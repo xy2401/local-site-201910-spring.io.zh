@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Using Google Protocol Buffers with Spring MVC-based REST Services</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Using Google Protocol Buffers with Spring MVC-based REST Services" />
+<meta name="twitter:description" content="&lt;p&gt;This week I’m in São Paulo, Brazil presenting at QCon SP. I had an interesting discussion with someone who loves Spring’s REST stack, but wondered if there was something more efficient than plain-ol’ JSON. Indeed, there is! I often get asked about Spring’s support for high-speed binary based encoding of messages. Spring’s long supported RPC encoding with the likes of Hessian, Burlap, etc., and Spring Framework 4.1 introduced support for &lt;a href=&quot;https://developers.google.com/protocol-buffers/&quot;&gt;Google Protocol Buffers&lt;/a&gt; which can be used with REST services as well. &lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Using Google Protocol Buffers with Spring MVC-based REST Services" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;This week I’m in São Paulo, Brazil presenting at QCon SP. I had an interesting discussion with someone who loves Spring’s REST stack, but wondered if there was something more efficient than plain-ol’ JSON. Indeed, there is! I often get asked about Spring’s support for high-speed binary based encoding of messages. Spring’s long supported RPC encoding with the likes of Hessian, Burlap, etc., and Spring Framework 4.1 introduced support for &lt;a href=&quot;https://developers.google.com/protocol-buffers/&quot;&gt;Google Protocol Buffers&lt;/a&gt; which can be used with REST services as well. &lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-03-22 17:10:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Using Google Protocol Buffers with Spring MVC-based REST Services</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-03-22 17:10:00.0">March 22, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2031" href="/blog/2015/03/22/using-google-protocol-buffers-with-spring-mvc-based-rest-services#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>This week I&rsquo;m in São Paulo, Brazil presenting at QCon SP. I had an interesting discussion with someone who loves Spring&rsquo;s REST stack, but wondered if there was something more efficient than plain-ol&rsquo; JSON. Indeed, there is! I often get asked about Spring&rsquo;s support for high-speed binary based encoding of messages. Spring&rsquo;s long supported RPC encoding with the likes of Hessian, Burlap, etc., and Spring Framework 4.1 introduced support for <a href="https://developers.google.com/protocol-buffers/">Google Protocol Buffers</a> which can be used with REST services as well. </p><p>From the Google Protocol Buffer website:</p>
+<blockquote><p>Protocol buffers are Google&rsquo;s language-neutral, platform-neutral, extensible mechanism for serializing structured data – think XML, but smaller, faster, and simpler. You define how you want your data to be structured once, then you can use special generated source code to easily write and read your structured data to and from a variety of data streams and using a variety of languages&hellip;</p>
+</blockquote><p>Google uses Protocol Buffers extensively in their own, internal, service-centric architecture.</p><p>A <code>.proto</code> document describes the types (_messages_) to be encoded and contains a definition language that should be familiar to anyone who&rsquo;s used C <code>struct</code>s. In the document, you define types, fields in those types, and their ordering (memory offsets!) in the type relative to each other.</p><p>The <code>.proto</code> files aren&rsquo;t implementations - they&rsquo;re declarative descriptions of messages that may be conveyed over the wire. They can prescribe and validate constraints - the type of a given field, or the cardinatlity of that field - on the messages that are encoded and decoded. You must use the Protobuf compiler to generate the appropriate client for your language of choice.</p><p>You can use Google Protocol Buffers anyway you like, but in this post we&rsquo;ll look at using it as a way to encode REST service payloads. This approach is powerful: you can use content-negotiation to serve high speed Protocol Buffer payloads to the clients (in any number of languages) that accept it, and something more conventional like JSON for those that don&rsquo;t.</p><p>Protocol Buffer messages offer a number of improvements over typical JSON-encoded messages, particularly in a polyglot system where microservices are implemented in various technologies but need to be able to reason about communication between services in a consistant, long-term manner. </p><p>Protocol Buffers are several nice features that promote stable APIs:</p>
+<ul>
+<li>Protocol Buffers offer backward compatibility for free. Each field is numbered in a Protocol Buffer, so you don&rsquo;t have to change the behavior of the code going forward to maintain backward compatability with older clients. Clients that don&rsquo;t know about new fields won&rsquo;t bother trying to parse them.</li>
+<li>Protocol Buffers provide a natural place to specify validation using the <code>required</code>, <code>optional</code>, and <code>repeated</code> keywords. Each client enforces these constraints in their own way.</li>
+<li>Protocol Buffers are polyglot, and <a href="https://developers.google.com/protocol-buffers/docs/reference/other">work with all manner of technologies</a>. In the example code for this blog alone there is a Ruby, Python and Java client for the Java service demonstrated. It&rsquo;s just a matter of using one of the <em>numerous</em> supported compilers.</li>
+</ul><p>You might think that you could just use Java&rsquo;s inbuilt serialization mechanism in a homogeneous service environment but, as the Protocol Buffers team were quick to point out whent hey first introduced the technology, there are some problems even with that. Java language luminary Josh Bloch&rsquo;s epic tome, <em>Effective Java</em>, on page 213, provides further details.</p><p>Let&rsquo;s first look at our <code>.proto</code> document:</p>
+<pre><code class="prettyprint json">package demo;
+
+option java_package = &quot;demo&quot;;
+option java_outer_classname = &quot;CustomerProtos&quot;;
+
+message Customer {
+    required int32 id = 1;
+    required string firstName = 2;
+    required string lastName = 3;
+
+    enum EmailType {
+        PRIVATE = 1;
+        PROFESSIONAL = 2;
+    }
+
+    message EmailAddress {
+        required string email = 1;
+        optional EmailType type = 2 [default = PROFESSIONAL];
+    }
+
+    repeated EmailAddress email = 5;
+}
+
+message Organization {
+    required string name = 1;
+    repeated Customer customer = 2;
+}
+</code></pre><p>You then pass this definition to the <code>protoc</code> compiler and specify the output type, like this:</p>
+<pre><code class="prettyprint sh">protoc -I=$IN_DIR --java_out=$OUT_DIR $IN_DIR/customer.proto
+</code></pre><p>Here&rsquo;s the little Bash script I put together to code-generate my various clients:</p>
+<pre><code class="prettyprint sh">#!/usr/bin/env bash
+
+
+SRC_DIR=`pwd`
+DST_DIR=`pwd`/../src/main/
+
+echo source:            $SRC_DIR
+echo destination root:  $DST_DIR
+
+function ensure_implementations(){
+
+    # Ruby and Go aren&#39;t natively supported it seems
+    # Java and Python are
+
+    gem list | grep ruby-protocol-buffers || sudo gem install ruby-protocol-buffers
+    go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+}
+
+function gen(){
+    D=$1
+    echo $D
+    OUT=$DST_DIR/$D
+    mkdir -p $OUT
+    protoc -I=$SRC_DIR --${D}_out=$OUT $SRC_DIR/customer.proto
+}
+
+ensure_implementations
+
+gen java
+gen python
+gen ruby
+</code></pre><p>This will generate the appropriate client classes in the <code>src/main/{java,ruby,python}</code> folders. Let&rsquo;s first look at the Spring MVC REST service itself.</p><h2><a href="#a-spring-mvc-rest-service" class="anchor" name="a-spring-mvc-rest-service"></a>A Spring MVC REST Service</h2><p>In our example, we&rsquo;ll register an instance of Spring framework 4.1&rsquo;s <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/http/converter/protobuf/ProtobufHttpMessageConverter.html"><code>org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter</code></a>. This type is an <code>HttpMessageConverter</code>. <code>HttpMessageConverter</code>s encode and decode the requests and responses in REST service calls. They&rsquo;re usually activated after some sort of content negotiation has occurred: if the client specifies <code>Accept: application/x-protobuf</code>, for example, then our REST service will send back the Protocol Buffer-encoded response.</p>
+<pre><code class="prettyprint java">package demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+@SpringBootApplication
+public class DemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+    @Bean
+    ProtobufHttpMessageConverter protobufHttpMessageConverter() {
+        return new ProtobufHttpMessageConverter();
+    }
+
+    private CustomerProtos.Customer customer(int id, String f, String l, Collection&lt;String&gt; emails) {
+        Collection&lt;CustomerProtos.Customer.EmailAddress&gt; emailAddresses =
+                emails.stream().map(e -&gt; CustomerProtos.Customer.EmailAddress.newBuilder()
+                        .setType(CustomerProtos.Customer.EmailType.PROFESSIONAL)
+                        .setEmail(e).build())
+                        .collect(Collectors.toList());
+
+        return CustomerProtos.Customer.newBuilder()
+                .setFirstName(f)
+                .setLastName(l)
+                .setId(id)
+                .addAllEmail(emailAddresses)
+                .build();
+    }
+
+    @Bean
+    CustomerRepository customerRepository() {
+        Map&lt;Integer, CustomerProtos.Customer&gt; customers = new ConcurrentHashMap&lt;&gt;();
+        // populate with some dummy data
+        Arrays.asList(
+                customer(1, &quot;Chris&quot;, &quot;Richardson&quot;, Arrays.asList(&quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bad9c8d3d9d2dbc8dec9d5d4fadfd7dbd3d694d9d5d7">[email&#160;protected]</a>&quot;)),
+                customer(2, &quot;Josh&quot;, &quot;Long&quot;, Arrays.asList(&quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a6cccac9c8c1e6c3cbc7cfca88c5c9cb">[email&#160;protected]</a>&quot;)),
+                customer(3, &quot;Matt&quot;, &quot;Stine&quot;, Arrays.asList(&quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="600d1314090e0520050d01090c4e030f0d">[email&#160;protected]</a>&quot;)),
+                customer(4, &quot;Russ&quot;, &quot;Miles&quot;, Arrays.asList(&quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9fedf2f6f3faecdffaf2fef6f3b1fcf0f2">[email&#160;protected]</a>&quot;))
+        ).forEach(c -&gt; customers.put(c.getId(), c));
+
+        // our lambda just gets forwarded to Map#get(Integer)
+        return customers::get;
+    }
+
+}
+
+interface CustomerRepository {
+    CustomerProtos.Customer findById(int id);
+}
+
+
+@RestController
+class CustomerRestController {
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @RequestMapping(&quot;/customers/{id}&quot;)
+    CustomerProtos.Customer customer(@PathVariable Integer id) {
+        return this.customerRepository.findById(id);
+    }
+}
+</code></pre><p>Most of this code is pretty straightforward. It&rsquo;s a Spring Boot application. Spring Boot automatically registers <code>HttpMessageConverter</code> beans so we need only define the <code>ProtobufHttpMessageConverter</code> bean and it gets configured appropriately. The <code>@Configuration</code> class seeds some dummy date and a mock <code>CustomerRepository</code> object. I won&rsquo;t reproduce the Java type for our Protocol Buffer, <code>demo/CustomerProtos.java</code>, here as it is code-generated bit twiddling and parsing code; not all that interesting to read. One convenience is that the Java implementation automatically provides <em>builder</em> methods for quickly creating instances of these types in Java.</p><p>The code-generated types are dumb <code>struct</code> like objects. They&rsquo;re suitable for use as DTOs, but should not be used as the basis for your API. Do <em>not</em> extend them using Java inheritance to introduce new functionality; it&rsquo;ll break the implementation and it&rsquo;s bad OOP practice, anyway. If you want to keep things cleaner, simply wrapt and adapt them as appropriate, perhaps handling conversion from an ORM entity to the Protocol Buffer client type as appropriate in that wrapper.</p><p><code>HttpMessageConverter</code>s may also be used with Spring&rsquo;s REST client, the <code>RestTemplate</code>. Here&rsquo;s the appropriate Java-language unit test:</p>
+<pre><code class="prettyprint java">package demo;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.IntegrationTest;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = DemoApplication.class)
+@WebAppConfiguration
+@IntegrationTest
+public class DemoApplicationTests {
+
+    @Configuration
+    public static class RestClientConfiguration {
+
+        @Bean
+        RestTemplate restTemplate(ProtobufHttpMessageConverter hmc) {
+            return new RestTemplate(Arrays.asList(hmc));
+        }
+
+        @Bean
+        ProtobufHttpMessageConverter protobufHttpMessageConverter() {
+            return new ProtobufHttpMessageConverter();
+        }
+    }
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    private int port = 8080;
+
+    @Test
+    public void contextLoaded() {
+
+        ResponseEntity&lt;CustomerProtos.Customer&gt; customer = restTemplate.getForEntity(
+                &quot;http://127.0.0.1:&quot; + port + &quot;/customers/2&quot;, CustomerProtos.Customer.class);
+
+        System.out.println(&quot;customer retrieved: &quot; + customer.toString());
+
+    }
+
+}
+</code></pre><p>Things just work as you&rsquo;d expect, not only in Java and Spring, but also in Ruby and Python. For completeness, here is a simple client using Ruby (client types omitted):</p>
+<pre><code class="prettyprint ruby">#!/usr/bin/env ruby
+
+require &#39;./customer.pb&#39;
+require &#39;net/http&#39;
+require &#39;uri&#39;
+
+uri = URI.parse(&#39;http://localhost:8080/customers/3&#39;)
+body = Net::HTTP.get(uri)
+puts Demo::Customer.parse(body)
+</code></pre><p>..and here&rsquo;s a client in Python (client types omitted):</p>
+<pre><code class="prettyprint python"><br />#!/usr/bin/env python
+
+import urllib
+import customer_pb2
+
+if __name__ == &#39;__main__&#39;:
+    customer = customer_pb2.Customer()
+    customers_read = urllib.urlopen(&#39;http://localhost:8080/customers/1&#39;).read()
+    customer.ParseFromString(customers_read)
+    print customer
+
+</code></pre><h2><a href="#where-to-go-from-here" class="anchor" name="where-to-go-from-here"></a>Where to go from Here</h2><p>If you want <em>very</em> high speed message encoding that works with multiple languages, Protocol Buffers are a compelling option. There are other encoding technologies like <a href="https://avro.apache.org/">Avro</a> or <a href="https://thrift.apache.org/">Thrift</a>, but none nearly so mature and entrenched as Protocol Buffers. You don&rsquo;t necessarily need to use Protocol Buffers with REST, either. You could plug it into some sort of RPC service, if that&rsquo;s your style. There are almost as many client implementations as there are buildpacks for Cloud Foundry - so you could run almost anything on Cloud Foundry and enjoy the same high speed, consistent messaging across all your services!</p><p>The <a href="https://github.com/joshlong/spring-and-google-protocol-buffers">code for this example is available online</a>, as well, so don&rsquo;t hesitate to check it out! </p><h2><a href="#also" class="anchor" name="also"></a>Also..</h2><p>Hi gang, in 2015, I&rsquo;ve been trying to do a random tech-tip style post every week based on things that I see garnering interest in the community, either here or on <a href="https://pivotal.io/blog">the Pivotal blog</a>. I use these weekly-_ish_ (OK! OK! - it&rsquo;s not been easy doing them as regularly as <em>This Week in Spring</em>, but so far I haven&rsquo;t missed a week! :-) ) posts as a chance to focus not on a specific new release, per se, but on the application of Spring in service to some community use case that might be cross-cutting or just might benefit from having a spotlight shined on it. So far we&rsquo;ve looked at all manner of things - Vaadin, Activiti, 12-Factor App Style Configuration, Smarter Service to Service Invocations, Couchbase, and much more, etc. - and we&rsquo;ve got some interesting stuff lined up, too. I wondered what else you want to see talked about, however. If you&rsquo;ve got some ideas about what you&rsquo;d like to see covered, or a community post of your own to contribute, reach out <a href="https://twitter.com/starbuxman">to me on Twitter (@starbuxman)</a> or via email (jlong [at] pivotal [dot] io). I remain, as always, at your service.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2031;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

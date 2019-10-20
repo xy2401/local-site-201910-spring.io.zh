@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring 3.1 M2: Testing with @Configuration Classes and Profiles</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring 3.1 M2: Testing with @Configuration Classes and Profiles" />
+<meta name="twitter:description" content="&lt;p&gt;As Jürgen Höller mentioned in his post announcing the &lt;a href=&quot;http://bit.ly/jPg8az&quot; target=&quot;_blank&quot; title=&quot;Spring Framework 3.1 M2 released&quot;&gt;release of Spring 3.1 M2&lt;/a&gt;, the &lt;a href=&quot;http://bit.ly/m3UHhv&quot; target=&quot;_blank&quot; title=&quot;Spring TestContext Framework&quot;&gt;Spring TestContext Framework&lt;/a&gt;(*) has been overhauled to provide first-class testing support for &lt;code&gt;@Configuration&lt;/code&gt; classes and environment profiles.&lt;/p&gt;
+&lt;p&gt;In this post I’ll first walk you through some examples that demonstrate these new testing features. I’ll then cover some of the new extension points in the TestContext framework that make these new features possible.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Please note: this is a cross post from my company blog &lt;a href=&quot;http://bit.ly/ixacQb&quot; target=&quot;_blank&quot; title=&quot;Swiftmind&quot;&gt;www.swiftmind.com&lt;/a&gt;.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@sam_brannen" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/64310de9c07f30458f9baae33d91ccdc?s=200" />
+
+<meta property="og:title" content="Spring 3.1 M2: Testing with @Configuration Classes and Profiles" />
+<meta property="og:image" content="https://gravatar.com/avatar/64310de9c07f30458f9baae33d91ccdc?s=200" />
+<meta property="og:description" content="&lt;p&gt;As Jürgen Höller mentioned in his post announcing the &lt;a href=&quot;http://bit.ly/jPg8az&quot; target=&quot;_blank&quot; title=&quot;Spring Framework 3.1 M2 released&quot;&gt;release of Spring 3.1 M2&lt;/a&gt;, the &lt;a href=&quot;http://bit.ly/m3UHhv&quot; target=&quot;_blank&quot; title=&quot;Spring TestContext Framework&quot;&gt;Spring TestContext Framework&lt;/a&gt;(*) has been overhauled to provide first-class testing support for &lt;code&gt;@Configuration&lt;/code&gt; classes and environment profiles.&lt;/p&gt;
+&lt;p&gt;In this post I’ll first walk you through some examples that demonstrate these new testing features. I’ll then cover some of the new extension points in the TestContext framework that make these new features possible.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Please note: this is a cross post from my company blog &lt;a href=&quot;http://bit.ly/ixacQb&quot; target=&quot;_blank&quot; title=&quot;Swiftmind&quot;&gt;www.swiftmind.com&lt;/a&gt;.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-06-21 23:07:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring 3.1 M2: Testing with @Configuration Classes and Profiles</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/64310de9c07f30458f9baae33d91ccdc?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/sbrannen">Sam Brannen</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-06-21 23:07:00.0">June 21, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="423" href="/blog/2011/06/21/spring-3-1-m2-testing-with-configuration-classes-and-profiles#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>As Jürgen Höller mentioned in his post announcing the <a href="https://bit.ly/jPg8az" target="_blank" title="Spring Framework 3.1 M2 released">release of Spring 3.1 M2</a>, the <a href="https://bit.ly/m3UHhv" target="_blank" title="Spring TestContext Framework">Spring TestContext Framework</a>(*) has been overhauled to provide first-class testing support for <code>@Configuration</code> classes and environment profiles.</p><p>In this post I&rsquo;ll first walk you through some examples that demonstrate these new testing features. I&rsquo;ll then cover some of the new extension points in the TestContext framework that make these new features possible.</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Please note: this is a cross post from my company blog <a href="https://bit.ly/ixacQb" target="_blank" title="Swiftmind">www.swiftmind.com</a>.</p>
+<h2>Background</h2><p>In Spring 2.5 we introduced the <em>Spring TestContext Framework</em> which provides annotation-driven integration testing support that can be used with JUnit or TestNG. The examples in this blog will focus on JUnit-based tests, but all features used here apply to TestNG as well.</p><p>At its core, the TestContext framework allows you to annotate test classes with <code>@ContextConfiguration</code> to specify which configuration files to use to load the <code>ApplicationContext</code> for your test. By default the <code>ApplicationContext</code> is loaded using the <code>GenericXmlContextLoader</code> which loads a context from XML Spring configuration files. You can then access beans from the <code>ApplicationContext</code> by annotating fields in your test class with <code>@Autowired</code>, <code>@Resource</code>, or <code>@Inject</code>.</p><p>Spring 3.0 introduced support for Java-based configuration via <code>@Configuration</code> classes, but the TestContext framework did not supply an appropriate <code>ContextLoader</code> to support <code>@Configuration</code> classes in tests until now. Spring 3.1 M2 introduces a new <code>AnnotationConfigContextLoader</code> for this purpose, and the <code>@ContextConfiguration</code> annotation has been updated to support declaration of <code>@Configuration</code> classes via a new <code>classes</code> attribute.</p><p>Let&rsquo;s take a look at some examples now.</p>
+<h2>Integration Testing with XML-based Configuration</h2><p>The <a href="https://bit.ly/m3UHhv" target="_blank">Testing</a> chapter of the Spring Reference Manual provides numerous examples of how to configure integration tests using XML configuration files, but we&rsquo;ll include an example here as a quick introduction.</p><p><em>If you&rsquo;re already familiar with the Spring TestContext Framework, feel free to skip to the next section.</em></p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans ...&gt;
+
+    &lt;!-- this bean will be injected into the OrderServiceTest class --&gt;
+    &lt;bean id=&quot;orderService&quot; class=&quot;com.example.OrderServiceImpl&quot;&gt;
+        &lt;!-- set properties, etc. --&gt;
+    &lt;/bean&gt;
+    
+    &lt;!-- other beans --&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<pre><code class="prettyprint java"><br />package com.example;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+// ApplicationContext will be loaded from &quot;classpath:/com/example/OrderServiceTest-context.xml&quot;
+@ContextConfiguration
+public class OrderServiceTest {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Test
+    public void testOrderService() {
+        // test the orderService
+    }
+}
+</code></pre><p>In the preceding example we configure JUnit to use the <code>SpringJUnit4ClassRunner</code> to run our tests. We do this using JUnit&rsquo;s <code>@RunWith</code> annotation. We also annotate our test class with Spring&rsquo;s <code>@ContextConfiguration</code> annotation without specifying any attributes. In this case the default <code>GenericXmlContextLoader</code> will be used, and following the principle of <em>convention over configuration</em> Spring will load our <code>ApplicationContext</code> from <code>classpath:/com/example/OrderServiceTest-context.xml</code>. Within the <code>testOrderService()</code> method we can directly test the <code>OrderService</code> that was injected into our test instance using <code>@Autowired</code>. Note that the <code>orderService</code> is defined as a bean in <code>OrderServiceTest-context.xml</code>.</p>
+<h2>Integration Testing with @Configuration Classes</h2><p>Spring 3.1 M2&rsquo;s support for integration testing with <code>@Configuration</code> classes is analogous to the XML-based example above. So let&rsquo;s rework that example to use a <code>@Configuration</code> class and the new <code>AnnotationConfigContextLoader</code>.</p>
+<pre><code class="prettyprint java"><br />package com.example;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+// ApplicationContext will be loaded from the static inner ContextConfiguration class
+@ContextConfiguration(loader=AnnotationConfigContextLoader.class)
+public class OrderServiceTest {
+
+    @Configuration
+    static class ContextConfiguration {
+
+        // this bean will be injected into the OrderServiceTest class
+        @Bean
+        public OrderService orderService() {
+            OrderService orderService = new OrderServiceImpl();
+            // set properties, etc.
+            return orderService;
+        }
+    }
+
+    @Autowired
+    private OrderService orderService;
+
+    @Test
+    public void testOrderService() {
+        // test the orderService
+    }
+}
+</code></pre><p>There are a few notable differences between this example and the XML-based one:</p>
+<ol>
+<li>There is no XML file.</li>
+<li>The bean definitions have been converted from XML to Java using <code>@Configuration</code> and <code>@Bean</code> in the static inner <code>ContextConfiguration</code> class.</li>
+<li>The <code>AnnotationConfigContextLoader</code> has been specified via the <code>loader</code> attribute of <code>@ContextConfiguration</code>.</li>
+</ol><p>Otherwise, the configuration and implementation of the test remain unchanged.</p><p>So, how does Spring know to use the static inner <code>ContextConfiguration</code> class to load the <code>ApplicationContext</code>? The answer is <em>convention over configuration</em>. By default, if no classes are explicitly declared, <code>AnnotationConfigContextLoader</code> will look for a static inner class of the test class named <code>ContextConfiguration</code>. Per the requirements of <code>@Configuration</code> classes, this static inner class must be non-final and non-private.</p><p><em>Note: as of Spring 3.1 M2, the default configuration class must be named exactly <code>ContextConfiguration</code>. As of Spring 3.1 RC1, however, the naming restriction has been lifted. In other words, from RC1 forward, you can choose to name your default configuration class whatever you want, but the other requirements still apply.</em></p><p>In the following example we&rsquo;ll see how to declare explicit configuration classes.</p>
+<pre><code class="prettyprint java"><br />package com.example;
+
+@Configuration
+public class OrderServiceConfig {
+
+    // this bean will be injected into the OrderServiceTest class
+    @Bean
+    public OrderService orderService() {
+        OrderService orderService = new OrderServiceImpl();
+        // set properties, etc.
+        return orderService;
+    }
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package com.example;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+// ApplicationContext will be loaded from the OrderServiceConfig class
+@ContextConfiguration(classes=OrderServiceConfig.class, loader=AnnotationConfigContextLoader.class)
+public class OrderServiceTest {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Test
+    public void testOrderService() {
+        // test the orderService
+    }
+}
+</code></pre><p>We have now extracted the static inner <code>ContextConfiguration</code> class into a top-level class named <code>OrderServiceConfig</code>. To instruct the <code>AnnotationConfigContextLoader</code> to use this configuration class instead of relying on the default, we simply declare <code>OrderServiceConfig.class</code> via the new <code>classes</code> attribute of <code>@ContextConfiguration</code>. As with <code>@ContextConfiguration</code>&rsquo;s <code>locations</code> attribute for resource locations, we can declare multiple configuration classes by supplying a Class[] array to the <code>classes</code> attribute &mdash; for example: <code>@ContextConfiguration(classes={Config1.class, Config2.class}, &hellip; )</code>.</p><p>This ends the coverage of integration testing with <code>@Configuration</code> classes. Now let&rsquo;s take a look at Spring&rsquo;s testing support for environment profiles.</p>
+<h2>Integration Testing with Environment Profiles</h2><p>As Chris Beams discussed in his release announcement for <a href="https://bit.ly/g8Eiv6" target="_blank" title="Spring Framework 3.1 M1 released">Spring 3.1 M1</a> and his follow-up blog <a href="https://bit.ly/mbOdHa" target="_blank" title="Spring 3.1 M1: Introducing @Profile">Introducing @Profile</a>, Spring 3.1 introduces first-class support in the framework for the notion of environments and profiles (a.k.a., <em>bean definition profiles</em>). As of Spring 3.1 M2, integration tests can also be configured to activate particular bean definition profiles for various testing scenarios. This is achieved by annotating a test class with the new <code>@ActiveProfiles</code> annotation and supplying a list of profiles that should be activated when loading the <code>ApplicationContext</code> for the test.</p><p><em>Note: <code>@ActiveProfiles</code> may be used with any implementation of the new <code>SmartContextLoader</code> SPI (see later discussion), but <code>@ActiveProfiles</code> is <strong>not</strong> supported with implementations of the simpler <code>ContextLoader</code> SPI.</em></p><p>Let&rsquo;s take a look at some examples with XML configuration and <code>@Configuration</code> classes.</p>
+<pre><code class="prettyprint xml"><br />&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;
+	xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;
+	xsi:schemaLocation=&quot;...&quot;&gt;
+
+	&lt;bean id=&quot;transferService&quot; class=&quot;com.bank.service.internal.DefaultTransferService&quot;&gt;
+		&lt;constructor-arg ref=&quot;accountRepository&quot;/&gt;
+		&lt;constructor-arg ref=&quot;feePolicy&quot;/&gt;
+	&lt;/bean&gt;
+
+	&lt;bean id=&quot;accountRepository&quot; class=&quot;com.bank.repository.internal.JdbcAccountRepository&quot;&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
+
+	&lt;bean id=&quot;feePolicy&quot; class=&quot;com.bank.service.internal.ZeroFeePolicy&quot;/&gt;
+
+	&lt;beans profile=&quot;dev&quot;&gt;
+		&lt;jdbc:embedded-database id=&quot;dataSource&quot;&gt;
+			&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/schema.sql&quot;/&gt;
+			&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/test-data.sql&quot;/&gt;
+		&lt;/jdbc:embedded-database&gt;
+	&lt;/beans&gt;
+
+	&lt;beans profile=&quot;production&quot;&gt;
+		&lt;jee:jndi-lookup id=&quot;dataSource&quot; jndi-name=&quot;java:comp/env/jdbc/datasource&quot;/&gt;
+	&lt;/beans&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<pre><code class="prettyprint java"><br />package com.bank.service;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+// ApplicationContext will be loaded from &quot;classpath:/app-config.xml&quot;
+@ContextConfiguration(&quot;/app-config.xml&quot;)
+@ActiveProfiles(&quot;dev&quot;)
+public class TransferServiceTest {
+
+    @Autowired
+    private TransferService transferService;
+
+    @Test
+    public void testTransferService() {
+        // test the transferService
+    }
+}
+</code></pre><p>When <code>TransferServiceTest</code> is run, its <code>ApplicationContext</code> will be loaded from the <code>app-config.xml</code> configuration file in the root of the classpath. If you inspect <code>app-config.xml</code> you&rsquo;ll notice that the <code>accountRepository</code> bean has a dependency on a <code>dataSource</code> bean; however, <code>dataSource</code> is not defined as a top-level bean. Instead, <code>dataSource</code> is defined twice: once in the <em>production</em> profile and once in the <em>dev</em> profile.</p><p>By annotating <code>TransferServiceTest</code> with <code>@ActiveProfiles(&ldquo;dev&rdquo;)</code> we instruct the Spring TestContext Framework to load the <code>ApplicationContext</code> with the active profiles set to {&ldquo;dev&rdquo;}. As a result, an embedded database will be created, and the <code>accountRepository</code> bean will be wired with a reference to the development DataSource. And that&rsquo;s likely what we want in an integration test!</p><p>The following code listings demonstrate how to implement the same configuration and integration test but using <code>@Configuration</code> classes instead of XML.</p>
+<pre><code class="prettyprint java"><br />@Configuration
+@Profile(&quot;dev&quot;)
+public class StandaloneDataConfig {
+
+	@Bean
+	public DataSource dataSource() {
+		return new EmbeddedDatabaseBuilder()
+			.setType(EmbeddedDatabaseType.HSQL)
+			.addScript(&quot;classpath:com/bank/config/sql/schema.sql&quot;)
+			.addScript(&quot;classpath:com/bank/config/sql/test-data.sql&quot;)
+			.build();
+	}
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />@Configuration
+@Profile(&quot;production&quot;)
+public class JndiDataConfig {
+
+	@Bean
+	public DataSource dataSource() throws Exception {
+		Context ctx = new InitialContext();
+		return (DataSource) ctx.lookup(&quot;java:comp/env/jdbc/datasource&quot;);
+	}
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />@Configuration
+public class TransferServiceConfig {
+
+	@Autowired DataSource dataSource;
+
+	@Bean
+	public TransferService transferService() {
+		return new DefaultTransferService(accountRepository(), feePolicy());
+	}
+
+	@Bean
+	public AccountRepository accountRepository() {
+		return new JdbcAccountRepository(dataSource);
+	}
+
+	@Bean
+	public FeePolicy feePolicy() {
+		return new ZeroFeePolicy();
+	}
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package com.bank.service;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader=AnnotationConfigContextLoader.class,
+    classes={TransferServiceConfig.class, StandaloneDataConfig.class, JndiDataConfig.class})
+@ActiveProfiles(&quot;dev&quot;)
+public class TransferServiceTest {
+
+    @Autowired
+    private TransferService transferService;
+
+    @Test
+    public void testTransferService() {
+        // test the transferService
+    }
+}
+</code></pre><p>In this variation, we have split the XML configuration into three independent <code>@Configuration</code> classes:</p>
+<ul>
+<li><code>TransferServiceConfig</code>: acquires a <code>dataSource</code> via dependency injection using <code>@Autowired</code></li>
+<li><code>StandaloneDataConfig</code>: defines a <code>dataSource</code> for an embedded database suitable for developer tests</li>
+<li><code>JndiDataConfig</code>: defines a <code>dataSource</code> that is retrieved from JNDI in a production environment</li>
+</ul><p>As with the XML-based configuration example, we still annotate <code>TransferServiceTest</code> with <code>@ActiveProfiles(&ldquo;dev&rdquo;)</code>, but this time we specify the <code>AnnotationConfigContextLoader</code> and all three configuration classes via the <code>@ContextConfiguration</code> annotation. The body of the test class itself remains completely unchanged.</p><p>For details on how to simplify the above <code>@Configuration</code> classes consult the <a href="https://bit.ly/mbOdHa" target="_blank" title="Spring 3.1 M1: Introducing @Profile">Spring 3.1 M1: Introducing @Profile</a> blog post.</p>
+<h2>ApplicationContext Caching</h2><p>Since Spring 2.5 the <em>Spring TestContext Framework</em> has <a href="https://bit.ly/jzG3Ie" target="_blank" title="Context management and caching">cached <code>ApplicationContexts</code> for integration tests</a> based on a key that was generated from all merged context resource locations for a given test. Since the <code>ContextLoader</code> SPI only supported locations, this key generation algorithm was sufficient for uniquely identifying the configuration used to load an <code>ApplicationContext</code>. With the added support for configuration classes and profiles, however, the old algorithm is no longer adequate.</p><p>As a result, the context cache key generation algorithm has been updated in Spring 3.1 M2 to include the all of the following:</p>
+<ul>
+<li>locations <em>(from <code>@ContextConfiguration</code>)</em></li>
+<li>classes <em>(from <code>@ContextConfiguration</code>)</em></li>
+<li>contextLoader <em>(from <code>@ContextConfiguration</code>)</em></li>
+<li>activeProfiles <em>(from <code>@ActiveProfiles</code>)</em></li>
+</ul><p>What this means for you as a developer is that you can implement a base test class that declares a certain set of resource locations or configuration classes. Then, if you want to run tests against that base configuration but with different active profiles, you can extend that base test class and annotate each concrete subclass with <code>@ActiveProfiles</code>, supplying a different set of profiles to activate per subclass. Each of these subclasses would therefore define a unique set of configuration attributes that would result in different <code>ApplicationContexts</code> being loaded and cached.</p>
+<h2>SmartContextLoader Supersedes ContextLoader SPI</h2><p>As hinted at earlier in this post, Spring 3.1 M2 introduces a new <code>SmartContextLoader</code> SPI that supersedes the existing <code>ContextLoader</code> SPI. If you plan to develop or already have developed your own custom <code>ContextLoader</code>, you will likely want to take a closer look at the new <a href="https://bit.ly/m4Yg73" target="_blank" title="SmartContextLoader.java in FishEye"><code>SmartContextLoader</code></a> interface. In contrast to the old <code>ContextLoader</code> interface, a <code>SmartContextLoader</code> can process both resource locations and configuration classes. Furthermore, a <code>SmartContextLoader</code> can set active bean definition profiles in the context that it loads.</p><p><code>ContextLoader</code> will continue to be supported, and any existing implementations of that SPI should continue to work <em>as is</em>; however, if you want to support configuration classes or environment profiles in your custom loader, you will need to implement <code>SmartContextLoader</code>.</p>
+<h2>DelegatingSmartContextLoader</h2><p>If you have been paying close attention to the examples presented thus far, you may have noticed that we always had to explicitly declare <code>AnnotationConfigContextLoader.class</code> for <code>@ContextConfiguration</code>&rsquo;s <code>loader</code> attribute when using configuration classes. But when we specified XML configuration files (or relied on convention over configuration), the <code>GenericXmlContextLoader</code> was used by default.</p><p><em>Wouldn&rsquo;t it be nice if Spring could just notice whether we are using configuration classes or XML resource locations and then automatically pick the right <code>ContextLoader</code> to load our application context?</em></p><p>Yeah, we think so, too! ;)</p><p>So for Spring 3.1 RC1 we plan to introduce a <code>DelegatingSmartContextLoader</code> that will delegate to a list of candidate <code>SmartContextLoaders</code> (i.e., <code>GenericXmlContextLoader</code> and <code>AnnotationConfigContextLoader</code>) to determine which context loader is appropriate for a given test class&rsquo;s configuration. The winning candidate will then be used to actually load the context.</p><p>Once this work is complete, <code>DelegatingSmartContextLoader</code> will replace <code>GenericXmlContextLoader</code> as the default loader. Feel free to follow the progress of this development in JIRA: <a href="https://bit.ly/l5eKWS" target="_blank" title="SPR-8387: Introduce a DelegatingSmartContextLoader">SPR-8387</a>.</p>
+<h2>Summary</h2><p>Spring 3.1 provides first-class testing support for <code>@Configuration</code> classes and environment profiles, and we encourage you to try out these features as soon as you can. M2 is the last milestone in the 3.1 release train. So if you find any bugs or have any suggestions for improvements, now is the time to <a href="https://jira.springsource.org/browse/SPR" target="_blank" title="Spring JIRA issue tracker">take action</a>!</p>
+<hr /><p><em>(*) The reference manual has not yet been updated to reflect testing support for <code>@Configuration</code> classes and environment profiles, but these features will certainly be well documented by Spring 3.1 RC1 or GA. In the meantime, the JavaDoc for each of the new classes and annotations can serve as a good starting point.</em></p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 423;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Flight of the Flux 2 - Debugging Caveats</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Flight of the Flux 2 - Debugging Caveats" />
+<meta name="twitter:description" content="&lt;p&gt;This blog post is the second in a series of posts that aim at providing a deeper look into &lt;a href=&quot;https://github.com/reactor/reactor-core&quot;&gt;Reactor&lt;/a&gt;’s more advanced concepts and inner workings.&lt;/p&gt;
+&lt;p&gt;It is derived from my &lt;code&gt;Flight of the Flux&lt;/code&gt; talk, which content I found to be more adapted to a blog post format.&lt;/p&gt;
+&lt;p&gt;I’ll update the table below with links when the other posts are published, but here is the planned content:&lt;/p&gt;
+&lt;ol&gt; 
+ &lt;li&gt;&lt;a href=&quot;https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription&quot;&gt;Assembly vs Subscription&lt;/a&gt;&lt;/li&gt; 
+ &lt;li&gt;Debugging caveats (this post)&lt;/li&gt; 
+ &lt;li&gt;Concurrent Agnostic&lt;/li&gt; 
+ &lt;li&gt;Schedulers and &lt;code&gt;publishOn&lt;/code&gt; vs &lt;code&gt;subscribeOn&lt;/code&gt;&lt;/li&gt; 
+ &lt;li&gt;Inner workings: work stealing&lt;/li&gt; 
+ &lt;li&gt;Inner workings: operator fusion&lt;/li&gt; 
+&lt;/ol&gt;
+" />
+<meta name="twitter:creator" content="@simonbasle" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=200" />
+
+<meta property="og:title" content="Flight of the Flux 2 - Debugging Caveats" />
+<meta property="og:image" content="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=200" />
+<meta property="og:description" content="&lt;p&gt;This blog post is the second in a series of posts that aim at providing a deeper look into &lt;a href=&quot;https://github.com/reactor/reactor-core&quot;&gt;Reactor&lt;/a&gt;’s more advanced concepts and inner workings.&lt;/p&gt;
+&lt;p&gt;It is derived from my &lt;code&gt;Flight of the Flux&lt;/code&gt; talk, which content I found to be more adapted to a blog post format.&lt;/p&gt;
+&lt;p&gt;I’ll update the table below with links when the other posts are published, but here is the planned content:&lt;/p&gt;
+&lt;ol&gt; 
+ &lt;li&gt;&lt;a href=&quot;https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription&quot;&gt;Assembly vs Subscription&lt;/a&gt;&lt;/li&gt; 
+ &lt;li&gt;Debugging caveats (this post)&lt;/li&gt; 
+ &lt;li&gt;Concurrent Agnostic&lt;/li&gt; 
+ &lt;li&gt;Schedulers and &lt;code&gt;publishOn&lt;/code&gt; vs &lt;code&gt;subscribeOn&lt;/code&gt;&lt;/li&gt; 
+ &lt;li&gt;Inner workings: work stealing&lt;/li&gt; 
+ &lt;li&gt;Inner workings: operator fusion&lt;/li&gt; 
+&lt;/ol&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-04-16 16:45:13.637" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Flight of the Flux 2 - Debugging Caveats</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/simonbasle">Simon Baslé</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-04-16 16:45:13.637">April 16, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3647" href="/blog/2019/04/16/flight-of-the-flux-2-debugging-caveats#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>This blog post is the second in a series of posts that aim at providing a deeper look into <a href="https://github.com/reactor/reactor-core">Reactor</a>&rsquo;s more advanced concepts and inner workings.</p>
+<p>It is derived from my <code>Flight of the Flux</code> talk, which content I found to be more adapted to a blog post format.</p>
+<p>I&rsquo;ll update the table below with links when the other posts are published, but here is the planned content:</p>
+<ol>
+<li><a href="https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription">Assembly vs Subscription</a></li>
+<li>Debugging caveats (this post)</li>
+<li>Concurrent Agnostic</li>
+<li>Schedulers and <code>publishOn</code> vs <code>subscribeOn</code></li>
+<li>Inner workings: work stealing</li>
+<li>Inner workings: operator fusion</li>
+</ol>
+<p>If you&rsquo;re missing an introduction to <em>Reactive Streams</em> and the basic concepts of Reactor, head out to the site&rsquo;s <a href="https://projectreactor.io/learn">learning section</a> and the <a href="https://projectreactor.io/docs/core/release/reference">reference guide</a>.</p>
+<p>Without further ado, let&rsquo;s jump in:</p><h2><a href="#debugging-in-a-reactive-world" class="anchor" name="debugging-in-a-reactive-world"></a>Debugging in a Reactive World</h2>
+<p>Switching from an imperative, blocking paradigm to a reactive, non-blocking one brings benefits but also comes with some caveats. One of these is the debugging experience. Why is that?</p>
+<p>Primarily because you&rsquo;ve learned to rely on the good old <em>stacktrace</em>, but suddenly this invaluable tool becomes far less valuable due to the <strong>asynchronous</strong> aspect of reactive programming. This is not specific to reactive programming though: as soon as you introduce asynchronous code, you create a boundary in the program between the code that <em>schedules</em> and the code that <em>asynchronously executes</em>.</p><h3><a href="#demonstrating-the-issue-with-vanilla-async-code" class="anchor" name="demonstrating-the-issue-with-vanilla-async-code"></a>Demonstrating the issue with vanilla async code</h3>
+<p>Let&rsquo;s take an example with an <code>ExecutorService</code> and a <code>Future</code> (no Reactor code here):</p>
+<pre><code class="prettyprint java">	private static void imperative() throws ExecutionException, InterruptedException {
+		final ScheduledExecutorService executor =
+				Executors.newSingleThreadScheduledExecutor();
+
+		int seconds = LocalTime.now().getSecond();
+		List&lt;Integer&gt; source;
+		if (seconds % 2 == 0) {
+			source = IntStream.range(1, 11).boxed().collect(Collectors.toList());
+		}
+		else if (seconds % 3 == 0) {
+			source = IntStream.range(0, 4).boxed().collect(Collectors.toList());
+		}
+		else {
+			source = Arrays.asList(1, 2, 3, 4);
+		}
+
+		executor.submit(() -&gt; source.get(5))  //line 76
+		        .get();
+	}
+</code></pre>
+<p>This example is a bit contrived, but let&rsquo;s imagine that we have these two out of three path in the code that can lead to the asynchronous task throwing an <code>IndexOutOfBoundsException</code>&hellip; How helpful would the stacktrace be?</p>
+<pre><code class="prettyprint">java.util.concurrent.ExecutionException: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 4
+	at java.base/java.util.concurrent.FutureTask.report(FutureTask.java:122)
+	at java.base/java.util.concurrent.FutureTask.get(FutureTask.java:191)
+	at Scratch.imperative(Scratch.java:77)
+	at Scratch.main(Scratch.java:50)
+Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 4
+	at java.base/java.util.Arrays$ArrayList.get(Arrays.java:4351)
+	at Scratch.lambda$imperative$0(Scratch.java:76)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+
+</code></pre>
+<p>We see that:</p>
+<ul>
+<li>the <code>Future</code>&rsquo;s <code>get()</code> method threw an <code>ExecutionException</code></li>
+<li>the cause is an <code>IndexOutOfBoundsException</code></li>
+<li>the code throwing is in the <code>submit(() -&gt; source.get(5))</code> <strong>lambda</strong> line 76</li>
+<li>it executed in a <code>FutureTask</code>, from something called a <code>ThreadPoolExecutor</code>, itself running in a <code>Thread</code>&hellip;</li>
+<li>we have two potential sources that could cause this but no idea which one is the culprit (which path was taken in the test prior to calling <code>submit()</code>).</li>
+</ul>
+<p>Not terribly useful :-(</p><h3><a href="#demonstrating-the-issue-in-reactor" class="anchor" name="demonstrating-the-issue-in-reactor"></a>Demonstrating the issue in Reactor</h3>
+<p>If we look for a Reactor equivalent to the above code, we can come up with this:</p>
+<pre><code class="prettyprint java">	private static void reactive() {
+		int seconds = LocalTime.now().getSecond();
+		Mono&lt;Integer&gt; source;
+		if (seconds % 2 == 0) {
+			source = Flux.range(1, 10)
+			             .elementAt(5);
+		}
+		else if (seconds % 3 == 0) {
+			source = Flux.range(0, 4)
+			             .elementAt(5);
+		}
+		else {
+			source = Flux.just(1, 2, 3, 4)
+			             .elementAt(5);
+		}
+
+		source.subscribeOn(Schedulers.parallel())
+		      .block(); //line 97
+	}
+</code></pre>
+<p>Which triggers the following stacktrace:</p>
+<pre><code class="prettyprint">java.lang.IndexOutOfBoundsException
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
+	at reactor.core.publisher.FluxArray$ArraySubscription.fastPath(FluxArray.java:176)
+	at reactor.core.publisher.FluxArray$ArraySubscription.request(FluxArray.java:96)
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.request(MonoElementAt.java:92)
+	at reactor.core.publisher.MonoSubscribeOn$SubscribeOnSubscriber.trySchedule(MonoSubscribeOn.java:186)
+	at reactor.core.publisher.MonoSubscribeOn$SubscribeOnSubscriber.onSubscribe(MonoSubscribeOn.java:131)
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onSubscribe(MonoElementAt.java:107)
+	at reactor.core.publisher.FluxArray.subscribe(FluxArray.java:53)
+	at reactor.core.publisher.FluxArray.subscribe(FluxArray.java:59)
+	at reactor.core.publisher.MonoElementAt.subscribe(MonoElementAt.java:59)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:3711)
+	at reactor.core.publisher.MonoSubscribeOn$SubscribeOnSubscriber.run(MonoSubscribeOn.java:123)
+	at reactor.core.scheduler.WorkerTask.call(WorkerTask.java:84)
+	at reactor.core.scheduler.WorkerTask.call(WorkerTask.java:37)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+	Suppressed: java.lang.Exception: #block terminated with an error
+		at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:93)
+		at reactor.core.publisher.Mono.block(Mono.java:1495)
+		at Scratch.reactive(Scratch.java:97)
+		at Scratch.main(Scratch.java:51)
+</code></pre>
+<ul>
+<li>We see the <code>ArrayIndexOutOfBoundsException</code> again, hinting at a source that was too short for the <code>MonoElementAt</code> operator</li>
+<li>We see that it came from an <code>onComplete</code>, itself triggered by <code>request</code>&hellip; and a bunch of other steps in <code>reactor.core.publisher</code></li>
+<li>With a bit of familiarity with these reactor methods, we <em>might</em> deduce that the pipeline was made up of <code>range</code> (<code>FluxRange.subscribe</code>), <code>elementAt</code> and <code>subscribeOn</code>&hellip;</li>
+<li>It seems the throwing code was executed from the worker <code>Thread</code> of a <code>ThreadPoolExecutor</code></li>
+<li>The trail goes cold here&hellip;</li>
+</ul>
+<p>Worse, even if we did get rid of <code>subscribeOn</code> we&rsquo;d still wouldn&rsquo;t discover which of the two possible error paths was triggered:</p>
+<pre><code class="prettyprint java">	private static void reactiveNoSubscribeOn() {
+		int seconds = LocalTime.now().getSecond();
+		Mono&lt;Integer&gt; source;
+		if (seconds % 2 == 0) {
+			source = Flux.range(1, 10)
+			             .elementAt(5);
+		}
+		else if (seconds % 3 == 0) {
+			source = Flux.range(0, 4)
+			             .elementAt(5);
+		}
+		else {
+			source = Flux.just(1, 2, 3, 4)
+			             .elementAt(5);
+		}
+
+		source.block(); //line 116
+	}
+</code></pre>
+<p>Gives the stacktrace:</p>
+<pre><code class="prettyprint">java.lang.IndexOutOfBoundsException
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
+	at reactor.core.publisher.FluxArray$ArraySubscription.fastPath(FluxArray.java:176)
+	at reactor.core.publisher.FluxArray$ArraySubscription.request(FluxArray.java:96)
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.request(MonoElementAt.java:92)
+	at reactor.core.publisher.BlockingSingleSubscriber.onSubscribe(BlockingSingleSubscriber.java:49)
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onSubscribe(MonoElementAt.java:107)
+	at reactor.core.publisher.FluxArray.subscribe(FluxArray.java:53)
+	at reactor.core.publisher.FluxArray.subscribe(FluxArray.java:59)
+	at reactor.core.publisher.MonoElementAt.subscribe(MonoElementAt.java:59)
+	at reactor.core.publisher.Mono.block(Mono.java:1494)
+	at Scratch.reactiveNoSubscribeOn(Scratch.java:116)
+	at Scratch.main(Scratch.java:52)
+	Suppressed: java.lang.Exception: #block terminated with an error
+		at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:93)
+		at reactor.core.publisher.Mono.block(Mono.java:1495)
+		... 2 more
+</code></pre>
+<p>That is because, as we saw previously, there is an additional &ldquo;boundary&rdquo; in code between <em>assembly</em> and <em>subscription</em>. The trail only goes back to the point of <strong>subscription</strong> (here the <code>block()</code>) :-(</p>
+<p>So using stacktraces for analysis and debugging purposes is harder in an asynchronous world, and even a bit harder in Reactor (because it is asynchronous and has a lazy-by-default approach with assembly vs subscription). But fortunately there are tools in the library to try and alleviate that fact.</p><h2><a href="#making-things-better" class="anchor" name="making-things-better"></a>Making Things Better</h2><h3><a href="#back-to-classics-code-log-code" class="anchor" name="back-to-classics-code-log-code"></a>Back to classics: <code>log</code></h3>
+<p>Remember when you sprinkled your imperative code with <code>print</code> statements? It might not be as cool as firing up the step debugger, but sometimes it is the quick and dirty solution you need.</p>
+<p>In Reactor, you have the <code>log()</code> operator:</p>
+<ul>
+<li>It logs Reactive Stream signals: <code>onNext</code>, <code>onComplete</code>, <code>onError</code> (and <strong>even</strong> <code>onSubscribe</code>, <code>cancel</code> and <code>request</code>!)</li>
+<li>You can tune it to whitelist only part of these signals</li>
+<li>You can choose a particular <code>Logger</code> as well</li>
+</ul>
+<p>In short, <code>log</code> is the quick and dirty solution to get an easy bird eye&rsquo;s view of what is going on at one step of your sequence. Use it liberally during development, with the possibility of specifying a &ldquo;name&rdquo; to each <code>log</code> call to differentiate them.</p>
+<p>Using <code>log(String)</code> can be diverted to get a hint at which source causes the error:</p>
+<pre><code class="prettyprint java">	private static void log() {
+		int seconds = LocalTime.now().getSecond();
+		Mono&lt;Integer&gt; source;
+		if (seconds % 2 == 0) {
+			source = Flux.range(1, 10)
+			             .elementAt(5)
+			             .log(&quot;source A&quot;);
+		}
+		else if (seconds % 3 == 0) {
+			source = Flux.range(0, 4)
+			             .elementAt(5)
+			             .log(&quot;source B&quot;);
+		}
+		else {
+			source = Flux.just(1, 2, 3, 4)
+			             .elementAt(5)
+			             .log(&quot;source C&quot;);
+		}
+
+		source.block(); //line 138
+	}
+</code></pre>
+<p>The stacktrace itself isn&rsquo;t much more interesting (apart from mentioning the <code>MonoLogFuseable</code> class, but the log itself contains this interesting tidbit:</p>
+<pre><code class="prettyprint">17:01:23.711 [main] INFO  source C - | onSubscribe([Fuseable] MonoElementAt.ElementAtSubscriber)
+17:01:23.716 [main] INFO  source C - | request(unbounded)
+17:01:23.717 [main] ERROR source C - | onError(java.lang.IndexOutOfBoundsException)
+17:01:23.721 [main] ERROR source C - 
+java.lang.IndexOutOfBoundsException: null
+</code></pre>
+<p>At least we get our hardcoded <code>source C</code> label&hellip;</p><h3><a href="#enriching-stacktraces-with-debug-mode" class="anchor" name="enriching-stacktraces-with-debug-mode"></a>Enriching stacktraces with Debug Mode</h3>
+<p>Another approach that is available in Reactor is to try and get back the assembly information in the runtime stacktraces.</p>
+<p>This can be done by activating the so-called &ldquo;debug mode&rdquo; via the <code>Hooks</code> class:</p>
+<pre><code class="prettyprint java">Hooks.onOperatorDebug();
+</code></pre>
+<p>What does it do? It makes each operator instantiation (aka assembly) capture a stacktrace and keep it for later.</p>
+<p>If an <code>onError</code> reaches one operator, it will attach that assembly stacktrace to the <code>onError</code> &rsquo;s <code>Throwable</code> (as a <strong>suppressed <code>Exception</code></strong>). As a result, when you see the stacktrace you&rsquo;ll get a more complete picture of both the runtime AND the assembly.</p>
+<p>With debug mode on, in our earlier example we would be able to see which assembly path was taken and which source was actually processed:</p>
+<pre><code class="prettyprint java">	private static void hook() {
+		Hooks.onOperatorDebug();
+		try {
+			int seconds = LocalTime.now().getSecond();
+			Mono&lt;Integer&gt; source;
+			if (seconds % 2 == 0) {
+				source = Flux.range(1, 10)
+				             .elementAt(5); //line 149
+			}
+			else if (seconds % 3 == 0) {
+				source = Flux.range(0, 4)
+				             .elementAt(5); //line 153
+			}
+			else {
+				source = Flux.just(1, 2, 3, 4)
+				             .elementAt(5); //line 157
+			}
+
+			source.block(); //line 160
+		}
+		finally {
+			Hooks.resetOnOperatorDebug();
+		}
+	}
+</code></pre>
+<p>Which produces the following stacktrace:</p>
+<pre><code class="prettyprint java">java.lang.IndexOutOfBoundsException
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
+(...)
+	at reactor.core.publisher.Mono.block(Mono.java:1494)
+	at Scratch.hook(Scratch.java:160)
+	at Scratch.main(Scratch.java:54)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Assembly trace from producer [reactor.core.publisher.MonoElementAt] :
+	reactor.core.publisher.Flux.elementAt(Flux.java:4367)
+	Scratch.hook(Scratch.java:157)
+Error has been observed by the following operator(s):
+	|_	Flux.elementAt ⇢ Scratch.hook(Scratch.java:157)
+</code></pre>
+<p>Notice the last line? Yay :-D</p><h3><a href="#bringing-the-cost-down-with-code-checkpoint-code" class="anchor" name="bringing-the-cost-down-with-code-checkpoint-code"></a>Bringing the cost down with <code>checkpoint</code></h3>
+<p>One drawback of using <code>Hooks.onOperatorDebug()</code> is that it does the assembly stacktrace capture <strong>for every single operator used in the application</strong>. Filling a single stacktrace is a costly operation, so it goes without saying that this can have an heavy impact on performance. As a result, this is only recommended in a development setting.</p>
+<p>Fortunately, you can bring the cost down a little if you identify parts of your codebase that are prone to that sort of source ambiguity.</p>
+<p>By using the <code>checkpoint()</code> operator, it is possible to activate the assembly trace capture only at that specific point in the codebase. You can even do entirely without the filling of a stacktrace if you give the checkpoint a unique and meaningful name using <code>checkpoint(String)</code>:</p>
+<pre><code class="prettyprint java">	private static void checkpoint() {
+		int seconds = LocalTime.now().getSecond();
+		Mono&lt;Integer&gt; source;
+		if (seconds % 2 == 0) {
+			source = Flux.range(1, 10)
+			             .elementAt(5)
+			             .checkpoint(&quot;source range(1,10)&quot;);
+		}
+		else if (seconds % 3 == 0) {
+			source = Flux.range(0, 4)
+			             .elementAt(5)
+			             .checkpoint(&quot;source range(0,4)&quot;);
+		}
+		else {
+			source = Flux.just(1, 2, 3, 4)
+			             .elementAt(5)
+			             .checkpoint(&quot;source just(1,2,3,4)&quot;);
+		}
+
+		source.block(); //line 186
+	}
+</code></pre>
+<p>This produces the following stacktrace:</p>
+<pre><code class="prettyprint">java.lang.IndexOutOfBoundsException
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
+	at reactor.core.publisher.FluxArray$ArraySubscription.fastPath(FluxArray.java:176)
+	at reactor.core.publisher.FluxArray$ArraySubscription.request(FluxArray.java:96)
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.request(MonoElementAt.java:92)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.request(FluxOnAssembly.java:438)
+	at reactor.core.publisher.BlockingSingleSubscriber.onSubscribe(BlockingSingleSubscriber.java:49)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onSubscribe(FluxOnAssembly.java:422)
+	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onSubscribe(MonoElementAt.java:107)
+	at reactor.core.publisher.FluxArray.subscribe(FluxArray.java:53)
+	at reactor.core.publisher.FluxArray.subscribe(FluxArray.java:59)
+	at reactor.core.publisher.MonoElementAt.subscribe(MonoElementAt.java:59)
+	at reactor.core.publisher.MonoOnAssembly.subscribe(MonoOnAssembly.java:61)
+	at reactor.core.publisher.Mono.block(Mono.java:1494)
+	at Scratch.checkpoint(Scratch.java:186)
+	at Scratch.main(Scratch.java:55)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Assembly site of producer [reactor.core.publisher.MonoElementAt] is identified by light checkpoint [source just(1,2,3,4)].
+</code></pre>
+<p>Notice the <code>is identified by light checkpoint [source just(1,2,3,4)].</code>, which gives us our culprit (because we used a meaningful description for the checkpoint).</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>Conclusion</h2>
+<p>In this article, we&rsquo;ve learned that stacktraces can be less useful in asynchronous programming. This effect is further compounded by the lazy way Reactor let you build reactive sequences.</p>
+<p>We&rsquo;ve looked at the worst cases that can be encountered and at several ways this problem can be lessened.</p>
+<p>The whole code can be found in a gist <a href="https://gist.github.com/simonbasle/a4c6cfe79071610e1fe3bd27984d4381">here</a>.</p>
+<p>In the next instalment, we&rsquo;ll see why we sometimes say that Reactor is &ldquo;Concurrent Agnostic&rdquo;.</p>
+<p>In the meantime, happy reactive coding!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3647;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+ <a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

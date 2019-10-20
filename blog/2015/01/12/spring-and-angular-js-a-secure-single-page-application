@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring and Angular JS: A Secure Single Page Application</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring and Angular JS: A Secure Single Page Application" />
+<meta name="twitter:description" content="&lt;blockquote&gt;
+ &lt;p&gt;Note: the source code and test for this blog continue to evolve, but the changes to the text are not being maintained here. Please see &lt;a href=&quot;https://spring.io/guides/tutorials/spring-security-and-angular-js/&quot;&gt;the tutorial version&lt;/a&gt; for the most up to date content.&lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;p&gt;In this article we show some nice features of Spring Security, Spring Boot and Angular JS working together to provide a pleasant and secure user experience. It should be accessible to beginners with Spring and Angular JS, but there also is plenty of detail that will be of use to experts in either. This is actually the first in a series of articles on Spring Security and Angular JS, with new features exposed in each one successively. We’ll improve on the application in the &lt;a href=&quot;https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii&quot;&gt;second&lt;/a&gt; and subsequent installments, but the main changes after this are architectural rather than functional.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@david_syer" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+
+<meta property="og:title" content="Spring and Angular JS: A Secure Single Page Application" />
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta property="og:description" content="&lt;blockquote&gt;
+ &lt;p&gt;Note: the source code and test for this blog continue to evolve, but the changes to the text are not being maintained here. Please see &lt;a href=&quot;https://spring.io/guides/tutorials/spring-security-and-angular-js/&quot;&gt;the tutorial version&lt;/a&gt; for the most up to date content.&lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;p&gt;In this article we show some nice features of Spring Security, Spring Boot and Angular JS working together to provide a pleasant and secure user experience. It should be accessible to beginners with Spring and Angular JS, but there also is plenty of detail that will be of use to experts in either. This is actually the first in a series of articles on Spring Security and Angular JS, with new features exposed in each one successively. We’ll improve on the application in the &lt;a href=&quot;https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii&quot;&gt;second&lt;/a&gt; and subsequent installments, but the main changes after this are architectural rather than functional.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-01-12 12:20:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring and Angular JS: A Secure Single Page Application</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-01-12 12:20:00.0">January 12, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1903" href="/blog/2015/01/12/spring-and-angular-js-a-secure-single-page-application#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><blockquote><p>Note: the source code and test for this blog continue to evolve, but the changes to the text are not being maintained here. Please see <a href="https://spring.io/guides/tutorials/spring-security-and-angular-js/">the tutorial version</a> for the most up to date content.</p>
+</blockquote><p>In this article we show some nice features of Spring Security, Spring Boot and Angular JS working together to provide a pleasant and secure user experience. It should be accessible to beginners with Spring and Angular JS, but there also is plenty of detail that will be of use to experts in either. This is actually the first in a series of articles on Spring Security and Angular JS, with new features exposed in each one successively. We&rsquo;ll improve on the application in the <a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii">second</a> and subsequent installments, but the main changes after this are architectural rather than functional.</p><h2><a href="#spring-and-the-single-page-application" class="anchor" name="spring-and-the-single-page-application"></a>Spring and the Single Page Application</h2><p>HTML5, rich browser-based features, and the &ldquo;single page application&rdquo; are extremely valuable tools for modern developers, but any meaningful interactions will involve a backend server, so as well as static content (HTML, CSS and JavaScript) we are going to need a backend server. The backend server can play any or all of a number of roles: serving static content, sometimes (but not so often these days) rendering dynamic HTML, authenticating users, securing access to protected resources, and (last but not least) interacting with JavaScript in the browser through HTTP and JSON (sometimes referred to as a REST API).</p><p>Spring has always been a popular technology for building the backend features (especially in the enterprise), and with the advent of <a href="https://projects.spring.io/spring-boot">Spring Boot</a> things have never been easier. Let&rsquo;s have a look at how to build a new single page application from nothing using Spring Boot, Angular JS and Twitter Bootstrap. There&rsquo;s no particular reason to choose that specific stack, but it is quite popular, especially with the core Spring constituency in enterprise Java shops, so it&rsquo;s a worthwhile starting point.</p><h2><a href="#create-a-new-project" class="anchor" name="create-a-new-project"></a>Create a New Project</h2><p>We are going to step through creating this application in some detail, so that anyone who isn&rsquo;t completely au fait with Spring and Angular can follow what is happening. If you prefer to cut to this chase, you can <a href="#how-does-it-work">skip to the end</a> where the application is working, and see how it all fits together. There are various options for creating a new project:</p>
+<ul>
+<li><a href="#using-curl">Using curl on the command line</a></li>
+<li><a href="#using-spring-boot-cli">Using Spring Boot CLI</a></li>
+<li><a href="#using-the-initializr-website">Using the Spring Initializr website</a></li>
+<li><a href="#using-spring-tool-suite">Using Spring Tool Suite</a></li>
+</ul><p>The source code for the complete project we are going to build is in <a href="https://github.com/dsyer/spring-security-angular/tree/master/basic">Github here</a>, so you can just clone the project and work directly from there if you want. Then jump to the <a href="#add-a-home-page">next section</a>.</p><p><span id="using-curl"></span></p><h3><a href="#using-curl" class="anchor" name="using-curl"></a>Using Curl</h3><p>The easiest way to create a new project to get started is via the <a href="https://start.spring.io">Spring Boot Initializr</a>. E.g. using curl on a UN*X like system:</p>
+<pre><code class="prettyprint">$ mkdir ui &amp;&amp; cd ui
+$ curl https://start.spring.io/starter.tgz -d style=web \
+-d style=security -d name=ui | tar -xzvf - 
+</code></pre><p>You can then import that project (it&rsquo;s a normal Maven Java project by default) into your favourite IDE, or just work with the files and &ldquo;mvn&rdquo; on the command line. Then jump to the <a href="#add-a-home-page">next section</a>.</p><p><span id="using-spring-boot-cli"></span></p><h3><a href="#using-spring-boot-cli" class="anchor" name="using-spring-boot-cli"></a>Using Spring Boot CLI</h3><p>You can create the same project using the <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#getting-started-installing-the-cli">Spring Boot CLI</a>, like this:</p>
+<pre><code class="prettyprint">$ spring init --dependencies web,security ui/ &amp;&amp; cd ui
+</code></pre><p>Then jump to the <a href="#add-a-home-page">next section</a>.</p><p><span id="using-the-initializr-website"></span></p><h3><a href="#using-the-initializr-website" class="anchor" name="using-the-initializr-website"></a>Using the Initializr Website</h3><p>If you prefer you can also get the same code directly as a .zip file from the <a href="https://start.spring.io">Spring Boot Initializr</a>. Just open it up in your browser and select dependencies &ldquo;Web&rdquo; and &ldquo;Security&rdquo;, then click on &ldquo;Generate Project&rdquo;. The .zip file contains a standard Maven or Gradle project in the root directory, so you might want to create an empty directory before you unpack it. Then jump to the <a href="#add-a-home-page">next section</a>.</p><p><span id="using-spring-tool-suite"></span></p><h3><a href="#using-spring-tool-suite" class="anchor" name="using-spring-tool-suite"></a>Using Spring Tool Suite</h3><p>In <a href="https://spring.io/tools/sts">Spring Tool Suite</a> (a set of Eclipse plugins) you can also create and import a project using a wizard at <code>File-&gt;New-&gt;Spring Starter Project</code>. Then jump to the <a href="#add-a-home-page">next section</a>.</p><p><span id="add-a-home-page"></span></p><h2><a href="#add-a-home-page" class="anchor" name="add-a-home-page"></a>Add a Home Page</h2><p>The core of a single page application is a static &ldquo;index.html&rdquo;, so let&rsquo;s go ahead and create one (in &ldquo;src/main/resources/static&rdquo; or &ldquo;src/main/resources/public&rdquo;):</p>
+<pre><code class="prettyprint html">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Hello AngularJS&lt;/title&gt;
+&lt;link href=&quot;css/angular-bootstrap.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style type=&quot;text/css&quot;&gt;
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+&lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body ng-app=&quot;hello&quot;&gt;
+  &lt;div class=&quot;container&quot;&gt;
+    &lt;h1&gt;Greeting&lt;/h1&gt;
+    &lt;div ng-controller=&quot;home&quot; ng-cloak class=&quot;ng-cloak&quot;&gt;
+      &lt;p&gt;The ID is {{greeting.id}}&lt;/p&gt;
+      &lt;p&gt;The content is {{greeting.content}}&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script src=&quot;js/angular-bootstrap.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;js/hello.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>It&rsquo;s pretty short and sweet because it is just going to say &ldquo;Hello World&rdquo;.</p><h3><a href="#features-of-the-home-page" class="anchor" name="features-of-the-home-page"></a>Features of the Home Page</h3><p>Salient features include:</p>
+<ul>
+<li><p>Some CSS imported in the <code>&lt;head&gt;</code>, one placeholder for a file that doesn&rsquo;t yet exist, but is named suggestively (&ldquo;angular-bootstrap.css&rdquo;) and one inline stylesheet defining the <a href="https://docs.angularjs.org/api/ng/directive/ngCloak">&ldquo;ng-cloak&rdquo;</a> class.</p></li>
+<li><p>The &ldquo;ng-cloak&rdquo; class is applied to the content <code>&lt;div&gt;</code> so that dynamic content is hidden until Angular JS has had a chance to process it (this prevents &ldquo;flickering&rdquo; during the initial page load).</p></li>
+<li><p>The <code>&lt;body&gt;</code> is marked as <code>ng-app=&quot;hello&quot;</code> which means we need to define a JavaScript module that Angular will recognise as an application called &ldquo;hello&rdquo;.</p></li>
+<li><p>All the CSS classes (apart from &ldquo;ng-cloak&rdquo;) are from <a href="https://getbootstrap.com/">Twitter Bootstrap</a>. They will make things look pretty once we get the right stylesheets set up.</p></li>
+<li><p>The content in the greeting is marked up using handlebars, e.g. <code>{{greeting.content}}</code> and this will be filled in later by Angular (using a &ldquo;controller&rdquo; called &ldquo;home&rdquo; according to the <code>ng-controller</code> directive on the surrounding <code>&lt;div&gt;</code>).</p></li>
+<li><p>Angular JS (and Twitter Bootstrap) are included at the bottom of the <code>&lt;body&gt;</code> so that the browser can process all the HTML before it gets processed.</p></li>
+<li><p>We also include a separate &ldquo;hello.js&rdquo; which is where we are going to define the application behaviour.</p></li>
+</ul><p>We are going to create the script and stylesheet assets in a minute, but for now we can ignore the fact that they don&rsquo;t exist.</p><h3><a href="#running-the-application" class="anchor" name="running-the-application"></a>Running the Application</h3><p>Once the home page file is added, your application will be loadable in a browser (even though it doesn&rsquo;t do much yet). On the command line you can do this</p>
+<pre><code class="prettyprint">$ mvn spring-boot:run
+</code></pre><p>and go to a browser at <a href="http://localhost:8080">http://localhost:8080</a>. When you load the home page you should get a browser dialog asking for username and password (the username is &ldquo;user&rdquo; and the password is printed in the console logs on startup). There&rsquo;s actually no content yet, so you should get a blank page with a &ldquo;Greeting&rdquo; header once you successfully authenticate.</p>
+<blockquote><p>Tip: if you don&rsquo;t like scraping the console log for the password just add this to the &ldquo;application.properties&rdquo; (in &ldquo;src/main/resources&rdquo;): <code>security.user.password=password</code> (and choose your own password). We did this in the sample code using &ldquo;application.yml&rdquo;.</p>
+</blockquote><p>In an IDE, just run the <code>main()</code> method in the application class (there is only one class, and it is called <code>UiApplication</code> if you used the &ldquo;curl&rdquo; command above).</p><p>To package and run as a standalone JAR, you can do this:</p>
+<pre><code class="prettyprint">$ mvn package
+$ java -jar target/*.jar
+</code></pre><h2><a href="#front-end-assets" class="anchor" name="front-end-assets"></a>Front End Assets</h2><p>Entry-level tutorials on Angular and other front end technologies often just include the library assets directly from the internet (e.g. <a href="https://docs.angularjs.org/misc/downloading">the Angular JS website</a> itself recommends downloading from <a href="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js">Google CDN</a>). Instead of doing that we are going to generate the &ldquo;angular-bootstrap.js&rdquo; asset by concatenating several files from such libraries. This is not strictly necessary to get the application working, but it <em>is</em> best practice for a production application to consolidate scripts to avoid chatter between the browser and the server (or content delivery network). Since we aren&rsquo;t modifying or customizing the CSS stylesheets it is also unecessary to generate the &ldquo;angular-bootstrap.css&rdquo;, and we could just use static assets from Google CDN for that as well. However, in a real application we almost certainly would want to modify the stylesheets and we wouldn&rsquo;t want to edit the CSS sources by hand, so we would use a higher level tool (e.g. <a href="http://lesscss.org/">Less</a> or <a href="http://sass-lang.com/">Sass</a>), so we are going to use one too.</p><p>There are many different ways of doing this but for the purposes of this article we are going to use <a href="https://alexo.github.io/wro4j/">wro4j</a>, which is a Java-based toolchain for preprocessing and packaging front end assets. It can be used as a JIT (Just in Time) <code>Filter</code> in any Servlet application, but it also has good support for build tools like Maven and Eclipse, and that is how we are going to use it. So we are going to build static resource files and bundle them in our application JAR.</p>
+<blockquote><p>Aside: Wro4j is probably not the tool of choice for hard-core front end developers - they would probably be using a node-based toolchain, with <a href="https://bower.io/">bower</a> and/or <a href="https://gruntjs.com/">grunt</a>. These are definitely excellent tools, and covered in great detail all over the internet, so please feel free to use them if you prefer. If you just put the outputs from those toolchains in &ldquo;src/main/resources/static&rdquo; then it will all work. I find wro4j comfortable because I am not a hard-core front end developer and I know how to use Java-based tooling.</p>
+</blockquote><p>To create static resources at build time we add some magic to the Maven <code>pom.xml</code> (it&rsquo;s quite verbose, but boilerplate, so it could be extracted into a parent pom in Maven, or a shared task or plugin for Gradle):</p>
+<pre><code class="prettyprint xml">&lt;build&gt;
+  &lt;resources&gt;
+    &lt;resource&gt;
+      &lt;directory&gt;${project.basedir}/src/main/resources&lt;/directory&gt;
+    &lt;/resource&gt;
+    &lt;resource&gt;
+      &lt;directory&gt;${project.build.directory}/generated-resources&lt;/directory&gt;
+    &lt;/resource&gt;
+  &lt;/resources&gt;
+  &lt;plugins&gt;
+    &lt;plugin&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+    &lt;/plugin&gt;
+    &lt;plugin&gt;
+      &lt;artifactId&gt;maven-resources-plugin&lt;/artifactId&gt;
+      &lt;executions&gt;
+        &lt;execution&gt;
+          &lt;!-- Serves *only* to filter the wro.xml so it can get an absolute 
+            path for the project --&gt;
+          &lt;id&gt;copy-resources&lt;/id&gt;
+          &lt;phase&gt;validate&lt;/phase&gt;
+          &lt;goals&gt;
+            &lt;goal&gt;copy-resources&lt;/goal&gt;
+          &lt;/goals&gt;
+          &lt;configuration&gt;
+            &lt;outputDirectory&gt;${basedir}/target/wro&lt;/outputDirectory&gt;
+            &lt;resources&gt;
+              &lt;resource&gt;
+                &lt;directory&gt;src/main/wro&lt;/directory&gt;
+                &lt;filtering&gt;true&lt;/filtering&gt;
+              &lt;/resource&gt;
+            &lt;/resources&gt;
+          &lt;/configuration&gt;
+        &lt;/execution&gt;
+      &lt;/executions&gt;
+    &lt;/plugin&gt;
+    &lt;plugin&gt;
+      &lt;groupId&gt;ro.isdc.wro4j&lt;/groupId&gt;
+      &lt;artifactId&gt;wro4j-maven-plugin&lt;/artifactId&gt;
+      &lt;version&gt;1.7.6&lt;/version&gt;
+      &lt;executions&gt;
+        &lt;execution&gt;
+          &lt;phase&gt;generate-resources&lt;/phase&gt;
+          &lt;goals&gt;
+            &lt;goal&gt;run&lt;/goal&gt;
+          &lt;/goals&gt;
+        &lt;/execution&gt;
+      &lt;/executions&gt;
+      &lt;configuration&gt;
+        &lt;wroManagerFactory&gt;ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory&lt;/wroManagerFactory&gt;
+        &lt;cssDestinationFolder&gt;${project.build.directory}/generated-resources/static/css&lt;/cssDestinationFolder&gt;
+        &lt;jsDestinationFolder&gt;${project.build.directory}/generated-resources/static/js&lt;/jsDestinationFolder&gt;
+        &lt;wroFile&gt;${project.build.directory}/wro/wro.xml&lt;/wroFile&gt;
+        &lt;extraConfigFile&gt;${basedir}/src/main/wro/wro.properties&lt;/extraConfigFile&gt;
+        &lt;contextFolder&gt;${basedir}/src/main/wro&lt;/contextFolder&gt;
+      &lt;/configuration&gt;
+      &lt;dependencies&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.webjars&lt;/groupId&gt;
+          &lt;artifactId&gt;jquery&lt;/artifactId&gt;
+          &lt;version&gt;2.1.1&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.webjars&lt;/groupId&gt;
+          &lt;artifactId&gt;angularjs&lt;/artifactId&gt;
+          &lt;version&gt;1.3.8&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.webjars&lt;/groupId&gt;
+          &lt;artifactId&gt;bootstrap&lt;/artifactId&gt;
+          &lt;version&gt;3.2.0&lt;/version&gt;
+        &lt;/dependency&gt;
+      &lt;/dependencies&gt;
+    &lt;/plugin&gt;
+  &lt;/plugins&gt;
+&lt;/build&gt;
+</code></pre><p>You can copy that verbatim into your POM, or just scan it if you are following along from the <a href="https://github.com/dsyer/spring-security-angular/tree/master/basic/pom.xml#L43">source in Github</a>. The main points are:</p>
+<ul>
+<li><p>We are including some webjars libraries as dependencies (jquery and bootstrap for CSS and styling, and Angular JS for business logic). Some of the static resources in those jar files will be included in our generated &ldquo;angular-bootstrap.*&rdquo; files, but the jars themselves don&rsquo;t need to be packaged with the application.</p></li>
+<li><p>Twitter Bootstrap has a dependency on jQuery, so we include that as well. An Angular JS application that didn&rsquo;t use Bootstrap wouldn&rsquo;t need that since Angular has its own version of the features it needs from jQuery.</p></li>
+<li><p>The generated resources will go in &ldquo;target/generated-resources&rdquo;, and because that is declared in the <code>&lt;resources/&gt;</code> section, they will be packaged in the output JAR from the project, and available on the classpath in the IDE (as long as we are using Maven tooling, e.g. m2e in Eclipse).</p></li>
+<li><p>The wro4j-maven-plugin has some Eclipse integration features and you can install it from the Eclipse Marketplace (try it later if this is your first time - it&rsquo;s not needed to complete the application). If you do that then Eclipse will watch the source files and re-generate the outputs if they change. If you run in debug mode then changes are immediately re-loadable in a browser.</p></li>
+<li><p>Wro4j is controlled from an XML configuration file that doesn&rsquo;t know about your build classpath, and only understand absolute file paths, so we have to create an absolute file location and insert it in <code>wro.xml</code>. For that purpose we use Maven resource filtering and that is why there is an explicit &ldquo;maven-resources-plugin&rdquo; declaration.</p></li>
+</ul><p>That&rsquo;s all of the changes we are going to need to the POM. It remains to add the wro4j build files, which we have specified are going to live in &ldquo;src/main/wro&rdquo;.</p><h3><a href="#wro4j-source-files" class="anchor" name="wro4j-source-files"></a>Wro4j Source Files</h3><p>If you look in the <a href="https://github.com/dsyer/spring-security-angular/tree/master/basic/src/main/wro">source code in Github</a> you will see there are only 3 files (and one of those is empty, ready for later customization):</p>
+<ul>
+<li><p><code>wro.properties</code> is a configuration file for the preprocessing and rendering engine in wro4j. You can use it to switch on and off various parts of the toolchain. In this case we use it to compile CSS from <a href="http://lesscss.org/">Less</a> and to minify JavaScript, ultimately combining the sources from all the libraries we need in two files.</p>
+<pre><code class="prettyprint">preProcessors=lessCssImport
+postProcessors=less4j,jsMin
+</code></pre></li>
+<li><p><code>wro.xml</code> declares a single &ldquo;group&rdquo; of resources called &ldquo;angular-bootstrap&rdquo;, and this ends up being the base name of the static resources that are generated. It includes references to <code>&lt;css&gt;</code> and <code>&lt;js&gt;</code> elements in the webjars we added, and also to a local source file <code>main.less</code>.</p>
+<pre><code class="prettyprint">&lt;groups xmlns=&quot;http://www.isdc.ro/wro&quot;&gt;
+  &lt;group name=&quot;angular-bootstrap&quot;&gt;
+  &lt;css&gt;webjar:bootstrap/3.2.0/less/bootstrap.less&lt;/css&gt;   
+    &lt;css&gt;file:${project.basedir}/src/main/wro/main.less&lt;/css&gt;
+    &lt;js&gt;webjar:jquery/2.1.1/jquery.min.js&lt;/js&gt;
+    &lt;js&gt;webjar:bootstrap/3.2.0/bootstrap.js&lt;/js&gt;
+    &lt;js&gt;webjar:angularjs/1.3.8/angular.min.js&lt;/js&gt;
+  &lt;/group&gt;
+&lt;/groups&gt;
+</code></pre></li>
+<li><p><code>main.less</code> is empty, but could be used to customise the look and feel, changing the default settings in Twitter Bootstrap. E.g. to change the colours from default blue to light pink you could add a single line: <code>@brand-primary: #de8579;</code>.</p></li>
+</ul><p>Copy those files to your project and run &ldquo;mvn package&rdquo; and you should see the &ldquo;bootstrap-angular.*&rdquo; resources show up in your JAR file. If you run the app now, you should see the CSS take effect, but the business logic and navigation is still missing.</p><h2><a href="#create-the-angular-application" class="anchor" name="create-the-angular-application"></a>Create the Angular Application</h2><p>Let&rsquo;s create the &ldquo;hello&rdquo; application (in &ldquo;src/main/resources/static/js/hello.js&rdquo; so that the <code>&lt;script/&gt;</code> at the bottom of our &ldquo;index.html&rdquo; finds it in the right place).</p><p>A minimal Angular JS application looks like this:</p>
+<pre><code class="prettyprint javascript">angular.module(&#39;hello&#39;, [])
+  .controller(&#39;home&#39;, function($scope) {
+    $scope.greeting = {id: &#39;xxx&#39;, content: &#39;Hello World!&#39;}
+})
+</code></pre><p>The name of the application is &ldquo;hello&rdquo; and it has an empty (and redundant) &ldquo;config&rdquo; and an empty &ldquo;controller&rdquo; called &ldquo;home&rdquo;. The &ldquo;home&rdquo; controller will be called when we load the &ldquo;index.html&rdquo; because we have decorated the content <code>&lt;div&gt;</code> with <code>ng-controller=&quot;home&quot;</code>.</p><p>Notice that we injected a magic <code>$scope</code> into the controller function (Angular does <a href="https://docs.angularjs.org/tutorial">dependency injection by naming convention</a>, and recognises the names of your function parameters). The <code>$scope</code> is then used inside the function to set up content and behaviour for the UI elements that this controller is responsible for.</p><p>If you added that file under &ldquo;src/main/resources/static/js&rdquo; your app should now be secure and functional, and it will say &ldquo;Hello World!&rdquo;. The <code>greeting</code> is rendered by Angular in the HTML using the handlebar placeholders, <code>{{greeting.id}}</code> and <code>{{greeting.content}}</code>.</p><p><span id="dynamic-content" /></p><h2><a href="#adding-dynamic-content" class="anchor" name="adding-dynamic-content"></a>Adding Dynamic Content</h2><p>So far we have an application with a greeting that is hard coded. That&rsquo;s useful for learning how things fit together, but really we expect content to come from a backend server, so let&rsquo;s create an HTTP endpoint that we can use to grab a greeting. In your <a href="https://github.com/dsyer/spring-security-angular/blob/master/basic/src/main/java/demo/UiApplication.java">application class</a> (in &ldquo;src/main/java/demo&rdquo;), add the <code>@RestController</code> annotation and define a new <code>@RequestMapping</code>:</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+@RestController
+public class UiApplication {
+
+  @RequestMapping(&quot;/resource&quot;)
+  public Map&lt;String,Object&gt; home() {
+    Map&lt;String,Object&gt; model = new HashMap&lt;String,Object&gt;();
+    model.put(&quot;id&quot;, UUID.randomUUID().toString());
+    model.put(&quot;content&quot;, &quot;Hello World&quot;);
+    return model;
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(UiApplication.class, args);
+  }
+
+}
+</code></pre>
+<blockquote><p>Note: Depending on the way you created your new project it might not be called <code>UiApplication</code>, and it might have <code>@EnableAutoConfiguration @ComponentScan @Configuration</code> instead of <code>@SpringBootApplication</code>.</p>
+</blockquote><p>Run that application and try to curl the &ldquo;/resource&rdquo; endpoint and you will find that it is secure by default:</p>
+<pre><code class="prettyprint">$ curl localhost:8080/resource
+{&quot;timestamp&quot;:1420442772928,&quot;status&quot;:401,&quot;error&quot;:&quot;Unauthorized&quot;,&quot;message&quot;:&quot;Full authentication is required to access this resource&quot;,&quot;path&quot;:&quot;/resource&quot;}
+</code></pre><h3><a href="#loading-a-dynamic-resource-from-angular" class="anchor" name="loading-a-dynamic-resource-from-angular"></a>Loading a Dynamic Resource from Angular</h3><p>So let&rsquo;s grab that message in the browser. Modify the &ldquo;home&rdquo; controller to load the protected resource using XHR:</p>
+<pre><code class="prettyprint javascript">angular.module(&#39;hello&#39;, [])
+  .controller(&#39;home&#39;, function($scope, $http) {
+  $http.get(&#39;/resource/&#39;).success(function(data) {
+    $scope.greeting = data;
+  })
+});
+</code></pre><p>We injected an <a href="https://docs.angularjs.org/api/ng/service/$http"><code>$http</code> service</a>, which is provided by Angular as a core feature, and used it to GET our resource. Angular passes us the JSON from the response body back to a callback function on success.</p><p>Run the application again (or just reload the home page in the browser), and you will see the dynamic message with its unique ID. So, even though the resource is protected and you can&rsquo;t curl it directly, the browser was able to access the content. We have a secure single page application in less than a hundred lines of code!</p>
+<blockquote><p>Note: You might need to force your browser to reload the static resources after you change them. In Chrome (and Firefox with a plugin) you can use &ldquo;developer tools&rdquo; (F12), and that might be enough. Or you might have to use CTRL+F5.</p>
+</blockquote><p><span id="how-does-it-work" /></p><h2><a href="#how-does-it-work" class="anchor" name="how-does-it-work"></a>How Does it Work?</h2><p>The interactions between the browser and the backend can be seen in your browser if you use some developer tools (usually F12 opens this up, works in Chrome by default, requires a plugin in Firefox). Here&rsquo;s a summary:</p>
+<table>
+<thead>
+<tr>
+<th>Verb </th>
+<th>Path </th>
+<th>Status </th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET </td>
+<td>/ </td>
+<td>401 </td>
+<td>Browser prompts for authentication</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/ </td>
+<td>200 </td>
+<td>index.html</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/css/angular-bootstrap.css </td>
+<td>200 </td>
+<td>Twitter bootstrap CSS</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/js/angular-bootstrap.js </td>
+<td>200 </td>
+<td>Bootstrap and Angular JS</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/js/hello.js </td>
+<td>200 </td>
+<td>Application logic</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/resource </td>
+<td>200 </td>
+<td>JSON greeting</td>
+</tr>
+</tbody>
+</table><p>You might not see the 401 because the browser treats the home page load as a single interaction, and you might see 2 requests for &ldquo;/resource&rdquo; because there is a <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> negotiation.</p><p>Look more closely at the requests and you will see that all of them have an &ldquo;Authorization&rdquo; header, something like this:</p>
+<pre><code class="prettyprint">Authorization: Basic dXNlcjpwYXNzd29yZA==
+</code></pre><p>The browser is sending the username and password with every request (so remember to use HTTPS exclusively in production). There&rsquo;s nothing &ldquo;Angular&rdquo; about that, so it works with your JavaScript framework or non-framework of choice.</p><h3><a href="#what-rsquo-s-wrong-with-that" class="anchor" name="what-rsquo-s-wrong-with-that"></a>What&rsquo;s Wrong with That?</h3><p>On the face of it, it seems like we did a pretty good job, it&rsquo;s concise, easy to implement, all our data are secured by a secret password, and it would still work if we changed the front end or backend technologies. But there are some issues.</p>
+<ul>
+<li><p>Basic authentication is restricted to username and password authentication.</p></li>
+<li><p>The authentication UI is ubiquitous but ugly (browser dialog).</p></li>
+<li><p>There is no protection from <a href="https://en.wikipedia.org/wiki/Cross-site_request_forgery">Cross Site Request Forgery</a> (CSRF).</p></li>
+</ul><p>CSRF isn&rsquo;t really an issue with our application as it stands since it only needs to GET the backend resources (i.e. no state is changed in the server). As soon as you have a POST, PUT or DELETE in your application it simply isn&rsquo;t secure any more by any reasonable modern measure.</p><p>In the <a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii">next article in this series</a> we will extend the application to use form-based authentication, which is a lot more flexible than HTTP Basic. Once we have a form we will need CSRF protection, and both Spring Security and Angular have some nice out-of-the box features to help with this. Spoiler: we are going to need to use the <code>HttpSession</code>.</p>
+<blockquote><p>Thanks: I would like to thank everyone who helped me develop this series, and in particular <a href="https://spring.io/team/rwinch">Rob Winch</a> and <a href="https://twitter.com/thspaeth">Thorsten Spaeth</a> for their careful reviews of the articles and sources codes, and for teaching me a few tricks I didn&rsquo;t know even about the parts I thought I was most familar with.</p>
+</blockquote></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1903;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

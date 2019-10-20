@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Multiple UI Applications and a Gateway: Single Page Application with Spring and Angular JS Part VI</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Multiple UI Applications and a Gateway: Single Page Application with Spring and Angular JS Part VI" />
+<meta name="twitter:description" content="&lt;blockquote&gt;
+ &lt;p&gt;Note: the source code and test for this blog continue to evolve, but the changes to the text are not being maintained here. Please see &lt;a href=&quot;https://spring.io/guides/tutorials/spring-security-and-angular-js/&quot;&gt;the tutorial version&lt;/a&gt; for the most up to date content.&lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;p&gt;In this article we continue &lt;a href=&quot;https://spring.io/blog/2015/02/03/sso-with-oauth2-angular-js-and-spring-security-part-v&quot; title=&quot;Fifth Article in the Series&quot;&gt;our discussion&lt;/a&gt; of how to use &lt;a href=&quot;http://projects.spring.io/spring-security&quot;&gt;Spring Security&lt;/a&gt; with &lt;a href=&quot;http://angularjs.org&quot;&gt;Angular JS&lt;/a&gt; in a “single page application”. Here we show how to use &lt;a href=&quot;http://projects.spring.io/spring-security-oauth/&quot;&gt;Spring Session&lt;/a&gt; together with &lt;a href=&quot;http://projects.spring.io/spring-cloud/&quot;&gt;Spring Cloud&lt;/a&gt; to combine the features of the systems we built in parts II and IV, and actually end up building 3 single page applications with quite different responsibilities. The aim is to build a Gateway (like in &lt;a href=&quot;http://spring.io/blog/2015/01/28/the-api-gateway-pattern-angular-js-and-spring-security-part-iv&quot; title=&quot;Fourth Article in the Series&quot;&gt;part IV&lt;/a&gt;) that is used not only for API resources but also to load the UI from a backend server. We simplify the token-wrangling bits of &lt;a href=&quot;http://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii&quot; title=&quot;Second Article in the Series&quot;&gt;part II&lt;/a&gt; by using the Gateway to pass through the authentication to the backends. Then we extend the system to show how we can make local, granular access decisions in the backends, while still controlling identity and authentication at the Gateway. This is a very powerful model for building distributed systems in general, and has a number of benefits that we can explore as we introduce the features in the code we build.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@david_syer" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+
+<meta property="og:title" content="Multiple UI Applications and a Gateway: Single Page Application with Spring and Angular JS Part VI" />
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta property="og:description" content="&lt;blockquote&gt;
+ &lt;p&gt;Note: the source code and test for this blog continue to evolve, but the changes to the text are not being maintained here. Please see &lt;a href=&quot;https://spring.io/guides/tutorials/spring-security-and-angular-js/&quot;&gt;the tutorial version&lt;/a&gt; for the most up to date content.&lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;p&gt;In this article we continue &lt;a href=&quot;https://spring.io/blog/2015/02/03/sso-with-oauth2-angular-js-and-spring-security-part-v&quot; title=&quot;Fifth Article in the Series&quot;&gt;our discussion&lt;/a&gt; of how to use &lt;a href=&quot;http://projects.spring.io/spring-security&quot;&gt;Spring Security&lt;/a&gt; with &lt;a href=&quot;http://angularjs.org&quot;&gt;Angular JS&lt;/a&gt; in a “single page application”. Here we show how to use &lt;a href=&quot;http://projects.spring.io/spring-security-oauth/&quot;&gt;Spring Session&lt;/a&gt; together with &lt;a href=&quot;http://projects.spring.io/spring-cloud/&quot;&gt;Spring Cloud&lt;/a&gt; to combine the features of the systems we built in parts II and IV, and actually end up building 3 single page applications with quite different responsibilities. The aim is to build a Gateway (like in &lt;a href=&quot;http://spring.io/blog/2015/01/28/the-api-gateway-pattern-angular-js-and-spring-security-part-iv&quot; title=&quot;Fourth Article in the Series&quot;&gt;part IV&lt;/a&gt;) that is used not only for API resources but also to load the UI from a backend server. We simplify the token-wrangling bits of &lt;a href=&quot;http://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii&quot; title=&quot;Second Article in the Series&quot;&gt;part II&lt;/a&gt; by using the Gateway to pass through the authentication to the backends. Then we extend the system to show how we can make local, granular access decisions in the backends, while still controlling identity and authentication at the Gateway. This is a very powerful model for building distributed systems in general, and has a number of benefits that we can explore as we introduce the features in the code we build.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-03-23 14:50:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Multiple UI Applications and a Gateway: Single Page Application with Spring and Angular JS Part VI</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-03-23 14:50:00.0">March 23, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2011" href="/blog/2015/03/23/multiple-ui-applications-and-a-gateway-single-page-application-with-spring-and-angular-js-part-vi#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><blockquote><p>Note: the source code and test for this blog continue to evolve, but the changes to the text are not being maintained here. Please see <a href="https://spring.io/guides/tutorials/spring-security-and-angular-js/">the tutorial version</a> for the most up to date content.</p>
+</blockquote><p>In this article we continue <a href="https://spring.io/blog/2015/02/03/sso-with-oauth2-angular-js-and-spring-security-part-v" title="Fifth Article in the Series">our discussion</a> of how to use <a href="https://projects.spring.io/spring-security">Spring Security</a> with <a href="http://angularjs.org">Angular JS</a> in a &ldquo;single page application&rdquo;. Here we show how to use <a href="https://projects.spring.io/spring-security-oauth/">Spring Session</a> together with <a href="https://projects.spring.io/spring-cloud/">Spring Cloud</a> to combine the features of the systems we built in parts II and IV, and actually end up building 3 single page applications with quite different responsibilities. The aim is to build a Gateway (like in <a href="https://spring.io/blog/2015/01/28/the-api-gateway-pattern-angular-js-and-spring-security-part-iv" title="Fourth Article in the Series">part IV</a>) that is used not only for API resources but also to load the UI from a backend server. We simplify the token-wrangling bits of <a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii" title="Second Article in the Series">part II</a> by using the Gateway to pass through the authentication to the backends. Then we extend the system to show how we can make local, granular access decisions in the backends, while still controlling identity and authentication at the Gateway. This is a very powerful model for building distributed systems in general, and has a number of benefits that we can explore as we introduce the features in the code we build.</p>
+<blockquote><p>Reminder: if you are working through this article with the sample application, be sure to clear your browser cache of cookies and HTTP Basic credentials. In Chrome the best way to do that is to open a new incognito window.</p>
+</blockquote><h2><a href="#target-architecture" class="anchor" name="target-architecture"></a>Target Architecture</h2><p>Here&rsquo;s a picture of the basic system we are going to build to start with:</p><p><img src="https://raw.githubusercontent.com/dsyer/spring-security-angular/master/double/double-simple.png" alt="Components of the System" /></p><p>Like the other sample applications in this series it has a UI (HTML and JavaScript) and a Resource server. Like the sample in <a href="https://spring.io/blog/2015/01/28/the-api-gateway-pattern-angular-js-and-spring-security-part-iv" title="Fourth Article in the Series">Part IV</a> it has a Gateway, but here it is separate, not part of the UI. The UI effectively becomes part of the backend, giving us even more choice to re-configure and re-implement features, and also bringing other benefits as we will see.</p><p>The browser goes to the Gateway for everything and it doesn&rsquo;t have to know about the architecture of the backend (fundamentally, it has no idea that there is a back end). One of the things the browser does in this Gateway is authentication, e.g. it sends a username and password like in <a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii" title="Second Article in the Series">Part II</a>, and it gets a cookie in return. On subsequent requests it presents the cookie automatically and the Gateway passes it through to the backends. No code needs to be written on the client to enable the cookie passing. The backends use the cookie to authenticate and because all components share a session they share the same information about the user. Contrast this with <a href="https://spring.io/blog/2015/02/03/sso-with-oauth2-angular-js-and-spring-security-part-v" title="Fifth Article in the Series">Part V</a> where the cookie had to be converted to an access token in the Gateway, and the access token then had to be independently decoded by all the backend components.</p><p>As in <a href="https://spring.io/blog/2015/01/28/the-api-gateway-pattern-angular-js-and-spring-security-part-iv" title="Fourth Article in the Series">Part IV</a> the Gateway simplifies the interaction between clients and servers, and it presents a small, well-defined surface on which to deal with security. For example, we don&rsquo;t need to worry about <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">Common Origin Resource Sharing</a>, which is a welcome relief since it is easy to get wrong.</p><p>The source code for the complete project we are going to build is in <a href="https://github.com/dsyer/spring-security-angular/tree/master/double">Github here</a>, so you can just clone the project and work directly from there if you want. There is an extra component in the end state of this system (&ldquo;double-admin&rdquo;) so ignore that for now.</p><h2><a href="#building-the-backend" class="anchor" name="building-the-backend"></a>Building the Backend</h2><p>In this architecture the backend is very similar to the <a href="https://github.com/dsyer/spring-security-angular/tree/master/spring-session">&ldquo;spring-session&rdquo;</a> sample we built in <a href="https://spring.io/blog/2015/01/20/the-resource-server-angular-js-and-spring-security-part-iii" title="Third Article in the Series">Part III</a>, with the exception that it doesn&rsquo;t actually need a login page. The easiest way to get to what we want here is probably to copy the &ldquo;resource&rdquo; server from Part III and take the UI from the <a href="https://github.com/dsyer/spring-security-angular/tree/master/basic">&ldquo;basic&rdquo;</a> sample in <a href="https://spring.io/blog/2015/01/12/spring-and-angular-js-a-secure-single-page-application" title="First Article in the Series">Part I</a>. To get from the &ldquo;basic&rdquo; UI to the one we want here, we need only to add a couple of dependencies (like when we first used <a href="https://github.com/spring-projects/spring-session/">Spring Session</a> in Part III):</p>
+<pre><code class="prettyprint xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.session&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-session&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-redis&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre><p>and add the <code>@EnableRedisHttpSession</code> annotation to the main application class:</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+@EnableRedisHttpSession
+public class UiApplication {
+
+public static void main(String[] args) {
+    SpringApplication.run(UiApplication.class, args);
+  }
+
+}
+</code></pre><p>Since this is now a UI there is no need for the &ldquo;/resource&rdquo; endpoint. When you have done that you will have a very simple Angular application (the same as in the &ldquo;basic&rdquo; sample), which simplifies testing and reasoning about its behaviour greatly.</p><p>Lastly, we want this server to run as a backend, so we&rsquo;ll give it a non-default port to listen on (in <code>application.properties</code>):</p>
+<pre><code class="prettyprint properties">server.port: 8081
+security.sessions: NEVER
+</code></pre><p>If that&rsquo;s the <em>whole</em> content <code>application.properties</code> then the application will be secure and accessible to a user called &ldquo;user&rdquo; with a password that is random, but printed on the console (at log level INFO) on startup. The &ldquo;security.sessions&rdquo; setting means that Spring Security will accept cookies as authentication tokens but won&rsquo;t create them unless they already exist.</p><h2><a href="#the-resource-server" class="anchor" name="the-resource-server"></a>The Resource Server</h2><p>The Resource server is easy to generate from one of our existing samples. It is the same as the &ldquo;spring-session&rdquo; Resource server in <a href="https://spring.io/blog/2015/01/20/the-resource-server-angular-js-and-spring-security-part-iii" title="Third Article in the Series">Part III</a>: just a &ldquo;/resource&rdquo; endpoint and <code>@EnableRedisHttpSession</code> to get the distributed session data. We want this server to have a non-default port to listen on, and we want to be able to look up authentication in the session so we need this (in <code>application.properties</code>):</p>
+<pre><code class="prettyprint properties">server.port: 9000
+security.sessions: NEVER
+</code></pre><p>The completed sample is <a href="https://github.com/dsyer/spring-security-angular/tree/master/double/resource">here in github</a> if you want to take a peek.</p><h2><a href="#the-gateway" class="anchor" name="the-gateway"></a>The Gateway</h2><p>For an initial implementation of a Gateway (the simplest thing that could possibly work) we can just take an empty Spring Boot web application and add the <code>@EnableZuulProxy</code> annotation. As we saw in <a href="https://spring.io/blog/2015/01/12/spring-and-angular-js-a-secure-single-page-application" title="First Article in the Series">Part I</a> there are several ways to do that, and one is to use the <a href="https://start.spring.io">Spring Initializr</a> to generate a skeleton project. Even easier, is to use the <a href="https://cloud-start.spring.io">Spring Cloud Initializr</a> which is the same thing, but for <a href="https://cloud.spring.io">Spring Cloud</a> applications. Using the same sequence of command line operations as in Part I:</p>
+<pre><code class="prettyprint">$ mkdir gateway &amp;&amp; cd gateway
+$ curl https://cloud-start.spring.io/starter.tgz -d style=web \
+  -d style=security -d style=cloud-zuul -d name=gateway \
+  -d style=redis | tar -xzvf - 
+</code></pre><p>You can then import that project (it&rsquo;s a normal Maven Java project by default) into your favourite IDE, or just work with the files and &ldquo;mvn&rdquo; on the command line. There is a version <a href="https://github.com/dsyer/spring-security-angular/tree/master/double/gateway">in github</a> if you want to go from there, but it has a few extra features that we don&rsquo;t need yet.</p><p>Starting from the blank Initializr application, we add the Spring Session dependency (like in the UI above), and the <code>@EnableRedisHttpSession</code> annotation:</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+@EnableRedisHttpSession
+@EnableZuulProxy
+public class GatewayApplication {
+
+public static void main(String[] args) {
+    SpringApplication.run(GatewayApplication.class, args);
+  }
+
+}
+</code></pre><p>The Gateway is ready to run, but it doesn&rsquo;t yet know about our backend services, so let&rsquo;s just set that up in its <code>application.yml</code> (renaming from <code>application.properties</code> if you did the curl thing above):</p>
+<pre><code class="prettyprint">zuul:
+  routes:
+    ui:
+      url: http://localhost:8081
+    resource:
+      url: http://localhost:9000
+security:
+  user:
+    password:
+      password
+  sessions: ALWAYS
+</code></pre><p>There are 2 routes in the proxy, one each for the UI and resource server, and we have set up a default password and a session persistence strategy (telling Spring Security to always create a session on authentication). This last bit is important because we want authentication and therefore sessions to be managed in the Gateway.</p><h2><a href="#up-and-running" class="anchor" name="up-and-running"></a>Up and Running</h2><p>We now have three components, running on 3 ports. If you point the browser at <a href="http://localhost:8080/ui/">http://localhost:8080/ui/</a> you should get an HTTP Basic challenge, and you can authenticate as &ldquo;user/password&rdquo; (your credentials in the Gateway), and once you do that you should see a greeting in the UI, via a backend call through the proxy to the Resource server.</p><p>The interactions between the browser and the backend can be seen in your browser if you use some developer tools (usually F12 opens this up, works in Chrome by default, requires a plugin in Firefox). Here&rsquo;s a summary:</p>
+<table>
+<thead>
+<tr>
+<th>Verb </th>
+<th>Path </th>
+<th>Status </th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET </td>
+<td>/ui/ </td>
+<td>401 </td>
+<td>Browser prompts for authentication</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/ui/ </td>
+<td>200 </td>
+<td>index.html</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/ui/css/angular-bootstrap.css </td>
+<td>200 </td>
+<td>Twitter bootstrap CSS</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/ui/js/angular-bootstrap.js </td>
+<td>200 </td>
+<td>Bootstrap and Angular JS</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/ui/js/hello.js </td>
+<td>200 </td>
+<td>Application logic</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/ui/user </td>
+<td>200 </td>
+<td>authentication</td>
+</tr>
+<tr>
+<td>GET </td>
+<td>/resource/ </td>
+<td>200 </td>
+<td>JSON greeting</td>
+</tr>
+</tbody>
+</table><p>You might not see the 401 because the browser treats the home page load as a single interaction. All requests are proxied (there is no content in the Gateway yet, beyond the Actuator endpoints for management).</p><p>Hurrah, it works! You have two backend servers, one of which is a UI, each with independent capabilities and able to be tested in isolation, and they are connected together with a secure Gateway that you control and for which you have configured the authentication. If the backends are not accessible to the browser it doesn&rsquo;t matter (in fact it&rsquo;s probably an advantage because it gives you yet more control over physical security).</p><h2><a href="#adding-a-login-form" class="anchor" name="adding-a-login-form"></a>Adding a Login Form</h2><p>Just as in the &ldquo;basic&rdquo; sample in <a href="https://spring.io/blog/2015/01/12/spring-and-angular-js-a-secure-single-page-application" title="First Article in the Series">Part I</a> we can now add a login form to the Gateway, e.g. by copying the code from <a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii" title="Second Article in the Series">Part II</a>. When we do that we can also add some basic navigation elements in the Gateway, so the user doesn&rsquo;t have to know the path to the UI backend in the proxy. So let&rsquo;s first copy the static assets from the &ldquo;single&rdquo; UI into the Gateway, delete the message rendering and insert a login form into our home page (in the <code>&lt;body/&gt;</code> somewhere):</p>
+<pre><code class="prettyprint html">&lt;body ng-app=&quot;hello&quot; ng-controller=&quot;navigation&quot; ng-cloak
+	class=&quot;ng-cloak&quot;&gt;
+  ...
+  &lt;div class=&quot;container&quot; ng-show=&quot;!authenticated&quot;&gt;
+    &lt;form role=&quot;form&quot; ng-submit=&quot;login()&quot;&gt;
+      &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label for=&quot;username&quot;&gt;Username:&lt;/label&gt; &lt;input type=&quot;text&quot;
+          class=&quot;form-control&quot; id=&quot;username&quot; name=&quot;username&quot;
+          ng-model=&quot;credentials.username&quot; /&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label for=&quot;password&quot;&gt;Password:&lt;/label&gt; &lt;input type=&quot;password&quot;
+          class=&quot;form-control&quot; id=&quot;password&quot; name=&quot;password&quot;
+          ng-model=&quot;credentials.password&quot; /&gt;
+      &lt;/div&gt;
+      &lt;button type=&quot;submit&quot; class=&quot;btn btn-primary&quot;&gt;Submit&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+</code></pre><p>Instead of the message rendering we will have a nice big navigation button:</p>
+<pre><code class="prettyprint html">&lt;div class=&quot;container&quot; ng-show=&quot;authenticated&quot;&gt;
+  &lt;a class=&quot;btn btn-primary&quot; href=&quot;/ui/&quot;&gt;Go To User Interface&lt;/a&gt;
+&lt;/div&gt;
+</code></pre><p>If you are looking at the sample in github, it also has a minimal navigation bar with a &ldquo;Logout&rdquo; button. Here&rsquo;s the login form in a screenshot:</p><p><img src="https://raw.githubusercontent.com/dsyer/spring-security-angular/master/double/login.png" alt="Login Page" /></p><p>To support the login form we need some JavaScript with a &ldquo;navigation&rdquo; controller implementing the <code>login()</code> function we declared in the <code>&lt;form/&gt;</code>, and we need to set the <code>authenticated</code> flag so that the home page will render differently depending on whether or not the user is authenticated. For example:</p>
+<pre><code class="prettyprint javascript">angular.module(&#39;hello&#39;, []).controller(&#39;navigation&#39;,
+function($scope, $http) {
+
+  ...
+  
+  authenticate();
+  
+  $scope.credentials = {};
+
+$scope.login = function() {
+    authenticate($scope.credentials, function() {
+      if ($scope.authenticated) {
+        console.log(&quot;Login succeeded&quot;)
+        $scope.error = false;
+        $scope.authenticated = true;
+      } else {
+        console.log(&quot;Login failed&quot;)
+        $scope.error = true;
+        $scope.authenticated = false;
+      }
+    })
+  };
+
+}
+</code></pre><p>where the implementation of the <code>authenticate()</code> function is similar to that in <a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii" title="Second Article in the Series">Part II</a>:</p>
+<pre><code class="prettyprint javascript">var authenticate = function(credentials, callback) {
+
+  var headers = credentials ? {
+    authorization : &quot;Basic &quot;
+        + btoa(credentials.username + &quot;:&quot;
+            + credentials.password)
+  } : {};
+
+  $http.get(&#39;user&#39;, {
+    headers : headers
+  }).success(function(data) {
+    if (data.name) {
+      $scope.authenticated = true;
+    } else {
+      $scope.authenticated = false;
+    }
+    callback &amp;&amp; callback();
+  }).error(function() {
+    $scope.authenticated = false;
+    callback &amp;&amp; callback();
+  });
+
+}
+</code></pre><p>We can use the <code>$scope</code> to store the <code>authenticated</code> flag because there is only one controller in this simple application.</p><p>If we run this enhanced Gateway, instead of having to remember the URL for the UI we can just load the home page and follow links. Here&rsquo;s the home page for an authenticated user:</p><p><img src="https://raw.githubusercontent.com/dsyer/spring-security-angular/master/double/home.png" alt="Home Page" /></p><h2><a href="#granular-access-decisions-in-the-backend" class="anchor" name="granular-access-decisions-in-the-backend"></a>Granular Access Decisions in the Backend</h2><p>Up to now our application is functionally very similar to the one in <a href="https://spring.io/blog/2015/01/20/the-resource-server-angular-js-and-spring-security-part-iii" title="Third Article in the Series">Part III</a> or <a href="https://spring.io/blog/2015/01/28/the-api-gateway-pattern-angular-js-and-spring-security-part-iv" title="Fourth Article in the Series">Part IV</a>, but with an additional dedicated Gateway. The advantage of the extra layer may not be yet apparent, but we can emphasise it by expanding the system a bit. Suppose we want to use that Gateway to expose another backend UI, for users to &ldquo;administrate&rdquo; the content in the main UI, and that we want to restrict access to this feature to users with special roles. So we will add an &ldquo;Admin&rdquo; application behind the proxy, and the system will look like this:</p><p><img src="https://raw.githubusercontent.com/dsyer/spring-security-angular/master/double/double-components.png" alt="Components of the System" /></p><p>There is a new component (Admin) and a new route in the Gateway in <code>application.yml</code>:</p>
+<pre><code class="prettyprint yaml">zuul:
+  routes:
+    ui:
+      url: http://localhost:8081
+    admin:
+      url: http://localhost:8082
+    resource:
+      url: http://localhost:9000
+</code></pre><p>The fact that the existing UI is available to users in the &ldquo;USER&rdquo; role is indicated on the block diagram above in the Gateway box (green lettering), as is the fact that the &ldquo;ADMIN&rdquo; role is needed to go to the Admin application. The access decision for the &ldquo;ADMIN&rdquo; role could be applied in the Gateway, in which case it would appear in a <code>WebSecurityConfigurerAdapter</code>, or it could be applied in the Admin application itself (and we will see how to do that below).</p><p>In addition, suppose that within the Admin application we want to distinguish between &ldquo;READER&rdquo; and &ldquo;WRITER&rdquo; roles, so that we can permit (let&rsquo;s say) users who are auditors to view the changes made by the main admin users. This is a granular access decision, where the rule is only known, and should only be known, in the backend application. In the Gateway we only need to ensure that our user accounts have the roles needed, and this information is available, but the Gateway doesn&rsquo;t need to know how to interpret it. In the Gateway we create user accounts to keep the sample application self-contained:</p>
+<pre><code class="prettyprint javascript">@Configuration
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+  @Autowired
+  public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
+    auth.inMemoryAuthentication()
+      .withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;)
+    .and()
+      .withUser(&quot;admin&quot;).password(&quot;admin&quot;).roles(&quot;USER&quot;, &quot;ADMIN&quot;, &quot;READER&quot;, &quot;WRITER&quot;)
+    .and()
+      .withUser(&quot;audit&quot;).password(&quot;audit&quot;).roles(&quot;USER&quot;, &quot;ADMIN&quot;, &quot;READER&quot;);
+  }
+  
+}
+</code></pre><p>where the &ldquo;admin&rdquo; user has been enhanced with 3 new roles (&ldquo;ADMIN&rdquo;, &ldquo;READER&rdquo; and &ldquo;WRITER&rdquo;) and we have also added an &ldquo;audit&rdquo; user with &ldquo;ADMIN&rdquo; access, but not &ldquo;WRITER&rdquo;.</p>
+<blockquote><p>Aside: In a production system the user account data would be managed in a backend database (most likely a directory service), not hard coded in the Spring Configuration. Sample applications connecting to such a database are easy to find on the internet, for example in the <a href="https://github.com/spring-projects/spring-security/tree/master/samples">Spring Security Samples</a>.</p>
+</blockquote><p>The access decisions go in the Admin application. For the &ldquo;ADMIN&rdquo; role (which is required globally for this backend) we do it in Spring Security:</p>
+<pre><code class="prettyprint java">@Configuration
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+@Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http
+    ...
+      .authorizeRequests()
+        .antMatchers(&quot;/index.html&quot;, &quot;/login&quot;, &quot;/&quot;).permitAll()
+        .antMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;)
+        .anyRequest().authenticated()
+    ...
+  }
+  
+}
+</code></pre><p>For the &ldquo;READER&rdquo; and &ldquo;WRITER&rdquo; roles the application itself is split, and since the application is implemented in JavaScript, that is where we need to make the access decision. One way to do this is to have a home page with a computed view embedded in it:</p>
+<pre><code class="prettyprint html">&lt;div class=&quot;container&quot;&gt;
+  &lt;h1&gt;Admin&lt;/h1&gt;
+  &lt;div ng-show=&quot;authenticated&quot; ng-include=&quot;template&quot;&gt;&lt;/div&gt;
+  &lt;div ng-show=&quot;!authenticated&quot; ng-include=&quot;&#39;unauthenticated.html&#39;&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><p>Angular JS evaluates the &ldquo;ng-include&rdquo; attribute value as an expression, and then uses the result to load a template. </p>
+<blockquote><p>Tip: A more complex application might use other mechanisms to modularize itself, e.g. the <code>$routeProvider</code> service that we used in nearly all the other applications in this series. </p>
+</blockquote><p>The <code>template</code> variable is initialized in our controller, first by defining a utility function:</p>
+<pre><code class="prettyprint javascript">var computeDefaultTemplate = function(user) {
+  $scope.template = user &amp;&amp; user.roles
+      &amp;&amp; user.roles.indexOf(&quot;ROLE_WRITER&quot;)&gt;0 ? &quot;write.html&quot; : &quot;read.html&quot;;		
+}
+</code></pre><p>then by using the utility function when the controller loads:</p>
+<pre><code class="prettyprint javascript">angular.module(&#39;admin&#39;, []).controller(&#39;home&#39;,
+
+function($scope, $http) {
+	
+  $http.get(&#39;user&#39;).success(function(data) {
+    if (data.name) {
+      $scope.authenticated = true;
+      $scope.user = data;
+      computeDefaultTemplate(data);
+    } else {
+      $scope.authenticated = false;
+    }
+    $scope.error = null
+  })
+  ...
+      
+})
+</code></pre><p>the first thing the application does is look at the usual (for this series) &ldquo;/user&rdquo; endpoint, then it extracts some data, sets the authenticated flag, and if the user is authenticated, computes the template by looking at the user data. </p><p>To support this function on the backend we need an endpoint, e.g. in our main application class:</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+@RestController
+@EnableRedisHttpSession
+public class AdminApplication {
+
+  @RequestMapping(&quot;/user&quot;)
+  public Map&lt;String, Object&gt; user(Principal user) {
+    Map&lt;String, Object&gt; map = new LinkedHashMap&lt;String, Object&gt;();
+    map.put(&quot;name&quot;, user.getName());
+    map.put(&quot;roles&quot;, AuthorityUtils.authorityListToSet(((Authentication) user)
+        .getAuthorities()));
+    return map;
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(AdminApplication.class, args);
+  }
+
+}
+</code></pre>
+<blockquote><p>Note: the role names come back from the &ldquo;/user&rdquo; endpoint with the &ldquo;ROLE_&rdquo; prefix so we can distinguish them from other kinds of authorities (it&rsquo;s a Spring Security thing). Thus the &ldquo;ROLE_&rdquo; prefix is needed in the JavaScript, but not in the Spring Security configuration, where it is clear from the method names that &ldquo;roles&rdquo; are the focus of the operations.</p>
+</blockquote><h2><a href="#why-are-we-here" class="anchor" name="why-are-we-here"></a>Why are we Here?</h2><p>Now we have a nice little system with 2 independent user interfaces and a backend Resource server, all protected by the same authentication in a Gateway. The fact that the Gateway acts as a micro-proxy makes the implementation of the backend security concerns extremely simple, and they are free to concentrate on their own business concerns. The use of Spring Session has (again) avoided a huge amount of hassle and potential errors.</p><p>A powerful feature is that the backends can independently have any kind of authentication they like (e.g. you can go directly to the UI if you know its physical address and a set of local credentials). The Gateway imposes a completely unrelated set of constraints, as long as it can authenticate users and assign metadata to them that satisfy the access rules in the backends. This is an excellent design for being able to independently develop and test the backend components. If we wanted to, we could go back to an external OAuth2 server (like in <a href="https://spring.io/blog/2015/02/03/sso-with-oauth2-angular-js-and-spring-security-part-v" title="Fifth Article in the Series">Part V</a>, or even something completely different) for the authentication at the Gateway, and the backends would not need to be touched.</p><p>A bonus feature of this architecture (single Gateway controlling authentication, and shared session token across all components) is that &ldquo;Single Logout&rdquo;, a feature we identified as difficult to implement in <a href="https://spring.io/blog/2015/02/03/sso-with-oauth2-angular-js-and-spring-security-part-v" title="Fifth Article in the Series">Part V</a>, comes for free. To be more precise, one particular approach to the user experience of single logout is automatically available in our finished system: if a user logs out of any of the UIs (Gateway, UI backend or Admin backend), he is logged out of all the others, assuming that each individual UI implemented a &ldquo;logout&rdquo; feature the same way (invalidating the session).</p><p>If you&rsquo;re still having fun, try the <a href="https://spring.io/blog/2015/05/13/modularizing-the-client-angular-js-and-spring-security-part-vii">next</a> article in the series, which is mostly about the Javascript, but still shows how a Spring backend makes things easier.</p>
+<blockquote><p>Thanks: I would like to thank again everyone who helped me develop this series, and in particular <a href="https://spring.io/team/rwinch">Rob Winch</a> and <a href="https://twitter.com/thspaeth">Thorsten Späth</a> for their careful reviews of the articles and sources code. Since <a href="https://spring.io/blog/2015/01/12/spring-and-angular-js-a-secure-single-page-application" title="First Article in the Series">Part I</a> was published it hasn&rsquo;t changed much but all the other parts have evolved in response to comments and insights from readers, so thank you also to anyone who read the articles and took the trouble to join in the discussion.</p>
+</blockquote></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2011;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

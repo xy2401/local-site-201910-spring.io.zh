@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Notes on Reactive Programming Part III: A Simple HTTP Server Application</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Notes on Reactive Programming Part III: A Simple HTTP Server Application" />
+<meta name="twitter:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this article we continue the series on &lt;a href=&quot;https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code&quot;&gt;Reactive Programming&lt;/a&gt;, and the focus is less on learning the basic APIs and more on more concrete use cases and writing code that actually does something useful. We will see how Reactive is a useful abstraction for concurrent programming, but also that it has some very low level features that we should learn to treat with respect and caution. If we start to use these features to their full potential we can take control of layers in our application that previously were invisible, hidden by containers, platforms and frameworks.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@david_syer" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+
+<meta property="og:title" content="Notes on Reactive Programming Part III: A Simple HTTP Server Application" />
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta property="og:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this article we continue the series on &lt;a href=&quot;https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code&quot;&gt;Reactive Programming&lt;/a&gt;, and the focus is less on learning the basic APIs and more on more concrete use cases and writing code that actually does something useful. We will see how Reactive is a useful abstraction for concurrent programming, but also that it has some very low level features that we should learn to treat with respect and caution. If we start to use these features to their full potential we can take control of layers in our application that previously were invisible, hidden by containers, platforms and frameworks.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2016-07-20 13:51:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Notes on Reactive Programming Part III: A Simple HTTP Server Application</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2016-07-20 13:51:00.0">July 20, 2016</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2562" href="/blog/2016/07/20/notes-on-reactive-programming-part-iii-a-simple-http-server-application#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div class="paragraph">
+<p>In this article we continue the series on <a href="https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code">Reactive Programming</a>, and the focus is less on learning the basic APIs and more on more concrete use cases and writing code that actually does something useful. We will see how Reactive is a useful abstraction for concurrent programming, but also that it has some very low level features that we should learn to treat with respect and caution. If we start to use these features to their full potential we can take control of layers in our application that previously were invisible, hidden by containers, platforms and frameworks.</p>
+</div>
+<div class="sect1">
+<h2 id="bridging-from-blocking-to-reactive-with-spring-mvc"><a class="anchor" href="#bridging-from-blocking-to-reactive-with-spring-mvc"></a>Bridging from Blocking to Reactive with Spring MVC</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Being Reactive forces you to look at the world differently. Instead of asking for something and getting it (or not getting it), everything is delivered as a sequence (<code>Publisher</code>) and you have to subscribe to it. Instead of waiting for an answer, you have to register a callback. It&#8217;s not so hard when you get used to it, but unless the whole world turns on its head and becomes Reactive, you are going to find you need to interact with an old-style blocking API</p>
+</div>
+<div class="paragraph">
+<p>Suppose we have a blocking method that returns an <code>HttpStatus</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private RestTemplate restTemplate = new RestTemplate();
+
+private HttpStatus block(int value) {
+    return this.restTemplate.getForEntity("http://example.com/{value}", String.class, value)
+            .getStatusCode();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and we want to call it repeatedly with different arguments and aggregate the results. It&#8217;s a classic "scatter-gather" use case, which you would get, for instance, if you had a paginated back end needed to summarize the "top N" items across multiple pages. Since the details of the non-reactive (blocking) operation are not relevant to the scatter-gather pattern, we can push them down into a method called <code>block()</code>, and implement it later. Here&#8217;s a (bad) example that calls the back end and aggregates into an object of type <code>Result</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.range(1, 10) // <b class="conum">(1)</b>
+    .log()
+    .map(this::block) // <b class="conum">(2)</b>
+    .collect(Result::new, Result::add) // <b class="conum">(3)</b>
+    .doOnSuccess(Result::stop) // <b class="conum">(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>make 10 calls</p>
+</li>
+<li>
+<p>blocking code here</p>
+</li>
+<li>
+<p>collect results and aggregate into a single object</p>
+</li>
+<li>
+<p>at the end stop the clock (the result is a <code>Mono&lt;Result&gt;</code>)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Don&#8217;t do this at home. It&#8217;s a "bad" example because, while the APIs are technically being used correctly, we know that it is going to block the calling thread; this code is more or less equivalent to a for loop with the call to <code>block()</code> in the body of the loop. A better implementation would push the call to <code>block()</code> onto a background thread. We can do that by wrapping it in a method that returns a <code>Mono&lt;HttpStatus&gt;</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private Mono&lt;HttpStatus&gt; fetch(int value) {
+    return Mono.fromCallable(() -&gt; block(value)) // <b class="conum">(1)</b>
+        .subscribeOn(this.scheduler);            // <b class="conum">(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>blocking code here inside a Callable to defer execution</p>
+</li>
+<li>
+<p>subscribe to the slow publisher on a background thread</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The <code>scheduler</code> is declared separately as a shared field: <code>Scheduler scheduler = Schedulers.parallel()</code>. Then we can declare that we want to <code>flatMap()</code> the sequence instead of using <code>map()</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.range(1, 10)
+    .log()
+    .flatMap(                             // <b class="conum">(1)</b>
+        this::fetch, 4)                   // <b class="conum">(2)</b>
+    .collect(Result::new, Result::add)
+    .doOnSuccess(Result::stop)</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>drop down to a new publisher to process in parallel</p>
+</li>
+<li>
+<p>concurrency hint in flatMap</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="embedding-in-a-non-reactive-server"><a class="anchor" href="#embedding-in-a-non-reactive-server"></a>Embedding in a Non-Reactive Server</h3>
+<div class="paragraph">
+<p>If we wanted to run the scatter-gather code above in a non-reactive server like a servlet container, we could use Spring MVC, like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RequestMapping("/parallel")
+public CompletableFuture&lt;Result&gt; parallel() {
+    return Flux.range(1, 10)
+      ...
+      .doOnSuccess(Result::stop)
+      .toFuture();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you read the Javadocs for <code>@RequestMapping</code> you will find that a method can return a <code>CompletableFuture</code> "which the application uses to produce a return value in a separate thread of its own choosing". The separate thread in this case is provided by "scheduler", which is a thread pool, so the processing is happening on multiple threads, 4 at a time because of the way that <code>flatMap()</code> is called.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="no-such-thing-as-a-free-lunch"><a class="anchor" href="#no-such-thing-as-a-free-lunch"></a>No Such Thing as a Free Lunch</h3>
+<div class="paragraph">
+<p>The scatter-gather with a background thread is a useful pattern but it isn&#8217;t perfect&#8201;&#8212;&#8201;it&#8217;s not blocking the caller, but it&#8217;s blocking something, so it&#8217;s just moving the problem around. There are some practical implications. We have an HTTP server with (probably) non-blocking IO handlers, passing work back to a thread pool, one HTTP request per thread&#8201;&#8212;&#8201;all of this is happening inside a servlet container (e.g. Tomcat). The request is processed asynchronously, so the worker thread in Tomcat isn&#8217;t blocked, and the thread pool that we created in our "scheduler" is processing on up to 4 concurrent threads. We are processing 10 back end requests (calls to <code>block()</code>) so there is a maximum, theoretical benefit of using the scheduler of 4 times lower latency. In other words, if processing all 10 requests one after the other in a single thread takes 1000ms, we might see a processing time of 250ms for a single incoming request at our HTTP service. We should emphasise the "might" though: it&#8217;s only going to go that fast if there is no contention for the processing threads (in both stages, the Tomcat workers, and the application scheduler). If you have a server with a large number of cores, very low concurrency, i.e. a small number of clients connecting to your application, and hardly any chance that two will make a request at the same time, then you will probably see close to the theoretical improvement. As soon as there are multiple clients trying to connect, they will all be competing for the same 4 threads, and the latency will drift up, and could even be worse than that experienced by a single client with no background processing. We can improve the latency for concurrent clients by creating the scheduler with a larger thread pool, e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">    private Scheduler scheduler = Schedulers.newParallel("sub", 16);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(16 threads.) Now we are using more memory for the threads and their stacks, and we can expect to see lower latency for low concurrency, but not necessarily for high concurrency if our hardware has fewer than 16 cores. We also do not expect higher throughput under load: if there is contention for the threads, there is a high cost for managing those resources and that has to be reflected somwehere in a metric that matters. If you are interested in more detailed analysis of that kind of trade off, some detailed analyses of how performance metrics scale under load can be found in a blog series by <a href="https://robharrop.github.io/">Rob Harrop</a>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Tomcat allocates 100 threads for processing HTTP requests by default. That is excessive if we know all the processing is going to be on our scheduler thread pool. There is an impedance mismatch: the scheduler thread pool can be a bottleneck because it has fewer threads than the upstream Tomcat thread pool. This highlights the fact that performance tuning can be very hard, and, while you might have control of all the configuration, it&#8217;s a delicate balance.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We can do better than a fixed thread pool if we use a scheduler that adjusts its capacity according to demand. Reactor has a convenience for that, so if you try the same code with <code>Schedulers.elastic()</code> (you can call it anywhere; there is only one instance), you will see that under load more threads are created.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-all-the-way-down"><a class="anchor" href="#reactive-all-the-way-down"></a>Reactive all the Way Down</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The bridge from blocking to reactive is a useful pattern, and is easy to implement using available technology in Spring MVC (as shown above). The next stage in the Reactive journey is to break out of blocking in application threads completely, and to do that requires new APIs and new tools. Ultimately we have to be Reactive all the way down the stack, including servers and clients. This is the goal of Spring Reactive, which is a new framework, orthogonal to Spring MVC, but meeting the same needs, and using a similar programming model.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Spring Reactive started as a standalone project, but is folded into the Spring Framework in version 5.0 (first milestone June 2016).
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The first step to fully Reactive in our scatter-gather example would be to replace <code>spring-boot-starter-web</code> with <code>spring-boot-starter-webflux</code> on the classpath. In Maven:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependencies&gt;
+  &lt;dependency&gt;
+	&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+	&lt;artifactId&gt;spring-boot-starter-webflux&lt;/artifactId&gt;
+  &lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Gradle:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">dependencies {
+	compile('org.springframework.boot:spring-boot-starter-webflux')
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then in the controller, we can simply lose the bridge to <code>CompletableFuture</code> and return an object of type <code>Mono</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RequestMapping("/parallel")
+public Mono&lt;Result&gt; parallel() {
+    return Flux.range(1, 10)
+            .log()
+            .flatMap(this::fetch, 4)
+            .collect(Result::new, Result::add)
+            .doOnSuccess(Result::stop);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Take this code and put it in a Spring Boot application and it will run in Tomcat, Jetty or Netty, depending on what it finds on the classpath. Tomcat is the default server in that starter, so you have to exclude it and provide a different one if you want to switch. All three have very similar characteristics in terms of startup time, memory usage and runtime resource usage.</p>
+</div>
+<div class="paragraph">
+<p>We still have the blocking backend call in <code>block()</code>, so we still have to subscribe on a thread pool to avoid blocking the caller. We can change that if we have a non-blocking client, e.g. instead of using <code>RestTemplate</code> we use the new <code>WebClient</code> then we might do this instead to use a non-blocking client:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private WebClient client = new WebClient(new ReactorHttpClientRequestFactory());
+
+private Mono&lt;HttpStatus&gt; fetch(int value) {
+    return this.client.perform(HttpRequestBuilders.get("http://example.com"))
+            .extract(WebResponseExtractors.response(String.class))
+            .map(response -&gt; response.getStatusCode());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the <code>WebClient.perform()</code> (or the <code>WebResponseExtractor</code> to be precise) has a Reactive return type, which we have transformed into a <code>Mono&lt;HttpStatus&gt;</code>, but we have not subscribed to it. We want the framework to do all the subscribing, so now we are Reactive all the way down.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+Methods in Spring Reactive that return a <code>Publisher</code> <strong>are</strong> non-blocking, but in general a method that returns a <code>Publisher</code> (or <code>Flux</code>, <code>Mono</code> or <code>Observable</code>) is only a hint that it might be non-blocking. If you are writing such methods it is important to analyse (and preferably test) whether they block, and to let callers know explicitly if they might do.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The trick we played just now of using a non-blocking client to simplify the HTTP stack works in regular Spring MVC as well. The result of the <code>fetch()</code> method above can be converted to a <code>CompletableFuture</code> and passed out of a regular <code>@RequestMapping</code> method (in Spring Boot 1.3 for instance).
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="inversion-of-control"><a class="anchor" href="#inversion-of-control"></a>Inversion of Control</h3>
+<div class="paragraph">
+<p>Now we can remove the concurrency hint after the call to <code>fetch()</code> in the HTTP request handler:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RequestMapping("/netty")
+public Mono&lt;Result&gt; netty() {
+    return Flux.range(1, 10) // <b class="conum">(1)</b>
+        .log() //
+        .flatMap(this::fetch) // <b class="conum">(2)</b>
+        .collect(Result::new, Result::add)
+        .doOnSuccess(Result::stop);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>make 10 calls</p>
+</li>
+<li>
+<p>drop down to a new publisher to process in parallel</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Taking into account that we don&#8217;t need the extra callable and subscriber thread at all, this code is a lot cleaner than when we had to bridge to the blocking client, which can be attributed to the fact that the code is Reactive all the way down. The Reactive <code>WebClient</code> returns a <code>Mono</code>, and that drives us immediately to select <code>flatMap()</code> in the transformation chain, and the code we need just falls out. It&#8217;s a nicer experience to write it, and it&#8217;s more readable, so it&#8217;s easier to maintain. Also, since there is no thread pooling and no concurrency hint, there is no magic factor of 4 to plug into our performance expectations. There is a limit somewhere, but it&#8217;s not imposed by our choices in the application tier any more, nor is it limited by anything in the server "container". It&#8217;s not magic, and there are still laws of physics, so the backend calls are all still going to take 100ms or so each, but with low contention we might even see all 10 requests complete in roughly the same time it takes for one. As the load on the server increases latency and throughput will naturally degrade, but in a way that is governed by buffer contention and kernel networking, not by application thread management. It&#8217;s an inversion of control, to lower levels of the stack below the application code.</p>
+</div>
+<div class="paragraph">
+<p>Remember the same application code runs on Tomcat, Jetty or Netty. Currently, the Tomcat and Jetty support is provided on top of Servlet 3.1 asynchronous processing, so it is no longer limited to one request per thread. It is build on top of a Reactive bridge that adapts the Servlet 3.1 concepts to the reactive paradigm. In the case of Reactor Netty, the backpressure and reactive support is built-in. Depending on your choice of HTTP client library, server and client might share the same HTTP resources and optimize things even more. We will come back to that later in another article in this series.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+in the <a href="https://github.com/dsyer/reactive-notes">sample code</a> the "reactive" sample has Maven profiles "tomcat", "tomcatNext" (for Tomcat 8.5), "jetty" and "netty", so you can easily try out all the different server options without changing a line of code.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+the blocking code in many applications is not HTTP backend calls, but database interactions. Very few databases support non-blocking clients at this point in time (MongoDB and Couchbase are notable exceptions, but even those are not as mature as the HTTP clients). Thread pools and the blocking-to-reactive pattern will have a long life until all the database vendors catch up on the client side.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="still-no-free-lunch"><a class="anchor" href="#still-no-free-lunch"></a>Still No Free Lunch</h3>
+<div class="paragraph">
+<p>We have whittled down our basic scatter-gather use case until the code is very clean, and very sympathetic to the hardware it runs on. We wrote some simple code and it was stacked up and orchestrated very nicely into a working HTTP service using Spring. On a sunny day everyone is more than happy with the outcome. But as soon as there are errors, e.g. a badly behaved network connection, or a back end service that suffers from poor latency, we are going to suffer.</p>
+</div>
+<div class="paragraph">
+<p>The first, most obvious way to suffer is that the code we wrote is declarative, so it&#8217;s hard to debug. When errors occur the diagnostics can be very opaque. Using the raw, low-level APIs, like Reactor without Spring, or even down to the level of Netty without Reactor would probably make it even worse, because then we would have to build a lot of error handling ourselves, repeating the boiler plate every time we interact with the network. At least with Spring and Reactor in the mix we can expect to see stack traces logged for stray, uncaught exceptions. They might not be easy to understand though because they happen on threads that we don&#8217;t control, and they sometimes show up as quite low level concerns, from unfamiliar parts of the stack.</p>
+</div>
+<div class="paragraph">
+<p>Another source of pain is that if we ever make a mistake and block in one of our Reactive callbacks, we will be holding up <strong>all</strong> requests on the same thread. With the servlet-based containers every request is isolated to a thread, and blocking doesn&#8217;t hold up other requests because they are be processed on different threads. Blocking all requests is still a recipe for trouble, but it only shows up as increased latency with roughly a constant factor per request. In the Reactive world, blocking a single request can lead to increased latency for all requests, and blocking all requests can bring a server to its knees because the extra layers of buffers and threads are not there to take up the slack.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It&#8217;s nice to be able to control all the moving parts in our asynchronous processing: every layer has a thread pool size and a queue. We can make some of those layers elastic, and try and adjust them according to how much work they do. But at some point it becomes a burden, and we start looking for something simpler, or leaner. Analysis of scalability leads to the conclusion that it is often better to shed the extra threads, and work with the constraints imposed by the physical hardware. This is an example of "mechanical sympathy", as is famously exploited by LMAX to great effect in the <a href="https://lmax-exchange.github.io/disruptor/">Disruptor Pattern</a>.</p>
+</div>
+<div class="paragraph">
+<p>We have begun to see the power of the Reactive approach, but remember that with power comes responsibility. It&#8217;s radical, and it&#8217;s fundamental. It&#8217;s "rip it up and start again" territory. So you will also hopefully appreciate that Reactive isn&#8217;t a solution to all problems. In fact it isn&#8217;t a solution to any problem, it merely facilitates the solution of a certain class of problems. The benefits you get from using it might be outweighed by the costs of learning it, modifying your APIs to be Reactive all the way down, and maintaining the code afterwards, so tread carefully.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2562;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

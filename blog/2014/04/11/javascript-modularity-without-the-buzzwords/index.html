@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>JavaScript modularity (without the buzzwords)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="JavaScript modularity (without the buzzwords)" />
+<meta name="twitter:description" content="&lt;p&gt;Almost ten years ago &lt;a href=&quot;https://spring.io/team/acolyer&quot;&gt;Adrian Colyer&lt;/a&gt; wrote a &lt;a href=&quot;http://aspectprogrammer.org/blogs/adrian/2004/05/the_ted_neward.html&quot;&gt;memorable blog post&lt;/a&gt;, giving the best explanation on aspect oriented programming (AOP) out there: clear and simple style, accurate content, no buzzwords. If you’ve taken a look at the the earlier &lt;a href=&quot;https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io&quot;&gt;two&lt;/a&gt; &lt;a href=&quot;https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments&quot;&gt;posts&lt;/a&gt; in this series, you may have noticed some of our architecture choices in the &lt;a href=&quot;https://github.com/spring-io/sagan/tree/master/sagan-client&quot;&gt;client module&lt;/a&gt; of the Sagan application, including the &lt;strong&gt;use of JavaScript modules&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;In this post, I want to walk you through the basics of JavaScript modules in the style of Adrian’s post: clear, simple, accurate, no buzzwords!&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@bclozel" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/7f6b3d65ae30e6fec52287f34e22dcb0?s=200" />
+
+<meta property="og:title" content="JavaScript modularity (without the buzzwords)" />
+<meta property="og:image" content="https://gravatar.com/avatar/7f6b3d65ae30e6fec52287f34e22dcb0?s=200" />
+<meta property="og:description" content="&lt;p&gt;Almost ten years ago &lt;a href=&quot;https://spring.io/team/acolyer&quot;&gt;Adrian Colyer&lt;/a&gt; wrote a &lt;a href=&quot;http://aspectprogrammer.org/blogs/adrian/2004/05/the_ted_neward.html&quot;&gt;memorable blog post&lt;/a&gt;, giving the best explanation on aspect oriented programming (AOP) out there: clear and simple style, accurate content, no buzzwords. If you’ve taken a look at the the earlier &lt;a href=&quot;https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io&quot;&gt;two&lt;/a&gt; &lt;a href=&quot;https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments&quot;&gt;posts&lt;/a&gt; in this series, you may have noticed some of our architecture choices in the &lt;a href=&quot;https://github.com/spring-io/sagan/tree/master/sagan-client&quot;&gt;client module&lt;/a&gt; of the Sagan application, including the &lt;strong&gt;use of JavaScript modules&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;In this post, I want to walk you through the basics of JavaScript modules in the style of Adrian’s post: clear, simple, accurate, no buzzwords!&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2014-04-11 10:25:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">JavaScript modularity (without the buzzwords)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/7f6b3d65ae30e6fec52287f34e22dcb0?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/bclozel">Brian Clozel</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2014-04-11 10:25:00.0">April 11, 2014</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1493" href="/blog/2014/04/11/javascript-modularity-without-the-buzzwords#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Almost ten years ago <a href="https://spring.io/team/acolyer">Adrian Colyer</a> wrote a <a href="http://aspectprogrammer.org/blogs/adrian/2004/05/the_ted_neward.html">memorable blog post</a>, giving the best explanation on aspect oriented programming (AOP) out there: clear and simple style, accurate content, no buzzwords. If you&rsquo;ve taken a look at the the earlier <a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">two</a> <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">posts</a> in this series, you may have noticed some of our architecture choices in the <a href="https://github.com/spring-io/sagan/tree/master/sagan-client">client module</a> of the Sagan application, including the <strong>use of JavaScript modules</strong>.</p><p>In this post, I want to walk you through the basics of JavaScript modules in the style of Adrian&rsquo;s post: clear, simple, accurate, no buzzwords!</p><h2><a href="#why-javascript-needs-modularity-too" class="anchor" name="why-javascript-needs-modularity-too"></a>Why JavaScript needs modularity too</h2><p>If, like me, you have a Java background, some JavaScript language features may look a bit odd to you:</p>
+<ul>
+<li>its strong <a href="http://javascript.crockford.com/prototypal.html">prototypal nature</a></li>
+<li>no software component unit: no packages nor modules built in the language</li>
+<li>difference of programming style between browser applications and server applications</li>
+</ul><p>Simple web applications usually look like this:</p>
+<pre><code class="prettyprint html">&lt;html&gt;
+&lt;head&gt;
+	&lt;!-- scripts are loaded **sequentially** --&gt;
+	&lt;script src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+	&lt;script src=&quot;widget.js&quot;&gt;&lt;/script&gt;
+	&lt;!-- all objects are in the global namespace, 
+			 no way to isolate the code completely! --&gt;
+	&lt;script&gt;
+		window.$; // this is jquery
+	&lt;/script&gt;
+&lt;/head&gt;
+&lt;/html&gt;
+</code></pre><p>Developers often try to reuse blocks of functionality and manage dependencies between them. That&rsquo;s really hard to achieve in the previous case: you have to declare scripts in the right order and avoid name collisions <strong>without any metadata about dependencies</strong>. With a growing application, this task becomes a nightmare: imagine managing your Java applications without the benefit of packages or dependency management infrastructure!</p><h2><a href="#understanding-javascript-authoring-formats-commonjs-and-amd" class="anchor" name="understanding-javascript-authoring-formats-commonjs-and-amd"></a>Understanding JavaScript authoring formats: commonJS and AMD</h2><p>Fortunately, the JS community is well aware of the need for modularity and over the last few years, a couple widely-adopted approaches to solving this problem have emerged:</p><p><a href="https://github.com/amdjs/amdjs-api/blob/master/AMD.md">AMD (Asynchronous Module Definition)</a> is one of them:</p>
+<pre><code class="prettyprint javascript">// defining a module that depends on &quot;graphmodule&quot;,
+// injected in the function definition as an argument
+define([&quot;graphmodule&quot;],
+  function (graph) {
+    // this module exports a &quot;draw&quot; function
+    return function draw(data) {
+      return graph.piechart(data);
+    }
+  }
+);
+</code></pre><p>The AMD format is often used in browser applications, since:</p>
+<ul>
+<li>it allows variables to be scoped inside the factory function (vs. having everything in the window global scope)</li>
+<li>dependencies may not be available synchronously, e.g., they need to be fetched via asynchronous network request</li>
+<li>modules are defined in a callback, then run once all dependencies are loaded</li>
+</ul><p><a href="http://wiki.commonjs.org/wiki/Modules/1.1.1">CommonJS</a> is another <em>authoring format</em>, often used in Node.js applications on the server side, but also in browser applications.</p>
+<pre><code class="prettyprint javascript"><br />/**
+ * Our module&#39;s dependencies and API 
+ **/
+// we fetch the graph module as a dependency
+var graph = require(&#39;graphmodule&#39;);
+
+// we decorate the `exports` variable to export our function
+exports.draw = drawFunc;
+
+/**
+ * API implementation
+ **/
+function drawFunc(data) {
+    return graph.piechart(data);
+}
+</code></pre><p>You probably spotted some differences with AMD:</p>
+<ul>
+<li>this authoring format can be used in the browser <strong>and</strong> on the server!</li>
+<li>thus you can test your modules in headless browsers <strong>and</strong> Node.js unit tests!</li>
+<li>module definitions aren&rsquo;t wrapped in a <code>define</code></li>
+</ul><h2><a href="#what-rsquo-s-next" class="anchor" name="what-rsquo-s-next"></a>What&rsquo;s next?</h2><p>The next version of JavaScript (technically called ECMAScript 6) will <a href="https://spring.io/understanding/javascript-modules#user-content-es6-modules">standardize JavaScript modularity</a>, albeit using a slightly different syntax than either the AMD or commonJS formats we&rsquo;ve seen above.<br />More, EcmaScript 6 will solve many problems in that space but will also make available syntactic sugar to define OO-like classes.</p><p>Wherever you&rsquo;re putting JavaScript to use, be it client or server, consider taking the modular approach — for all the same reasons we do in Java. There is a small learning curve to getting proficient with JS module technology, but the results are well worth it.</p><p>If you&rsquo;re brand new to JavaScript modularity, I recommend checking out the <a href="http://know.cujojs.com/tutorials/modules/authoring-cjs-modules">&ldquo;Authoring CommonJS modules&rdquo; tutorial</a> and the module loader we&rsquo;re using in Sagan: <a href="https://github.com/cujojs/curl">curl</a>.<br />And once you&rsquo;re feeling familiar, take a look at our <a href="https://github.com/spring-io/sagan/tree/master/sagan-client/src/feature">module definitions in the Sagan app</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1493;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

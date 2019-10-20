@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Hiding Services &amp; Runtime Discovery with Spring Cloud Gateway</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Hiding Services &amp; Runtime Discovery with Spring Cloud Gateway" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;a href=&quot;https://twitter.com/benbravo73&quot;&gt;Ben Wilcock&lt;/a&gt; – Spring Marketing, Pivotal.&lt;br&gt;&lt;a href=&quot;https://twitter.com/BrianMMcClain&quot;&gt;Brian McClain&lt;/a&gt; – Technical Marketing, Pivotal.&lt;/p&gt;
+&lt;p&gt;It’s rare for a company to want &lt;em&gt;every&lt;/em&gt; API to be publicly accessible. Most prefer to keep their services secret by default, only exposing APIs publicly when absolutely necessary. &lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://spring.io/guides/gs/gateway/&quot;&gt;Spring Cloud Gateway&lt;/a&gt; can help. Spring Cloud Gateway allows you to route traffic to your APIs using simple Java™ instructions (which we saw &lt;a href=&quot;https://content.pivotal.io/practitioners/getting-started-with-spring-cloud-gateway-3&quot;&gt;in the last article&lt;/a&gt;) or with YAML configuration files (which we’ll demonstrate in this one). To hide your services, you set up your network so that the only server accessible from the outside is the gateway. The gateway then becomes a gate-keeper, controlling ingress and egress from outside. It’s a very popular pattern.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@benbravo73" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/15aba3f666761f09945e8efc6384006b?s=200" />
+
+<meta property="og:title" content="Hiding Services &amp; Runtime Discovery with Spring Cloud Gateway" />
+<meta property="og:image" content="https://gravatar.com/avatar/15aba3f666761f09945e8efc6384006b?s=200" />
+<meta property="og:description" content="&lt;p&gt;&lt;a href=&quot;https://twitter.com/benbravo73&quot;&gt;Ben Wilcock&lt;/a&gt; – Spring Marketing, Pivotal.&lt;br&gt;&lt;a href=&quot;https://twitter.com/BrianMMcClain&quot;&gt;Brian McClain&lt;/a&gt; – Technical Marketing, Pivotal.&lt;/p&gt;
+&lt;p&gt;It’s rare for a company to want &lt;em&gt;every&lt;/em&gt; API to be publicly accessible. Most prefer to keep their services secret by default, only exposing APIs publicly when absolutely necessary. &lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://spring.io/guides/gs/gateway/&quot;&gt;Spring Cloud Gateway&lt;/a&gt; can help. Spring Cloud Gateway allows you to route traffic to your APIs using simple Java™ instructions (which we saw &lt;a href=&quot;https://content.pivotal.io/practitioners/getting-started-with-spring-cloud-gateway-3&quot;&gt;in the last article&lt;/a&gt;) or with YAML configuration files (which we’ll demonstrate in this one). To hide your services, you set up your network so that the only server accessible from the outside is the gateway. The gateway then becomes a gate-keeper, controlling ingress and egress from outside. It’s a very popular pattern.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-07-01 16:57:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Hiding Services &amp; Runtime Discovery with Spring Cloud Gateway</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/15aba3f666761f09945e8efc6384006b?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/benwilcock">Ben Wilcock</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-07-01 16:57:00.0">July 01, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3733" href="/blog/2019/07/01/hiding-services-runtime-discovery-with-spring-cloud-gateway#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p><a href="https://twitter.com/benbravo73">Ben Wilcock</a> – Spring Marketing, Pivotal.<br /><a href="https://twitter.com/BrianMMcClain">Brian McClain</a> – Technical Marketing, Pivotal.</p>
+<p>It&rsquo;s rare for a company to want <em>every</em> API to be publicly accessible. Most prefer to keep their services secret by default, only exposing APIs publicly when absolutely necessary. </p>
+<p><a href="https://spring.io/guides/gs/gateway/">Spring Cloud Gateway</a> can help. Spring Cloud Gateway allows you to route traffic to your APIs using simple Java™ instructions (which we saw <a href="https://content.pivotal.io/practitioners/getting-started-with-spring-cloud-gateway-3">in the last article</a>) or with YAML configuration files (which we’ll demonstrate in this one). To hide your services, you set up your network so that the only server accessible from the outside is the gateway. The gateway then becomes a gate-keeper, controlling ingress and egress from outside. It’s a very popular pattern.</p>
+<p>Cloud-based services also have a habit of changing location and granularity without much warning. To cope better with this, you can combine a gateway with a service registry to allow the applications on your network to find each other dynamically at runtime. If you do this, your applications will be much more resilient to changes. <a href="https://spring.io/guides/gs/service-registration-and-discovery/">Spring Cloud Netflix Eureka Server</a> is one such service registry.</p>
+<p>In this post, we&rsquo;ll look at Spring Cloud’s gateway and registry components and illustrate how you can use them together to make your applications more secure and more reliable. </p>
+<p>Because this arrangement requires a particular setup, we’ve provided ready-to-run code which you can download and run. We’ll be using Docker to orchestrate our services and emulate a private network. We’ll then talk to our running services using HTTPie.</p><h2><a href="#things-you-rsquo-ll-need" class="anchor" name="things-you-rsquo-ll-need"></a>Things You&rsquo;ll Need</h2>
+<ul>
+<li>
+<p>Java (version 8 is assumed), plus your favorite web browser and terminal applications.</p></li>
+<li>
+<p><a href="https://github.com/benwilcock/spring-cloud-gateway-demo.git">The Source Code</a> – There’s no need to write any code this time, simply <code>git clone</code> (or download and <code>unzip</code>) <a href="https://github.com/benwilcock/spring-cloud-gateway-demo.git">this project&rsquo;s source code repository</a> from GitHub.</p></li>
+<li>
+<p><a href="https://www.docker.com/products/docker-desktop">Docker Desktop</a> – Docker will provide our pseudo-production environment. We&rsquo;ll use it to hide our services in a private network.</p></li>
+<li>
+<p><a href="https://buildpacks.io/docs/app-journey/">Cloud Native Buildpacks</a> – We&rsquo;ll use Cloud Native Buildpacks to build Docker container images for us. Buildpacks embody several DevOps best practices, including hardened open-source operating systems and free to use OpenJDK distributions.</p></li>
+<li>
+<p>About 10-15 minutes, depending on the speed of your internet, etc.</p></li>
+</ul><h2><a href="#let-s-get-started-hellip" class="anchor" name="let-s-get-started-hellip"></a>Let’s Get Started&hellip;</h2><h4><a href="#step-1" class="anchor" name="step-1"></a>Step 1:</h4>
+<p>Download and install all the &ldquo;things you&rsquo;ll need&rdquo; from the list above. Then change to the runtime-discovery folder in the source code as follows:</p>
+<pre><code class="prettyprint bash">cd runtime-discovery
+</code></pre><h4><a href="#step-2" class="anchor" name="step-2"></a>Step 2:</h4>
+<p>Build &amp; package the gateway, registry, and service into JARs using Maven, and then create Docker containers for each of them. We have provided a handy <a href="https://github.com/benwilcock/spring-cloud-gateway-demo/blob/master/runtime-discovery/pack-images.sh">pack-images</a> script to do this:</p>
+<pre><code class="prettyprint bash"> ./pack-images.sh
+</code></pre><h4><a href="#step-3" class="anchor" name="step-3"></a>Step 3:</h4>
+<p>Start up the Docker test environment in the background. We’re using docker-compose here as it can start multiple containers and create a private network for them to communicate on:</p>
+<pre><code class="prettyprint bash">docker-compose up
+</code></pre><h4><a href="#step-4" class="anchor" name="step-4"></a>Step 4:</h4>
+<p>Wait. Docker will start all the containers (using the configuration provided in the <a href="https://github.com/benwilcock/spring-cloud-gateway-demo/blob/master/runtime-discovery/docker-compose.yml">docker-compose.yml</a> file). Waiting a couple of extra minutes here is advised. It gives Docker time to start everything and gives the applications a chance to communicate and settle down. If you do wait, you should see the Gateway and the Greeting Service register themselves with the Registry. There will be lots of logs, but within them will be lines like these from the registry:</p>
+<pre><code class="prettyprint bash">registry    | 2019-06-28 12:19:01.780  INFO 1 --- [nio-8761-exec-2] c.n.e.registry.AbstractInstanceRegistry  : Registered instance REGISTRY/db1d80613789:registry:8761 with status UP (replication=false)
+registry    | 2019-06-28 12:19:02.380  INFO 1 --- [nio-8761-exec-6] c.n.e.registry.AbstractInstanceRegistry  : Registered instance GATEWAY/9c0c0c9ba027:gateway:8760 with status UP (replication=true)
+registry    | 2019-06-28 12:19:02.382  INFO 1 --- [nio-8761-exec-6] c.n.e.registry.AbstractInstanceRegistry  : Registered instance SERVICE/fe7e38b21cac:service:8762 with status UP (replication=true)
+</code></pre><h2><a href="#let-rsquo-s-try-it-hellip" class="anchor" name="let-rsquo-s-try-it-hellip"></a>Let&rsquo;s Try It&hellip;</h2><h4><a href="#first-check-that-the-greeting-service-is-hidden" class="anchor" name="first-check-that-the-greeting-service-is-hidden"></a>First, Check that the Greeting Service is Hidden:</h4>
+<p>The Greeting Service operates on port <code>8762</code> and is hidden inside the Docker network. Let&rsquo;s try to call it from your favorite browser using <a href="http://localhost:8762/greeting">http://localhost:8762/greeting</a>. You should be told that &ldquo;the site can&rsquo;t be reached&rdquo; by your browser. This is because the Greeting Service is hidden inside the Docker network (as if it were behind a company firewall). It shouldn&rsquo;t be possible for us to talk to the greeting service directly. Instead, you’ll see an error page similar to the one below.</p>
+<p><img src="https://static.spring.io/blog/bwilcock/20190701/unreachable.png" alt="Screenshot from the browser window showing that the service is unreachable" title="Screenshot from the browser window showing that the service is unreachable" /></p><h4><a href="#next-access-the-greeting-service-via-the-gateway" class="anchor" name="next-access-the-greeting-service-via-the-gateway"></a>Next, Access the Greeting Service via the Gateway:</h4>
+<p>Now, Navigate your browser to <a href="http://localhost:8080/service/greeting">http://localhost:8080/service/greeting</a>. You should now get a valid response with content similar to the &ldquo;Hello, World&rdquo; JSON shown below:</p>
+<pre><code class="prettyprint json">{ &quot;id&quot;: 1, &quot;content&quot;: &quot;Hello, World!&quot;}
+</code></pre>
+<p>When you issued this new HTTP request from your browser, it was sent to, and handled by, the Gateway. The Gateway service <em>is</em> publicly accessible (it’s mapped to port <code>8080</code>). Your request was forwarded by the Gateway to the Greeting Service on your behalf, and the response was then routed back to you by the Gateway.</p><h4><a href="#now-view-the-registry-of-services" class="anchor" name="now-view-the-registry-of-services"></a>Now, View the Registry of Services:</h4>
+<p>The microservices on the Docker network are each registering themselves with the Registry server (this may take a couple of minutes, so be patient). The Registry server acts an address book for the services. If the services move, or if new instances are created, they will add themselves to the registry.</p>
+<p>To view the current list of registered services, point your browser at <a href="http://localhost:8080/registry">http://localhost:8080/registry</a>. You should see a screen similar to the one below.</p>
+<p><img src="https://static.spring.io/blog/bwilcock/20190701/registry.png" alt="Screenshot from the Registry console, listing several services" title="Screenshot showing the Eureka registry console window in a browser" /></p><h4><a href="#finally-shutting-down" class="anchor" name="finally-shutting-down"></a>Finally, Shutting Down:</h4>
+<p>When you&rsquo;re done, use <code>ctrl-C</code> in your terminal to shut down the Docker services. If for any reason this fails to work, you can also use <code>docker-compose down</code> from the <code>runtime-discovery</code> folder. Using either technique, you should see output similar to this:</p>
+<pre><code class="prettyprint bash">Stopping gateway  ... done
+Stopping service  ... done
+Stopping registry ... done
+</code></pre>
+<p>Further clean-up can be achieved using <code>docker-compose rm -f</code>.</p><h2><a href="#how-it-works" class="anchor" name="how-it-works"></a>How It Works</h2>
+<p>In this demo, we have 3 servers. These servers are all running inside a &ldquo;hidden&rdquo; network which is provided by <a href="https://docs.docker.com/compose/">Docker Compose</a>. Only the <a href="https://github.com/benwilcock/spring-cloud-gateway-demo/tree/master/runtime-discovery/gateway">Gateway server</a> is exposed to the outside world, so all HTTP traffic must go via this Gateway.</p>
+<p>Here&rsquo;s a description of the 3 servers and what each does&hellip;</p>
+<ol>
+<li>
+<p><a href="https://github.com/benwilcock/spring-cloud-gateway-demo/tree/master/runtime-discovery/gateway">The Gateway</a> – acts as our gatekeeper for all HTTP traffic. All inbound and outbound traffic flows through this portal – it acts as the bridge between the outside world (your browser) and the services on the internal Docker network. The Gateway has a configuration that specifies routes which can be used to talk to the services inside the network. These routes use the &lsquo;logical&rsquo; names of the target services. These logical names are turned into real addresses by the Registry server.</p></li>
+<li>
+<p><a href="https://github.com/benwilcock/spring-cloud-gateway-demo/tree/master/runtime-discovery/registry">The Registry</a> – acts as a phone book of all the services on the hidden network. It allows the Gateway to find the Greeting Service using only its logical name.</p></li>
+<li>
+<p><a href="https://github.com/benwilcock/spring-cloud-gateway-demo/tree/master/runtime-discovery/service">The Greeting Service</a> – is a simple REST service based on the popular Spring.io guide &ldquo;<a href="https://spring.io/guides/gs/rest-service/">Building a RESTful Web Service</a>&rdquo;.</p></li>
+</ol>
+<p>As you can see in the <a href="https://github.com/benwilcock/spring-cloud-gateway-demo/blob/master/runtime-discovery/docker-compose.yml"><code>docker-compose.yml</code></a>, Docker is configured to only allow external calls to reach the Gateway – on port <code>80</code>. The other servers (the Registry, and the Greeting Service), cannot be reached directly from outside.</p>
+<p>The Gateway&rsquo;s configured URL passthrough paths can be seen in the Gateway&rsquo;s <a href="https://github.com/benwilcock/spring-cloud-gateway-demo/blob/master/runtime-discovery/gateway/src/main/resources/application.yml">application.yml file</a>. This configuration is using the &ldquo;logical&rdquo; names of these servers and the <code>lb:</code> (load balancer) protocol as shown in the extract below:</p>
+<pre><code class="prettyprint yaml">spring:
+  application:
+    name: gateway  
+  cloud:
+    gateway:
+      routes:
+      - id: service
+        uri: lb://service
+        predicates:
+        - Path=/service/**
+        filters:
+        - StripPrefix=1
+...
+</code></pre>
+<p>By using these &lsquo;logical&rsquo; server names, the Gateway can use the Registry to discover the true location of these services at runtime.</p><h2><a href="#wrapping-up" class="anchor" name="wrapping-up"></a>Wrapping Up</h2>
+<p>With the entire Spring toolkit at your disposal, it quickly becomes apparent how flexible and powerful Spring Cloud Gateway can be. If you dig into <a href="https://github.com/benwilcock/spring-cloud-gateway-demo.git">the source code</a>, you’ll notice that with just a few lines of Java and a few dependencies, we can easily integrate Spring Boot microservices with Eureka, and control access to our service’s APIs. </p>
+<p>Before you finish, why not sign up for <a href="https://springoneplatform.io/">SpringOne Platform 2019</a> – the premier conference for building scalable applications that delight users. Join thousands of like-minded Spring developers to learn, share, and have fun in Austin, TX from October 7th to 10th. Use the discount code <strong>S1P_Save200</strong> when registering to save money on your ticket. If you need help convincing your manager use <a href="https://springoneplatform.io/2019/convince-your-manager">this page</a>. See you there.</p>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3733;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

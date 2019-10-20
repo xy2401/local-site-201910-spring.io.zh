@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Latest Jackson integration improvements in Spring</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Latest Jackson integration improvements in Spring" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;strong&gt;Updated on 2015/08/31 with an additional &lt;a href=&quot;#jackson-modules&quot;&gt;Jackson modules section&lt;/a&gt;&lt;/strong&gt; &lt;/p&gt;
+&lt;p&gt;Spring &lt;a href=&quot;https://github.com/FasterXML/jackson&quot;&gt;Jackson&lt;/a&gt; support has been improved lately to be more flexible and powerful. This blog post gives you an update about the most useful Jackson related features available in Spring Framework 4.x and Spring Boot. All the code samples are coming from this &lt;a href=&quot;https://github.com/sdeleuze/spring-jackson-demo&quot;&gt;spring-jackson-demo&lt;/a&gt; sample application, feel free to have a look at the code.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#json-views&quot; class=&quot;anchor&quot; name=&quot;json-views&quot;&gt;&lt;/a&gt;JSON Views&lt;/h2&gt;
+&lt;p&gt;It can sometimes be useful to filter contextually objects serialized to the HTTP response body. In order to provide such capabilities, Spring MVC now has builtin support for &lt;a href=&quot;http://wiki.fasterxml.com/JacksonJsonViews&quot;&gt;Jackson’s Serialization Views&lt;/a&gt; (as of Spring Framework 4.2, JSON Views are supported on &lt;code&gt;@MessageMapping&lt;/code&gt; handler methods as well).&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@sdeleuze" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/5778521f67d80de0ee3b213e4f159a59?s=200" />
+
+<meta property="og:title" content="Latest Jackson integration improvements in Spring" />
+<meta property="og:image" content="https://gravatar.com/avatar/5778521f67d80de0ee3b213e4f159a59?s=200" />
+<meta property="og:description" content="&lt;p&gt;&lt;strong&gt;Updated on 2015/08/31 with an additional &lt;a href=&quot;#jackson-modules&quot;&gt;Jackson modules section&lt;/a&gt;&lt;/strong&gt; &lt;/p&gt;
+&lt;p&gt;Spring &lt;a href=&quot;https://github.com/FasterXML/jackson&quot;&gt;Jackson&lt;/a&gt; support has been improved lately to be more flexible and powerful. This blog post gives you an update about the most useful Jackson related features available in Spring Framework 4.x and Spring Boot. All the code samples are coming from this &lt;a href=&quot;https://github.com/sdeleuze/spring-jackson-demo&quot;&gt;spring-jackson-demo&lt;/a&gt; sample application, feel free to have a look at the code.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#json-views&quot; class=&quot;anchor&quot; name=&quot;json-views&quot;&gt;&lt;/a&gt;JSON Views&lt;/h2&gt;
+&lt;p&gt;It can sometimes be useful to filter contextually objects serialized to the HTTP response body. In order to provide such capabilities, Spring MVC now has builtin support for &lt;a href=&quot;http://wiki.fasterxml.com/JacksonJsonViews&quot;&gt;Jackson’s Serialization Views&lt;/a&gt; (as of Spring Framework 4.2, JSON Views are supported on &lt;code&gt;@MessageMapping&lt;/code&gt; handler methods as well).&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2014-12-02 13:30:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Latest Jackson integration improvements in Spring</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/5778521f67d80de0ee3b213e4f159a59?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/sdeleuze">Sébastien Deleuze</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2014-12-02 13:30:00.0">December 02, 2014</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1840" href="/blog/2014/12/02/latest-jackson-integration-improvements-in-spring#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p><strong>Updated on 2015/08/31 with an additional <a href="#jackson-modules">Jackson modules section</a></strong> </p><p>Spring <a href="https://github.com/FasterXML/jackson">Jackson</a> support has been improved lately to be more flexible and powerful. This blog post gives you an update about the most useful Jackson related features available in Spring Framework 4.x and Spring Boot. All the code samples are coming from this <a href="https://github.com/sdeleuze/spring-jackson-demo">spring-jackson-demo</a> sample application, feel free to have a look at the code.</p><h2><a href="#json-views" class="anchor" name="json-views"></a>JSON Views</h2><p>It can sometimes be useful to filter contextually objects serialized to the HTTP response body. In order to provide such capabilities, Spring MVC now has builtin support for <a href="http://wiki.fasterxml.com/JacksonJsonViews">Jackson’s Serialization Views</a> (as of Spring Framework 4.2, JSON Views are supported on <code>@MessageMapping</code> handler methods as well).</p><p>The following example illustrates how to use <code>@JsonView</code> to filter fields depending on the context of serialization - e.g. getting a &ldquo;summary&rdquo; view when dealing with collections, and getting a full representation when dealing with a single resource:</p>
+<pre><code class="prettyprint java">public class View {
+	interface Summary {}
+}
+
+public class User {
+
+	@JsonView(View.Summary.class)
+	private Long id;
+
+	@JsonView(View.Summary.class)
+	private String firstname;
+
+	@JsonView(View.Summary.class)
+	private String lastname;
+
+	private String email;
+	private String address;
+	private String postalCode;
+	private String city;
+	private String country;
+}
+
+public class Message {
+
+	@JsonView(View.Summary.class)
+	private Long id;
+
+	@JsonView(View.Summary.class)
+	private LocalDate created;
+
+	@JsonView(View.Summary.class)
+	private String title;
+
+	@JsonView(View.Summary.class)
+	private User author;
+
+	private List&lt;User&gt; recipients;
+  
+	private String body;
+}
+</code></pre><p>Thanks to Spring MVC <code>@JsonView</code> support, it is possible to choose, on a per handler method basis, which field should be serialized:</p>
+<pre><code class="prettyprint java">@RestController
+public class MessageController {
+
+	@Autowired
+	private MessageService messageService;
+
+	@JsonView(View.Summary.class)
+	@RequestMapping(&quot;/&quot;)
+	public List&lt;Message&gt; getAllMessages() {
+		return messageService.getAll();
+	}
+
+	@RequestMapping(&quot;/{id}&quot;)
+	public Message getMessage(@PathVariable Long id) {
+		return messageService.get(id);
+	}
+}
+</code></pre><p>In this example, if all messages are retrieved, only the most important fields are serialized thanks to the <code>getAllMessages()</code> method annotated with <code>@JsonView(View.Summary.class)</code>:</p>
+<pre><code class="prettyprint javascript">[ {
+  &quot;id&quot; : 1,
+  &quot;created&quot; : &quot;2014-11-14&quot;,
+  &quot;title&quot; : &quot;Info&quot;,
+  &quot;author&quot; : {
+    &quot;id&quot; : 1,
+    &quot;firstname&quot; : &quot;Brian&quot;,
+    &quot;lastname&quot; : &quot;Clozel&quot;
+  }
+}, {
+  &quot;id&quot; : 2,
+  &quot;created&quot; : &quot;2014-11-14&quot;,
+  &quot;title&quot; : &quot;Warning&quot;,
+  &quot;author&quot; : {
+    &quot;id&quot; : 2,
+    &quot;firstname&quot; : &quot;Stéphane&quot;,
+    &quot;lastname&quot; : &quot;Nicoll&quot;
+  }
+}, {
+  &quot;id&quot; : 3,
+  &quot;created&quot; : &quot;2014-11-14&quot;,
+  &quot;title&quot; : &quot;Alert&quot;,
+  &quot;author&quot; : {
+    &quot;id&quot; : 3,
+    &quot;firstname&quot; : &quot;Rossen&quot;,
+    &quot;lastname&quot; : &quot;Stoyanchev&quot;
+  }
+} ]
+</code></pre><p>In Spring MVC default configuration, <code>MapperFeature.DEFAULT_VIEW_INCLUSION</code> is set to <code>false</code>. That means that when enabling a JSON View, non annotated fields or properties like <code>body</code> or <code>recipients</code> are not serialized.</p><p>When a specific <code>Message</code> is retrieved using the <code>getMessage()</code> handler method (no JSON View specified), all fields are serialized as expected:</p>
+<pre><code class="prettyprint javascript">{
+  &quot;id&quot; : 1,
+  &quot;created&quot; : &quot;2014-11-14&quot;,
+  &quot;title&quot; : &quot;Info&quot;,
+  &quot;body&quot; : &quot;This is an information message&quot;,
+  &quot;author&quot; : {
+    &quot;id&quot; : 1,
+    &quot;firstname&quot; : &quot;Brian&quot;,
+    &quot;lastname&quot; : &quot;Clozel&quot;,
+    &quot;email&quot; : &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0b69686764716e674b7b627d647f6a67256264">[email&#160;protected]</a>&quot;,
+    &quot;address&quot; : &quot;1 Jaures street&quot;,
+    &quot;postalCode&quot; : &quot;69003&quot;,
+    &quot;city&quot; : &quot;Lyon&quot;,
+    &quot;country&quot; : &quot;France&quot;
+  },
+  &quot;recipients&quot; : [ {
+    &quot;id&quot; : 2,
+    &quot;firstname&quot; : &quot;Stéphane&quot;,
+    &quot;lastname&quot; : &quot;Nicoll&quot;,
+    &quot;email&quot; : &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="eb98858288848787ab9b829d849f8a87c58284">[email&#160;protected]</a>&quot;,
+    &quot;address&quot; : &quot;42 Obama street&quot;,
+    &quot;postalCode&quot; : &quot;1000&quot;,
+    &quot;city&quot; : &quot;Brussel&quot;,
+    &quot;country&quot; : &quot;Belgium&quot;
+  }, {
+    &quot;id&quot; : 3,
+    &quot;firstname&quot; : &quot;Rossen&quot;,
+    &quot;lastname&quot; : &quot;Stoyanchev&quot;,
+    &quot;email&quot; : &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="89fbfafde6f0e8e7eae1ecffc9f9e0ffe6fde8e5a7e0e6">[email&#160;protected]</a>&quot;,
+    &quot;address&quot; : &quot;3 Warren street&quot;,
+    &quot;postalCode&quot; : &quot;10011&quot;,
+    &quot;city&quot; : &quot;New York&quot;,
+    &quot;country&quot; : &quot;USA&quot;
+  } ]
+}
+</code></pre><p>Only <strong>one</strong> class or interface can be specified with the <code>@JsonView</code> annotation, but you can use inheritance to represent JSON View hierarchies (if a field is part of a JSON View, it will be also part of parent view). For example, this handler method will serialize fields annotated with <code>@JsonView(View.Summary.class)</code> <strong>and</strong> <code>@JsonView(View.SummaryWithRecipients.class)</code>:</p>
+<pre><code class="prettyprint java">public class View {
+	interface Summary {}
+	interface SummaryWithRecipients extends Summary {}
+}
+
+public class Message {
+
+	@JsonView(View.Summary.class)
+	private Long id;
+
+	@JsonView(View.Summary.class)
+	private LocalDate created;
+
+	@JsonView(View.Summary.class)
+	private String title;
+
+	@JsonView(View.Summary.class)
+	private User author;
+
+	@JsonView(View.SummaryWithRecipients.class)
+	private List&lt;User&gt; recipients;
+  
+	private String body;
+}
+
+@RestController
+public class MessageController {
+
+	@Autowired
+	private MessageService messageService;
+
+	@JsonView(View.SummaryWithRecipients.class)
+	@RequestMapping(&quot;/with-recipients&quot;)
+	public List&lt;Message&gt; getAllMessagesWithRecipients() {
+		return messageService.getAll();
+	}
+}
+</code></pre><p>JSON Views could also be specified when using <code>RestTemplate</code> HTTP client or <code>MappingJackson2JsonView</code> by wrapping the value to serialize in a <code>MappingJacksonValue</code> as shown in this <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/test/java/org/springframework/web/client/RestTemplateIntegrationTests.java#L224">code sample</a>.</p><h2><a href="#jsonp" class="anchor" name="jsonp"></a>JSONP</h2><p>As described in the <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-ann-jsonp">reference documentation</a>, you can enable <a href="https://en.wikipedia.org/wiki/JSONP">JSONP</a> for <code>@ResponseBody</code> and <code>ResponseEntity</code> methods by declaring an <code>@ControllerAdvice</code> bean that extends <code>AbstractJsonpResponseBodyAdvice</code> as shown below:</p>
+<pre><code class="prettyprint java">@ControllerAdvice
+public class JsonpAdvice extends AbstractJsonpResponseBodyAdvice {
+
+    public JsonpAdvice() {
+        super(&quot;callback&quot;);
+    }
+}
+</code></pre><p>With such <code>@ControllerAdvice</code> bean registered, it will be possible to request the JSON webservice from another domain using a <code>&lt;script /&gt;</code> tag:</p>
+<pre><code class="prettyprint html">&lt;script type=&quot;application/javascript&quot;
+            src=&quot;http://mydomain.com/1.json?jsonp=parseResponse&quot;&gt;
+&lt;/script&gt;
+</code></pre><p>In this example, the received payload would be:</p>
+<pre><code class="prettyprint javascript">parseResponse({
+  &quot;id&quot; : 1,
+  &quot;created&quot; : &quot;2014-11-14&quot;,
+  ...
+});
+</code></pre><p>JSONP is also supported and automatically enabled when using <code>MappingJackson2JsonView</code> with a request that has a query parameter named jsonp or callback. The JSONP query parameter name(s) could be customized through the <code>jsonpParameterNames</code> property.</p><h2><a href="#xml-support" class="anchor" name="xml-support"></a>XML support</h2><p>Since 2.0 release, Jackson provides first class support for some other data formats than JSON. Spring Framework and Spring Boot provide builtin support for Jackson based XML serialization/deserialization.</p><p>As soon as you include the <a href="https://github.com/FasterXML/jackson-dataformat-xml"><code>jackson-dataformat-xml</code></a> dependency to your project, it is automatically used instead of JAXB2.</p><p>Using Jackson XML extension has several advantages over JAXB2:</p>
+<ul>
+<li>Both Jackson and JAXB annotations are recognized</li>
+<li>JSON View are supported, allowing you to build easily REST Webservices with the same filtered output for both XML and JSON data formats</li>
+<li>No need to annotate your class with <code>@XmlRootElement</code>, each class serializable in JSON will serializable in XML</li>
+</ul><p>You usually also want to make sure that the XML library in use is Woodstox since:</p>
+<ul>
+<li>It is faster than Stax implementation provided with the JDK</li>
+<li>It avoids some known issues like adding unnecessary namespace prefixes</li>
+<li>Some features like pretty print don&rsquo;t work without it</li>
+</ul><p>In order to use it, simply add the latest <a href="https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.codehaus.woodstox%22%20AND%20a%3A%22woodstox-core-asl%22"><code>woodstox-core-asl</code></a> dependency available to your project.</p><h2><a href="#customizing-the-jackson-objectmapper" class="anchor" name="customizing-the-jackson-objectmapper"></a>Customizing the Jackson ObjectMapper</h2><p>Prior to Spring Framework 4.1.1, Jackson <code>HttpMessageConverter</code>s were using <code>ObjectMapper</code> default configuration. In order to provide a better and easily customizable default configuration, a new <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html"><code>Jackson2ObjectMapperBuilder</code></a> has been introduced. It is the JavaConfig equivalent of the well known <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperFactoryBean.html"><code>Jackson2ObjectMapperFactoryBean</code></a> used in XML configuration.</p><p><a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html"><code>Jackson2ObjectMapperBuilder</code></a> provides a nice API to customize various Jackson settings while retaining Spring Framework provided default ones. It also allows to create <code>ObjectMapper</code> and <code>XmlMapper</code> instances based on the same configuration.</p><p>Both <code>Jackson2ObjectMapperBuilder</code> and <code>Jackson2ObjectMapperFactoryBean</code> define a better Jackson default configuration. For example, the <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.0.0/com/fasterxml/jackson/databind/DeserializationFeature.html#FAIL_ON_UNKNOWN_PROPERTIES"><code>DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES</code></a> property set to false, in order to allow deserialization of JSON objects with unmapped properties.</p><p>These classes also allow you to register easily Jackson <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#mixIn-java.lang.Class-java.lang.Class-">mixins</a>, <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#modules-java.util.List-">modules</a>, <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#serializers-com.fasterxml.jackson.databind.JsonSerializer...-">serializers</a> or even property naming strategy like <code>PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES</code> if you want to have your <code>userName</code> java property translated to <code>user_name</code> in JSON.</p><h3><a href="#with-spring-boot" class="anchor" name="with-spring-boot"></a>With Spring Boot</h3><p>As described in the Spring Boot reference documentation, there are various ways to <a href="https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto-customize-the-jackson-objectmapper">customize the Jackson <code>ObjectMapper</code></a>.</p><p>You can for example enable/disable Jackson features easily by adding properties like <code>spring.jackson.serialization.indent_output=true</code> to <a href="https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-external-config-application-property-files"><code>application.properties</code></a>.</p><p>As an alternative, Spring Boot also allows to customize the Jackson configuration (JSON and XML) used by Spring MVC <code>HttpMessageConverter</code>s by declaring a <code>Jackson2ObjectMapperBuilder</code> <code>@Bean</code>:</p>
+<pre><code class="prettyprint java">@Bean
+public Jackson2ObjectMapperBuilder jacksonBuilder() {
+	Jackson2ObjectMapperBuilder b = new Jackson2ObjectMapperBuilder();
+	b.indentOutput(true).dateFormat(new SimpleDateFormat(&quot;yyyy-MM-dd&quot;));
+	return b;
+}
+</code></pre><p>This is useful if you want to use advanced Jackson configuration not exposed through regular configuration keys.</p><p>If you just need to register an additional Jackson module, be aware that Spring Boot autodetects all <code>Module</code> <code>@Bean</code>. For example to register <a href="https://github.com/FasterXML/jackson-module-parameter-names">jackson-module-parameter-names</a>:</p>
+<pre><code class="prettyprint java">@Bean
+public Module parameterNamesModule() {
+  return new ParameterNamesModule(JsonCreator.Mode.PROPERTIES);
+}
+</code></pre><h3><a href="#without-spring-boot" class="anchor" name="without-spring-boot"></a>Without Spring Boot</h3><p>In a plain Spring Framework application, you can also use <code>Jackson2ObjectMapperBuilder</code> to customize the XML and JSON <code>HttpMessageConverter</code>s as shown bellow:</p>
+<pre><code class="prettyprint java">@Configuration
+@EnableWebMvc
+public class WebConfiguration extends WebMvcConfigurerAdapter {
+
+	@Override
+	public void configureMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) {
+		Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+		builder.indentOutput(true).dateFormat(new SimpleDateFormat(&quot;yyyy-MM-dd&quot;));
+		converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
+		converters.add(new MappingJackson2XmlHttpMessageConverter(builder.createXmlMapper(true).build()));
+	}
+}
+</code></pre><h3><a href="#jackson-modules" class="anchor" name="jackson-modules"></a>Jackson modules</h3><p>Some well known Jackson modules are automatically registered if they are detected on the classpath:</p>
+<ul>
+<li><a href="https://github.com/FasterXML/jackson-datatype-jdk7">jackson-datatype-jdk7</a>: Java 7 types like <code>java.nio.file.Path</code> (as of 4.2.1 release)</li>
+<li><a href="https://github.com/FasterXML/jackson-datatype-joda">jackson-datatype-joda</a>: Joda-Time types</li>
+<li><a href="https://github.com/FasterXML/jackson-datatype-jsr310">jackson-datatype-jsr310</a>: Java 8 Date &amp; Time API data types</li>
+<li><a href="https://github.com/FasterXML/jackson-datatype-jdk8">jackson-datatype-jdk8</a>: other Java 8 types like <code>Optional</code> (as of 4.2.0 release)</li>
+</ul><p>Some other modules are not registered by default (mainly because they require additional configuration) so you will have to register them explicitly, for example with <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#modulesToInstall-com.fasterxml.jackson.databind.Module...-"><code>Jackson2ObjectMapperBuilder#modulesToInstall()</code></a> or by declaring a Jackson <code>Module</code> <code>@Bean</code> if you are using Spring Boot:</p>
+<ul>
+<li><a href="https://github.com/FasterXML/jackson-module-parameter-names">jackson-module-parameter-names</a>: adds support for accessing parameter names (feature added in Java 8)</li>
+<li><a href="https://github.com/zalando/jackson-datatype-money">jackson-datatype-money</a>: <code>javax.money</code> types (unofficial module)</li>
+<li><a href="https://github.com/FasterXML/jackson-datatype-hibernate">jackson-datatype-hibernate</a>: Hibernate specific types and properties (including lazy-loading aspects)</li>
+</ul><h2><a href="#advanced-features" class="anchor" name="advanced-features"></a>Advanced features</h2><p>As of Spring Framework 4.1.3, thanks to the addition of a Spring context aware <a href="http://wiki.fasterxml.com/HandlerInstantiator"><code>HandlerInstantiator</code></a> (see <a href="https://jira.spring.io/browse/SPR-10768">SPR-10768</a> for more details), you are able to autowire Jackson handlers (serializers, deserializers, type and type id resolvers).</p><p>This could allow you to build, for example, a custom deserializer that will replace a field containing only a reference in the JSON payload by the full <code>Entity</code> retrieved from the database.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1840;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

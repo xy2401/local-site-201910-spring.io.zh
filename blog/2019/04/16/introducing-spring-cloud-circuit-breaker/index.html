@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Introducing Spring Cloud Circuit Breaker</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Introducing Spring Cloud Circuit Breaker" />
+<meta name="twitter:description" content="&lt;h1&gt;&lt;a href=&quot;#background&quot; class=&quot;anchor&quot; name=&quot;background&quot;&gt;&lt;/a&gt;Background&lt;/h1&gt;
+&lt;p&gt;When using a microservices architecture to build our applications, it is very common to end up with a pretty complex dependency tree amongst services. If the service down the dependency tree encounters an issue that causes it to start to respond slowly, it ends up causing a set of issues that cascade up the dependency tree. As more and more requests come in to the application, more and more resources may be consumed by waiting for the slow service to respond. Even worse, the additional load being put on the slow service may exacerbate the problem. To help alleviate the effect of these types of cascading failures, it is common practice to use &lt;a href=&quot;https://microservices.io/patterns/reliability/circuit-breaker.html&quot;&gt;circuit breakers&lt;/a&gt; as part of microservice applications.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@ryanjbaxter" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/afd50fcf492f7ceb9cdb646d960c882b?s=200" />
+
+<meta property="og:title" content="Introducing Spring Cloud Circuit Breaker" />
+<meta property="og:image" content="https://gravatar.com/avatar/afd50fcf492f7ceb9cdb646d960c882b?s=200" />
+<meta property="og:description" content="&lt;h1&gt;&lt;a href=&quot;#background&quot; class=&quot;anchor&quot; name=&quot;background&quot;&gt;&lt;/a&gt;Background&lt;/h1&gt;
+&lt;p&gt;When using a microservices architecture to build our applications, it is very common to end up with a pretty complex dependency tree amongst services. If the service down the dependency tree encounters an issue that causes it to start to respond slowly, it ends up causing a set of issues that cascade up the dependency tree. As more and more requests come in to the application, more and more resources may be consumed by waiting for the slow service to respond. Even worse, the additional load being put on the slow service may exacerbate the problem. To help alleviate the effect of these types of cascading failures, it is common practice to use &lt;a href=&quot;https://microservices.io/patterns/reliability/circuit-breaker.html&quot;&gt;circuit breakers&lt;/a&gt; as part of microservice applications.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-04-16 15:54:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Introducing Spring Cloud Circuit Breaker</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/afd50fcf492f7ceb9cdb646d960c882b?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/ryanjbaxter">Ryan Baxter</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-04-16 15:54:00.0">April 16, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3643" href="/blog/2019/04/16/introducing-spring-cloud-circuit-breaker#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><h1><a href="#background" class="anchor" name="background"></a>Background</h1>
+<p>When using a microservices architecture to build our applications, it is very common to end up with a pretty complex dependency tree amongst services. If the service down the dependency tree encounters an issue that causes it to start to respond slowly, it ends up causing a set of issues that cascade up the dependency tree. As more and more requests come in to the application, more and more resources may be consumed by waiting for the slow service to respond. Even worse, the additional load being put on the slow service may exacerbate the problem. To help alleviate the effect of these types of cascading failures, it is common practice to use <a href="https://microservices.io/patterns/reliability/circuit-breaker.html">circuit breakers</a> as part of microservice applications.</p>
+<p>Spring Cloud has <a href="https://spring.io/guides/gs/circuit-breaker/">let developers add circuit breakers</a> to their application by using <a href="https://github.com/Netflix/Hystrix">Netflix Hystrix</a> as part of the <a href="https://github.com/spring-cloud/spring-cloud-netflix">Spring Cloud Netflix project</a>. In addition to Hystrix, Spring Cloud developers may want to use other circuit breaker implementations. To help Spring Cloud developers add circuit breakers to their applications in a consistent manner, we have introduced the <a href="https://github.com/spring-cloud-incubator/spring-cloud-circuitbreaker">Spring Cloud Circuit Breaker project</a> as part of the Spring Cloud incubator.</p><h1><a href="#about" class="anchor" name="about"></a>About</h1>
+<p>The Spring Cloud Circuit Breaker project provides an abstraction API for adding circuit breakers to your application. At the time of this blog post, there are four supported implementations:</p>
+<ul>
+<li><a href="https://github.com/Netflix/Hystrix">Hystrix</a></li>
+<li><a href="https://github.com/resilience4j/resilience4j">Resilience4J</a></li>
+<li><a href="https://github.com/alibaba/Sentinel">Sentinel</a></li>
+<li><a href="https://github.com/spring-projects/spring-retry">Spring Retry</a></li>
+</ul>
+<p>To use a given implementation, add the appropriate <a href="https://github.com/spring-cloud-incubator/spring-cloud-circuitbreaker/tree/master/spring-cloud-starter-circuitbreaker">starter</a> to your application&rsquo;s classpath.</p><h1><a href="#using-spring-cloud-circuit-breaker" class="anchor" name="using-spring-cloud-circuit-breaker"></a>Using Spring Cloud Circuit Breaker</h1>
+<p>Currently, Spring Cloud Circuit Breaker is not part of the Spring Cloud BOM and is being published only to our <a href="https://repo.spring.io/snapshot/org/springframework/cloud/spring-cloud-circuitbreaker/">snapshot repo</a>. You need to add our snapshot repo to your Maven or Gradle file. The following example uses Maven:</p>
+<pre><code class="prettyprint">&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;spring-snapshots&lt;/id&gt;
+        &lt;name&gt;Spring Snapshots&lt;/name&gt;
+        &lt;url&gt;https://repo.spring.io/libs-snapshot-local&lt;/url&gt;
+        &lt;snapshots&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+        &lt;releases&gt;
+            &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/releases&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;
+</code></pre>
+<p>Next, you need to add the Spring Cloud Circuit Breaker dependency to your application. Again, the following example uses Maven:</p>
+<pre><code class="prettyprint">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+        &lt;artifactId&gt;
+            spring-cloud-starter-circuitbreaker-resilience4j
+       &lt;/artifactId&gt;
+        &lt;version&gt;0.0.1.BUILD-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+<p>Spring Cloud Circuit Breaker auto-configures an implementation of <code>CircuitBreakerFactory</code>, based on the starter on your application&rsquo;s classpath. You can then inject this interface into any class you want. The following example shows how to do so:</p>
+<pre><code class="prettyprint">@Service
+public static class DemoControllerService {
+	private RestTemplate rest;
+	private CircuitBreakerFactory cbFactory;
+
+	public DemoControllerService(RestTemplate rest, 
+                CircuitBreakerFactory cbFactory) {
+		this.rest = rest;
+		this.cbFactory = cbFactory;
+	}
+
+	public String slow() {
+		return cbFactory.create(&quot;slow&quot;).run(() -&gt; 
+                rest.getForObject(&quot;/slow&quot;, String.class),
+                throwable -&gt; &quot;fallback&quot;);
+	}
+}
+</code></pre>
+<p>Most implementations also support Reactive APIs. Currently, Spring Retry is the only implementation that does not have a reactive implementation. If you want to wrap some reactive code in a circuit breaker ,you need to use <code>ReactiveCircuitBreakerFactory</code>. The following example shows how to do so:</p>
+<pre><code class="prettyprint">@Service
+public static class DemoControllerService {
+	private ReactiveCircuitBreakerFactory cbFactory;
+	private WebClient webClient;
+
+
+	public DemoControllerService(WebClient webClient, 
+                ReactiveCircuitBreakerFactory cbFactory) {
+		this.webClient = webClient;
+		this.cbFactory = cbFactory;
+	}
+
+	public Mono&lt;String&gt; slow() {
+		return webClient.get().uri(&quot;/slow&quot;).retrieve()
+                .bodyToMono(String.class).transform(it -&gt; {
+			CircuitBreaker cb = cbFactory.create(&quot;slow&quot;);
+			return cb.run(it, throwable -&gt; 
+                            Mono.just(&quot;fallback&quot;));
+                });
+	}
+}
+</code></pre><h1><a href="#configuring-circuit-breakers" class="anchor" name="configuring-circuit-breakers"></a>Configuring Circuit Breakers</h1>
+<p>In most cases, you are going to want to configure the behavior of your circuit breakers. To do so, you can create beans of type <code>Customizer</code>. Spring Cloud Circuit Breaker lets you provide a default configuration for all circuit breakers as well as configuration for specific circuit breakers. For example, to provide a default configuration for all circuit breakers when using Resilience4J you could add the following bean to a configuration class:</p>
+<pre><code class="prettyprint">@Bean
+public Customizer&lt;Resilience4JCircuitBreakerFactory&gt; defaultCustomizer() {
+	return factory -&gt; factory.configureDefault(
+            id -&gt; new Resilience4JConfigBuilder(id)
+            .timeLimiterConfig(TimeLimiterConfig.custom()
+                .timeoutDuration(Duration.ofSeconds(4)).build())
+            .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
+            .build());
+}
+</code></pre>
+<p>The code to configure an individual circuit breaker would look very similar, except you would provide a circuit breaker ID in your <code>Customizer</code>, as follows:</p>
+<pre><code class="prettyprint">@Bean
+public Customizer&lt;Resilience4JCircuitBreakerFactory&gt; slowCustomizer() {
+	return factory -&gt; factory.configure(builder -&gt; {
+		return builder
+			.timeLimiterConfig(TimeLimiterConfig.custom()
+                            .timeoutDuration(Duration.ofSeconds(2)).build())
+			.circuitBreakerConfig(
+                            CircuitBreakerConfig.ofDefaults());
+	}, &quot;slow&quot;);
+}
+</code></pre><h1><a href="#feedback" class="anchor" name="feedback"></a>Feedback</h1>
+<p>We look forward to hearing what you think about this new project. Check out the <a href="https://github.com/spring-cloud-incubator/spring-cloud-circuitbreaker">GitHub project</a> as well as the <a href="https://spring-cloud-incubator.github.io/spring-cloud-circuitbreaker/spring-cloud-circuitbreaker.html">documentation</a> for more information. As always, you can reach out to us on <a href="https://stackoverflow.com/questions/tagged/spring-cloud">Stack Overflow</a> and <a href="https://gitter.im/spring-cloud/spring-cloud">Gitter</a> or by creating a <a href="https://github.com/spring-cloud-incubator/spring-cloud-circuitbreaker/issues">GitHub issue</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3643;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

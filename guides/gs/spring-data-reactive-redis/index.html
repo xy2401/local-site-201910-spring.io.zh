@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html data-clipboard-buttons="" data-code-prettify="" data-code-sidebar="" data-hide-show-guide="" data-sts-import="" data-mobile-support="" data-search="">
+<head>
+<title>Getting Started · Accessing Data Reactively with Redis</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link rel="stylesheet" type="text/css" href="/css/gsguide-cce08ab7a9f46db88819a14148e45bad.css" />
+
+<meta property="og:title" content="Accessing Data Reactively with Redis" />
+<meta property="og:image" content="/img/spring-by-pivotal-9066b55828deb3c10e27e609af322c40.png" />
+<meta property="og:description" content="this guide is designed to get you productive as quickly as possible and using the latest Spring project releases and techniques as recommended by the Spring team" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link active">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<main class="main-body--wrapper">
+<div class="row-fluid">
+<div class="span8 mobile-left-pane">
+<div class="content--title desktop-only">Getting Started</div>
+<article class="content--container">
+<h1 class="title">Accessing Data Reactively with Redis</h1>
+<div class="article-body"><div class="paragraph">
+<p>This guide walks you through the process of creating a functional reactive application that uses Spring Data to interact with Redis using the non-blocking Lettuce driver.</p>
+</div>
+<div class="sect1">
+<h2 id="_what_youll_build">What you’ll build</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You’ll build a Spring application that uses <a href="https://projects.spring.io/spring-data-redis/">Spring Data Redis</a> and <a href="https://projectreactor.io/">Project Reactor</a> to interact with a Redis data store reactively, storing and retrieving <code>Coffee</code> objects without blocking. This application uses Reactor’s <code>Publisher</code> implementations based upon the Reactive Streams specification, namely <code>Mono</code> (for a Publisher returning 0 or 1 value) and <code>Flux</code> (for a Publisher returning 0 to n values).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_youll_need">What you’ll need</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li> <p>About 15 minutes</p> </li>
+<li> <p>A favorite text editor or IDE</p> </li>
+<li> <p><a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">JDK 1.8</a> or later</p> </li>
+<li> <p><a href="http://www.gradle.org/downloads">Gradle 4+</a> or <a href="https://maven.apache.org/download.cgi">Maven 3.2+</a></p> </li>
+<li> <p>You can also import the code straight into your IDE:</p>
+<div class="ulist">
+<ul>
+<li> <p><a href="/guides/gs/sts">Spring Tool Suite (STS)</a></p> </li>
+<li> <p><a href="/guides/gs/intellij-idea/">IntelliJ IDEA</a></p> </li>
+</ul>
+</div> </li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_complete_this_guide">How to complete this guide</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Like most Spring <a href="/guides">Getting Started guides</a>, you can start from scratch and complete each step or you can bypass basic setup steps that are already familiar to you. Either way, you end up with working code.</p>
+</div>
+<div class="paragraph">
+<p>To <strong>start from scratch</strong>, move on to <a href="#scratch">Build with Gradle</a>.</p>
+</div>
+<div class="paragraph">
+<p>To <strong>skip the basics</strong>, do the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li> <p><a href="https://github.com/spring-guides/gs-spring-data-reactive-redis/archive/master.zip">Download</a> and unzip the source repository for this guide, or clone it using <a href="/understanding/Git">Git</a>: <code>git clone <a href="https://github.com/spring-guides/gs-spring-data-reactive-redis.git" class="bare">https://github.com/spring-guides/gs-spring-data-reactive-redis.git</a></code></p> </li>
+<li> <p>cd into <code>gs-spring-data-reactive-redis/initial</code></p> </li>
+<li> <p>Jump ahead to <a href="#initial">Create a domain class</a>.</p> </li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>When you finish</strong>, you can check your results against the code in <code>gs-spring-data-reactive-redis/complete</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1 reveal-gradle">
+<h2 id="reveal-gradle">Build with Gradle</h2>
+<div class="sectionbody">
+</div>
+</div>
+<div class="sect1 use-gradle">
+<h2 id="scratch">Build with Gradle</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First you set up a basic build script. You can use any build system you like when building apps with Spring, but the code you need to work with <a href="http://gradle.org">Gradle</a> and <a href="https://maven.apache.org">Maven</a> is included here. If you’re not familiar with either, refer to <a href="/guides/gs/gradle">Building Java Projects with Gradle</a> or <a href="/guides/gs/maven">Building Java Projects with Maven</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_create_the_directory_structure">Create the directory structure</h3>
+<div class="paragraph">
+<p>In a project directory of your choosing, create the following subdirectory structure; for example, with <code>mkdir -p src/main/java/hello</code> on *nix systems:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>└── src
+    └── main
+        └── java
+            └── hello</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_a_gradle_build_file">Create a Gradle build file</h3>
+<div class="paragraph">
+<p>Below is the <a href="https://github.com/spring-guides/gs-spring-data-reactive-redis/blob/master/initial/build.gradle">initial Gradle build file</a>.</p>
+</div>
+<div class="paragraph">
+<p><code>build.gradle</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">buildscript {
+	ext {
+		springBootVersion = '2.1.6.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+bootJar {
+    baseName = 'gs-spring-data-reactive-redis'
+    version =  '0.1.0'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-redis-reactive')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
+	compileOnly('org.projectlombok:lombok')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('io.projectreactor:reactor-test')
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <a href="https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/html">Spring Boot gradle plugin</a> provides many convenient features:</p>
+</div>
+<div class="ulist">
+<ul>
+<li> <p>It collects all the jars on the classpath and builds a single, runnable "über-jar", which makes it more convenient to execute and transport your service.</p> </li>
+<li> <p>It searches for the <code>public static void main()</code> method to flag as a runnable class.</p> </li>
+<li> <p>It provides a built-in dependency resolver that sets the version number to match <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-dependencies/pom.xml">Spring Boot dependencies</a>. You can override any version you wish, but it will default to Boot’s chosen set of versions.</p> </li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 reveal-maven">
+<h2 id="reveal-maven">Build with Maven</h2>
+<div class="sectionbody">
+</div>
+</div>
+<div class="sect1 use-maven">
+<h2 id="use-maven">Build with Maven</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>First you set up a basic build script. You can use any build system you like when building apps with Spring, but the code you need to work with <a href="https://maven.apache.org">Maven</a> is included here. If you’re not familiar with Maven, refer to <a href="/guides/gs/maven">Building Java Projects with Maven</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_create_the_directory_structure_2">Create the directory structure</h3>
+<div class="paragraph">
+<p>In a project directory of your choosing, create the following subdirectory structure; for example, with <code>mkdir -p src/main/java/hello</code> on *nix systems:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>└── src
+    └── main
+        └── java
+            └── hello</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>pom.xml</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;reactive-redis&lt;/artifactId&gt;
+    &lt;version&gt;0.1.0&lt;/version&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.1.6.RELEASE&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-data-redis-reactive&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-webflux&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+			&lt;artifactId&gt;lombok&lt;/artifactId&gt;
+			&lt;optional&gt;true&lt;/optional&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;io.projectreactor&lt;/groupId&gt;
+			&lt;artifactId&gt;reactor-test&lt;/artifactId&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;1.8&lt;/java.version&gt;
+    &lt;/properties&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <a href="https://docs.spring.io/spring-boot/docs/current/maven-plugin">Spring Boot Maven plugin</a> provides many convenient features:</p>
+</div>
+<div class="ulist">
+<ul>
+<li> <p>It collects all the jars on the classpath and builds a single, runnable "über-jar", which makes it more convenient to execute and transport your service.</p> </li>
+<li> <p>It searches for the <code>public static void main()</code> method to flag as a runnable class.</p> </li>
+<li> <p>It provides a built-in dependency resolver that sets the version number to match <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-dependencies/pom.xml">Spring Boot dependencies</a>. You can override any version you wish, but it will default to Boot’s chosen set of versions.</p> </li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 reveal-sts">
+<h2 id="reveal-sts">Build with your IDE</h2>
+<div class="sectionbody">
+</div>
+</div>
+<div class="sect1 use-sts">
+<h2 id="use-sts">Build with your IDE</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li> <p>Read how to import this guide straight into <a href="/guides/gs/sts/">Spring Tool Suite</a>.</p> </li>
+<li> <p>Read how to work with this guide in <a href="/guides/gs/intellij-idea">IntelliJ IDEA</a>.</p> </li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="initial">Create a domain class</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a class representing a type of coffee we wish to stock in our coffee catalog.</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/hello/Coffee.java</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Coffee {
+    private String id;
+    private String name;
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content"> I use Lombok in this example to eliminate the boilerplate code for constructors and so-called "data class" methods ( accessors/mutators, <code>equals()</code>, <code>toString()</code>, &amp; <code>hashCode()</code>). </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_create_a_configuration_class_with_spring_beans_supporting_reactive_redis_operations">Create a configuration class with Spring Beans supporting reactive Redis operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>src/main/java/hello/CoffeeConfiguration.java</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+@Configuration
+public class CoffeeConfiguration {
+    @Bean
+    ReactiveRedisOperations&lt;String, Coffee&gt; redisOperations(ReactiveRedisConnectionFactory factory) {
+        Jackson2JsonRedisSerializer&lt;Coffee&gt; serializer = new Jackson2JsonRedisSerializer&lt;&gt;(Coffee.class);
+
+        RedisSerializationContext.RedisSerializationContextBuilder&lt;String, Coffee&gt; builder =
+                RedisSerializationContext.newSerializationContext(new StringRedisSerializer());
+
+        RedisSerializationContext&lt;String, Coffee&gt; context = builder.value(serializer).build();
+
+        return new ReactiveRedisTemplate&lt;&gt;(factory, context);
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_create_a_spring_bean_to_load_some_sample_data_to_our_application_when_we_start_it">Create a Spring Bean to load some sample data to our application when we start it</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content"> Since we may (re)start our application multiple times, we should first remove any data that may still exist from previous executions. We do this with a <code>flushAll()</code> (Redis) server command. Once we’ve flushed any existing data, we create a small <code>Flux</code>, map each coffee name to a <code>Coffee</code> object, and save it to the reactive Redis repository. We then query the repo for all values and display them. </td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/hello/CoffeeLoader.java</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
+
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+
+import javax.annotation.PostConstruct;
+import java.util.UUID;
+
+@Component
+public class CoffeeLoader {
+    private final ReactiveRedisConnectionFactory factory;
+    private final ReactiveRedisOperations&lt;String, Coffee&gt; coffeeOps;
+
+    public CoffeeLoader(ReactiveRedisConnectionFactory factory, ReactiveRedisOperations&lt;String, Coffee&gt; coffeeOps) {
+        this.factory = factory;
+        this.coffeeOps = coffeeOps;
+    }
+
+    @PostConstruct
+    public void loadData() {
+        factory.getReactiveConnection().serverCommands().flushAll().thenMany(
+                Flux.just("Jet Black Redis", "Darth Redis", "Black Alert Redis")
+                        .map(name -&gt; new Coffee(UUID.randomUUID().toString(), name))
+                        .flatMap(coffee -&gt; coffeeOps.opsForValue().set(coffee.getId(), coffee)))
+                .thenMany(coffeeOps.keys("*")
+                        .flatMap(coffeeOps.opsForValue()::get))
+                .subscribe(System.out::println);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_create_a_restcontroller_to_provide_an_external_interface_for_our_application">Create a RestController to provide an external interface for our application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>src/main/java/hello/CoffeeController.java</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
+
+import org.springframework.data.redis.core.ReactiveRedisOperations;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+
+@RestController
+public class CoffeeController {
+    private final ReactiveRedisOperations&lt;String, Coffee&gt; coffeeOps;
+
+    CoffeeController(ReactiveRedisOperations&lt;String, Coffee&gt; coffeeOps) {
+        this.coffeeOps = coffeeOps;
+    }
+
+    @GetMapping("/coffees")
+    public Flux&lt;Coffee&gt; all() {
+        return coffeeOps.keys("*")
+                .flatMap(coffeeOps.opsForValue()::get);
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_make_the_application_executable">Make the application executable</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Although it is possible to package this service as a traditional <a href="/understanding/WAR">WAR</a> file for deployment to an external application server, the simpler approach demonstrated below creates a standalone application. You package everything in a single, executable JAR file, driven by a good old Java <code>main()</code> method. Along the way, you use Spring’s support for embedding the <a href="/understanding/Netty">Netty</a> asynchronous "container" as the HTTP runtime instead of deploying to an external instance.</p>
+</div>
+<div class="paragraph">
+<p><code>src/main/java/hello/Application.java</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@SpringBootApplication</code> is a convenience annotation that adds all of the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li> <p><code>@Configuration</code>: Tags the class as a source of bean definitions for the application context.</p> </li>
+<li> <p><code>@EnableAutoConfiguration</code>: Tells Spring Boot to start adding beans based on classpath settings, other beans, and various property settings. For example, if <code>spring-webmvc</code> is on the classpath, this annotation flags the application as a web application and activates key behaviors, such as setting up a <code>DispatcherServlet</code>.</p> </li>
+<li> <p><code>@ComponentScan</code>: Tells Spring to look for other components, configurations, and services in the <code>hello</code> package, letting it find the controllers.</p> </li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>main()</code> method uses Spring Boot’s <code>SpringApplication.run()</code> method to launch an application. Did you notice that there was not a single line of XML? There is no <code>web.xml</code> file, either. This web application is 100% pure Java and you did not have to deal with configuring any plumbing or infrastructure.</p>
+</div>
+<div class="sect2">
+<h3 id="_build_an_executable_jar">Build an executable JAR</h3>
+<div class="paragraph">
+<p>You can run the application from the command line with Gradle or Maven. You can also build a single executable JAR file that contains all the necessary dependencies, classes, and resources and run that. Building an executable jar so makes it easy to ship, version, and deploy the service as an application throughout the development lifecycle, across different environments, and so forth.</p>
+</div>
+<div class="paragraph">
+<p>If you use Gradle, you can run the application by using <code>./gradlew bootRun</code>. Alternatively, you can build the JAR file by using <code>./gradlew build</code> and then run the JAR file, as follows:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock has-copy-button">
+<div class="content">
+<pre>java -jar build/libs/gs-spring-data-reactive-redis-0.1.0.jar</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>If you use Maven, you can run the application by using <code>./mvnw spring-boot:run</code>. Alternatively, you can build the JAR file with <code>./mvnw clean package</code> and then run the JAR file, as follows:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock has-copy-button">
+<div class="content">
+<pre>java -jar target/gs-spring-data-reactive-redis-0.1.0.jar</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content"> The steps described here create a runnable JAR. You can also <a href="/guides/gs/convert-jar-to-war/">build a classic WAR file</a>. </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_test_the_application">Test the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that the application is running, you can test it by accessing <code><a href="http://localhost:8080/coffees" class="bare">http://localhost:8080/coffees</a></code> from HTTPie, curl, or your favorite browser.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary">Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Congratulations! You’ve just developed a Spring application that uses Spring Data and Redis for fully reactive, non-blocking database access!</p>
+</div>
+<div class="paragraph">
+<p>Want to write a new guide or contribute to an existing one? Check out our <a href="https://github.com/spring-guides/getting-started-guides/wiki">contribution guidelines</a>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-important" title="Important"></i> </td>
+<td class="content"> All guides are released with an ASLv2 license for the code, and an <a href="https://creativecommons.org/licenses/by-nd/3.0/">Attribution, NoDerivatives creative commons license</a> for the writing. </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+<aside class="span4 content-right-pane--container mobile-left-pane" id="sidebar">
+<a class="ci-status desktop-only" href="https://travis-ci.org/spring-guides/gs-spring-data-reactive-redis">
+<img src="https://travis-ci.org/spring-guides/gs-spring-data-reactive-redis.svg?branch=master" />
+</a>
+<div class="right-pane-widget--container desktop-only">
+<div class="github-actions https">
+<h2>Get the Code</h2>
+<div class="btn-group">
+<button class="btn" data-protocol="https">HTTPS</button>
+<button class="btn" data-protocol="ssh">SSH</button>
+</div>
+ <div class="clone-url https">
+<input id="clone-url-https" readonly="readonly" type="text" value="https://github.com/spring-guides/gs-spring-data-reactive-redis.git" />
+<button class="copy-button github" data-toggle="tooltip" data-clipboard-text="https://github.com/spring-guides/gs-spring-data-reactive-redis.git"></button>
+</div>
+<div class="clone-url ssh">
+<input id="clone-url-ssh" readonly="readonly" type="text" value="git@github.com:spring-guides/gs-spring-data-reactive-redis.git" />
+<button class="copy-button github" data-toggle="tooltip" data-clipboard-text="git@github.com:spring-guides/gs-spring-data-reactive-redis.git"></button>
+</div>
+<a class="github_download btn btn-black uppercase" href="https://github.com/spring-guides/gs-spring-data-reactive-redis/archive/master.zip">Download ZIP</a>
+<a class="gs-guide-import" href="https://github.com/spring-guides/gs-spring-data-reactive-redis.git">Import into STS</a>
+<div class="go-to-repo--container">
+<a href="https://github.com/spring-guides/gs-spring-data-reactive-redis"><i class="icon-github"></i>Go To Repo</a>
+</div>
+<div class="go-to-repo--container">
+</div>
+</div>
+</div>
+<div class="right-pane-widget--container">
+<div>
+<h3><a class="anchor" href="#table-of-contents" name="table-of-contents"></a>Table of contents</h3>
+<div><ul class="sectlevel1">
+<li><a href="#_what_youll_build">What you’ll build</a></li>
+<li><a href="#_what_youll_need">What you’ll need</a></li>
+<li><a href="#_how_to_complete_this_guide">How to complete this guide</a></li>
+<li><a href="#scratch">Build with Gradle</a> </li>
+<li><a href="#use-maven">Build with Maven</a> </li>
+<li><a href="#use-sts">Build with your IDE</a></li>
+<li><a href="#initial">Create a domain class</a></li>
+<li><a href="#_create_a_configuration_class_with_spring_beans_supporting_reactive_redis_operations">Create a configuration class with Spring Beans supporting reactive Redis operations</a></li>
+<li><a href="#_create_a_spring_bean_to_load_some_sample_data_to_our_application_when_we_start_it">Create a Spring Bean to load some sample data to our application when we start it</a></li>
+<li><a href="#_create_a_restcontroller_to_provide_an_external_interface_for_our_application">Create a RestController to provide an external interface for our application</a></li>
+<li><a href="#_make_the_application_executable">Make the application executable</a> </li>
+<li><a href="#_test_the_application">Test the application</a></li>
+<li><a href="#_summary">Summary</a></li>
+</ul></div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

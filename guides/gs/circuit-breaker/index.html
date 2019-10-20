@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html data-clipboard-buttons="" data-code-prettify="" data-code-sidebar="" data-hide-show-guide="" data-sts-import="" data-mobile-support="" data-search="">
+<head>
+<title>Getting Started · Circuit Breaker</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link rel="stylesheet" type="text/css" href="/css/gsguide-cce08ab7a9f46db88819a14148e45bad.css" />
+
+<meta property="og:title" content="Circuit Breaker" />
+<meta property="og:image" content="/img/spring-by-pivotal-9066b55828deb3c10e27e609af322c40.png" />
+<meta property="og:description" content="this guide is designed to get you productive as quickly as possible and using the latest Spring project releases and techniques as recommended by the Spring team" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link active">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<main class="main-body--wrapper">
+<div class="row-fluid">
+<div class="span8 mobile-left-pane">
+<div class="content--title desktop-only">Getting Started</div>
+<article class="content--container">
+<h1 class="title">Circuit Breaker</h1>
+<div class="article-body"><div class="paragraph">
+<p>This guide walks you through the process of applying circuit breakers to potentially failing method calls by using the Netflix Hystrix fault tolerance library.</p>
+</div>
+<div class="sect1">
+<h2 id="_what_you_will_build">What You Will Build</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You will build a microservice application that uses the <a href="http://martinfowler.com/bliki/CircuitBreaker.html">circuit breaker pattern</a> to gracefully degrade functionality when a method call fails. Use of the Circuit Breaker pattern can let a microservice continue operating when a related service fails, preventing the failure from cascading and giving the failing service time to recover.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_you_need">What You Need</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li> <p>About 15 minutes</p> </li>
+<li> <p>A favorite text editor or IDE</p> </li>
+<li> <p><a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">JDK 1.8</a> or later</p> </li>
+<li> <p><a href="http://www.gradle.org/downloads">Gradle 4+</a> or <a href="https://maven.apache.org/download.cgi">Maven 3.2+</a></p> </li>
+<li> <p>You can also import the code straight into your IDE:</p>
+<div class="ulist">
+<ul>
+<li> <p><a href="/guides/gs/sts">Spring Tool Suite (STS)</a></p> </li>
+<li> <p><a href="/guides/gs/intellij-idea/">IntelliJ IDEA</a></p> </li>
+</ul>
+</div> </li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_complete_this_guide">How to complete this guide</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Like most Spring <a href="/guides">Getting Started guides</a>, you can start from scratch and complete each step or you can bypass basic setup steps that are already familiar to you. Either way, you end up with working code.</p>
+</div>
+<div class="paragraph">
+<p>To <strong>start from scratch</strong>, move on to <a href="#scratch">Starting with Spring Initializr</a>.</p>
+</div>
+<div class="paragraph">
+<p>To <strong>skip the basics</strong>, do the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li> <p><a href="https://github.com/spring-guides/gs-circuit-breaker/archive/master.zip">Download</a> and unzip the source repository for this guide, or clone it using <a href="/understanding/Git">Git</a>: <code>git clone <a href="https://github.com/spring-guides/gs-circuit-breaker.git" class="bare">https://github.com/spring-guides/gs-circuit-breaker.git</a></code></p> </li>
+<li> <p>cd into <code>gs-circuit-breaker/initial</code></p> </li>
+<li> <p>Jump ahead to <a href="#initial">Set up a Server Microservice Application</a>.</p> </li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>When you finish</strong>, you can check your results against the code in <code>gs-circuit-breaker/complete</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="scratch">Starting with Spring Initializr</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For all Spring applications, you should start with the <a href="https://start.spring.io">Spring Initializr</a>. The Initializr offers a fast way to pull in all the dependencies you need for an application and does a lot of the set up for you.</p>
+</div>
+<div class="paragraph">
+<p>This guide needs two applications. The first application (a simple bookstore site) needs only the Web dependency. The following image shows the Initializr set up for the bookstore:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/initializr-bookstore.png" alt="initializr bookstore">
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content"> The preceding image shows the Initializr with Maven chosen as the build tool. You can also use Gradle. It also shows values of <code>com.example</code> and <code>circuit-breaker-bookstore</code> as the Group and Artifact, respectively. You will use those values throughout the rest of this sample. </td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph">
+<p>The following listing shows the <code>pom.xml</code> file (for the configuration service) that is created when you choose Maven:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+	&lt;parent&gt;
+		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+		&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+		&lt;version&gt;2.1.8.RELEASE&lt;/version&gt;
+		&lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+	&lt;/parent&gt;
+	&lt;groupId&gt;com.example&lt;/groupId&gt;
+	&lt;artifactId&gt;circuit-breaker-bookstore&lt;/artifactId&gt;
+	&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+	&lt;name&gt;circuit-breaker-bookstore&lt;/name&gt;
+	&lt;description&gt;Demo project for Spring Boot&lt;/description&gt;
+
+	&lt;properties&gt;
+		&lt;java.version&gt;1.8&lt;/java.version&gt;
+	&lt;/properties&gt;
+
+	&lt;dependencies&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+	&lt;/dependencies&gt;
+
+	&lt;build&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+
+&lt;/project&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The following listing shows the <code>build.gradle</code> file (for the configuration service) that is created when you choose Gradle:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>plugins {
+	id 'org.springframework.boot' version '2.1.8.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The second application (the reading application, which will use a Hystrix circuit breaker) needs the Web and Hystrix dependencies. The following image shows the Initializr set up for the configuration client:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/initializr-reading.png" alt="initializr reading">
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content"> The preceding image shows the Initializr with Maven chosen as the build tool. You can also use Gradle. It also shows values of <code>com.example</code> and <code>circuit-breaker-reading</code> as the Group and Artifact, respectively. You will use those values throughout the rest of this sample. </td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph">
+<p>The following listing shows the <code>pom.xml</code> file (for the configuration client) that is created when you choose Maven:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+	&lt;parent&gt;
+		&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+		&lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+		&lt;version&gt;2.1.8.RELEASE&lt;/version&gt;
+		&lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+	&lt;/parent&gt;
+	&lt;groupId&gt;com.example&lt;/groupId&gt;
+	&lt;artifactId&gt;circuit-breaker-reading&lt;/artifactId&gt;
+	&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+	&lt;name&gt;circuit-breaker-reading&lt;/name&gt;
+	&lt;description&gt;Demo project for Spring Boot&lt;/description&gt;
+
+	&lt;properties&gt;
+		&lt;java.version&gt;1.8&lt;/java.version&gt;
+		&lt;spring-cloud.version&gt;Greenwich.SR3&lt;/spring-cloud.version&gt;
+	&lt;/properties&gt;
+
+	&lt;dependencies&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-cloud-starter-netflix-hystrix&lt;/artifactId&gt;
+		&lt;/dependency&gt;
+
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+			&lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+			&lt;scope&gt;test&lt;/scope&gt;
+		&lt;/dependency&gt;
+	&lt;/dependencies&gt;
+
+	&lt;dependencyManagement&gt;
+		&lt;dependencies&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+				&lt;version&gt;${spring-cloud.version}&lt;/version&gt;
+				&lt;type&gt;pom&lt;/type&gt;
+				&lt;scope&gt;import&lt;/scope&gt;
+			&lt;/dependency&gt;
+		&lt;/dependencies&gt;
+	&lt;/dependencyManagement&gt;
+
+	&lt;build&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+
+&lt;/project&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The following listing shows the <code>build.gradle</code> file (for the configuration client) that is created when you choose Gradle:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>plugins {
+	id 'org.springframework.boot' version '2.1.8.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "Greenwich.SR3")
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content"> For convenience, we have provided build files (a <code>pom.xml</code> file and a <code>build.gradle</code> file) at the top of the complete and initial projects (one directory above the <code>bookstore</code> and <code>reading</code> directories) that you can use to build both the bookstore project and the reading project at once. We also added the Maven and Gradle wrappers there. </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="initial">Set up a Server Microservice Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Bookstore service will have a single endpoint. It will be accessible at <code>/recommended</code> and will (for simplicity) return a recommended reading list as a <code>String</code>.</p>
+</div>
+<div class="paragraph">
+<p>You need to make your main class in <code>BookstoreApplication.java</code>. It should look like the following listing (from <code>bookstore/src/main/java/com/example/circuitbreakerbookstore/CircuitBreakerBookstoreApplication.java</code>):</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package com.example.circuitbreakerbookstore;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@RestController
+@SpringBootApplication
+public class CircuitBreakerBookstoreApplication {
+
+  @RequestMapping(value = "/recommended")
+  public String readingList(){
+    return "Spring in Action (Manning), Cloud Native Java (O'Reilly), Learning Spring Boot (Packt)";
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(CircuitBreakerBookstoreApplication.class, args);
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>@RestController</code> annotation indicates that <code>BookstoreApplication</code> is a REST controller class and ensures that any <code>@RequestMapping</code> methods in this class behave as though annotated with <code>@ResponseBody</code>. That is, the return values of <code>@RequestMapping</code> methods in this class are automatically and appropriately converted from their original types and are written directly to the response body.</p>
+</div>
+<div class="paragraph">
+<p>You are going to run this application locally alongside an application with a consuming application. As a result, in <code>src/main/resources/application.properties</code>, you need to set <code>server.port</code> so that the Bookstore service cannot conflict with the consuming application when we get that running. The following listing (from <code>bookstore/src/main/resources/application.properties</code>) shows how to do so:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-properties" data-lang="properties">server.port=8090</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_set_up_a_client_microservice_application">Set up a Client Microservice Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The reading application will be your consumer (modeling visitors) for the bookstore application. You can view your reading list there at <code>/to-read</code>, and that reading list is retrieved from the bookstore service application. The following example (from <code>reading/src/main/java/com/example/circuitbreakerreading/CircuitBreakerReadingApplication.java</code>) shows this class:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package com.example.circuitbreakerreading;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.web.client.RestTemplate;
+
+@EnableCircuitBreaker
+@RestController
+@SpringBootApplication
+public class CircuitBreakerReadingApplication {
+
+  @Autowired
+  private BookService bookService;
+
+  @Bean
+  public RestTemplate rest(RestTemplateBuilder builder) {
+    return builder.build();
+  }
+
+  @RequestMapping("/to-read")
+  public String toRead() {
+    return bookService.readingList();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(CircuitBreakerReadingApplication.class, args);
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>To get the list from your bookstore, you can use Spring’s <code>RestTemplate</code> template class. <code>RestTemplate</code> makes an HTTP GET request to the bookstore service’s URL and returns the result as a <code>String</code>. (For more information on using Spring to consume a RESTful service, see the <a href="https://spring.io/guides/gs/consuming-rest/">Consuming a RESTful Web Service</a> guide.) To do so, you need to add the <code>server.port</code> property to <code>reading/src/main/resources/application.properties</code>, as the following listing shows:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-properties" data-lang="properties">server.port=8080</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>You now can access, in a browser, the <code>/to-read</code> endpoint of your reading application and see your reading list. However, since we rely on the bookstore application, if anything happens to it or if the reading application is unable to access Bookstore, you will have no list and your users will get a nasty HTTP 500 error message.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_apply_the_circuit_breaker_pattern">Apply the Circuit Breaker Pattern</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Netflix’s Hystrix library provides an implementation of the circuit breaker pattern. When you apply a circuit breaker to a method, Hystrix watches for failing calls to that method, and, if failures build up to a threshold, Hystrix opens the circuit so that subsequent calls automatically fail. While the circuit is open, Hystrix redirects calls to the method, and they are passed to your specified fallback method.</p>
+</div>
+<div class="paragraph">
+<p>Spring Cloud Netflix Hystrix looks for any method annotated with the <code>@HystrixCommand</code> annotation and wraps that method in a proxy connected to a circuit breaker so that Hystrix can monitor it. This currently works only in a class marked with <code>@Component</code> or <code>@Service</code>. Therefore, in the reading application, under <code>src/main/java/com/example/circuitbreakerreading</code>, you need to add a new class (called <code>BookService</code>).</p>
+</div>
+<div class="paragraph">
+<p>The <code>RestTemplate</code> is injected into the constructor of the <code>BookService</code> when it is created. The following listing (from <code>reading/src/main/java/com/example/circuitbreakerreading/BookService.java</code> shows the <code>BookService</code> class):</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package com.example.circuitbreakerreading;
+
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.URI;
+
+@Service
+public class BookService {
+
+  private final RestTemplate restTemplate;
+
+  public BookService(RestTemplate rest) {
+    this.restTemplate = rest;
+  }
+
+  @HystrixCommand(fallbackMethod = "reliable")
+  public String readingList() {
+    URI uri = URI.create("http://localhost:8090/recommended");
+
+    return this.restTemplate.getForObject(uri, String.class);
+  }
+
+  public String reliable() {
+    return "Cloud Native Java (O'Reilly)";
+  }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>You have applied <code>@HystrixCommand</code> to your original <code>readingList()</code> method. You also have a new method here: <code>reliable()</code>. The <code>@HystrixCommand</code> annotation has <code>reliable</code> as its <code>fallbackMethod</code>. If, for some reason, Hystrix opens the circuit on <code>readingList()</code>, you have an excellent (if short) placeholder reading list ready for your users.</p>
+</div>
+<div class="paragraph">
+<p>In our main class, <code>ReadingApplication</code>, you need to create a <code>RestTemplate</code> bean, inject the <code>BookService</code>, and call it for your reading list. The following example (from <code>reading/src/main/java/com/example/circuitbreakerreading/CircuitBreakerReadingApplication.java</code>) shows how to do so:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package com.example.circuitbreakerreading;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.web.client.RestTemplate;
+
+@EnableCircuitBreaker
+@RestController
+@SpringBootApplication
+public class CircuitBreakerReadingApplication {
+
+  @Autowired
+  private BookService bookService;
+
+  @Bean
+  public RestTemplate rest(RestTemplateBuilder builder) {
+    return builder.build();
+  }
+
+  @RequestMapping("/to-read")
+  public String toRead() {
+    return bookService.readingList();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(CircuitBreakerReadingApplication.class, args);
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, to retrieve the list from the Bookstore service, you can call <code>bookService.readingList()</code>. You should also add one last annotation, <code>@EnableCircuitBreaker</code>. That annotation tells Spring Cloud that the reading application uses circuit breakers and to enable their monitoring, opening, and closing (behavior supplied, in our case, by Hystrix).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_try_it">Try It</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To test your circuit breaker, run both the bookstore service and the reading service and then open a browser to the reading service, at <code>localhost:8080/to-read</code>. You should see the complete recommended reading list, as the following listing shows:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-text" data-lang="text">Spring in Action (Manning), Cloud Native Java (O'Reilly), Learning Spring Boot (Packt)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Now stop the bookstore application. Your list source is gone, but thanks to Hystrix and Spring Cloud Netflix, you have a reliable abbreviated list to stand in the gap. You should see the following:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-text" data-lang="text">Cloud Native Java (O'Reilly)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary">Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Congratulations! You have just developed a Spring application that uses the circuit breaker pattern to protect against cascading failures and to provide fallback behavior for potentially failing calls.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_see_also">See Also</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following guides may also be helpful:</p>
+</div>
+<div class="ulist">
+<ul>
+<li> <p><a href="https://spring.io/guides/gs/consuming-rest/">Consuming a RESTful Web Service</a></p> </li>
+<li> <p><a href="https://spring.io/guides/gs/rest-service/">Building a RESTful Web Service</a></p> </li>
+<li> <p><a href="https://spring.io/guides/gs/serving-web-content/">Serving Web Content with Spring MVC</a></p> </li>
+<li> <p><a href="https://spring.io/guides/gs/spring-boot/">Building an Application with Spring Boot</a></p> </li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Want to write a new guide or contribute to an existing one? Check out our <a href="https://github.com/spring-guides/getting-started-guides/wiki">contribution guidelines</a>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-important" title="Important"></i> </td>
+<td class="content"> All guides are released with an ASLv2 license for the code, and an <a href="https://creativecommons.org/licenses/by-nd/3.0/">Attribution, NoDerivatives creative commons license</a> for the writing. </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</article>
+</div>
+<aside class="span4 content-right-pane--container mobile-left-pane" id="sidebar">
+<a class="ci-status desktop-only" href="https://travis-ci.org/spring-guides/gs-circuit-breaker">
+<img src="https://travis-ci.org/spring-guides/gs-circuit-breaker.svg?branch=master" />
+</a>
+<div class="right-pane-widget--container desktop-only">
+<div class="github-actions https">
+<h2>Get the Code</h2>
+<div class="btn-group">
+<button class="btn" data-protocol="https">HTTPS</button>
+<button class="btn" data-protocol="ssh">SSH</button>
+</div>
+<div class="clone-url https">
+<input id="clone-url-https" readonly="readonly" type="text" value="https://github.com/spring-guides/gs-circuit-breaker.git" />
+<button class="copy-button github" data-toggle="tooltip" data-clipboard-text="https://github.com/spring-guides/gs-circuit-breaker.git"></button>
+</div>
+<div class="clone-url ssh">
+<input id="clone-url-ssh" readonly="readonly" type="text" value="git@github.com:spring-guides/gs-circuit-breaker.git" />
+<button class="copy-button github" data-toggle="tooltip" data-clipboard-text="git@github.com:spring-guides/gs-circuit-breaker.git"></button>
+</div>
+<a class="github_download btn btn-black uppercase" href="https://github.com/spring-guides/gs-circuit-breaker/archive/master.zip">Download ZIP</a>
+<a class="gs-guide-import" href="https://github.com/spring-guides/gs-circuit-breaker.git">Import into STS</a>
+<div class="go-to-repo--container">
+<a href="https://github.com/spring-guides/gs-circuit-breaker"><i class="icon-github"></i>Go To Repo</a>
+</div>
+<div class="go-to-repo--container">
+</div>
+</div>
+</div>
+<div class="right-pane-widget--container">
+<div>
+<h3><a class="anchor" href="#table-of-contents" name="table-of-contents"></a>Table of contents</h3>
+<div><ul class="sectlevel1">
+<li><a href="#_what_you_will_build">What You Will Build</a></li>
+<li><a href="#_what_you_need">What You Need</a></li>
+<li><a href="#_how_to_complete_this_guide">How to complete this guide</a></li>
+<li><a href="#scratch">Starting with Spring Initializr</a></li>
+<li><a href="#initial">Set up a Server Microservice Application</a></li>
+<li><a href="#_set_up_a_client_microservice_application">Set up a Client Microservice Application</a></li>
+<li><a href="#_apply_the_circuit_breaker_pattern">Apply the Circuit Breaker Pattern</a></li>
+<li><a href="#_try_it">Try It</a></li>
+<li><a href="#_summary">Summary</a></li>
+<li><a href="#_see_also">See Also</a></li>
+</ul></div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>
