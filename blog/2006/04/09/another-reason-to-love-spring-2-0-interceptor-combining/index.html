@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Another Reason to Love Spring 2.0: Interceptor Combining</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Another Reason to Love Spring 2.0: Interceptor Combining" />
+<meta name="twitter:description" content="&lt;p&gt;Recently I was working on a project that had a Swing client communicating via RMI to a service layer. The service layer was marked with transactions and everything seemed to work fine. However everytime we’d get an exception at the Hibernate DAO layer, Spring would turn the exception into a runtime exception and it would get propagated all the way up the stack and across the RMI connection as a &lt;span style=&quot;font-family: courier&quot;&gt;RemoteException&lt;/span&gt;. Whenever the exception was deserialized there would be an exception on the client (separate from the &lt;span style=&quot;font-family: courier&quot;&gt;RemoteException&lt;/span&gt;.The decision was taken to simply introduce an aspect. Any exception that subclassed &lt;span style=&quot;font-family: courier&quot;&gt;ServiceAccessException&lt;/span&gt; would be let through to the client while anything else would be converted to a &lt;span style=&quot;font-family: courier&quot;&gt;FilteredServiceAccessException&lt;/span&gt; (a subclass of &lt;span style=&quot;font-family: courier&quot;&gt;ServiceAccessException&lt;/span&gt;) and then be thrown. This led to some loss in content, so we made sure to log the original exception on the server where it could be useful and let the client show a generic dialog so the user knew generally what had happened.&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
+
+<meta property="og:title" content="Another Reason to Love Spring 2.0: Interceptor Combining" />
+<meta property="og:image" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
+<meta property="og:description" content="&lt;p&gt;Recently I was working on a project that had a Swing client communicating via RMI to a service layer. The service layer was marked with transactions and everything seemed to work fine. However everytime we’d get an exception at the Hibernate DAO layer, Spring would turn the exception into a runtime exception and it would get propagated all the way up the stack and across the RMI connection as a &lt;span style=&quot;font-family: courier&quot;&gt;RemoteException&lt;/span&gt;. Whenever the exception was deserialized there would be an exception on the client (separate from the &lt;span style=&quot;font-family: courier&quot;&gt;RemoteException&lt;/span&gt;.The decision was taken to simply introduce an aspect. Any exception that subclassed &lt;span style=&quot;font-family: courier&quot;&gt;ServiceAccessException&lt;/span&gt; would be let through to the client while anything else would be converted to a &lt;span style=&quot;font-family: courier&quot;&gt;FilteredServiceAccessException&lt;/span&gt; (a subclass of &lt;span style=&quot;font-family: courier&quot;&gt;ServiceAccessException&lt;/span&gt;) and then be thrown. This led to some loss in content, so we made sure to log the original exception on the server where it could be useful and let the client show a generic dialog so the user knew generally what had happened.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2006-04-09 20:41:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Another Reason to Love Spring 2.0: Interceptor Combining</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/bhale">Ben Hale</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2006-04-09 20:41:00.0">April 09, 2006</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2" href="/blog/2006/04/09/another-reason-to-love-spring-2-0-interceptor-combining#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Recently I was working on a project that had a Swing client communicating via RMI to a service layer. The service layer was marked with transactions and everything seemed to work fine. However everytime we&rsquo;d get an exception at the Hibernate DAO layer, Spring would turn the exception into a runtime exception and it would get propagated all the way up the stack and across the RMI connection as a <span style="font-family: courier">RemoteException</span>. Whenever the exception was deserialized there would be an exception on the client (separate from the <span style="font-family: courier">RemoteException</span>.The decision was taken to simply introduce an aspect. Any exception that subclassed <span style="font-family: courier">ServiceAccessException</span> would be let through to the client while anything else would be converted to a <span style="font-family: courier">FilteredServiceAccessException</span> (a subclass of <span style="font-family: courier">ServiceAccessException</span>) and then be thrown. This led to some loss in content, so we made sure to log the original exception on the server where it could be useful and let the client show a generic dialog so the user knew generally what had happened.</p><p>Now this was a pretty good plan and seemed on track to work until we tried to implement it. We were using the magic way of autoproxying any bean that had <span style="font-family: courier">@Transactional</span> on it to get our transactional proxies. We could have updated the definition of that autoproxying to make sure that the advice for this exception filtering was added (think <a style="font-family: courier" href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html#setPreInterceptors(java.lang.Object[])">setPreInterceptor</a> in <a style="font-family: courier" href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html">TransactionProxyFactoryBean</a>) but the the autoproxying was catching more than just the service layer.</p><p>So where did that leave us? We could either A) explicitly declare each use of the <span style="font-family: courier">TransactionProxyFactoryBean</span>, B) make two different sets of autoproxying and have them be mutually exclusive for one another, or C) ignore the requirement for now and hope something magical happens. Since the product was still six months away from consumers and I try to follow the principal of the &lsquo;<a href="http://codebetter.com/blogs/jeremy.miller/archive/2006/01/18/136648.aspx">last responsible moment</a>&rsquo; introduced to me by Jeremy Miller I decided to table the issue with choice A being my backup plan (better to have no magic than twice as much magic).</p><p>Lo and behold, Spring 2.0 solved my problem. I cannot for the life of me find where I read it, but starting in one of the milestones of 2.0, when a bean is proxied the proxy factory can now detect that the bean already has a proxy and just add the intended interceptor as another interceptor (if you know where it was leave the link in the comments please). This means that I could just use the new magic (<span style="font-family:courier">&lt;tx:annotation-driven&gt;</span>) and simply add an aspect with the proper pointcut that I wanted and I wouldn&rsquo;t have to worry about the transaction proxy and the AOP proxy getting crossed up. Not quite sure what this is all about? How about an example. First an interface and implementation.</p>
+<pre><code class="prettyprint java"><br />package interceptorcombiningexample;
+
+import org.springframework.transaction.annotation.Transactional;
+
+@Transactional
+public interface ExampleTarget {
+
+	void exampleMethod();
+
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package interceptorcombiningexample;
+
+public class DefaultExampleTarget implements ExampleTarget {
+
+	public void exampleMethod() {
+	}
+}
+</code></pre><p>Notice that the interface is marked <span style="font-family: courier">@Transactional</span>. We&rsquo;ll use that to get some magic autoproxying later on. Next we&rsquo;ll take a look at the bean definitions.</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd&quot;&gt;
+
+	&lt;tx:annotation-driven /&gt;
+
+	&lt;aop:config&gt;
+		&lt;aop:aspect id=&quot;exampleAspect&quot; ref=&quot;exampleAdvice&quot;&gt;
+			&lt;aop:before method=&quot;exampleAdvice&quot;
+				pointcut=&quot;execution(* interceptorcombiningexample.ExampleTarget.exampleMethod())&quot; /&gt;
+		&lt;/aop:aspect&gt;
+	&lt;/aop:config&gt;
+
+	&lt;bean id=&quot;exampleAdvice&quot;
+		class=&quot;interceptorcombiningexample.ExampleAdvice&quot; /&gt;
+
+	&lt;bean id=&quot;exampleTarget&quot;
+		class=&quot;interceptorcombiningexample.DefaultExampleTarget&quot; /&gt;
+
+	&lt;bean id=&quot;transactionManager&quot;
+		class=&quot;interceptorcombiningexample.DummyTransactionManager&quot; /&gt;
+
+&lt;/beans&gt;
+</code></pre><p>You&rsquo;ll notice that we set up annotation driven transactions which will automatically build a proxy around our <span style="font-family: courier">DefaultExampleTarget</span>. In addition, we define another aspect that should need to proxy the same <span style="font-family: courier">DefaultExampleTarget</span> bean. Finally lets take a look at our executable class.</p>
+<pre><code class="prettyprint java"><br />package interceptorcombiningexample;
+
+import org.springframework.aop.Advisor;
+import org.springframework.aop.framework.Advised;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class InterceptorCombiningExample {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+				&quot;classpath:interceptorcombiningexample/applicationContext.xml&quot;);
+
+		ExampleTarget target = (ExampleTarget) ctx.getBean(&quot;exampleTarget&quot;);
+		if (target instanceof Advised) {
+			Advised advised = (Advised) target;
+			System.out
+					.println(&quot;Advisor count: &quot; + advised.getAdvisors().length);
+			for (Advisor advisor : advised.getAdvisors()) {
+				System.out.println(&quot;Advisor type: &quot;
+						+ advisor.getAdvice().getClass().getName());
+			}
+		}
+	}
+
+}
+</code></pre><p>This class takes advantage of a nice little feature of Spring&rsquo;s proxy mechanism. Any Spring created proxy can be cast to the <a style="font-family: courier" href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/aop/framework/Advised.html">Advised</a> interface. This interface will give you access to all of the interceptors in a proxy. When we go ahead and run this class the output shows:</p>
+<pre><code class="prettyprint code">Advisor count: 3
+Advisor type: org.springframework.aop.interceptor.ExposeInvocationInterceptor
+Advisor type: org.springframework.transaction.interceptor.TransactionInterceptor
+Advisor type: org.springframework.aop.aspectj.AspectJMethodBeforeAdvice
+</code></pre><p>From this we can see that not only was the <a style="font-family: courier" href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionInterceptor.html">TransactionInterceptor</a> contained in the proxy, but also the <a style="font-family: courier" href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/aop/aspectj/AspectJMethodBeforeAdvice.html">AspectJMethodBeforeAdvice</a>.</p><p>It&rsquo;s important to know that this shouldn&rsquo;t affect any implementations that already exist that attempt to do the same thing. This should just make life easier for all those who&rsquo;ve been waiting for the &lsquo;last responsible moment&rsquo; to solve this problem. :)</p><p>P.S. As in the last post, I&rsquo;ve included an <a id="p8" href="http://blog.springframework.com/benh/wp-content/uploads/2006/04/InterceptorCombiningExample.zip">archive of the project</a> from this example so that you can see the rest of the code if you need it.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

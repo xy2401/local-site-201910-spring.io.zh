@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring 3.1 M1: Unified Property Management</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring 3.1 M1: Unified Property Management" />
+<meta name="twitter:description" content="&lt;p&gt;In the first &lt;a href=&quot;http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released&quot;&gt;two&lt;/a&gt; &lt;a href=&quot;http://blog.springsource.com/2011/02/14/spring-3-1-m1-introducing-profile/&quot;&gt;posts&lt;/a&gt; of this series, I described the &lt;em&gt;bean definition profiles&lt;/em&gt; feature, and how it relates to the &lt;em&gt;&lt;code&gt;Environment&lt;/code&gt;&lt;/em&gt; abstraction new in Spring 3.1 M1. Today we’ll take a look at a second aspect of the &lt;code&gt;Environment&lt;/code&gt; – how it helps simplify the concern of configuration property management.&lt;/p&gt;
+&lt;h3&gt;Understanding property sources&lt;/h3&gt;
+&lt;p&gt;Spring’s &lt;code&gt;Environment&lt;/code&gt; abstraction provides search operations over a configurable hierarchy of property sources. To explain fully, consider the following:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;prettyprint java&quot;&gt;&lt;br&gt;ApplicationContext ctx = new GenericApplicationContext();
+Environment env = ctx.getEnvironment();
+boolean containsFoo = env.containsProperty(&quot;foo&quot;);
+System.out.println(&quot;Does my environment contain the &#39;foo&#39; property? &quot; + containsFoo);
+&lt;/code&gt;&lt;/pre&gt;
+" />
+<meta name="twitter:creator" content="@cbeams" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+
+<meta property="og:title" content="Spring 3.1 M1: Unified Property Management" />
+<meta property="og:image" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;In the first &lt;a href=&quot;http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released&quot;&gt;two&lt;/a&gt; &lt;a href=&quot;http://blog.springsource.com/2011/02/14/spring-3-1-m1-introducing-profile/&quot;&gt;posts&lt;/a&gt; of this series, I described the &lt;em&gt;bean definition profiles&lt;/em&gt; feature, and how it relates to the &lt;em&gt;&lt;code&gt;Environment&lt;/code&gt;&lt;/em&gt; abstraction new in Spring 3.1 M1. Today we’ll take a look at a second aspect of the &lt;code&gt;Environment&lt;/code&gt; – how it helps simplify the concern of configuration property management.&lt;/p&gt;
+&lt;h3&gt;Understanding property sources&lt;/h3&gt;
+&lt;p&gt;Spring’s &lt;code&gt;Environment&lt;/code&gt; abstraction provides search operations over a configurable hierarchy of property sources. To explain fully, consider the following:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;prettyprint java&quot;&gt;&lt;br&gt;ApplicationContext ctx = new GenericApplicationContext();
+Environment env = ctx.getEnvironment();
+boolean containsFoo = env.containsProperty(&quot;foo&quot;);
+System.out.println(&quot;Does my environment contain the &#39;foo&#39; property? &quot; + containsFoo);
+&lt;/code&gt;&lt;/pre&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-02-15 01:29:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring 3.1 M1: Unified Property Management</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=20&amp;d=mm" />
+<span class="author">Chris Beams</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-02-15 01:29:00.0">February 15, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="395" href="/blog/2011/02/15/spring-3-1-m1-unified-property-management#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In the first <a href="http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released">two</a> <a href="http://blog.springsource.com/2011/02/14/spring-3-1-m1-introducing-profile/">posts</a> of this series, I described the <em>bean definition profiles</em> feature, and how it relates to the <em><code>Environment</code></em> abstraction new in Spring 3.1 M1. Today we&rsquo;ll take a look at a second aspect of the <code>Environment</code> &ndash; how it helps simplify the concern of configuration property management.</p>
+<h3>Understanding property sources</h3><p>Spring&rsquo;s <code>Environment</code> abstraction provides search operations over a configurable hierarchy of property sources. To explain fully, consider the following:</p>
+<pre><code class="prettyprint java"><br />ApplicationContext ctx = new GenericApplicationContext();
+Environment env = ctx.getEnvironment();
+boolean containsFoo = env.containsProperty(&quot;foo&quot;);
+System.out.println(&quot;Does my environment contain the &#39;foo&#39; property? &quot; + containsFoo);
+</code></pre><p>In the snippet above, we see a high-level way of asking Spring whether the &lsquo;foo&rsquo; property is defined for the current environment. To answer this question, the <code>Environment</code> object performs a search over a set of <em><code>PropertySource</code></em> objects. A <code>PropertySource</code> is a simple abstraction over any source of key-value pairs, and Spring&rsquo;s <code>DefaultEnvironment</code> is configured with two <code>PropertySource</code> objects &ndash; one representing the set of JVM system properties (a la <code>System.getProperties()</code>) and one representing the set of system environment variables (a la <code>System.getenv()</code>)[1]. This means that if a &lsquo;foo&rsquo; system property or &lsquo;foo&rsquo; environment variable is present at runtime, the call to <code>env.containsProperty(&ldquo;foo&rdquo;)</code> will return <code>true</code>.</p><p>The search performed is hierarchical. By default, system properties have precedence over environment variables, so if the &lsquo;foo&rsquo; property happens to be set in both places during a call to <code>env.getProperty(&ldquo;foo&rdquo;)</code>, the system property value will &lsquo;win&rsquo; and be returned preferentially over the environment variable.</p><p>Most importantly, the entire mechanism is configurable. Perhaps you have a custom source of properties that you&rsquo;d like to integrate into this search. No problem &ndash; simply implement and instantiate your own <code>PropertySource</code> and add it to the set of <code>PropertySources</code> for the current <code>Environment</code>:</p>
+<pre><code class="prettyprint java"><br />ConfigurableApplicationContext ctx = new GenericApplicationContext();
+MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
+sources.addFirst(new MyPropertySource());
+</code></pre><p>In the code above, <code>MyPropertySource</code> has been added with highest precedence in the search. If it contains a &lsquo;foo&rsquo; property, it will be detected and returned ahead of any &lsquo;foo&rsquo; property in any other <code>PropertySource</code>. The <code>MutablePropertySources</code> API exposes a number of methods that allow for precise manipulation of the set of property sources. Explore the <a href="https://bit.ly/emBbI6">Javadoc</a> for full details.</p>
+<h3>Putting property sources to use</h3><p>Now that you understand the basics of property sources and their relationship to the <code>Environment</code>, you might be wondering how all of this is relevant to you as a developer of Spring applications. Let&rsquo;s consider a couple of scenarios and see how it all comes together.</p><p><strong>Scenario 1: <code>${placeholder}</code> resolution in <code><import /></code> statements</strong></p><p>You have a set of Spring configuration files that configure beans specific to certain customers of your application, and you conditionally load those files using <code><import /></code> statements containing a placeholder resolving to the value of a &lsquo;customer&rsquo; property:</p>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
+	&lt;import resource=&quot;com/bank/service/${customer}-config.xml&quot;/&gt;
+&lt;/beans&gt;
+</code></pre><p>Prior to Spring 3.1, the value of placeholders in <code><import /></code> elements could be resolved only against JVM system properties or environment variables[2]. No longer is this the case. Because the <code>Environment</code> abstraction is integrated throughout the container, it&rsquo;s easy to route resolution of placeholders through it. This means that you may configure the resolution process in any way you like: change the precedence of searching through system properties and environment variables, or remove them entirely; add your own property sources to the mix as appropriate.</p><p><strong>Scenario 2: <code>${placeholder}</code> resolution in bean definitions</strong></p><p>Most Spring users will be familiar with the use of <code>PropertyPlaceholderConfigurer</code> or <code>&lt;context:property-placeholder/&gt;</code> to replace <code>${&hellip;}</code> placeholders in Spring bean definitions. Here is a typical configuration:</p>
+<pre><code class="prettyprint xml"><br />&lt;context:property-placeholder location=&quot;com/bank/config/datasource.properties&quot;/&gt;
+
+&lt;bean id=&quot;dataSource&quot; class=&quot;org.apache.commons.dbcp.BasicDataSource&quot; destroy-method=&quot;close&quot;&gt;
+	&lt;property name=&quot;driverClass&quot; value=&quot;${database.driver}&quot;/&gt;
+	&lt;property name=&quot;jdbcUrl&quot; value=&quot;${database.url}&quot;/&gt;
+	&lt;property name=&quot;username&quot; value=&quot;${database.username}&quot;/&gt;
+	&lt;property name=&quot;password&quot; value=&quot;${database.password}&quot;/&gt;
+&lt;/bean&gt;
+</code></pre><p>As of Spring 3.1, the <code>&lt;context:property-placeholder/&gt;</code> no longer registers a <code>PropertyPlaceholderConfigurer</code>, but rather a <code>PropertySourcesPlaceholderConfigurer</code>[3]. This component still looks to the <code>datasource.properties</code> file to reslove the <code>${database.*}</code> placeholders above, but will fall back to the set of <code>PropertySources</code> for the current <code>Environment</code> if the properties are not found in the file. Again this gives you more control; prior to this change, the only fallback options were system properties and environment variables.</p>
+<h3>Manipulating property sources in a web application</h3><p>So far we&rsquo;ve seen how to access and manipulate property sources in a standalone application where we have programmatic access to an <code>ApplicationContext</code>. In reality, however, many Spring applications are webapps in which the <code>ApplicationContext</code> is managed for you by Spring&rsquo;s <code>ContextLoaderListener</code>. For this reason we&rsquo;ve introduced the <em><code>ApplicationContextInitializer</code></em> interface and its companion, the <em><code>contextInitializerClasses</code></em> servlet context param. Take a look:</p><p><code>web.xml</code></p>
+<pre><code class="prettyprint xml"><br />&lt;context-param&gt;
+    &lt;param-name&gt;contextInitializerClasses&lt;/param-name&gt;
+    &lt;param-value&gt;com.bank.MyInitializer&lt;/param-value&gt;
+&lt;/context-param&gt;
+</code></pre>
+<pre><code class="prettyprint java"><br />public class MyInitializer implements ApplicationContextInitializer&lt;ConfigurableWebApplicationContext&gt; {
+	public void initialize(ConfigurableWebApplicationContext ctx) {
+		PropertySource ps = new MyPropertySource();
+		ctx.getEnvironment().getPropertySources().addFirst(ps);
+		// perform any other initialization of the context ...
+	}
+}
+</code></pre><p>Implementing and registering an <code>ApplicationContextInitializer</code> provides a simple way to interact with your application context <em>before it is refreshed</em>. This is a perfect place to manipulate property sources, but you could also call <code>setConfigLocations(&hellip;)</code> or any other method designed to be called prior to <code>refresh()</code>.</p>
+<h3>Summary</h3><p>Spring&rsquo;s <code>Environment</code> abstraction provides a single location to configure both <em>profiles</em> and <em>properties</em>. Profiles, as described in earlier posts, determine which bean definitions should be registered for a given deployment context; the property support described in this post provides a consistent abstraction over any source of properties, resulting in more flexible property access and placeholder resolution throughout your application configuration.</p><p>In the next post in this series we&rsquo;ll take a look at how Spring 3.1 makes 100% Java-based (read: XML-free) application configuration a reality with <em><code>FeatureSpecification</code></em> support &ndash; an natural evolution out of the <code>@Configuration</code> class support introduced in Spring 3.0.</p>
+<h3>Footnotes</h3><p>[1]: These default property sources are present for <code>DefaultEnvironment</code>, for use in standalone applications. <code>DefaultWebEnvironment</code> is populated with additional default property sources including servlet config and servlet context parameters. <code>DefaultPortletEnvironment</code> similarly has access to portlet config and portlet context parameters as property sources. Both can optionally enable a <code>JndiPropertySource</code>. See <a href="https://bit.ly/fNBkNG">Javadoc</a> for details.</p><p>[2]: Because processing of <import /> elements necessarily occurs before <code>BeanFactoryPostProcessors</code> are invoked, meaning that even <code>PropertyPlaceholderConfigurer</code> could not help here. Because the <code>Environment</code> and its set of <code>PropertySources</code> are configured before container refresh, placeholders in <import /> elements can be resolved against the <code>Environment</code> without any lifecycle issues.</p><p>[3]: In certain cases, <code>&lt;context:property-placeholder/&gt;</code> <strong>will</strong> still register a <code>PropertyPlaceholderConfigurer</code>. In the 3.1 version of the <code>spring-context</code> schema, the <code>system-properties-mode</code> attribute has been removed from the <code>property-placeholder</code> element. This is because this attribute no longer makes sense in a <code>PropertySources</code>-/<code>Environment</code>-aware world. However, if you build against Spring 3.1 but still use the <code>spring-context-3.0.xsd</code> schema and set the <code>system-properties-mode</code> attribute, <code>&lt;context:property-placeholder&gt;</code> will revert to registering a <code>PropertyPlaceholderConfigurer</code> in order to honor the exact semantics of this setting. This approach preserves backward compatibility in any case.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 395;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Querying and Downloading from Amazon S3</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Querying and Downloading from Amazon S3" />
+<meta name="twitter:description" content="&lt;p&gt;In a &lt;a href=&quot;http://blog.interface21.com/main/2007/04/25/uploading-to-amazon-s3-using-a-custom-ant-task&quot;&gt;previous post&lt;/a&gt;, I described how we use a custom ANT task to upload nightly snapshots from the ANT based projects in the Spring portfolio. In this post I’ll describe how we use Amazon S3 to generate pages for the snapshots from each project and allow users to download the snapshots.&lt;/p&gt;
+&lt;p&gt;As I mentioned in the previous post, S3 is primarily used as a REST-ful service. This means that while I used Java for the upload portion, I was free to use other languages for the download portion. I chose to use PHP in this case because it was already available on the server I was working with, and was the path of least resistance.&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
+
+<meta property="og:title" content="Querying and Downloading from Amazon S3" />
+<meta property="og:image" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
+<meta property="og:description" content="&lt;p&gt;In a &lt;a href=&quot;http://blog.interface21.com/main/2007/04/25/uploading-to-amazon-s3-using-a-custom-ant-task&quot;&gt;previous post&lt;/a&gt;, I described how we use a custom ANT task to upload nightly snapshots from the ANT based projects in the Spring portfolio. In this post I’ll describe how we use Amazon S3 to generate pages for the snapshots from each project and allow users to download the snapshots.&lt;/p&gt;
+&lt;p&gt;As I mentioned in the previous post, S3 is primarily used as a REST-ful service. This means that while I used Java for the upload portion, I was free to use other languages for the download portion. I chose to use PHP in this case because it was already available on the server I was working with, and was the path of least resistance.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2007-04-30 17:55:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Querying and Downloading from Amazon S3</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/bhale">Ben Hale</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2007-04-30 17:55:00.0">April 30, 2007</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="70" href="/blog/2007/04/30/querying-and-downloading-from-amazon-s3#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In a <a href="http://blog.interface21.com/main/2007/04/25/uploading-to-amazon-s3-using-a-custom-ant-task">previous post</a>, I described how we use a custom ANT task to upload nightly snapshots from the ANT based projects in the Spring portfolio. In this post I&rsquo;ll describe how we use Amazon S3 to generate pages for the snapshots from each project and allow users to download the snapshots.</p><p>As I mentioned in the previous post, S3 is primarily used as a REST-ful service. This means that while I used Java for the upload portion, I was free to use other languages for the download portion. I chose to use PHP in this case because it was already available on the server I was working with, and was the path of least resistance.</p><p>There were two parts for this effort. The first was that I needed to query the Amazon S3 service for the list of snapshots for a given Spring project. To do this, you create a REST query with a prefix parameter:</p>
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=$prefix
+</code></pre><p>Now that you&rsquo;ve seen the basic way to query, I want to go back to the previous example and point out some important parts of the upload definition:</p>
+<pre><code class="prettyprint xml"><br />&lt;aws:s3 accessKey=&quot;${s3.accessKey}&quot; secretKey=&quot;${s3.secretKey}&quot;&gt;
+	&lt;upload bucketName=&quot;static.springframework.org&quot;
+		file=&quot;${target.release.dir}/${release-with-dependencies.zip}&quot;
+		toFile=&quot;SPR/spring-framework-${spring-version}-with-dependencies-${tstamp}-${build.number}.zip&quot;
+		publicRead=&quot;true&quot;/&gt;
+	&lt;upload bucketName=&quot;static.springframework.org&quot;
+		file=&quot;${target.release.dir}/${release.zip}&quot;
+		toFile=&quot;SPR/spring-framework-${spring-version}-${tstamp}-${build.number}.zip&quot;
+		publicRead=&quot;true&quot;/&gt;
+&lt;/aws:s3&gt;
+</code></pre><p>The first thing that you&rsquo;ll notice is that for the Spring artifacts, I&rsquo;ve chosen to prefix them with <span style="font-family:courier">SPR</span>. The name of the file is essentially free form, so using slashes, you can create a virtual directory structure to query against. If you take a look at the builds for Spring Web Flow, you&rsquo;ll see its artifacts are prefixed with <span style="font-family:courier">SWF</span>, Spring LDAP&rsquo;s artifacts get <span style="font-family:courier">LDAP</span>, and Spring Modules&rsquo; artifacts get <span style="font-family:courier">MOD</span>. So now by customizing our query parameters, we can choose one project specifically.</p>
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=SPR
+</code></pre>
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=SWF
+</code></pre>
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=LDAP
+</code></pre>
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=MOD
+</code></pre><p>The second thing to notice is the <span style="font-family:courier">publicRead=true</span> declaration. By default, S3 does not allow anyone to view or download from your bucket. You can give them permission by using your secret and access keys to create a token that will allows downloads. For this effort though, I deemed that unnecessary. The snapshots are publicly accessible, so I loosened the security and allowed them to be downloadable without the token.</p><p>Now you can call the S3 REST service and get a properly filtered list of items in the bucket, but the response is in raw XML. Even though I&rsquo;m a Spring developer, looking through raw XML in a web browser doesn&rsquo;t excite me. ;) So the next step in the process is to transform the XML into a useful HTML page. I had two choices at this point. I could execute the transform on the server to generate HTML and then return it to the user, or I could return the XML to the user along with an XSLT file and let the users browser do the transform for me. Now I&rsquo;ll be honest, the latter lightens the load on the server and actually allows the user&rsquo;s browser to cache the transform for performance. But the reality is, I just didn&rsquo;t have access to the XSLT PHP libraries so I couldn&rsquo;t do the server-side transform if I wanted to. I realize that some older browsers will have trouble with this setup, but we&rsquo;ll cross that bridge when we get to it.</p><p>So I needed to take the returned XML:</p>
+<pre><code class="prettyprint xml"><br />&lt;ListBucketResult xmlns=&quot;http://s3.amazonaws.com/doc/2006-03-01/&quot;&gt;
+	&lt;Name&gt;static.springframework.org&lt;/Name&gt;
+	&lt;Prefix&gt;SPR&lt;/Prefix&gt;
+	&lt;Marker/&gt;
+	&lt;MaxKeys&gt;1000&lt;/MaxKeys&gt;
+	&lt;IsTruncated&gt;false&lt;/IsTruncated&gt;
+	&lt;Contents&gt;
+		&lt;Key&gt;SPR/spring-framework-2.0.5-20070411-50.zip&lt;/Key&gt;
+		&lt;LastModified&gt;2007-04-11T13:27:34.000Z&lt;/LastModified&gt;
+		&lt;ETag&gt;&quot;1ab20ad18ca0edb4a360279f27409d54&quot;&lt;/ETag&gt;
+		&lt;Size&gt;10725241&lt;/Size&gt;
+		&lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
+	&lt;/Contents&gt;
+	&lt;Contents&gt;
+		&lt;Key&gt;SPR/spring-framework-2.0.5-20070411-51.zip&lt;/Key&gt;
+		&lt;LastModified&gt;2007-04-12T01:25:58.000Z&lt;/LastModified&gt;
+		&lt;ETag&gt;&quot;de2e5833ae8fe4cc06987935bea06e57&quot;&lt;/ETag&gt;
+		&lt;Size&gt;10727049&lt;/Size&gt;
+		&lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
+	&lt;/Contents&gt;
+	&lt;Contents&gt;
+		&lt;Key&gt;SPR/spring-framework-2.0.5-20070412-52.zip&lt;/Key&gt;
+		&lt;LastModified&gt;2007-04-13T01:22:23.000Z&lt;/LastModified&gt;
+		&lt;ETag&gt;&quot;414b947226fc4e08bd118e0f16a6be67&quot;&lt;/ETag&gt;
+		&lt;Size&gt;10736732&lt;/Size&gt;
+		&lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
+	&lt;/Contents&gt;
+...
+</code></pre><p>and turn it into HTML:</p><p><img id="image157" src="http://blog.interface21.com/main/wp-content/uploads/2007/04/snapshot-download.png" alt="snapshot-download.png" /></p><p>Most of the content returned from the service isn&rsquo;t useful to this effort, and so the XSLT becomes very simple:</p>
+<pre><code class="prettyprint xml"><br />&lt;xsl:template match=&quot;/&quot;&gt;
+	&lt;head&gt;
+		&lt;style type=&quot;text/css&quot; media=&quot;all&quot;&gt;@import &quot;./snapshot-download.css&quot;;&lt;/style&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;xsl:apply-templates select=&quot;s3:ListBucketResult&quot;/&gt;
+	&lt;/body&gt;
+&lt;/xsl:template&gt;
+
+&lt;xsl:template match=&quot;s3:ListBucketResult&quot;&gt;
+	&lt;xsl:variable name=&quot;bucket-name&quot; select=&quot;s3:Name&quot;/&gt;
+	&lt;table&gt;
+		&lt;tr&gt;
+			&lt;th class=&quot;name&quot;&gt;&lt;xsl:value-of select=&quot;s3:Prefix&quot;/&gt; Project Snapshots&lt;/th&gt;
+			&lt;th class=&quot;size&quot;&gt;Size&lt;/th&gt;
+		&lt;/tr&gt;
+		&lt;xsl:for-each select=&quot;s3:Contents&quot;&gt;
+			&lt;tr&gt;
+				&lt;td class=&quot;name&quot;&gt;
+					&lt;a class=&quot;name&quot; href=&quot;http://s3.amazonaws.com/{$bucket-name}/{s3:Key}&quot;&gt;
+						&lt;xsl:value-of select=&quot;substring-after(s3:Key, &#39;/&#39;)&quot;/&gt;
+					&lt;/a&gt;
+				&lt;/td&gt;
+				&lt;td class=&quot;size&quot;&gt;&lt;xsl:value-of select=&quot;format-number(s3:Size div 1048576, &#39;###,###.0&#39;)&quot;/&gt; MB&lt;/td&gt;
+			&lt;/tr&gt;
+		&lt;/xsl:for-each&gt;
+	&lt;/table&gt;
+&lt;/xsl:template&gt;
+</code></pre><p>The transform starts with some HTML declarations and then iterates over each of the bucket&rsquo;s items. Then it uses the object identifier to create a link to the file on the S3 servers. That&rsquo;s it. The PHP page calls S3 for the XML and then passes it along with an XSLT declaration to the user&rsquo;s browser:</p>
+<pre><code class="prettyprint php"><br />&lt;?php
+$prefix = $HTTP_GET_VARS[&quot;project&quot;];
+$url = &quot;http://s3.amazonaws.com/static.springframework.org/?prefix=$prefix&quot;;
+$xml = file_get_contents($url);
+
+header(&#39;Content-Type: text/xml; charset=UTF-8&#39;);
+echo &#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#39;;
+echo &#39;&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;./snapshot-download.xsl&quot;?&gt;&#39;;
+echo substr($xml, 39);
+?&gt;
+</code></pre><p>Add a little customization for each project with a request parameter and you get individual download pages for each project:</p>
+<ul>
+<li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR</a></li>
+<li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SWF">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SWF</a></li>
+<li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=LDAP">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=LDAP</a></li>
+<li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=MOD">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=MOD</a></li>
+</ul><p>This completes my exploration of the Amazon S3 service. I can say from experience now that if you have a ton of data and a lot of bandwidth needs there aren&rsquo;t many places that will give you better rates. And with the REST-ful interface, it&rsquo;s flexible enough to use with your favorite language. Thank you for having me, and I&rsquo;ll take any questions now. :)</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 70;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

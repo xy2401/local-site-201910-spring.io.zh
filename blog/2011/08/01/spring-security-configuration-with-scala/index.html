@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Security Configuration with Scala</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Security Configuration with Scala" />
+<meta name="twitter:description" content="&lt;p&gt;In a previous article, &lt;a href=&quot;http://blog.springsource.com/2010/03/06/behind-the-spring-security-namespace/&quot;&gt;Behind the Spring Security Namespace&lt;/a&gt;, I talked about how the Spring Security namespace has been very successful in providing a simple alternative to plain Spring bean configuration, but how there is still a steep learning curve when you want to start customizing its behaviour. Behind the XML elements and attributes, various filters and helper strategies are created and wired together, but, short of reading the code which handles the XML parsing, there is no easy way of working out which classes are involved or the details of how they interact.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@tekul" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/91c15183d9efc15c30ff1e65f084314d?s=200" />
+
+<meta property="og:title" content="Spring Security Configuration with Scala" />
+<meta property="og:image" content="https://gravatar.com/avatar/91c15183d9efc15c30ff1e65f084314d?s=200" />
+<meta property="og:description" content="&lt;p&gt;In a previous article, &lt;a href=&quot;http://blog.springsource.com/2010/03/06/behind-the-spring-security-namespace/&quot;&gt;Behind the Spring Security Namespace&lt;/a&gt;, I talked about how the Spring Security namespace has been very successful in providing a simple alternative to plain Spring bean configuration, but how there is still a steep learning curve when you want to start customizing its behaviour. Behind the XML elements and attributes, various filters and helper strategies are created and wired together, but, short of reading the code which handles the XML parsing, there is no easy way of working out which classes are involved or the details of how they interact.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-08-01 18:18:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Security Configuration with Scala</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/91c15183d9efc15c30ff1e65f084314d?s=20&amp;d=mm" />
+<span class="author">Luke Taylor</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-08-01 18:18:00.0">August 01, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="425" href="/blog/2011/08/01/spring-security-configuration-with-scala#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In a previous article, <a href="http://blog.springsource.com/2010/03/06/behind-the-spring-security-namespace/">Behind the Spring Security Namespace</a>, I talked about how the Spring Security namespace has been very successful in providing a simple alternative to plain Spring bean configuration, but how there is still a steep learning curve when you want to start customizing its behaviour. Behind the XML elements and attributes, various filters and helper strategies are created and wired together, but, short of reading the code which handles the XML parsing, there is no easy way of working out which classes are involved or the details of how they interact.</p><p>For some time now, we&rsquo;ve been trying to come up with an alternative Java-based solution using <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">Spring&rsquo;s <code>@Configuration</code> classes</a> that retains the simplicity of the XML namespace but also makes the underlying behavior more transparent and easier to customize. While theoretically possible, no Java-based solution seemed to meet the goals we set out to achieve, mainly due to the range of options available in Spring Security.</p><p>In this post, I&rsquo;ll give an overview of how Scala provides an elegant solution to the problem, with a syntax which is very readable to someone who is already familiar with the XML namespace. The code is available on <a href="https://github.com/tekul/scalasec/">github</a>, It&rsquo;s a work in progress and I&rsquo;m still a Scala novice, so any feedback or suggestions from experts out there would be most welcome.</p><p>The references to Spring Security here apply to the forthcoming 3.1 release. Also, if you haven&rsquo;t used Spring&rsquo;s Java-based configuration before, you might want to check out <a href="http://blog.springsource.com/2009/12/22/configuration-simplifications-in-spring-3-0/">this blog post</a> by Chris Beams.</p>
+<h2>The Problem</h2><p>Let&rsquo;s first briefly run over how the namespace configuration works, focusing on the web part, which is the most complex. Suppose our configuration contains the following:</p>
+<pre><code class="prettyprint xml"><br />    &lt;http use-expressions=&quot;true&quot;&gt;
+        &lt;intercept-url pattern=&quot;/secure/extreme/**&quot; access=&quot;hasRole(&#39;Admin&#39;)&quot; /&gt;
+        &lt;intercept-url pattern=&quot;/**&quot; access=&quot;hasRole(&#39;User&#39;)&quot; /&gt;
+        &lt;form-login /&gt;
+        &lt;logout  /&gt;
+    &lt;/http&gt;
+</code></pre><p>The <code>http</code> element creates a <code>SecurityFilterChain</code> which is used to configure an instance of Spring Security&rsquo;s <code>FilterChainProxy</code> (the target bean which we usually refer to as &ldquo;springSecurityFilterChain&rdquo; in our <code>web.xml</code> files). </p><p>By itself, <code>http</code> creates several standard filters (including a <code>SecurityContextPeristenceFilter</code>, <code>ExceptionTranslationFilter</code> and <code>FilterSecurityInterceptor</code>). The <code>intercept-url</code> elements describe the access rules which are used by the <code>FilterSecurityInterceptor</code> to decide whether access should be granted for a particular request.</p><p>As we add other XML elements, additional features are &ldquo;mixed in&rdquo; to the filter chain. The <code>form-login</code> element adds a <code>UsernamePasswordAuthenticationFilter</code> and <code>logout</code> adds a <code>LogoutFilter</code>. If you added a <code>remember-me</code> element, you would get a <code>RememberMeAuthenticationFilter</code> and <code>RememberMeServices</code> implementation, the specific type of which depends on the additional XML attributes used.</p><p>In Spring Security 3.1, you will be able to use more than one <code>http</code> element to create multiple filter chains. Each chain handles different paths within the application, for example a stateless API under the URL <code>/rest/**</code> and a stateful web application configuration for all other requests.</p><p>So the namespace offers a lot of different possibities. How can we achieve something like this using an <code>@Configuration</code> model, retaining the simplicity of the XML mix-in approach, but exposing the underlying implementation as part of the syntax? </p>
+<h2>Scala Traits as Configuration Mixins</h2><p>Ideally, we&rsquo;d like to be able to write something like:</p>
+<pre><code class="prettyprint scala"><br />@Configuration
+class SecurityConfiguration {
+
+  @Bean
+  def filterChainProxy = new FilterChainProxy(formLoginFilterChain)
+
+  @Bean
+  def formLoginFilterChain = 
+    new FilterChain with FormLogin with Logout {
+      interceptUrl(&quot;/secure/**&quot;, hasRole(&quot;Admin&quot;))
+      interceptUrl(&quot;/**&quot;, hasRole(&quot;User&quot;))
+    }
+}
+</code></pre><p>where <code>FormLogin</code> and <code>Logout</code> are types we can inspect in our code editor to see exactly what they do. It turns out that by using Scala we can do just that. The configuration snippet above is 100% pure Scala code and apart from a couple of minor requirements (such as the need for an <code>AuthenticationManager</code>), it could be used directly in an existing Java web application. </p><p>We&rsquo;ve used <a href="https://www.scala-lang.org/node/126">Scala traits</a> here to mix in the form-login and logout behaviour to a basic filter chain class (see the highlighted line in the above snippet). In Java, we are limited to single-inheritance and the use of interfaces. Traits are a bit like interfaces, but can contain implementations of methods and even additional fields which will become part of the class into which they are mixed, so they can easily encapsulate the functionality required by a particular feature. They can also override the built-in behaviour of the class (or indeed other mixed-in traits). Traits can take a bit of getting your head round at first. I&rsquo;d recommend reading the traits chapter in <a href="http://www.artima.com/shop/programming_in_scala_2ed">Programming in Scala</code></a> as a good introduction.</p><p>The <code>FilterChain</code> class here is analogous to the <code>http</code> element from the XML namespace, providing a basic configuration into which the traits can be mixed. It extends a base class, <code>StatelessFilterChain</code> which provides the bare configuration to handle stateless requests and <code>FilterChain</code> then overrides and augments it with the beans and filters that are appropriate for stateful requests which make use of an <code>HttpSession</code>. Of course you can override or manipulate any of the references (from either the class or the mixed-in traits) directly in your configuration. You can find more detail on how these classes work together in the <a href="https://github.com/tekul/scalasec/wiki">project wiki on github</a>.</p><p>A major benefit of the Scala approach is that you can immediately find out what each of the traits does. Since Scala has static typing, both Eclipse and IntelliJ IDEA will let you navigate directly to the implementation:</p>
+<div id="attachment_9112" class="aligncenter wp-caption" style="margin: auto;">
+<img class="centered size-full wp-image-2129" title="Syntax highlighting of Logout trait" src="http://blog.springsource.com/wp-content/uploads/2011/07/scalaConfigFormLogin.png" alt="Image of IDE highlighting" width="471" height="169" />
+<p class="wp-caption-text">Syntax highlighting of Logout trait</p>
+</div><p>So, for example you can navigate to the <code>FormLogin</code> trait and see that it must be mixed into a <code>StatelessFilterChain</code> instance (the &ldquo;extends&rdquo; clause) and that it adds a reference to a <code>UsernamePasswordAuthenticationFilter</code>:</p>
+<pre><code class="prettyprint scala"><br />trait FormLogin extends StatelessFilterChain with LoginPage with FilterChainAuthenticationManager {
+  lazy val formLoginFilter = {
+    val filter = new UsernamePasswordAuthenticationFilter
+    filter.setAuthenticationManager(authenticationManager)
+    filter.setRememberMeServices(rememberMeServices)
+    filter
+  }
+
+  ...
+}
+</code></pre><p>You can also see that it mixes in a couple of additional traits. The code for <code>LoginPage</code> is:</p>
+<pre><code class="prettyprint scala"><br />private[scalasec] trait LoginPage extends StatelessFilterChain {
+  val loginPage: String
+
+  override def entryPoint : AuthenticationEntryPoint = {
+    new LoginUrlAuthenticationEntryPoint(loginPage)
+  }
+}
+</code></pre><p>So this adds an <em>abstract</em> value called <code>loginPage</code> and uses it to override the <code>AuthenticationEntryPoint</code> which is defined in <code>StatelessFilterChain</code>. The <code>FilterChainAuthenticationManager</code> trait also defines an abstract value called <code>authenticationManager</code>. Looking back at the code-highlighting example above, you might wonder why &ldquo;<code>FilterChain</code>&rdquo; is underlined in red. In fact, this code won&rsquo;t compile as it stands. </p>
+<pre><code class="prettyprint source">error] value loginPage in trait LoginPage of type String is not defined
+[error] value authenticationManager in trait FilterChainAuthenticationManager of type org.springframework.security.authentication.AuthenticationManager is not defined
+[error]     new FilterChain with FormLogin with Logout {
+[error]         ^
+</code></pre><p>So we will get an error even before we try to run the application unless we supply values for the abstract values <code>loginPage</code> and <code>authenticationManager</code>. A working configuration would be:</p>
+<pre><code class="prettyprint scala"><br />@Configuration
+class SecurityConfiguration {
+
+  @Bean
+  def filterChainProxy = new FilterChainProxy(formLoginFilterChain)
+
+  @Bean
+  def formLoginFilterChain = {
+    new FilterChain with FormLogin with Logout {
+      override val loginPage = &quot;/login.jsp&quot;
+      override val authenticationManager = testAuthenticationManager
+      interceptUrl(&quot;/secure/extreme/**&quot;, hasRole(&quot;Admin&quot;))
+      interceptUrl(&quot;/**&quot;, hasRole(&quot;User&quot;))
+    }
+  }
+
+  @Bean
+  def testAuthenticationManager = new TestAuthenticationManager()
+}
+</code></pre><p>We&rsquo;ve defined the <code>AuthenticationManager</code> instance using standard <code>@Bean</code> syntax. In a real application you would most likely use an instance of Spring Security&rsquo;s <code>ProviderManager</code> injected with a list of <code>AuthenticationProvider</code>s.</p>
+<h2>Scala Functions as an Alternative to Expression-Language (EL)</h2><p>Spring Security 3.0 introduced support for EL expressions for access-control. However, since Scala supports first-class functions, why use an untyped string when you can just pass a function directly? This is something else that takes a bit of getting used to if you haven&rsquo;t seen it before. I&rsquo;d recommend reading up on Scala&rsquo;s support for partial functions and <a href="https://www.scala-lang.org/node/135">currying</a> to understand fully how this works. </p><p>Consider the line:</p>
+<pre><code class="prettyprint scala"><br />     interceptUrl(&quot;/**&quot;, hasRole(&quot;User&quot;))
+</code></pre><p>The second argument to the <code>interceptUrl</code> method is a function of type <code>(Authentication, HttpServletRequest) =&gt; Boolean</code>, which means it must accept an <code>Authentication</code> object and an <code>HttpServletRequest</code> and return a boolean. When a request is received which matches this rule, the function will be invoked passing in the user&rsquo;s <code>Authentication</code> object and the request. This is exactly the same as using EL rules but is much more powerful, and is also statically typed. You can pass in any function with this signature, so you can code all your access rules directly in Scala and easily unit test them in isolation. The example code has some functions which mimic the current EL support. Again, you can navigate directly to the implementations in your IDE:</p>
+<pre><code class="prettyprint scala"><br />  def permitAll(a: Authentication, r: HttpServletRequest) = true
+
+  def denyAll(a: Authentication, r: HttpServletRequest) = false
+
+  def hasRole(role: String)(a: Authentication, r: HttpServletRequest) = a.getAuthorities.exists(role == _.getAuthority)
+
+  ...
+</code></pre><p>Note that <code>hasRole</code> has two parameter groups (another Scala feature), which allows us to use <code>hasRole(&ldquo;someRole&rdquo;)</code> as a function of the required type to pass to the <code>interceptUrl</code> method. This is only a very basic illustration of what&rsquo;s possible. You can write any function you want and use it directly without any extra configuration requirements.</p>
+<h2>Conclusion</h2><p>Overall, I was very impressed with Scala and how well the use of traits fits this problem, without the need for a special DSL. It&rsquo;s trivially easy to write <code>@Configuration</code> classes directly in Scala and with some simple implicit conversions and the use of traits, the syntax is just as concise as the XML namespace, but without the obfuscation issues that the latter suffers from. When coding with the pre-defined traits and filter chain classes, you are a step away from the Spring Security objects which make up the configuration and can easily modify or replace them, so you have all the power of a traditional Spring bean configuration but without the verbosity. Being able to use Scala functions directly as security access rules is also a really nice bonus as an alternative to EL.</p><p>This has really just been an overview rather than an in-depth discussion. I&rsquo;d encourage you to take a look at the code on github and experiment with different configurations. Even though some of the implementation details of the configuration traits and their supporting classes might initially be a bit tricky for a beginner, you don&rsquo;t need to know a lot of Scala to use them to build configurations. The github project is also a simple webapp which uses the <code>@Configuration</code> class <a href="https://github.com/tekul/scalasec/blob/master/src/main/scala/sample/config/ScalaSecurityConfiguration.scala">ScalaSecurityConfiguration.scala</a>. This is a good place to start as it contains several example configurations.</p><p>Support for Scala in IDEs is improving all the time. STS users can install Scala support from the STS extentions tab (I tested this in STS 2.7.1). While you are at it you could also install Gradle support and <a href="http://static.springsource.org/sts/docs/2.7.0.M1/reference/html/gradle/gradle-sts-tutorial.html#import">import the project as a gradle build</a>. Just add the Scala nature to the project once you&rsquo;ve imported it. The latest versions of the Intellij IDEA <a href="http://blog.jetbrains.com/scala/">Scala plugin</a> are also very usable, though you might want to try one of the nightly builds to get the latest features and fixes.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 425;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

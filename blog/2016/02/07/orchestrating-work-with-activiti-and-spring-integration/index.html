@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Orchestrating Work with Activiti and Spring Integration</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Orchestrating Work with Activiti and Spring Integration" />
+<meta name="twitter:description" content="&lt;p&gt;I received an email recently that asked about how to forward control from a wait-state in an Activiti (which is an open-source BPMN2 workflow engine from Alfresco) to a Spring Integration flow and then resume execution of the Activiti workflow process upon completion of some work in Spring Integration.&lt;/p&gt;
+&lt;p&gt;To really appreciate why this is useful goal, we need some background.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#what-is-activiti&quot; class=&quot;anchor&quot; name=&quot;what-is-activiti&quot;&gt;&lt;/a&gt;What is Activiti&lt;/h2&gt;
+&lt;p&gt;Activiti is a &lt;em&gt;business process engine&lt;/em&gt;. It’s basically a directed graph of nodes (states) that model the states of a complex business process. It keeps track of the progression of work described in a business process. It describe automatic- and human-based actors in a system. It also supports interrogating the business process engine to ask questions about the process instances underway: how many of them are there, which ones are stalled, etc. Business Process Management Systems (BPMS) offer many advantages, some of which are:&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Orchestrating Work with Activiti and Spring Integration" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;I received an email recently that asked about how to forward control from a wait-state in an Activiti (which is an open-source BPMN2 workflow engine from Alfresco) to a Spring Integration flow and then resume execution of the Activiti workflow process upon completion of some work in Spring Integration.&lt;/p&gt;
+&lt;p&gt;To really appreciate why this is useful goal, we need some background.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#what-is-activiti&quot; class=&quot;anchor&quot; name=&quot;what-is-activiti&quot;&gt;&lt;/a&gt;What is Activiti&lt;/h2&gt;
+&lt;p&gt;Activiti is a &lt;em&gt;business process engine&lt;/em&gt;. It’s basically a directed graph of nodes (states) that model the states of a complex business process. It keeps track of the progression of work described in a business process. It describe automatic- and human-based actors in a system. It also supports interrogating the business process engine to ask questions about the process instances underway: how many of them are there, which ones are stalled, etc. Business Process Management Systems (BPMS) offer many advantages, some of which are:&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2016-02-07 00:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Orchestrating Work with Activiti and Spring Integration</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2016-02-07 00:00:00.0">February 07, 2016</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2370" href="/blog/2016/02/07/orchestrating-work-with-activiti-and-spring-integration#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>I received an email recently that asked about how to forward control from a wait-state in an Activiti (which is an open-source BPMN2 workflow engine from Alfresco) to a Spring Integration flow and then resume execution of the Activiti workflow process upon completion of some work in Spring Integration.</p>
+<p>To really appreciate why this is useful goal, we need some background.</p><h2><a href="#what-is-activiti" class="anchor" name="what-is-activiti"></a>What is Activiti</h2>
+<p>Activiti is a <em>business process engine</em>. It&rsquo;s basically a directed graph of nodes (states) that model the states of a complex business process. It keeps track of the progression of work described in a business process. It describe automatic- and human-based actors in a system. It also supports interrogating the business process engine to ask questions about the process instances underway: how many of them are there, which ones are stalled, etc. Business Process Management Systems (BPMS) offer many advantages, some of which are:</p>
+<ul>
+<li>collaborative processes where humans and services are used to drive towards a larger business requirement (imagine loan approval, legal compliance, document revision, etc)</li>
+<li>they support auditing and journaling of important business processes in an organization. This is invaluable in regulatory environments.</li>
+<li>a BPM engine is <em>designed</em> to handle long running process state, this means your domain model no longer needs to be riddled with process-state specific fields like <code>is_enrolled</code> or <code>reset_password_date</code>.</li>
+<li>ease-of-modeling complex business processes</li>
+</ul>
+<p>This last point merits some focus: a good BPM engine like Activiti supports visually modeling business processes. UML supports visually describing processes using activities (steps) and swimlanes (agents involved in satisfying those steps). UML, of course, is just a modeling tool. It has no runtime semantics. The holy grail of business process management has been to have a modeling notation that could be used by business analysts <em>and</em> application developers. <a href="https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation">BPMN 2</a> is as as close as we&rsquo;ve come towards achieving that goal.</p>
+<p>Here, for example, is a visual model of a <em>very</em> simple business process.</p>
+<img src="https://raw.githubusercontent.com/joshlong/meh/master/bpmn-model.png" width="500" />
+<p>And here is the standard XML markup that&rsquo;s been created to support that model. This XML has execution semantics, not <em>just</em> modeling semantics.</p>
+<pre><code class="prettyprint xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;definitions id=&quot;definitions&quot;
+             xmlns=&quot;http://www.omg.org/spec/BPMN/20100524/MODEL&quot;
+             xmlns:activiti=&quot;http://activiti.org/bpmn&quot;
+             typeLanguage=&quot;http://www.w3.org/2001/XMLSchema&quot;
+             expressionLanguage=&quot;http://www.w3.org/1999/XPath&quot;
+             targetNamespace=&quot;http://www.activiti.org/bpmn2.0&quot;&gt;
+
+    &lt;process id=&quot;asyncProcess&quot;&gt;
+
+        &lt;startEvent id=&quot;start&quot;/&gt;
+
+          &lt;sequenceFlow
+            id=&quot;flow1&quot;
+            sourceRef=&quot;start&quot;
+            targetRef=&quot;sigw&quot;/&gt;
+
+        &lt;serviceTask 
+            id=&quot;sigw&quot;
+           name=&quot;Delegate to Spring Integration&quot;
+           activiti:delegateExpression=&quot;#{gateway}&quot;/&gt;
+
+           &lt;sequenceFlow
+            id=&quot;scriptFlow&quot;
+            sourceRef=&quot;sigw&quot;
+            targetRef=&quot;confirmMovementTask&quot;/&gt;
+
+        &lt;scriptTask 
+            id=&quot;confirmMovementTask&quot;
+            name=&quot;Execute script&quot; scriptFormat=&quot;groovy&quot;&gt;
+            &lt;script&gt;
+                println &#39;Moving on..&#39;
+            &lt;/script&gt;
+        &lt;/scriptTask&gt;
+
+          &lt;sequenceFlow
+            id=&quot;flow2&quot;
+            sourceRef=&quot;confirmMovementTask&quot;
+            targetRef=&quot;theEnd&quot;/&gt;
+
+        &lt;endEvent id=&quot;theEnd&quot;/&gt;
+
+    &lt;/process&gt;
+
+&lt;/definitions&gt;
+</code></pre>
+<p>Most analysts won&rsquo;t write this XML by hand. Instead, they&rsquo;ll use a modeling tool like <a href="https://www.alfresco.com/products/business-process-management">Alfresco&rsquo;s Activiti Cloud</a>. The XML artifact, however, is round-trippable: it may be annotated by developers and then revised in the modeling tool.</p>
+<p>On inspection, though, you&rsquo;ll see that most of this isn&rsquo;t very complicated. The process has four states:</p>
+<ul>
+<li><strong><code>startEvent</code></strong> - where the process starts</li>
+<li><strong><code>serviceTask</code></strong> - invoke the Spring bean called <code>gateway</code> to kick off a bit of processing in Spring Integration (more on this later!)</li>
+<li><strong><code>scriptTask</code></strong> - print out a simple confirmational message using Groovy</li>
+<li><strong><code>endEvent</code></strong> - done</li>
+</ul>
+<p>The ordering is explicitly spelled out by the various <code>sequenceFlow</code> elements which connect the nodes.</p>
+<p>Activiti is a great way to keep track of business process state, but it&rsquo;s not a particularly powerful component model or integration technology. For that we need an integration framework like Spring Integration..</p><h2><a href="#what-is-spring-integration" class="anchor" name="what-is-spring-integration"></a>What is Spring Integration</h2>
+<p>Spring Integration supports the integration of services and data across multiple otherwise incompatible systems. Conceptually, composing an integration flow is similar to composing a pipes-and-filters flow on a UNIX OS with <code>stdin</code> and <code>stdout</code>:</p>
+<pre><code class="prettyprint">cat input.txt |  grep ERROR | wc -l &gt; output.txt
+</code></pre>
+<p>In the example, we take data from a source (the file <code>input.txt</code>), pipe it to the <code>grep</code> command to filter the results and keep only the lines that contain the token <code>ERROR</code>, and then pipe it to the <code>wc</code> utility which we to count how many lines there are. Finally, the final count is written to an output file, <code>output.txt</code>. These components - <code>cat</code>, <code>grep</code>, and <code>wc</code> - know nothing of each other. They were not designed with each other in mind. Instead, they know only how to read from <code>stdin</code> and write to <code>stdout</code>. This normalization of data makes it very easy to compose complex solutions from simple atoms. In the example, the act of <code>cat</code>ing a file turns data into data that any process aware of <code>stdin</code> can read. It <em>adapts</em> the inbound data into the normalized format, lines of strings. At the end, the redirect (<code>&gt;</code>) operator turns the normalized data, lines of strings, into data on the file system. It <em>adapts</em> it. The pipe (<code>|</code>) character is used to signal that the output of one component should flow to the input of another.</p>
+<p>A Spring Integration flow works the same way: data is normalized into <code>Message&lt;T&gt;</code> instances. Each <code>Message&lt;T&gt;</code> has a payload and headers - metadata about the payload in a <code>Map&lt;K,V&gt;</code> - that are the input and output of different messaging components. These messaging components are typically provided by Spring Integration, but it&rsquo;s easy to write and use your own. There are all manner of messaging components supporting all of the <a href="http://www.enterpriseintegrationpatterns.com/">the Enterprise Application Integration patterns</a> (filters, routers, transformers, adapters, gateways, etc.). The Spring framework <code>MessageChannel</code> is a named conduit through which <code>Message&lt;T&gt;</code>s flow between messaging components. They&rsquo;re pipes and, by default, they work sort of like a <code>java.util.Queue</code>. Data in, data out.</p>
+<p>Spring Integration inbound adapters <em>adapt</em> data from external systems (message queues like RabbitMQ, Apache Kafka, and JMS, email, Twitter, file system mounts, IoT-devices, and a zillion other systems) into <code>Message&lt;T&gt;</code>s. Spring Integration outbound adapters do the same, in reverse, taking <code>Message&lt;T&gt;</code>s and writing them to an external system (for example, as an e-mail, or a Tweet, or an Apache Kafka message).</p>
+<p>Spring Integration supports <em>event-driven architectures</em> because it can help detect and then respond to events in the external world. For example, you can use Spring Integration to poll a filesystem every 10 seconds and publish a <code>Message&lt;T&gt;</code> whenever a new file appears. You can use Spring Integration to act as a listener to messages delivered to a Apache Kafka topic. The adapter handles responding to the external event and frees you from worrying too much about originating the message and lets you focus on handling the message once it arrives. It&rsquo;s the integration equivalent of dependency injection! </p>
+<p>Dependency injection leaves component code free of worries about resource initialization and acquisition and leaves it free to focus on writing code with those dependencies. Where did the <code>javax.sql.DataSource</code> field come from? Who cares! Spring wired it in, and it may have gotten it from a Mock in a test, from JNDI in a classic application server, or from a configured Spring Boot bean. Component code remains ignorant of those details. ~15 years ago, when we first started talking about dependency injection, we would talk about the &ldquo;Hollywood principal:&rdquo; &ldquo;don&rsquo;t call me, I&rsquo;ll call you!&rdquo; This applies even more to Spring Integration!</p>
+<p>Inbound gateways take incoming requests from external systems, process them as <code>Message&lt;T&gt;</code>s, and send a reply. Outbound gateways take <code>Message&lt;T&gt;</code>s, forward them to an external system, and await the response from that system. They support request and reply interactions.</p><h2><a href="#an-activiti-and-spring-integration-gateway" class="anchor" name="an-activiti-and-spring-integration-gateway"></a>An Activiti and Spring Integration Gateway</h2>
+<p>Activiti can be used to describe a complex, long-running process in terms of recorded, auditable, and predictable states, and Spring Integration can be used to, well, <em>integrate</em>! Spring Integration is where we keep the interesting Java code, and Activiti keeps track of the overarching state. This trick was useful 20 years ago and it&rsquo;s useful today in the massively distributed world of microservices, too, where processing for a single request may span multiple services and nodes. It&rsquo;s convenient, then, <a href="https://spring.io/blog/2015/03/08/getting-started-with-activiti-and-spring-boot">that Spring Boot, Spring Integration and Activiti work so well together</a>!</p>
+<p>One common use case is to initiate a BPM process with Activiti and then, on entering a wait-state, delegate handling of that state to Spring Integration which can, of course, spread the work to other systems. Here&rsquo;s a simple diagram illustrating the flow.</p>
+<img src="https://raw.githubusercontent.com/joshlong/meh/master/activiti-and-si-interaction.jpg" width="500" />
+<p>BPM process states can often involve human agents. For example, a workflow engine may have a state where a document is sent to a human for approval, but the reviewer is on vacation and won&rsquo;t be back for weeks. It would be wasteful, not to mention dangerous, to keep a thread open with the expectation that whatever confirmation is needed to continue processing will come back within milliseconds or seconds.</p>
+<p>Activiti is smart enough to pause execution, persist execution state to a database during a wait-state, and only resume upon having the process execution <em>signaled</em>. Signalling the process engine rehydrates the process and resumes execution. A simple example might be a new user enrollment business process that delegates to Spring Integration to send an email with a sign up confirmation link. It may take days for the user to click the confirmation link, but on clicking, the system should proceed with the enrollment business process.</p>
+<p>In this post we&rsquo;re going to look at how to initiate a BPM process that enters a wait-state and then delegates to Spring Integration to do some kind of custom processing and then, in the far flung future, resumes execution of the process.</p>
+<p>We&rsquo;ll setup two Spring Integration flows: one to handle requests from Activiti into Spring Integration and another that handles eventual replies and triggers the resumption of the process.</p>
+<p>We&rsquo;ll need something to kick off our process, so here&rsquo;s a simple REST endpoint (<code>http://localhost:8080/start</code>) that launches a new process each time:</p>
+<pre><code class="prettyprint java">@RestController
+class ProcessStartingRestController {
+
+ @Autowired
+ private ProcessEngine processEngine;
+
+ @RequestMapping(method = RequestMethod.GET, value = &quot;/start&quot;)
+ Map&lt;String, String&gt; launch() {
+  ProcessInstance asyncProcess = this.processEngine.getRuntimeService()
+    .startProcessInstanceByKey(&quot;asyncProcess&quot;);
+  return Collections.singletonMap(&quot;executionId&quot;, asyncProcess.getId());
+ }
+}
+</code></pre>
+<p>Messages will flow across two <code>MesssageChannel</code>s that we&rsquo;ll create in a <code>@Configuration</code> class: <code>requests</code> and <code>replies</code>.</p>
+<pre><code class="prettyprint java">@Configuration
+class MessageChannels {
+
+ @Bean
+ DirectChannel requests() {
+  return new DirectChannel();
+ }
+
+ @Bean
+ DirectChannel replies() {
+  return new DirectChannel();
+ }
+}
+</code></pre>
+<p>The nice thing about using a <code>@Configuration</code> class is that it is itself a Spring component and can be injected anywhere. We can dereference the channels by invoking the <code>@Bean</code> provider methods directly. The alternative is to use <code>@Qualifier</code> everytime we inject a reference to one of the channels, e.g.:</p>
+<pre><code class="prettyprint java"><br />public static final String REPLIES_CHANNEL_NAME = &quot;replies&quot;;
+
+@Autowired
+@Qualifier(REPLIES_CHANNEL_NAME)
+private MessageChannel replies;
+</code></pre>
+<p>Our BPMN is pretty straightforward, but we&rsquo;ll use an Activiti-specific namespace attribute, <code>activiti:delegateExpression=&quot;#{gateway}&quot;</code>, to tell Activiti to call a bean named <code>gateway</code> that&rsquo;s registered in Spring. Activiti knows to do this because this application uses the Activiti auto-configuration for Spring Boot which, among many other things, exposes Spring-managed beans to the Activiti expression-language. The <code>gateway</code> is an Activiti-based bean of type <code>ReceiveTaskActivityBehavior</code>. Spring Boot has auto-configurations for both Spring Integration and Activiti so 90% of the tedious setup goes out the window.</p>
+<p>Let&rsquo;s look at our simple <code>gateway</code> component, an implementation of Activiti&rsquo;s <code>ActivityBehavior</code> interface that acts as a callback where we can send a <code>Message&lt;T&gt;</code> into the <code>requests</code> channel and kick off our Spring Integration flow. The important thing here is that we&rsquo;ve captured the <code>executionId</code> which we&rsquo;ll need later to <em>resume</em> or <em>signal</em> the process.</p>
+<pre><code class="prettyprint java">@Bean
+ActivityBehavior gateway(MessageChannels channels) {
+  return new ReceiveTaskActivityBehavior() {
+
+    @Override
+    public void execute(ActivityExecution execution) throws Exception {
+
+      Message&lt;?&gt; executionMessage = MessageBuilder
+          .withPayload(execution)
+          .setHeader(&quot;executionId&quot;, execution.getId())
+          .build();
+
+      channels.requests().send(executionMessage);
+    }
+  };
+}
+</code></pre>
+<p>The <code>Message&lt;T&gt;</code> will pop out the other side of the <code>requests</code> <code>MessageChannel</code> and something needs to process it. In a sophisticated example, it&rsquo;d be trivial to transform the request into a meaningful message and then, for example, forward it to some other system like e-mail. Here, we just print out the headers so that we can note the <code>executionId</code> and use that later.</p>
+<pre><code class="prettyprint java">@Bean
+IntegrationFlow requestsFlow(MessageChannels channels) {
+ return IntegrationFlows.from(channels.requests())
+   .handle(msg -&gt; msg.getHeaders().entrySet()
+     .forEach(e -&gt; log.info(e.getKey() + &#39;=&#39; + e.getValue())))
+   .get();
+}
+</code></pre>
+<p>At this point, the workflow definition will have been persisted and there is no active process instance. We need to signal it, somehow, asynchronously. We&rsquo;ll do so using a REST endpoint, <code>http://localhost:8080/resume/{executionId}</code>. REST is easy to grok, but really we could&rsquo;ve used any event from any external system that Spring Integration knows about to achieve this effect. The only thing to ensure is that, whatever the external event, we&rsquo;re somehow able to send the <code>executionId</code> along, as we do here by capturing it in the URI.</p>
+<pre><code class="prettyprint java"><br />@RestController
+class ProcessResumingRestController {
+
+ @Autowired
+ private MessageChannels messageChannels;
+
+ @RequestMapping(method = RequestMethod.GET, value = &quot;/resume/{executionId}&quot;)
+ void resume(@PathVariable String executionId) {
+
+  Message&lt;String&gt; build = MessageBuilder.withPayload(executionId)
+    .setHeader(&quot;executionId&quot;, executionId)
+    .build();
+
+  this.messageChannels.replies().send(build);
+ }
+}
+
+</code></pre>
+<p>When the <code>Message&lt;T&gt;</code> flows through the <code>replies</code> <code>MessageChannel</code>, it&rsquo;ll pop out the other end and, again, something needs to process it. Here, we&rsquo;ll use another Spring Integration flow that takes the incoming <code>Message&lt;T&gt;</code> and signals the resumption of the process. Once this flow is executed, you&rsquo;ll see the next step in the process, the <code>scriptTask</code>, evaluated and the words &ldquo;Moving on!&rdquo; printed to the console.</p>
+<pre><code class="prettyprint java">@Bean
+IntegrationFlow repliesFlow(MessageChannels channels,
+       ProcessEngine engine) {
+ return IntegrationFlows.from(channels.replies())
+   .handle(msg -&gt; engine.getRuntimeService().signal(
+     String.class.cast(msg.getHeaders().get(&quot;executionId&quot;))))
+   .get();
+}
+</code></pre><h2><a href="#next-steps" class="anchor" name="next-steps"></a>Next Steps</h2>
+<p>We&rsquo;ve covered a lot! We&rsquo;re involving <em>both</em> a BPM engine and an integration framework to handle processing, and I appreciate that the correct use of the intersection of the two is kind of a niche topic. The goal in this post was to effectively use both, where applicable, to the fullest. BPM adds a fair amount of <a href="https://en.wikipedia.org/wiki/Cognitive_load"><em>cognitive load</em></a> for simple integrations but offers a <em>lot</em> of value when business process descriptions must be model- and business analyst-friendly. One common misconception is that developers have to give up the ability to enhance the system once BPM is involved; NOT SO! Thanks to Spring Boot and some hard work from the Activiti team, Activiti works perfectly with all of Spring.</p>
+<p>The real power is using BPM to orchestrate complex processing logic: imagine hitting a state in a BPM process and then invoking a Spring Batch job, or calling a REST service with a Ribbon load-balanced <code>RestTemplate</code> in Spring Cloud, or forwarding the <code>Message&lt;T&gt;</code> into a Spring Cloud Data Flow stream process. Spring Cloud Data Flow is one of my favorite approaches to data processing because it builds on Spring Cloud Stream which in turn builds on Spring Integration: it&rsquo;s <code>MessageChannel</code>s all the way down!</p>
+<p>The code for <a href="https://github.com/joshlong/activiti-examples/tree/master/async-activiti-integration">the example is online</a>. </p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2370;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

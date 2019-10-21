@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Capturing failures and system state (part I)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Capturing failures and system state (part I)" />
+<meta name="twitter:description" content="&lt;p&gt;At The Spring Experience, I hosted a session various aspects. One of them was the &lt;a href=&quot;http://blog.interface21.com/main/2008/01/04/before-a-jdbc-operation-flush-the-hibernate-session-includes-tse-example-code/&quot;&gt;Hibernate synchronization aspect&lt;/a&gt; that I described last week. Another was an aspect capable of capturing first failures and system state, sometimes called First-Failure Data Capture (FFDC). I hosted this session to show off some aspects that are very useful, but that people might not have come across in practice yet. I often hear people asking about aspects other than logging, tracing, transaction management and security. The Hibernate synchronization aspect and the FFDC aspect are nice examples I think.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Capturing failures and system state (part I)" />
+<meta property="og:description" content="&lt;p&gt;At The Spring Experience, I hosted a session various aspects. One of them was the &lt;a href=&quot;http://blog.interface21.com/main/2008/01/04/before-a-jdbc-operation-flush-the-hibernate-session-includes-tse-example-code/&quot;&gt;Hibernate synchronization aspect&lt;/a&gt; that I described last week. Another was an aspect capable of capturing first failures and system state, sometimes called First-Failure Data Capture (FFDC). I hosted this session to show off some aspects that are very useful, but that people might not have come across in practice yet. I often hear people asking about aspects other than logging, tracing, transaction management and security. The Hibernate synchronization aspect and the FFDC aspect are nice examples I think.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-01-07 21:17:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Capturing failures and system state (part I)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Alef Arendsen</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-01-07 21:17:00.0">January 07, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="126" href="/blog/2008/01/07/capturing-failures-and-system-state-part-i#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>At The Spring Experience, I hosted a session various aspects. One of them was the <a href="http://blog.interface21.com/main/2008/01/04/before-a-jdbc-operation-flush-the-hibernate-session-includes-tse-example-code/">Hibernate synchronization aspect</a> that I described last week. Another was an aspect capable of capturing first failures and system state, sometimes called First-Failure Data Capture (FFDC). I hosted this session to show off some aspects that are very useful, but that people might not have come across in practice yet. I often hear people asking about aspects other than logging, tracing, transaction management and security. The Hibernate synchronization aspect and the FFDC aspect are nice examples I think.</p>
+<h2>Introduction</h2><p>The objective of FFDC is to capture as much information about the current state of the system when an error occurs. The following entry explains how this aspect works and how you can use in your own applications.</p><p>Let&rsquo;s set the following two goals:</p>
+<ul>
+<li>When a failure escapes from a business service, we want to log the call context, meaning all calls that have happened in the context of this execution of the business service</li>
+<li>When a failure escapes from a business service, we want to log the root cause of the failure, meaning not only the top-most exception (the exception that escaped from the method), but also the <i>first</i> exception that was thrown that might have been wrapped, swallowed or re-thrown</li>
+</ul><p>In order to do this, first let&rsquo;s devise a class that is capable is keeping track of the data for us that we want to record. We will call this class the CallContext. I&rsquo;m omitting the actual implementation. I&rsquo;ll post the code in my next entry, the implementation does not really matter here and other than that, it&rsquo;s a pretty straightforward data holder anyway.</p>
+<pre><code class="prettyprint java"><br />public class CallContext {
+
+	/**
+	 * Registers the root call of this call context.
+	 * We want to distinguish between the root call
+	 * and all subsequent calls issued in the context
+	 * of the root call.
+	 */
+	public void setRootCall(JoinPoint rootCall) { ... }
+	
+	/**
+	 * Registers a call at a certain depth.
+	 * @param the call to register
+	 * @param the depth of the call
+	 */ 
+	public void registerCall(JoinPoint call, int depth) { ... }
+	
+	/**
+	 * Registers the first failure of this call context.
+	 * A first failure might already have occurred in which
+	 * case subsequent registrations of the same or different
+	 * failures will be ignored.
+	 */
+	public void setFirstFailure(Throwable t) { ... }
+	
+	/**
+	 * Log the entire call context (i.e. output it to
+	 * System.out).
+	 */
+	public void log(Throwable t) { ... }
+}
+</code></pre><p>As you can see, we are using the AspectJ <a href="https://www.eclipse.org/aspectj/doc/released/runtime-api/org/aspectj/lang/JoinPoint.html">JoinPoint</a> type to identify an event happening in a program.</p>
+<h2>Defining four scenarios</h2><p>So, we&rsquo;ve got the data ready. Next, let&rsquo;s rephrase the two goals we&rsquo;ve set previously a little bit and create a list of things that we want to have happening in our program(s):</p>
+<ul>
+<li>Before a call to a business service, we want to register the root call with the current call context</li>
+<li>Before a call in the context of a business service, we want to register the (and the current depth) call with the current call context</li>
+<li>When an exception occurs inside a business service, register it with the current call context as the first failure</li>
+<li>After an exception escapes from a business service, we want to log the current call context</li>
+</ul><p>As you can see, I&rsquo;m just slicing and dicing things a little in such a way that sentences in the form of &lsquo;before/after <i>something</i> happens, do <i>something</i>&rsquo; start appearing. The only thing left to do is to identify the two <i>somethings</i> and we&rsquo;re done. Let&rsquo;s tackle each of the three different pieces of logic individually.</p>
+<h3>Before a business service, register the root call with the current context</h3><p>Using AspectJ, this is relatively simple to do. Let&rsquo;s assume a business service can be identified by a @BusinessService annotation that can be added to a method or a class. In case it&rsquo;s added to a class, all methods on that class are business services. In case it&rsquo;s added on to a method, that method alone is a business service. In other words: a business service is <i>a method defined in a class that in its turn is annotated by @BusinessService</i> or <i>a method that is annotated by @BusinessService itself</i>. In AspectJ this comes down to the following (for more information on the exact syntax of the AspectJ pointcut expression language, refer to <a href="https://www.eclipse.org/aspectj//doc/released/progguide/semantics-pointcuts.html"><a href="https://www.eclipse.org/aspectj//doc/released/progguide/semantics-pointcuts.html">http://www.eclipse.org/aspectj//doc/released/progguide/semantics-pointcuts.html</a></a>).</p>
+<pre><code class="prettyprint java"><br />pointcut businessService() : call(* (@BusinessService *..*).*(..)) || call(@BusinessService * *(..));
+</code></pre><p>Now we have identified a business service, we can finish the first scenario:</p>
+<pre><code class="prettyprint java"><br />public aspect FirstFailureDataCapturer {
+
+	public CallContext callContext = new CallContext();
+	
+	pointcut businessService() : call(@BusinessService *..*).*(..)) || 
+			call(@BusinessService * *(..));
+	
+	before() : businessService() {
+		// &#39;thisJoinPoint&#39; is an implicit variable (just like &#39;this&#39;)
+		// that represents the current join point
+		this.callContext.setRootCall(thisJoinPoint);
+	}
+}
+</code></pre>
+<h3>Before a call in the context of a business service, register it with the current call context</h3><p>We&rsquo;re done with the first scenario, let&rsquo;s tackle the second scenario. We have already identified what it means to be a business service. We want to trap all calls in the context of business services. An arbitrary call can be identified as follows:</p>
+<pre><code class="prettyprint java"><br />pointcut methodCall() : call(* *(..));
+</code></pre><p>If we&rsquo;d use this pointcut, we&rsquo;d make the scenario applicable to <i>all methods</i>, but we only want to apply it to methods inside business services. Therefore we need to limit the scope of this pointcut. We can do that by using the <i>cflow</i> pointcut designator. The <i>cflow pointcut designator</i> takes another pointcut and limits to the things happening in the context of that pointcut. Let&rsquo;s see how we can use it to solve the problem at hand. Read the following as: &lsquo;a method call in a business service is a method call (refer to pointcut defined above) while (and) in the control flow of a business service (refer to other pointcut defined earlier&rsquo;.</p>
+<pre><code class="prettyprint java"><br />pointcut methodCallInBusinessService() : methodCall() &amp;&amp; cflow(businessService());
+</code></pre><p>Let&rsquo;s go one step further and say that we do not want to register <i>all</i> method calls, but only a limited set. The following defines a traceable method, identifying only methods that I thought are relevant. It also excludes methods defined in the aspect itself (or in the control flow of the aspect). The latter prevents endless loops from occurring. Let&rsquo;s read this out aloud as well: a traceable method is a method call in a business service (refer to pointcut defined above) while not (and not) in the control flow of an executing advice defined in the FirstFailureDataCapturer and it should also not be a call to equals(), hashCode() or getClass().</p>
+<pre><code class="prettyprint java"><br />pointcut traceableMethod() : 
+	methodCallInBusinessService() &amp;&amp;
+	!cflow(within(FirstFailureDataCapturer) &amp;&amp; adviceexecution()) &amp;&amp;
+	!call(* equals(Object)) &amp;&amp; !call(* hashCode()) &amp;&amp; !call(* getClass());
+</code></pre><p>Let&rsquo;s use this pointcut to implement the second scenario that we&rsquo;ve identified. In the description of the scenario above, we have not specified that we also need to keep track of the current depth. We&rsquo;re using a before advice to log the current call. Let&rsquo;s also use that same advice to keep track of the depth and let&rsquo;s use an after advice to reset the depth to it&rsquo;s previous state.</p>
+<pre><code class="prettyprint java"><br />public aspect FirstFailureDataCapturer {
+
+	public CallContext callContext = new CallContext();
+	
+	public int currentDepth = 0;
+	
+	// other pointcuts and advices omitted
+
+	pointcut methodCallInBusinessService() : methodCall() &amp;&amp; cflow(businessService());
+	
+	pointcut traceableMethod() : 
+		methodCallInBusinessService() &amp;&amp;
+		!cflow(within(FirstFailureDataCapturer) &amp;&amp; adviceexecution())) &amp;&amp;
+		!call(* equals(Object)) &amp;&amp; !call(* hashCode()) &amp;&amp; !call(* getClass());
+		
+	before() : traceableMethod() {
+		currentDepth++;
+		callContext.registerCall(thisJoinPoint, currentDepth);
+	}
+	
+	after() : traceableMethod() {
+		currentDepth--;
+	}
+}
+</code></pre>
+<h3>When an exception occurs inside a business service, register it with the current call context</h3><p>Now that we&rsquo;re done with the second scenario, we&rsquo;ve captured almost all state that we want to capture. The last thing that we wanted to capture was the first exception occurring in the context of that same business service.</p><p>A potential failure point is a) an exception escaping from a method or b) an exception handler inside a method (and then wrapped, swallowed, possibly re-thrown, et cetera). Let&rsquo;s use this definition to implement our third scenario. The first pointcut just uses the traceable method pointcut to identify potential failure points. We&rsquo;ll use after throwing advice in a minute to finish part of our scenario. The second is a little more interesting. It defines a pointcut that identifies exception handler (catch blocks) in the control flow of business services. Using this pointcut, we can identify excpetion that are caught, wrapped and re-thrown for example (or caught and swallowed).</p>
+<pre><code class="prettyprint java"><br />pointcut potentialFailurePoint() : traceableMethod();
+	
+pointcut exceptionHandler(Throwable t) : handler(*) &amp;&amp; args(t) &amp;&amp; cflow(businessService());
+</code></pre><p>We&rsquo;ll use after before and after advice to finish the third scenario. First: before an exception handler, log the exception:</p>
+<pre><code class="prettyprint java"><br />public aspect FirstFailureDataCapturer {
+
+	private CallContext context = new CallContext();
+
+	// other members omitted
+
+	before(Throwable t) : exceptionHandler(t) {
+		this.callContext.setFirstFailure(t);
+	}
+}
+</code></pre><p>And now, let&rsquo;s define the other advice:</p>
+<pre><code class="prettyprint java"><br />public aspect FirstFailureDataCapturer {
+
+	private CallContext context = new CallContext();
+
+	// other members omitted
+
+	after() throwing(Throwable t) : potentialFailurePoint() {
+		this.callContext.setFirstFailure(t);
+	}
+}
+</code></pre>
+<h3>After an exception escapes from a business service, log the current call context</h3><p>The last thing we need to do is logging the current call context in case a business service execution results in an exception. We already have all the ingredients (the pointcuts) to skip straight on to the advice, so let&rsquo;s go ahead:</p>
+<pre><code class="prettyprint java"><br />public aspect FirstFailureDataCapturer {
+
+	private CallContext context = new CallContext();
+
+	// other members omitted
+
+	after() throwing(Throwable t) : businessService() {
+		this.callContext.log(t);
+	}
+}
+</code></pre>
+<h2>Using the CarPlant as an example</h2><p>In my session at The Spring Experience I used my (infamous) CarPlant example to show the FirstFailureDataCapturer. The CarPlant is a relatively small system that is capable of manufacturing cars. Manufacturing cars is a two-step process: 1) getting parts from a CarPartsInventory system and 2) asking the CarAssemblyLine to assemble the parts into a Car. The CarPlant itself:</p>
+<pre><code class="prettyprint java"><br />@BusinessService public Car manufactureCar(CarModel model) {
+	Set &lt;Part&gt; parts = inventory.getPartsForModel(model);
+	
+	return assemblyLine.assembleCarFromParts(model, parts);
+}
+</code></pre><p>The CarPartsInventory in this example is a stub and does not really do anything useful:</p>
+<pre><code class="prettyprint java"><br />public Set&lt;Part&gt; getPartsForModel(CarModel model) {
+	return new HashSet&lt;Part&gt;();
+}
+</code></pre><p>The interesting bit here is the CarAssemblyLine. As you can see in the code below, the CarAssemblyLine has some strange code in it. It first throws an exception, catches it itself and then re-throws it as a pretty MeaninglessException.</p>
+<pre><code class="prettyprint java"><br />public Car assembleCarFromParts(CarModel model, Set&lt;Part&gt; parts) {
+		
+	try {
+		throw new OnStrikeException(&quot;The workers are on strike!&quot;);
+	} catch (OnStrikeException e) {
+		throw new MeaninglessException();
+	}
+}
+</code></pre><p>Obviously, under normal circumstances, the real cause of the problem, the root cause would never be identified in this case (it&rsquo;s caught, not logged&hellip; a different exception is thrown and the root cause is not passed along), and we&rsquo;d also never be able to register the system state <i>exactly</i> at the point the real and first failure (the OnStrikeException) occurred. Fortunately now we have the FirstFailureDataCapturer, we can register the root cause and log it. Below you can find a sequence diagram and some output of a test that I ran. As you can see, we do not just get the call stack, but <b>all calls that occurred in the context of this business service execution</b>, or in other words: the entire call tree.</p><p><img id="image255" src="http://blog.springsource.com/main/wp-content/uploads/2008/01/ffdc.png" alt="ffdc.png" /></p>
+<h2>Capturing system state</h2><p>If you look carefully, you can see the first exception that is dumped is the MeaninglessException. Right after the MeaninglessException has been dumped however there&rsquo;s a message saying that there is a root cause that&rsquo;s different from the MeaninglessException and then the real exception is dumped. The stack trace also mentions that the real exception was caused at line 18, whereas the MeaninglessException originated at line 20.</p><p>Now we have identified the <i>real</i> point where failure occur, we can also start capturing system state. As you can imagine, the system state at CarPlant:18 might differ from the system state at CarPlant:20 and our FirstFailureDataCapturer allows us to register the system state at the <i>correct point in time</i>.</p><p>So what is system state anyway? Well, that all depends on the runtime, your specific application and what you are interested in. A couple of examples:</p>
+<ul>
+<li>The currently logged on user</li>
+<li>The current car manufacturing request</li>
+<li>Any technical system state (amount of threads, caching statistics, et cetera)
+<li>The node this exception occurred on</li>
+</ul><p>Capturing system state is now very easy and we can do this inside the CallContext.setFirstFailure() method for example.</p>
+<h2>What about part II??</h2><p>This aspect is not done yet! The first time the complete aspect came in the picture it was coded up as follows:</p>
+<pre><code class="prettyprint java"><br />public aspect FirstFailureDataCapturer {
+
+	public CallContext callContext = new CallContext();
+	
+	pointcut businessService() : call(@BusinessService * *(..)) || call(* (@BusinessService *..*).*(..)) || call(@BusinessService * *(..));
+	
+	before() : businessService() {
+		// &#39;thisJoinPoint&#39; is an implicit variable (just like &#39;this&#39;)
+		// that represents the current join point
+		this.callContext.setRootCall(thisJoinPoint);
+	}
+}
+</code></pre><p>As you can see, the call context is instantiated when the FirstFailureDataCapturer is instantiated. The question of course now is: <i>when and how many times will the FirstFailureDataCapturer be instantiated</i>? And, when you&rsquo;ve answered this question, another question might come to mind: <i>what happens if this aspect is used in a multi-threaded environment?</i> In the next part I&rsquo;ll discuss all of this and make some other changes to the aspect to polish it a bit. In the meantime, you can always try to answer those questions in the comments of course :)! I&rsquo;ll also provide the source code for the aspect in the next part.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 126;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

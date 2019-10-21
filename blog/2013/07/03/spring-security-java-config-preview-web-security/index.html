@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Security Java Config Preview: Web Security</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Security Java Config Preview: Web Security" />
+<meta name="twitter:description" content="&lt;h1&gt;&lt;a href=&quot;#update&quot; class=&quot;anchor&quot; name=&quot;update&quot;&gt;&lt;/a&gt;Update&lt;/h1&gt;
+&lt;p&gt;Users should refer to the &lt;a href=&quot;http://docs.spring.io/spring-security/site/docs/3.2.0.RC2/reference/htmlsingle/#jc&quot;&gt;Spring Security Reference&lt;/a&gt; which contains more up to date information.&lt;/p&gt;
+&lt;h1&gt;&lt;a href=&quot;#original-blog-post&quot; class=&quot;anchor&quot; name=&quot;original-blog-post&quot;&gt;&lt;/a&gt;Original Blog Post&lt;/h1&gt;
+&lt;p&gt;In my &lt;a href=&quot;http://blog.springsource.org/2013/07/02/spring-security-java-config-preview-introduction/&quot;&gt;previous post&lt;/a&gt;, I introduced Spring Security Java configuration and discussed some of the logistics of the project. In this post, we will start off by walking through a very simple web security configuration. We will then spice things up a bit with configuration that has been customized some.&lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;#hello-web-security&quot; class=&quot;anchor&quot; name=&quot;hello-web-security&quot;&gt;&lt;/a&gt;Hello Web Security&lt;/h3&gt;
+&lt;p&gt;In this section we go through the most basic configuration for web based security. It can be broken into four steps:&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@rob_winch" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/30ed046efb35c67d4c055dab109b8933?s=200" />
+
+<meta property="og:title" content="Spring Security Java Config Preview: Web Security" />
+<meta property="og:image" content="https://gravatar.com/avatar/30ed046efb35c67d4c055dab109b8933?s=200" />
+<meta property="og:description" content="&lt;h1&gt;&lt;a href=&quot;#update&quot; class=&quot;anchor&quot; name=&quot;update&quot;&gt;&lt;/a&gt;Update&lt;/h1&gt;
+&lt;p&gt;Users should refer to the &lt;a href=&quot;http://docs.spring.io/spring-security/site/docs/3.2.0.RC2/reference/htmlsingle/#jc&quot;&gt;Spring Security Reference&lt;/a&gt; which contains more up to date information.&lt;/p&gt;
+&lt;h1&gt;&lt;a href=&quot;#original-blog-post&quot; class=&quot;anchor&quot; name=&quot;original-blog-post&quot;&gt;&lt;/a&gt;Original Blog Post&lt;/h1&gt;
+&lt;p&gt;In my &lt;a href=&quot;http://blog.springsource.org/2013/07/02/spring-security-java-config-preview-introduction/&quot;&gt;previous post&lt;/a&gt;, I introduced Spring Security Java configuration and discussed some of the logistics of the project. In this post, we will start off by walking through a very simple web security configuration. We will then spice things up a bit with configuration that has been customized some.&lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;#hello-web-security&quot; class=&quot;anchor&quot; name=&quot;hello-web-security&quot;&gt;&lt;/a&gt;Hello Web Security&lt;/h3&gt;
+&lt;p&gt;In this section we go through the most basic configuration for web based security. It can be broken into four steps:&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2013-07-03 15:01:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Security Java Config Preview: Web Security</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/30ed046efb35c67d4c055dab109b8933?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/rwinch">Rob Winch</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2013-07-03 15:01:00.0">July 03, 2013</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="526" href="/blog/2013/07/03/spring-security-java-config-preview-web-security#disqus_thread">
+</a></div>
+</div>
+ </header>
+<div class="blog--post"><h1><a href="#update" class="anchor" name="update"></a>Update</h1><p>Users should refer to the <a href="https://docs.spring.io/spring-security/site/docs/3.2.0.RC2/reference/htmlsingle/#jc">Spring Security Reference</a> which contains more up to date information.</p><h1><a href="#original-blog-post" class="anchor" name="original-blog-post"></a>Original Blog Post</h1><p>In my <a href="http://blog.springsource.org/2013/07/02/spring-security-java-config-preview-introduction/">previous post</a>, I introduced Spring Security Java configuration and discussed some of the logistics of the project. In this post, we will start off by walking through a very simple web security configuration. We will then spice things up a bit with configuration that has been customized some.</p><h3><a href="#hello-web-security" class="anchor" name="hello-web-security"></a>Hello Web Security</h3><p>In this section we go through the most basic configuration for web based security. It can be broken into four steps:</p>
+<ul>
+<li>Updating your dependencies - <a href="http://blog.springsource.org/2013/07/02/spring-security-java-config-preview-introduction/#availability">we demonstrated this using Maven</a> in our previous blog post</li>
+<li>Provide the Spring Security configuration - in our example this is done with a <a href="#wsca">WebSecurityConfigurerAdapter</a></li>
+<li>Ensure the Spring Security configuration is loaded - in our example this is done with <a href="#aacdsi">AbstractAnnotationConfigDispatcherServletInitializer</a></li>
+<li>Configure the springSecurityFilterChain - in our example this is done with <a href="aswai">AbstractSecurityWebApplicationInitializer</a></li>
+</ul><h4><a href="#websecurityconfigureradapter" class="anchor" name="websecurityconfigureradapter"></a>WebSecurityConfigurerAdapter</h4><p>The <code>@EnableWebSecurity</code> annotation and <code>WebSecurityConfigurerAdapter</code> work together to provide web based security. By extending <code>WebSecurityConfigurerAdapter</code> and only a few lines of code we are able to do the following:</p>
+<ul>
+<li>Require the user to be authenticated prior to accessing any URL within our application</li>
+<li>Create a user with the username &ldquo;user&rdquo;, password &ldquo;password&rdquo;, and role of &ldquo;ROLE_USER&rdquo;</li>
+<li>Enables HTTP Basic and Form based authentication</li>
+<li>Spring Security will automatically render a login page and logout success page for you</li>
+</ul>
+<pre><code class="prettyprint java"><br />@Configuration
+@EnableWebSecurity
+public class HelloWebSecurityConfiguration
+   extends WebSecurityConfigurerAdapter {
+
+  @Autowired
+  public void configureGlobal(AuthenticationManagerBuilder auth) {
+    auth
+      .inMemoryAuthentication()
+        .withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;);
+  }
+}
+</code></pre><p>For your reference, this is similar to the following XML configuration with a few exceptions:</p>
+<ul>
+<li>Spring Security will render the login, authentication failure url, and logout success URLs</li>
+<li>The login-processing-url will only be processed for HTTP POST</li>
+<li>The login-page will only be processed for HTTP GET</li>
+</ul>
+<pre><code class="prettyprint xml"><br />&lt;http use-expressions=&quot;true&quot;&gt;
+  &lt;intercept-url pattern=&quot;/**&quot; access=&quot;authenticated&quot;/&gt;
+  &lt;logout
+    logout-success-url=&quot;/login?logout&quot;
+    logout-url=&quot;/logout&quot;
+  /&gt;
+  &lt;form-login
+    authentication-failure-url=&quot;/login?error&quot;
+    login-page=&quot;/login&quot;
+    login-processing-url=&quot;/login&quot;
+    password-parameter=&quot;password&quot;
+    username-parameter=&quot;username&quot;
+  /&gt;
+&lt;/http&gt;
+&lt;authentication-manager&gt;
+  &lt;authentication-provider&gt;
+    &lt;user-service&gt;
+      &lt;user name=&quot;user&quot; 
+          password=&quot;password&quot; 
+          authorities=&quot;ROLE_USER&quot;/&gt;
+    &lt;/user-service&gt;
+  &lt;/authentication-provider&gt;
+&lt;/authentication-manager&gt;
+</code></pre><h4><a href="#abstractannotationconfigdispatcherservletinitializer" class="anchor" name="abstractannotationconfigdispatcherservletinitializer"></a>AbstractAnnotationConfigDispatcherServletInitializer</h4><p>The next step is to ensure that the root <code>ApplicationContext</code> includes the <a href="#web-security-hellowebsecurityconfiguration">HelloWebSecurityConfiguration we just specified</a>. There are <a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/WebApplicationInitializer.html">many different ways</a> we could do this, but if you are using Spring&rsquo;s <a href="http://static.springsource.org/spring/docs/current/spring-framework-reference/htmlsingle/#mvc-container-config">AbstractAnnotationConfigDispatcherServletInitializer</a> it might look something like this:</p>
+<pre><code class="prettyprint java"><br />public class SpringWebMvcInitializer extends
+   AbstractAnnotationConfigDispatcherServletInitializer {
+
+  @Override
+  protected Class&lt;?&gt;[] getRootConfigClasses() {
+    return new Class[] { HelloWebSecurityConfiguration.class };
+  }
+  ...
+}
+</code></pre><p>To put this in perspective, Spring Security was traditionally initialized using something similar to the following lines within the web.xml:</p>
+<pre><code class="prettyprint xml"><br />&lt;!-- Creates the Spring Container shared by all Servlets and Filters --&gt;
+&lt;listener&gt;
+  &lt;listener-class&gt;
+    org.springframework.web.context.ContextLoaderListener
+  &lt;/listener-class&gt;
+&lt;/listener&gt;
+
+&lt;!-- Load all Spring XML configuration including our security.xml file --&gt;
+&lt;context-param&gt;
+  &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+  &lt;param-value&gt;/WEB-INF/spring/*.xml&lt;/param-value&gt;
+&lt;/context-param&gt;
+</code></pre><p><div class="callout">
+<div class="callout-title">&ldquo;Ordering of WebApplicationInitializer&rdquo;</div>
+If any servlet Filter mappings are added after AbstractSecurityWebApplicationInitializer is invoked, they might be accidentally added before springSecurityFilterChain. Unless an application contains Filter instances that do not need to be secured, springSecurityFilterChain should be before any other Filter mappings. The @Order annotation can be used to help ensure that any WebApplicationInitializer is loaded in a deterministic order.
+</div></p><h4><a href="#abstractsecurity-webapplicationinitializer" class="anchor" name="abstractsecurity-webapplicationinitializer"></a>AbstractSecurity WebApplicationInitializer</h4><p>The last step is we need to map the <code>springSecurityFilterChain</code>. We can easily do this by extending <a href="http://static.springsource.org/spring-security/site/docs/3.2.x/apidocs/org/springframework/security/web/context/AbstractSecurityWebApplicationInitializer.html">AbstractSecurityWebApplicationInitializer</a> and optionally overriding methods to customize the mapping. </p><p>The most basic example below accepts the default mapping and adds springSecurityFilterChain with the following characteristics:</p>
+<ul>
+<li>springSecurityFilterChain is mapped to &ldquo;/*&rdquo;</li>
+<li>springSecurityFilterChain uses the dispatch types of <code>ERROR</code> and <code>REQUEST</code></li>
+<li>The <code>springSecurityFilterChain</code> mapping is inserted before any servlet Filter mappings that have already been configured</li>
+</ul>
+<pre><code class="prettyprint java"><br />public class SecurityWebApplicationInitializer 
+   extends AbstractSecurityWebApplicationInitializer {
+}
+</code></pre><p>The above code is the equivalent of the following lines within the web.xml:</p>
+<pre><code class="prettyprint xml"><br />&lt;filter&gt;
+  &lt;filter-name&gt;springSecurityFilterChain&lt;/filter-name&gt;
+  &lt;filter-class&gt;
+    org.springframework.web.filter.DelegatingFilterProxy
+  &lt;/filter-class&gt;
+&lt;/filter&gt;
+
+&lt;filter-mapping&gt;
+  &lt;filter-name&gt;springSecurityFilterChain&lt;/filter-name&gt;
+  &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+  &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
+  &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+&lt;/filter-mapping&gt;
+</code></pre><h3><a href="#customwebsecurityconfigureradapter" class="anchor" name="customwebsecurityconfigureradapter"></a>CustomWebSecurityConfigurerAdapter</h3><p>Our <a href="#web-security-hellowebsecurityconfiguration">HelloWebSecurityConfiguration</a> sample, demonstrates that Spring Security Java configuration can provide some very nice defaults for us. Let&rsquo;s take a look at some basic customization. </p>
+<pre><code class="prettyprint java"><br />@EnableWebSecurity
+@Configuration
+public class CustomWebSecurityConfigurerAdapter extends
+   WebSecurityConfigurerAdapter {
+  @Autowired
+  public void configureGlobal(AuthenticationManagerBuilder auth) {
+    auth
+      .inMemoryAuthentication()
+        .withUser(&quot;user&quot;)  // #1
+          .password(&quot;password&quot;)
+          .roles(&quot;USER&quot;)
+          .and()
+        .withUser(&quot;admin&quot;) // #2
+          .password(&quot;password&quot;)
+          .roles(&quot;ADMIN&quot;,&quot;USER&quot;);
+  }
+
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    web
+      .ignoring()
+         .antMatchers(&quot;/resources/**&quot;); // #3
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http
+      .authorizeUrls()
+        .antMatchers(&quot;/signup&quot;,&quot;/about&quot;).permitAll() // #4
+        .antMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;) // #6
+        .anyRequest().authenticated() // 7
+        .and()
+    .formLogin()  // #8
+        .loginUrl(&quot;/login&quot;) // #9
+        .permitAll(); // #5
+  }
+}
+</code></pre><p>Assuming that we adjust <a href="#aacdsi">AbstractAnnotationConfigDispatcherServletInitializer</a> to load our new configuration, our CustomWebSecurityConfigurerAdapter will do the following:</p>
+<ul>
+<li>Allow in memory authentication with a user named &ldquo;user&rdquo;</li>
+<li>Allow in memory authentication with an administrative user named &ldquo;admin&rdquo;</li>
+<li>Ignore any request that starts with &ldquo;/resources/&rdquo;. This is similar to configuring <a href="http://static.springsource.org/spring-security/site/docs/3.1.x/reference/appendix-namespace.html#nsa-http-security"><a href="/cdn-cgi/l/email-protection#fddbde85cbc5c6dbdecccccbc6dbdecccccbc68ddbdecbc9c6dbdeccccc8c6dbde85cbc8c69edbdecccccac6dbdeccccc9c6dbdecccdc8c6dbde85cac9c6dbdecccfccc6c0dbdecccccdc6929398">&#x68;&#116;&#116;p&#64;&#115;&#x65;c&#117;&#114;&#105;&#x74;&#121;=&#110;one</a></a> when using the XML namespace configuration.<br /><li>Allow anyone (including unauthenticated users) to access to the URLs &ldquo;/signup&rdquo; and &ldquo;/about&rdquo;</li></li>
+<li>Allow anyone (including unauthenticated users) to access to the URLs &ldquo;/login&rdquo; and &ldquo;/login?error&rdquo;. The permitAll() in this case means, allow access to any URL that formLogin() uses.</li>
+<li>Any URL that starts with &ldquo;/admin/&rdquo; must be an administrative user. For our example, that would be the user &ldquo;admin&rdquo;.</li>
+<li>All remaining URLs require that the user be successfully authenticated</li>
+<li>Setup form based authentication using the Java configuration defaults. Authentication is performed when a POST is submitted to the URL &ldquo;/login&rdquo; with the parameters &ldquo;username&rdquo; and &ldquo;password&rdquo;.</li>
+<li>Explicitly state the login page, which means the developer is required to render the login page when <b>GET /login</b> is requested.</li>
+</ul><p>For those that are familiar with the XML based configuration, the configuration above is very similar to the following XML configuration:</p>
+<pre><code class="prettyprint xml"><br />&lt;http security=&quot;none&quot; pattern=&quot;/resources/**&quot;/&gt;
+&lt;http use-expressions=&quot;true&quot;&gt;
+  &lt;intercept-url pattern=&quot;/logout&quot; access=&quot;permitAll&quot;/&gt;
+  &lt;intercept-url pattern=&quot;/login&quot; access=&quot;permitAll&quot;/&gt;
+  &lt;intercept-url pattern=&quot;/signup&quot; access=&quot;permitAll&quot;/&gt;
+  &lt;intercept-url pattern=&quot;/about&quot; access=&quot;permitAll&quot;/&gt;
+  &lt;intercept-url pattern=&quot;/**&quot; access=&quot;hasRole(&#39;ROLE_USER&#39;)&quot;/&gt;
+  &lt;logout
+      logout-success-url=&quot;/login?logout&quot;
+      logout-url=&quot;/logout&quot;
+  /&gt;
+  &lt;form-login
+      authentication-failure-url=&quot;/login?error&quot;
+      login-page=&quot;/login&quot;
+      login-processing-url=&quot;/login&quot;
+      password-parameter=&quot;password&quot;
+      username-parameter=&quot;username&quot;
+  /&gt;
+&lt;/http&gt;
+&lt;authentication-manager&gt;
+  &lt;authentication-provider&gt;
+    &lt;user-service&gt;
+      &lt;user name=&quot;user&quot; 
+          password=&quot;password&quot; 
+          authorities=&quot;ROLE_USER&quot;/&gt;
+      &lt;user name=&quot;admin&quot; 
+          password=&quot;password&quot; 
+          authorities=&quot;ROLE_USER,ROLE_ADMIN&quot;/&gt;
+    &lt;/user-service&gt;
+  &lt;/authentication-provider&gt;
+&lt;/authentication-manager&gt;
+</code></pre><h4><a href="#similarities-to-the-xml-namespace" class="anchor" name="similarities-to-the-xml-namespace"></a>Similarities to the XML Namespace</h4><p>After looking at our slightly more complicated example, you might be able to find some similarities between the XML namespace and the Java configuration. Here are some of the more useful points:</p>
+<ul>
+<li>HttpSecurity is quite similar to the http namespace element. It allows configuring web based security for a certain selection (in this case all) requests.</li>
+<li>WebSecurity is quite similar to any Security namespace elements that are for the web and that do not require a parent (i.e. security=none, debug, etc). It allows configuring things that impact all of web security.</li>
+<li>WebSecurityConfigurerAdapter is a convenience class that allows customization to both WebSecurity and HttpSecurity. We can extend WebSecurityConfigurerAdapter multiple times (in distinct objects) to replicate the behavior of having multiple http elements.</li>
+<li>By formatting our Java configuration code it is much easier to read. It can be read similar to the XML namespace equivalent where &ldquo;and()&rdquo; represents optionally closing an XML element.</li>
+</ul><h4><a href="#differences-to-the-xml-namespace" class="anchor" name="differences-to-the-xml-namespace"></a>Differences to the XML Namespace</h4><p>You will notice that there are some important differences between the XML and Java configuration too.</p>
+<ul>
+<li>When creating our users in <a href="#cwsca">#1 and #2</a>, we do not specify &ldquo;ROLE_&rdquo; as we would with the XML configuration. Since this convention is so common, the &ldquo;roles&rdquo; method automatically adds &ldquo;ROLE_&rdquo; for you. If you did not want &ldquo;ROLE_&rdquo; added you could use the authorities method instead.</li>
+<li>Java configuration has different defaults URLs and parameters. Keep this in mind when creating custom login pages. The result is that our URLs are more RESTful. Additionally, it is not quite so obvious we are using Spring Security which helps to prevent <a href="https://www.owasp.org/index.php/Information_Leak_(information_disclosure)">information leaks</a>. For example:</li>
+<li><b>GET /login</b> renders the login page instead of <b>/spring_security_login</b></li>
+<li><b>POST /login</b> authenticates the user instead of <b>/j_spring_security_check</b></li>
+<li>The username parameter defaults to <b>username</b> instead of <b>j_username</b></li>
+<li>The password parameter defaults to <b>password</b> instead of <b>j_password</b></li>
+<li>Java configuration can easily map multiple request matchers to the same roles. This is apparent in <a href="#cwsca">#4</a> where we map two URLs to be accessible to anyone</li>
+<li>Java configuration tries to remove redundant code. For example, instead of repeating our /login URL in the form-login element and the intercept-url element as we did with the XML, we can simply declare that users should have access to any URL related to formLogin() as shown with <a href="#cwsca">#5</a></li>
+<li>When mapping HTTP requests using the hasRole method as we did in <a href="#cwsca">#6</a>, we do not need to specify &ldquo;ROLE_&rdquo; as we would in XML. Again, this is so common of a convention that the hasRole method automatically adds &ldquo;ROLE_&rdquo; for you. If you did not want to automatically prefix with &ldquo;ROLE_&rdquo;, you could use the &ldquo;access&rdquo; method.</li>
+</ul><h3><a href="#additional-web-samples" class="anchor" name="additional-web-samples"></a>Additional Web Samples</h3>
+<blockquote><p><strong>Sample Compatibility</strong> Since the code was merged into Spring Security 3.2 M2 with no changes, the samples will be compatible with either the stand alone module or spring-security-config-3.2.0.M2+</p>
+</blockquote>
+<p>We have given a few examples of how the Spring Security Java configuration can be used to secure your web application in order to wet your appetite. Below you can find a number of resources with additional samples.</p>
+<ul>
+<li>There are plenty of samples in the <a href="http://static.springsource.org/spring-security/site/docs/3.2.x/apidocs/org/springframework/security/config/annotation/web/builders/HttpSecurity.html">HttpSecurity Javadoc</a>. Be sure to check out the Javadoc on individual methods which gives examples for how to do things like <a href="http://static.springsource.org/spring-security/site/docs/3.2.x/apidocs/org/springframework/security/config/annotation/web/builders/HttpSecurity.html#openidLogin()">openid</a>, <a href="http://static.springsource.org/spring-security/site/docs/3.2.x/apidocs/org/springframework/security/config/annotation/web/builders/HttpSecurity.html#rememberMe()">remember me</a>, etc.</li>
+<li><a href="https://github.com/spring-projects/spring-security/tree/master/samples">Web Samples</a></li>
+</ul><h3><a href="#xml-namespace-to-java-config" class="anchor" name="xml-namespace-to-java-config"></a>XML namespace to Java Config</h3><p>If you are having trouble converting from the XML namespace to the Java configuration, you can refer to the tests. The convention is that the test for a given XML element will start with &ldquo;Namespace&rdquo;, contain the XML element name, and end with &ldquo;Tests&rdquo;. For example, to learn how the http element maps to Java configuration, you would refer to the <a href="https://github.com/SpringSource/spring-security-javaconfig/blob/master/spring-security-javaconfig/src/test/groovy/org/springframework/security/config/annotation/web/builders/NamespaceHttpTests.groovy">NamespaceHttpTests</a>. Another example, is that you can figure out how the remember-me namespace maps to Java configuration in the <a href="https://github.com/SpringSource/spring-security-javaconfig/blob/master/spring-security-javaconfig/src/test/groovy/org/springframework/security/config/annotation/web/configurers/NamespaceRememberMeTests.groovy">NamespaceRememberMeTests</a>.</p><h3><a href="#feedback-please" class="anchor" name="feedback-please"></a>Feedback Please</h3><p>If you encounter a bug, have an idea for improvement, etc please do not hesitate to bring it up! We want to hear your thoughts so we can ensure we get it right before the code is generally available. Trying out new features early is a good and simple way to give back to the community. This also ensures that the features you want are present and working as you think they should</p><p>Please log any issues or feature requests to the <a href="https://jira.springsource.org/browse/SEC">Spring Security JIRA</a> under the category &ldquo;Java Config&rdquo;. After logging a JIRA, we encourage (but do not require) you to submit your changes in a pull request. You can read more about how to do this in the <a href="https://github.com/SpringSource/spring-security/blob/master/CONTRIBUTING.md">Contributor Guidelines</a></p><p>If you have questions on how to do something, please use the <a href="http://forum.springsource.org/forumdisplay.php?33-Security">Spring Security forums</a> or <a href="https://stackoverflow.com/questions/tagged/spring-security">Stack Overflow with the tag spring-security</a> (I will be monitoring them closely). If you have specific comments questions about this blog, feel free to leave a comment. Using the appropriate tools will help make it easier for everyone.</p><h3><a href="#conclusion" class="anchor" name="conclusion"></a>Conclusion</h3><p>You should have a fairly good idea of how to use Spring Security Java configuration for web based security. In the <a href="http://blog.springsource.org/2013/07/04/spring-security-java-config-preview-method-security/">next post</a>, we will take a look at how to setup method based security with Java configuration.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 526;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

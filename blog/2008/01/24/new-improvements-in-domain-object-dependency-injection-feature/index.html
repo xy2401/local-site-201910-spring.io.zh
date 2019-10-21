@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>New Improvements in Domain Object Dependency Injection Feature</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="New Improvements in Domain Object Dependency Injection Feature" />
+<meta name="twitter:description" content="&lt;p&gt;Spring’s dependency injection (DI) mechanism allows configuring beans defined in application context. What if you want to extend the same idea to non-beans? Spring’s support for &lt;em&gt;domain object DI&lt;/em&gt; utilizes AspectJ weaving to extend DI to any object, even if it is created by, say, a web or an ORM framework. This enables creating domain behavior rich objects, since domain objects can now collaborate with the injected objects. In this blog, I discuss the latest improvements in the Spring framework in this area.&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/8fa7e069d3807412499606915fddc108?s=200" />
+
+<meta property="og:title" content="New Improvements in Domain Object Dependency Injection Feature" />
+<meta property="og:image" content="https://gravatar.com/avatar/8fa7e069d3807412499606915fddc108?s=200" />
+<meta property="og:description" content="&lt;p&gt;Spring’s dependency injection (DI) mechanism allows configuring beans defined in application context. What if you want to extend the same idea to non-beans? Spring’s support for &lt;em&gt;domain object DI&lt;/em&gt; utilizes AspectJ weaving to extend DI to any object, even if it is created by, say, a web or an ORM framework. This enables creating domain behavior rich objects, since domain objects can now collaborate with the injected objects. In this blog, I discuss the latest improvements in the Spring framework in this area.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-01-24 00:57:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">New Improvements in Domain Object Dependency Injection Feature</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/8fa7e069d3807412499606915fddc108?s=20&amp;d=mm" />
+<span class="author">Ramnivas Laddad</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-01-24 00:57:00.0">January 24, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="130" href="/blog/2008/01/24/new-improvements-in-domain-object-dependency-injection-feature#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Spring&rsquo;s dependency injection (DI) mechanism allows configuring beans defined in application context. What if you want to extend the same idea to non-beans? Spring&rsquo;s support for <em>domain object DI</em> utilizes AspectJ weaving to extend DI to any object, even if it is created by, say, a web or an ORM framework. This enables creating domain behavior rich objects, since domain objects can now collaborate with the injected objects. In this blog, I discuss the latest improvements in the Spring framework in this area.</p><p>The core idea behind domain object DI is quite simple: An AspectJ-woven aspect selects join points corresponding to <em>creation</em> or <em>deserialization</em> of any object matching certain specification. Advice to those join points inject dependencies into the object being created or deserialized. Of course, the devil is in the details. For example, how do you select join point corresponding to deserialization or how do you inject dependency only once per object? By offering a few pre-written aspects, Spring shields developers from all these details.</p><p>Currently, most Spring users use the <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/annotation/Configurable.html">@Configurable</a> annotation to designate the configurable classes. With latest improvements in upcoming Spring 2.5.2, <a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR">available starting with nightly build 379</a>, you have a few more options making this feature a lot more powerful. The new improvements follow the &ldquo;Make simple things simple, complex things possible&rdquo; principle. Depending on your familiarity with AspectJ and expected design sophistication, one of the options will serve well. Figure 1 shows the new aspect hierarchy that makes a combination of simplicity and flexibility possible.</p>
+<p><img src="http://blog.springsource.com/main/wp-content/uploads/2008/01/SpringDomainObjectDI.png" alt="Domain Object Dependency Injection Aspects" style="text-align: center;" /></p>
+<p style="text-align: center;"><strong>Figure 1: Inheritance hierarchy for domain object dependency injection aspects.</strong></p><p>So what does each of these aspects offer? Let&rsquo;s go bottom up. </p><p><a name="AnnotationBeanConfigurerAspect"></a><br /><h2>Simple things simple: AnnotationBeanConfigurerAspect</h2><br /><span style="font-family:courier">AnnotationBeanConfigurerAspect</span> enables domain object DI without any user AspectJ code. Therefore, it is the easiest choice for many developers. With this aspect, you annotate the classes that need dependency injection with the <span style="font-family:courier">@Configurable</span> annotation. For example, you can have the <span style="font-family:courier">Order</span> class annotated as follows:</p>
+<pre><code class="prettyprint java"><br />@Configurable
+public class Order {
+    private transient MailSender mailSender;
+    
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+    
+    public void process() {
+        ... 
+        mailSender.send(...);
+        ...
+    }
+}
+</code></pre><p>Next, you instruct Spring on how to configure objects of the <span style="font-family:courier">Order</span> type. The instructions follow the standard bean definition for a prototype bean as follows:</p>
+<pre><code class="prettyprint xml"><br />&lt;context:spring-configured/&gt;
+    
+&lt;bean class=&quot;example.Order&quot; scope=&quot;prototype&quot;&gt;
+    &lt;property name=&quot;mailSender&quot; ref=&quot;externalMailSender&quot;/&gt;
+&lt;/bean&gt;
+    
+&lt;bean id=&quot;externalMailSender&quot; ...&gt;
+    ...
+&lt;/bean&gt;
+</code></pre><p>Now upon any <span style="font-family:courier">Order</span> creation or deserialization, Spring will set the <span style="font-family:courier">mailSender</span> property of the created object with the <span style="font-family:courier">externalMailSender</span> bean. </p><p>Spring 2.5 features a new <a href="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-annotation-config">annotation-based configuration option</a> that allows eliminating or reducing the attendant XML. The @Configurable annotation-based DI benefits from it as well. For example, you can mark the <span style="font-family:courier">mailSender</span> property as <span style="font-family:courier">@Autowired</span> as follows:</p>
+<pre><code class="prettyprint java"><br />@Configurable
+public class Order {
+    private transient MailSender mailSender;
+    
+    @Autowired
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+    
+    public void process() {
+        ... 
+        mailSender.send(...);
+        ...
+    }
+}
+</code></pre><p>You can get rid of even the setter by annotating the field itself, reducing the above code to:</p>
+<pre><code class="prettyprint java"><br />@Configurable
+public class Order {
+    @Autowired private transient MailSender mailSender;
+    
+    public void process() {
+        ... 
+        mailSender.send(...);
+        ...
+    }
+}
+</code></pre><p>In either case, the attendant XML configuration reduces to the following (note the use of &lt;context:annotation-config/&gt;):</p>
+<pre><code class="prettyprint xml"><br />&lt;context:spring-configured/&gt;
+    
+&lt;context:annotation-config/&gt;
+    
+&lt;bean id=&quot;externalMailSender&quot; ...&gt;
+    ...
+&lt;/bean&gt;
+</code></pre><p>For more details on this domain object DI option, please see <a href="http://static.springframework.org/spring/docs/2.5.x/reference/aop.html#aop-atconfigurable">Using AspectJ to dependency inject domain objects with Spring</a>.</p><p><a name="AbstractInterfaceDrivenDependencyInjectionAspect"></a><br /><h2>Complex things possible: AbstractInterfaceDrivenDependencyInjectionAspect</h2><br />The base aspect of <span style="font-family:courier">AnnotationBeanConfigurerAspect</span>, <span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span>, uses an interface instead of annotation to mark a configurable class. While it looks like a rather superficial change, it offers some interesting options such as using domain interfaces and annotations to designate dependency injection, improving performance of injection by bypassing reflection, and utilizing multiple aspects to configure an object.</p><p>At the design level, this aspect configures any domain object whose type implements the <span style="font-family:courier">ConfigurableObject</span> interface. While, having a type implement the <span style="font-family:courier">ConfigurableObject</span> interface directly is certainly a valid choice, an elegant alternative is to use a <span style="font-family:courier">declare parents</span> statement in another aspect (a subaspect of <span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span> would be a logical choice). The statement would declare a configurable class as implementing the <span style="font-family:courier">ConfigurableObject</span> interface. This keeps your domain classes free from Spring-specific artifacts, while benefiting from the DI mechanism. Let&rsquo;s see an example of such usage.</p><p>Consider the <span style="font-family:courier">Order</span> class from the earlier section. Instead of using the <span style="font-family:courier">@Configurable</span>, you can let it implement a domain-specific <span style="font-family:courier">MailSenderClient</span> interface that signifies that it uses a <span style="font-family:courier">MailSender</span>.</p>
+<pre><code class="prettyprint java"><br />public class Order implements MailSenderClient {
+    private transient MailSender mailSender;
+            
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+            
+    public void process() {
+        ... 
+        mailSender.send(...);
+        ...
+    }
+}
+</code></pre><p>Next you write a subaspect of <span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span> to inject dependencies into any <span style="font-family:courier">MailSenderClient</span> objects.</p>
+<pre><code class="prettyprint java"><br />public aspect MailClientDependencyInjectionAspect extends 
+    AbstractInterfaceDrivenDependencyInjectionAspect {
+    private MailSender mailSender;
+    
+    declare parents: MailSenderClient implements ConfigurableObject;
+            
+    public pointcut inConfigurableBean() : within(MailSenderClient+);
+    
+    public void configureBean(Object bean) {
+        ((MailSenderClient)bean).setMailSender(this.mailSender);
+    }
+            
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+}
+</code></pre><p>There are two AspectJ constructs used in the aspect:<br /><ol><br /><li>The <span style="font-family:courier">declare parents</span> statement makes <span style="font-family:courier">MailSenderClient</span> implement the <span style="font-family:courier">ConfigurableObject</span> interface, making it eligible for DI through <span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span>.</li><br /><li>The <span style="font-family:courier">inConfigurableBean()</span> selects join points only in the <span style="font-family:courier">MailSenderClient</span>&rsquo;s subtype, thus restricting aspect&rsquo;s applicability to only the matching types.</li><br /></ol></p><p>The <span style="font-family:courier">configureBean()</span> method performs injection into the bean by making direct calls to the appropriate setters. Of course, any other logic appropriate for bean configuration such as calling a multi-argument method or calling any initialization methods would work just fine. Note that direct calls used in this way avoid reflection and can yield noticeable performance improvements if the rate of domain object creation is high.</p><p>You need to configure the <span style="font-family:courier">MailClientDependencyInjectionAspect</span> aspect instance itself to inject its dependency&ndash;the <span style="font-family:courier">mailSender</span> property. The Spring way would be to create a bean for the aspect and configure it in application context:</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;example.MailClientDependencyInjectionAspect&quot; 
+        factory-method=&quot;aspectOf&quot;&gt;
+    &lt;property name=&quot;mailSender&quot; ref=&quot;externalMailSender&quot;/&gt;
+&lt;/bean&gt;
+    
+&lt;bean id=&quot;externalMailSender&quot; ...&gt;
+    ...
+&lt;/bean&gt;
+</code></pre><p>There are a few additional patterns around this aspect:<br /><ul><br /><li>Using multiple aspects to configure one object (one per &ldquo;client&rdquo; interface, for example).</li><br /><li>Using domain annotation instead of domain interface or the <span style="font-family:courier">@Configurable</span> annotation to designate a configurable type.</li><br /><li>Using <span style="font-family:courier">hasmethod()</span>-based type pattern (currently an experimental feature in AspectJ 5 that will become <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=86818">a regular feature in AspectJ 6</a>) to avoid use of DI related types or annotations.</li><br /><li>Using AspectJ-based mixins to provide default implementation for the client interfaces and avoid repeated setters.</li><br /></ul></p><p>However, let&rsquo;s save these ideas for another blog entry.</p><p><a name="AbstractDependencyInjectionAspect"></a><br /><h2>Flexibility when you need it: AbstractDependencyInjectionAspect</h2><br />Finally, here is the most flexible base aspect. This aspect requires you to have solid understanding of the AspectJ pointcut language. However, except in extreme customization scenario (such as custom deserialization events), you won&rsquo;t directly create a subaspect of this base aspect. Instead, you will use one of the subaspects we discussed earlier.</p><p>The aspect declares six pointcuts that a subaspect may define:<br /><ol><br /><li><span style="font-family:courier">beanConstruction(Object bean)</span>: Select bean construction. Typical implementation will select object initialization join point.</li><br /><li><span style="font-family:courier">beanDeserialization(Object bean)</span>: Select bean deserialization. Typical implementation will select the <span style="font-family:courier">readResolve()</span> method that must be present in the injected object. If you are using a nonstandard deserialization (that doesn&rsquo;t invoke <span style="font-family:courier">readResolve()</span>), you would select an appropriate alternative method with this pointcut.</li><br /><li><span style="font-family:courier">inConfigurableBean()</span>: Select join points in bean configurable by the defining aspect. Typical implementation will use a <span style="font-family:courier">within()</span> pointcut with appropriate type pattern.</li><br /><li><span style="font-family:courier">preConstructionConfiguration()</span>: Select join points for beans that need dependencies injected prior to construction. The default implementation of this pointcut select no join point (beans will have dependencies injected after the constructor has run).</li><br /><li><span style="font-family:courier">mostSpecificSubTypeConstruction()</span>: Select join points corresponding to the most specific subtype. Default implementation uses join point signature to determine if the constructor represents the most specific in a type hierarchy of the bean being injected. This information is then used in conjunction with the <span style="font-family:courier">preConstructionConfiguration()</span> pointcut to use a before or after advice for injecting dependencies.</li><br /><li><span style="font-family:courier">leastSpecificSuperTypeConstruction()</span>: Select join points corresponding to the least specific supertype.</li><br /></ol></p><p>This aspect also defines an abstract method <span style="font-family:courier">configureBean(Object bean)</span>, whose implementation should specify the logic corresponding to dependency injection.</p><p>So there you have all options to enable domain object DI in your application. If you are into DDD or otherwise need DI extended to your domain objects, you have to look at these new set of aspects. Depending on your specific needs and AspectJ knowledge, you will find one of them helpful towards creating an elegant solution.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 130;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

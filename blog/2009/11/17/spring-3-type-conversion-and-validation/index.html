@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring 3 Type Conversion and Validation</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring 3 Type Conversion and Validation" />
+<meta name="twitter:description" content="&lt;p&gt;The Spring 3 final release is &lt;em&gt;right around the corner&lt;/em&gt;, and it’s going to be a great release. In this blog entry, I will take you through some of Spring 3’s type conversion and validation enhancements. Whether you are developing a traditional web application, a desktop application, or a “next-generation” RIA, data binding, type conversion, and validation are important areas. As you’ll see in this entry, Spring 3 gives you a significant upgrade in each of these areas while preserving backwards compatibility with previous releases.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Spring 3 Type Conversion and Validation" />
+<meta property="og:description" content="&lt;p&gt;The Spring 3 final release is &lt;em&gt;right around the corner&lt;/em&gt;, and it’s going to be a great release. In this blog entry, I will take you through some of Spring 3’s type conversion and validation enhancements. Whether you are developing a traditional web application, a desktop application, or a “next-generation” RIA, data binding, type conversion, and validation are important areas. As you’ll see in this entry, Spring 3 gives you a significant upgrade in each of these areas while preserving backwards compatibility with previous releases.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2009-11-17 08:41:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring 3 Type Conversion and Validation</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Keith Donald</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2009-11-17 08:41:00.0">November 17, 2009</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="285" href="/blog/2009/11/17/spring-3-type-conversion-and-validation#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>The Spring 3 final release is <em>right around the corner</em>, and it&rsquo;s going to be a great release. In this blog entry, I will take you through some of Spring 3&rsquo;s type conversion and validation enhancements. Whether you are developing a traditional web application, a desktop application, or a &ldquo;next-generation&rdquo; RIA, data binding, type conversion, and validation are important areas. As you&rsquo;ll see in this entry, Spring 3 gives you a significant upgrade in each of these areas while preserving backwards compatibility with previous releases.</p>
+<h3>New System Goals</h3><p>Before I get into features, I&rsquo;d first like to highlight the goals we had when we set out to improve Spring 3&rsquo;s data binding system:<br /><ol><br /><li>Provide a stateless, strongly-typed Type Converter SPI that supercedes JavaBean PropertyEditors</li><br /><li>Provide a unified Type Conversion API to use anywhere conversion is required, including Spring&rsquo;s DataBinder and Expression Language<br /><li>Allow for type conversion to be driven by Java Annotation metadata</li><br /><li>Simplify by registering sensible defaults and applying convention-over-configuration</li><br /></ol><br />As Spring 3 final approaches, I believe we have delivered on each of the goals. Read on and you be the judge of that.</p>
+<h3>Features</h3><p>The first environment that takes full advantage of the new type conversion system is Spring MVC, which I&rsquo;ll pull from to demonstrate the new features. This starts with the new Spring MVC 3 configuration namespace:</p>
+<pre><code class="prettyprint xml"><br />&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+        xsi:schemaLocation=&quot;
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/mvc
+            http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd&quot;&gt;
+
+    &lt;mvc:annotation-driven /&gt;
+
+&lt;/beans&gt;
+</code></pre><p>The preceding minimal configuration causes Spring to automatically install default type converters that localize Number and Date fields, including full support for the popular Joda Time library if it is present on your classpath. In addition, Spring automatically enables annotation-driven declarative validation if a JSR-303 provider, such as Hibernate Validator, is present on your classpath.</p><p>Now when you bind to a field, that field will be printed and parsed for the user&rsquo;s locale using a sensible default format. To illustrate, consider the following model:</p>
+<pre><code class="prettyprint java"><br />public class Account {
+
+    private Date activationDate = new Date(1258466400);
+
+    private BigDecimal balance = new BigDecimal(&quot;3000.25&quot;);
+}
+</code></pre><p>&hellip; printed on a form for users in the US and DE Locales:</p>
+<table>
+<tr>
+<th>Locale.US</th>
+<th>Locale.DE</th>
+<tr>
+<tbody>
+<tr>
+<td>
+<form>
+Activation Date: <input type="text" value="11/17/09 9:00 AM" readonly="true" />
+Balance: <input type="text" value="3,000.25" readonly="true" />
+</form>
+</td>
+<td>
+<form>
+Activation Date: <input type="text" value="17.11.2009 9:00" readonly="true" />
+Balance: <input type="text" value="3.000,25" readonly="true" />
+</form>
+</td>
+</tr>
+</table>
+<h3>Overriding Defaults with Annotations</h3><p>Often you need to format a field in a manner that differs from the default format. In the previous example, you probably want the <b>activationDate</b> field to be formatted using a short date format, and the <b>balance</b> field to be formatted using a currency format. In previous versions of Spring, you would register a custom PropertyEditor in your Controller to achieve this. In Spring 3, you simply annotate your fields:</p>
+<pre><code class="prettyprint java"><br />private class Account {
+
+    @DateTimeFormat(style=&quot;S-&quot;)
+    private Date activationDate = new Date(1258466400);
+
+    @NumberFormat(style=Style.CURRENCY)
+    private BigDecimal balance = new BigDecimal(&quot;3000.25&quot;);
+}
+</code></pre><p>With the annotation overrides, the following is printed for the US and DE Locales:</p>
+<table>
+<tr>
+<th>Locale.US</th>
+<th>Locale.DE</th>
+<tr>
+<tbody>
+<tr>
+<td>
+<form>
+Activation Date: <input type="text" value="11/17/09" readonly="true" />
+Balance: <input type="text" value="$3,000.25" readonly="true" />
+</form>
+</td>
+<td>
+<form>
+Activation Date: <input type="text" value="17.11.2009" readonly="true" />
+Balance: <input type="text" value="€3.000,25" readonly="true" />
+</form>
+</td>
+</tr>
+</table>
+<h4>Parameter Annotations</h4><p>Annotation-driven overrides can also be applied to method parameters. Consider the following Controller method that fetches upcoming appointments for a specific day, where the day is a URL path variable encoded in ISO date format:</p>
+<pre><code class="prettyprint java"><br />    @RequestMapping(value = &quot;/appointments/{day}&quot;, method = RequestMethod.GET)
+    public String getAppointmentsForDay(@PathVariable @DateTimeFormat(iso=ISO.DATE) Date day) {
+        ...
+    }
+</code></pre><p>Sending a GET request to /appointments/2009-11-17 fetches all Appointments on November 17th, 2009. Setting the @DateTimeFormat <b>iso</b> attribute to <b>ISO.DATE</b> instructs Spring to parse the incoming date string as an ISO Date (yyyy-mm-dd).</p>
+<h3>Validation</h3><p>It is common to validate a model after binding user input to it. Spring 3 provides support for declarative validation with JSR-303. This support is enabled automatically if a JSR-303 provider, such as Hibernate Validator, is present on your classpath. When enabled, you can trigger validation simply by annotating a Controller method parameter with the @Valid annotation:</p>
+<pre><code class="prettyprint java"><br />    @RequestMapping(value = &quot;/appointments&quot;, method = RequestMethod.POST)
+    public String add(@Valid AppointmentForm form, BindingResult result) {
+        ....
+    }
+
+    static class AppointmentForm {
+
+        @NotNull @Future
+        private Date date;
+    }
+</code></pre><p>After binding incoming POST parameters, the AppointmentForm will be validated; in this case, to verify the date field value is not null and occurs in the future.</p>
+<h3>Convention Over Configuration</h3><p>Finally, consider how the principle of <i>convention over configuration</i> can be applied to type conversion. In a business application, you will often define your own custom field types. In previous versions of Spring, to format such types you would create a custom PropertyEditor implementation and register it in your Controller. With Spring 3, in most cases you simply can adhere to the following convention:<br /><ol><br /><li> Define a static valueOf(String) method or Constructor(String) to parse your value from its String representation<br /><li> Implement toString() to print your value for display<br /></ol></p><p>Consider a SocialSecurityNumber type that adheres to this convention:</p>
+<pre><code class="prettyprint java"><br />    public class SocialSecurityNumber {
+
+        @Size(9)
+        @Mask(&quot;###-##-####&quot;)
+        private String value;
+
+        public SocialSecurityNumber(String value) {
+            this.value = value;
+        }
+
+        public String toString() {
+            return this.value;
+        }
+    }
+</code></pre><p>When a SocialSecurityNumber field is printed for display, toString() will be called; when a client value is parsed, the Constructor will be called. No separate Formatter or PropertyEditor implementation is required.</p>
+<h3>Summary</h3><p>This entry has covered some of the new Spring 3 type conversion and validation features. To learn more, including how to implement your own type converters, checkout the <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/validation.html#core-convert">Spring 3 Reference Guide</a>. Also, watch for the release of the revised Petclinic 3 sample application in the coming weeks (this sample app demonstrates all the features highlighted here and is currently available for early access in our SVN repo <a href="https://src.springframework.org/svn/spring-samples/petclinic/trunk/">here</a>) .</p><p>I am excited about the foundation these new capabilities provide us moving forward! Please do let me know about your experiences applying and extending these features, and keep the feedback and ideas coming at <a href="http://jira.springframework.org">jira.springframework.org</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 285;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

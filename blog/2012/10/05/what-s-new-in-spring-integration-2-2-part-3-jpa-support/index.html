@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>What&#39;s New in Spring Integration 2.2 (Part 3 – JPA Support)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="What&#39;s New in Spring Integration 2.2 (Part 3 – JPA Support)" />
+<meta name="twitter:description" content="&lt;p&gt;This is the third part in a series of blog posts highlighting some of the new features available in &lt;a href=&quot;http://www.springsource.org/spring-integration/&quot;&gt;Spring Integration&lt;/a&gt; 2.2 following the recent release of &lt;a href=&quot;http://www.springsource.org/node/3665&quot;&gt;Release Candidate 1&lt;/a&gt;. The &lt;a href=&quot;http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/&quot;&gt;first part&lt;/a&gt; described the new set of &lt;a href=&quot;http://www.mongodb.org/&quot;&gt;MongoDB&lt;/a&gt; adapters. In &lt;a href=&quot;http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/&quot;&gt;part two&lt;/a&gt; we highlighted the new&amp;nbsp;extended support for synchronizing non-transactional resources with transactions.&lt;/p&gt;
+&lt;p&gt;In this third part today, we would&amp;nbsp;like to introduce the new &lt;a href=&quot;http://en.wikipedia.org/wiki/Java_Persistence_API&quot;&gt;Java Persistence API&lt;/a&gt; (JPA) support that is provided starting with &lt;em&gt;Spring Integration 2.2&lt;/em&gt;. The JPA module is persistence-provider-agnostic and has been tested using:&lt;br&gt;&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@ghillert" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/69270987b4535e921268c4bf8a800b2c?s=200" />
+
+<meta property="og:title" content="What&#39;s New in Spring Integration 2.2 (Part 3 – JPA Support)" />
+<meta property="og:image" content="https://gravatar.com/avatar/69270987b4535e921268c4bf8a800b2c?s=200" />
+<meta property="og:description" content="&lt;p&gt;This is the third part in a series of blog posts highlighting some of the new features available in &lt;a href=&quot;http://www.springsource.org/spring-integration/&quot;&gt;Spring Integration&lt;/a&gt; 2.2 following the recent release of &lt;a href=&quot;http://www.springsource.org/node/3665&quot;&gt;Release Candidate 1&lt;/a&gt;. The &lt;a href=&quot;http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/&quot;&gt;first part&lt;/a&gt; described the new set of &lt;a href=&quot;http://www.mongodb.org/&quot;&gt;MongoDB&lt;/a&gt; adapters. In &lt;a href=&quot;http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/&quot;&gt;part two&lt;/a&gt; we highlighted the new&amp;nbsp;extended support for synchronizing non-transactional resources with transactions.&lt;/p&gt;
+&lt;p&gt;In this third part today, we would&amp;nbsp;like to introduce the new &lt;a href=&quot;http://en.wikipedia.org/wiki/Java_Persistence_API&quot;&gt;Java Persistence API&lt;/a&gt; (JPA) support that is provided starting with &lt;em&gt;Spring Integration 2.2&lt;/em&gt;. The JPA module is persistence-provider-agnostic and has been tested using:&lt;br&gt;&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2012-10-05 16:36:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">What&#39;s New in Spring Integration 2.2 (Part 3 – JPA Support)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/69270987b4535e921268c4bf8a800b2c?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/ghillert">Gunnar Hillert</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2012-10-05 16:36:00.0">October 05, 2012</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="488" href="/blog/2012/10/05/what-s-new-in-spring-integration-2-2-part-3-jpa-support#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>This is the third part in a series of blog posts highlighting some of the new features available in <a href="http://www.springsource.org/spring-integration/">Spring Integration</a> 2.2 following the recent release of <a href="http://www.springsource.org/node/3665">Release Candidate 1</a>. The <a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">first part</a> described the new set of <a href="https://www.mongodb.org/">MongoDB</a> adapters. In <a href="http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/">part two</a> we highlighted the new extended support for synchronizing non-transactional resources with transactions.</p><p>In this third part today, we would like to introduce the new <a href="https://en.wikipedia.org/wiki/Java_Persistence_API">Java Persistence API</a> (JPA) support that is provided starting with <em>Spring Integration 2.2</em>. The JPA module is persistence-provider-agnostic and has been tested using:<br /><ul style="margin-bottom: 1em"><br /> <li><a href="http://www.hibernate.org/">Hibernate</a></li><br /> <li><a href="https://openjpa.apache.org/">OpenJPA</a></li><br /> <li><a href="https://www.eclipse.org/eclipselink/jpa.php">EclipseLink</a></li><br /></ul><br />As part of the new JPA module, we provide several components for retrieving and persisting JPA entity objects:<br /><ul style="margin-bottom: 1em"><br /> <li>JPA Inbound Channel Adapter</li><br /> <li>JPA Outbound Channel Adapter</li><br /> <li>JPA Updating Outbound Gateway</li><br /> <li>JPA Retrieving Outbound Gateway</li><br /></ul><br />Using these components, you can select, create, update and delete entities in your database. Besides persisting data using the entity classes directly, you can also execute queries using the <a href="https://docs.oracle.com/javaee/6/tutorial/doc/bnbtg.html">Java Persistence Query Language</a> (JPQL) as well as using native SQL queries. Additionally, named queries are supported as well.<br /><h3>The JPA Sample</h3><br /><p></p><br />In our <a href="https://github.com/SpringSource/spring-integration-samples">Spring Integration Samples</a> repository, we provide <a href="https://github.com/SpringSource/spring-integration-samples/tree/master/basic/jpa">a sample application</a> demonstrating the JPA support, which we want to use in this blog post to show you how to easily get started.</p><p>The provided sample is using an embedded <a href="http://www.h2database.com/">H2 database</a> which contains a single table called <strong>PEOPLE</strong>. This table is mapped to the <strong>Person</strong> entity class in package <em>org.springframework.integration.samples.jpa</em>. With that setup we cover two simple use-cases:<br /><ul style="margin-bottom: 1em"><br /> <li>List all people from the database</li><br /> <li>Create a new Person record in the database</li><br /></ul><br />The corresponding Spring Integration flow is quite simple as well. The flow is started via a <a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/html/messaging-endpoints-chapter.html#gateway">Messaging Gateway</a>. This allows us to hide the Spring Integration messaging API and to only expose a plain Java interface (<strong>PersonService</strong>) to the sample&rsquo;s <em>Main</em> class (org.springframework.integration.samples.jpa.Main). Depending on which method is invoked on the <em>PersonService</em>, the Spring Integration message will be routed to either a <em>JPA Retrieving Outbound Gateway</em> (List all people) or a <em>JPA Updating Outbound Gateway</em> (Create a new Person).</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/10/http-outbound-gateway-s.png"><img class="aligncenter size-full wp-image-11657" title="Jpa Flow" src="http://blog.springsource.org/wp-content/uploads/2012/10/http-outbound-gateway-s.png" alt="" width="600" height="273" style="border:1px solid black;" /></a></p>
+<h3>Execute the Sample</h3>
+<p></p><p>In order to set the sample up, please checkout the <a href="https://github.com/SpringSource/spring-integration-samples">Spring Integration Samples repository</a> using <a href="https://git-scm.com/">Git</a>:</p>
+<pre><code class="prettyprint xml"><br />    $ git clone https://github.com/SpringSource/spring-integration-samples.git
+</code></pre><p>Next, go to the JPA sample directory:</p>
+<pre><code class="prettyprint xml"><br />    $ cd spring-integration-samples/basic/jpa
+</code></pre><p>Now we can build and run the application by executing the following <a href="https://maven.apache.org/">Maven</a> command:</p>
+<pre><code class="prettyprint xml"><br />    $ mvn clean package exec:exec
+</code></pre><p>Eventually the application starts up and you should see the following screen:</p>
+<pre><code class="prettyprint xml"><br />=========================================================
+
+    Welcome to the Spring Integration JPA Sample!
+
+    For more information please visit:
+    http://www.springintegration.org/
+
+=========================================================
+Please enter a choice and press enter:
+	1. Use Hibernate
+	2. Use OpenJPA
+	3. Use EclipseLink
+	q. Quit the application
+Enter you choice:
+</code></pre><p>The JPA sample allows you to execute the JPA operations using one of the following persistance providers: Hibernate, OpenJPA or EclipseLink. At application startup you will therefore be able to choose the desired persistence provider. Once selected, you can select which specific JPA operation to execute:</p>
+<pre><code class="prettyprint xml"><br />Please enter a choice and press enter:
+	1. List all people
+	2. Create a new person
+	q. Quit the application
+Enter you choice:
+</code></pre><p>You can either list each <strong>Person</strong> from the <strong>PEOPLE</strong> table (Option 1):</p>
+<pre><code class="prettyprint xml"><br />Enter you choice: 1
+ID            NAME         CREATED
+==================================
+1001, Cartman, 2012-10-04 16:14:02
+==================================
+</code></pre><p>or you can create a new <strong>Person</strong> (Option 2):</p>
+<pre><code class="prettyprint xml"><br />Enter the Person&#39;s name:Demo User
+Created person record with id: 1002
+Do you want to create another person? (y/n)
+...
+</code></pre>
+<h3>Configuration Details</h3>
+<p></p><p>The JPA sample is configured using several Spring XML Application Context files. For the most part, Spring Integration&rsquo;s JPA support uses the JPA support provided by the core Spring Framework. Thus, the common JPA configuration is located at:</p>
+<pre><code class="prettyprint xml"><br />/src/main/resources/META-INF/spring/integration/commonJpa-context.xml
+</code></pre><p>This file does not contain anything Spring Integration specific. All we do, is to setup the embedded database, the respective DataSource, the EntityManagerFactory and the Transaction Manager. </p><p>The JPA persistence provider specific configuration is located under:</p>
+<pre><code class="prettyprint xml"><br />/src/main/resources/META-INF/spring/integration/eclipselink-context.xml
+/src/main/resources/META-INF/spring/integration/hibernate-context.xml
+/src/main/resources/META-INF/spring/integration/openjpa-context.xml
+</code></pre><p>As you will see, these configurations are very light-weight, containing only the persistence provider specific <a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/orm/jpa/JpaVendorAdapter.html">JpaVendorAdapter</a> bean declarations.</p><p>Everything Spring Integration specific is configured in:</p>
+<pre><code class="prettyprint xml"><br />/src/main/resources/META-INF/spring/integration/spring-integration-context.xml
+</code></pre>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:int=&quot;http://www.springframework.org/schema/integration&quot;
+	xmlns:int-jpa=&quot;http://www.springframework.org/schema/integration/jpa&quot;
+	xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;
+	xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+	xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/integration/jpa http://www.springframework.org/schema/integration/jpa/spring-integration-jpa.xsd&quot;&gt;
+
+	&lt;int:channel id=&quot;createPersonRequestChannel&quot;/&gt;
+	&lt;int:channel id=&quot;listPeopleRequestChannel&quot;/&gt;
+
+	&lt;int:gateway id=&quot;personService&quot;
+		service-interface=&quot;org.springframework.integration.samples.jpa.service.PersonService&quot;
+		default-request-timeout=&quot;5000&quot; default-reply-timeout=&quot;5000&quot;&gt;
+		&lt;int:method name=&quot;createPerson&quot; request-channel=&quot;createPersonRequestChannel&quot;/&gt;
+		&lt;int:method name=&quot;findPeople&quot;   request-channel=&quot;listPeopleRequestChannel&quot;/&gt;
+	&lt;/int:gateway&gt;
+
+	&lt;int-jpa:retrieving-outbound-gateway entity-manager-factory=&quot;entityManagerFactory&quot;
+		request-channel=&quot;listPeopleRequestChannel&quot;
+		jpa-query=&quot;select p from Person p order by p.name asc&quot;&gt;
+	&lt;/int-jpa:retrieving-outbound-gateway&gt;
+
+	&lt;int-jpa:updating-outbound-gateway entity-manager-factory=&quot;entityManagerFactory&quot;
+		request-channel=&quot;createPersonRequestChannel&quot; &gt;
+		&lt;int-jpa:transactional transaction-manager=&quot;transactionManager&quot; /&gt;
+	&lt;/int-jpa:updating-outbound-gateway&gt;
+
+	&lt;!-- Depending on the selected profile, users can use different JPA Providers --&gt;
+
+	&lt;beans profile=&quot;default, hibernate&quot;&gt;
+		&lt;import resource=&quot;classpath:/META-INF/spring/integration/hibernate-context.xml&quot;/&gt;
+	&lt;/beans&gt;
+	&lt;beans profile=&quot;openjpa&quot;&gt;
+		&lt;import resource=&quot;classpath:/META-INF/spring/integration/openjpa-context.xml&quot;/&gt;
+	&lt;/beans&gt;
+	&lt;beans profile=&quot;eclipselink&quot;&gt;
+		&lt;import resource=&quot;classpath:/META-INF/spring/integration/eclipselink-context.xml&quot;/&gt;
+	&lt;/beans&gt;
+&lt;/beans&gt;
+</code></pre><p>Both, the <em>Retrieving Outbound Gateway</em> and the <em>Updating Outbound Gateway</em> are wired up with an <a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/orm/jpa/LocalContainerEntityManagerFactoryBean.html">EntityManagerFactory</a> reference. Alternatively, we also provide means to pass-in a reference to an <a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/html/jpa.html#jpa-namespace-support-common-attributes">EntityManager</a> directly.</p><p>The <em>Retrieving Outbound Gateway</em> is also configured with an JPQL query to retrieve all people from the database ordered by their name. The <em>Updating Outbound Gateway</em> on the other hand does not specify any queries at all. It directly uses the <strong>Person</strong> object that is being passed in as the Spring Integration <a href="http://static.springsource.org/spring-integration/api/org/springframework/integration/Message.html">Message</a> payload. Ultimately, the <strong>Person</strong> object is passed to the <a href="https://docs.oracle.com/javaee/6/api/javax/persistence/EntityManager.html">EntityManager</a> and persisted to the database. Furthermore, the <em>Updating Outbound Gateway</em> is being declared transactional ensuring that the JPA session is flushed and the data committed to the database.</p>
+<h3>Providing Parameters</h3><p>Not shown in the example above but with the JPA supporting components you are also able to provide parameters for your JPQL/SQL queries. In order to do so, you can use the</p>
+<pre><code class="prettyprint xml"><br />&lt;int-jpa:parameter/&gt;
+</code></pre><p>sub-element. For example, you can provide <em>Named Parameters</em> by specifying:</p>
+<pre><code class="prettyprint xml"><br />&lt;int-jpa:parameter name=&quot;myNamedParam&quot; type=&quot;java.lang.String&quot; value=&quot;myParamValue&quot;/&gt;
+</code></pre><p>Alternatively, you can also provide <em>Positional Parameters</em> by leaving off the name attribute:</p>
+<pre><code class="prettyprint xml"><br />&lt;int-jpa:parameter type=&quot;java.lang.String&quot; value=&quot;myFirstParam&quot;/&gt;
+&lt;int-jpa:parameter type=&quot;java.lang.Integer&quot; value=&quot;2&quot;/&gt;
+</code></pre><p>Lastly, if you are using the <em>Outbound Channel Adapter</em> or any of the <em>Outbound Gateways</em>, you can also provide dynamic parameters using the <a href="http://static.springsource.org/spring/docs/current/spring-framework-reference/html/expressions.html">Spring Expression Language</a> (SpEL), giving you easy access to values from the Message&rsquo;s payload or its Message headers:</p>
+<pre><code class="prettyprint xml"><br />&lt;int-jpa:parameter expression=&quot;payload.name&quot; name=&quot;firstName&quot;/&gt;
+</code></pre>
+<h3>Conclusion</h3>
+<p></p><p>We hope that this blog post provides you with an useful overview of the new Spring Integration JPA support. For much more detailed information, please consult the chapter titled <a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/html/jpa.html">JPA Support</a> in the Spring Integration reference manual. Lastly, if you run into any trouble or have additional questions, please feel free to post those to our <a href="http://forum.springsource.org/forumdisplay.php?42-Integration">Spring Integration Forum</a>.</p>
+<h3>Resources</h3>
+<p></p>
+<ul style="margin-bottom: 1em">
+<li><a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/html/jpa.html">Spring Integration Reference Documentation</a></li>
+<li><a href="https://github.com/SpringSource/spring-integration-samples/tree/master/basic/jpa">Spring Integration JPA Sample</a></li>
+<li><a href="http://forum.springsource.org/forumdisplay.php?42-Integration">Spring Integration Forum</a></li>
+<li><a href="https://jcp.org/en/jsr/detail?id=317">JSR 317: Java™ Persistence 2.0</a></li>
+</ul></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 488;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

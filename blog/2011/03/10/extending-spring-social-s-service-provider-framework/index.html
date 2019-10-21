@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Extending Spring Social&#39;s Service Provider Framework</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Extending Spring Social&#39;s Service Provider Framework" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;a href=&quot;http://blog.springsource.com/2011/03/02/introducing-spring-socials-service-provider-framework/&quot;&gt;Last week&lt;/a&gt;, I introduced you to Spring Social&#39;s Service Provider &quot;Connect&quot; Framework and showed you how it simplifies creating connections between a user&#39;s local application account and their accounts on Software-as-a-Service (SaaS) providers. Today I want to show you how to extend the service provider framework to handle connections to providers that aren&#39;t directly supported by Spring Social.&lt;/p&gt;
+&lt;h3&gt;Extending Spring Social for Netflix&lt;/h3&gt;
+&lt;p&gt;Suppose that you&#39;re developing a movie review website where users can go to read and post short movie reviews. Normally, the movie reviews are displayed with the most recent entries appearing first on the home page. But if a user has connected their account to their Netflix account, then you can show them reviews for the movies in their Netflix disc queue. To pull this off, you&#39;d like to take advantage of Spring Social&#39;s Service Provider Framework for connecting your user&#39;s accounts with their Netflix accounts. Spring Social 1.0.0.M2 doesn&#39;t include a Netflix service provider or API binding, but can be easily extended to work with providers that aren&#39;t directly supported.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@habuma" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200" />
+
+<meta property="og:title" content="Extending Spring Social&#39;s Service Provider Framework" />
+<meta property="og:image" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200" />
+<meta property="og:description" content="&lt;p&gt;&lt;a href=&quot;http://blog.springsource.com/2011/03/02/introducing-spring-socials-service-provider-framework/&quot;&gt;Last week&lt;/a&gt;, I introduced you to Spring Social&#39;s Service Provider &quot;Connect&quot; Framework and showed you how it simplifies creating connections between a user&#39;s local application account and their accounts on Software-as-a-Service (SaaS) providers. Today I want to show you how to extend the service provider framework to handle connections to providers that aren&#39;t directly supported by Spring Social.&lt;/p&gt;
+&lt;h3&gt;Extending Spring Social for Netflix&lt;/h3&gt;
+&lt;p&gt;Suppose that you&#39;re developing a movie review website where users can go to read and post short movie reviews. Normally, the movie reviews are displayed with the most recent entries appearing first on the home page. But if a user has connected their account to their Netflix account, then you can show them reviews for the movies in their Netflix disc queue. To pull this off, you&#39;d like to take advantage of Spring Social&#39;s Service Provider Framework for connecting your user&#39;s accounts with their Netflix accounts. Spring Social 1.0.0.M2 doesn&#39;t include a Netflix service provider or API binding, but can be easily extended to work with providers that aren&#39;t directly supported.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-03-10 21:41:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Extending Spring Social&#39;s Service Provider Framework</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/cwalls">Craig Walls</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-03-10 21:41:00.0">March 10, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="400" href="/blog/2011/03/10/extending-spring-social-s-service-provider-framework#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p><a href="http://blog.springsource.com/2011/03/02/introducing-spring-socials-service-provider-framework/">Last week</a>, I introduced you to Spring Social's Service Provider "Connect" Framework and showed you how it simplifies creating connections between a user's local application account and their accounts on Software-as-a-Service (SaaS) providers. Today I want to show you how to extend the service provider framework to handle connections to providers that aren't directly supported by Spring Social.</p>
+<h3>Extending Spring Social for Netflix</h3>
+<p>Suppose that you're developing a movie review website where users can go to read and post short movie reviews. Normally, the movie reviews are displayed with the most recent entries appearing first on the home page. But if a user has connected their account to their Netflix account, then you can show them reviews for the movies in their Netflix disc queue. To pull this off, you'd like to take advantage of Spring Social's Service Provider Framework for connecting your user's accounts with their Netflix accounts. Spring Social 1.0.0.M2 doesn't include a Netflix service provider or API binding, but can be easily extended to work with providers that aren't directly supported.</p>
+<p>In this article, I'll show you how to build on Spring Social's Service Provider Framework to enable connectivity with Netflix. We'll start by developing a Netflix service provider implementation, then build a simple API binding to support our application's needs. The techniques used to develop the Netflix service provider can be applied to extend Spring Social to support almost any service provider. You can follow along by reviewing the <a href="https://github.com/SpringSource/spring-social-samples/tree/master/spring-social-extending-new-api">sample code on GitHub</a>.</p>
+<h3>Getting to Know Netflix' Authorization API</h3>
+<p>Before we can start developing the Netflix service provider implementation, we need to do a bit of up-front research to get to know a few basic details about how the Netflix Authorization API works.</p>
+<p>The first thing we need to determine is what authorization protocol Netflix uses. The <a href="http://developer.netflix.com/docs/read/Security" target="_blank">Authentication Overview</a> section of the Netflix API documentation tells us that they use OAuth, but doesn't explicitly tell us which version of the OAuth specification is in play. Therefore a bit of detective work will be required.</p>
+<p>Down the page a bit (under the "Those Pesky OAuth Parameters" header) we see mention of consumer keys, nonces, and timestamps. These are things that are not applicable to OAuth 2, so Netflix must be an OAuth 1 provider. Furthermore, the description of the <code>oauth_version</code> parameter being set to "1.0" serves to confirm that Netflix implements OAuth 1.</p>
+<p>Now we know that Netflix uses OAuth 1. But it's also important to know whether they implement version 1.0 of the specification or version 1.0a. Service providers usually don't spell this out in their documentation and the <code>oauth_version</code> value should be "1.0" in either case. There are a few tell-tale signs, however, that point at a particular version of the OAuth specification. Here are a few clues that indicate that OAuth 1.0 is in play:</p>
+<ul>
+<li>The <code>oauth_callback</code> parameter is sent on the authorization URL and not the request token request.</li>
+<li>There is no notion of verifiers and no <code>oauth_verifier</code> parameter must be sent to the access token URL.</li>
+</ul>
+<p>For OAuth 1.0a, watch for these signs:</p>
+<ul>
+<li>The <code>oauth_callback</code> parameter is sent in the request token request and not in the authorization URL.</li>
+<li>A verifier is received from the provider in the callback and an <code>oauth_verifier</code> parameter must be sent to the access token URL.</li>
+</ul>
+<p>Looking for these clues in the Netflix documentation, we determine that Netflix uses OAuth 1.0 (not 1.0a). This information is significant and will be useful as we define our service provider implementation.</p>
+<p>Finally, we need to know what the request token, authorization, and access token URLs are. Further down the page (under the "Making Protected Calls" header) you'll find details that tell us that the needed URLs are as follows:</p>
+<ul>
+<li><b>Request Token URL:</b> http://api.netflix.com/oauth/request_token</li>
+<li><b>Authorization URL:</b> https://api-user.netflix.com/oauth/login</li>
+<li><b>Access Token URL:</b> http://api.netflix.com/oauth/access_token</li>
+</ul>
+<p>Pay particular attention to the protocols used in the request and access token URLs. Most providers are flexible in this regard, recommending that you use https. In my experience with Netflix, however, I've found that if you ask for a request or access token over https, Netflix will complain that the request signature is invalid. The authorization URL works fine over https, though.</p>
+<h3>Developing a Netflix Service Provider Implementation</h3>
+<p>To create a new service provider implementation, we'll need to extend either <code>AbstractOAuth1ServiceProvider</code> or <code>AbstractOAuth2ServiceProvider</code>. These two classes provide OAuth version-specific base functionality for OAuth 1.0/1.0a and OAuth 2, respectively. Since Netflix is an OAuth 1.0 provider, our <code>NetFlixServiceProvider</code> will need to extend <code>AbstractOAuth1ServiceProvider</code>:</p>
+<pre><code class="prettyprint java"><br />package org.springframework.social.movies.netflix;
+import org.springframework.social.connect.oauth1.AbstractOAuth1ServiceProvider;
+import org.springframework.social.connect.support.ConnectionRepository;
+import org.springframework.social.oauth1.OAuth1Template;
+
+public final class NetFlixServiceProvider extends AbstractOAuth1ServiceProvider&lt;NetFlixApi&gt; {
+
+    public NetFlixServiceProvider(String consumerKey, String consumerSecret, ConnectionRepository connectionRepository) {
+        super(&quot;netflix&quot;, connectionRepository, consumerKey, consumerSecret, 
+            new OAuth1Template(consumerKey, consumerSecret, 
+                &quot;http://api.netflix.com/oauth/request_token&quot;,
+                &quot;https://api-user.netflix.com/oauth/login?oauth_token={requestToken}&quot; +
+                    &quot;&amp;oauth_callback={redirectUri}&amp;oauth_consumer_key=&quot; + consumerKey,
+                &quot;http://api.netflix.com/oauth/access_token&quot;, 
+                 OAuth1Version.CORE_10));
+    }
+
+    @Override
+    protected NetFlixApi getApi(String consumerKey, String consumerSecret, String accessToken, String secret) {
+        return new NetFlixTemplate(consumerKey, consumerSecret, accessToken, secret);
+    }
+	
+}
+</code></pre>
+<p>There are two things you must do when extending one of Spring Social's abstract service provider classes: Setup the provider specifics in the constructor and implement the <code>getApi()</code> method.</p>
+<p>The abstract base class contains all of the mechanics of connecting with a service provider. But you must set it up by passing provider specifics to the <code>super()</code> constructor. Here, the <code>NetFlixServiceProvider</code> constructor calls the <code>super()</code> constructor, passing in "netflix" as the provider ID, the given connection repository, consumer key, and consumer secret, and an instance of <code>OAuth1Template</code> that should be used to negotiate authentication with the provider.</p>
+<p>The <code>OAuth1Template</code> given here is constructed with the consumer key and secret and is also given the three URLs (request token, authorization, and access token) that we gathered during our preliminary research. Notice that the authorization URL is parameterized to take the request token and redirect URI. <code>ConnectController</code> will provide those details in the course of doing the authorization flow. Also note that the authorization URL also takes an <code>oauth_consumer_key</code> parameter. This appears to be a Netflix-specific demand; the OAuth 1.0 specification has no such requirement and I've not come across any other provider that requires it.</p>
+<p>Most OAuth 1 service providers implement the OAuth 1.0a specification. Therefore, <code>OAuth1Template</code> assumes that it will be dealing with OAuth 1.0a by default. Netflix, however, is an OAuth 1.0-based provider. The final parameter given to <code>OAuth1Template</code>'s constructor specifies that it should not assume 1.0a and should negotiate with the provider on OAuth 1.0 terms. If Netflix were an OAuth 1.0a provider, this parameter could be set to <code>OAuth1Version.CORE_10_REVISION_A</code> or left out altogether.</p>
+<p>The one other thing that is required of a service provider implementation is to implement the <code>getApi()</code> method. For OAuth 1 providers, this method takes four <code>String</code> parameters containing the application's consumer key/secret pair and an access token/secret pair. Here, those values are used to create and return a new instance of <code>NetFlixTemplate</code> (more on this class in a moment).</p>
+<p>Although <code>NetFlixServiceProvider</code> only demonstrates how to develop a service provider implementation for OAuth 1, the model isn't much different when extending <code>AbstractOAuth2ServiceProvider</code> to create an OAuth 2 service provider. The key differences are:</p>
+<ul>
+<li>The client ID and secret aren't passed up through the <code>super()</code> constructor.</li>
+<li>An instance of <code>OAuth2Template</code> is created instead of <code>OAuth1Template</code> (and no request token URL is needed).</li>
+<li>The <code>getApi()</code> method is only given the access token value for constructing the API binding.</li>
+</ul>
+<p>Have a look at <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-facebook/src/main/java/org/springframework/social/facebook/connect/FacebookServiceProvider.java"><code>FacebookServiceProvider</code></a>, <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-github/src/main/java/org/springframework/social/github/connect/GitHubServiceProvider.java"><code>GitHubServiceProvider</code></a>, or <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-gowalla/src/main/java/org/springframework/social/gowalla/connect/GowallaServiceProvider.java"><code>GowallaServiceProvider</code></a> for examples of how to create an OAuth 2-based service provider implementation. For more examples OAuth 1 service providers you might also want to look at <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-twitter/src/main/java/org/springframework/social/twitter/connect/TwitterServiceProvider.java"><code>TwitterServiceProvider</code></a>, <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-linkedin/src/main/java/org/springframework/social/linkedin/connect/LinkedInServiceProvider.java"><code>LinkedInServiceProvider</code></a>, and <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-tripit/src/main/java/org/springframework/social/tripit/connect/TripItServiceProvider.java"><code>TripItServiceProvider</code></a>.</p>
+<h3>Creating the Netflix API Binding</h3>
+<p>With the service provider implementation complete, we now turn our attention to creating a binding to the Netflix REST API. For our immediate needs, we'll need a way to read the user's disc queue. To define that operation, we create the <code>NetFlixApi</code> interface which defines the service API:</p>
+<pre><code class="prettyprint java"><br />public interface NetFlixApi {
+
+    List&lt;CatalogTitle&gt; searchForTitles(String searchTerms);
+
+    List&lt;QueueItem&gt; getDiscQueue();
+
+}
+</code></pre>
+<p>This is hardly a complete binding to Netflix' REST API. But it will suffice for our purposes. The <code>searchForTitles()</code> method can be used to help a user select a movie that they'd like to write a review for. And the <code>getDiscQueue()</code> method will be used to retrieve the items in a user's disc queue. Now we need to create an implementation class. <code>NetFlixTemplate</code> uses Spring's <code>RestTemplate</code> to make calls to Netflix' REST API:</p>
+<pre><code class="prettyprint java"><br />package org.springframework.social.netflix;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.springframework.social.oauth1.ProtectedResourceClientFactory;
+import org.springframework.web.client.RestTemplate;
+
+public class NetFlixTemplate implements NetFlixApi {
+
+    private final RestTemplate restTemplate;
+
+    private final String userBaseUrl;
+
+    public NetFlixTemplate(String apiKey, String apiSecret, String accessToken, 
+            String accessTokenSecret) {
+        this.restTemplate = 
+                ProtectedResourceClientFactory.create(apiKey, apiSecret, accessToken, accessTokenSecret);
+        this.userBaseUrl = getUserBaseUrl();
+    }
+
+    public List&lt;CatalogTitle&gt; searchForTitles(String searchTerm) {
+        Map&lt;String, Object&gt; resultMap = restTemplate.getForObject(SEARCH_TITLES_URL, Map.class, searchTerm);
+        List&lt;CatalogTitle&gt; titles = new ArrayList&lt;CatalogTitle&gt;();
+
+        // extract CatalogTitle objects from resultMap
+
+        return titles;
+    }
+
+    public List&lt;QueueItem&gt; getDiscQueue() {
+        Map&lt;String, Object&gt; resultMap = restTemplate.getForObject(userBaseUrl + QUEUE_PATH, Map.class);
+        List&lt;QueueItem&gt; queueItems = new ArrayList&lt;QueueItem&gt;();
+
+        // extract QueueItem objects from resultMap
+
+        return queueItems;
+    }
+
+    private String getUserBaseUrl() {
+        Map&lt;String, Map&lt;String, Map&lt;String, String&gt;&gt;&gt; result = 
+                restTemplate.getForObject(CURRENT_USER_URL, Map.class);
+        return result.get(&quot;resource&quot;).get(&quot;link&quot;).get(&quot;href&quot;);
+    }
+
+    private static final String SEARCH_TITLES_URL = 
+            &quot;http://api.netflix.com/catalog/titles?term={term}&amp;max_results=5&amp;output=json&quot;;
+    
+    private static final String CURRENT_USER_URL = 
+            &quot;http://api.netflix.com/users/current?output=json&quot;;
+    
+    private static final String QUEUE_PATH = &quot;/queues/disc?output=json&quot;;
+}
+</code></pre>
+<p>Notice that although <code>NetFlixTemplate</code> uses <code>RestTemplate</code> it doesn't create a <code>RestTemplate</code> instance for itself. Instead, it uses <code>ProtectedResourceClientFactory</code> to create an OAuth-ready instance of <code>RestTemplate</code>. The <code>RestTemplate</code> created by <code>ProtectedResourceClientFactory</code> will be setup to use the OAuth credentials to sign each request it makes with an "Authorization" header.</p>
+<p>Both <code>searchForTitles()</code> and <code>getDiscQueue()</code> use the OAuth-ready <code>RestTemplate</code> to perform their respective operations against the Netflix REST API. The <code>output</code> parameter in the URLs tell the Netflix API that we'd prefer to receive a JSON response and not XML. In each case, the call to <code>getForObject()</code> returns a <code>Map</code> that mirrors the structure of the JSON response. Relevant pieces of information are then extracted from the <code>Map</code> to produce the lists returned to the caller. (For brevity's sake, I've left the details of how the <code>Map</code> is broken down out of the listing above. Look in GitHub for the full implementation of <a href="https://github.com/SpringSource/spring-social-samples/blob/master/spring-social-extending-new-api/src/main/java/org/springframework/social/movies/netflix/NetFlixTemplate.java"><code>NetFlixTemplate</code></a>.)</p>
+<p>All of the user-oriented operations in Netflix's REST API, including the call to retrieve a user's disc queue, have URLs that start with "http://api.netflix.com/users/{user ID}". Although the user's Netflix ID isn't readily available to <code>NetFlixTemplate</code>, the user's base URL (including their Netflix ID) can be retrieved via the "/users/current" API call. The <code>getUserBaseUrl()</code> method makes the call to "/users/current" to retrieve the user's base URL. To avoid having to retrieve the base URL before every call, the constructor calls the <code>getUserBaseUrl()</code> method once and stores the base URL in a member variable for later use when constructing URLs for user-oriented operations.</p>
+<p>Now that we have a Netflix service provider and API binding, we can build up the rest of the movie review application around them. As an illustration how the <code>getDiscQueue()</code> method may be used, look at the right column in the following screenshot:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/movie_app.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/movie_app.png" alt="" title="movie_app" width="822" height="636" class="alignnone size-full wp-image-8251" /></a></p>
+<p>Here, a list of movies in the user's disc queue is displayed along with any recent reviews for those movies. At this point, it's easy to imagine further enhancement to this application, perhaps enabling the user to revise their queue as they consider the reviews of other users.</p>
+<h3>Using an existing API Binding</h3>
+<p>In the Netflix example, I chose to create my own API binding. But if there is already some existing library that binds to the service provider that you prefer to use, then there's no reason why you can't use it to interact with the provider's API alongside Spring Social's Service Provider Framework for connection-handling.</p>
+<p>For example, although Spring Social comes with a Java binding to Twitter's REST API, you may prefer to use another binding implementation such as Twitter4J. Twitter4J provides a comprehensive Java binding to Twitter's service API, but does not address the authorization flow or connection management. If you'd like to use Twitter4J's API along with Spring Social's connection management features, you can do so by creating a service provider that uses Twitter4J as the API binding.</p>
+<p>To do that, you'll need to create a service provider implementation whose <code>getApi()</code> method uses a <code>TwitterFactory</code> to construct a Twitter4J instance rather than a <code>TwitterTemplate</code>. Here's what a Twitter4J-based service provider implementation might look like:</p>
+<pre><code class="prettyprint java"><br />package org.springframework.social.showcase.twitter;
+import java.util.Properties;
+import org.springframework.social.connect.oauth1.AbstractOAuth1ServiceProvider;
+import org.springframework.social.connect.support.ConnectionRepository;
+import org.springframework.social.oauth1.OAuth1Template;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.PropertyConfiguration;
+
+public final class Twitter4JServiceProvider extends AbstractOAuth1ServiceProvider&lt;Twitter&gt; {
+
+    public Twitter4JServiceProvider(String consumerKey, String consumerSecret, ConnectionRepository connectionRepository) {
+        super(&quot;twitter&quot;, connectionRepository, consumerKey, consumerSecret, new OAuth1Template(consumerKey, consumerSecret,
+            &quot;https://twitter.com/oauth/request_token&quot;,
+            &quot;https://twitter.com/oauth/authorize?oauth_token={requestToken}&quot;,
+            &quot;https://twitter.com/oauth/access_token&quot;));
+    }
+
+    @Override
+    protected Twitter getApi(String consumerKey, String consumerSecret, String accessToken, String secret) {
+        Properties props = new Properties();
+        props.setProperty(PropertyConfiguration.OAUTH_CONSUMER_KEY, consumerKey);
+        props.setProperty(PropertyConfiguration.OAUTH_CONSUMER_SECRET, consumerSecret);
+        props.setProperty(PropertyConfiguration.OAUTH_ACCESS_TOKEN, accessToken);
+        props.setProperty(PropertyConfiguration.OAUTH_ACCESS_TOKEN_SECRET, secret);
+        Configuration conf = new PropertyConfiguration(props);
+        return new TwitterFactory(conf).getInstance();
+    }
+
+}
+</code></pre>
+<p>As you can see, <code>Twitter4JServiceProvider</code> looks very similar to Spring Social's <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-twitter/src/main/java/org/springframework/social/twitter/connect/TwitterServiceProvider.java"><code>TwitterServiceProvider</code></a> and also quite like the <code>NetFlixServiceProvider</code> created earlier. The key differences are that <code>Twitter4JServiceProvider</code> is parameterized as a <code>Twitter</code> service provider and the <code>getApi()</code> method constructs a Twitter4J <code>Twitter</code> instance.</p>
+<p>The code for <code>Twitter4JServiceProvider</code> along with a sample that uses it can be found at GitHub in the <a href="https://github.com/SpringSource/spring-social-samples/tree/master/spring-social-extending-new-api">Spring Social Samples repository</a>.</p>
+<h3>Summary</h3>
+<p>Even though Spring Social 1.0.0.M2 is focused on a select few SaaS providers, the Service Provider Framework is easily extensible, enabling you to build support for other providers on top of Spring Social. Moreover, the framework is not limited to developing service provider implementations for Spring Social-specific API bindings--you may use it to create connections for an existing API binding.</p>
+<p>While I'm on the subject of extending Spring Social, another area you may want to explore is creating new implementations of the <a href="https://github.com/SpringSource/spring-social/blob/master/spring-social-core/src/main/java/org/springframework/social/connect/support/ConnectionRepository.java" target="_blank"><code>ConnectionRepository</code></a> interface. Spring Social 1.0.0.M2 comes with a JDBC-backed implementation, but there are other possibilities for persisting connections. For example, the <a href="http://www.springsource.org/spring-android" target="_blank">Spring Android</a> project defines a <a href="http://git.springsource.org/spring-mobile/spring-android/blobs/master/spring-android-auth/src/main/java/org/springframework/social/connect/sqlite/SqliteConnectionRepository.java"><code>SqliteConnectionRepository</code></a> that enables connections to be written to a SQLite database stored locally on Android devices. Also, it'd be interesting to see what a NoSQL connection repository might look like.</p>
+<p>We look forward to seeing how you extend Spring Social. If you create a useful or interesting extension to Spring Social, please tell us about it in the <a href="http://forum.springsource.org/forumdisplay.php?f=82" target="_blank">forum</a> or send us a pull request in GitHub. We've already received a handful of pull requests from the community and are working on incorporating them into Spring Social. Many thanks for those contributions!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 400;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+ <form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

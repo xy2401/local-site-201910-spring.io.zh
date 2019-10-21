@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Understanding the OSGi uses Directive</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Understanding the OSGi uses Directive" />
+<meta name="twitter:description" content="&lt;p&gt;If you build an application for the SpringSource dm Server, or any other OSGi platform, you’ll probably encounter the &lt;q&gt;uses&lt;/q&gt; directive before long. Unless you have a clear understanding of the purpose of the directive, you won’t know when to code it and you’ll be left guessing when a bundle fails to resolve because of a &lt;q&gt;uses&lt;/q&gt; conflict. This article should give you a thorough understanding of the &lt;q&gt;uses&lt;/q&gt; directive, when to use it, and how to debug &lt;q&gt;uses&lt;/q&gt; conflicts.&lt;/p&gt;
+&lt;h2&gt;Bundle Resolution&lt;/h2&gt;
+&lt;p&gt;OSGi is designed so that once bundles are ‘resolved’, you shouldn’t typically hit class cast exceptions and similar problems due to type mismatches. This is very important since OSGi uses a class loader for each bundle, so there is ample opportunity to expose users to various kinds of type mismatches.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@@glynnormington" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/132b1a9d7e4acd28950bb6e72256b078?s=200" />
+
+<meta property="og:title" content="Understanding the OSGi uses Directive" />
+<meta property="og:image" content="https://gravatar.com/avatar/132b1a9d7e4acd28950bb6e72256b078?s=200" />
+<meta property="og:description" content="&lt;p&gt;If you build an application for the SpringSource dm Server, or any other OSGi platform, you’ll probably encounter the &lt;q&gt;uses&lt;/q&gt; directive before long. Unless you have a clear understanding of the purpose of the directive, you won’t know when to code it and you’ll be left guessing when a bundle fails to resolve because of a &lt;q&gt;uses&lt;/q&gt; conflict. This article should give you a thorough understanding of the &lt;q&gt;uses&lt;/q&gt; directive, when to use it, and how to debug &lt;q&gt;uses&lt;/q&gt; conflicts.&lt;/p&gt;
+&lt;h2&gt;Bundle Resolution&lt;/h2&gt;
+&lt;p&gt;OSGi is designed so that once bundles are ‘resolved’, you shouldn’t typically hit class cast exceptions and similar problems due to type mismatches. This is very important since OSGi uses a class loader for each bundle, so there is ample opportunity to expose users to various kinds of type mismatches.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-10-20 15:27:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Understanding the OSGi uses Directive</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/132b1a9d7e4acd28950bb6e72256b078?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/gnormington">Glyn Normington</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-10-20 15:27:00.0">October 20, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="182" href="/blog/2008/10/20/understanding-the-osgi-uses-directive#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>If you build an application for the SpringSource dm Server, or any other OSGi platform, you&rsquo;ll probably encounter the <q>uses</q> directive before long. Unless you have a clear understanding of the purpose of the directive, you won&rsquo;t know when to code it and you&rsquo;ll be left guessing when a bundle fails to resolve because of a <q>uses</q> conflict. This article should give you a thorough understanding of the <q>uses</q> directive, when to use it, and how to debug <q>uses</q> conflicts.</p>
+<h2>Bundle Resolution</h2><p>OSGi is designed so that once bundles are &lsquo;resolved&rsquo;, you shouldn&rsquo;t typically hit class cast exceptions and similar problems due to type mismatches. This is very important since OSGi uses a class loader for each bundle, so there is ample opportunity to expose users to various kinds of type mismatches.</p><p>It is essential to grasp that any Java type, such as a class or interface, must be loaded by a class loader before it is available at runtime. A runtime type is defined by the combination of the type&rsquo;s fully qualified class name and the class loader that defined the type. If the same fully qualified class name is defined by two distinct class loaders, then this produces two incompatible runtime types. This incompatibility causes runtime errors if the two types come into <q>contact</q>. For example, attempting to cast one of these types to the other will result in a class cast exception.</p><p>OSGi isn&rsquo;t the only Java module system based on class loaders, but it is by far the most mature. This means that the designers of OSGi have thought long and hard about these kinds of problems and have included solutions in the OSGi specification. The design of OSGi is to get these problems out of the way before the application code runs, in a process known as resolution. Resolution is analogous to compilation in a strongly typed programming language, such as Java, in that certain categories of problems are diagnosed before the application code ever starts to run. Getting your bundles to resolve can sometimes be a bit of a headache, but it beats diagnosing runtime errors such as class cast exceptions.</p><p>So what does it mean to resolve a bundle? It means satisfying the dependencies of the bundle, typically by finding bundles which export the packages that the given bundle imports and which satisfy various constraints. The most obvious constraint is that each exported package version should lie in the package version range of the package import. Another kind of constraint is where arbitrary attributes can be specified on a package import which then have to match attributes on the corresponding package exports.</p>
+<h2>Packages Exported by Multiple Bundles</h2><p>The uses constraint, which we&rsquo;ll get to soon, aims to remove a category of type mismatches caused by a package being exported by more than one bundle. A type mismatch occurs when a type from one bundle is used where a type from another bundle is required, as the runtime types are incompatible. For instance, a class cast exception occurs when an attempt is made to cast a type from one bundle using a different type with the same class name from another bundle. How can this happen? Since a bundle cannot import the same package from more than one bundle, there has to be some other way for conflicting types to come into contact. It happens by a type being passed &ldquo;through&rdquo; a type in another package.</p><p>There are two ways a type can be passed through another type. The first way is when one type refers to the other type explicitly. For example, a method of the <span style="font-family:courier">Bar</span> type in the <span style="font-family:courier">org.bar</span> package may refer to a type <span style="font-family:courier">Foo</span> in the <span style="font-family:courier">org.foo</span> package:<br /><span style="font-family:courier"><br /> public Foo getFoo();<br /></span></p><p>The second way a type can be passed through another type is implicitly, via a supertype. For instance, the signature of a method may refer to a supertype:<br /><span style="font-family:courier"><br /> public Object getFoo();<br /></span><br />In the implicit case, an instance of the supertype will at some point be cast to the conflicting type.</p><p>So that&rsquo;s how such a type mismatch occurs at the Java code level. Let&rsquo;s consider what the bundle manifests look like.</p><p>The required type <span style="font-family:courier">Foo</span> may be exported by the same bundle (<span style="font-family:courier">B</span>) that exports the <span style="font-family:courier">org.bar</span> package:<br /><span style="font-family:courier"><br /> bundle-symbolicname: B<br /> bundle-manifestversion: 2<br /> export-package: org.foo,org.bar<br /></span><br />or by another bundle (<span style="font-family:courier">F</span>):<br /><span style="font-family:courier"><br /> bundle-symbolicname: B<br /> bundle-manifestversion: 2<br /> export-package: org.bar<br /> import-package: org.foo<br /></span><br /><span style="font-family:courier"><br /> bundle-symbolicname: F<br /> bundle-manifestversion: 2<br /> export-package: org.foo<br /></span></p><p>The <q>uses</q> directive was introduced so that OSGi could diagnose the above kinds of type mismatches during bundle resolution.</p>
+<h2>The <q>uses</q> Directive</h2><p>To detect potential type mismatches of the above kind during resolution, the explicit or implicit type reference at the level of Java code is declared in the corresponding bundle manifest. The export of the package containing the referring type is tagged with a <q>uses</q> directive which declares the package of the type referred to.</p><p>In the above example, the export of the <span style="font-family:courier">org.bar</span> package is declared to <q>use</q> the <span style="font-family:courier">org.foo</span> package:<br /><span style="font-family:courier"><br /> &hellip;<br /> export-package: org.bar;uses:=&ldquo;org.foo&rdquo;<br /> &hellip;<br /></span><br />Note that the package, or packages, named in a <q>uses</q> directive are either exported or imported by the bundle manifest containing the <q>uses</q> directive. So the following manifest<br />is valid:<br /><span style="font-family:courier"><br /> &hellip;<br /> export-package: p;uses:=&ldquo;q,r&rdquo;, q<br /> import-package: r<br /> &hellip;<br /></span><br />whereas the following manifest is invalid (because it neither exports nor imports the package <span style="font-family:courier">q</span>):<br /><span style="font-family:courier"><br /> &hellip;<br /> export-package: p;uses:=&ldquo;q,r&rdquo;<br /> import-package: r<br /> &hellip;<br /></span></p>
+<h2>Transitive <q>uses</q></h2><p>Type references are transitive. For example, if a type <span style="font-family:courier">A</span> refers to type <span style="font-family:courier">B</span> which refers to another type <span style="font-family:courier">C</span>, a user of <span style="font-family:courier">A</span> can obtain a reference to <span style="font-family:courier">C</span> via <span style="font-family:courier">B</span>.</p><p>Since type references are transitive, OSGi automatically takes this into account. It forms what is known as the <q>transitive closure</q> of the <q>uses</q> directive. This means that it is sufficient to code a <q>uses</q> directive for each type reference and OSGi will take care of transitive type references.</p><p>For example, although the bundle manifest:<br /><span style="font-family:courier"><br /> &hellip;<br /> export-package: p;uses:=&ldquo;q,r&rdquo;,q;uses:=&ldquo;r&rdquo;<br /> import-package: r<br /> &hellip;<br /></span><br />is correct, the following bundle manifest is sufficient to capture type references from package <span style="font-family:courier">p</span> to <span style="font-family:courier">q</span>, from <span style="font-family:courier">q</span> to <span style="font-family:courier">r</span>, and (transitively) from <span style="font-family:courier">p</span> to <span style="font-family:courier">r</span>:<br /><span style="font-family:courier"><br /> &hellip;<br /> export-package: p;uses:=&ldquo;q&rdquo;,q;uses:=&ldquo;r&rdquo;<br /> import-package: r<br /> &hellip;<br /></span></p>
+<h2>Diagnosing <q>uses</q> Conflicts</h2><p>The bundle resolution process aims to satisfy all constraints, so it will only report a <q>uses</q> conflict if it cannot satisfy dependencies in such a way as to honour all <q>uses</q> constraints. The diagnostics issued by SpringSource dm Server in these circumstances help to pin down the problem.</p><p>Let&rsquo;s look at a made-up example to understand the principle. Suppose we are developing a couple of utility bundles F and B which will be invoked from a client bundle C. Suppose we have introduced a second version of F and have tried deploying the bundles with the following manifests on the server.<br /><span style="font-family:courier"><br />Manifest-Version: 1.0<br />Bundle-ManifestVersion: 2<br />Bundle-SymbolicName: F<br />Bundle-Version: 1<br />Bundle-Name: F Bundle<br />Export-Package: org.foo;version=1<br /></span><br /><span style="font-family:courier"><br />Manifest-Version: 1.0<br />Bundle-ManifestVersion: 2<br />Bundle-SymbolicName: F<br />Bundle-Version: 2<br />Bundle-Name: F Bundle<br />Export-Package: org.foo;version=2<br /></span><br /><span style="font-family:courier"><br />Manifest-Version: 1.0<br />Bundle-ManifestVersion: 2<br />Bundle-SymbolicName: B<br />Bundle-Version: 1<br />Bundle-Name: B Bundle<br />Export-Package: org.bar;uses:=&ldquo;org.foo&rdquo;<br />Import-Package: org.foo;version=&ldquo;[1,2)&rdquo;<br /></span><br /><span style="font-family:courier"><br />Manifest-Version: 1.0<br />Bundle-ManifestVersion: 2<br />Bundle-SymbolicName: C<br />Bundle-Version: 1.0.0<br />Bundle-Name: C Bundle<br />Import-Package: org.bar,org.foo;version=&ldquo;[2,3)&rdquo;<br /></span><br />When we try to deploy bundle C, dm Server issues the following log message:<br /><span style="font-family:courier"><br />&lt;SPDE0018E&gt; Unable to install application from location &lsquo;file:/xxx/C.jar/&rsquo;. Could not satisfy constraints for bundle &lsquo;C&rsquo; at version &lsquo;1.0.0&rsquo;.<br /> Cannot resolve: C<br /> Resolver report:<br /> Bundle: C_1.0.0 - Uses Conflict: Import-Package: org.bar; version=&ldquo;0.0.0&rdquo;<br /> Possible Supplier: B_1.0.0 - Export-Package: org.bar; version=&ldquo;0.0.0&rdquo;<br /> Possible Conflicts: org.foo<br />.<br /></span><br />The line:<br /><span style="font-family:courier"><br />Bundle: C_1.0.0 - Uses Conflict: Import-Package: org.bar; version=&ldquo;0.0.0&rdquo;<br /></span><br />tells us that there is a <q>uses</q> constraint violation related to the package import of <span style="font-family:courier">org.bar</span> by bundle <span style="font-family:courier">C</span>. In other words, the export of <span style="font-family:courier">org.bar</span> that <span style="font-family:courier">C</span> is attempting to use has a <q>uses</q> constraint that cannot be satisfied.</p><p>The line:<br /><span style="font-family:courier"><br />Possible Supplier: B_1.0.0 - Export-Package: org.bar; version=&ldquo;0.0.0&rdquo;<br /></span><br />tells us which supplier of <span style="font-family:courier">org.bar</span> was under consideration.</p><p>The line:<br /><span style="font-family:courier"><br />Possible Conflicts: org.foo<br /></span><br />tells us which package is violating the <q>uses</q> constraint.</p><p>Stepping back from the detail, we know that the <q>uses</q> conflict is due to bundle <span style="font-family:courier">C</span> importing a different version of package <span style="font-family:courier">org.foo</span> than that imported by bundle <span style="font-family:courier">B</span>. Something must be causing different versions to be used and when we check the package imports carefully, we realise that we forgot to upgrade <span style="font-family:courier">B</span> to use the latest version of <span style="font-family:courier">F</span>.</p><p>After updating the manifest of <span style="font-family:courier">B</span> to:<br /><span style="font-family:courier"><br />Manifest-Version: 1.0<br />Bundle-ManifestVersion: 2<br />Bundle-SymbolicName: B<br />Bundle-Version: 1<br />Bundle-Name: B Bundle<br />Export-Package: org.bar;uses:=&ldquo;org.foo&rdquo;<br />Import-Package: org.foo;version=&ldquo;[2,3)&rdquo;<br /></span><br />we can now deploy bundle <span style="font-family:courier">C</span> successfully.</p>
+<h2>Diagnosing Complex <q>uses</q> Conflicts</h2><p>Our made-up <q>uses</q> conflict was sufficiently simple that we could find the problem by staring at the various bundle manifests for long enough. With more complex <q>uses</q> conflicts, such as when there are a number of possibly conflicting packages listed in <q>uses</q> directives, you can probably make progress faster by using the Equinox console (<span style="font-family:courier">telnet</span> to port 2401) to examine the bundles which have been successfully installed (dm Server uninstalls any bundles it cannot successfully deploy).</p><p>You can get a list of the installed bundles by issuing the following Equinox console command:<br /><span style="font-family:courier"><br />osgi&gt; ss<br /></span><br />which, in our made-up problem, shows something like this:<br /><span style="font-family:courier"><br />&hellip;<br />82 ACTIVE F_1.0.0<br />84 ACTIVE F_2.0.0<br />85 ACTIVE B_1.0.0<br /></span></p><p>To display the bundle manifest of <span style="font-family:courier">B</span> issue:<br /><span style="font-family:courier"><br />osgi&gt; headers 85<br /></span><br />and to display the importers and exporters of package <span style="font-family:courier">org.foo</span> issue:<br /><span style="font-family:courier"><br />osgi&gt; packages org.foo<br /></span></p>
+<h2>Summary</h2><p>This article has explored the need for the <q>uses</q> directive, how it is used to provide early diagnosis of a certain category of type mismatch errors, and how you can get to the bottom of <q>uses</q> constraint violations using dm Server diagnostics and the Equinox console.</p><p>You may think the <q>uses</q> directive is more trouble than it is worth, but when you consider the alternative of tracking down the reason for a possibly obscure class cast exception while your application is running, you should start to see the rationale for <q>uses</q>. Indeed any Java module system which doesn&rsquo;t provide the equivalent of <q>uses</q> constraints is likely to give you class cast exceptions at runtime once you have gotten to the point of having multiple versions of your application modules. The OSGi <q>uses</q> directive solves a general problem of Java modularity.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 182;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Clean Code in Android Applications</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Clean Code in Android Applications" />
+<meta name="twitter:description" content="&lt;p&gt;Let&#39;s say you wake up one morning, and think, &quot;Hey, I&#39;m going to build an Android app today.&quot; First off, good choice! As of the end of June, 500,000 Android devices were being &lt;a href=&quot;http://www.informationweek.com/news/231000573&quot;&gt;activated every day&lt;/a&gt;, outpacing even the iPhone. That means there is a large, potential audience for your app. Additionally, Android is built with Java. This may not seem like a big deal, but I have worked in &lt;a href=&quot;http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html&quot;&gt;Objective-C&lt;/a&gt; on the &lt;a href=&quot;http://developer.apple.com/technologies/ios/&quot;&gt;iOS platform&lt;/a&gt; for a few years, and while I am now quite comfortable with it, the &lt;a href=&quot;http://developer.apple.com/devcenter/ios/index.action&quot;&gt;iOS SDK&lt;/a&gt; offered a steeper learning curve than I experienced with Android. Android just felt more accessible when I first started working with the &lt;a href=&quot;http://developer.android.com/sdk/index.html&quot;&gt;Android SDK&lt;/a&gt;. That said, there are some clear differences from any other Java application you have built in the past, and I&#39;ll go over some of those in the first section.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@royclarkson" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=200" />
+
+<meta property="og:title" content="Clean Code in Android Applications" />
+<meta property="og:image" content="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=200" />
+<meta property="og:description" content="&lt;p&gt;Let&#39;s say you wake up one morning, and think, &quot;Hey, I&#39;m going to build an Android app today.&quot; First off, good choice! As of the end of June, 500,000 Android devices were being &lt;a href=&quot;http://www.informationweek.com/news/231000573&quot;&gt;activated every day&lt;/a&gt;, outpacing even the iPhone. That means there is a large, potential audience for your app. Additionally, Android is built with Java. This may not seem like a big deal, but I have worked in &lt;a href=&quot;http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html&quot;&gt;Objective-C&lt;/a&gt; on the &lt;a href=&quot;http://developer.apple.com/technologies/ios/&quot;&gt;iOS platform&lt;/a&gt; for a few years, and while I am now quite comfortable with it, the &lt;a href=&quot;http://developer.apple.com/devcenter/ios/index.action&quot;&gt;iOS SDK&lt;/a&gt; offered a steeper learning curve than I experienced with Android. Android just felt more accessible when I first started working with the &lt;a href=&quot;http://developer.android.com/sdk/index.html&quot;&gt;Android SDK&lt;/a&gt;. That said, there are some clear differences from any other Java application you have built in the past, and I&#39;ll go over some of those in the first section.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-08-26 19:30:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Clean Code in Android Applications</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/rclarkson">Roy Clarkson</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-08-26 19:30:00.0">August 26, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="433" href="/blog/2011/08/26/clean-code-in-android-applications#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Let's say you wake up one morning, and think, "Hey, I'm going to build an Android app today." First off, good choice! As of the end of June, 500,000 Android devices were being <a href="http://www.informationweek.com/news/231000573">activated every day</a>, outpacing even the iPhone. That means there is a large, potential audience for your app. Additionally, Android is built with Java. This may not seem like a big deal, but I have worked in <a href="https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html">Objective-C</a> on the <a href="https://developer.apple.com/technologies/ios/">iOS platform</a> for a few years, and while I am now quite comfortable with it, the <a href="https://developer.apple.com/devcenter/ios/index.action">iOS SDK</a> offered a steeper learning curve than I experienced with Android. Android just felt more accessible when I first started working with the <a href="https://developer.android.com/sdk/index.html">Android SDK</a>. That said, there are some clear differences from any other Java application you have built in the past, and I'll go over some of those in the first section.</p>
+<p>So moving forward in time, you have completed your first app, and have submitted it to the <a href="https://market.android.com/">Android Market</a>. Congratulations are in order, as your friends are all downloading your app and tweeting about it. Now it is time to start on your second app. You spend a few days, and suddenly realize that you are starting to reuse code from your first app, which in itself is not a bad thing. Code reuse can be valuable. But you notice there is a lot of boilerplate code that tends to be repeated often, and that can be distracting from focusing on your business logic. Fortunately, there are some ways to improve upon this.</p>
+<p>In this blog post, I will provide an overview of Android and the application lifecycle, and discuss some of the limitations imposed by the framework. I will also review a few of the techniques and third party projects that can help you clean up your Android code, and focus on what you want to achieve with your app.</p>
+<h3>Android Overview</h3>
+<p>Let's begin with a brief overview of how Android works. Android applications (apps) are built using Java, and compiled to class files. The class files are then compiled into the Dalvik Executable (DEX) format, so they may run on the Dalvik virtual machine used by Android. After conversion to DEX format, the class files are zipped to an Android Package (APK) for distribution to devices. Because of the use of the DEX format, the Dalvik VM is not a true Java Virtual Machine, since it does not operate on Java byte code. Additionally, the Dalvik VM is based on a subset of the Apache Harmony project for its core class library. This means that many of the classes and methods to which you are accustomed in Java SE are available, but certainly not all. I have found the <a href="https://developer.android.com/reference/packages.html">API reference</a> on the <a href="https://developer.android.com/index.html">Android developer web site</a> to be an invaluable resource for reviewing these differences.</p>
+<p>By default, each Android application is assigned a unique Linux user ID by the Android operating system. When started by the system, an application runs in its own Linux process, within its own virtual machine (VM). The system manages the starting and shutting down of this process when needed. As you can guess, this means that each application runs in isolation from the other running applications. When installed, an app can request permission to access hardware features or interact with other applications. The user elects to grant these permissions to the app or to not install it. The permissions required or requested by an app are defined in each app's Android Manifest file. This is an XML file that lists all the components of the app, and any settings for those components. The four types of application components are <a href="https://developer.android.com/reference/android/app/Activity.html">activities</a>, <a href="https://developer.android.com/reference/android/app/Service.html">services</a>, <a href="https://developer.android.com/reference/android/content/ContentProvider.html">content providers</a>, and <a href="https://developer.android.com/reference/android/content/BroadcastReceiver.html">broadcast receivers</a>. For the purposes of this post, I will be focusing on activities.</p>
+<p>Activities basically represent a single screen of an Android application. For example, a Twitter app may have a login screen, a screen with a list of tweets, and a screen for authoring a new tweet. Each of these screens represent different activities within the application. As a developer you never instantiate an activity object yourself. Activities are activated by sending an asynchronous message called an <a href="https://developer.android.com/reference/android/content/Intent.html">Intent</a>, as seen in the example below.</p>
+<pre><code class="prettyprint java"><br />startActivity(new Intent(context, HomeActivity.class));
+</code></pre>
+<p>When <a href="https://developer.android.com/reference/android/content/Context.html#startActivity%28android.content.Intent%29">startActivity(Intent intent)</a> is called, the system either creates a new instance or reuses an existing one in order to display the activity to the user. The important point is that the system controls the starting and stopping, and creation and destroying of the application and each activity. If you want to interact with this process, then the application and activity classes provide methods for different <a href="https://developer.android.com/reference/android/app/Activity.html#ActivityLifecycle">lifecycle events</a> that you can override in a subclass.</p>
+<h3>Dependency Injection</h3>
+<p>The <a href="http://www.springsource.org/spring-android">Spring Android</a> project recently reached its <a href="http://www.springsource.org/spring-android/news/1.0.0.m4-released">fourth milestone</a> release. With that release we have continued to improve upon the <a href="http://static.springsource.org/spring-android/docs/1.0.x/reference/html/rest-template.html">RestTemplate</a> and <a href="http://www.springsource.org/spring-social">Spring Social</a> support for Android, which simplifies the process of making RESTful HTTP requests and accessing REST APIs secured by <a href="https://oauth.net/">OAuth</a>. And while we believe these are valuable additions for Android development, some developers have asked questions regarding the possibility of dependency injection support in Spring Android, because as you are probably aware, the <a href="http://www.springsource.org/about">Spring Framework</a> already provides a popular Inversion of Control (IOC) container for enabling dependency injection in enterprise Java applications. Early in the Spring Android planning stages, dependency injection support was identified as a potential candidate for inclusion in the project. At that point, it was unclear what that support would entail, and how it would be implemented. Because of this, I began the process of researching and investigating the possible methods available for, and limitations of, performing dependency injection in Android.</p><p><p>Well, what is dependency injection? If you ask two different developers, you may get two different answers. You might hear about IOC, XML files, annotations, or some other implementation detail. In reality, dependency injection is simply a technique to reduce coupling by handing an object what it needs to work, rather than having the object reach out into its environment. That sounds easy enough, and you might be thinking to yourself you can already get this with class constructors and setter methods, which is completely true. However, recall from the overview section above, the Android system drives the application lifecycle, so the <strong>way</strong> we can do this is limited.</p>
+<h4>The Android Way</h4>
+<p>Without using any third party libraries, it is rather easy to pass a dependency to an Activity. As discussed earlier, the system creates the application instance. So by extending application, you can effectively create a singleton dependency instance, which can then be accessed by any of the activities in the app.</p>
+<pre><code class="prettyprint java"><br />public class MainApplication extends Application  {
+
+    private MyService service;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        service = new MyServiceImpl();
+    }
+
+    public MyService getMyService() {
+        return this.service;
+    }
+}
+</code></pre>
+<p>The activity class has a method called <a href="https://developer.android.com/reference/android/app/Activity.html#getApplication%28%29">getApplication()</a> which returns a reference to the application object that owns the activity. We simply cast it to MainApplication, and we can access the getter method for the MyService. Of course, the activity now has to "know" about the application, which might seem like a disadvantage. But remember, the activity already knows about its application. The method is built in.</p>
+<pre><code class="prettyprint java"><br />public class MainActivity extends Activity  {
+
+    private MyService service;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MainApplication app = (MainApplication) getApplication();
+        service = app.getMyService();
+    }
+}
+</code></pre>
+<h4>RoboGuice</h4>
+<p>The <a href="https://code.google.com/p/roboguice/">RoboGuice</a> project utilizes Google's <a href="https://code.google.com/p/google-guice/">Guice</a> library to add dependency injection support to Android. Guice itself comes in two flavors, with and without AOP (Aspect Oriented Programming) support. Internally, standard Guice relies on bytecode generation to perform method interception. Android however, does not support runtime bytecode generation, so RoboGuice depends on the version of Guice without AOP. Let's look at how we would implement the previous example using RoboGuice. To add a custom binding, you must implement an Application object that extends from <a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/application/RoboApplication.html">RoboApplication</a>. You then override the <a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/application/RoboApplication.html#addApplicationModules%28java.util.List%29">addApplicationModules(…)</a> method, and add a module instance that binds your objects.</p>
+<pre><code class="prettyprint java"><br />public class MainApplication extends RoboApplication {
+
+    @Override
+    protected void addApplicationModules(List&lt;Module&gt; modules) {
+        // add your module with custom bindings
+        modules.add(new MainModule());
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+}
+</code></pre>
+<p><a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/config/AbstractAndroidModule.html">AbstractAndroidModule</a> extends from the the standard Guice AbstractModule. Override the <a href="https://google-guice.googlecode.com/svn/tags/2.0/javadoc/com/google/inject/AbstractModule.html#configure%28%29">configure()</a> method to specify bindings:</p>
+<pre><code class="prettyprint java"><br />public class MainModule extends AbstractAndroidModule {
+
+    @Override
+    protected void configure() {
+        bind(MyService.class).to(MyServiceImpl.class);
+    }
+}
+</code></pre>
+<p>Each activity must inherit from <a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/activity/RoboActivity.html">RoboActivity</a> so that injection can occur:</p>
+<pre><code class="prettyprint java"><br />public class MainActivity extends RoboActivity {
+
+	@Inject 
+	MyService service;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+}
+</code></pre>
+<p>This example is not overly impressive, since it requires more code to accomplish a similar task. RoboGuice wiring becomes more useful in larger applications that consist of multiple domain modules encapsulating considerable business logic. Also, the support it provides for injecting views, resources, and system services is generally useful. You can see this in the examples below. The first example illustrates the standard android approach, while the second utilizes RoboGuice. As you can see, RoboGuice allows you to eliminate much of the boilerplate lookup code.</p>
+<pre><code class="prettyprint java"><br />public class MyActivity extends Activity {
+	
+    private TextView label;
+    
+    private Drawable image;
+
+    private SearchManager searchManager;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.myactivity);
+        this.label = (TextView) findViewById(R.id.mylabel);
+        this.image = getResources().getDrawable(R.drawable.myimage);
+        this.searchManager = (SearchManager) getSystemService(Activity.SEARCH_SERVICE);
+    }
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />public class MyActivity extends RoboActivity {
+	
+    @InjectView(R.id.mylabel)
+    TextView label;
+
+    @InjectResource(R.drawable.myimage)
+    Drawable image;
+
+    @Inject
+    SearchManager searchManager;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.myactivity);
+    }
+}
+</code></pre>
+<p>Some additional things about the programming model jump out at me here. Previously we extended from standard android classes, now we extend from RoboGuice specific variants. This takes us back to the previous section about the architecture of Android. Subclassing framework specific types is required because the way a third-party framework can hook into the Android application lifecycle is limited. In addition, injection is performed at runtime which brings a performance and footprint cost. Finally, it is worth noting the latest released version is built on Guice 2.0. My understanding is an update to Guice 3.0 is in progress.</p>
+<p>I am currently undecided about whether the benefits of RoboGuice are great enough to warrant tightly coupling your application with a third party framework. I have generally found it good enough to implement my own manual dependency injection techniques, as outlined in the previous section and demonstrated in the <a href="https://github.com/SpringSource/greenhouse-android">Greenhouse</a> reference application. Additionally, Guice itself is not small, adding about 400 KB to the size of your application. The RoboGuice project page even <a href="https://code.google.com/p/roboguice/wiki/ProGuard">discusses this</a> in reference to configuring <a href="https://developer.android.com/guide/developing/tools/proguard.html">ProGuard</a> to reduce the size of your app. While configuring ProGuard is not necessarily trivial, it is also a good practice to use it on any app, regardless of whether you are using RoboGuice or not.</p>
+<h3>Beyond Dependency Injection</h3>
+<p>We've covered dependency injection and RoboGuice, and discussed the advantages and disadvantages of that project's approach. The title of this post is about clean code in Android and how to reduce redundancy, so let's now step beyond dependency injection, and discuss some other techniques.
+<h4>Android Annotations</h4>
+<a href="https://code.google.com/p/androidannotations/">Android Annotations</a> is a project started and maintained by Pierre-Yves Ricau. Through the use of annotations, the goal of the project is specifically to help reduce the amount of boilerplate code in Android projects. It's not trying to be a general dependency injection framework, and in fact, can work side by side with RoboGuice. There is some overlap, as Android Annotations provides some similar annotations for injecting views and resources, but it offers many other useful features as well. The main differentiator is that Android Annotations <a href="https://code.google.com/p/androidannotations/wiki/HowItWorks">generates the boilerplate code</a> at compile time, so there is no runtime penalty for using it. It does this by generating a subclass of each activity, and substituting the annotations with the standard boilerplate code. One minor disadvantage to this approach is that you must append an underscore to the name of each activity in your manifest file. For example, if I create a MyActivity class, Android Annotations will generate a corresponding MyActivity_ class. Additionally, any reference in startActivity(…) has to be updated to use the new class as well.</p>
+<p>Here you can see some similarities to RoboGuice. This is the Android Annotations version of the previous RoboGuice example. Note that using the @EActivity annotation on the class allows you to set the activity's layout. Another nice touch is that if you omit the resource id from the annotation, Android Annotations will look for a resource id that matches the name of the variable.</p>
+<pre><code class="prettyprint java"><br />@EActivity(R.layout.myactivity) // Sets content view to R.layout.myactivity
+public class MyActivity extends Activity {
+
+    @InjectView  // Injects R.id.mylabel
+    TextView mylabel;
+
+    @DrawableRes(R.drawable.myimage)
+    Drawable image;
+
+    @SystemService
+    SearchManager searchManager;
+}
+</code></pre>
+<p>The annotations library is fairly extensive. Currently, it supports several areas of the SDK:</p>
+<ul>
+<li>views</li>
+<li>event handling</li>
+<li>accessing resources</li>
+<li>extras</li>
+<li>system services</li>
+<li>threading</li>
+</ul>
+<p>Here are a few more examples of what is possible. I want to highlight the click event handing and threading support, because they really illustrate the power of the library.</p>
+<pre><code class="prettyprint java"><br />public class AnotherActivity extends Activity {
+
+    @Click // When R.id.runProcess button is clicked 
+    void runProcess() {
+        runInBackground();
+    }
+ 
+   @Background // Executed in a background thread
+   void runInBackground() {
+        // perform some long running task
+        notifyUser();
+    }
+   
+    @UiThread // Executed in the ui thread
+    void notifyUser() {
+         // display a notification that task is complete
+    }
+}
+</code></pre>
+<p>Some developers may be turned off by the use of code generation, but considering the limitations of the Android architecture, Android Annotations provides an elegant approach to minimizing the use of boilerplate code, helping you focus on your business logic while not increasing runtime footprint.</p>
+<h4>Android Binding</h4>
+<p>The final project I want to touch on is <a href="https://code.google.com/p/android-binding/">Android Binding</a>. Android Binding is a <a href="https://en.wikipedia.org/wiki/Model_View_ViewModel">MVVM</a> (Model-View-ViewModel) framework, designed to separate the activity from working directly on the user interfaces. To do this, almost all of the code is moved out of the Android activity class and placed in a ViewModel object, which is meant to help with testability. The ViewModel object handles all the events and data for the view (the layout), but it is not tightly coupled to it. Events that occur in the view are sent to the ViewModel as commands. These commands then execute some business logic and possibly interact with the model, and update the ViewModel's properties so the View can then bind to them. If you have ever worked with .Net, then the concept of data binding will be quite familiar to you, and Android Binding strives to apply that concept to Android. Android Binding was started and is being maintained by <a href="https://andytsui.wordpress.com/">Andy Tsui</a>. It is still young and lacks documentation, but there is some nice potential.</p>
+<p>The example below shows an EmailActivity extending from BindingActivity. When you extend from BindingActivity, you use the setAndBindRootView(…) method to set the Model for the view:</p>
+<pre><code class="prettyprint java"><br />public class EmailActivity extends BindingActivity {
+
+    private EmailViewModel model;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        model = new EmailViewModel();
+        setAndBindRootView(R.layout.main, model);
+    }
+}
+</code></pre>
+<p>The next example snippet shows the view declaration. For me, this is the really interesting part. Looking at this layout file, you can see the addition of the "binding" attribute, as well as a custom "binding" xmlns declaration. This example shows binding two text fields and a button, but the project supports binding to many other <a href="https://code.google.com/p/android-binding/wiki/BindableAttributes">controls.</a>.</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout 
+    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:binding=&quot;http://www.gueei.com/android-binding&quot;
+    android:orientation=&quot;vertical&quot;
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;&gt;
+    		
+    &lt;EditText
+        android:id=&quot;@+id/subject&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        binding:text=&quot;subject&quot;
+    /&gt;
+		
+    &lt;EditText
+        android:id=&quot;@+id/message&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        binding:text=&quot;message&quot;
+    /&gt;
+	
+    &lt;Button
+        android:id=&quot;@+id/submit&quot;
+        android:text=&quot;Submit&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        binding:onClick=&quot;submit&quot;
+    /&gt;
+	
+&lt;/LinearLayout&gt;
+</code></pre>
+<p>Lastly, the EmailViewModel contains the data and control logic for the view. The excerpt below shows the Observables for the textfield values, as well as the Command that executes when the submit button is clicked:</p>
+<pre><code class="prettyprint java"><br />public class EmailViewModel {
+
+    @Required
+    public StringObservable subject = new StringObservable();
+
+    @Required
+    public StringObservable message = new StringObservable();
+
+    public Command submit = new Command() {
+        public void Invoke(View arg0, Object... arg1) {
+            ValidationResult result = ModelValidator.ValidateModel(EmailViewModel.this);
+            if (result.isValid()){
+                // send email
+            } else {
+                // display validation error message
+            }
+        }		
+    };
+}
+</code></pre>
+<p>There is more to this library than what I've included here. It also includes support for <a href="https://code.google.com/p/android-binding/wiki/ModelValidation">model validation</a> through the use of a set of annotations. There are some built in rules, and you can use RegEx pattern matching, as well as implement your own custom rules. The recent version has also added support for <a href="https://code.google.com/p/android-binding/wiki/OptionsMenu">binding to Options menus</a>.</p>
+<p>Like RoboGuice, Android Binding is runtime-based and requires you to extend from specific Activity base classes. Such reliance on concrete inheritance would likely make it difficult to use RoboGuice and Binding together in the same application. Where I think Binding really shines is in larger business applications that have data entry and validation requirements. The declarative <a href="https://code.google.com/p/android-binding/wiki/BindingSyntax">xml binding syntax</a> is pretty nice. I'm not familiar with other projects doing this, and it shows a fresh perspective on Android development.</p>
+<h3>Closing Thoughts</h3>
+<p>All of these techniques and projects are striving to implement known design patterns within the Android framework. This is a worthy goal, because when applied correctly, these patterns can help us better structure our applications. Generally speaking, when I approach a new platform or language, I try to work with what the SDK provides first. From there I can decide whether to use a third party library or apply a specific design pattern. One of my concerns is that sometimes design patterns or ideas that work well in one situation or technology do not translate well to another one. In spite of the limitations of the Android architecture, the techniques and projects highlighted in this post succeed in helping you write cleaner code.</p>
+<p>Of all the approaches I have discussed in this post, I am most interested in Android Annotations. I like it because it is designed to keep your code clean and readable, without sacrificing performance or using additional resources. Because it generates standard Android code at compile time, this means you can debug your app without having to step through a third party library. <a href="http://www.springsource.org/roo">Spring Roo</a> takes a very similar approach, except its code generation model is based on AspectJ instead of <a href="https://download.oracle.com/javase/6/docs/technotes/guides/apt/index.html">Java Annotation processing</a>. It would be exciting to see if the Android Annotations project could be integrated into a Spring Roo add-on. This would allow the community to create new Roo commands to scaffold Android projects and types, among other things. In addition, since Roo uses AspectJ compile-time weaving, it would be possible to eliminate the need for separate classes generated with the underscore naming.</p>
+<p>In conclusion, I have illustrated the use of some techniques and third party libraries to help eliminate boilerplate code and simplify the development process of an Android app. Yes, there is some setup involved in preparing your environment. However, the benefits can outweigh that initial time investment. I recommend devoting some time to each of these projects and techniques. They each offer a unique and valuable perspective on Android development.</p>
+<p>Thanks for reading! I would really enjoy hearing your feedback. What do you think of the libraries discussed in this article - are you using them? Are there other libraries you consider essential? Would you find value in a Roo add-on for Android that builds on the Android Annotations project?</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 433;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

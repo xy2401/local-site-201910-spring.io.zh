@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Functional Bean Registrations in Spring Cloud Function</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Functional Bean Registrations in Spring Cloud Function" />
+<meta name="twitter:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;&lt;a href=&quot;https://github.com/spring-cloud/spring-cloud-function&quot;&gt;Spring Cloud Function&lt;/a&gt; has a couple of new features in 2.0 (still in milestone phase), and possibly the most dramatic is the ability to go &quot;fully functional&quot;. This is made possible by changes in Spring Boot 2.1 together with Spring Framework 5.1, and it means a different way of thinking about bean definitions in Spring applications, but also significant improvements in startup performance.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;aws-cost-savings&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#aws-cost-savings&quot;&gt;&lt;/a&gt;AWS Cost Savings&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;It’s always good to start with a picture, especially if it tells a story. Here’s a graph that shows the improvement in Spring Cloud Function 2.0 over 1.0, comparing the cost of cold starts in AWS:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;imageblock&quot;&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;img src=&quot;https://docs.google.com/spreadsheets/d/e/2PACX-1vQRWYdp_BpzQg7nA9P7xi9bjTapxu6cYrLi7PFvBmnnKM2zCuVuYzAh25KpFuz0hX0fqJyo1nJO5fyN/pubchart?oid=459598255&amp;amp;format=image&quot; alt=&quot;Memory Cost&quot;&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The x-axis is memory in MB, and the y-axis is cost of a cold start in GBsec. The most dramatic effect is for low memory containers, where the cost is almost 4 times lower with 2.0. The &quot;Custom&quot; function is even faster (10x over Spring Cloud Function 1.0) - it’s a &lt;a href=&quot;https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html&quot;&gt;custom AWS runtime&lt;/a&gt; using Spring Cloud Function with functional beans. The origin of the improvement is in dramatically shorter startup times, which in turn come from using the functional form of bean definitions in the application. Josh made a &lt;a href=&quot;https://www.youtube.com/watch?v=Q_P28p7XsbQ&quot;&gt;video&lt;/a&gt; about functional bean registration a while ago if you need an introduction (it’s on YouTube). Now let’s have a closer look at how it works in Spring Cloud Function.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@david_syer" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+
+<meta property="og:title" content="Functional Bean Registrations in Spring Cloud Function" />
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta property="og:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;&lt;a href=&quot;https://github.com/spring-cloud/spring-cloud-function&quot;&gt;Spring Cloud Function&lt;/a&gt; has a couple of new features in 2.0 (still in milestone phase), and possibly the most dramatic is the ability to go &quot;fully functional&quot;. This is made possible by changes in Spring Boot 2.1 together with Spring Framework 5.1, and it means a different way of thinking about bean definitions in Spring applications, but also significant improvements in startup performance.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;aws-cost-savings&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#aws-cost-savings&quot;&gt;&lt;/a&gt;AWS Cost Savings&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;It’s always good to start with a picture, especially if it tells a story. Here’s a graph that shows the improvement in Spring Cloud Function 2.0 over 1.0, comparing the cost of cold starts in AWS:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;imageblock&quot;&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;img src=&quot;https://docs.google.com/spreadsheets/d/e/2PACX-1vQRWYdp_BpzQg7nA9P7xi9bjTapxu6cYrLi7PFvBmnnKM2zCuVuYzAh25KpFuz0hX0fqJyo1nJO5fyN/pubchart?oid=459598255&amp;amp;format=image&quot; alt=&quot;Memory Cost&quot;&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The x-axis is memory in MB, and the y-axis is cost of a cold start in GBsec. The most dramatic effect is for low memory containers, where the cost is almost 4 times lower with 2.0. The &quot;Custom&quot; function is even faster (10x over Spring Cloud Function 1.0) - it’s a &lt;a href=&quot;https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html&quot;&gt;custom AWS runtime&lt;/a&gt; using Spring Cloud Function with functional beans. The origin of the improvement is in dramatically shorter startup times, which in turn come from using the functional form of bean definitions in the application. Josh made a &lt;a href=&quot;https://www.youtube.com/watch?v=Q_P28p7XsbQ&quot;&gt;video&lt;/a&gt; about functional bean registration a while ago if you need an introduction (it’s on YouTube). Now let’s have a closer look at how it works in Spring Cloud Function.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2018-10-22 13:01:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Functional Bean Registrations in Spring Cloud Function</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2018-10-22 13:01:00.0">October 22, 2018</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3443" href="/blog/2018/10/22/functional-bean-registrations-in-spring-cloud-function#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div class="paragraph">
+<p><a href="https://github.com/spring-cloud/spring-cloud-function">Spring Cloud
+Function</a> has a couple of new features in 2.0 (still in milestone
+phase), and possibly the most dramatic is the ability to go "fully
+functional". This is made possible by changes in Spring Boot 2.1
+together with Spring Framework 5.1, and it means a different way of
+thinking about bean definitions in Spring applications, but also
+significant improvements in startup performance.</p>
+</div>
+<div class="sect1">
+<h2 id="aws-cost-savings"><a class="anchor" href="#aws-cost-savings"></a>AWS Cost Savings</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It&#8217;s always good to start with a picture, especially if it tells a
+story. Here&#8217;s a graph that shows the improvement in Spring Cloud
+Function 2.0 over 1.0, comparing the cost of cold starts in AWS:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQRWYdp_BpzQg7nA9P7xi9bjTapxu6cYrLi7PFvBmnnKM2zCuVuYzAh25KpFuz0hX0fqJyo1nJO5fyN/pubchart?oid=459598255&format=image" alt="Memory Cost">
+</div>
+</div>
+<div class="paragraph">
+<p>The x-axis is memory in MB, and the y-axis is cost of a cold start in
+GBsec. The most dramatic effect is for low memory containers, where
+the cost is almost 4 times lower with 2.0. The "Custom" function is even faster (10x over Spring Cloud Function 1.0)
+- it&#8217;s a <a href="https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html">custom AWS runtime</a> using Spring Cloud Function with functional beans. The origin of the improvement is in
+dramatically shorter startup times, which in turn come from using the
+functional form of bean definitions in the application. Josh made a
+<a href="https://www.youtube.com/watch?v=Q_P28p7XsbQ">video</a> about functional
+bean registration a while ago if you need an introduction (it&#8217;s on
+YouTube).
+Now let&#8217;s have a closer look at how it works in Spring Cloud
+Function.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="comparing-functional-with-traditional-bean-definitions"><a class="anchor" href="#comparing-functional-with-traditional-bean-definitions"></a>Comparing Functional with Traditional Bean Definitions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Here&#8217;s a Spring Cloud Function application from version 1.0, with the
+familiar <code>@Configuration</code> and <code>@Bean</code> declaration style:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@SpringBootApplication
+public class DemoApplication {
+
+  @Bean
+  public Function&lt;String, String&gt; uppercase() {
+    return value -&gt; value.toUpperCase();
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(DemoApplication.class, args);
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can run it in AWS Lambda (for instance) by jarring it up with all
+its dependencies and uploading it to Amazon. There is also support for
+<a href="https://azure.microsoft.com/en-gb/services/functions">Azure Functions</a>
+and <a href="https://openwhisk.apache.org/">Apache OpenWhisk</a> in the
+project. Other serverless providers, e.g. <a href="https://fnproject.io/">Oracle
+Fn</a> and <a href="https://projectriff.io/">Riff</a>, maintain their own bindings.</p>
+</div>
+<div class="paragraph">
+<p>You can also run the app above in its own HTTP server just by
+including <code>spring-cloud-function-starter-web</code> on the
+classpath. Running the main method would expose an endpoint that you
+can use to ping that <code>uppercase</code> function:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>$ curl localhost:8080 -d foo
+FOO</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The web adapter in 1.0 was implemented using Spring MVC, so you needed
+a Servlet container. In Spring Cloud Function 2.0 you can also use
+Webflux and the default server is netty (even though you can still use
+Servlet containers if you want to) - just include the
+<code>spring-cloud-starter-function-webflux</code> dependency instead. The
+functionality is the same, and the user application code can be used
+in both.</p>
+</div>
+<div class="paragraph">
+<p>In 2.0 though, the user application code can be recast into
+"functional" form, like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@SpringBootConfiguration
+public class DemoApplication
+    implements ApplicationContextInitializer&lt;GenericApplicationContext&gt; {
+
+  public static void main(String[] args) {
+    FunctionalSpringApplication.run(DemoApplication.class, args);
+  }
+
+  public Function&lt;String, String&gt; uppercase() {
+    return value -&gt; value.toUpperCase();
+  }
+
+  @Override
+  public void initialize(GenericApplicationContext context) {
+    context.registerBean("demo", FunctionRegistration.class,
+        () -&gt; new FunctionRegistration&lt;&gt;(uppercase())
+            .type(FunctionType.from(String.class).to(String.class)));
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The main differences are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The main class is an <code>ApplicationContextInitializer</code>.</p>
+</li>
+<li>
+<p>The <code>@Bean</code> methods have been converted to calls to <code>context.registerBean()</code></p>
+</li>
+<li>
+<p>The <code>@SpringBootApplication</code> has been replaced with
+<code>@SpringBootConfiguration</code> to signify that we are not enabling Spring
+Boot autoconfiguration, and yet still marking the class as an "entry
+point".</p>
+</li>
+<li>
+<p>The <code>SpringApplication</code> from Spring Boot has been replaced with a
+<code>FunctionalSpringApplication</code> from Spring Cloud Function (it&#8217;s a
+subclass).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The business logic beans that you register in a Spring Cloud Function
+app are of type <code>FunctionRegistration</code>. This is a wrapper that
+contains both the function and information about the input and output
+types. In the <code>@Bean</code> form of the application that information can be
+derived reflectively, but in a functional bean registration some of it
+is lost unless we use a <code>FunctionRegistration</code>.</p>
+</div>
+<div class="paragraph">
+<p>An alternative to using an <code>ApplicationContextInitializer</code> and
+<code>FunctionRegistration</code> is to make the application itself implement
+<code>Function</code> (or <code>Consumer</code> or <code>Supplier</code>). Example (equivalent to the
+above):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@SpringBootConfiguration
+public class DemoApplication implements Function&lt;String, String&gt; {
+
+  public static void main(String[] args) {
+    FunctionalSpringApplication.run(DemoApplication.class, args);
+  }
+
+  @Override
+  public String apply(String value) {
+    return value.toUpperCase();
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It would also work to add a separate, standalone class of type
+<code>Function</code> and register it with the <code>SpringApplication</code> using an
+alternative form of the <code>run()</code> method. The main thing is that the
+generic type information is available at runtime through the class
+declaration.</p>
+</div>
+<div class="paragraph">
+<p>The app runs in its own HTTP server if you add
+<code>spring-cloud-starter-function-webflux</code> (it won&#8217;t work with the MVC
+starter at the moment because the functional form of the embedded
+Servlet container hasn&#8217;t been implemented). The app also runs just
+fine in AWS Lambda or Azure Functions, and the improvements in startup
+time are dramatic (as shown in the graph above). Here are the startup
+times in another graph (startup time in seconds on the y-axis):</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQRWYdp_BpzQg7nA9P7xi9bjTapxu6cYrLi7PFvBmnnKM2zCuVuYzAh25KpFuz0hX0fqJyo1nJO5fyN/pubchart?oid=1202364356&format=image" alt="Memory Startup Time">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-functional-applications"><a class="anchor" href="#testing-functional-applications"></a>Testing Functional Applications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Function 2.0 also has some utilities for integration
+testing that will be very familiar to Spring Boot users. For example,
+here is an integration test for the HTTP server wrapping the app above:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RunWith(SpringRunner.class)
+@FunctionalSpringBootTest
+@AutoConfigureWebTestClient
+public class FunctionalTests {
+
+	@Autowired
+	private WebTestClient client;
+
+	@Test
+	public void words() throws Exception {
+		client.post().uri("/").body(Mono.just("foo"), String.class)
+                    .exchange().expectStatus().isOk()
+                          .expectBody(String.class).isEqualTo("FOO");
+	}
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This test is almost identical to the one you would write for the
+<code>@Bean</code> version of the same app - the only difference is the
+<code>@FunctionalSpringBootTest</code> annotation, instead of the regular
+<code>@SpringBootTest</code>. All the other pieces, like the <code>@Autowired</code>
+<code>WebTestClient</code>, are standard Spring Boot features.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="functional-bean-definitions-in-mainstream-spring-boot-applications"><a class="anchor" href="#functional-bean-definitions-in-mainstream-spring-boot-applications"></a>Functional Bean Definitions in Mainstream Spring Boot Applications</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Boot works just fine with functional bean registrations -
+Spring Cloud Function builds and runs on Spring Boot - but some of the
+most useful features in Spring Boot, the autoconfigurations, are all
+coded in the non-functional style. Most Spring Cloud Function apps
+have a relatively small scope compared to the whole of Spring Boot, so
+we are able to adapt it to these functional bean definitions
+easily. If you step outside that limited scope, you can extend your
+Spring Cloud Function app by switching back to <code>@Bean</code> style
+configuration, or by using a hybrid approach. It will take a little
+longer to extend the same kind of features to the rest of the Spring
+Boot ecosystem, but it is something we are working on quite
+actively. Please take Spring Cloud Function 2.0 for a spin and provide
+us with some feedback if you have a moment - the GA release will be
+coming soon.</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3443;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

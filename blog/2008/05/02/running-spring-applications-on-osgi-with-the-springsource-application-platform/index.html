@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Running Spring Applications on OSGi with the SpringSource Application Platform</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Running Spring Applications on OSGi with the SpringSource Application Platform" />
+<meta name="twitter:description" content="&lt;p&gt;A lot of people have been asking what exactly the SpringSource Application Platform does for Spring applications to make them run well under OSGi, over and above what you can get out of the box with OSGi and Spring Dynamic Modules. Adrian’s post yesterday highlighted some of the general issues, now lets look at a few of the details.&lt;/p&gt;
+&lt;p&gt;The three most challenging aspects of running Spring applications on OSGi are:&lt;/p&gt;
+&lt;ul&gt; 
+ &lt;li&gt;Load-time weaving&lt;/li&gt; 
+ &lt;li&gt;Classpath scanning&lt;/li&gt; 
+ &lt;li&gt;Thread context classloader management&lt;/li&gt; 
+&lt;/ul&gt;
+&lt;p&gt;The remaining, but less interesting, issues include: JSP support, TLD scanning, annotation matching and resource lookups. Overall, there was a decent-sized set of issues that needed to be solved to make applications deploy smoothly.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Running Spring Applications on OSGi with the SpringSource Application Platform" />
+<meta property="og:description" content="&lt;p&gt;A lot of people have been asking what exactly the SpringSource Application Platform does for Spring applications to make them run well under OSGi, over and above what you can get out of the box with OSGi and Spring Dynamic Modules. Adrian’s post yesterday highlighted some of the general issues, now lets look at a few of the details.&lt;/p&gt;
+&lt;p&gt;The three most challenging aspects of running Spring applications on OSGi are:&lt;/p&gt;
+&lt;ul&gt; 
+ &lt;li&gt;Load-time weaving&lt;/li&gt; 
+ &lt;li&gt;Classpath scanning&lt;/li&gt; 
+ &lt;li&gt;Thread context classloader management&lt;/li&gt; 
+&lt;/ul&gt;
+&lt;p&gt;The remaining, but less interesting, issues include: JSP support, TLD scanning, annotation matching and resource lookups. Overall, there was a decent-sized set of issues that needed to be solved to make applications deploy smoothly.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-05-02 14:34:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Running Spring Applications on OSGi with the SpringSource Application Platform</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Rob Harrop</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-05-02 14:34:00.0">May 02, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="156" href="/blog/2008/05/02/running-spring-applications-on-osgi-with-the-springsource-application-platform#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>A lot of people have been asking what exactly the SpringSource Application Platform does for Spring applications to make them run well under OSGi, over and above what you can get out of the box with OSGi and Spring Dynamic Modules. Adrian&#8217;s post yesterday highlighted some of the general issues, now lets look at a few of the details.</p>
+<p>The three most challenging aspects of running Spring applications on OSGi are:</p>
+<ul>
+<li>Load-time weaving</li>
+<li>Classpath scanning</li>
+<li>Thread context classloader management</li>
+</ul>
+<p>The remaining, but less interesting, issues include: JSP support, TLD scanning, annotation matching and resource lookups. Overall, there was a decent-sized set of issues that needed to be solved to make applications deploy smoothly.</p>
+<h2 id="load_time_weaving">Load-time weaving</h2>
+<p>Load-time weaving was one of the most problematic features to support in a robust manner. At the basic level, it requires hooking into the Equinox <span style="font-family:courier">ClassLoader</span> so that standard <span style="font-family:courier">ClassFileTransformers</span> can be attached and used during the <span style="font-family:courier">defineClass</span> calls. On top of this, many uses of LTW require access to a throwaway <span style="font-family:courier">ClassLoader</span> that can be used to inspect types to decide what needs to happen during the weave, without affecting the real <span style="font-family:courier">ClassLoader</span>.</p>
+<p>This base level of support was actually reasonably simple to achieve. The difficulty comes in when weaving is driven by classes in one bundle, but classes in another bundle need to be woven. This is pretty common in enterprise applications where one bundle contains domain entities and another contains types that use a JPA <span style="font-family:courier">EntityManager</span>. The Platform takes care of this complexity by ensuring that all bundles in an application can be woven with the appropriate <span style="font-family:courier">ClassFileTransformers</span>.</p>
+<p>When you start propagating weaving across to other bundles, you really need to know when to stop. If you simply apply weaving to all bundles, then applications will interfere with each other. The Platform prevents this from happening by explicitly scoping weaving so that it applies only to modules in the application.</p>
+<p>Another issue with LTW is that it complicates refresh. When a bundle is refreshed, OSGi will refresh all the bundles that depend on it. This means that, in the example I gave above, refreshing the domain bundle will cause the <span style="font-family:courier">EntityManager</span> bundle to be refreshed. However, refreshing the <span style="font-family:courier">EntityManager</span> <strong>does not</strong> refresh the domain bundle, meaning that weaving is possibly out of sync. The Platform handles this by propagating refresh to other bundles that are affected by weaving.</p>
+<h2 id="classpath_scanning">Classpath scanning</h2>
+<p>With classpath scanning, the main issue is that Equinox doesn&#8217;t expose standard <span style="font-family:courier">jar:</span> and <span style="font-family:courier">file:</span> resources. The Platform puts an adapter in the middle so that libraries see the resource protocols that they expect. This has a nice side-effect of making a <strong>lot</strong> of third-party libraries work - it&#8217;s not just a fix for classpath scanning.</p>
+<h2 id="thread_context_classloader_management">Thread context classloader management</h2>
+<p>Many third-party libraries use the thread context <span style="font-family:courier">ClassLoader</span> to access application types and resources. Each bundle in OSGi has it&#8217;s own <span style="font-family:courier">ClassLoader</span>, so therefore, only one bundle can be exposed as the thread context <span style="font-family:courier">ClassLoader</span> at any time. This means that if a third-party library needs to see types that are distributed across multiple bundles, it isn&#8217;t going to work as expected.</p>
+<p>The Platform fixes this by creating a <span style="font-family:courier">ClassLoader</span> that imports all the exported packages of every module in your application. This <span style="font-family:courier">ClassLoader</span> is then exposed as the thread context <span style="font-family:courier">ClassLoader</span>, enabling third-party libraries to see all the exported types in your application.</p>
+<p>This is just a small cross-section of the issues that are addressed by the Platform but hopefully it gives you an idea of what the Platform means for Spring Framework users.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 156;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

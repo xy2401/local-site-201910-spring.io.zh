@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Integration in Grails (Part 1)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Integration in Grails (Part 1)" />
+<meta name="twitter:description" content="&lt;p&gt;Spring Integration last week went &lt;a href=&quot;http://www.springsource.org/spring-integration&quot;&gt;1.0 GA&lt;/a&gt; and so, inspired by &lt;a href=&quot;http://www.springsource.org/node/845&quot;&gt;Adrian’s keynote&lt;/a&gt; (no, not the Monty Python sketch, just the Grails live-coding example) from SpringONE Americas, I thought it would be fun to show how to take advantage of Spring Integration in the slightly different setting of a Grails application.&lt;br&gt;&lt;/p&gt;
+&lt;p style=&quot;padding-left: 30px;&quot;&gt;Please note: This is a cross post from my own blog @ &lt;a href=&quot;http://www.russmiles.com&quot;&gt;www.russmiles.com&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This series of articles will look at how to add Spring Integration to Grails in a number of configurations that will eventually lead to a full Grails plugin for Spring Integration. More like an online diary, you’ll get the chance to see how we take our first steps by bootstrapping Spring Integration into a Grails application, through using some of the more advanced features of Spring Integration to bridge messages across diverse infrastructures, to finally applying this experience to create a Grails plugin that you can use to quickly and easily add Spring Integration to your own Grails projects.&lt;br&gt;&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Spring Integration in Grails (Part 1)" />
+<meta property="og:description" content="&lt;p&gt;Spring Integration last week went &lt;a href=&quot;http://www.springsource.org/spring-integration&quot;&gt;1.0 GA&lt;/a&gt; and so, inspired by &lt;a href=&quot;http://www.springsource.org/node/845&quot;&gt;Adrian’s keynote&lt;/a&gt; (no, not the Monty Python sketch, just the Grails live-coding example) from SpringONE Americas, I thought it would be fun to show how to take advantage of Spring Integration in the slightly different setting of a Grails application.&lt;br&gt;&lt;/p&gt;
+&lt;p style=&quot;padding-left: 30px;&quot;&gt;Please note: This is a cross post from my own blog @ &lt;a href=&quot;http://www.russmiles.com&quot;&gt;www.russmiles.com&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;This series of articles will look at how to add Spring Integration to Grails in a number of configurations that will eventually lead to a full Grails plugin for Spring Integration. More like an online diary, you’ll get the chance to see how we take our first steps by bootstrapping Spring Integration into a Grails application, through using some of the more advanced features of Spring Integration to bridge messages across diverse infrastructures, to finally applying this experience to create a Grails plugin that you can use to quickly and easily add Spring Integration to your own Grails projects.&lt;br&gt;&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-12-11 13:22:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Integration in Grails (Part 1)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Russ Miles</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-12-11 13:22:00.0">December 11, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="195" href="/blog/2008/12/11/spring-integration-in-grails-part-1#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Spring Integration last week went <a href="http://www.springsource.org/spring-integration">1.0 GA</a> and so, inspired by <a href="http://www.springsource.org/node/845">Adrian&rsquo;s keynote</a> (no, not the Monty Python sketch, just the Grails live-coding example) from SpringONE Americas, I thought it would be fun to show how to take advantage of Spring Integration in the slightly different setting of a Grails application.<br /><p style="padding-left: 30px;">Please note: This is a cross post from my own blog @ <a href="http://www.russmiles.com">www.russmiles.com</a></p></p><p>This series of articles will look at how to add Spring Integration to Grails in a number of configurations that will eventually lead to a full Grails plugin for Spring Integration. More like an online diary, you&rsquo;ll get the chance to see how we take our first steps by bootstrapping Spring Integration into a Grails application, through using some of the more advanced features of Spring Integration to bridge messages across diverse infrastructures, to finally applying this experience to create a Grails plugin that you can use to quickly and easily add Spring Integration to your own Grails projects.<br /><p style="padding-left: 30px;">If you&rsquo;d prefer to have the finished project as you work through the article, the full Grails project source code is <a href="http://www.russmiles.com/storage/code/grails-integration-part1/grails-plus-integration-demo.zip">available for download here</a> (NOTE: Built against <a href="http://www.grails.org/Download">Grails 1.1 Beta 1</a> )</p></p>
+<h2>Grails (for blaggers)</h2><p>Grails is a dynamic, convention-over-configuration application framework based on the Groovy language that uses Spring under the covers. This usage of Spring makes it a doddle to add <a href="http://www.springsource.org/projects">Spring portfolio project</a> functionality to a Grails application, which is exactly what we will look at in this article in terms of the Spring Integration project.<br /><h2>Spring Integration (for blaggers)</h2><br />For anyone who has not had the chance to use Spring Integration, in a nutshell it is a lightweight message-oriented collection of libraries that you can use inside your Spring-based applications. To that end, Spring Integration has some core concepts that are useful to understand:<br /><ul><br /> <li><strong>Messages</strong><br />Messages are the core abstraction of any message-oriented middleware and Spring Integration is no different. Messages can be made up of any Java, and therefore Groovy, type that is then passed from endpoints to endpoint using channels&hellip;</li><br /> <li><strong>Endpoints</strong><br />Endpoints are the components that want to send or receive a message. Sometimes a number of endpoints are involved in the chain of pipes between where a message is sent and it is delivered. To this end, endpoints itself is a strange name as in fact nothing actually ends at an endpoint.</li><br /> <li><strong>Channels</strong><br />These are the pipes that hold your messages while they are in transit from one endpoint to another. Channels come in a number of flavors, including <a href="http://static.springframework.org/spring-integration/reference/htmlsingle/spring-integration-reference.html#channel-implementations-directchannel">Direct</a> channels (Messages are passed in a blocking fashion from endpoint to endpoint in the same thread), which is the default type of channel if no other behavior is specified, and <a href="http://static.springframework.org/spring-integration/reference/htmlsingle/spring-integration-reference.html#channel-implementations-publishsubscribechannel">PublishAndSubscribe</a> channels (Messages are sent to all subscribed consumers in an asynchronous, non-blocking fashion).</li><br /></ul><br /><h2>Getting started - Creating the sample application</h2><br />The first step in any Grails development is to create an application to do your work in. A Grails application is made up of a number of directories and files that all have an implied meaning within the context of the Grails convention over configuration approach.</p><p>To create your Grails application, all you have to do is make sure that your Grails installation is on your path and then issue the following command from the command line:<br /><p style="padding-left: 30px;">&gt; <strong>grails create-app grails-plus-integration-demo</strong></p></p><p>If everything is working fine then you should see the following output:<br /><p style="padding-left: 30px;">&hellip; some other output first and then &hellip;</p><br /><p style="padding-left: 30px;"><strong>Created Grails Application at &lt;Your directory&gt;/grails-plus-integration-demo</strong></p></p><p>Grails has now created an application in the grails-plus-integration-demo directory from wherever you typed the grails create-app command. Change directory into your new Grails application and then run it to make sure everything is healthy:<br /><p style="padding-left: 30px;">&gt;<strong> cd grails-plus-integration-demo<br /></strong>&gt;<strong> grails run-app</strong></p><p>You should see some output like the following:<br /><p style="padding-left: 30px;">&hellip; other output then &hellip;</p><br /><p style="padding-left: 30px;"><strong>Server running. Browse to <a href="http://localhost:8080/grails-plus-integration-demo">http://localhost:8080/grails-plus-integration-demo</a></strong></p></p><p>Open up your browser of choice and navigate to the address of your running grails application, which should be <strong><a href="http://localhost:8080/grails-plus-integration-demo">http://localhost:8080/grails-plus-integration-demo</a></strong> and you should see something like the following:<br /><p style="text-align: center;"><img class="aligncenter" src="http://www.russmiles.com/storage/images/grails-integration-part1/images01-running-app.png" alt="" width="719" height="565" /></p><br /><p style="text-align: center;"><strong>Figure 1. Your new Grails app, up and running</strong></p><br /><p style="text-align: left;">Ok, nothing groundbreaking so far but now we are all set to create some functionality that will eventually exercise a Spring Integration messaging pipeline. To close your Grails application from the command-line, press Ctrl-C.</p></p>
+<h2 style="text-align: left;"><strong>Creating the Domain objects</strong></h2><p>If you&rsquo;re practicing domain driven design then a typical next step is to create some domain objects. Grails is designed with this approach in mind and provides some default commands to get you started.</p><p>For our very simple sample application in this article, all we need is one domain object called inventively &ldquo;GreetingsMessage&rdquo;. To do this, use the following grails command from within your new application&rsquo;s directory:<br /><p style="padding-left: 30px;">&gt;<strong> grails create-domain-class GreetingsMessage</strong></p></p><p>You should then see something like the following:<br /><p style="padding-left: 30px; text-align: left;"><strong>Running script /Applications/SpringSource/grails/grails-1.1-beta1/scripts/CreateDomainClass.groovy<br />Environment set to development<br />Created DomainClass for GreetingsMessage<br />Created Tests for GreetingsMessage</strong></p><p>With your GreetingsMessage domain class created, it&rsquo;s time to add a couple of properties. To do this you&rsquo;ll need to edit the GreetingsMessage.groovy file that is currently residing in your grails-app/domain directory. You only need to add one line for our sample to allow us to send a string message along as the content of a GreetingsMessage object:<br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images02-updating-domain-class.png" alt="" width="700" height="511" /></p><br /><p style="text-align: center;"><strong>Figure 2. Updating your domain class with one property</strong></p><br /><p style="text-align: left;">Save away your updated GreetingsMessage domain class and you&rsquo;re done.</p></p>
+<h2 style="text-align: left;"><strong>Creating a controller and form view</strong></h2><p>Next we need to create a controller and a view to create instances of our GreetingsMessage to then eventually send them across a Spring Integration pipeline. Now, if we were simply persisting our GreetingsMessage objects in a database then we could use the grails generate-all command to give us immediate access to all the controllers and views we&rsquo;d need. However, in this sample application all we want to create is a controller that allows the user to enter a string for the message content and then to route that to a specific service endpoint and so we&rsquo;re going to hand craft a simple controller and view to do that.</p><p>Using the command line, create a grails controller called &ldquo;GreetingsMessageSender&rdquo;:<br /><p style="padding-left: 30px;">&gt;<strong> grails create-controller GreetingsMessageSender</strong></p></p><p>This command should emit something like the following:<br /><p style="padding-left: 30px; text-align: left;"><strong>Running script /Applications/SpringSource/grails/grails-1.1-beta1/scripts/CreateController.groovy<br />Environment set to development<br />Created Controller for GreetingsMessageSender<br />[mkdir] Created dir: /Users/russellmiles/project/grails-plus-integration-demo/grails-app/views/greetingsMessageSender<br />Created Tests for GreetingsMessageSender</strong></p><p>You&rsquo;ve now created an empty controller and some unit tests for its functionality. Grails has also created an empty directory in your <strong>grail-app/views</strong> directory called greetingsMessageSender that will contain your view templates when you&rsquo;ve added some controller methods.</p><p>The next step is update the controller with the methods we want it to support. Open and update <strong>grails-app/controllers/GreetingsMessageSender.groovy</strong> so that it matches the following:<br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images03-partially-completed-controller.png" alt="" width="684" height="522" /></p><br /><p style="text-align: center;"><strong>Figure 3. The (partially) completed GreetingsMessageSender controller</strong></p><br /><p style="text-align: left;">If you&rsquo;re not too familiar with Groovy then this is what the class&rsquo;s code is doing:</p></p>
+<ul>
+<li>The index closure is executed when the controller is visited with no other specific action being invoked. For the time being, this index closure is simply redirecting the browser to the send action.</li>
+<li>The send closure is executed whenever the send action on this controller is visited by a browser. This code for now simply looks for a 'content' entry in the HTTP params passed into the send closure, and then, if not null, sets the flash message with some simple text that can then be rendered in the associated view.</li>
+</ul><p>So where&rsquo;s the associated view? It&rsquo;s now time to create one. Save away your controller and then create a new file in the <strong>grails-app/views/greetingsMessageSender</strong> directory called <strong>send.gsp</strong>.</p><p>There&rsquo;s quite a bit of code in this send.gsp view, so I recommend that you <a href="http://www.russmiles.com/storage/code/grails-integration-part1/send.gsp">download the code here</a> as opposed to typing it all in yourself. However if you&rsquo;re feeling plucky then you can copy the code shown below into your send.gsp file:</p><p><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images04-completed-view.png" alt="" width="706" height="613" /><br /><p style="text-align: center;"><strong>Figure 4. The completed send.gsp view</strong></p><br /><p style="text-align: left;">The key pieces of code in the view to focus on are the g:form and the flash.message sections. The g:form contains a single input text box that populates the content field from the form into the HTTP params that will then be picked up by the send closure on the GreetingsMessageSenderController when the form is submitted.</p><br /><p style="text-align: left;">The flash.message code displays the contents of the flash collection, in this case our message as added by the send closure.</p><br /><p style="text-align: left;">You&rsquo;re now ready to run and try out this simple interface, although we don&rsquo;t expect it to do much for the time being. Try it out by running your app again using the <strong>grails run-app</strong> command and navigating to your application&rsquo;s homepage:</p><br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images05-completed-grails-app-homepage.png" alt="" width="719" height="565" /></p><br /><p style="text-align: center;"><strong>Figure 5. Your new controller link on your Grails application homepage</strong></p><br /><p style="text-align: left;">Clicking on the GreetingsMessageController results in the &lsquo;index&rsquo; method being executed, which then results in your browser being redirected to the send closure and you should then see your new form:</p><br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images06-completed-message-entry-form.png" alt="" width="719" height="565" /></p><br /><p style="text-align: center;"><strong>Figure 6. Your send form</strong></p><br /><p style="text-align: left;">You should be able to enter in a message in the text box, click on &ldquo;Send&rdquo;, and then, well, nothing will happen&hellip; yet.</p></p>
+<h2 style="text-align: left;"><strong>Add one part Spring Integration, mix well</strong></h2><p>So far you&rsquo;ve created a pretty straightforward Grails application but now it&rsquo;s time to add a little Spring Integration into the mix. Spring Integration offers a great way to loosely de-couple components inside and outside your application, and that&rsquo;s exactly what we&rsquo;re going to do here.</p><p>The plan is to create a service that takes a string and then simply pushes it to upper case. Nothing too exciting there, but here&rsquo;s the juicy part: we&rsquo;re going to make it so that our front-end controller has no idea where the controller is or what interface it supports. Of course, we could simply inject our service into the controller, but that would tie our controller to the service at the interface level. What we&rsquo;re going to do here is manifest the contract between the service and the controller as nothing more than the types of messages that will be passed, in this case messages that contain a single string.<br /><p style="padding-left: 30px;"><strong>NOTE: </strong>SOA folks ears will have likely pricked up when I mentioned contracts and message passing. realizing that this is fairly close to the purpose of services where you declare the contract as being the types of messages that will be exchanged with a service endpoint. This is absolutely on purpose but it&rsquo;s worth mentioning that although Spring Integration is a great facilitator for SOA practices, it is no where near as heavy weight as having a distributed, monolithic ESB even though it shares some of the same architectural underpinnings (like message passing and endpoints). Typical ESB implementations tend to result in expensive web service calls to achieve the most trivial of exchanges and come with all sorts of baggage, whereas Spring Integration allows complete control to scale up exchanges from in-thread message passing, through multi-thread in-process polling, right up to inter-process/machine exchanges if they are required (more on that in forthcoming articles in this series).</p></p><p>The first step is to add the Spring Integration libraries to our sample application. Grails has a specific, per-application location for libraries that are directly depended upon by the application. The easiest way of doing this is to copy the contents of the Spring Integration distribution dist directory to our grails application&rsquo;s lib directory.<br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images08-spring-integration-dist.png" alt="" width="543" height="380" /></p><br /><p style="text-align: center;"><strong>Copy the contents of the Spring Integration dist directory&hellip;</strong></p><br /><p style="text-align: center;"><img class="alignnone" src=" http://www.russmiles.com/storage/images/grails-integration-part1/images07-application-root-directory.png" alt="" width="630" height="484" /></p><br /><p style="text-align: center;"><strong>&hellip; to the lib directory in your Grails application&rsquo;s root directory.</strong></p></p><p>Adding the libraries makes Spring Integration available to your Grails application. You&rsquo;re now all set to create your Spring Integration pipeline, after you&rsquo;ve created the component that will service that pipeline.<br /><h2><strong>Creating a Grails Service as the pipeline endpoint</strong></h2><br />Grails includes the concept of a service so we&rsquo;re going to create a simple service that will take an incoming String message and shift its contents to uppercase. To create the service, using the following Grails command:<br /><p style="padding-left: 30px;">&gt;<strong> grails create-service DemoBean</strong></p></p><p>Executing this command should give you an output similar to the following:<br /><p style="padding-left: 30px; text-align: left;"><strong>Running script /Applications/SpringSource/grails/grails-1.1-beta1/scripts/CreateService.groovy<br />Environment set to development<br />Created Service for DemoBean<br />Created Tests for DemoBean</strong></p><p>Now Grails has created a DemoBeanService inside the grails-app/services directory. It&rsquo;s not the most interesting service, but it will serve to illustrate the spring integration mechanisms.</p><p>To complete the service, open up the <strong>DemoBeanService.groovy</strong> file in the <strong>grails-app/services</strong> directory and complete it as show below:<br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images09-demo-bean-service.png" alt="" width="644" height="538" /></p><br /><p style="text-align: center;"><strong>Figure 7. Your completed DemoBeanService class</strong></p><br /><p style="text-align: left;">The service has one method whose purpose is to shift any incoming string to uppercase before it is returned. Now that you have a service that you want to invoke when a user submits a String into the controller, it&rsquo;s time to wire these two together.</p></p><p>Now, we could use DI directly but for this example we&rsquo;re going to lay the foundation of a more flexible architecture by using Spring Integration to handle passing the incoming strings to the specific service that we configure.<br /><h2 style="text-align: left;">Creating the Spring Integration pipeline</h2><br />To join up our front end Grails controller with a backend service we&rsquo;re going to use a simple Spring Integration pipeline. Spring Integration is driven using a Spring configuration domain specific dialect with its own namespace to keep the configuration as minimal as possible.</p><p>Grails supports adding existing Spring XML configuration to an application using a convention where the configuration is kept in a <strong>resources.xml</strong> file in the <strong>grails-app/conf/spring</strong> directory. To save yourself some typing time, <a href="http://www.russmiles.com/storage/code/grails-integration-part1/resources.xml">download that file here</a> and then drop it into your <strong>grails-app/conf/spring</strong> directory.</p><p>Next, open up the <strong>resources.xml</strong> in your favorite text editor and let&rsquo;s have a look at what&rsquo;s going on.</p><p>First, notice that we&rsquo;re introducing the Spring Integration namespace so that we can use the elements and attributes associated with the Spring Integration XML-based domain specific language. In fact, the Spring Integration namespace is set up as the default namespace for the document, so we have to qualify bean elements with a namespace.</p><p>The entire pipeline is then expressed in this document. The main components and the roles that those components meet in this pipeline are as follows:<br /><ul><br /> <li><strong>The Gateway, whose id is </strong><strong>messagingGateway</strong><br />This component is in fact a facade that separates the rest of the application from the underlying messaging architecture. Components can consume this gateway and invoke it as normal, synchronously according to the specified service interface. Under the skin, the gateway is a proxy that will conduct the necessary messaging exchanges the the Spring Integration channels. In this case, the gateway will take the contents of any method invocation and wrap the contents in a Spring Integration message before placing it on the default-request-channel.</li><br /></ul><br /><ul><br /> <li><strong>The outgoing channel, whose id is demoChannel</strong><br />This channel is where outgoing messages are placed. An incoming message channel is not actually needed as Spring Integration will create a temporary channel for reply messages that automatically hooks up with the gateway that the request messages came from. This is achieved using a correlation id that is originally set by the gateway.</li><br /></ul><br /><ul><br /> <li><strong>The service activator endpoint, whose id is localService</strong><br />This component is responsible for invoking a specific method on a specific bean when a message appears on the incoming channel. In this case the doSomething method on the demoBean service will be invoked with the message contents, which is a string as dictated by the parameter on the doSomething method.</li><br /></ul><br /><p style="padding-left: 30px;"><strong>NOTE:</strong> All service classes in grails by default result in a singleton service object of that class that is indexed in the Spring application context under a camel-cased version of the class name. So where the service-activator refers to the demoBeanService bean, this is automatically resolved by Grails to the singleton instance of the DemoBeanService we created earlier.</p></p><p>And that&rsquo;s it, we have a complete message passing pipeline that will pass messages through an internal queue, strongly decoupling any message provider from the consumers. You&rsquo;ll notice that any consumer that creates a message and invokes the gateway does not need to know where the message ends up, nor does it even need to know what interface that destination endpoint implements. The contract here is the types of the messages being passed, which for this simple example are merely Strings.<br /><h2>Hooking in the gateway to the controller</h2><br />The final step is to hook the Spring Integration pipeline into the Grails controller so that it can pass and receive messages transparently. As far as the controller is concerned, it is merely invoking a local object that meets a specific interface, but under the skin Spring Integration is routing that message to the specified bean which is our <strong>demoBeanService</strong>.</p><p>To tie the loose ends, you need to create a service interface that you are happy to expose to the controller. Note that the actual bean that is referenced by the endpoint does not need to necessarily implement the same interface, it&rsquo;s the message parameters that matter here.</p><p>To create the interface, create a Java interface in the <strong>src/java</strong> directory called <strong>MessageService.java</strong>, within a suitable package structure like <strong>com.russmiles.demo.grails.integration</strong>. Complete the interface so that it matches the following:<br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images10-message-service-interface.png" alt="" width="643" height="514" /></p><br /><p style="text-align: center;"><strong>Figure 8. The definition of the MessageService interface</strong></p><br /><p style="text-align: left;">Now that you&rsquo;ve defined the gateway interface, the last job is to hook the gateway itself into your controller. In grails, you can automatically provide dependencies to an object based upon their name, and so to access the gateway from inside your controller all you need to do is declare an attribute whose name matches the gateway&rsquo;s id:</p><br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images11-adding-gateway-dependency.png" alt="" width="644" height="505" /></p><br /><p style="text-align: center;"><strong>Figure 9. Adding the dependency on the gateway into your controller</strong></p><br /><p style="text-align: left;">Now that you&rsquo;ve hooked in the gateway to the controller, you can amend your send closure to make use of it:</p><br /><p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images12-final-controller.png" alt="" width="701" height="504" /></p><br /><p style="text-align: center;"><strong>Figure 10. Your completed controller</strong></p><br /><p style="text-align: left;">And that&rsquo;s it, time to fire up your Grails application that uses Spring Integration.</p></p>
+<h3>Running your Spring Integration based Grails application</h3>
+<p style="text-align: left;">With everything wired together, all that's left to do is to take your application for a spin. Run the Grails application using the usual command:</p>
+<p style="text-align: left; padding-left: 30px;">&gt; <strong>grails run-app</strong></p>
+<p style="text-align: left;">Now go and visit your <strong>GreetingsMessageSenderController</strong> in your browser as shown below:</p>
+<p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images13-final-form-ready-for-input.png" alt="" width="616" height="504" /></p>
+<p style="text-align: center;"><strong>Figure 11. Your form, ready for input to trigger your Spring Integration pipeline</strong></p>
+<p style="text-align: left;">Enter in some text to the form and click on Send:</p>
+<p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/images14-final-form-taking-input.png" alt="" width="616" height="504" /></p>
+<p style="text-align: center;"><strong>Figure 12. Some data entered into the form and ready to roll</strong></p>
+<p style="text-align: left;">The following diagram shows what should happen next:</p>
+<p style="text-align: center;"><img class="alignnone" src="http://www.russmiles.com/storage/images/grails-integration-part1/15-final-form-with-return-message.png" alt="" width="616" height="504" /></p>
+<p style="text-align: center;"><strong>Figure 13. You message, sent through the pipeline and returned processed to be displayed as part of the flash message</strong></p>
+<p style="text-align: left;">To reiterate, here's what's happening when you click that "Send" button.</p>
+<p style="text-align: left;">When you click send, your controller will call the gateway, the gateway will hand the message onto the appropriate channel as a Spring Integration message, the service activator will then take that message, unpack it and invoke the demoBean service. The service takes the string content and shifts it to upper case and returns the result through a temporary channel setup for this exchange. The method on the gateway returns, unblocking the controller who then renders the view with the result in the flash collection.</p>
+<h2 style="text-align: left;">Summary</h2><p>This article was just the first attempt to bootstrap a Spring Integration messaging pipeline into a Grails application. The next step is to do something a bit more than just pass a message from a gateway to a service-activated object in process. In the next article in this series we&rsquo;ll look at how to take advantage of our flexible Spring Integration pipeline to pass a message to a service endpoint that is not running in the same process as our Grails application, using JMS adapters.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 195;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

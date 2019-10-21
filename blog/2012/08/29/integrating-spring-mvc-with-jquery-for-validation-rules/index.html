@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Integrating Spring MVC with jQuery for validation rules</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Integrating Spring MVC with jQuery for validation rules" />
+<meta name="twitter:description" content="&lt;p&gt;I was thrilled to see in a recent &lt;a href=&quot;http://zeroturnaround.com/blog/developer-productivity-report-2012-java-tools-tech-devs-and-data/&quot;&gt;survey from zeroturnaround&lt;/a&gt; that Spring MVC was voted the most popular web framework for Java.&lt;/p&gt;
+&lt;p&gt;This framework is very flexible and there are dozens of ways to use it. As with all flexible frameworks that have many options, it is important to discuss common practices.&lt;/p&gt;
+&lt;p&gt;The project I have created for this blog entry uses features common in many Spring MVC applications. You will find something like this:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://blog.springsource.org/wp-content/uploads/2012/08/01-controller-view.png&quot;&gt;&lt;img title=&quot;01-controller-view&quot; src=&quot;http://blog.springsource.org/wp-content/uploads/2012/08/01-controller-view.png&quot; alt=&quot;&quot; width=&quot;510&quot; height=&quot;325&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In controllers you will find typical Spring MVC features for mapping requests, extracting request data through annotations, data binding, file upload…&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/e0dffdc6678a8035ce431e3bc46a82f8?s=200" />
+
+<meta property="og:title" content="Integrating Spring MVC with jQuery for validation rules" />
+<meta property="og:image" content="https://gravatar.com/avatar/e0dffdc6678a8035ce431e3bc46a82f8?s=200" />
+<meta property="og:description" content="&lt;p&gt;I was thrilled to see in a recent &lt;a href=&quot;http://zeroturnaround.com/blog/developer-productivity-report-2012-java-tools-tech-devs-and-data/&quot;&gt;survey from zeroturnaround&lt;/a&gt; that Spring MVC was voted the most popular web framework for Java.&lt;/p&gt;
+&lt;p&gt;This framework is very flexible and there are dozens of ways to use it. As with all flexible frameworks that have many options, it is important to discuss common practices.&lt;/p&gt;
+&lt;p&gt;The project I have created for this blog entry uses features common in many Spring MVC applications. You will find something like this:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://blog.springsource.org/wp-content/uploads/2012/08/01-controller-view.png&quot;&gt;&lt;img title=&quot;01-controller-view&quot; src=&quot;http://blog.springsource.org/wp-content/uploads/2012/08/01-controller-view.png&quot; alt=&quot;&quot; width=&quot;510&quot; height=&quot;325&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In controllers you will find typical Spring MVC features for mapping requests, extracting request data through annotations, data binding, file upload…&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2012-08-29 10:18:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Integrating Spring MVC with jQuery for validation rules</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/e0dffdc6678a8035ce431e3bc46a82f8?s=20&amp;d=mm" />
+<span class="author">Michael Isvy</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2012-08-29 10:18:00.0">August 29, 2012</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="484" href="/blog/2012/08/29/integrating-spring-mvc-with-jquery-for-validation-rules#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>I was thrilled to see in a recent <a href="http://zeroturnaround.com/blog/developer-productivity-report-2012-java-tools-tech-devs-and-data/">survey from zeroturnaround</a> that Spring MVC was voted the most popular web framework for Java.</p><p>This framework is very flexible and there are dozens of ways to use it. As with all flexible frameworks that have many options, it is important to discuss common practices.</p><p>The project I have created for this blog entry uses features common in many Spring MVC applications. You will find something like this:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/08/01-controller-view.png"><img title="01-controller-view" src="http://blog.springsource.org/wp-content/uploads/2012/08/01-controller-view.png" alt="" width="510" height="325" /></a></p><p>In controllers you will find typical Spring MVC features for mapping requests, extracting request data through annotations, data binding, file upload…</p><p>On the other hand, inside JSPs, most of the HTML is written natively (as opposed to being generated by Spring MVC tags). Moreover, the Spring MVC tag libraries do not generate any Javascript code.</p><p>We are first going to discuss how to integrate Spring MVC with jQuery and Bean Validation. We will then see how to make those JSPs less verbose.</p>
+
+<h2>Bean Validation?</h2><p>JSR 303 Bean Validation provides a comprehensive way to declare validation rules. Here is an example:</p>
+<pre><code class="prettyprint java"><br />public class DiningForm {
+  @Pattern(regexp=&quot;\\d{16}&quot;)
+
+  private String creditCardNumber;
+
+  @Size(1)
+  private String merchantNumber;
+
+  @Min(0)
+  private double monetaryAmount;
+
+  @NotNull
+  private Date date;
+
+  ...
+
+}
+</code></pre><p>When validation is called, an instance of DiningForm is validated against the annotations above.</p><p>From Spring 3.0, Spring MVC integrates with Bean validation for validation rules (that’s not the only way to do validation with Spring @MVC but it is obviously becoming the most common approach).</p><p>In a controller method, we can use @Valid as follows:</p>
+<pre><code class="prettyprint java"><br />@RequestMapping(value=&quot;/update&quot;, method=RequestMethod.POST)
+  public String update(@Valid DiningForm diningForm, BindingResult result) {
+
+    if (result.hasErrors()) {
+      return “rewards/edit”;
+    }
+
+    // continue on success...
+
+  }
+}
+</code></pre><p>At the JSP level, error messages can be displayed using &lt;form:errors /&gt;:</p>
+<pre><code class="prettyprint xml"><br />&lt;form:form modelAttribute=&quot;diningForm&quot;&gt;
+  &lt;form:input path=&quot;firstName&quot;/&gt;
+  &lt;form:errors path=&quot;firstName&quot;/&gt;
+  …
+&lt;/form:form&gt;
+</code></pre><p>The code above is fairly simple and works well. But it does not generate any Javascript. Consequently it does not allow partial rendering or client side validation. Let’s see how to improve that!<br /><h2>Adding Javascript for partial rendering</h2><br />Let us consider what happens when “first name” is empty.</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/08/02-form.png"><img title="02-form" src="http://blog.springsource.org/wp-content/uploads/2012/08/02-form.png" alt="" width="312" height="185" /></a></p><p>In the previous example, the whole page was refreshed every time the form was submitted. Here is an extract of the HTML response:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/08/02bis-fieldset.png"><img title="02bis-fieldset" src="http://blog.springsource.org/wp-content/uploads/2012/08/02bis-fieldset.png" alt="" width="518" height="176" /></a></p><p>Our target is to minimize the response size. We should be able to have such response instead (using json syntax):</p>
+<pre><code class="prettyprint xml"><br />{&quot;status&quot;:&quot;FAIL&quot;,&quot;result&quot;:[{&quot;fieldName&quot;:&quot;firstName&quot;,&quot;message&quot;:&quot;firstName  may not be empty&quot;}]}
+
+</code></pre><p>Firstly, we will use a jQuery form submission to validate the form. When the form will be considered as valid, form submission will be triggered using regular HTML form submission (in that way we&rsquo;ll be able to redirect to a different page).</p><p>Let us first create a simple <em>ValidationResponse</em> class as follows:</p>
+<pre><code class="prettyprint java"><br />public class ValidationResponse {
+ private String status;
+ private List errorMessageList;
+
+ public String getStatus() {
+   return status;
+ }
+ public void setStatus(String status) {
+   this.status = status;
+ }
+ public List getErrorMessageList() {
+   return this.errorMessageList;
+ }
+ public void setErrorMessageList(List errorMessageList) {
+   this.errorMessageList = errorMessageList;
+ }
+}
+</code></pre><p>Inside the controller class, we can add an action method:</p>
+<pre><code class="prettyprint java"><br />@RequestMapping(value=&quot;/user.json&quot;)
+public @ResponseBody ValidationResponse processForm (Model model, @Valid User user, BindingResult result ) {
+ ValidationResponse res = new ValidationResponse();
+ if(!result.hasErrors()){
+   res.setStatus(&quot;SUCCESS&quot;);
+ }
+ // …
+ return res;
+}
+</code></pre><p>Thanks to the <em>@ResponseBody</em> annotation, the returned object will be converted into JSON as explained in the diagram below:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/08/03-json-query1.png"><img title="03-json-query" src="http://blog.springsource.org/wp-content/uploads/2012/08/03-json-query1.png" alt="" width="517" height="161" /></a></p><p>Inside the JSP, the error message is parsed and displayed if appropriate. You can browse <a href="https://raw.github.com/michaelisvy/ajax-samples/16e1ba9b140c811f4cc74c0e2e740a97ec39f324/src/main/webapp/WEB-INF/jsp/02-ajax/userForm.jsp">the Javascript code</a> for more details.</p><p>According to <a href="https://en.wikipedia.org/wiki/Progressive_enhancement">progressive enhancement</a> best practices, all Javascript code has been placed outside the HTML form. In case Javascript is disabled on a client’s browser, the form falls back into full page refresh.</p><p>Now that we have partial refresh working for validation rules, there are 2 points that still need improvement:<br /><ul><br /> <li>This page does not look cool!</li><br /></ul><br /><ul><br /> <li>This hello-world-style page has 100 lines already. There should be some ways to make it shorter.</li><br /></ul><br /><h2>Let’s make it pretty with Bootstrap</h2><br />Even though this is not directly related to Spring MVC, it was hard for me to present a sample application with such a poor UI design. In case you haven’t heard of it yet, <a href="https://github.com/twitter/bootstrap">twitter Bootstrap</a> is becoming the de facto CSS framework.  Many developers love it because it allows to make an acceptable design for a website with little effort. After copying the Bootstrap CSS and images, I just need to use the Boostrap CSS classes (see the <a href="https://github.com/michaelisvy/ajax-samples/blob/16e1ba9b140c811f4cc74c0e2e740a97ec39f324/src/main/webapp/WEB-INF/jsp/03-bootstrap/userForm.jsp">JSP source code</a> for more details). My form now looks like this:<br /><a name="custom"></a></p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/08/04-form-bootstrap.png"><img class="aligncenter size-full wp-image-11466" title="04-form-bootstrap" src="http://blog.springsource.org/wp-content/uploads/2012/08/04-form-bootstrap.png" alt="" width="470" height="186" /></a></p>
+<h2>Using custom tags to avoid the “JSP soup” syndrome</h2><p>That’s where things become really interesting: even though we have some code which is working already, it is pretty hard to read. We are mixing together HTML, Javascript, CSS and JSP Expression Language. It would be more readable if my JSP code looked something like this:</p>
+<pre><code class="prettyprint xml"><br /><br />&lt;html:form modelAttribute=&quot;user&quot;  id=&quot;add-user-form&quot; formUrl=&quot;/userAjaxCustomTag.htm&quot;&gt;
+ &lt;html:inputField name=&quot;firstName&quot; label=&quot;Enter your first name:&quot; /&gt;
+ &lt;html:inputField name=&quot;lastName&quot; label=&quot;Enter your last name:&quot; /&gt;
+ &lt;div&gt;
+   &lt;button type=&quot;submit&quot;&gt;Save changes&lt;/button&gt;
+   &lt;button type=&quot;reset&quot;&gt;Cancel&lt;/button&gt;
+ &lt;/div&gt;
+&lt;/html:form&gt;
+
+</code></pre><p>Custom tags are part of Java EE and also work great on Apache Tomcat. It is surprisingly easy to create a custom tag. Let us take a simple example with form input fields. We currently use this syntax (8 lines):</p>
+<pre><code class="prettyprint xml"><br />&lt;div id=&quot;firstName&quot;&gt;
+ &lt;label&gt;Enter your first name:&lt;/label&gt;
+ &lt;div&gt;
+   &lt;form:input path=&quot;firstName&quot; /&gt;
+   &lt;span&gt;
+     &lt;form:errors path=&quot;firstName&quot; /&gt;
+   &lt;/span&gt;
+ &lt;/div&gt;
+&lt;/div&gt;
+</code></pre><p>Our goal is to use this instead (1 line):</p>
+<pre><code class="prettyprint xml"><br />&lt;html:inputField name=&quot;firstName&quot; label=&quot;Enter your first name:&quot; /&gt;
+</code></pre><p>In the WEB-INF folder, I can create a new tag file as follows:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/08/05-folders1.png"><img title="05-folders" src="http://blog.springsource.org/wp-content/uploads/2012/08/05-folders1.png" alt="" width="397" height="141" /></a></p><p>Its content is the following:</p>
+<pre><code class="prettyprint xml"><br />&lt;%@ taglib prefix=&quot;form&quot; uri=&quot;http://www.springframework.org/tags/form&quot; %&gt;
+&lt;%@ attribute name=&quot;name&quot; required=&quot;true&quot; rtexprvalue=&quot;true&quot; %&gt;
+&lt;%@ attribute name=&quot;label&quot; required=&quot;true&quot; rtexprvalue=&quot;true&quot; %&gt;
+&lt;div id=&quot;${name}&quot;&gt;
+ &lt;label&gt;${label}&lt;/label&gt;
+&lt;div&gt;
+  &lt;form:input path=&quot;${name}&quot;/&gt;
+  &lt;span&gt;&lt;form:errors path=&quot;${name}&quot;/&gt;&lt;/span&gt;
+&lt;/div&gt;
+</code></pre><p>Back in <em>userForm.jsp</em>, I just need to declare the tag folder:</p>
+<pre><code class="prettyprint xml"><br />&lt;%@ taglib prefix=&quot;html&quot; tagdir=&quot;/WEB-INF/tags/html&quot; %&gt;
+</code></pre><p>And I can use this newly created tag as follows:</p>
+<pre><code class="prettyprint xml"><br />&lt;html:inputField name=&quot;firstName&quot; label=&quot;Enter your first name:&quot; /&gt;
+</code></pre><p>Custom tags are well integrated in Eclipse/STS and I even have access to code completion:<a href="http://blog.springsource.org/wp-content/uploads/2012/08/06-auto-complete.png"><img title="06-auto-complete" src="http://blog.springsource.org/wp-content/uploads/2012/08/06-auto-complete.png" alt="" width="435" height="117" /></a></p><p>In a similar fashion, I can also externalize the JavaScript code into a tag so I just have one line to call:</p>
+<pre><code class="prettyprint xml"><br />&lt;ajax:formPartialRefresh validateUrl=&quot;/userAjaxBootstrap.json&quot; formName=&quot;add-user-form&quot;/&gt;
+</code></pre>
+<h2>Conclusion</h2><p>We have discussed partial rendering in form validation with Spring MVC. In just a few minutes, we have turned JSP soup into something which is much simpler and easier to understand.</p><p>You are welcome to have a look at the corresponding <a href="https://github.com/michaelisvy/ajax-samples">sample application on github</a>.</p><p>Credits: I would like to thank my friend Nicholas Ding who worked with me on building the code samples for this blog entry.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 484;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

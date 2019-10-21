@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>React.js and Spring Data REST: Part 1 - Basic Features</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="React.js and Spring Data REST: Part 1 - Basic Features" />
+<meta name="twitter:description" content="&lt;div id=&quot;preamble&quot;&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;admonitionblock note&quot;&gt; 
+   &lt;table&gt; 
+    &lt;tbody&gt; 
+     &lt;tr&gt; 
+      &lt;td class=&quot;icon&quot;&gt; &lt;i class=&quot;fa icon-note&quot; title=&quot;Note&quot;&gt;&lt;/i&gt; &lt;/td&gt; 
+      &lt;td class=&quot;content&quot;&gt;To see updates to this code, visit our &lt;a href=&quot;https://spring.io/guides/tutorials/react-and-spring-data-rest/&quot;&gt;React.js and Spring Data REST tutorial&lt;/a&gt;.&lt;/td&gt; 
+     &lt;/tr&gt; 
+    &lt;/tbody&gt; 
+   &lt;/table&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Welcome Spring community,&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;This is the first of several blog entries. In this session, you will see how to get a bare-bones Spring Data REST application up and running quickly. Then you will build a simple UI on top of it using Facebook’s React.js toolset.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;_step_0_setting_up_your_environment&quot;&gt;Step 0 - Setting up your environment&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Feel free to &lt;a href=&quot;https://github.com/gregturn/react-and-spring-data-rest/tree/master/basic&quot;&gt;grab the code&lt;/a&gt; from this repository and follow along.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;If you want to do it yourself, visit &lt;a href=&quot;http://start.spring.io&quot; class=&quot;bare&quot;&gt;http://start.spring.io&lt;/a&gt; and pick these items:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;ulist&quot;&gt; 
+   &lt;ul&gt; 
+    &lt;li&gt;Rest Repositories &lt;/li&gt; 
+    &lt;li&gt;Thymeleaf &lt;/li&gt; 
+    &lt;li&gt; JPA &lt;/li&gt; 
+    &lt;li&gt; H2 &lt;/li&gt; 
+   &lt;/ul&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;This demo uses Java 8, Maven Project, and the latest stable release of Spring Boot. This will give you a clean, empty project. From there, you can add the various files shown explicitly in this session, and/or borrow from the repository listed above.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@gregturn" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200" />
+
+<meta property="og:title" content="React.js and Spring Data REST: Part 1 - Basic Features" />
+<meta property="og:image" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200" />
+<meta property="og:description" content="&lt;div id=&quot;preamble&quot;&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;admonitionblock note&quot;&gt; 
+   &lt;table&gt; 
+    &lt;tbody&gt; 
+     &lt;tr&gt; 
+      &lt;td class=&quot;icon&quot;&gt; &lt;i class=&quot;fa icon-note&quot; title=&quot;Note&quot;&gt;&lt;/i&gt; &lt;/td&gt; 
+      &lt;td class=&quot;content&quot;&gt;To see updates to this code, visit our &lt;a href=&quot;https://spring.io/guides/tutorials/react-and-spring-data-rest/&quot;&gt;React.js and Spring Data REST tutorial&lt;/a&gt;.&lt;/td&gt; 
+     &lt;/tr&gt; 
+    &lt;/tbody&gt; 
+   &lt;/table&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Welcome Spring community,&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;This is the first of several blog entries. In this session, you will see how to get a bare-bones Spring Data REST application up and running quickly. Then you will build a simple UI on top of it using Facebook’s React.js toolset.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;_step_0_setting_up_your_environment&quot;&gt;Step 0 - Setting up your environment&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Feel free to &lt;a href=&quot;https://github.com/gregturn/react-and-spring-data-rest/tree/master/basic&quot;&gt;grab the code&lt;/a&gt; from this repository and follow along.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;If you want to do it yourself, visit &lt;a href=&quot;http://start.spring.io&quot; class=&quot;bare&quot;&gt;http://start.spring.io&lt;/a&gt; and pick these items:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;ulist&quot;&gt; 
+   &lt;ul&gt; 
+    &lt;li&gt;Rest Repositories &lt;/li&gt; 
+    &lt;li&gt;Thymeleaf &lt;/li&gt; 
+    &lt;li&gt; JPA &lt;/li&gt; 
+    &lt;li&gt; H2 &lt;/li&gt; 
+   &lt;/ul&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;This demo uses Java 8, Maven Project, and the latest stable release of Spring Boot. This will give you a clean, empty project. From there, you can add the various files shown explicitly in this session, and/or borrow from the repository listed above.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-09-01 11:33:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">React.js and Spring Data REST: Part 1 - Basic Features</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/gturnquist">Greg Turnquist</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-09-01 11:33:00.0">September 01, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2220" href="/blog/2015/09/01/react-js-and-spring-data-rest-part-1-basic-features#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content">To see updates to this code, visit our <a href="https://spring.io/guides/tutorials/react-and-spring-data-rest/">React.js and Spring Data REST tutorial</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph">
+<p>Welcome Spring community,</p>
+</div>
+<div class="paragraph">
+<p>This is the first of several blog entries. In this session, you will see how to get a bare-bones Spring Data REST application up and running quickly. Then you will build a simple UI on top of it using Facebook&#8217;s React.js toolset.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_0_setting_up_your_environment">Step 0 - Setting up your environment</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Feel free to <a href="https://github.com/gregturn/react-and-spring-data-rest/tree/master/basic">grab the code</a> from this repository and follow along.</p>
+</div>
+<div class="paragraph">
+<p>If you want to do it yourself, visit <a href="https://start.spring.io" class="bare">http://start.spring.io</a> and pick these items:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>Rest Repositories
+</li>
+<li>Thymeleaf
+</li>
+<li>
+JPA
+</li>
+<li>
+H2
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This demo uses Java 8, Maven Project, and the latest stable release of Spring Boot. This will give you a clean, empty project. From there, you can add the various files shown explicitly in this session, and/or borrow from the repository listed above.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_in_the_beginning">In the beginning&#8230;&#8203;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the beginning there was data. And it was good. But then people wanted to access the data through various means. Over the years, people cobbled together lots of MVC controllers, many using Spring&#8217;s powerful REST support. But doing over and over cost a lot of time.</p>
+</div>
+<div class="paragraph">
+<p>Spring Data REST addresses how simple this problem can be if some assumptions are made:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+The developer uses a Spring Data project that supports the repository model.
+</li>
+<li>
+The system uses well accepted, industry standard protocols, like HTTP verbs, standardized media types, and IANA-approved link names.
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_declaring_your_domain">Declaring your domain</h3>
+<div class="paragraph">
+<p>The cornerstone of any Spring Data REST-based application are the domain objects. For this session, you will build an application to track the employees for a company. Kick that off by creating a data type like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/com/greglturnquist/payroll/Employee.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Data
+@Entity
+public class Employee {
+
+	private @Id @GeneratedValue Long id;
+	private String firstName;
+	private String lastName;
+	private String description;
+
+	private Employee() {}
+
+	public Employee(String firstName, String lastName, String description) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.description = description;
+	}
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<code>@Entity</code> is a JPA annotation that denotes the whole class for storage in a relational table.
+</li>
+<li>
+<code>@Id</code> and <code>@GeneratedValue</code> are JPA annotation to note the primary key and that is generated automatically when needed.
+</li>
+<li>
+<code>@Data</code> and <code>@RequiredArgsConstructor</code> are Project Lombok annotations to autogenerate getters, setters, constructors, toString, hash, equals, and other things. It cuts down on the boilerplate.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This entity is used to track employee information. In this case, their name and job description.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Spring Data REST isn&#8217;t confined to JPA. It supports many NoSQL data stores, but you won&#8217;t be covering those here.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_defining_the_repository">Defining the repository</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Another key piece of a Spring Data REST application is to create a corresponding repository definition.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/com/greglturnquist/payroll/EmployeeRepository.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public interface EmployeeRepository extends CrudRepository&lt;Employee, Long&gt; {
+
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+The repository extends Spring Data Commons' <code>CrudRepository</code> and plugs in the type of the domain object and its primary key
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>That is all that is needed! In fact, you don&#8217;t even have to annotate this invisible if its top-level and visible. If you use your IDE and open up <code>CrudRepository</code>, you&#8217;ll find a fist full of pre-built methods already defined.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+You can define <a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.definition">your own repository</a> if you wish. Spring Data REST supports that as well.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pre_loading_the_demo">Pre-loading the demo</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To work this this application, you need to pre-load it with some data like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/com/greglturnquist/payroll/DatabaseLoader.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Component
+public class DatabaseLoader implements CommandLineRunner {
+
+	private final EmployeeRepository repository;
+
+	@Autowired
+	public DatabaseLoader(EmployeeRepository repository) {
+		this.repository = repository;
+	}
+
+	@Override
+	public void run(String... strings) throws Exception {
+		this.repository.save(new Employee("Frodo", "Baggins", "ring bearer"));
+	}
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+This class is marked with Spring&#8217;s <code>@Component</code> annotation so that it is automatically picked up by <code>@SpringBootApplication</code>.
+</li>
+<li>
+It implements Spring Boot&#8217;s <code>CommandLineRunner</code> so that it gets run after all the beans are created and registered.
+</li>
+<li>
+It uses constructor injection and autowiring to get Spring Data&#8217;s automatically created <code>EmployeeRepository</code>.
+</li>
+<li>
+The <code>run()</code> method is invoked with command line arguments, loading up your data.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>One of the biggest, most powerful features Spring Data is its ability to write JPA queries for you. This not only cuts down on your development time, but also reduces the risk of bugs and errors. Spring Data <a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods.details">looks at the name of methods</a> in a repository class and figures out the operation you need including saving, deleting, and finding.</p>
+</div>
+<div class="paragraph">
+<p>That is how we can write an empty interface and inherit already build save, find, and delete operations.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adjusting_the_root_uri">Adjusting the root URI</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, Spring Data REST hosts a root collection of links at <code>/</code>. Because you will host a web UI on the same path, you need to change the root URI.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre>spring.data.rest.base-path=/api</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_launching_the_backend">Launching the backend</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The last step needed to get a fully operationl REST API off the ground is to write a <code>public static void main</code> using Spring Boot:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/com/greglturnquist/payroll/ReactAndSpringDataRestApplication.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@SpringBootApplication
+public class ReactAndSpringDataRestApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ReactAndSpringDataRestApplication.class, args);
+	}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Assuming the previous class as well as your Maven build file were generated from <a href="https://start.spring.io" class="bare">http://start.spring.io</a>, you can now launch it either by running that <code>main()</code> method inside your IDE, or type <code>./mvnw spring-boot:run</code> on the command line. (mvnw.bat for Windows users).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If you aren&#8217;t up-to-date on Spring Boot and how it works, you should consider watch one of <a href="https://www.youtube.com/watch?v=sbPSjI4tt10">Josh Long&#8217;s introductory presentations</a>. Did it? Press on!
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_touring_your_rest_service">Touring your REST service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With the app running, you can check things out on the command line using <a href="https://curl.haxx.se/">cURL</a> (or any other tool you like).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl localhost:8080/api
+{
+  "_links" : {
+    "employees" : {
+      "href" : "http://localhost:8080/api/employees"
+    },
+    "profile" : {
+      "href" : "http://localhost:8080/api/profile"
+    }
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When you ping the root node, you get back a collection of links wrapped up in a <a href="http://stateless.co/hal_specification.html">HAL-formatted JSON document</a>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<strong>_links</strong> is a the collection of links available.
+</li>
+<li>
+<strong>employees</strong> points to an aggregate root for the employee objects defined by the <code>EmployeeRepository</code> interface.
+</li>
+<li>
+<strong>profile</strong> is an IANA-standard relation and points to discoverable metadata about the entire service. We&#8217;ll explore this in a later session.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can further dig into this service by navigating the <strong>employees</strong> link.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl localhost:8080/api/employees
+{
+  "_embedded" : {
+    "employees" : [ {
+      "firstName" : "Frodo",
+      "lastName" : "Baggins",
+      "description" : "ring bearer",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/employees/1"
+        }
+      }
+    } ]
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At this stage, you are viewing the entire collection of employees.</p>
+</div>
+<div class="paragraph">
+<p>What&#8217;s included along with the data you pre-loaded earlier is a <strong>_links</strong> attribute with a <strong>self</strong> link. This is the canonical link for that particular employee. What is canonical? It means free of context. For example, the same user could be fetched through a link like /api/orders/1/processor, in which the employee is assocated with processing a particular order. Here, there is no relationship to other entities.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Links are a critical facet of REST. They provide the power to navigate to related items. It makes it possible for other parties to navigate around your API without having to rewrite things everytime there is a change. Updates in the client is a common problem when the clients hard code paths to resources. Restructuring resources can cause big upheavals in code. If links are used and instead the navigation route is maintained, then it becomes easy and flexible to make such adjustments.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can decide to view that one employee if you wish.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl localhost:8080/api/employees/1
+{
+  "firstName" : "Frodo",
+  "lastName" : "Baggins",
+  "description" : "ring bearer",
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/api/employees/1"
+    }
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Little change here, except that there is no need for the <strong>_embedded</strong> wrapper since there is only domain object.</p>
+</div>
+<div class="paragraph">
+<p>That&#8217;s all and good, but you are probably itching to create some new entries.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl -X POST localhost:8080/api/employees -d '{"firstName": "Bilbo", "lastName": "Baggins", "description": "burglar"}' -H 'Content-Type:application/json'
+{
+  "firstName" : "Bilbo",
+  "lastName" : "Baggins",
+  "description" : "burglar",
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/api/employees/2"
+    }
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also PUT, PATCH, and DELETE as shown in <a href="https://spring.io/guides/gs/accessing-data-rest/">this related guide</a>. But let&#8217;s not dig into that. You have already spent way too much time interacting with this REST service manually. Don&#8217;t you want to build a slick UI instead?</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setting_up_a_custom_ui_controller">Setting up a custom UI controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Boot makes it super simple to stand up a custom web page. First, you need a Spring MVC controller.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/com/greglturnquist/payroll/HomeController.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Controller
+public class HomeController {
+
+	@RequestMapping(value = "/")
+	public String index() {
+		return "index";
+	}
+
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<code>@Controller</code> marks this class as a Spring MVC controller.
+</li>
+<li>
+<code>@RequestMapping</code> flags the <code>index()</code> method to support the <code>/</code> route.
+</li>
+<li>
+It returns <code>index</code> as the name of the template, which Spring Boot&#8217;s autoconfigured view resolver will map to <code>src/main/resources/templates/index.html</code>.
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_defining_an_html_template">Defining an HTML template</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You are using Thymeleaf, although you won&#8217;t really use many of its features.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/templates/index.html</div>
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">&lt;!DOCTYPE html&gt;
+&lt;html xmlns:th="http://www.thymeleaf.org"&gt;
+&lt;head lang="en"&gt;
+    &lt;meta charset="UTF-8"/&gt;
+    &lt;title&gt;ReactJS + Spring Data REST&lt;/title&gt;
+    &lt;script async="" data-main="/run.js" src="/bower_components/requirejs/require.js"&gt;&lt;/script&gt;
+    &lt;link rel="stylesheet" href="/main.css" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;div id="react"&gt;&lt;/div&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The key part in this template is the <code>&lt;div id="react"&gt;&lt;/div&gt;</code> component in the middle. It is where you will direct React to plug in the rendered output.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_loading_javascript_modules">Loading JavaScript modules</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This tutorial won&#8217;t go into extensive detail on how it uses require.js to load JavaScript modules. But thanks to the <strong>frontend-maven-plugin</strong>, you don&#8217;t <em>have</em> to install any of the node.js tools to build and run the code.</p>
+</div>
+<div class="paragraph">
+<p>The following JavaScript modules will be used:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+require.js
+</li>
+<li>
+react.js
+</li>
+<li>
+rest.js
+</li>
+<li>
+requirejs-react-js
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you&#8217;re interested, the paths for the JavaScript moodules are defined in <a href="https://github.com/gregturn/react-and-spring-data-rest/blob/master/basic/src/main/resources/static/run.js">run.js</a>. The main JavaScript app is loaded by the web page through <a href="https://github.com/gregturn/react-and-spring-data-rest/blob/master/basic/src/main/resources/static/main.js">main.js</a>.</p>
+</div>
+<div class="paragraph">
+<p>With all that in place, you can focus on the React bits which are fetched after the DOM is loaded. It&#8217;s broken down into parts as below:</p>
+</div>
+<div class="paragraph">
+<p>Since you are using require.js to load things, go ahead and fetch the modules you need:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/static/app.jsx</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var React = require('react');
+var client = require('./client');</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<code>React</code> is the main library from Facebook for building this app.
+</li>
+<li>
+<code>client</code> is custom code that configures rest.js to include support for HAL, URI Templates, and other things. It also sets the default <strong>Accept</strong> request header to <strong>application/hal+json</strong>. You can <a href="https://github.com/gregturn/react-and-spring-data-rest/blob/master/basic/src/main/resources/static/client.js">read the code here</a>.
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_diving_into_react">Diving into React</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>React is based on defining components. Oftentimes, one component can hold multiple instances of another in a parent-child relationship. It&#8217;s easy for this concept to extend several layers.</p>
+</div>
+<div class="paragraph">
+<p>To start things off, it&#8217;s very handy to have a top level container for all components. (This will become more evident as you expand upon the code throughout this series.) Right now, you only have the employee list. But you might need some other related components later on, so let&#8217;s start with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/static/app.jsx - App component</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var App = React.createClass({
+    getInitialState: function () {
+        return ({employees: []});
+    },
+    componentDidMount: function () {
+        client({method: 'GET', path: '/api/employees'}).done(response =&gt; {
+            this.setState({employees: response.entity._embedded.employees});
+        });
+    },
+    render: function () {
+        return (
+            &lt;EmployeeList employees={this.state.employees}/&gt;
+        )
+    }
+})</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<code>React.createClass({&#8230;&#8203;})</code> is the method to create a React component.
+</li>
+<li>
+<code>getInitialState</code> is the API to initialize state data (data that is expected to vary).
+</li>
+<li>
+<code>componentDidMount</code> is the API invoked after React renders a component in the DOM.
+</li>
+<li>
+<code>render</code> is the API to "draw" the component on the screen.
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+In React, uppercase is the convention for naming components.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In the <strong>App</strong> component, an array of employees is fetched from the Spring Data REST backend and stored in this component&#8217;s <strong>state</strong> data.</p>
+</div>
+<div id="NOTE" class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>React components have two types of data: <strong>state</strong> and <strong>properties</strong>.</p>
+</div>
+<div class="paragraph">
+<p><strong>State</strong> is data that the component is expected to handle itself. It is also data that can fluctuate and change. To read the state, you use <code>this.state</code>. To update it, you use <code>this.setState()</code>. Every time <code>this.setState()</code> is called, React updates the state, calculates a diff between the previous state and the new state, and injects a set of changes to the DOM on the page. This results a fast and efficient updates to your UI.</p>
+</div>
+<div class="paragraph">
+<p>The common convention is to initialize state with all your attributes empty in <code>getInitialState</code>. Then you lookup data from the server using <code>componentDidMount</code> and populate your attributes. From there on, updates can be driven by user action or other events.</p>
+</div>
+<div class="paragraph">
+<p><strong>Properties</strong> encompass data that is passed into the component. Properties do NOT change but are instead fixed values. To set them, you assign them to attributes when creating a new component and you&#8217;ll soon see.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+JavaScript doesn&#8217;t lock down data structures like other languages. You can try to subvert properties by assigning values, but this doesn&#8217;t work with React&#8217;s differential engine and should be avoided.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>In this code, the function loads data via <code>client</code>, a <a href="https://promisesaplus.com/">Promise compliant</a> instance of rest.js. When it is done retrieving from <code>/api/employees</code>, it then invokes the function inside <code>done()</code> and set&#8217;s the state based on it&#8217;s HAL document (<code>response.entity._embedded.employees</code>). You might remember the structure of <code>curl /api/employees</code> <a href="#_touring_your_rest_service">earlier</a> and see how it maps onto this structure.</p>
+</div>
+<div class="paragraph">
+<p>When the state is updated, the <code>render()</code> function is invoked by the framework. The employee state data is included in creation of the <code>&lt;EmployeeList /&gt;</code> React component as an input parameter.</p>
+</div>
+<div class="paragraph">
+<p>Below is the definition for an <code>EmployeeList</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/static/app.jsx - EmployeeList component</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var EmployeeList = React.createClass({
+    render: function () {
+        var employees = this.props.employees.map(employee =&gt;
+            &lt;Employee key={employee._links.self.href} employee={employee}/&gt;
+        );
+        return (
+            &lt;table&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;First Name&lt;/th&gt;
+                    &lt;th&gt;Last Name&lt;/th&gt;
+                    &lt;th&gt;Description&lt;/th&gt;
+                &lt;/tr&gt;
+                {employees}
+            &lt;/table&gt;
+        )
+    }
+})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using JavaScript&#8217;s map function, <code>this.props.employees</code> is transformed from an array of employee records into an array of <code>&lt;Element /&gt;</code> React components (which you&#8217;ll see a little further down).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">&lt;Employee key={employee._links.self.href} data={employee} /&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This shows a new React component (note the uppercase format) being created along with two properties: <strong>key</strong> and <strong>data</strong>. These are supplied the values from <code>employee._links.self.href</code> and <code>employee</code>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Whenever you work with Spring Data REST, the <strong>self</strong> link IS the key for a given resource. React needs a unique identifer for child nodes, and <code>_links.self.href</code> is perfect.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Finally, you return an HTML table wrapped around the array of <code>employees</code> built with mapping.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-html" data-lang="html">&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;First Name&lt;/th&gt;
+        &lt;th&gt;Last Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+    {employees}
+&lt;/table&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This simple layout of state, properties, and HTML shows how React lets you declaritively create a simple and easy-to-understand component.</p>
+</div>
+<div id="NOTE" class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>Does this code contain both HTML <em>and</em> JavaScript? Yes. If you noticed the file extension, this is <a href="https://facebook.github.io/jsx/">JSX</a>. There is no requirement to use it. React can be written using pure JavaScript, but the JSX syntax is quite terse.</p>
+</div>
+<div class="paragraph">
+<p>JSX also includes bits and pieces of <a href="http://es6-features.org/#Constants">ES6</a>. The one used in the code is the <a href="http://es6-features.org/#ExpressionBodies">arrow function</a>. It avoids creating a nested function() with its own scoped <strong>this</strong>, and avoids needing a <a href="https://stackoverflow.com/a/962040/28214"><strong>self</strong> variable</a>.</p>
+</div>
+<div class="paragraph">
+<p>Worried about mixing logic with your structure? React&#8217;s APIs encourage nice, declarative structure combined with state and properties. Instead of mixing a bunch of unrelated JavaScript and HTML, React encourages building simple components with small bits of related state and properties that work well together. It lets you look at a single component and understand the design. Then they are easy to combine together for bigger structures.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, you need to actually define what an <code>&lt;Employee /&gt;</code> is.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/static/app.jsx - Employee component</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var Employee = React.createClass({
+    render: function () {
+        return (
+            &lt;tr&gt;
+                &lt;td&gt;{this.props.employee.firstName}&lt;/td&gt;
+                &lt;td&gt;{this.props.employee.lastName}&lt;/td&gt;
+                &lt;td&gt;{this.props.employee.description}&lt;/td&gt;
+            &lt;/tr&gt;
+        )
+    }
+})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This component is very simple. It has a single HTML table row wrapped around the employee&#8217;s three properties. The property itself is <code>this.props.employee</code>. Notice how passing in a JavaScript object makes it easy to pass along data fetched from the server?</p>
+</div>
+<div class="paragraph">
+<p>Because this component doesn&#8217;t manage any state nor does it deal with user input, there is nothing else to do. This might tempt you to cram it into the <code>&lt;EmployeeList /&gt;</code> up above. Don&#8217;t do it! Instead, splitting your app up into small components that each do one job will make it easier to build up functionality in the future.</p>
+</div>
+<div class="paragraph">
+<p>The last step is to render the whole thing.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/static/app.jsx - rendering code</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">React.render(
+    &lt;App /&gt;,
+    document.getElementById('react')
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>React.render()</code> accepts two arguments: a React component you defined as well as a DOM node to inject it into. Remember how you saw the <code>&lt;div id="react"&gt;&lt;/div&gt;</code> item earlier from the HTML page? This is where it gets picked up and plugged in.</p>
+</div>
+<div class="paragraph">
+<p>With all this in place, re-run the application (<code>./mvnw spring-boot:run</code>) and visit <a href="http://localhost:8080" class="bare">http://localhost:8080</a>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://github.com/gregturn/react-and-spring-data-rest/raw/master/basic/images/basic-1.png" alt="basic 1">
+</div>
+</div>
+<div class="paragraph">
+<p>You can see the initial employee loaded up by the system.</p>
+</div>
+<div class="paragraph">
+<p>Remember using cURL to create new entries? Do that again.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>curl -X POST localhost:8080/api/employees -d '{"firstName": "Bilbo", "lastName": "Baggins", "description": "burglar"}' -H 'Content-Type:application/json'</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Refresh the browser, and you should see the new entry:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://github.com/gregturn/react-and-spring-data-rest/raw/master/basic/images/basic-2.png" alt="basic 2">
+</div>
+</div>
+<div class="paragraph">
+<p>And now you can see both of them listed on the web site.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_review">Review</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this session:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>You defined a domain object and a corresponding repository.
+</li>
+<li>You let Spring Data REST export it with full blown hypermedia controls.
+</li>
+<li>You created two simple React components in a parent-child relationship.
+</li>
+<li>You fetched server data and rendered them in as a simple, static HTML structure.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Issues?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>The web page wasn&#8217;t dynamic. You had to refresh the browser to fetch new records.
+</li>
+<li>The web page didn&#8217;t use any hypermedia controls or metadata. Instead, it was hardcoded to fetch data from <code>/api/employees</code>.
+</li>
+<li>It&#8217;s read only. While you can alter records using cURL, the web page offers none of that.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These are things we can address in the next session. Until then, happy coding!</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2220;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

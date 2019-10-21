@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>The Spring Boot Dashboard in STS - Part 2: Working with Cloud Foundry</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="The Spring Boot Dashboard in STS - Part 2: Working with Cloud Foundry" />
+<meta name="twitter:description" content="&lt;p&gt;Welcome back Spring community,&lt;/p&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this second part of our blog series about the new Spring Boot Dashboard in the Spring Tool Suite we will move beyond local applications in your workspace and take a look at remote apps deployed to a cloud runtime. If you missed the &lt;a href=&quot;https://spring.io/blog/2015/10/08/the-spring-boot-dashboard-in-sts-part-1-local-boot-apps&quot;&gt;first part&lt;/a&gt;, please take a look it to get familiar with the boot dashboard in STS first.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;h2&gt;Cloud runtime support&lt;/h2&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;The initial remote target that we support in the Boot Dashboard is Cloud Foundry. Neither the design nor the implementation of the Boot Dashboard limits this to be the only supported remote target, it is just the first one that we worked on.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@martinlippert" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/8491f7d4276bddcfdcefaf5ae860b9f6?s=200" />
+
+<meta property="og:title" content="The Spring Boot Dashboard in STS - Part 2: Working with Cloud Foundry" />
+<meta property="og:image" content="https://gravatar.com/avatar/8491f7d4276bddcfdcefaf5ae860b9f6?s=200" />
+<meta property="og:description" content="&lt;p&gt;Welcome back Spring community,&lt;/p&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this second part of our blog series about the new Spring Boot Dashboard in the Spring Tool Suite we will move beyond local applications in your workspace and take a look at remote apps deployed to a cloud runtime. If you missed the &lt;a href=&quot;https://spring.io/blog/2015/10/08/the-spring-boot-dashboard-in-sts-part-1-local-boot-apps&quot;&gt;first part&lt;/a&gt;, please take a look it to get familiar with the boot dashboard in STS first.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;h2&gt;Cloud runtime support&lt;/h2&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;The initial remote target that we support in the Boot Dashboard is Cloud Foundry. Neither the design nor the implementation of the Boot Dashboard limits this to be the only supported remote target, it is just the first one that we worked on.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-10-15 14:32:28.242" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">The Spring Boot Dashboard in STS - Part 2: Working with Cloud Foundry</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/8491f7d4276bddcfdcefaf5ae860b9f6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mlippert">Martin Lippert</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-10-15 14:32:28.242">October 15, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2252" href="/blog/2015/10/15/the-spring-boot-dashboard-in-sts-part-2-working-with-cloud-foundry#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Welcome back Spring community,</p>
+<div class="paragraph">
+<p>In this second part of our blog series about the new Spring Boot Dashboard in the Spring Tool Suite we will move beyond local applications in your workspace and take a look at remote apps deployed to a cloud runtime. If you missed the <a href="https://spring.io/blog/2015/10/08/the-spring-boot-dashboard-in-sts-part-1-local-boot-apps">first part</a>, please take a look it to get familiar with the boot dashboard in STS first.</p>
+</div>
+<h2>Cloud runtime support</h2>
+<div class="paragraph">
+<p>The initial remote target that we support in the Boot Dashboard is Cloud Foundry. Neither the design nor the implementation of the Boot Dashboard limits this to be the only supported remote target, it is just the first one that we worked on.</p>
+</div>
+<div class="paragraph">
+<p>The goal for us was to provide a similar experience as for local apps, giving you an easy way to interact, start, stop, update, and lookup log output of your Spring Boot apps on Cloud Foundry. Therefore you can add a Cloud Foundry section to the boot dashboard using the big plus icon in the toolbar.</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/09-cloudfoundry.png" /></p>
+<div class="paragraph">
+<p>Once you entered your credentials and selected an org/space, a new section will appear in the boot dashboard, listing the apps that are deployed to this space on Cloud Foundry. You can see the name of the app as well as the number of instances that are configured and that are up and running.</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/10-cloudsection.png" /></p>
+<div class="paragraph">
+<p>The basic actions work for one or multiple apps on CF in the same or a very similar way to how they work for local apps. You can jump to the console output and it will appear in the console view of STS/Eclipse, you can start and stop apps, you can double-click them to get to a browser window for the running app, you can configure a default path for the app, and you can add/remove tags to/from those apps. You can even execute some of the actions (like start and stop) across targets, if you select multiple entries in the boot dashboard across those target sections.</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/11-multiple-apps.png" /></p>
+<div class="paragraph">
+<p>In addition to the common actions that are suitable for local and apps on Cloud Foundry, there are certain additional actions specifically for apps on Cloud Foundry. The boot dashboard allows you, for example, to delete an app entirely from Cloud Foundry, or to easily jump to the web console.</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/12-cloud-specific-actions.png" /></p>
+<h2>Deploying to Cloud Foundry</h2>
+<div class="paragraph">
+<p>Up to here, we talked about existing apps on Cloud Foundry. But how do you get your apps deployed to Cloud Foundry? There are various ways, using the CLI or the Eclipse Plugin for Cloud Foundry. The boot dashboard offers you another option: you can drag&drop your Spring Boot application directly onto the Cloud Foundry target in the dashboard and it will deploy the Spring Boot app to CF. This is as easy as its sounds.</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/13-dnd-deploy.png" /></p>
+<div class="paragraph">
+<p>If your application contains a manifest.yml file, this will be used to configure the application for Cloud Foundry. This typically contains the name of the app, the domain, memory settings, number of instances, and potentially a lot more.</p>
+</div>
+<div class="paragraph">
+<p>If you don’t have a manifest.yml file in your project, the deploy action will prompt you in a dialog for the basic information it needs to deploy the app.</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/14-deploy-dialog.png" /></p>
+<div class="paragraph">
+<p>But take care: if the project contains a manifest.yml file, it will be used to deploy and configure the app. Changes to the configuration on CF that you might have made via the web console will be lost the next time you restart/redeploy/update your app using the boot dashboard. Either configure everything in the manifest.yml file or go without it altogether - at least for the moment. We will be working to improve this to allow more flexible ways of dealing with manifest.yml files and external changes to the config of your app, but that is something to be done in future releases of STS.</p>
+</div>
+<div class="paragraph">
+<p>Once the app is deployed, the boot dashboard will keep the association between the project in your workspace and the deployed app on Cloud Foundry (and will show this association in the boot dashboard).</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/15-project-association.png" /></p>
+<div class="paragraph">
+<p>Keeping this association between your workspace project and the app on Cloud Foundry makes changes to this app a lot easier. If you change the code in your workspace and press the (re)start button for the app on CF, the boot dashboard will automatically re-push the app (the changes) to Cloud Foundry.</p>
+</div>
+<div class="paragraph">
+<p>Once you have deployed your apps on Cloud Foundry, you often don’t need to work on everything locally at the same time. Usually you focus on certain parts of the application and sometimes you would like to use use even both: some services running on Cloud Foundry and some services running on your local machine in your IDE. But how do they interact?</p>
+</div>
+<h2>Tunneling local services for mixed deployments</h2>
+<div class="paragraph">
+<p>As an early experiment, we built a specific feature into the boot dashboard that lets you use all your services and apps on CF and have them call individual services running on your local machine. That way you can focus on individual projects of your landscape and continue to use Cloud Foundry for the rest of your world. You can quickly iterate and work on the code locally - and test it while working with the other parts on Cloud Foundry. Isn’t that great?</p>
+</div>
+<div class="paragraph">
+<p>They way this works is: You have a service discovery mechanism for your microservices in place. At the moment we support the Eureka service discovery service for this feature. You can start your local Spring Boot app using a special action called “(re)start and expose app via ngrok”. Executing this action will (re)start your local app on your machine. At the same time the action will create a public visible tunnel to this app using the ngrok service. As a result, you get a publicly visible URL that routes all its traffic to your local machine and to the local Spring Boot app that is running on your local machine. The app is automatically configured to register with the remote Eureka using this publicly visible tunnel URL.</p>
+</div><p><img src="https://docs.spring.io/sts/nan/v371/img/blog-series/16-ngrok-tunnel.png" /></p>
+<div class="paragraph">
+<p>Clients to this service will now get this tunnel URL from Eureka instead of (or in addition to) the default instance of your service that might be running on Cloud Foundry already - and will call your locally running service instead of the one on CF. You can iterate on your local service quickly or even debug it.</p>
+</div>
+<div class="paragraph">
+<p>This mixed deployment scenario is obviously not useful for production or team environments, where multiple people are using the applications on CF simultaneously. But this is extremely useful for testing and development environments.</p>
+</div>
+<div class="paragraph">
+<p>The support for Cloud Foundry is just a starting point here. The Spring Boot Dashboard is by no means limited or focused on Cloud Foundry. Other remote cloud runtimes could and will be added in the future. One of the next runtimes that we are going to work on is Lattice, but other runtimes are very welcome as well. If you are interested in collaborating on this, let us know. The Spring Boot Dashboard is open-source under the EPL and we would be more than happy to collaborate with you on additional features and adding support for more cloud runtimes to it.</p>
+</div>
+<h2>Outlook</h2>
+<div class="paragraph">
+<p>The third part of this series will introduce you to the built-in support for the Spring Boot Devtools and how you can use them from within the Boot Dashboard to make quick modifications to your apps (even on CF) and how to do remote debugging on CF.</p>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2252;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

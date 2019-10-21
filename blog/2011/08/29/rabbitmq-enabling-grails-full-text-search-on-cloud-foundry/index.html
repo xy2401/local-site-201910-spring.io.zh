@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>RabbitMQ: Enabling Grails full text search on Cloud Foundry</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="RabbitMQ: Enabling Grails full text search on Cloud Foundry" />
+<meta name="twitter:description" content="&lt;p&gt;In my &lt;a href=&quot;http://blog.springsource.com/2011/04/21/deeper-into-grails-cloud-foundry/&quot;&gt;second blog about Grails and Cloud Foundry&lt;/a&gt; I introduced a variant of the &lt;a href=&quot;https://github.com/SpringSource/cloudfoundry-samples/tree/master/grailstwitter&quot;&gt;Grails Twitter example&lt;/a&gt; that could be hosted on &lt;a href=&quot;http://www..cloudfoundry.com/&quot;&gt;CloudFoundry.com&lt;/a&gt; At the time I mentioned that full text search using the Searchable plugin would limit you to a single application instance because the search indices would be unique to each instance. In other words, you might very easily get different search results depending on which application instance your browser is routed to.&lt;/p&gt;
+&lt;p&gt;I also said that one option for fixing this problem would be to synchronise the search indices across the instances. But that doesn’t sound particularly easy, does it? As it happens, the introduction of the RabbitMQ service into Cloud Foundry means that the required code changes are far smaller than you might expect. So let’s see how I added full text search for the Grails Twitter status messages.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="RabbitMQ: Enabling Grails full text search on Cloud Foundry" />
+<meta property="og:description" content="&lt;p&gt;In my &lt;a href=&quot;http://blog.springsource.com/2011/04/21/deeper-into-grails-cloud-foundry/&quot;&gt;second blog about Grails and Cloud Foundry&lt;/a&gt; I introduced a variant of the &lt;a href=&quot;https://github.com/SpringSource/cloudfoundry-samples/tree/master/grailstwitter&quot;&gt;Grails Twitter example&lt;/a&gt; that could be hosted on &lt;a href=&quot;http://www..cloudfoundry.com/&quot;&gt;CloudFoundry.com&lt;/a&gt; At the time I mentioned that full text search using the Searchable plugin would limit you to a single application instance because the search indices would be unique to each instance. In other words, you might very easily get different search results depending on which application instance your browser is routed to.&lt;/p&gt;
+&lt;p&gt;I also said that one option for fixing this problem would be to synchronise the search indices across the instances. But that doesn’t sound particularly easy, does it? As it happens, the introduction of the RabbitMQ service into Cloud Foundry means that the required code changes are far smaller than you might expect. So let’s see how I added full text search for the Grails Twitter status messages.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-08-29 13:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">RabbitMQ: Enabling Grails full text search on Cloud Foundry</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-08-29 13:00:00.0">August 29, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="435" href="/blog/2011/08/29/rabbitmq-enabling-grails-full-text-search-on-cloud-foundry#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In my <a href="http://blog.springsource.com/2011/04/21/deeper-into-grails-cloud-foundry/">second blog about Grails and Cloud Foundry</a> I introduced a variant of the <a href="https://github.com/SpringSource/cloudfoundry-samples/tree/master/grailstwitter">Grails Twitter example</a> that could be hosted on <a href="http://www..cloudfoundry.com/">CloudFoundry.com</a> At the time I mentioned that full text search using the Searchable plugin would limit you to a single application instance because the search indices would be unique to each instance. In other words, you might very easily get different search results depending on which application instance your browser is routed to.</p><p>I also said that one option for fixing this problem would be to synchronise the search indices across the instances. But that doesn&rsquo;t sound particularly easy, does it? As it happens, the introduction of the RabbitMQ service into Cloud Foundry means that the required code changes are far smaller than you might expect. So let&rsquo;s see how I added full text search for the Grails Twitter status messages.</p>
+<h2>Making status messages searchable</h2><p>The Searchable plugin makes a strong assumption that you want to index standard GORM domain classes. That means Hibernate/SQL. But the Grails Twitter status messages are being stored in MongoDB, not MySQL. Can we make them searchable? Yes we can, but at the cost of some features.</p><p>As with a normal domain class, the first step to searching the <tt>Status</tt> instances is to add a <tt>searchable</tt> property:</p>
+<pre><code class="prettyprint groovy">package org.grails.twitter
+
+import org.grails.twitter.auth.Person
+
+class Status {
+    static mapWith = &quot;mongo&quot;
+    static transients = [&quot;author&quot;]
+
+    static searchable = {
+        only = [&quot;message&quot;, &quot;dateCreated&quot;]
+        authorId index: &quot;no&quot;, store: &quot;yes&quot;
+    }
+	
+    String message
+    Long authorId
+    List&lt;String&gt; tags = []
+    Date dateCreated
+	
+    Person getAuthor() {
+        return Person.get(authorId)
+    }
+
+    static constraints = {
+        message maxSize: 160
+    }
+}
+</code></pre><p>In this case I want to be able to search on the creation date and the content of the message but nothing else. I also want to link to a message&rsquo;s author from the search results. But if the <tt>authorId</tt> isn&rsquo;t indexed, then the search results won&rsquo;t contain the ID of the poster. So, I store <tt>authorId</tt> in the index, but don&rsquo;t make it searchable (index: &ldquo;no&rdquo;). Simple, no? When the search results are displayed, they can now include the name of each message&rsquo;s author.</p><p>One significant limitation of indexing a non-Hibernate domain class is that mirroring won&rsquo;t work. This means that new messages won&rsquo;t automatically be indexed when they are saved. Fortunately, we don&rsquo;t actually want this behaviour here, so I disable mirroring and &lsquo;bulk indexing on startup&rsquo; in <tt>Config.groovy</tt>:</p>
+<pre><code class="prettyprint groovy">searchable {
+    ...
+    mirrorChanges = false
+    bulkIndexOnStartup = false
+}
+</code></pre><p>Of course, we do want the status messages indexed on startup because the file system on Cloud Foundry is transient and so the search index will need rebuilding at every startup. But the automatic indexing won&rsquo;t work with non-Hibernate domain classes either, so I resort to manual indexing at the end of <tt>BootStrap.groovy</tt>:</p>
+<pre><code class="prettyprint groovy">...
+class BootStrap {
+
+    def searchableService
+    def springSecurityService
+
+    def init = { servletContext -&gt;
+        ...
+        // Index all Hibernate mapped domain classes.
+        searchableService.reindex()
+
+        // Index all status messages.
+        def statusMessages = Status.list()
+        log.info &quot;Indexing ${statusMessages.size()} status messages&quot;
+        Status.reindex(statusMessages)
+        log.info &quot;Finished indexing&quot;
+    }
+    ...
+}
+</code></pre><p>That&rsquo;s not an awful lot of code, but it&rsquo;s enough to make the status messages searchable. All that&rsquo;s left is to make sure that new messages are indexed and that the search indices are synchronised across application instances.</p>
+<h2>Syncing with RabbitMQ</h2><p>The basic model for keeping the search indices in sync is pretty straightforward:</p><p><img src="http://blog.springsource.com/wp-content/uploads/2011/08/grailstwitter-search-sync.png" alt="" title="Synchronising search indices with RabbitMQ" width="430" height="252" class="aligncenter size-full wp-image-9490" /></p><p>Each time a status message is saved, a message is sent to the RabbitMQ broker, which then forwards it to all the application instances. Each instance then indexes the <tt>Status</tt> instance identified by the message.</p><p>Before we can implement this feature, we need to install the RabbitMQ plugin:<br /><pre><br /> grails install-plugin rabbitmq<br /></pre></p><p>The next job is to configure the broker with the appropriate exchanges and queues. I&rsquo;ve blogged about both the <a href="http://blog.springsource.com/2010/06/14/understanding-amqp-the-protocol-used-by-rabbitmq/">AMQP protocol</a> and the <a href="http://blog.springsource.com/2010/08/23/rabbitmq-plugin-for-grails-early-access/">RabbitMQ plugin</a> before, so I won&rsquo;t go into the detail of exchanges and queues here. Suffice it say that all we need is a single fanout exchange (where all messages are routed to all listeners) and a Grails service that subscribes to that exchange. So in <tt>Config.groovy</tt> I add:</p>
+<pre><code class="prettyprint groovy">rabbitmq {
+    connectionfactory {
+        username = &#39;guest&#39;
+        password = &#39;guest&#39;
+        hostname = &#39;localhost&#39;
+    }
+
+    queues = {
+        exchange name: &#39;search.sync&#39;, type: fanout, durable: false
+    }
+}
+</code></pre><p>The important bit is the exchange declaration: the connection factory settings are ignored when the application is deployed to Cloud Foundry because the RabbitMQ service is bound to the application at runtime.</p><p>Sending the message is a one-liner:</p>
+<pre><code class="prettyprint groovy">...
+class StatusService {
+    def springSecurityService
+    def tagService
+    
+    void updateStatus(long userId, String message) {
+        def status = new Status(message: message, authorId: userId).save(flush: true, failOnError: true)
+        rabbitSend &#39;search.sync&#39;, &#39;&#39;, &quot;${status.id}:${status.class.name}&quot;
+        
+        runAsync {
+            tagService.extractTagsFromMessage(status)
+        }
+    }
+    ...
+}
+</code></pre><p>and the service that indexes the status messages isn&rsquo;t much more complicated:</p>
+<pre><code class="prettyprint groovy">package org.grails.twitter
+
+class SyncService {
+    static rabbitSubscribe = &quot;search.sync&quot;
+    static transactional = false
+
+    def grailsApplication
+    def searchableService
+
+    void handleMessage(String message) {
+        def parts = message.split(/:/)
+        if (parts.size() != 2) {
+            log.error &quot;Invalid message: $message&quot;
+            return
+        }
+
+        def domainClass = grailsApplication.getDomainClass(parts[1])
+        log.debug &quot;Reindexing instance ${parts[0]} of ${parts[1]}&quot;
+        try {
+            searchableService.reindex(domainClass.clazz.get(parts[0]))
+        }
+        catch (Exception ex) {
+            log.error &quot;Failed to index instance ${parts[0]} of ${parts[1]}&quot;, ex
+        }
+    }
+}
+</code></pre><p>So the <tt>rabbitSend()</tt> method is used to send a simple string that contains the <tt>Status</tt> instance ID and the class name. In this case we&rsquo;re only dealing with <tt>Status</tt> instances, but it&rsquo;s useful to make the service generic to all potential searchable domain classes. Also, using Groovy means we don&rsquo;t have to do any nasty reflection: we just fetch the class and call the methods we want directly on it!</p><p>The important parts of <tt>SyncService</tt> are the <tt>rabbitSubscribe</tt> property and the <tt>handleMessage()</tt> method. The former declares that the service should subscribe to the exchange &ldquo;search.sync&rdquo;, which is the one I&rsquo;m sending the messages to. The <tt>handleMessage()</tt> method is invoked each time a message is received from that exchange, with the message content as its argument. Hence the method extracts the class name and instance ID and uses the Grails <tt>DomainClass.get()</tt> method to retrieve the relevant instance from the data store (MongoDB for our <tt>Status</tt> messages). Finally, the <tt>searchableService.reindex()</tt> method adds the status message to the local search index. And of course this is happening on every application instance.</p><p>The application is now ready for deployment to Cloud Foundry and scaling up to as many instances as you&rsquo;re allowed! You can see the result on <a href="http://grailstwitter.cloudfoundry.com/">CloudFoundry.com</a>. Note that in the GitHub project I have done some UI work to support full-text search, but those changes aren&rsquo;t really relevant to the subject at hand.</p>
+<h2>Wrap up</h2><p>I have to say, I was surprised myself how little code was required to get the search indices syncing. Not only that, but I was able to focus on how to solve the problem rather than how to code it, since the coding was so straightforward. To top it off, using Cloud Foundry meant the deployment consisted of creating and binding a RabbitMQ service and then running the <tt>grails prod cf-update</tt> command to push the changes to the server. Simple stuff.</p><p>As you&rsquo;ve seen, RabbitMQ can provide innovative solutions for cloud-related problems, and the Grails plugin makes it very easy to use through the power of its conventions. You can communicate between different instances of the same application, different Grails applications, or even applications written using different languages and frameworks. We could for example deploy a simple Node.js or Sinatra application that logs and displays the &ldquo;search.sync&rdquo; messages, so you can keep track of them. Basically, RabbitMQ is an essential item in your cloud toolbox.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 435;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

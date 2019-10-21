@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Eventing Data with RabbitMQ and Riak </title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Eventing Data with RabbitMQ and Riak " />
+<meta name="twitter:description" content="&lt;p&gt;As new applications take advantage of the scalability benefits of message brokers like &lt;a href=&quot;http://www.rabbitmq.com/&quot; title=&quot;RabbitMQ Home&quot;&gt;RabbitMQ&lt;/a&gt; and cloud-scale datastores like &lt;a href=&quot;http://wiki.basho.com/&quot; title=&quot;Riak Home&quot;&gt;Riak&lt;/a&gt;, it’s inevitable that the two should become fast friends (the kind who actually talk to each other in person rather than the kind whose only contact is through Facebook).&lt;/p&gt;
+&lt;p&gt;So many of the applications we find ourselves writing these days have these two functions in the same application. Very often we want to update data as the result of a message or send a message as the result of updated data. Two new utilities facilitating RabbitMQ and Riak integration allow you to do either directly inside their respective servers.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@j_brisbin" />
+<meta name="twitter:image:src" content="http://gravatar.com/avatar/5500b5cf634f9a3921e4619778a1425f?s=200" />
+
+<meta property="og:title" content="Eventing Data with RabbitMQ and Riak " />
+<meta property="og:image" content="http://gravatar.com/avatar/5500b5cf634f9a3921e4619778a1425f?s=200" />
+<meta property="og:description" content="&lt;p&gt;As new applications take advantage of the scalability benefits of message brokers like &lt;a href=&quot;http://www.rabbitmq.com/&quot; title=&quot;RabbitMQ Home&quot;&gt;RabbitMQ&lt;/a&gt; and cloud-scale datastores like &lt;a href=&quot;http://wiki.basho.com/&quot; title=&quot;Riak Home&quot;&gt;Riak&lt;/a&gt;, it’s inevitable that the two should become fast friends (the kind who actually talk to each other in person rather than the kind whose only contact is through Facebook).&lt;/p&gt;
+&lt;p&gt;So many of the applications we find ourselves writing these days have these two functions in the same application. Very often we want to update data as the result of a message or send a message as the result of updated data. Two new utilities facilitating RabbitMQ and Riak integration allow you to do either directly inside their respective servers.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-04-21 17:52:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Eventing Data with RabbitMQ and Riak </h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/5500b5cf634f9a3921e4619778a1425f?s=20&amp;d=mm" />
+<span class="author">Jon Brisbin</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-04-21 17:52:00.0">April 21, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="413" href="/blog/2011/04/21/eventing-data-with-rabbitmq-and-riak#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>As new applications take advantage of the scalability benefits of message brokers like <a href="https://www.rabbitmq.com/" title="RabbitMQ Home">RabbitMQ</a> and cloud-scale datastores like <a href="http://wiki.basho.com/" title="Riak Home">Riak</a>, it&rsquo;s inevitable that the two should become fast friends (the kind who actually talk to each other in person rather than the kind whose only contact is through Facebook).</p><p>So many of the applications we find ourselves writing these days have these two functions in the same application. Very often we want to update data as the result of a message or send a message as the result of updated data. Two new utilities facilitating RabbitMQ and Riak integration allow you to do either directly inside their respective servers.</p>
+<h3>RabbitMQ Custom Exchange</h3><p>The purpose of the experimental RabbitMQ Riak custom exchange is to send AMQP messages from the broker to a Riak cluster. You could, of course, simply bind a consumer to a particular exchange and do that yourself. If you&rsquo;re doing any kind of message transformation, then you might still need to do that in a special consumer. But having a dedicated exchange type for this purpose gives you lots of flexibility over where the message actually ends up with minimal configuration or overhead. You can specify the host and Protocol Buffers port of the Riak server in the arguments you pass to the exchange declare operation, or you can pass that information as an AMQP message header&ndash;or you could do both. You could specify the bucket and key information in an AMQP message header, or you could let that be inferred from the exchange name and routing key, respectively&ndash;or you could do a combination of both by overriding, say, the bucket name in which the message will be stored.</p><p>Once the message has been delivered to Riak, the exchange calls the topic exchange routing logic, which means this exchange works just like a normal topic exchange&ndash;with the exception that it stores all messages it receives in Riak. In the near future, support will be added for all the exchange types that RabbitMQ supports, not just the topic exchange type.</p><p>Internally, the exchange uses connection pooling to send messages to Riak. To expand the number of available clients in the pool beyond the default of five, simply set the &ldquo;maxclients&rdquo; argument when you declare your exchange.</p>
+<h3>RabbitMQ Riak postcommit Hook</h3><p>The other side of the coin is the <a href="http://wiki.basho.com/Pre--and-Post-Commit-Hooks.html" title="Pre and Post-commit Hooks">postcommit hook</a> you can install into your Riak server that will send any updated Riak objects to a RabbitMQ server whenever that entry is modified.</p><p>To specify where to send this message, you can include a number of different metadata headers of the &ldquo;X-Riak-Meta-&rdquo; variety on your entry. Here is the full list of possible options that can be set either on each individual entry or on a special document in that bucket with a key of &ldquo;AMQP-Meta&rdquo;. This will provide a default set of metadata headers that will be checked if none exist on the actual entry.</p><p>The full list of headers recognized is:</p>
+<ul>
+<li>X-Riak-Meta-Amqp-Exchange</li>
+<li>X-Riak-Meta-Amqp-Routing-Key</li>
+<li>X-Riak-Meta-Amqp-Host</li>
+<li>X-Riak-Meta-Amqp-Port</li>
+<li>X-Riak-Meta-Amqp-Vhost</li>
+<li>X-Riak-Meta-Amqp-User</li>
+<li>X-Riak-Meta-Amqp-Password</li>
+<li>X-Riak-Meta-Amqp-Ignore</li>
+</ul><p>Most of these options are self-documenting. One option to note is the &ldquo;X-Riak-Meta-Amqp-Ignore&rdquo; header. By setting this to the value &ldquo;true&rdquo;, the RabbitMQ postcommit hook will ignore any updates to this entry and not send a message like it normally would.</p>
+<h3>What can I do with it?</h3><p>The concept is simple, of course, but the implications are profound.</p><p>One of the problems when dealing with RabbitMQ&rsquo;s clustering is that it uses mnesia under the covers. In many distributed setups this is not always ideal. Sometimes-connected WAN nodes in particular can suffer from not having a solid connection to the other brokers.</p><p>By specifying the RabbitMQ server to send Riak updates to, it&rsquo;s actually possible to set up a scenario like the one in the following diagram:</p><p><img src="http://cms.jbrisbin.com/riak-shovel-diagram.jpg" alt="Riak Shovel Diagram" style="padding: 1.5em 50% 1.5em 50%; margin-left: -146px;" /></p><p>The two RabbitMQ servers in this diagram are not clustered. Using a combination of a Riak exchange type for RabbitMQ and the RabbitMQ postcommit hook for Riak, consumers on both servers will receive the messages in a manner much like what the <a href="https://www.rabbitmq.com/plugins.html#rabbitmq-shovel">shovel plugin for RabbitMQ</a> does.</p><p>Keep in mind that this custom exchange type does not address the underlying problem of communicating with nodes across a WAN (or, for that matter, in any scenario where nodes come and go ad hoc, like in a dynamic scaling situation). There are trade-offs in everything, of course, so your mileage may vary. Currently, neither of these utilties handles retries or resends. There is no official roadmap yet, but if there were, retries would be at the top of the list.</p><p>One of the nice things about using a Riak-backed message exchange is that your messages are all stored. Since Riak is a cloud-scale data store, you can keep every message your exchange receives without worrying about the storage overhead (just add more Riak servers for greater capacity). This also means you can write a simple web interface to display those messages and, by simply updating the message, you can resend any (or all!) of them. This could be a great way to replay a set of messages for testing, or if you wanted to re-send all your messages somewhere else by changing one of the metadata headers to point to a different broker.</p><p>This is just a quick introduction to a brand new, but potentially powerful tool. I&rsquo;m sure you&rsquo;ve already got ideas on how you can apply this method to your own problem domains. I&rsquo;d love to hear how you plan to do that! Send me a Tweet (<a href="https://twitter.com/#!/j_brisbin">@j_brisbin</a>) about what you&rsquo;re doing.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 413;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

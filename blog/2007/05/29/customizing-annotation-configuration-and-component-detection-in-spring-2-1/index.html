@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Customizing Annotation Configuration and Component Detection in Spring 2.1</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Customizing Annotation Configuration and Component Detection in Spring 2.1" />
+<meta name="twitter:description" content="&lt;p&gt; &lt;i&gt;NOTE: This post has been updated as of May 31, 2007 to reflect the state of the 2.1-M2 official release&lt;/i&gt; &lt;/p&gt;
+&lt;p&gt; Two weeks ago I &lt;a href=&quot;http://blog.interface21.com/main/2007/05/14/annotation-driven-dependency-injection-in-spring-21/&quot;&gt;blogged&lt;/a&gt; about the new annotation-driven dependency injection capabilities of Spring 2.1, and I mentioned that I would follow-up with more info &quot;later in the week&quot;. It turns out that was a bit optimistic, but the good news is the functionality has evolved quite a bit in the meantime. Therefore, to follow along with the examples here you will need to download the &lt;a href=&quot;http://sourceforge.net/project/showfiles.php?group_id=73357&amp;amp;package_id=173644&quot;&gt;2.1-M2 official release&lt;/a&gt; (or if you are one of the first people to read this updated entry and M2 is not yet available, you should grab at least nightly build #115 which you can download &lt;a href=&quot;http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR&quot;&gt;here&lt;/a&gt;). &lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@m_f_" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+
+<meta property="og:title" content="Customizing Annotation Configuration and Component Detection in Spring 2.1" />
+<meta property="og:image" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+<meta property="og:description" content="&lt;p&gt; &lt;i&gt;NOTE: This post has been updated as of May 31, 2007 to reflect the state of the 2.1-M2 official release&lt;/i&gt; &lt;/p&gt;
+&lt;p&gt; Two weeks ago I &lt;a href=&quot;http://blog.interface21.com/main/2007/05/14/annotation-driven-dependency-injection-in-spring-21/&quot;&gt;blogged&lt;/a&gt; about the new annotation-driven dependency injection capabilities of Spring 2.1, and I mentioned that I would follow-up with more info &quot;later in the week&quot;. It turns out that was a bit optimistic, but the good news is the functionality has evolved quite a bit in the meantime. Therefore, to follow along with the examples here you will need to download the &lt;a href=&quot;http://sourceforge.net/project/showfiles.php?group_id=73357&amp;amp;package_id=173644&quot;&gt;2.1-M2 official release&lt;/a&gt; (or if you are one of the first people to read this updated entry and M2 is not yet available, you should grab at least nightly build #115 which you can download &lt;a href=&quot;http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR&quot;&gt;here&lt;/a&gt;). &lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2007-05-29 13:57:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Customizing Annotation Configuration and Component Detection in Spring 2.1</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mfisher">Mark Fisher</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2007-05-29 13:57:00.0">May 29, 2007</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="79" href="/blog/2007/05/29/customizing-annotation-configuration-and-component-detection-in-spring-2-1#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>
+<i>NOTE: This post has been updated as of May 31, 2007 to reflect the state of the 2.1-M2 official release</i>
+</p>
+<p>
+Two weeks ago I <a href="http://blog.interface21.com/main/2007/05/14/annotation-driven-dependency-injection-in-spring-21/">blogged</a> about the new annotation-driven dependency injection capabilities of Spring 2.1, and I mentioned that I would follow-up with more info "later in the week". It turns out that was a bit optimistic, but the good news is the functionality has evolved quite a bit in the meantime. Therefore, to follow along with the examples here you will need to download the <a href="https://sourceforge.net/project/showfiles.php?group_id=73357&package_id=173644">2.1-M2 official release</a> (or if you are one of the first people to read this updated entry and M2 is not yet available, you should grab at least nightly build #115 which you can download <a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR">here</a>).
+</p>
+<p>
+The first thing I want to demonstrate is how to create an application context without using any XML. For those who have used Spring's BeanDefinitionReader implementations, this will look very familiar. Before creating the context however, we need a few "candidate" beans on the classpath. Continuing with the example from my previous blog, I have the following two interfaces:
+```java
+public interface GreetingService {
+String greet(String name);
+}
+```
+```java
+public interface MessageRepository {
+String getMessage(String language);
+}
+```
+...and these corresponding implementations:
+```java
+@Component
+public class GreetingServiceImpl implements GreetingService {
+@Autowired
+private MessageRepository messageRepository;
+public String greet(String name) {
+Locale locale = Locale.getDefault();
+if (messageRepository == null) {
+return "Sorry, no messages";
+}
+String message = messageRepository.getMessage(locale.getDisplayLanguage());
+return message + " " + name;
+}
+}
+```
+```java
+@Repository
+public class StubMessageRepository implements MessageRepository {
+Map<String,String> messages = new HashMap<String,String>();
+@PostConstruct
+public void initialize() {
+messages.put("English", "Welcome");
+messages.put("Deutsch", "Willkommen");
+}
+public String getMessage(String language) {
+return messages.get(language);
+}
+}
+```
+</p>
+<p>
+Now as promised... to assemble this admittedly trivial "application" without any XML:
+```java
+Locale.setDefault(Locale.GERMAN);
+GenericApplicationContext context = new GenericApplicationContext();
+ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(context);
+scanner.scan("blog"); // the parameter is 'basePackage'
+context.refresh();
+GreetingService greetingService = (GreetingService) context.getBean("greetingServiceImpl");
+String message = greetingService.greet("Standalone Beans");
+System.out.println(message);
+```
+And the result:
+```java
+Willkommen Standalone Beans
+```
+</p>
+<p>
+Essentially, this is the exact same behavior as when using the <i>component-scan</i> XML element from the new "context" namespace (as demonstrated in my <a href="http://blog.interface21.com/main/2007/05/14/annotation-driven-dependency-injection-in-spring-21/">previous blog</a>). However, I want to focus on some of the newer features as well as customization options. First, I will remove the @Repository annotation from the StubMessageRepository, and rerun the tests which produces the following exception:
+```java
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'greetingServiceImpl': Autowiring of fields failed; nested exception is org.springframework.beans.factory.BeanCreationException: Could not autowire field: private blog.MessageRepository blog.GreetingServiceImpl.messageRepository; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No unique bean of type [blog.MessageRepository] is defined: expected single bean but found 0
+```
+Clearly the @Autowired annotation indicates a <i>required</i> dependency by default, but this can easily be switched by adding the 'required' parameter with a value of 'false', such as:
+```java
+@Component
+public class GreetingServiceImpl implements GreetingService {
+@Autowired(required=false)
+private MessageRepository messageRepository;
+...
+```
+The result after this modification:
+```java
+Sorry, no messages
+```
+</p>
+<p>
+To make things a bit more interesting, I will add the JDBC version of the MessageRepository (also from the previous post):
+```java
+@Repository
+public class JdbcMessageRepository implements MessageRepository {
+private SimpleJdbcTemplate jdbcTemplate;
+@Autowired
+public void createTemplate(DataSource dataSource) {
+this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+}
+@PostConstruct
+public void setUpDatabase() {
+jdbcTemplate.update("create table messages (language varchar(20), message varchar(100))");
+jdbcTemplate.update("insert into messages (language, message) values ('English', 'Welcome')");
+jdbcTemplate.update("insert into messages (language, message) values ('Deutsch', 'Willkommen')");
+}
+@PreDestroy
+public void tearDownDatabase() {
+jdbcTemplate.update("drop table messages");
+}
+public String getMessage(String language) {
+return jdbcTemplate.queryForObject("select message from messages where language = ?", String.class, language);
+}
+}
+```
+As long as the stub version still <i>does not</i> contain the @Repository annotation, rerunning the tests will now produce the following exception:
+```java
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'greetingServiceImpl': Autowiring of fields failed; nested exception is org.springframework.beans.factory.BeanCreationException: Could not autowire field: private blog.MessageRepository blog.GreetingServiceImpl.messageRepository; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jdbcMessageRepository': Autowiring of methods failed; nested exception is org.springframework.beans.factory.BeanCreationException: Could not autowire method: public void blog.JdbcMessageRepository.createTemplate(javax.sql.DataSource); nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No unique bean of type [javax.sql.DataSource] is defined: expected single bean but found 0
+```
+</p>
+<p>
+Obviously a chain reaction of autowiring failures has resulted since no DataSource is available in the context. However, as a firm believer in test-driven development, I would like to <i>unit test</i> my implementation prior to setting up the infrastructure. Luckily, the scanner is fairly customizable, and I can provide filters, such as:
+```java
+Locale.setDefault(Locale.GERMAN);
+GenericApplicationContext context = new GenericApplicationContext();
+boolean useDefaultFilters = false;
+ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(context, useDefaultFilters);
+scanner.addExcludeFilter(new AssignableTypeFilter(JdbcMessageRepository.class));
+scanner.addIncludeFilter(new AnnotationTypeFilter(Component.class));
+scanner.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile("blog\\.Stub.*")));
+scanner.scan("blog");
+context.refresh();
+GreetingService greetingService =
+(GreetingService) context.getBean("greetingServiceImpl");
+String message = greetingService.greet("Standalone Beans");
+System.out.println(message);
+```
+As you can see, I disabled the 'defaultFilters' and explicitly added my own. In this case, that was not completely necessary since the default includes the @Component and @Repository annotations, but I wanted to show the various filtering options - including not only annotations, but also assignable types and even regular expressions. The main goal of course was to disable the JDBC version of MessageRepository in favor of the stub, and according to my result, that is exactly what happened:
+```java
+Willkommen Standalone Beans
+```
+</p>
+<p>
+Assuming that I am now ready to incorporate the JDBC version, I will likely need to include some XML configuration for the DataSource, such as:
+```xml
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.1.xsd">
+<context:property-placeholder location="classpath:blog/jdbc.properties" />
+<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+<property name="driverClassName" value="${jdbc.driver}" />
+<property name="url" value="${jdbc.url}" />
+<property name="username" value="${jdbc.username}" />
+<property name="password" value="${jdbc.password}" />
+</bean>
+</beans>
+```
+Then, I can combine the scanning with an XmlBeanDefinitionReader (notice that I have reverted to the default filters only):
+```java
+Locale.setDefault(Locale.GERMAN);
+GenericApplicationContext context = new GenericApplicationContext();
+ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(context);
+scanner.scan("blog");
+BeanDefinitionReader reader = new XmlBeanDefinitionReader(context);
+reader.loadBeanDefinitions("classpath:/blog/dataSource.xml");
+context.refresh();
+GreetingService greetingService = (GreetingService) context.getBean("greetingServiceImpl");
+String message = greetingService.greet("Hybrid Beans");
+System.out.println(message);
+```
+The context contains both the scanned beans as well as those defined in XML, and the result is:
+```java
+Willkommen Hybrid Beans
+```
+</p>
+<p>
+Up to this point, you've seen that 0 candidate beans will cause the autowiring to fail unless the 'required' parameter of @Autowired is set to <i>false</i>. Given that the autowiring is following 'by-type' semantics, more than 1 bean will cause a failure regardless of the required parameter's value. For example, after adding the @Repository annotation back to the StubMessageRepository and rerunning the previous example, I receive the following exception:
+```java
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'greetingServiceImpl': Autowiring of fields failed; nested exception is org.springframework.beans.factory.BeanCreationException: Could not autowire field: private blog.MessageRepository blog.GreetingServiceImpl.messageRepository; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No unique bean of type [blog.MessageRepository] is defined: expected single bean but found 2
+```
+This can be resolved by switching to 'by-name' semantics - accomplished via Spring 2.1's support for the JSR-250 @Resource annotation:
+```java
+@Component
+public class GreetingServiceImpl implements GreetingService {
+@Resource(name="jdbcMessageRepository")
+private MessageRepository messageRepository;
+...
+```
+</p>
+<p>
+You probably noticed in the previous example that the bean name (as specified in the @Resource annotation) defaults to the decapitalized non-qualified classname. To override this behavior, it is possible to add your own implementation of the BeanNameGenerator strategy, such as:
+```java
+private static class MyBeanNameGenerator implements BeanNameGenerator {
+public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
+String fqn = definition.getBeanClassName();
+return Introspector.decapitalize(fqn.replace("blog.", "").replace("Jdbc", ""));
+}
+}
+```
+Then providing this strategy to the scanner overrides the default:
+```java
+ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(context);
+scanner.setBeanNameGenerator(new MyBeanNameGenerator());
+scanner.scan("blog");
+```
+And therefore, the name specified in the @Resource annotation can be modified accordingly:
+```java
+@Resource(name="messageRepository")
+private MessageRepository messageRepository;
+```
+NOTE: When relying on the container for autowiring, the default naming strategy is typically sufficient (i.e. it works "behind the scenes"). Therefore the naming strategy should only be considered for cases where you will be referring to beans by name elsewhere. Even then, for isolated cases it is much simpler to explicitly provide a bean name in the 'stereotype' annotation (e.g. @Repository("messageRepository")). Providing your own strategy can be useful if you are able to take advantage of naming conventions that are used consistently throughout your application (This particular example is a little contrived, but hopefully demonstrates that the strategy is very accommodating so that you can follow your own naming conventions).
+</p>
+<p>
+So far all of the beans have been configured with the default 'singleton' scope, but scope resolution is another customizable strategy of the scanner. The default will look for a @Scope annotation on each component. For example, to configure the GreetingServiceImpl as a 'prototype', simply add the following:
+```java
+@Scope("prototype")
+@Component
+public class GreetingServiceImpl implements GreetingService { .. }
+```
+While the default annotation approach is quite simple, scope is almost always a deployment-specific consideration. Therefore it often does not belong at the class-level or in the source code at all. For these reasons, the following strategy interface is available and may be specified on the scanner as with the BeanNameGenerator in the previous example:
+```java
+public interface ScopeMetadataResolver {
+ScopeMetadata resolveScopeMetadata(BeanDefinition definition);
+}
+```
+Note that the name generation and scope resolution strategies may also be provided in the XML-based configuration, such as:
+```xml
+<context:component-scan base-package="blog" name-generator="blog.MyBeanNameGenerator" scope-resolver="blog.MyScopeMetadataResolver" />
+```
+</p>
+<p>
+Likewise, custom filters can be added as sub-elements:
+```xml
+<context:component-scan base-package="blog" use-default-filters="false">
+<context:include-filter type="annotation" expression="org.springframework.stereotype.Component" />
+<context:include-filter type="regex" expression="blog\.Stub.*" />
+<context:exclude-filter type="assignable" expression="blog.JdbcMessageRepository" />
+</context:component-scan>
+```
+</p>
+<p>
+I realize this entry has already covered quite a bit of ground, but there is one last topic I would like to cover. In the previous post, I included an aspect with the &lt;aop:aspectj-autoproxy/&gt; element. Now I want to demonstrate how to add the autoproxy behavior with our standalone version. First, the aspect itself (same as last time):
+```java
+@Aspect
+public class ServiceInvocationLogger {
+private int invocationCount;
+@Pointcut("execution(* blog.*Service+.*(..))")
+public void serviceInvocation() {}
+@Before("serviceInvocation()")
+public void log() {
+invocationCount++;
+System.out.println("service invocation #" + invocationCount);
+}
+}
+```
+Next, I need to add an include filter for the @Aspect annotation (it is no longer included in the default filters):
+```java
+scanner.addIncludeFilter(new AnnotationTypeFilter(Aspect.class));
+scanner.scan("blog");
+```
+And finally, I need to register the AspectJ annotation-based autoproxy creator (prior to calling refresh() on the context):
+```java
+AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(context);
+context.refresh();
+```
+The result:
+```java
+service invocation #1
+Willkommen Hybrid Beans
+```
+</p>
+<p>
+Hopefully this entry and the <a href="http://blog.interface21.com/main/2007/05/14/annotation-driven-dependency-injection-in-spring-21/">preceding one</a> have provided a sufficient introduction to these new features of Spring 2.1. You should now have a decent understanding of how to combine the component scanning and annotation configuration in small doses alongside "traditional" Spring XML configuration if you prefer. Also, by providing your own filters, name generators, and scope resolvers, you can customize the configuration process. The official 2.1-M2 release contains more detailed information in the reference documentation.
+</p>
+<p>
+Stay tuned to this <a href="http://blog.interface21.com">Interface21 Team Blog</a> to learn about more new features as we continue to progress from the current milestone phase toward the RC1 release of Spring 2.1, and if you are not particularly excited about the annotation-driven configuration, then you may want to keep an eye out for an upcoming blog by <a href="http://blog.interface21.com/main/author/costinl">Costin Leau</a> on Spring Java Configuration - which offers yet another alternative to XML but without the invasiveness of annotations in your application code.
+</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 79;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+ <li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

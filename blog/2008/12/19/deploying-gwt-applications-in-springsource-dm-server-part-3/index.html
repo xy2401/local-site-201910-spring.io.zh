@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Deploying GWT Applications in SpringSource dm Server - Part 3</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Deploying GWT Applications in SpringSource dm Server - Part 3" />
+<meta name="twitter:description" content="&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This is the final blog in a series of three describing a step-by-step approach to building and deploying GWT applications in the &lt;a href=&quot;http://www.springsource.com/products/suite/dmserver&quot; target=&quot;_blank&quot;&gt;SpringSource dm Server™&lt;/a&gt;. The first blog looked at the process of creating a simple WAR file from a sample GWT application and the second blog turned the GWT dependencies into an OSGi bundle which can be shared across multiple applications. This final blog will further modularize our GWT sample into OSGi services using Spring Dynamic Modules. This should clearly demonstrate the benefits of OSGi modularity: The ability to remove and replace services at runtime, seamlessly managing multiple versions of bundles and how straightforward it is to deploy and manage using dm Server.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Deploying GWT Applications in SpringSource dm Server - Part 3" />
+<meta property="og:description" content="&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This is the final blog in a series of three describing a step-by-step approach to building and deploying GWT applications in the &lt;a href=&quot;http://www.springsource.com/products/suite/dmserver&quot; target=&quot;_blank&quot;&gt;SpringSource dm Server™&lt;/a&gt;. The first blog looked at the process of creating a simple WAR file from a sample GWT application and the second blog turned the GWT dependencies into an OSGi bundle which can be shared across multiple applications. This final blog will further modularize our GWT sample into OSGi services using Spring Dynamic Modules. This should clearly demonstrate the benefits of OSGi modularity: The ability to remove and replace services at runtime, seamlessly managing multiple versions of bundles and how straightforward it is to deploy and manage using dm Server.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-12-19 21:37:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Deploying GWT Applications in SpringSource dm Server - Part 3</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Ben Corrie</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-12-19 21:37:00.0">December 19, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="192" href="/blog/2008/12/19/deploying-gwt-applications-in-springsource-dm-server-part-3#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><h2>Introduction</h2><p>This is the final blog in a series of three describing a step-by-step approach to building and deploying GWT applications in the <a href="http://www.springsource.com/products/suite/dmserver" target="_blank">SpringSource dm Server™</a>. The first blog looked at the process of creating a simple WAR file from a sample GWT application and the second blog turned the GWT dependencies into an OSGi bundle which can be shared across multiple applications. This final blog will further modularize our GWT sample into OSGi services using Spring Dynamic Modules. This should clearly demonstrate the benefits of OSGi modularity: The ability to remove and replace services at runtime, seamlessly managing multiple versions of bundles and how straightforward it is to deploy and manage using dm Server.</p><p>This is the only blog in the series to actually use the Spring Framework. Spring is used to configure the Spring Dynamic Modules and publish and consume the OSGi services. It also demonstrates one mechanism of bridging the world of Spring-managed beans with GWT remoting. However, I&rsquo;m well aware that Spring/GWT integration is a significant topic in itself, so I&rsquo;m purposefully keeping to the one simple solution here.</p><p>Please see <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a> for the background to the GWT <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=GettingStarted" target="_blank">StockWatcher</a> sample and the software I&rsquo;m using.</p><p>Also note that you can skip all these tedious instructions and zoom on down to the downloads summary at the bottom.<br /><h2>Quick Catch Up</h2><br />In <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a>, we built the GWT StockWatcher sample application from scratch as an Eclipse project and then generated the code into a Dynamic Web project which was then deployed into dm Server. Finally, we exported the Dynamic Web project into a WAR file and deployed it outside of STS.</p><p>In <a href="http://blog.springsource.com/2008/11/24/deploying-gwt-applications-in-springsource-dm-server-part-2/" target="_blank">Part 2</a>, we removed the GWT dependencies from the WAR file and turned them into an OSGi bundle which was installed into dm Server&rsquo;s repository. Having done that, we were then able to deploy any number of applications which use GWT remoting without having to include any GWT dependencies in the WARs.</p><p>In this final part, we&rsquo;re going to further modularize the application using Spring Dynamic Modules. A question you might well be asking is&hellip; why? It&rsquo;s not a bad question - no-one wants to unnecessarily complicate their code for the sake of it. In deciding whether a shared services approach is going to be helpful, you could boil it down some simple questions:<br /><p style="padding-left: 30px;">- Is there any part of my application which may need to be used by another application?<br />- Will different components in my application evolve at different rates?<br />- Is it possible that I may need to maintain multiple concurrent versions of the same component?<br />- Do I want to be able to deploy changes to components in my application while it&rsquo;s running?</p><p>Looking at our Stockwatcher application, it&rsquo;s currently limited to just one stock market. We know that there are many different markets around the world, so to make it more flexible, it would certainly make sense to give it the capability to access different markets, so that&rsquo;s what we&rsquo;re going to do - turn our stock markets into shared services. One bundle will contain a shared API which defines what a market can do. Other bundles can then be implementations of that API - maybe one for London and one for New York. We&rsquo;ll then have the capability to deploy the market we want, start it, stop it, undeploy it and replace it with another - all at runtime.</p><p>I&rsquo;m conscious that the process of transforming a single WAR file into shared services will likely be a far more common experience than designing it in a modular way from the ground up, so this blog will further build on what we did in <a href="http://blog.springsource.com/2008/11/24/deploying-gwt-applications-in-springsource-dm-server-part-2/" target="_blank">Part 2</a>, rather than start over. You can download the Eclipse projects from Part 2 <a href="http://blog.springsource.com/wp-content/uploads/2008/11/stockwatcherwarslproj.zip">here</a> and the finished projects from all the work in Part 3 <a href="http://blog.springsource.com/wp-content/uploads/2008/12/stockwatcherwarssproj.zip">here</a> (you&rsquo;ll need to define GWT_ROOT_INSTALL classpath variable if you do). Hopefully, some of the suggestions I made in earlier blogs about dividing up the source code will start to finally make sense!<br /><h2>Step 1: Create a StockService API bundle</h2><br />In order to create the London and New York StockWatcherService implementation bundles, we&rsquo;ll need a common API for them both. Obviously modularizing common code is good practice, but there is a more important reason why we need a separate bundle for the APIs. If you want to undeploy bundles in a running application in dm Server, you can safely remove code which implements a service, but you can&rsquo;t remove any interfaces which the remaining code has a dependency on. Therefore, it makes sense to put our service interface and common code into an API bundle which will be a dependency of the other bundles.</p><p>To create a simple bundle project in Eclipse, right-click and select New-&gt;Other-&gt;SpringSource dm Server-&gt;Bundle Project. This will create a skeleton <tt>MANIFEST.MF</tt> for you to get started with. There&rsquo;s no need for us to make this a Spring Dynamic Module as its sole purpose is to provide APIs and it won&rsquo;t have any bean instances of its own, so a vanilla bundle is fine.<br /><p style="padding-left: 30px;">- Specify StockWatcherServiceAPI as the project name<br />- If you prefer, you can configure the source directory by clicking the Configure Default&hellip; link in Project Layout. For consistency, I&rsquo;d set it to <tt>src/main/java</tt><br />- Set the bundle name and symbolic name to <tt>com.google.gwt.sample.stockwatcher.client.api</tt> and leave the version as <tt>1.0.0</tt><br />- The Module Type should be <tt>None</tt> and the Target Runtime should be your dm Server instance. If you don&rsquo;t have the option to select this, you&rsquo;ll need to click New and create one.<br />- You can now click Finish and you should see your new bundle project with a generated <tt>MANIFEST.MF</tt>.</p><p>Next thing to do is to move the API code into the new project. Drag and drop the entire <tt>com.google.gwt.sample.stockwatcher.client.api</tt> package from the StockWatcherWar project into the new bundle project. This is all the code which is shared by both the client and the server. It should contain the <tt>StockPriceService</tt> interface and the <tt>StockPrice</tt> and <tt>DelistedException</tt> classes. If this was successful, just about everything should be broken!</p><p>Next, let&rsquo;s think about what we need to export from the new bundle. Well, in this case it&rsquo;s simple - the APIs from one package. In the Runtime tab of the <tt>MANIFEST.MF</tt> editor, add the package to the Exported Packages list and save.</p><p>Now we need to think about which dependencies our API code requires, in other words, why it isn&rsquo;t building anymore. Clearly, the GWT bundle we created in <a href="http://blog.springsource.com/2008/11/24/deploying-gwt-applications-in-springsource-dm-server-part-2/" target="_blank">Part 2</a> would be a good start. In the Dependencies tab, add the com.google.gwt bundle to the Import Bundle list (if it&rsquo;s not listed, it&rsquo;s likely not in the dm Server repository, which is explained in <a href="http://blog.springsource.com/2008/11/24/deploying-gwt-applications-in-springsource-dm-server-part-2/" target="_blank">Part 2</a>) and save. This should fix all of the build problems in the new project, but the other projects should still be broken. For now, let&rsquo;s ignore this as there&rsquo;s still more refactoring to do.</p><p>At this point, the the StockWatcherServiceAPI project should look like this:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1c.png"><img class="alignnone size-full wp-image-771" title="StockWatcherServiceAPI project" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1c.png" alt="" /></a></p><p>And its <tt>MANIFEST.MF</tt> should look like this:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-2c.png"><img class="alignnone size-full wp-image-772" title="StockWatcherServiceAPI MANIFEST.MF" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-2c.png" alt="" /></a><br /><h2>Step 2: Create a StockPriceService service bundle</h2><br />Having created an API bundle containing common code from which we can create multiple service implementations, let&rsquo;s create one of those implementations. We&rsquo;ll start with London.</p><p>Create a new Bundle Project called &ldquo;StockWatcherServiceLondon&rdquo; using the instructions in Step 1 and give it a bundle name of com.google.gwt.sample.stockwatcher.service.london</p><p>So let&rsquo;s think about what this bundle is going to need. It needs code to implement a London stock price service and a way of exporting that service to the OSGi registry as a shared service. The first part is a simple refactoring job as we already have some service code we can reuse. For the second part, making the bundle into a Spring Dynamic Module is going to be the easiest approach as it makes publishing and consuming OSGi services using Spring beans very simple.</p><p>First things first. Go back and look at the service implementation in <tt>StockPriceServiceImpl.java</tt>. You&rsquo;ll see that the <tt>StockPriceService</tt> code is tied into the <tt>RemoteServiceServlet</tt>. The servlet needs to remain for the remoting to work, but we need to extract the implementation code and use it to create the shared service. Later on in Part 4, the servlet will need to be adapted to consume the service we&rsquo;ve created.</p><p>So, copy the <tt>com.google.gwt.sample.stockwatcher.server</tt> package from the StockWatcherWar project and paste it into the <tt>src/main/java</tt> of StockWatcherServiceLondon. You should now have a copy of <tt>StockPriceServiceImpl.java</tt> that can be refactored.</p><p>Delete <tt>extends RemoteServiceServlet</tt>, the <tt>RemoteServiceServlet</tt> import and the <tt>SerialVersionUID</tt> field as none of these are now required. When you save the changes, you&rsquo;ll see that we need to import some dependencies for the bundle - specifically, the API bundle created in Step 1.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-2d.png"><img class="alignnone size-full wp-image-777" title="StockWatcherServiceLondon code" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-2d.png" alt="" /></a></p><p>Edit <tt>MANIFEST.MF</tt> to add an Import Package for <tt>com.google.gwt.sample.stockwatcher.client.api</tt>. When you save, you should see an error in the manifest saying that the package can&rsquo;t be resolved. What have we done wrong?! The problem is that when you have imports and exports between bundle projects in Eclipse, you need to tell the tooling to allow the projects to share references. Right-click on StockWatcherServiceLondon and select Properties-&gt;Project References. Tick the box for StockWatcherServiceAPI and then OK. You&rsquo;ll then need to fake edit the <tt>MANIFEST.MF</tt> to pick up the change. You should now see StockWatcherServiceAPI listed as a Bundle Dependency. Let me make it clear that once a bundle has been exported from Eclipse, you don&rsquo;t need to peform this extra step - it&rsquo;s only when you want to create dependencies between bundles when they are just Projects.</p><p>You should still have one more problem to solve. Although the com..client.api bundle imports the com.google.gwt bundle, the import is private to that bundle. Any bundle which imports the com..client.api bundle doesn&rsquo;t inherit this dependency - it must be made explicitly. So in the <tt>MANIFEST.MF</tt>, add an <tt>Import-Bundle</tt> for the com.google.gwt bundle and save. If you still see a problem in <tt>StockPriceServiceImpl.java</tt>, you may need to try a fake edit on it, otherwise you&rsquo;ve done something wrong.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-7d.png"><img class="alignnone size-full wp-image-778" title="StockWatcherServiceLondon &lt;tt&gt;MANIFEST.MF&lt;/tt&gt;" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-7d.png" alt="" /></a></p><p>Brilliant! We&rsquo;re now half way to creating a shared service. This is how it should currently look:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1d.png"><img class="alignnone size-full wp-image-776" title="StockWatcherServiceLondon hierarchy" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1d.png" alt="" /></a></p><p>The next step is to turn StockPriceServiceLondon into an OSGi service. We&rsquo;re going to do this using Spring Dynamic Modules. The principle of a Spring Dynamic Module is simple - you provide Spring configuration files in a <tt>/META-INF/spring</tt> folder and an ApplicationContext is created for you when the bundle is deployed. It&rsquo;s an excellent and very simple way of exporting Spring-managed beans as OSGi services.</p><p>So, create a <tt>/spring</tt> folder in <tt>/META-INF</tt> (right-click on <tt>/META-INF</tt> and select New-&gt;Folder). Then right-click on the new <tt>/spring</tt> folder and select New-&gt;Spring Bean Definition. You can call this whatever you like, but in my example it&rsquo;s called <tt>serviceLondon-config.xml</tt>. Enter the name and click Finish. We now need to define the <tt>StockPriceServiceImpl</tt> as a Spring bean, so that an instance of it is created when the bundle is deployed. If you&rsquo;re familiar with Spring, this should be easy. If you&rsquo;re not, you need to insert the following XML:<br /><pre class="xml"> &lt;bean id=&ldquo;stockPrices&rdquo;<br /> class=&ldquo;com.google.gwt.sample.stockwatcher.server.StockPriceServiceImpl&rdquo;/&gt;</pre><br />Finally, we need to export this bean as an OSGi service. We could do this in the same configuration file, but it&rsquo;s good practice to keep OSGi dependencies separate. So create another Spring Bean Definition called osgi-config.xml and this time, click Next and select the osgi namespace checkbox before clicking Finish. To export the bean as an OSGi service, insert the following XML:<br /><pre class="xml"> &lt;osgi:service<br /> interface=&ldquo;com.google.gwt.sample.stockwatcher.client.api.StockPriceService&rdquo;<br /> ref=&ldquo;stockPrices&rdquo;/&gt;</pre><br />That&rsquo;s it! We now have a bundle which creates a shared service. Before we move on, it would be a wise idea to test it, to make sure it&rsquo;s behaving as we expect.<br /><h2>Step 3: Testing a shared service bundle</h2><br />I&rsquo;m going to describe two approaches to testing here: The quick and dirty method and a properly documented automated JUnit approach. Arguably this should be a blog posting all by itself, but I decided that it was an important enough subject to include here in detail.<br /><h3>Quick and dirty test:</h3><br />The quick and dirty method is to hack up another Spring Dynamic Module which will consume the service, inject it into a test class and then just log the output. It&rsquo;s a good way of making sure the service works, but obviously it&rsquo;s not asserting anything and can&rsquo;t run within a test framework.</p><p>So we&rsquo;ve already built one Spring Dynamic Module, so for this new TestConsumer module, I&rsquo;m only going to highlight the differences. The module will need to import the com.google.gwt.sample.stockwatcher.client.api bundle (or package) and it will need some Java code to call the service client. You&rsquo;ll need 2 spring config files in the <tt>/META-INF/spring</tt> folder:</p><p>one for the test bean (eg. <tt>testConsumer-config.xml</tt>)<br /><pre class="xml"> &lt;bean id=&ldquo;consumer&rdquo; class=&ldquo;com.ben.consumer.Consumer&rdquo;&gt;<br /> &lt;constructor-arg ref=&ldquo;priceService&rdquo;/&gt;<br /> &lt;/bean&gt;</pre><br />and one for the <tt>&lt;osgi:reference</tt> to consume the service (eg. <tt>osgi-config.xml</tt>)<br /><pre class="xml"> &lt;osgi:reference id=&ldquo;priceService&rdquo;<br /> interface=&ldquo;com.google.gwt.sample.stockwatcher.client.api.StockPriceService&rdquo;/&gt;</pre><br />In the Java code, simply call <tt>service.getPrices(new String{&ldquo;foo&rdquo;, &ldquo;bar&rdquo;})</tt> with some arbitrary strings and you should get back an array of <tt>StockPrice</tt> objects. If you want to log the output to <tt>System.err</tt>, this appears in dm Server&rsquo;s trace directory: <tt>&lt;dm server install directory&gt;/servicability/trace/&lt;name of your test bundle&gt;/trace.log</tt>.</p><p>To run your quick and dirty test in STS, you need to start dm Server. Then, drag and drop the entire StockWatcherServiceAPI project onto the server. When the project is deployed successfully, you should get a console message like this: <tt>Deployment of &lsquo;com.google.gwt.sample.stockwatcher.client.api&rsquo; version &lsquo;1&rsquo; completed</tt>. Next, drag and drop the entire StockPriceServiceLondon project onto the server and wait for the deployment message. If that all initializes succesfully, drop your test project onto the server.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1e.png"><img class="alignnone size-full wp-image-809" title="Deploy test bundle to server" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1e.png" alt="" /></a></p><p>If you want to get the server to start clean each time (wipe the old trace output etc) then add a <tt>-Dcom.springsource.server.clean=true</tt> VM argument to the launch configuration, which you can find by double-clicking on the server instance, selecting Open Launch Configuration and clicking on the Arguments tab.</p><p>If this isn&rsquo;t working and you&rsquo;re not sure why, you can download my entire Eclipse workspace <a href="http://blog.springsource.com/wp-content/uploads/2008/12/stockwatcherwarssproj.zip">here</a>.<br /><h3>Automated JUnit OSGi bundle test:</h3><br />You can read about the support for automated integration testing of Spring Dynamic modules in the Reference Guide <a href="http://static.springframework.org/osgi/docs/1.1.2/reference/html/testing.html" target="_blank">here</a>. The <tt>AbstractConfigurableBundleCreator</tt> test class will start an OSGi framework, load all the required test bundles and then build your test code as an on-the-fly bundle and test it. If you think that this maybe sounds complicated, you&rsquo;d be right. Not wanting you to feel short-changed, dear reader, I tried this for myself and I have to be honest, setting it up to get all of the required dependencies working was a bit of a pain. So here is my step-by-step pain-free guide to getting this up and running.</p><p>So out of the box, the test expects to get all of its dependencies from a local Maven repository. You can configure the test to use other types of dependency management, but for the sake of simplicity (heh!) I&rsquo;m using Maven. Firstly, I installed m2eclipse which I got by adding <tt><a href="http://m2eclipse.sonatype.org/update/">http://m2eclipse.sonatype.org/update/</a></tt> as an update site (Help-&gt;Software Updates-&gt;Available Sites-&gt;Add Site). It&rsquo;s advisable to unselect the optional Maven POM Editor, otherwise you&rsquo;ll get a bunch of unsatisfied dependency warnings and it won&rsquo;t install.</p><p>Create a new Java Project called StockWatcherServiceTest (with <tt>src/main/java</tt> as the source folder). Right-click on the project and select Maven-&gt;Enable Dependency Management to Mavenize the project. Next, create a new package (<tt>com.ben</tt> in my case) and copy the <tt>SimpleOSGiTest</tt> code from the Spring DM Reference Guide into a test class in that package (note that the test framework will not allow you to use the default package). This test class will help us to sanity-check that the dependencies are all set up correctly.</p><p>You&rsquo;ll notice that the test won&rsquo;t yet compile because we don&rsquo;t yet have the dependencies it needs. You need to specify the correct dependencies in the <tt>pom.xml</tt> file. To save you hours of fist-shaking and blaspheme, you can view my <tt>pom.xml</tt> file <a href="http://blog.springsource.com/wp-content/uploads/2008/12/pomxml.zip">here</a> (included in the full workspace download <a href="http://blog.springsource.com/wp-content/uploads/2008/12/stockwatcherwarssproj.zip">here</a>). Once you have the dependencies working, see if you can spot the typo in the sample code, add the java imports and you should now have a test class which compiles.</p><p>Try running the test with right-click-&gt;Run As-&gt;JUnit Test. If you get a <tt>ClassNotFoundException</tt>, it&rsquo;s because the test is looking in the wrong place for the <tt>.class</tt> files. The easiest way to fix this is to override <tt>getRootPath()</tt> and return <tt>&ldquo;file:./target/classes&rdquo;</tt> or whatever path your .class files are being generated into.</p><p>Hopefully you should now have a green bar, which has at least proved that the test case started up the Equinox framework and was able to create an on-the-fly bundle successfully. Now we can create our proper unit test for the StockWatcherServiceLondon bundle.</p><p>Next step is to get the test dependency bundles loading and resolving correctly. To do this, the required bundles need to be installed in the local maven repository and specified in <tt>getTestBundlesNames()</tt> in the testcase.</p><p>Let&rsquo;s deal with Maven first: The <tt>pom.xml</tt> file created earlier should have downloaded the external dependencies, but we will need to add the com..client.api, com..service.london and com.google.gwt bundles to the maven repository manually. I did this for the bundles in the workspace by mavenizing the projects and creating a <tt>pom.xml</tt> file for each. There are a couple of gotchas here. Firstly, to get Maven to pick up the <tt>MANIFEST.MF</tt> files, you have to configure <tt>maven-jar-plugin</tt> in the <tt>pom.xml</tt> and point it at the location of the file. See my <tt>pom.xml</tt> <a href="http://blog.springsource.com/wp-content/uploads/2008/12/pomxml1.zip">here</a>. Secondly, I discovered that the Spring dm Server proprietary <tt>Import-Bundle</tt> manifest entry doesn&rsquo;t work, so I had to change both projects to use a number of <tt>Import-Package</tt> entries instead. Once you have made these changes, open a command-prompt, change to the project directory and type <tt>mvn install</tt>. This will build the plugin and install it into the local maven repository. To install the gwt plugin we build in <a href="http://blog.springsource.com/2008/11/24/deploying-gwt-applications-in-springsource-dm-server-part-2/" target="_blank">Part 2</a> I used the following command-line: <tt>mvn install:install-file -DgroupId=com.google.gwt -DartifactId=com.google.gwt -Dversion=1.5.3 -Dpackaging=maven-plugin -Dfile=&lt;location of jar file&gt;</tt>. It&rsquo;s worth checking at this point that the plugins built correctly by unzipping the jars in the repository and checking that the manifests look sane.</p><p>Once all of the test bundles are built and installed into the repository, they need to be specified in the testcase in a <tt>getTestBundlesNames()</tt> method. The syntax is described in the <a href="http://static.springframework.org/osgi/docs/1.1.2/reference/html/testing.html" target="_blank">reference documentation</a> and I specified 4 bundles: the com..client.api, com..service.london, com.google.gwt and javax.servlet.</p><p>Hopefully at this point, you&rsquo;ll be able to run the test without any actual assertions, but you should be successfully getting it to install and start all of the test bundles without any problems. If it&rsquo;s not working, a useful debug tool is to enable the Equinox telnet console and use that to check that the expected imports and exports all appear to be correct. If you&rsquo;re getting <tt>ClassNotFoundException</tt>, they&rsquo;re probably not. The way to enable the console is overriding <tt>createPlatform()</tt> and calling <tt>System.setProperty(&ldquo;osgi.console&rdquo;, &ldquo;9000&rdquo;)</tt>.</p><p>Once all of the bundles are resolving and starting correctly, you&rsquo;re finally ready to write some assertions! We need to consume the service that&rsquo;s exported by the com..service.london bundle. Copy the <tt>&lt;osgi:reference</tt> line from the quick and dirty example above into an <tt>osgi-config.xml</tt> file and then add this to a <tt>getConfigLocations()</tt> method in the testcase, which returns a String array of config files. In this particular case, we&rsquo;re just going to make it a vanilla OSGi bundle rather than a Spring Dynamic Module, so no need to put the file in a <tt>/spring</tt> folder.</p><p>In an integration test, Spring will autowire all spring-managed beans into a testcase where there&rsquo;s an appropriate setter, so adding a <tt>setStockPriceService(StockPriceService s)</tt> method will inject the OSGi service into the test class. Once you have a reference to the service, you can start to assert things on it&hellip; finally!</p><p>Now, I realise that this is a very verbose description of what is ultimately a simple concept. Frankly, the best way to understand the configuration is to look at my Eclipse workspace <a href="http://blog.springsource.com/wp-content/uploads/2008/12/stockwatcherwarssproj.zip">here</a>. I&rsquo;ve described it in detail because it&rsquo;s one thing to see an example of something that works and it&rsquo;s quite another to understand the processes and pitfalls of how to get there. However, once set up, this is an extremely powerful way of integration testing bundle services in an automated manner.<br /><h2>Step 4: Consuming the shared service</h2><br />In Step 2, we created an API bundle and a shared service bundle. We now need to refactor our other projects to work with these bundles, both at compile-time and runtime. At the end of Step 2, you&rsquo;ll have broken some dependencies in the StockWatcherWar and StockWatcher projects. Let&rsquo;s fix these first.</p><p>Starting with StockWatcher, it&rsquo;s broken because we removed the APIs from the WAR project it depended on. Change its build-time dependency so that it references the StockWatcherServiceAPI project (right-click-&gt;Build Path-&gt;Configure Build Path-&gt;Projects). There are no runtime dependencies for this project, so this is all that needs to be done.</p><p>StockWatcherWar is now going to need some modification to consume the OSGi service we created in Step 2. Currently, it still contains the service code that we copied over to the service bundle in Step 2, so one job to do is to remove this code and replace it with a call which delegates to the OSGi service instead. However, this means that we&rsquo;ll need to somehow pass a reference to the service bundle into the class&hellip; which also means that we actually need to get an instance of it from somewhere. Let&rsquo;s deconstruct this further.</p><p>Ok, so we already know how to get a reference to the service because we did it in the test methods above: Create a spring configuration file and add an <tt>&lt;osgi:reference</tt> tag. So let&rsquo;s start by doing this. Create a new Spring Bean definition in <tt>/META-INF</tt> (right-click-&gt;New-&gt;Spring Bean Definition) call it whatever you like (eg <tt>osgi-config.xml</tt>) and make sure to select the osgi namespace checkbox to get the schema included. Add the <tt>&lt;osgi:reference</tt> example code from Step 3 and you now have a Spring configuration file to consume the OSGi service. Should this configuration file go into a <tt>/spring</tt> subdirectory to make it a Spring Dynamic Module? The correct answer is no. We need to use this to bootstrap a specific flavour of ApplicationContext defined in <tt>web.xml</tt>, so we don&rsquo;t need another one being created automatically for us.</p><p>While we&rsquo;re on the subject, edit web.xml and add the following lines:<br /><pre class="xml"> &lt;context-param&gt;<br /> &lt;param-name&gt;contextClass&lt;/param-name&gt;<br /> &lt;param-value&gt;com.springsource.server.web.dm.ServerOsgiBundleXmlWebApplicationContext&lt;/param-value&gt;<br /> &lt;/context-param&gt;</p>
+<pre><code class="prettyprint">&amp;lt;context-param&amp;gt;
+    &amp;lt;param-name&amp;gt;contextConfigLocation&amp;lt;/param-name&amp;gt;
+    &amp;lt;param-value&amp;gt;/META-INF/*.xml&amp;lt;/param-value&amp;gt;
+&amp;lt;/context-param&amp;gt;&lt;/pre&gt;
+</code></pre><p>This will bootstrap a dm Server ApplicationContext and use all of the xml files in /META-INF to configure it.</p><p>Next, we need to work out how to pass this Spring-managed service instance to the <tt>StockPriceServiceImpl</tt> class, in other words, a way of bridging the Spring and servlet worlds. One way to do this is to look up the <tt>ApplicationContext</tt> in the <tt>ServletContext</tt> and call <tt>getBean()</tt> on it. This isn&rsquo;t great because it requires us to hard-code a bean name into the service code and rely on dependency lookup. A cleaner mechanism is to use a Spring-managed <tt>ServletFilter</tt>, inject the service instance into it and then pass that through to the servlet using a static constant for the lookup. This is what I have implemented here:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1f.png"><img class="alignnone size-full wp-image-875" title="ServletFilter" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1f.png" alt="" /></a></p><p>This class should be created in the StockWatcherWar project along with the <tt>StockPriceServiceImpl</tt> class. Also, don&rsquo;t forget to delegate to the <tt>FilterChain</tt> in <tt>doFilter()</tt>.</p><p>If you&rsquo;ve been following the instructions carefully, neither this class or <tt>StockPriceServiceImpl</tt> will compile at this point, due to the refactoring in Step 1. To fix this, you need to add the StockWatcherServiceAPI as a project reference to StockWatcherWar (right-click-&gt;Properties-&gt;Project References) and then add com.google.gwt.sample.stockwatcher.client.api to the <tt>Import-Bundle</tt> list. With this change, the code should now compile.</p><p>Now that we have a bridge between the servlet and the ApplicationContext, all we need to do is to create an instance of the <tt>ServletFilter</tt> and inject the service into it. Create another spring bean definition in <tt>/META-INF</tt>, call it whatever you like (eg. <tt>stockwatcher-config.xml</tt>). Copy the following configuration into it (assuming that the bean name for the OSGi service you used was <tt>priceService</tt>):<br /><pre class="xml"> &lt;bean id=&ldquo;myFilter&rdquo; class=&ldquo;com.google.gwt.sample.stockwatcher.server.StockPriceServiceFilter&rdquo;&gt;<br /> &lt;constructor-arg ref=&ldquo;priceService&rdquo;/&gt;<br /> &lt;/bean&gt;</pre><br />Finally, we need a little magic trick called a <tt>DelegatingFilterProxy</tt>. This class delegates all incoming and out-going servlet requests to a Spring-managed <tt>ServletFilter</tt> and is defined in <tt>web.xml</tt>. Copy this code into your <tt>web.xml</tt> (it assumes that the bean name for your <tt>ServletFilter</tt> is <tt>myFilter</tt>)<br /><pre class="xml"> &lt;filter&gt;<br /> &lt;filter-name&gt;myFilter&lt;/filter-name&gt;<br /> &lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;/filter-class&gt;<br /> &lt;init-param&gt;<br /> &lt;param-name&gt;targetFilterLifecycle&lt;/param-name&gt;<br /> &lt;param-value&gt;true&lt;/param-value&gt;<br /> &lt;/init-param&gt;<br /> &lt;/filter&gt;</p>
+<pre><code class="prettyprint">&amp;lt;filter-mapping&amp;gt;
+    &amp;lt;filter-name&amp;gt;myFilter&amp;lt;/filter-name&amp;gt;
+    &amp;lt;servlet-name&amp;gt;StockService&amp;lt;/servlet-name&amp;gt;
+&amp;lt;/filter-mapping&amp;gt;&lt;/pre&gt;
+</code></pre><p>The pieces of the jigsaw are finally coming together. You&rsquo;ll see that in the code above we also mapped the <tt>DelegatingFilterProxy</tt> to the StockService servlet. The <tt>web.xml</tt> configuration is now complete.</p><p>All that remains now is to get hold of the service instance in the <tt>StockPriceServiceImpl</tt> code and use it!</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1g.png"><img class="alignnone size-full wp-image-876" title="StockPriceServiceImpl" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1g.png" alt="" /></a></p><p>Given that we seem to have thought of everything, try deploying the WAR project to dm Server, following the same instructions used for the quick and dirty test in Step 3: Drop the API project onto the Server, then the London Service project and finally the StockWatcherWar project.</p><p>You should see the following:</p><p><tt><br />[2008-12-19 17:46:23.504] onnection(4)-192.168.1.5 &lt;SPDE0010I&gt; Deployment of &lsquo;com.google.gwt.sample.stockwatcher.client.api&rsquo; version &lsquo;1&rsquo; completed.<br />[2008-12-19 17:46:44.125] onnection(4)-192.168.1.5 &lt;SPDE0010I&gt; Deployment of &lsquo;StockWatcherServiceLondon&rsquo; version &lsquo;1&rsquo; completed.<br />[2008-12-19 17:47:03.528] onnection(4)-192.168.1.5 &lt;SPSC1000I&gt; Creating web application &lsquo;/StockWatcherWar&rsquo;.<br />[2008-12-19 17:47:03.544] async-delivery-thread-1 &lt;SPSC1001I&gt; Starting web application &lsquo;/StockWatcherWar&rsquo;.<br />[2008-12-19 17:47:03.676] async-delivery-thread-1 &lt;SPSC1005E&gt; Failed to start web application &lsquo;/StockWatcherWar&rsquo;: consult the Server trace.log for further details.<br />[2008-12-19 17:47:03.680] async-delivery-thread-1 &lt;SPSC1002I&gt; Removing web application &lsquo;/StockWatcherWar&rsquo;.<br />[2008-12-19 17:47:03.752] onnection(4)-192.168.1.5 &lt;SPDE0011E&gt; Deployment of &lsquo;com.google.sample.stockwatcher&rsquo; version &lsquo;1&rsquo; failed.<br /></tt></p><p>Deployment failed? After all that? Gadzooks! What&rsquo;s wrong here?</p><p>Have a look at the trace file in <tt>&lt;dm Server installation&gt;/serviceability/trace/com.google.sample.stockwatcher-1/trace.log</tt>. You should see a <tt>ClassNotFoundException: org.springframework.web.context.ContextLoaderListener</tt>. The problem is that, now that we&rsquo;re in the world of explicit imports and exports, we need to explicitly import the bundles that give us the Spring support in the WAR file, so add the following bundles to the <tt>Import-Bundle</tt> entry: org.springframework.context, org.springframework.core, org.springframework.beans and org.springframework.web. It should now look like this:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1h.png"><img class="alignnone size-full wp-image-877" title="Final WAR MODULE.MF" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1h.png" alt="" /></a></p><p>Now try to deploy it again. This time, I promise, it <em>should</em> work. Don&rsquo;t move onto Step 5 until it does.<br /><h2>Step 5: Celebrate</h2><br />Raid the mini-bar, make a cup of tea, do a little dance or punch the air, whatever is appropriate for your culture and budget.<br /><h2>Step 6: Hot-swap different services</h2><br />Now it&rsquo;s time to show off one of dm Server&rsquo;s party pieces.</p><p>First, let&rsquo;s create another stock market service we can swap in. This is not much more than a copy/paste job. Right-click on the StockWatcherServiceLondon project, select Copy and then Paste. Name the copied project StockWatcherServiceNewYork. The things to edit are as follows:<br /><p style="padding-left: 30px;">- <tt>MANIFEST.MF</tt> - update the bundle name and symbolic name from London to NewYork.<br />- <tt>serviceLondon-config.xml</tt> - rename, but no need to change any of the contents<br />- <tt>StockPriceServiceImpl.java</tt> - change the prices considerably so that it&rsquo;s obvious we&rsquo;re using a different stock market. I just added 500 to each price. Go Dow Jones!</p><p>Now for the fun part. Start up the StockWatcherWar with the London stock service as before and add a few stocks so that you can see it working:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1i.png"><img class="alignnone size-full wp-image-879" title="Working with London" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1i.png" alt="" /></a></p><p>Then right-click on the StockWatcherServiceLondon entry in the Servers view and select Remove. This will undeploy the StockWatcherServiceLondon bundle from the server. You&rsquo;ll now see the application pause. The call to the remote service will block until dm Server has polled for a replacement service. So let&rsquo;s give it one. Take the StockPriceServiceNewYork project and drop it onto the server. Wait a couple of seconds and&hellip; hey presto&hellip; the application is now using the New York service (note the significant increase in prices).</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1j.png"><img class="alignnone size-full wp-image-880" title="Running with NewYork service" src="http://blog.springsource.com/wp-content/uploads/2008/12/picture-1j.png" alt="" /></a><br /><h2>Step 7: Deploy outside of STS</h2><br />Deploying the application outside of STS is a simple matter of exporting the bundles. The technique differs depending on whether or not you are using Maven and whether Maven is automatically doing the job for you. Using Export-&gt;Jar File on a Maven project will fail unless you only export the <tt>/src</tt> directory. You&rsquo;ll also need to select &ldquo;Use existing manifest from workspace&rdquo; regardless of whether you are using Maven or not.</p><p>Once the bundles are exported, there are a couple of ways of packaging them and then a couple of ways to deploy them.</p><p>In terms of packaging, you can leave them as individual bundles, or you can combine them all into a single PAR file. A PAR file looks like a bundle which contains bundles and is described <a href="http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-pars" target="_blank">here</a>. The significant benefit of using a PAR file is that runs its bundles in a &ldquo;scope&rdquo;, so it is completely isolated from other bundles running in other applications. However, if you deploy the application as a PAR, you can&rsquo;t then hot-swap individual bundles within it.</p><p>Once you&rsquo;ve decided on the deployment mode, you can either upload the file(s) using the admin console or you can copy them into the <tt>&lt;dm Server installation&gt;/pickup</tt> directory. The first time you do this, the server needs to be already running and you should copy the bundles into the directory in the correct order. dm Server remembers the order for the next time you start the server. The advantage of using this mechanism is that you can hot-deploy or undeploy individual bundles simply by moving them in and out of this directory.<br /><h2>Download Summary</h2><br />I realise I&rsquo;ve been scattering the downloads throughout the blog, so I thought I&rsquo;d summarise them here. Also, apologies for zipping up small files, but the blogging tool won&rsquo;t allow me to upload raw XML or Java files for security reasons. Have fun!</p>
+<ul>
+  <li><p>Entire Part 3 workspace projects, including both types of test mechanism are <a href="http://blog.springsource.com/wp-content/uploads/2008/12/stockwatcherwarssproj.zip">here</a>.</p></li>
+  <li><p>The exported bundles can be downloaded <a href="http://blog.springsource.com/wp-content/uploads/2008/12/bundles.zip">here</a>.</p></li>
+  <li><p>A PAR file of the project (with London market) can be downloaded <a href="http://blog.springsource.com/wp-content/uploads/2008/12/comgooglegwtsamplestockwatcher-100par.zip">here</a>.</p></li>
+</ul></div>
+    </div>
+    <section id="disqus_thread"></section>
+    <script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 192;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+    <div class="mobile-only">
+      <p><a href="/blog">
+        <i class="icon-chevron-left"></i>
+        Back
+      </a></p>
+    </div>
+  </article>
+        <aside class="span4 mobile-right-pane" id="sidebar">
+          <div>
+    <ul class="right-pane-widget--container secondary-nav with-icon">
+      <li class="blog-category">
+        <div class="icon blog-icon all-posts"></div>
+        <a href="/blog">All Posts</a>
+        <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+      </li>
+      <li class="blog-category active">
+        <div class="icon blog-icon engineering"></div>
+        <a href="/blog/category/engineering">Engineering</a>
+        <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+      </li>
+      <li class="blog-category">
+        <div class="icon blog-icon releases"></div>
+        <a href="/blog/category/releases">Releases</a>
+        <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+      </li>
+      <li class="blog-category">
+        <div class="icon blog-icon news-and-events"></div>
+        <a href="/blog/category/news">News and Events</a>
+        <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+      </li>
+    </ul>
+    <ul class="social-btn--container">
+      <a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+      
+      <a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+      <a class="social-btn youtube" href="/videos"></a>
+    </ul>
+    <div id="blog-sidebar-newsletter">
+      <p>Get updates from The Spring Team delivered to your inbox</p>
+      <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+      <form id="mktoForm_4723"></form>
+      <script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+    </div>
+  </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="navbar">
+              <div class="container">
+                <ul class="nav">
+                  <li><a href="/team">Team</a></li>
+                  <li><a href="/tools">Tools</a></li>
+                  <li><a href="https://store.pivotal.io/">Store</a></li>
+                  <li><a href="/blog">Newsletter</a></li>
+                </ul>
+              </div>
+            </div>
+            &copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+            <a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+            <a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+            <a href="/trademarks">Trademark Guidelines</a> 
+            <div id="teconsent" style="display:inline-block;"></div> 
+            
+          </div>
+        </div>
+      </div>
+    </footer>
+    <div id="scrim"></div>
+  </div>
+
+
+</body></html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring YARN Application Model</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring YARN Application Model" />
+<meta name="twitter:description" content="&lt;p&gt;Now that Thomas has just &lt;a href=&quot;https://spring.io/blog/2014/02/06/spring-for-apache-hadoop-2-0-m5-released&quot;&gt;released&lt;/a&gt; a fifth milestone for Spring for Apache Hadoop, I’d like to use this opportunity to talk about recent development in its new feature, Spring YARN.&lt;/p&gt;
+&lt;p&gt;One strength in our &lt;a href=&quot;https://spring.io/platform&quot;&gt;Spring IO Platform&lt;/a&gt; is interoperability of its technologies. Great example of this is how Spring Boot and Spring YARN are able work together to create a better model for Hadoop YARN application development. In this blog post I’d like to show an example of a new Spring Yarn Application model which is heavily based on &lt;a href=&quot;http://projects.spring.io/spring-boot&quot;&gt;Spring Boot&lt;/a&gt;.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@tunebluez" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/dbd576b7eed3f8db0503df5039166988?s=200" />
+
+<meta property="og:title" content="Spring YARN Application Model" />
+<meta property="og:image" content="https://gravatar.com/avatar/dbd576b7eed3f8db0503df5039166988?s=200" />
+<meta property="og:description" content="&lt;p&gt;Now that Thomas has just &lt;a href=&quot;https://spring.io/blog/2014/02/06/spring-for-apache-hadoop-2-0-m5-released&quot;&gt;released&lt;/a&gt; a fifth milestone for Spring for Apache Hadoop, I’d like to use this opportunity to talk about recent development in its new feature, Spring YARN.&lt;/p&gt;
+&lt;p&gt;One strength in our &lt;a href=&quot;https://spring.io/platform&quot;&gt;Spring IO Platform&lt;/a&gt; is interoperability of its technologies. Great example of this is how Spring Boot and Spring YARN are able work together to create a better model for Hadoop YARN application development. In this blog post I’d like to show an example of a new Spring Yarn Application model which is heavily based on &lt;a href=&quot;http://projects.spring.io/spring-boot&quot;&gt;Spring Boot&lt;/a&gt;.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2014-02-06 17:10:54.081" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring YARN Application Model</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/dbd576b7eed3f8db0503df5039166988?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jvalkealahti">Janne Valkealahti</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2014-02-06 17:10:54.081">February 06, 2014</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1378" href="/blog/2014/02/06/spring-yarn-application-model#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Now that Thomas has just <a href="https://spring.io/blog/2014/02/06/spring-for-apache-hadoop-2-0-m5-released">released</a> a fifth milestone for Spring for Apache Hadoop, I&rsquo;d like to use this opportunity to talk about recent development in its new feature, Spring YARN.</p><p>One strength in our <a href="https://spring.io/platform">Spring IO Platform</a> is interoperability of its technologies. Great example of this is how Spring Boot and Spring YARN are able work together to create a better model for Hadoop YARN application development. In this blog post I&rsquo;d like to show an example of a new Spring Yarn Application model which is heavily based on <a href="https://projects.spring.io/spring-boot">Spring Boot</a>.</p><h1><a href="#spring-yarn-intro" class="anchor" name="spring-yarn-intro"></a>Spring YARN Intro</h1><p>Development life cycle from a moment when a developer starts his work to a point when someone actually executes an application on a Hadoop cluster is a bit more complicated than just creating a few lines of code. Lets see what needs to be considered:</p>
+<ul>
+<li>What is a project structure for an application code</li>
+<li>How project is build and packaged</li>
+<li>How packaged application is configured</li>
+<li>How application is executed</li>
+</ul><p>We believe that Spring YARN and Spring Boot provides a simple programming model to develop applications than can easily be test and deployed as either a YARN application or a traditional application.</p><p>At a high level, Spring YARN provides three components, <code>YarnClient</code>, <code>YarnAppmaster</code> and <code>YarnContainer</code> that mirror the key processes in the YARN architecture. Taken together, these three components provide the foundation of the Spring YARN application model.</p><p>It has always been a cumbersome process to get your own code packaged and executed on a Hadoop cluster. One need to put compiled package in Hadoop&rsquo;s classpath or let Hadoop&rsquo;s tools to copy your package into Hadoop during a job submission. Once you get past WordCount, your code will depend on third party libraries that are not present in Hadoop&rsquo;s default classpath. How should you package you dependent libraries? Furthermore, what if your dependencies collide with libraries already part of Hadoop&rsquo;s default classpath.</p><p>Spring Boot helps to provide an elegant solution to these build and packaging issues. You either create an executable jar(sometimes called as uber or fat jar) which bundles your application code and all its dependencies into a single .jar file or create a zip file which can be exploded before code is about to be executed. The main difference between the two packaging formats is that the latter lets you re-use jars that are already available on Hadoop&rsquo;s default classpath.</p><p>In this guide we are going to show how these 3 components, <code>YarnClient</code>, <code>YarnAppmaster</code> and <code>YarnContainer</code> are packaged into executable jars using Spring Boot. Internally Spring Boot rely heavy on application auto-configuration and Spring YARN adds its own auto-configuration magic. User can then concentrate on his or her own code and application configuration instead of spending a lot of time trying to understand how all the components should integrate with each others.</p><p>We will now show you how simple it is to create and deploy a custom application to a Hadoop cluster. Notice that there are no need to use XML.</p><h1><a href="#create-a-yarn-container" class="anchor" name="create-a-yarn-container"></a>Create a Yarn Container</h1><p>Here you create <code>ContainerApplication</code> and <code>HelloPojo</code> classes.</p>
+<pre><code class="prettyprint java">@Configuration
+@EnableAutoConfiguration
+public class ContainerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ContainerApplication.class, args);
+	}
+
+	@Bean
+	public HelloPojo helloPojo() {
+		return new HelloPojo();
+	}
+
+}
+</code></pre><p>In above <code>ContainerApplication</code>, notice how we added <code>@Configuration</code> in a class level itself and <code>@Bean</code> for a <code>helloPojo()</code> method. We previously mentioned <code>YarnContainer</code> component which is an interface towards what you&rsquo;d execute in your containers. You could define your custom <code>YarnContainer</code> to implement this interface and wrap all logic inside of that implementation.</p><p>However, Spring YARN defaults to a <code>DefaultYarnContainer</code> if none is defined and this default implementation expects to find a specific bean having the real logic what container is supposed to do. This effectively creates a simple model where, at minimum, only a simple <code>POJO</code> is needed.</p>
+<pre><code class="prettyprint java">@YarnContainer
+public class HelloPojo {
+
+	private static final Log log = LogFactory.getLog(HelloPojo.class);
+
+	@Autowired
+	private Configuration configuration;
+
+	@OnYarnContainerStart
+	public void publicVoidNoArgsMethod() {
+		log.info(&quot;Hello from HelloPojo&quot;);
+		log.info(&quot;About to list from hdfs root content&quot;);
+		FsShell shell = new FsShell(configuration);
+		for (FileStatus s : shell.ls(false, &quot;/&quot;)) {
+			log.info(s);
+		}
+	}
+
+}
+</code></pre><p><code>HelloPojo</code> class is a simple <code>POJO</code> in a sense that it doesn&rsquo;t extend any Spring YARN base classes. What we did in this class:</p>
+<ul>
+<li>We&rsquo;ve added a class level <code>@YarnContainer</code> annotation.</li>
+<li>We&rsquo;ve added a method level <code>@OnYarnContainerStart</code> annotation</li>
+<li>We&rsquo;ve <code>@Autowired</code> a Hadoop&rsquo;s <code>Configuration</code> class</li>
+</ul><p><code>@YarnContainer</code> is a stereotype annotation itself having a Spring&rsquo;s <code>@Component</code> defined in it. This is automatically marking a class to be a candidate having a <code>@YarnContainer</code> functionality.</p><p>Within this class we can use <code>@OnYarnContainerStart</code> annotation to mark a public method having no return type or arguments act as something what needs to be executed on Hadoop.</p><p>To demonstrate that we actually have some real functionality in this class, we simply use Spring Hadoop&rsquo;s <code>@FsShell</code> to list entries from a root of a <code>HDFS</code> file system. For this we need to have access to Hadoop&rsquo;s <code>Configuration</code> which is prepared for you so that you can just autowire it.</p><h1><a href="#create-a-yarn-client" class="anchor" name="create-a-yarn-client"></a>Create a Yarn Client</h1><p>Here you create a <code>ClientApplication</code> class.</p>
+<pre><code class="prettyprint java">@EnableAutoConfiguration
+public class ClientApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ClientApplication.class, args)
+			.getBean(YarnClient.class)
+			.submitApplication();
+	}
+
+}
+</code></pre>
+<ul>
+<li><code>@EnableAutoConfiguration</code> tells Spring Boot to start adding beans based on classpath setting, other beans, and various property settings.</li>
+<li>Specific auto-configuration for Spring YARN components takes place since Spring YARN is on the classpath.</li>
+</ul><p>The <code>main()</code> method uses Spring Boot&rsquo;s <code>SpringApplication.run()</code> method to launch an application. From there we simply request a bean of type <code>YarnClient</code> and execute its <code>submitApplication()</code> method. What happens next depends on application configuration, which we go through later in this guide.</p><h1><a href="#create-a-yarn-appmaster" class="anchor" name="create-a-yarn-appmaster"></a>Create a Yarn Appmaster</h1><p>Here you create an <code>AppmasterApplication</code> class.</p>
+<pre><code class="prettyprint java">@EnableAutoConfiguration
+public class AppmasterApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AppmasterApplication.class, args);
+	}
+
+}
+</code></pre><p>Application class for <code>YarnAppmaster</code> looks even simpler than what we just did for <code>ClientApplication</code>. Again the <code>main()</code> method uses Spring Boot&rsquo;s <code>SpringApplication.run()</code> method to launch an application.</p><p>One might argue that if you use this type of dummy class to basically fire up your application, could we just use a generic class for this? Well simple answer is yes, we even have a generic <code>SpringYarnBootApplication</code> class just for this purpose. You&rsquo;d define that to be your main class for an executable jar and you&rsquo;d accomplish this during the gradle build.</p><p>In real life, however, you most likely need to start adding more custom functionality to your application component and you&rsquo;d do that by start adding more beans. To do that you need to define a Spring <code>@Configuration</code> or <code>@ComponentScan</code>. <code>AppmasterApplication</code> would then act as your main starting point to define more custom functionality.</p><h1><a href="#create-an-application-configuration" class="anchor" name="create-an-application-configuration"></a>Create an Application Configuration</h1><p>Create a new <code>yaml</code> configuration file.</p>
+<pre><code class="prettyprint yaml">spring:
+  yarn:
+    appName: yarn-boot-simple
+    applicationDir: /app/yarn-boot-simple/
+    fsUri: hdfs://localhost:8020
+    rmAddress: localhost:8032
+    schedulerAddress: localhost:8030
+    client:
+      appmasterFile: yarn-boot-simple-appmaster-0.1.0.jar
+      files:
+       - &quot;file:build/libs/yarn-boot-simple-container-0.1.0.jar&quot;
+       - &quot;file:build/libs/yarn-boot-simple-appmaster-0.1.0.jar&quot;
+    appmaster:
+      containerCount: 1
+      containerFile: yarn-boot-simple-container-0.1.0.jar
+</code></pre><p>Final part for your application is its runtime configuration which glues all the components together which then can be called as a Spring YARN application. This configuration act as source for Spring Boot&rsquo;s <code>@ConfigurationProperties</code> and contains relevant configuration properties which cannot be auto-discovered or otherwise needs to have an option to be overwritten by an end user.</p><p>You can then write your own defaults for your own environment. Because these <code>@ConfigurationProperties</code> are resolved at runtime by Spring Boot, you even have an easy option to overwrite these properties either by using command-line options or provide additional configuration property files.</p><h1><a href="#build-the-application" class="anchor" name="build-the-application"></a>Build the application</h1><p>Sample code used in this blog can be found from our <a href="https://github.com/spring-projects/spring-hadoop-samples">spring-hadoop-samples</a> repo on GitHub.</p><p>Once you checkout our samples, issue a gradle build command from <code>boot/yarn-boot-simple</code> directory.</p>
+<pre><code class="prettyprint text">$ cd boot/yarn-boot-simple
+$ ./gradlew clean build
+</code></pre><p>For this sample we wanted to keep the project structure simple. We don&rsquo;t go through the gradle build file in this blog but the sort story is that we will create three different jar files from one project. In reality, one would probably use a multi-project model where each sub-project creates its own jar file.</p><h1><a href="#run-the-application" class="anchor" name="run-the-application"></a>Run the application</h1><p>Now that you&rsquo;ve successfully compiled and packaged your application, it&rsquo;s time to do the fun part and execute it on a Hadoop YARN.</p><p>Below listing shows files after a succesfull gradle build.</p>
+<pre><code class="prettyprint text">$ ls -lt build/libs/
+-rw-r--r-- 1 hadoop hadoop 35975001 Feb  2 17:39 yarn-boot-simple-container-0.1.0.jar
+-rw-r--r-- 1 hadoop hadoop 35973937 Feb  2 17:39 yarn-boot-simple-client-0.1.0.jar
+-rw-r--r-- 1 hadoop hadoop 35973840 Feb  2 17:39 yarn-boot-simple-appmaster-0.1.0.jar
+</code></pre><p>Simply run your executable client jar.</p>
+<pre><code class="prettyprint text">$ java -jar build/libs/yarn-boot-simple-client-0.1.0.jar
+</code></pre><p>Using a Resource Manager UI you can see status of an application.</p><p><img src="https://raw.github.com/spring-projects/spring-hadoop-samples/master/boot/yarn-boot-simple/rm-ui.png" alt="Resource Manager UI" " /></p><p>To find Hadoop&rsquo;s application logs, do a little find within a configured userlogs directory.</p>
+<pre><code class="prettyprint text">$ find hadoop/logs/userlogs/|grep std
+hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000002/Container.stdout
+hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000002/Container.stderr
+hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000001/Appmaster.stdout
+hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000001/Appmaster.stderr
+</code></pre><p>Grep output logged by <code>HelloPojo</code> class.</p>
+<pre><code class="prettyprint text">$ grep HelloPojo hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000002/Container.stdout
+[2014-02-02 17:40:38,314] boot - 11944  INFO [main] --- HelloPojo: Hello from HelloPojo
+[2014-02-02 17:40:38,315] boot - 11944  INFO [main] --- HelloPojo: About to list from hdfs root content
+[2014-02-02 17:40:41,134] boot - 11944  INFO [main] --- HelloPojo: FileStatus{path=hdfs://localhost:8020/; isDirectory=true; modification_time=1390823919636; access_time=0; owner=root; group=supergroup; permission=rwxr-xr-x; isSymlink=false}
+[2014-02-02 17:40:41,135] boot - 11944  INFO [main] --- HelloPojo: FileStatus{path=hdfs://localhost:8020/app; isDirectory=true; modification_time=1391203430490; access_time=0; owner=jvalkealahti; group=supergroup; permission=rwxr-xr-x; isSymlink=false}
+</code></pre><p>Congratulations! You&rsquo;ve just developed a Spring YARN application! </p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1378;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

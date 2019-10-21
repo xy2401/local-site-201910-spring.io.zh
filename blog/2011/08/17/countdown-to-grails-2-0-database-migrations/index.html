@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Countdown to Grails 2.0: Database Migrations</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Countdown to Grails 2.0: Database Migrations" />
+<meta name="twitter:description" content="&lt;p&gt;One of the many nice features of Grails is the way it will automatically create your database schema for you from your domain model. Admittedly it’s a feature of Hibernate that Grails uses, but still, it helps you get started very quickly with database-driven web applications without having to worry about the database schema.&lt;/p&gt;
+&lt;p&gt;What happens once your application moves to production? During development, losing the data in between server runs isn’t a big issue. But you can’t just drop the database in production. So that rules out the “create” and “create-drop” values for the &lt;tt&gt;dbCreate&lt;/tt&gt; data source setting. What about “update”? It won’t clear the data from your database, so it’s often used by people. Yet it doesn’t work well for production because it has significant limitations. For example, it can’t handle simple column renames and it certainly can’t handle modifications to existing data that might be a necessary part of an upgrade. Although it’s tempting to use &lt;tt&gt;dbCreate = “update”&lt;/tt&gt; for your deployments to production, it is usually the wrong solution.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Countdown to Grails 2.0: Database Migrations" />
+<meta property="og:description" content="&lt;p&gt;One of the many nice features of Grails is the way it will automatically create your database schema for you from your domain model. Admittedly it’s a feature of Hibernate that Grails uses, but still, it helps you get started very quickly with database-driven web applications without having to worry about the database schema.&lt;/p&gt;
+&lt;p&gt;What happens once your application moves to production? During development, losing the data in between server runs isn’t a big issue. But you can’t just drop the database in production. So that rules out the “create” and “create-drop” values for the &lt;tt&gt;dbCreate&lt;/tt&gt; data source setting. What about “update”? It won’t clear the data from your database, so it’s often used by people. Yet it doesn’t work well for production because it has significant limitations. For example, it can’t handle simple column renames and it certainly can’t handle modifications to existing data that might be a necessary part of an upgrade. Although it’s tempting to use &lt;tt&gt;dbCreate = “update”&lt;/tt&gt; for your deployments to production, it is usually the wrong solution.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-08-17 16:05:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Countdown to Grails 2.0: Database Migrations</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-08-17 16:05:00.0">August 17, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="432" href="/blog/2011/08/17/countdown-to-grails-2-0-database-migrations#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>One of the many nice features of Grails is the way it will automatically create your database schema for you from your domain model. Admittedly it&rsquo;s a feature of Hibernate that Grails uses, but still, it helps you get started very quickly with database-driven web applications without having to worry about the database schema.</p><p>What happens once your application moves to production? During development, losing the data in between server runs isn&rsquo;t a big issue. But you can&rsquo;t just drop the database in production. So that rules out the &ldquo;create&rdquo; and &ldquo;create-drop&rdquo; values for the <tt>dbCreate</tt> data source setting. What about &ldquo;update&rdquo;? It won&rsquo;t clear the data from your database, so it&rsquo;s often used by people. Yet it doesn&rsquo;t work well for production because it has significant limitations. For example, it can&rsquo;t handle simple column renames and it certainly can&rsquo;t handle modifications to existing data that might be a necessary part of an upgrade. Although it&rsquo;s tempting to use <tt>dbCreate = &ldquo;update&rdquo;</tt> for your deployments to production, it is usually the wrong solution.</p><p>What does that leave you with? SQL scripts for performing the migrations? That&rsquo;s certainly possible, but it&rsquo;s not easy to create the appropriate SQL for given changes in your GORM domain model. And it&rsquo;s not suitable if you need to support multiple database types, since the SQL will probably differ for each one.</p><p>Fortunately, there is a flexible, database-agnostic tool for performing schema migrations: <a href="http://www.liquibase.org/">Liquibase</a>. Even better, there are two plugins for Grails that make using Liquibase a bit easier than would otherwise be the case: the <a href="http://grails.org/plugin/liquibase">Liquibase plugin</a> and <a href="http://grails.org/plugin/autobase">Autobase</a>.</p><p>So if those plugins have been around for a long time, what&rsquo;s new for Grails 2.0? Database migrations are an essential part of using Grails for any serious work and so the Grails team decided that there should be an official way to handle them. The result is a new plugin that combines the best parts of the Liquibase and Autobase plugins: the <a href="http://grails.org/plugin/database-migration">Database Migration plugin</a>.</p>
+<h2>In brief</h2><p>Even though core database migration support was part of the Grails 2.0 roadmap, there was no reason to tie it to that version. That means you can use the plugin on Grails 1.3 projects as well. The plugin brings these features to your applications:</p>
+<ul>
+<li>Declarative database schema and data migration</li>
+<li>Groovy and XML migration scripts</li>
+<li>Manual or automatic execution of migrations</li>
+<li>Automatic tracking of migrations that have already been applied</li>
+<li>Generation of migrations by diffing domain model and database</li>
+</ul><p>It provides well over 20 commands, giving you plenty of control. You can find out more from the plugin&rsquo;s <a href="https://grails-plugins.github.com/grails-database-migration/docs/manual/index.html">user guide</a>, but put simply it provides a great deal of help for managing controlled upgrades of a database for new versions of a Grails application. You can still use the other plugins or even a completely different approach if you want, but for most users this is definitely the way to go.</p><p>The rest of this article will show you a common usage pattern for the plugin.</p>
+<h2>Getting started</h2><p>Imagine you have been working hard on a Grails application and now you want to deploy the first version to production. It&rsquo;s time to consider how you&rsquo;re going to manage database upgrades. At this point the production database hasn&rsquo;t even been created. So, declare the Database Migration plugin as a runtime dependency like so:</p>
+<pre><code class="prettyprint groovy">grails.project.dependency.resolution = {
+    inherits &quot;global&quot;
+    ...
+    plugins {
+        runtime &quot;:database-migration:1.0&quot;
+
+        compile &quot;:hibernate:$grailsVersion&quot;
+        compile &quot;:jquery:1.6.1.1&quot;
+        compile &quot;:resources:1.0.2&quot;
+
+        build &quot;:tomcat:$grailsVersion&quot;
+    }
+    ...
+}
+</code></pre><p>and run <tt>grails compile</tt>. At the time of writing, 1.0 is the latest version of the plugin. Check the Grails <a href="http://grails.org/plugin/database-migration">plugin portal</a> to find out what the latest version is at any given time.</p><p>With the plugin available, you can start the database migration journey. As I said, the production database hasn&rsquo;t been created yet. You could deploy the initial version of the application with a <tt>dbCreate</tt> value of &ldquo;update&rdquo; and that would work fine. But for reasons that I&rsquo;ll discuss later, I want to encourage you to initialise the database from a Database Migration changelog, i.e. a migration script. Don&rsquo;t worry, it&rsquo;s a lot less work than you might think.</p><p>The trick is to use one of the plugin&rsquo;s commands to generate the migration scripts for us. You start by making sure that your &lsquo;prod&rsquo; database is empty and removing any <tt>dbCreate</tt> settings for that environment. You then run<br /><pre><br />grails dbm-create-changelog<br />grails prod dbm-generate-gorm-changelog &ndash;add changelog-1.0.groovy<br /></pre></p><p>(Now would be a good time to try the new Grails 2 interactive mode!)</p><p>The above will create a <tt>grails-app/migrations/changelog.groovy</tt> file that will become your parent changelog file. The second command then generates a migration script, <tt>grails-app/migrations/changelog-1.0.groovy</tt>, that will take an empty database and create the appropriate schema for the current version of the application. The parent changelog is also updated to include this new one. Note that your database will remain empty!</p><p>Although Liquibase aims to be database agnostic, it&rsquo;s best to run the various generation and diff commands in a Grails environment that has a data source of the appropriate type configured, typically &ldquo;production&rdquo;. This will ensure you don&rsquo;t have to make too many changes to the generated changelogs.</p><p><div class="callout">
+<div class="callout-title">Changelog Names</div>
+<br />The plugin doesn&rsquo;t force any particular naming convention on you for the changelog filenames. In this article, I&rsquo;m simply using &lsquo;changelog-<appVersion>&rsquo;, so each changelog is tied to a particular version of the application. It works pretty well.<br />
+</div></p><p>Why did we create a 1.0 changelog rather than use the &ldquo;update&rdquo; <tt>dbCreate</tt> setting? The initial changelog means that you can take your application and deploy it to a fresh, empty database. All the migrations will work as you&rsquo;d expect, since they will run in order from a known, fixed schema (i.e. an empty one). The trouble with the &lsquo;update&rsquo; setting is that it will aways create a schema that matches the current domain model. Older changelogs simply won&rsquo;t run because the database isn&rsquo;t in a state that they expect! You can still use &ldquo;update&rdquo; for your first application version if you want, but the above approach means you get an early chance to test your initial changelog.</p><p>At this point, it&rsquo;s work reviewing the <tt>changelog-1.0.groovy</tt> file to see what a migration looks like and whether anything needs changing. You might see more indexes and constraints added than you really need, so some trimming might be in order.</p><p>OK, so we now have a migration script now. But when we run <tt>grails prod run-app</tt> the application won&rsquo;t start up: the database is still empty. Why? The migration scripts do not automatically run on startup, which means that you either have to manually update the database using a command like <tt>dbm-update</tt> or enable migration execution on startup. I prefer the latter, particularly as there are many situations in which you simply don&rsquo;t have access to the production database from the Grails command line. So, add these settings to the <tt>Config.groovy</tt> file:</p>
+<pre><code class="prettyprint groovy">grails.plugin.databasemigration.updateOnStart = true
+grails.plugin.databasemigration.updateOnStartFileNames = [&quot;changelog.groovy&quot;]
+</code></pre><p>Now when you start the application, the migration scripts will run and your application will work! And when you restart the server, the plugin will detect that the migrations have already run so they&rsquo;re ignored.</p>
+<h2>Subsequent changes</h2><p>The whole point of database migrations is that you make changes to your database as your application evolves and control that process. So now imagine you&rsquo;ve done some work on your application and want to release a new version, perhaps 1.0.1. To upgrade the production database you will need to create a changelog for your domain model changes. You could do this manually, but you can save a fair bit of effort by making using of the Database Migration plugin&rsquo;s &lsquo;diff&rsquo; commands.</p><p>To perform a diff, you need a database that the plugin can compare the current domain model to. Again, it&rsquo;s a good idea to use the same type of database as you&rsquo;re using in production. Also, the database must be in its original state, i.e. before the current set of domain model changes were made. In other words, don&rsquo;t run your application against the database with <tt>dbCreate = &ldquo;update&rdquo;</tt> enabled! In fact, it&rsquo;s worth creating a database dump for every version of the application so that you can roll back in case you do accidentally update the database in this way.</p><p>OK, enough of the warnings. Let&rsquo;s create the next changelog:</p>
+<pre><code class="prettyprint groovy">grails prod dbm-gorm-diff --add changelog-1.0.1.groovy
+</code></pre><p>As before, this will create a <tt>changelog-1.0.1.groovy</tt> file in the migrations directory and include it from the parent changelog. You will also need to check the generated changelog and potentially tweak it, but it&rsquo;s much easier to edit an existing file than create a new one from scratch. That&rsquo;s it! Now you can commit this change log to version control along with the corresponding domain class changes. In fact, I recommend that you always include domain class changes ant the corresponding migration script modifications in the same commit.</p><p>The changelog files themselves look like this:</p>
+<pre><code class="prettyprint groovy">databaseChangeLog = {
+    changeSet(id: &quot;UpdateDescriminatorForPluginTabs&quot;, author: &quot;pledbrook&quot;) {
+        update(tableName: &quot;content&quot;) {
+            column name: &quot;class&quot;, value: &quot;org.grails.plugin.PluginTab&quot;
+            where &quot;title like &#39;description-%&#39; and class = &#39;org.grails.wiki.WikiPage&#39;&quot;
+        }
+    }
+
+    changeSet(id: &quot;IssuesUrlForPlugins&quot;, author: &quot;pledbrook&quot;) {
+        addColumn(tableName: &quot;plugin&quot;) {
+            column name: &quot;issues_url&quot;, type: &quot;varchar(255)&quot;, {
+                constraints nullable: true
+            }
+        }
+    }
+}
+</code></pre><p>As you can see, they are simply collections of change sets, where each change set contains some database refactorings. Each change set needs a unique ID per author per changelog so that Liquibase can track whether it has been applied or not (Liquibase tracks the change sets, not the changelogs!). The above example demonstrates how you can update existing data (id &ldquo;UpdateDescriminatorForPluginTabs&rdquo;) as well as add a new column. Other supported refactorings include:</p>
+<ul>
+<li>Add/rename/modify column (schema change)</li>
+<li>Add index</li>
+<li>Add/rename/modify table</li>
+<li>Add/remove unique constraint</li>
+</ul><p>The full range of refactorings are described in the <a href="http://www.liquibase.org/manual/home">Liquibase manual</a>, although all the examples are in XML. Fortunately, the mapping of XML -&gt; Groovy is pretty straightforward:</p>
+<ol>
+<li>XML element -> Groovy method</li>
+<li>Attribute -> named argument</li>
+<li>Nested elements -> nested methods inside a closure</li>
+</ol><p>Finally, you may be wondering how to structure your changelogs. Should you have a change set per refactoring? Or a single change set per changelog? Or something in between? This is up to you, but a change set per source control commit can work well. In other words, you create a change set for each commit that contains changes to the domain model. Alternatively, you may want a change set per database table. Do whatever works for you.</p><p>That&rsquo;s all for this article. As you have seen, proper database migration support is an important part of any production database-backed web application, so it&rsquo;s great news that we now have an officially supported and very capable plugin to meet this need. It only works with relational databases (so no migrations for Redis, MongoDB, etc. I&rsquo;m afraid) but it should still satisfy the requirements of the vast majority of Grails users. Go ahead and give it a try!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 432;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Deploying GWT Applications in SpringSource dm Server - Part 1</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Deploying GWT Applications in SpringSource dm Server - Part 1" />
+<meta name="twitter:description" content="&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This will be a series of 3 blogs describing a step-by-step approach to building and deploying GWT applications in the &lt;a href=&quot;http://www.springsource.com/products/suite/dmserver&quot; target=&quot;_blank&quot;&gt;SpringSource dm Server™&lt;/a&gt;. The focus of the blogs will be as follows:&lt;br&gt;&lt;/p&gt;
+&lt;ol&gt;
+ &lt;br&gt; 
+ &lt;li&gt;Building and deploying the GWT &lt;a href=&quot;http://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;amp;s=google-web-toolkit-doc-1-5&amp;amp;t=GettingStarted&quot; target=&quot;_blank&quot;&gt;StockWatcher&lt;/a&gt; sample app as a WAR file in dm Server, using the &lt;a href=&quot;http://www.springsource.com/products/suite/sts&quot; target=&quot;_blank&quot;&gt;SpringSource Tool Suite&lt;/a&gt; to build it from scratch.&lt;/li&gt;
+ &lt;br&gt; 
+ &lt;li&gt;Deploying with a &lt;a href=&quot;http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars&quot; target=&quot;_blank&quot;&gt;“Shared Libraries”&lt;/a&gt; approach: How to remove the GWT dependencies from the WAR and deploy them as an OSGi bundle in dm Server.&lt;/li&gt;
+ &lt;br&gt; 
+ &lt;li&gt;Deploying with a &lt;a href=&quot;http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars&quot; target=&quot;_blank&quot;&gt;“Shared Services”&lt;/a&gt; approach: We convert the single WAR file into OSGi services which can be shared by other applications and hot-swapped out.&lt;/li&gt;
+ &lt;br&gt;
+&lt;/ol&gt;
+" />
+
+<meta property="og:title" content="Deploying GWT Applications in SpringSource dm Server - Part 1" />
+<meta property="og:description" content="&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This will be a series of 3 blogs describing a step-by-step approach to building and deploying GWT applications in the &lt;a href=&quot;http://www.springsource.com/products/suite/dmserver&quot; target=&quot;_blank&quot;&gt;SpringSource dm Server™&lt;/a&gt;. The focus of the blogs will be as follows:&lt;br&gt;&lt;/p&gt;
+&lt;ol&gt;
+ &lt;br&gt; 
+ &lt;li&gt;Building and deploying the GWT &lt;a href=&quot;http://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;amp;s=google-web-toolkit-doc-1-5&amp;amp;t=GettingStarted&quot; target=&quot;_blank&quot;&gt;StockWatcher&lt;/a&gt; sample app as a WAR file in dm Server, using the &lt;a href=&quot;http://www.springsource.com/products/suite/sts&quot; target=&quot;_blank&quot;&gt;SpringSource Tool Suite&lt;/a&gt; to build it from scratch.&lt;/li&gt;
+ &lt;br&gt; 
+ &lt;li&gt;Deploying with a &lt;a href=&quot;http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars&quot; target=&quot;_blank&quot;&gt;“Shared Libraries”&lt;/a&gt; approach: How to remove the GWT dependencies from the WAR and deploy them as an OSGi bundle in dm Server.&lt;/li&gt;
+ &lt;br&gt; 
+ &lt;li&gt;Deploying with a &lt;a href=&quot;http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars&quot; target=&quot;_blank&quot;&gt;“Shared Services”&lt;/a&gt; approach: We convert the single WAR file into OSGi services which can be shared by other applications and hot-swapped out.&lt;/li&gt;
+ &lt;br&gt;
+&lt;/ol&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-11-07 16:29:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Deploying GWT Applications in SpringSource dm Server - Part 1</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Ben Corrie</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-11-07 16:29:00.0">November 07, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="184" href="/blog/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><h2>Introduction</h2><p>This will be a series of 3 blogs describing a step-by-step approach to building and deploying GWT applications in the <a href="http://www.springsource.com/products/suite/dmserver" target="_blank">SpringSource dm Server™</a>. The focus of the blogs will be as follows:<br /><ol><br /> <li>Building and deploying the GWT <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=GettingStarted" target="_blank">StockWatcher</a> sample app as a WAR file in dm Server, using the <a href="http://www.springsource.com/products/suite/sts" target="_blank">SpringSource Tool Suite</a> to build it from scratch.</li><br /> <li>Deploying with a <a href="http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars" target="_blank">&ldquo;Shared Libraries&rdquo;</a> approach: How to remove the GWT dependencies from the WAR and deploy them as an OSGi bundle in dm Server.</li><br /> <li>Deploying with a <a href="http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars" target="_blank">&ldquo;Shared Services&rdquo;</a> approach: We convert the single WAR file into OSGi services which can be shared by other applications and hot-swapped out.</li><br /></ol><br />It is worth noting that I am not using the <a href="http://www.springframework.org" target="_blank">Spring Framework</a> anywhere in these first two blogs. Integration between Spring and GWT is a subject in itself and I want to try to keep each blog as focused as possible. In the third blog, I will show how to use Spring to publish and consume OSGi services and how this can be integrated with GWT.<br /><h2>Background</h2><br />The blog will take a practical step-by-step approach to building the GWT StockWatcher sample described <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=GettingStarted" target="_blank">here</a>. The Google tutorial takes you through the steps required to build a GWT sample from scratch using RPC. I will be referring to pages in the tutorial as we go through and discussing the advantages/disadvantages to various approaches.</p><p>The blog assumes that you have an install of <a href="http://www.springsource.com/products/suite/sts" target="_blank">SpringSource Tool Suite 1.1.1</a> (I&rsquo;m using the Eclipse 3.4 version),  <a href="http://www.springsource.com/products/suite/dmserver" target="_blank">dm Server 1.0.0</a> and <a href="https://code.google.com/webtoolkit/download.html" target="_blank">GWT 1.5</a>. It also assumes that you have a good understanding of Java programming and a basic understanding of Javascript and Ajax.</p><p>For the purposes of the paths used in the demo, I created a new Eclipse workspace at <tt>/Users/bcorrie/gwt/workspace</tt>. I have included zipped up projects you can download below, which contain a <tt>GWT_ROOT_INSTALL</tt> variable I have defined. To use my projects, when you import them navigate to &ldquo;Preferences&rdquo; -&gt; &ldquo;Java&rdquo; -&gt; &ldquo;Build Path&rdquo; -&gt; &ldquo;Classpath Variables&rdquo; and define your own <tt>GWT_ROOT_INSTALL</tt>.<br /><h2>Step 1: Create a new GWT project</h2><br />The easiest way to create a GWT Eclipse project currently is to use the command-line tools provided with the GWT distribution: <tt>projectCreator</tt> and <tt>applicationCreator</tt>, with the <tt>-eclipse</tt> parameter as described <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=GettingStartedCreateProject" target="_blank">here</a>. These command-line tools create a simple Java project, skeleton project files, a Run Configuration to run your project in hosted mode and scripts for running or compiling the project outside of Eclipse.</p><p>One limitation of these tools is that they are prescriptive about where your source code goes. Your source code must be in a project sub-directory called <tt>/src</tt>, your client code must be in a package ending in <tt>client</tt> and your server code in a package ending in <tt>server</tt>. The <tt>projectCreator</tt> and <tt>applicationCreator</tt> cannot be configured to do otherwise because this is typically where <tt>GWTShell</tt> and <tt>GWTCompiler</tt> expect your code to be. Later on, we&rsquo;ll look at some ways of reorganizing the source code and tuning the Run Configurations to make them more flexible.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-12.png"><img class="alignnone size-full wp-image-534" title="Creating the Eclipse project" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-12.png" alt="" /></a></p><p>Once you&rsquo;ve created the project on the command-line, import it into STS.</p><p>Use &ldquo;Import&rdquo; -&gt; &ldquo;General&rdquo; -&gt; &ldquo;Existing Projects into Workspace&rdquo;.<br /><h2>Step 2: Go through the Google tutorial and develop the Java source code</h2><br />Make sure you continue through <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=GettingStartedBasics" target="_blank">&ldquo;The basics&rdquo;</a> and go on to tackle the <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=GettingStartedRPC" target="_blank">&ldquo;Use remote procedure calls&rdquo;</a> section. The section on remote procedure calls will ensure that you have your stock price update code running on the web server which will be dynamically updating the web page every 5 seconds. This gives a simple but powerful demonstration of the capabilities of Ajax and the way in which GWT abstracts that behavior in Java code. You should end up with a project which looks something like this:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-11.png"><img class="alignnone size-full wp-image-529" title="The Stockwatcher Eclipse project" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-11.png" alt="" /></a></p><p>If you don&rsquo;t want to go through the process of developing the Sample code, you can download a zipped copy of my initial project <a href="http://blog.springsource.com/wp-content/uploads/2008/11/stockwatcherprojinitial.zip">here</a>. To run with my project, you&rsquo;ll need to go through the following steps:<br /><p style="padding-left: 30px;">- Unzip and import the project (&ldquo;Import&rdquo; -&gt; &ldquo;Existing Projects Into Workspace&rdquo;)<br />- Define a <tt>GWT_ROOT_INSTALL</tt> variable as described in Background above<br />- Either modify the <tt>StockWatcher GWTShell.launch</tt> Run Configuration included, or create a new one with the following values:</p><p><p style="padding-left: 60px;">- Right-click on the StockWatcher Project -&gt; &ldquo;Run As&rdquo; -&gt; &ldquo;Run Configurations&rdquo;<br />- For the &ldquo;Main class&rdquo;, enter <tt>com.google.gwt.dev.GWTShell</tt><br />- In &ldquo;Program arguments&rdquo;, enter <tt>-out www com.google.gwt.sample.stockwatcher.StockWatcher/StockWatcher.html</tt><br />- On Mac OS X only, in &ldquo;VM arguments&rdquo;, enter <tt>-XstartOnFirstThread</tt><br />- In &ldquo;Classpath&rdquo; -&gt; &ldquo;User Entries&rdquo;:</p><p><p style="padding-left: 90px;">- add <tt>gwt-dev-&lt;os&gt;.jar</tt> (Eg. <tt>gwt-dev-mac.jar</tt>)<br />- add the StockWatcher Project <tt>/src</tt> folder, using &ldquo;Advanced&rdquo; -&gt; &ldquo;Add Folders&rdquo;<br /><p style="padding-left: 30px;">Note that adding the <tt>/src</tt> folder to the classpath is a requirement of the GWTShell because it needs to have the metadata, such as its .xml file, on the Java classpath.</p></p>
+<h2>Step 3: Run it in hosted mode - check that it works!</h2><p>Hosted mode allows you to run and debug your GWT application in its &ldquo;pre-compiled&rdquo; Java state before it&rsquo;s deployed. Read about hosted mode <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=DevGuideHostedMode" target="_blank">here</a>. It&rsquo;s important to remember that the client classes of the StockWatcher application will eventually be compiled to javascript and html to be deployed on the client and the server classes will run as normal Java code on the server. Confusingly, some of the client code is used both on the server as support classes and on the client as compiled javascript. This will become clearer when we start splitting up the project later.</p><p>Either click the &ldquo;Run&rdquo; button with the StockWatcher project selected, or choose the Run Configuration you created in Step 2.</p><p>Note also that when you run in hosted mode, <tt>GWTShell</tt> creates a <tt>/www</tt> output folder into your project as well as a <tt>/tomcat</tt> folder to configure the embedded Tomcat. You&rsquo;ll see these if you refresh your StockWatcher project after testing it.<br /><h2>Step 4: Create a new Dynamic Web project</h2><br />To create a WAR file, we need a Dynamic Web project&hellip; but we already have a Java project! So what&rsquo;s the most sensible way to manage this requirement? Google recommend generating the compiled code into the Eclipse Java project and then cut-and-pasting the output from the GWT compiler and the generated .class files into a separate WAR project. My preference is to set up the GWT compiler to build the deployed code straight into the WAR project and to also split up the source code into the two projects so that the client code is in the Java project and the server code is in the WAR Project.</p><p>So why not just copy everything over to the WAR project and run it all from there? Well, there are a number of reasons why I think it makes sense to maintain two separate projects:<br /><p style="padding-left: 30px;">Firstly, you don&rsquo;t want your hosted mode to generate its <tt>/www</tt> and <tt>/tomcat</tt> folders into your WAR project.</p><br /><p style="padding-left: 30px;">Secondly, generating javascript and html from the hosted mode project into the WAR project has the advantage of keeping both projects cleaner and separating concerns. It eliminates the duplication of generated code which can lead to versioning confusion, particularly given that the generated code is obfuscated.</p><br /><p style="padding-left: 30px;">Thirdly, as discussed in Step 1, <tt>GWTShell</tt> and <tt>GWTCompiler</tt> mandate that your source code is in a sub-directory called <tt>/src</tt>. This limits your WAR project&rsquo;s ease of integration with tools such as Maven and Ant.</p><br /><p style="padding-left: 30px;">Finally, it allows the Java code to also be separated so that you&rsquo;re not copying the redundant client code into the WAR file.</p></p><p>While it may seem like unnecessary extra effort, you&rsquo;ll see as we go forwards with the different approaches why breaking up the code early on makes it easier to deploy it as shared services later.</p><p>So let&rsquo;s create a new Dynamic Web project and at the same time, create a Server instance of the dm Server.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-2.png"><img class="alignnone size-full wp-image-536" title="Creating a Dynamic Web project" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-2.png" alt="" /></a></p><p>If you don&rsquo;t already have a dm Server instance in the workspace, you&rsquo;ll need to hit the &ldquo;New&rdquo; button next to the &ldquo;Target Runtime&rdquo; textfield and select &ldquo;Create a new local server&rdquo;. Note that I&rsquo;ve also chosen <tt>src/main/java</tt> and <tt>src/main/webapp</tt> for the &ldquo;Java Source Directory&rdquo; and &ldquo;Content Directory&rdquo; respectively. You can use the defaults, but these paths are recommended as they integrate well with build tools like Maven.</p><p>Next, we&rsquo;re going to split the Java code up between the two projects:<br /><p style="padding-left: 30px;">Note that this division of code is not essential if you are just going to export your GWT code as a vanilla WAR file. The simplest way to achieve that is to create your Java project as a Java EE Dependency of the WAR Project and Eclipse will turn your Java project into a JAR file which it adds to WEB-INF/lib in the WAR. However, the problems with that approach are that you package your redundant client code into the WAR and it makes it harder to split your application up into services later on.</p></p><p>So, we have 3 types of Java code in our project: code which is only ever compiled to javascript and html, code which is exclusively server-side and code which supports both purposes. It makes sense to move these last two types of code into our WAR project. It also makes sense to put our &ldquo;common&rdquo; classes (those used by the client and server) into a separate package (again, the need for this will become clearer in blog 3) which we&rsquo;ll call <tt>com&hellip;client.api</tt>. Finally, GWT requires that our Async interface is in the same package as the RemoteService interface, so refactor this into the <tt>com&hellip;client.api</tt> package. Once you&rsquo;re done, this is how it should look:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/11/picture-2c.png"><img class="alignnone size-full wp-image-689" title="Reorganised WAR project" src="http://blog.springsource.com/wp-content/uploads/2008/11/picture-2c.png" alt="" /></a></p><p>The last thing required in breaking up the code is to add the StockWatcherWar project to the build path of the StockWatcher project, so that it can access the classes in the <tt>com&hellip;client.api</tt> package (Properties -&gt; Java Build Path -&gt; Projects -&gt; Add&hellip;).</p><p>If you prefer, you can skip all of this arduous work by download a zip of my two finished projects, plus the various Run Configurations <a href="http://blog.springsource.com/wp-content/uploads/2008/11/stockwatcherwarproj.zip">here</a> (see Step 2 and Background for instructions on importing and setting up). If you have a clean workspace, you&rsquo;ll need to create an instance of a dm Server runtime (New -&gt; Server -&gt; SpringSource &hellip;) and you may need to select the server runtime for the WAR project in &ldquo;Properties&rdquo; -&gt; &ldquo;Targeted Runtimes&rdquo; as it may not match mine.<br /><h2>Step 5: Configuring GWTCompiler to generate client code into the WAR project</h2><br />We need to set up the GWT compiler to generate our code from the StockWatcher project into the StockWatcherWar project. This is virtually the same process as setting up GWTShell in Step 2. Either modify the <tt>StockWatcher GWTCompiler.launch</tt> script included with the project zip in Step 4, or create a new one with the following values:<br /><p style="padding-left: 30px;">- Right-click on the StockWatcher Project -&gt; &ldquo;Run As&rdquo; -&gt; &ldquo;Run Configurations&rdquo; and create a new configuration<br />- For the &ldquo;Main class&rdquo;, enter <tt>com.google.gwt.dev.GWTCompiler</tt><br />- In &ldquo;Program arguments&rdquo;, enter <tt>-out <em>&lt;path to your workspace&gt;</em>/StockWatcherWar/src/main/webapp com.google.gwt.sample.stockwatcher.StockWatcher</tt><br />- On Mac OS X only, in &ldquo;VM arguments&rdquo;, enter <tt>-XstartOnFirstThread</tt><br />- In &ldquo;Classpath&rdquo; -&gt; &ldquo;User Entries&rdquo;:</p><p><p style="padding-left: 60px;">- add <tt>gwt-dev-&lt;os&gt;.jar</tt> (Eg. <tt>gwt-dev-mac.jar</tt>)<br />- add the StockWatcher Project <tt>/src</tt> folder and the StockWatcherWar <tt>/src/main/java</tt> folder, using &ldquo;Advanced&rdquo; -&gt; &ldquo;Add Folders&rdquo;<br /><p style="padding-left: 30px;">Note that adding the source folders to the classpath is a requirement of the Google compiler.</p></p><p>Now, run the compiler configuration you just created and refresh the StockWatcherWar project to see the generated files. You should see something like this:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/11/picture-3c.png"><img class="alignnone size-full wp-image-690" title="Generated Code into StockWatcherWar" src="http://blog.springsource.com/wp-content/uploads/2008/11/picture-3c.png" alt="" /></a><br /><h2>Step 6: Configure the WAR project</h2><br />You&rsquo;ll notice that the Google compiler generates the output into 2 folders reflecting the name of the GWT project. The compiler assumes that the target folder will be the same as the source folder and there is no way to disconfigure this, so you&rsquo;ll have to drag the generated files into the <tt>src/main/webapp</tt> folder and then delete the 2 Google directories. This is in fact what Google themselves recommend you do <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=DevGuideRPCDeployment" target="_blank">here</a>.</p><p>Next, we need to add the required dependencies into our project.<br /><p style="padding-left: 30px;">- Add web module dependency <tt>gwt-servlet.jar</tt> (&ldquo;Properties&rdquo; -&gt; &ldquo;Java EE Module Dependencies&rdquo; -&gt; &ldquo;Add External Jar&rdquo;). Note that this module depends on the <tt>javax.servlet</tt> APIs.<br />- Modify the <tt>web.xml</tt> file as per Google&rsquo;s instructions. It&rsquo;s worth also adding <tt>StockWatcher.html</tt> to a <tt>&lt;welcome-file-list&gt;</tt> so that it comes up automatically on deployment (although this doesn&rsquo;t always work when deploying in Eclipse as the browser window usually opens before the server is fully initialized).</p><p>If you&rsquo;re having problems, have a look at my zipped projects from Step 4.<br /><h2>Step 7: Deploy onto dm Server in STS</h2><br />Now that we&rsquo;ve created our shiny new WAR project, let&rsquo;s deploy it to dm Server within STS. Simply right-click on the StockWatcherWar project and select &ldquo;Run As&rdquo; -&gt; &ldquo;Run On Server&rdquo;. If the welcome page doesn&rsquo;t come up automatically, either refresh the page or add <tt>/StockWatcher.html</tt> to the URL manually.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/11/picture-4c.png"><img class="alignnone size-full wp-image-694" title="Deployed StockWatcher in STS" src="http://blog.springsource.com/wp-content/uploads/2008/11/picture-4c.png" alt="" width="857" height="573" /></a></p><p>Once you&rsquo;ve got the WAR project running successfully, you can configure hosted mode to use dm Server as its server, rather than its embedded Tomcat. To do this, all you need to do is to modify the Run Configuration for <tt>GWTShell</tt> and change the Program Arguments to <tt>-noserver -out www <a href="http://localhost:8080/StockWatcherWar/">http://localhost:8080/StockWatcherWar/</a></tt>. This allows you to quickly test client-side changes. Server-side changes are automatically re-deployed to the running server. Nice!<br /><p style="padding-left: 30px;">It&rsquo;s important to mention that if you want to run in the embedded Tomcat hosted mode with the setup I&rsquo;m advocating, you need to temporarily unselect dm Server as the Targeted Runtime in the WAR project&rsquo;s properties. This is because adding StockWatcherWar to StockWatcher&rsquo;s build path also pulls in dm Server runtime packages (such as <tt>javax.servlet</tt>) which messes up the build path of <tt>GWTShell</tt>.</p></p><p>Assuming that this worked, let&rsquo;s now package up our WAR and deploy it outside of the tooling.<br /><h2>Step 8: Export and deploy outside of STS</h2><br />Firstly, we need to export our project as a WAR file. This is achieved with right-click on StockWatcherWar -&gt; &ldquo;Export&rdquo; -&gt; &ldquo;Web&rdquo; -&gt; &ldquo;WAR file&rdquo;. If you&rsquo;re wondering where the &ldquo;Overwrite existing file&rdquo; checkbox is, it&rsquo;s because there appears to be an Eclipse bug which hides it until you resize the WAR Export dialog. You can download my exported WAR <a href="http://blog.springsource.com/wp-content/uploads/2008/11/stockwatcherwar.zip">here</a> (note that it is zipped up).</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-8.png"><img class="alignnone size-full wp-image-544" title="Exporting WAR" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-8.png" alt="" /></a></p><p>Once we&rsquo;ve exported the WAR, we need to start up the dm Server outside of STS.</p><p>Firstly, make sure that the STS dm Server is stopped, otherwise they will clash over ports. Then, on the command-line, run the dm Server startup script. In my case, this is <tt>bin/startup.sh</tt>. You can add the <tt>-clean</tt> option to ensure that you&rsquo;re starting with a clean setup. You should see the message:</p><p><tt>[2008-10-27 14:14:44.468] server-dm-10             &lt;SPPM0002I&gt; Server open for business with profile &lsquo;web&rsquo;.</tt></p><p>Once this has started successfully, open up the Admin console in a web browser, using the following URL:</p><p><tt><a href="http://localhost:8080/admin/web/applications/list.htm">http://localhost:8080/admin/web/applications/list.htm</a></tt></p><p>The default username is <tt>admin</tt> and the password is <tt>springsource</tt>. For more detailed information on running and configuring dm Server, see the <a href="http://static.springsource.com/projects/dm-server/1.0.x/user-guide/html/" target="_blank">user guide</a>.</p><p>You should now see the following:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-10.png"><img class="alignnone size-full wp-image-545" title="Uploading the WAR" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-10.png" alt="" /></a></p><p>Browse for your exported WAR file in the &ldquo;Application Location&rdquo; textfield and then click on upload. This will upload and deploy the WAR file which should then appear in &ldquo;Deployed Applications&rdquo;:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-111.png"><img class="alignnone size-full wp-image-546" title="Deployed Application" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-111.png" alt="" /></a></p><p>In the terminal output, you should see the following messages:</p><p><tt>[2008-10-27 14:07:44.380] server-tomcat-thread-5   &lt;SPSC1000I&gt; Creating web application &lsquo;/StockWatcherWar&rsquo;.<br />[2008-10-27 14:07:44.396] async-delivery-thread-1  &lt;SPSC1001I&gt; Starting web application &lsquo;/StockWatcherWar&rsquo;.<br />[2008-10-27 14:07:44.684] server-tomcat-thread-5   &lt;SPDE0010I&gt; Deployment of &lsquo;StockWatcherWar.war&rsquo; version &lsquo;0&rsquo; completed.</tt></p><p>Finally, all that remains to do is to click on the <tt>/StockWatcherWar</tt> link shown above and you are now using your GWT application!<br /><h2>Looking forward to Part 2</h2><br />In the next blog, we will look at how we can make use of the OSGi capabilities of dm Server to extract our GWT dependencies out of the WAR and turn them into a bundle which can be shared by all GWT applications running in the server. We&rsquo;ll also take a little peak under the covers to see our OSGi bundles interacting.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 184;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Understanding AMQP, the protocol used by RabbitMQ</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Understanding AMQP, the protocol used by RabbitMQ" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;b&gt;Update&lt;/b&gt; I changed the first paragraph to clarify the relationship between RabbitMQ and JMS.&lt;/p&gt;
+&lt;p&gt;RabbitMQ is a lightweight, reliable, scalable and portable message broker. But unlike many message brokers familiar to Java developers, it&#39;s not based on JMS. Instead, your applications communicate with it via a platform-neutral, wire-level protocol: the Advanced Message Queuing Protocol (AMQP). Fortunately there&#39;s already a Java client library and SpringSource is working on first class Spring and Grails integration - so don&#39;t worry about having to do low-level stuff to use RabbitMQ. You can even find AMQP client libraries that expose a JMS interface. But AMQP is sufficiently different in operation from JMS that it might cause headaches for Java developers that are used to the JMS model.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Understanding AMQP, the protocol used by RabbitMQ" />
+<meta property="og:description" content="&lt;p&gt;&lt;b&gt;Update&lt;/b&gt; I changed the first paragraph to clarify the relationship between RabbitMQ and JMS.&lt;/p&gt;
+&lt;p&gt;RabbitMQ is a lightweight, reliable, scalable and portable message broker. But unlike many message brokers familiar to Java developers, it&#39;s not based on JMS. Instead, your applications communicate with it via a platform-neutral, wire-level protocol: the Advanced Message Queuing Protocol (AMQP). Fortunately there&#39;s already a Java client library and SpringSource is working on first class Spring and Grails integration - so don&#39;t worry about having to do low-level stuff to use RabbitMQ. You can even find AMQP client libraries that expose a JMS interface. But AMQP is sufficiently different in operation from JMS that it might cause headaches for Java developers that are used to the JMS model.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-06-14 12:37:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Understanding AMQP, the protocol used by RabbitMQ</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-06-14 12:37:00.0">June 14, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="330" href="/blog/2010/06/14/understanding-amqp-the-protocol-used-by-rabbitmq#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><style>
+table {
+    margin-bottom: 1em;
+}
+table, tr, th, td {
+    border: 1px solid #DDD;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px 10px;
+}
+</style>
+<p><b>Update</b> I changed the first paragraph to clarify the relationship between RabbitMQ and JMS.</p>
+<p>RabbitMQ is a lightweight, reliable, scalable and portable message broker. But unlike many message brokers familiar to Java developers, it's not based on JMS. Instead, your applications communicate with it via a platform-neutral, wire-level protocol: the Advanced Message Queuing Protocol (AMQP). Fortunately there's already a Java client library and SpringSource is working on first class Spring and Grails integration - so don't worry about having to do low-level stuff to use RabbitMQ. You can even find AMQP client libraries that expose a JMS interface. But AMQP is sufficiently different in operation from JMS that it might cause headaches for Java developers that are used to the JMS model.</p>
+<p>In order to ease the transition, I'll be looking in this post at the basic concepts that underpin AMQP along with three common usage scenarios. By the end, you will hopefully have a good enough understanding to configure RabbitMQ and use it via the APIs provided by Spring and Grails.</p>
+<h2>Exchanges, queues, and bindings</h2>
+<p>Like any messaging system, AMQP is a message protocol that deals with publishers and consumers. The publishers produce the messages, the consumers pick them up and process them. It's the job of the message broker (such as RabbitMQ) to ensure that the messages from a publisher go to the right consumers. In order to do that, the broker uses two key components: exchanges and queues. The following diagram shows how they connect a publisher to a consumer:</p>
+<p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/rabbit-basics.png" alt="rabbit-basics" title="rabbit-basics" width="587" height="152" class="aligncenter size-full wp-image-4912" /></p>
+<p>As you can see, the setup is pretty straightforward. A publisher sends messages to a named exchange and a consumer pulls messages from a queue (or the queue pushes them to the consumer depending on the configuration). Of course, the connections have to be made in the first place, so how do publishers and consumers discover each other? Via the name of the exchange. Usually, either the publisher or consumer creates the exchange with a given name and then makes that name public. How that publication happens depends on the circumstances, but one might put it in public API documentation or send it to known clients.</p>
+<p>How are the messages routed from the exchange to the queue? Good question. First, the queue has to be attached to the given exchange. Typically, a consumer creates a queue and attaches it to an exchange at the same time. Second, messages received by the exchange have to be matched to the queue - a process called "binding".</p>
+<p>To understand binding, it's useful to understand the structure of an AMQP message:</p>
+<p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/rabbit-message.png" alt="rabbit-message" title="rabbit-message" width="228" height="171" class="aligncenter size-full wp-image-4916" /></p>
+<p>The headers and properties of the message are basically key/value pairs. The difference between them is that headers are defined by the AMQP specification whereas properties can contain arbitrary, application-specific information. The actual message content is just a sequence of bytes, so if you want to pass text around in your messages, then you should standardise on an encoding. UTF-8 is a good bet. You can specify a content type and encoding in the message headers if you want, but that's apparently not particularly common.</p>
+<p>What does this have to do with binding? One of the standard headers is called <tt>routing-key</tt> and it is this that the broker uses to match messages to queues. Each queue specifies a "binding key" and if that key matches the value of the <tt>routing-key</tt> header, the queue receives the message.</p>
+<p>Things are slightly complicated by the concept of exchange types. The AMQP spec. defines the following four types:</p>
+<table>
+<tr style="background-color: #DDD;">
+<th> Exchange type </th>
+<th> Behaviour </th>
+</tr>
+<tr>
+<td> Direct </td>
+<td> The binding key must match the routing key exactly - no wildcard support. </td>
+</tr>
+<tr>
+<td> Topic </td>
+<td> Same as Direct, but wildcards are allowed in the binding key. '#' matches zero or more dot-delimited words and '*' matches exactly one such word. </td>
+</tr>
+<tr>
+<td> Fanout </td>
+<td> The routing and binding keys are ignored - all published messages go to all bound queues. </td>
+</tr>
+<tr>
+<td> Headers </td>
+<td></td>
+</tr>
+</table>
+<p><b>Update</b> I corrected the information on wildcards, which work on the basis of dot-delimited words or terms.</p>
+<p>For example, say a publisher sends a message with a routing key of "NYSE" to a topic exchange called "Stocks". If a consumer creates a queue attached to "Stocks" with a binding key of "#", "*", or "NYSE", then that consumer will get the message because all three binding keys match "NYSE". However, if the message is published to a direct exchange, then the consumer will not get the message if the binding key is "#" or "*" since those characters are treated as literals, not wildcards. Interestingly, "#.#" will also match "NYSE" despite the routing key not having a dot.</p>
+<p>Now consider a message with a routing key of "NYSE.TECH.MSFT". What binding keys will match it given that the message is going to a topic exchange?</p>
+<table>
+<tr style="background-color: #DDD;">
+<th> Binding key </th>
+<th> Match? </th>
+</tr>
+<tr>
+<td> NYSE.TECH.MSFT </td>
+<td> Yes </td>
+</tr>
+<tr>
+<td> # </td>
+<td> Yes </td>
+</tr>
+<tr>
+<td> NYSE.# </td>
+<td> Yes </td>
+</tr>
+<tr>
+<td> *.* </td>
+<td> No </td>
+</tr>
+<tr>
+<td> NYSE.* </td>
+<td> No </td>
+</tr>
+<tr>
+<td> NYSE.TECH.* </td>
+<td> Yes </td>
+</tr>
+<tr>
+<td> NYSE.*.MSFT </td>
+<td> Yes </td>
+</tr>
+</table>
+<p>That's really all there is to it. Flexibility is provided by support for multiple consumers per queue and multiple queues per exchange. In fact, a single queue can even be bound to multiple exchanges. Now let's look at some of those scenarios.</p>
+<h2>RPC</h2>
+<p>An AMQP broker can act as an RPC mechanism between a client and a service. The general setup is like this, using a direct exchange:</p>
+<p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/rabbit-rpc.png" alt="rabbit-rpc" title="rabbit-rpc" width="574" height="383" class="aligncenter size-full wp-image-4927" /></p>
+<p>The general sequence goes:</p>
+<ol>
+<li>Client sends message to the queue, specifying: (a) a routing key that matches the service; and (b) the name of a queue to pick the response up from.</li>
+<li>Exchange passes the message to the service's queue ("ops_q" in this case).</li>
+<li>The queue pushes the message to the service, which then does some work and sends a response message back to the exchange, specifying a routing_key that matches the reply queue.</li>
+<li>The client picks the response message off the reply queue.</li>
+</ol>
+<p>From the perspective of the client, the call could either be blocking or non-blocking. How easy it is to do one or the other, though, depends on the client library in use.</p>
+<p>The key to the RPC scenario is making sure that the client and service are using the same exchange for the initial request and that the client knows what to specify for the routing key.</p>
+<p>As for the reply queue, it's typically created by the client, which then populates the <tt>reply_to</tt> header appropriately. Also, although you can use a different exchange for the replies compared to the requests, it's much more common to use the same exchange for both requests and replies.</p>
+<h2>Pub(lish)/Sub(scribe)</h2>
+<p>JMS has the concept of topic queues that ensure that messages from a publisher go to all subscribers. You can easily achieve the same behaviour in AMQP by binding multiple queues to an exchange like so:</p>
+<p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/rabbit-pub-sub.png" alt="rabbit-pub-sub" title="rabbit-pub-sub" width="341" height="402" class="aligncenter size-full wp-image-4939" /></p>
+<p>Even better, the queues can filter which messages they receive via the binding key. If a consumer wants to receive all messages, then it can specify a binding key of "#" - the "match any number of words" wildcard. Rather confusingly for your average developer, "*" matches zero or one (dot-delimited) words as mentioned earlier.</p>
+<h2>Work distribution</h2>
+<p>Imagine you have an application that has a bunch of jobs that need executing. With AMQP, you can hook up multiple consumers such that each job goes to one, and only one, of those consumers. The publisher doesn't care which consumer does the work, just that the work is done. This is work distribution.</p>
+<p>Configuring it is pretty straightforward, as shown in this diagram:</p>
+<p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/rabbit-work.png" alt="rabbit-work" title="rabbit-work" width="341" height="432" class="aligncenter size-full wp-image-4940" /></p>
+<p>So you have one queue bound to the exchange with multiple consumers sharing that queue. This setup guarantees that only one consumer processes a given message, no matter how many consumers there are.</p>
+<p>Those are the three main usage patterns for AMQP brokers. Although I have described each individually, it's fairly common to combine them. For example, you could have multiple services sharing the same queue (work distribution) in the RPC pattern. It's really up to you to decide how to configure the exchanges and queues, and now you should have a good enough understanding to work out the appropriate setup for your situation.</p><p><p>If you want to go further into AMQP, then check out <a href="http://www.amqp.org/confluence/download/attachments/720900/amqp0-8.pdf">the specification itself</a>, particularly the section on General Architecture. And to get started with RabbitMQ, just go to <a href="https://www.rabbitmq.com/">its website</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 330;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

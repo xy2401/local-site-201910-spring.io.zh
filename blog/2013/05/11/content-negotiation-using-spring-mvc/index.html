@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Content Negotiation using Spring MVC</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Content Negotiation using Spring MVC" />
+<meta name="twitter:description" content="&lt;p&gt;There are two ways to generate output using Spring MVC:&lt;/p&gt;
+&lt;ul&gt; 
+ &lt;li&gt; You can use the RESTful &lt;code style=&quot;font-size: 100%; color: black;&quot;&gt;@ResponseBody&lt;/code&gt; approach and HTTP message converters, typically to return data-formats like JSON or XML. Programmatic clients, mobile apps and AJAX enabled browsers are the usual clients. &lt;/li&gt;
+ &lt;li&gt;Alternatively you may use &lt;em&gt;view resolution&lt;/em&gt;. Although views are perfectly capable of generating JSON and XML if you wish (more on that in my next post), views are normally used to generate presentation formats like HTML for a traditional web-application. &lt;/li&gt;
+ &lt;li&gt;Actually there is a third possibility - some applications require both, and Spring MVC supports such combinations easily. We will come back to that right at the end. &lt;/li&gt;
+&lt;/ul&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200" />
+
+<meta property="og:title" content="Content Negotiation using Spring MVC" />
+<meta property="og:image" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200" />
+<meta property="og:description" content="&lt;p&gt;There are two ways to generate output using Spring MVC:&lt;/p&gt;
+&lt;ul&gt; 
+ &lt;li&gt; You can use the RESTful &lt;code style=&quot;font-size: 100%; color: black;&quot;&gt;@ResponseBody&lt;/code&gt; approach and HTTP message converters, typically to return data-formats like JSON or XML. Programmatic clients, mobile apps and AJAX enabled browsers are the usual clients. &lt;/li&gt;
+ &lt;li&gt;Alternatively you may use &lt;em&gt;view resolution&lt;/em&gt;. Although views are perfectly capable of generating JSON and XML if you wish (more on that in my next post), views are normally used to generate presentation formats like HTML for a traditional web-application. &lt;/li&gt;
+ &lt;li&gt;Actually there is a third possibility - some applications require both, and Spring MVC supports such combinations easily. We will come back to that right at the end. &lt;/li&gt;
+&lt;/ul&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2013-05-11 12:54:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Content Negotiation using Spring MVC</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=20&amp;d=mm" />
+<span class="author">Paul Chapman</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2013-05-11 12:54:00.0">May 11, 2013</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="517" href="/blog/2013/05/11/content-negotiation-using-spring-mvc#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>There are two ways to generate output using Spring MVC:</p>
+<ul>
+<li> You can use the RESTful <code style="font-size: 100%; color: black;">@ResponseBody</code> approach and HTTP message converters, typically to return data-formats like JSON or XML. Programmatic clients, mobile apps and AJAX enabled browsers are the usual clients.
+<li>Alternatively you may use <em>view resolution</em>. Although views are perfectly capable of generating JSON and XML if you wish (more on that in my next post), views are normally used to generate presentation formats like HTML for a traditional web-application.
+<li>Actually there is a third possibility - some applications require both, and Spring MVC supports such combinations easily. We will come back to that right at the end.
+</ul><p>In either case you&rsquo;ll need to deal with multiple representations (or views) of the same data returned by the controller. Working out which data format to return is called <em>Content Negotiation</em>.</p><p>There are three situations where we need to know what type of data-format to send in the HTTP response:</p>
+<ul>
+<li><strong>HttpMessageConverters:</strong> Determine the right converter to use.</li>
+<li><strong>Request Mappings:</strong> Map an incoming HTTP request to different methods that return different formats.</li>
+<li><strong>View Resolution:</strong> Pick the right view to use.</li>
+</ul><p>Determining what format the user has requested relies on a <code style="font-size: 100%; color: black;">ContentNegotationStrategy</code>. There are default implementations available out of the box, but you can also implement your own if you wish.</p><p>In this post I want to discuss how to configure and use content negotiation with Spring, mostly in terms of RESTful Controllers using HTTP message converters. In a later <a href="http://blog.springsource.org/2013/06/03/content-negotiation-using-views/">post</a> I will show how to setup content negotiation specifically for use with views using Spring&rsquo;s <code style="font-size: 100%; color: black;">ContentNegotiatingViewResolver</code>.</p>
+<h2>How does Content Negotiation Work?</h2><p><strong>[caption id=&ldquo;attachment_13288&rdquo; align=&ldquo;alignleft&rdquo; width=&ldquo;200&rdquo; caption=&ldquo;Getting the Right Content&rdquo;]<img src="http://blog.springsource.org/wp-content/uploads/2013/05/Handshake_03.png" alt="Negotiation" title="Content Negotiation" align="alignleft" width="200" class="size-full wp-image-13288" />[/caption]</strong></p><p>When making a request via HTTP it is possible to specify what type of response you would like by setting the <code style="font-size: 100%; color: black;">Accept</code> header property. Web browsers have this preset to request HTML (among other things). In fact, if you look, you will see that browsers actually send very confusing Accept headers, which makes relying on them impractical. See <a href="http://www.gethifi.com/blog/browser-rest-http-accept-headers"><a href="http://www.gethifi.com/blog/browser-rest-http-accept-headers">http://www.gethifi.com/blog/browser-rest-http-accept-headers</a></a> for a nice discussion of this problem. Bottom-line: <code style="font-size: 100%; color: black;">Accept</code> headers are messed up and you can&rsquo;t normally change them either (unless you use JavaScript and AJAX).</p><p>So, for those situations where the <code style="font-size: 100%; color: black;">Accept</code> header property is not desirable, Spring offers some conventions to use instead. (This was one of the nice changes in Spring 3.2 making a flexible content selection strategy available across all of Spring MVC not just when using views). You can configure a content negotiation strategy centrally once and it will apply wherever different formats (media types) need to be determined.</p>
+<h2>Enabling Content Negotiation in Spring MVC</h2><p>Spring supports a couple of conventions for selecting the format required: URL suffixes and/or a URL parameter. These work alongside the use of <code style="font-size: 100%; color: black;">Accept</code> headers. As a result, the content-type can be requested in any of three ways. By default they are checked in this order:</p>
+<ul>
+<li>Add a path extension (suffix) in the URL. So, if the incoming URL is something like <code style="font-size: 100%; color: navy;">http://myserver/myapp/accounts/list.html</code> then HTML is required. For a spreadsheet the URL should be <code style="font-size: 100%; color: navy;">http://myserver/myapp/accounts/list.xls</code>. The suffix to media-type mapping is automatically defined via the <em>JavaBeans Activation Framework</em> or JAF (so <code style="font-size: 100%; color: black;">activation.jar</code> must be on the class path).</li>
+<li>A URL parameter like this: <code style="font-size: 100%; color: navy;">http://myserver/myapp/accounts/list?format=xls</code>. The name of the parameter is <code style="font-size: 100%; color: black;">format</code> by default, but this may be changed. Using a parameter is disabled by default, but when enabled, it is checked second.</li>
+<li>Finally the <code style="font-size: 100%; color: black;">Accept</code> HTTP header property is checked. This is how HTTP is actually defined to work, but, as previously mentioned, it can be problematic to use.</li>
+</ul><p>The Java Configuration to set this up, looks like this. Simply customize the predefined content negotiation manager via its configurer. Note the <code style="font-size: 100%; color: black;">MediaType</code> helper class has predefined constants for most well-known media-types.</p>
+<pre><code class="prettyprint java"><br />@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+  /**
+    * Setup a simple strategy: use all the defaults and return XML by default when not sure. 
+    */
+  @Override
+  public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+    configurer.defaultContentType(MediaType.APPLICATION_XML);
+  }
+}
+</code></pre><p>When using XML configuration, the content negotiation strategy is most easily setup via the <code style="font-size: 100%; color: black;">ContentNegotiationManagerFactoryBean</code>:</p>
+<pre><code class="prettyprint xml"><br />   &lt;!--
+        Setup a simple strategy: 
+           1. Take all the defaults.
+           2. Return XML by default when not sure. 
+       --&gt;
+  &lt;bean id=&quot;contentNegotiationManager&quot;
+             class=&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;&gt;
+       &lt;property name=&quot;defaultContentType&quot; value=&quot;application/xml&quot; /&gt;
+  &lt;/bean&gt;
+
+ &lt;!-- Make this available across all of Spring MVC --&gt;
+ &lt;mvc:annotation-driven content-negotiation-manager=&quot;contentNegotiationManager&quot; /&gt;
+</code></pre><p>The <code style="font-size: 100%; color: black;">ContentNegotiationManager</code> created by either setup is an implementation of <code style="font-size: 100%; color: black;">ContentNegotationStrategy</code> that implements the <em>PPA Strategy</em> (path extension, then parameter, then Accept header) described above.</p>
+<h2>Additional Configuration Options</h2><p>In Java configuration, the strategy can be fully customized using methods on the configurer:</p>
+<pre><code class="prettyprint java"><br />@Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+  /**
+    *  Total customization - see below for explanation.
+    */
+  @Override
+  public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+    configurer.favorPathExtension(false).
+            favorParameter(true).
+            parameterName(&quot;mediaType&quot;).
+            ignoreAcceptHeader(true).
+            useJaf(false).
+            defaultContentType(MediaType.APPLICATION_JSON).
+            mediaType(&quot;xml&quot;, MediaType.APPLICATION_XML).
+            mediaType(&quot;json&quot;, MediaType.APPLICATION_JSON);
+  }
+}
+</code></pre><p>In XML, the strategy can be configured using methods on the factory bean:</p>
+<pre><code class="prettyprint xml"><br /><br />  &lt;!-- Total customization - see below for explanation. --&gt;
+  &lt;bean id=&quot;contentNegotiationManager&quot;
+             class=&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;&gt;
+    &lt;property name=&quot;favorPathExtension&quot; value=&quot;false&quot; /&gt;
+    &lt;property name=&quot;favorParameter&quot; value=&quot;true&quot; /&gt;
+    &lt;property name=&quot;parameterName&quot; value=&quot;mediaType&quot; /&gt;
+    &lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;useJaf&quot; value=&quot;false&quot;/&gt;
+    &lt;property name=&quot;defaultContentType&quot; value=&quot;application/json&quot; /&gt;
+ 
+    &lt;property name=&quot;mediaTypes&quot;&gt;
+        &lt;map&gt;
+            &lt;entry key=&quot;json&quot; value=&quot;application/json&quot; /&gt;
+            &lt;entry key=&quot;xml&quot; value=&quot;application/xml&quot; /&gt;
+       &lt;/map&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>What we did, in both cases:</p>
+<ul>
+<li>Disabled path extension. Note that favor does not mean use one approach in preference to another, it just enables or disables it. The order of checking is always path extension, parameter, Accept header.</li>
+<li>Enable the use of the URL parameter but instead of using the default parameter, <code style="font-size: 100%; color: black;">format</code>, we will use <code style="font-size: 100%; color: black;">mediaType</code> instead.
+</li>
+<li>Ignore the <code style="font-size: 100%; color: black;">Accept</code> header completely. This is often the best approach if most of your clients are actually web-browsers (typically making REST calls via AJAX).
+<li>Don't use the JAF, instead specify the media type mappings manually - we only wish to support JSON and XML.
+</ul><p><br /></p>
+<h2>Listing User Accounts Example</h2><p><a href="http://blog.springsource.org/wp-content/uploads/2013/05/account-list-1.png"><img class="alignright size-full wp-image-13159" title="Account List as HTML" src="http://blog.springsource.org/wp-content/uploads/2013/05/account-list-1.png" alt="" width="380" /></a></p><p>To demonstrate, I have put together a simple account listing application as our worked example - the screenshot shows a typical list of accounts in HTML. The complete code can be found at Github: <a href="https://github.com/paulc4/mvc-content-neg"><a href="https://github.com/paulc4/mvc-content-neg">https://github.com/paulc4/mvc-content-neg</a></a>.</p><p>To return a list of accounts in JSON or XML, I need a Controller like this. We will ignore the HTML generating methods for now.</p>
+<p>&nbsp;</p>
+<pre><code class="prettyprint java"><br />@Controller
+class AccountController {
+    @RequestMapping(value=&quot;/accounts&quot;, method=RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public @ResponseBody List&lt;Account&gt; list(Model model, Principal principal) {
+        return accountManager.getAccounts(principal) );
+    }
+
+    // Other methods ...
+}
+</code></pre><p>Here is the content-negotiation strategy setup:</p>
+<pre><code class="prettyprint xml"><br />	&lt;!-- Simple strategy: only path extension is taken into account --&gt;
+	&lt;bean id=&quot;cnManager&quot;
+		class=&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;&gt;
+		&lt;property name=&quot;favorPathExtension&quot; value=&quot;true&quot;/&gt;
+		&lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot; /&gt;
+		&lt;property name=&quot;defaultContentType&quot; value=&quot;text/html&quot; /&gt;
+		&lt;property name=&quot;useJaf&quot; value=&quot;false&quot;/&gt;
+
+		&lt;property name=&quot;mediaTypes&quot;&gt;
+			&lt;map&gt;
+				&lt;entry key=&quot;html&quot; value=&quot;text/html&quot; /&gt;
+				&lt;entry key=&quot;json&quot; value=&quot;application/json&quot; /&gt;
+				&lt;entry key=&quot;xml&quot; value=&quot;application/xml&quot; /&gt;
+			&lt;/map&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+</code></pre><p>Or, using Java Configuration, the code looks like this:</p>
+<pre><code class="prettyprint java"><br />	@Override
+	public void configureContentNegotiation(
+			ContentNegotiationConfigurer configurer) {
+		// Simple strategy: only path extension is taken into account
+		configurer.favorPathExtension(true).
+			ignoreAcceptHeader(true).
+			useJaf(false).
+			defaultContentType(MediaType.TEXT_HTML).
+			mediaType(&quot;html&quot;, MediaType.TEXT_HTML).
+			mediaType(&quot;xml&quot;, MediaType.APPLICATION_XML).
+			mediaType(&quot;json&quot;, MediaType.APPLICATION_JSON);
+	}
+</code></pre><p>Provided I have JAXB2 and Jackson on my classpath, Spring MVC will automatically setup the necessary <code style="font-size: 100%; color: black;">HttpMessageConverters</code>. My domain classes must also be marked up with JAXB2 and Jackson annotations to enable conversion (otherwise the message converters don&rsquo;t know what to do). In response to comments (below), the annotated <code style="font-size: 100%; color: black;">Account</code> class is shown <a href="#annotated-account-class">below</a>.</p><p>Here is the JSON output from our Accounts application (note path-extension in URL).</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png"><img class="alignright size-full wp-image-13160" title="account-list-json" src="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png" alt="" width="580" /></a></p><p>How does the system know whether to convert to XML or JSON? Because of content negotiation - any one of the three (<em>PPA Strategy</em>) options discussed above will be used depending on how the <code style="font-size: 100%; color: black;">ContentNegotiationManager</code> is configured. In this case the URL ends in <code style="font-size: 100%; color: navy;">accounts.json</code> because the path-extension is the only strategy enabled.</p><p>In the sample code you can switch between XML or Java Configuration of MVC by setting an active profile in the <code style="font-size: 100%; color: black;">web.xml</code>. The profiles are &ldquo;xml&rdquo; and &ldquo;javaconfig&rdquo; respectively.</p>
+<h2 id="combined-controller">Combining Data and Presentation Formats</h2><p>Spring MVC&rsquo;s REST support builds on the existing MVC Controller framework. So it is possible to have the same web-applications return information both as raw data (like JSON) and using a presentation format (like HTML). </p><p>Both techniques can easily be used side by side in the same controller, like this:</p>
+<pre><code class="prettyprint java"><br />@Controller
+class AccountController {
+    // RESTful method
+    @RequestMapping(value=&quot;/accounts&quot;, produces={&quot;application/xml&quot;, &quot;application/json&quot;})
+    @ResponseStatus(HttpStatus.OK)
+    public @ResponseBody List&lt;Account&gt; listWithMarshalling(Principal principal) {
+        return accountManager.getAccounts(principal);
+    }
+
+    // View-based method
+    @RequestMapping(&quot;/accounts&quot;)
+    public String listWithView(Model model, Principal principal) {
+        // Call RESTful method to avoid repeating account lookup logic
+        model.addAttribute( listWithMarshalling(principal) );
+
+        // Return the view to use for rendering the response
+        return ¨accounts/list¨;
+    }
+}
+</code></pre><p>There is a simple Pattern here: the <code style="font-size: 100%; color: black;">@ResponseBody</code> method handles all data access and integration with the underlying service layer (the <code style="font-size: 100%; color: black;">AccountManager</code>). The second method calls the first and sets up the response in the Model for use by a View. This avoids duplicated logic. </p><p>To determine which of the two <code style="font-size: 100%; color: black;">@RequestMapping</code> methods to pick, we are again using our PPA content negotiation strategy. It allows the <code style="font-size: 100%; color: black;">produces</code> option to work. URLs ending with <code style="font-size: 100%; color: navy;">accounts.xml</code> or <code style="font-size: 100%; color: navy;">accounts.json</code> map to the first method, any other URLs ending in <code style="font-size: 100%; color: navy;">accounts.anything</code> map to the second.</p>
+<h2>Another Approach</h2><p>Alternatively we could do the whole thing with just one method if we used views to generate all possible content-types. This is where the <code style="font-size: 100%; color: black;">ContentNegotiatingViewResolver</code> comes in and that will be the subject of my next <a href="http://blog.springsource.org/2013/06/03/content-negotiation-using-views/">post</a>.</p>
+<h2>Acknoweldgements</h2><p>I would like to thank <a href="/author/rstoyanchev/">Rossen Stoyanchev</a> for his help in writing this post. Any errors are my own.</p>
+<h2 id="annotated-account-class">Addendum: The Annotated Account Class</h2><p><b>Added 2 June 2013</b>.</p><p>Since there were some questions on how to annotate a class for JAXB, here is part of the Account class. For brevity I have omitted the data-members, and all methods except the annotated getters. I could annotate the data-members directly if preferred (just like JPA annotations in fact). Remember that Jackson can marshal objects to JSON using these same annotations.</p>
+<pre><code class="prettyprint java"><br />/**
+ * Represents an account for a member of a financial institution. An account has
+ * zero or more {@link Transaction}s and belongs to a {@link Customer}. An aggregate entity.
+ */
+@Entity
+@Table(name = &quot;T_ACCOUNT&quot;)
+@XmlRootElement
+public class Account {
+
+	// data-members omitted ...
+
+	public Account(Customer owner, String number, String type) {
+		this.owner = owner;
+		this.number = number;
+		this.type = type;
+	}
+
+	/**
+	 * Returns the number used to uniquely identify this account.
+	 */
+	@XmlAttribute
+	public String getNumber() {
+		return number;
+	}
+
+	/**
+	 * Get the account type.
+	 * 
+	 * @return One of &quot;CREDIT&quot;, &quot;SAVINGS&quot;, &quot;CHECK&quot;.
+	 */
+	@XmlAttribute
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * Get the credit-card, if any, associated with this account.
+	 * 
+	 * @return The credit-card number or null if there isn&#39;t one.
+	 */
+	@XmlAttribute
+	public String getCreditCardNumber() {
+		return StringUtils.hasText(creditCardNumber) ? creditCardNumber : null;
+	}
+
+	/**
+	 * Get the balance of this account in local currency.
+	 * 
+	 * @return Current account balance.
+	 */
+	@XmlAttribute
+	public MonetaryAmount getBalance() {
+		return balance;
+	}
+
+
+	/**
+	 * Returns a single account transaction. Callers should not attempt to hold
+	 * on or modify the returned object. This method should only be used
+	 * transitively; for example, called to facilitate reporting or testing.
+	 * 
+	 * @param name
+	 *            the name of the transaction account e.g &quot;Fred Smith&quot;
+	 * @return the beneficiary object
+	 */
+	@XmlElement   // Make these a nested &lt;transactions&gt; element
+	public Set&lt;Transaction&gt; getTransactions() {
+		return transactions;
+	}
+
+    // Setters and other methods ...
+
+}
+</code></pre></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 517;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+ <div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

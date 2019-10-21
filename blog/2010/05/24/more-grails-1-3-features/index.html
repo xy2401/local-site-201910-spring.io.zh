@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>More Grails 1.3 features</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="More Grails 1.3 features" />
+<meta name="twitter:description" content="&lt;p&gt;Last week, &lt;a href=&quot;/2010/05/18/managing-plugins-with-grails-1-3/&quot;&gt;I described&lt;/a&gt; how Grails now treats plugins like normal dependencies that can be pulled from Maven-compatible repositories. Although this was the big new feature for 1.3, it wasn’t the only one. In this post, I’ll look at some of the others, starting with a feature that I only recently found out about.&lt;/p&gt;
+&lt;h2&gt;Named queries&lt;/h2&gt;
+&lt;p&gt;GORM provides three distinct ways of performing database queries:&lt;br&gt;&lt;/p&gt;
+&lt;ul&gt;
+ &lt;br&gt;
+ &lt;li&gt;dynamic finders, e.g. Book.findByTitleAndAuthorLike(…);&lt;/li&gt;
+ &lt;br&gt;
+ &lt;li&gt;criteria queries, which use a nice DSL; and&lt;/li&gt;
+ &lt;br&gt;
+ &lt;li&gt;HQL, Hibernate’s SQL-like query language.&lt;/li&gt;
+ &lt;br&gt;
+&lt;/ul&gt;
+" />
+
+<meta property="og:title" content="More Grails 1.3 features" />
+<meta property="og:description" content="&lt;p&gt;Last week, &lt;a href=&quot;/2010/05/18/managing-plugins-with-grails-1-3/&quot;&gt;I described&lt;/a&gt; how Grails now treats plugins like normal dependencies that can be pulled from Maven-compatible repositories. Although this was the big new feature for 1.3, it wasn’t the only one. In this post, I’ll look at some of the others, starting with a feature that I only recently found out about.&lt;/p&gt;
+&lt;h2&gt;Named queries&lt;/h2&gt;
+&lt;p&gt;GORM provides three distinct ways of performing database queries:&lt;br&gt;&lt;/p&gt;
+&lt;ul&gt;
+ &lt;br&gt;
+ &lt;li&gt;dynamic finders, e.g. Book.findByTitleAndAuthorLike(…);&lt;/li&gt;
+ &lt;br&gt;
+ &lt;li&gt;criteria queries, which use a nice DSL; and&lt;/li&gt;
+ &lt;br&gt;
+ &lt;li&gt;HQL, Hibernate’s SQL-like query language.&lt;/li&gt;
+ &lt;br&gt;
+&lt;/ul&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-05-24 17:38:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">More Grails 1.3 features</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-05-24 17:38:00.0">May 24, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="323" href="/blog/2010/05/24/more-grails-1-3-features#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Last week, <a href="/2010/05/18/managing-plugins-with-grails-1-3/">I described</a> how Grails now treats plugins like normal dependencies that can be pulled from Maven-compatible repositories. Although this was the big new feature for 1.3, it wasn&rsquo;t the only one. In this post, I&rsquo;ll look at some of the others, starting with a feature that I only recently found out about.</p>
+<h2>Named queries</h2><p>GORM provides three distinct ways of performing database queries:<br /><ul><br /><li>dynamic finders, e.g. Book.findByTitleAndAuthorLike(&hellip;);</li><br /><li>criteria queries, which use a nice DSL; and</li><br /><li>HQL, Hibernate&rsquo;s SQL-like query language.</li><br /></ul><br />These three features provide a potent mix of ease-of-use and power, providing you with the flexibility you need. And yet there&rsquo;s something missing.</p><p>Develop a non-trivial Grails application and you will soon realise that you often use the same queries again and again. What should you do? The copy-and-paste technique is simple but leaves you with major maintenance issues. You could write service methods for each of your common queries, but then you end up with quite fine-grained services and a pretty dumb domain model. The ideal place for these queries is on the domain classes themselves.</p><p>That&rsquo;s where named queries come in - a feature that slipped under the radar and into Grails 1.2.</p>
+<h3>An example</h3><p>Let&rsquo;s consider a simple domain model related to reports:<br />[caption id=&ldquo;attachment_4791&rdquo; align=&ldquo;alignnone&rdquo; width=&ldquo;398&rdquo;]<img src="http://blog.springsource.com/wp-content/uploads/2010/05/report-model.png" alt="Domain model for reports" title="Domain model for reports" width="398" height="235" class="size-full wp-image-4791" />[/caption]</p><p>The basic idea is that a report can be about one or more servers and it may be generated one or more times a month. So <tt>dow</tt> stands for &ldquo;day of week&rdquo; and <tt>wom</tt> stands for &ldquo;week of month&rdquo;. Each server has an associated location, which is just the name of a city in this much-reduced model.</p><p>Now consider what sort of information an application might want to extract from this model: perhaps all reports generated in the first week of the month, or all reports about a particular server. We could add static methods to the <tt>Report</tt> class to provide such queries, but named queries give us some additional benefits that you&rsquo;ll see later.</p><p>Creating a named query is straightforward, as you would expect with Grails. Simply add a static <tt>namedQueries</tt> property to the relevant domain class and assign a closure to it:</p>
+<pre><code class="prettyprint groovy">class Report {
+    String name
+
+    static hasMany = [frequencies: Frequency, servers: Server]
+
+    static namedQueries = {
+        inFirstWeek {
+            frequencies {
+                eq(&quot;wom&quot;, 1)
+            }
+        }
+
+        inWeek { wom -&gt;
+            frequencies {
+                eq(&quot;wom&quot;, wom)
+            }
+        }
+
+        dilbertsReports {
+            servers {
+                eq(&quot;mgrEmail&quot;, &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5e3a37323c3b2c2a1e303129363b2c3b70312c39">[email&#160;protected]</a>&quot;)
+            }
+        }
+
+        inCity { city -&gt;
+            servers {
+                location {
+                    eq(&quot;city&quot;, city)
+                }
+            }
+        }
+}
+</code></pre><p>The code above sets up four queries: inFirstWeek, inWeek, dilbertsReports, and inCity. You can then use them in the same places that you can use dynamic finders, for example in controller actions or service methods. If you want to retrieve all reports that are generated in the first week of the month, call the relevant named query like so:</p>
+<pre><code class="prettyprint groovy">Report.inFirstWeek.list()
+</code></pre><p>If you want all reports generated in one of the other weeks of the month, then use <tt>inWeek</tt> instead:</p>
+<pre><code class="prettyprint groovy">Report.inWeek(2).list()
+</code></pre><p>See how you can pass arguments to the named queries? Just make sure that your named query closure declares the appropriate number of arguments.</p><p>Hopefully you can see how easy it is to both declare and use named queries, but before I move on, a few points deserve clarification.</p><p>First, you must write the queries in Grails&rsquo; criteria DSL. If you&rsquo;ve been putting off learning about the criteria DSL, you now have a good reason to cease procrastinating!</p><p>Second, you invoke the DSL as a static property (if you aren&rsquo;t passing any arguments to it) or method, followed by a standard GORM retrieval method, such as <tt>list()</tt>, <tt>get()</tt>, or a dynamic finder. That means you can add extra filtering to your named queries. It&rsquo;s also worth pointing out that <tt>get()</tt> will only return a domain instance <em>if the result of the named query contains the required entity</em>. Otherwise, <tt>get()</tt> simply returns <tt>null</tt>.</p><p>In other words, let&rsquo;s say the <tt>inFirstWeek</tt> query returns the domain instances with IDs of 1, 3, and 6. Then</p>
+<pre><code class="prettyprint groovy">Report.inFirstWeek.get(3)
+</code></pre><p>will return the domain instance with ID of 3, whereas</p>
+<pre><code class="prettyprint groovy">Report.inFirstWeek.get(2)
+</code></pre><p>will return <tt>null</tt>, even if <tt>Report.get(2)</tt> returns a real domain instance. So the named query acts like a filter.</p><p>So far, so good. The way that the named queries combine with <tt>get()</tt>, <tt>list()</tt>, and dynamic finders may be enough of a reason to use them right away. But Grails 1.3 includes another trick up its sleeve.</p>
+<h3>Chaining queries</h3><p>How do arbitrary combinations of named queries sound? Well, by chaining named queries, you have just that. For example, if I want all of Dilbert&rsquo;s reports that are generated in the first week of the month, I can call</p>
+<pre><code class="prettyprint groovy">Report.dilbertsReports.inFirstWeek.list()
+</code></pre><p>Alternatively, if I want all first week reports about servers in London, I can use</p>
+<pre><code class="prettyprint groovy">Report.inFirstWeek.inCity(&quot;London&quot;).list()
+</code></pre><p>In fact, you can chain as many named queries as you like, as long as they all return the same type of domain class. </p><p>Named queries provide a powerful technique for query reuse that is both simple to implement and to use. You can now have a very rich domain model with client code that is easy to read and understand. How good is that?</p><p>Now I&rsquo;d like to quickly look at some other Grails 1.3 features.</p>
+<h2>Best of the rest</h2><p>Smaller, but still useful, features made it into the Grails 1.3 release. Foremost of these was the upgrade to Groovy 1.7 (Grails 1.2 and previous are based on Groovy 1.6).<br /><h3>Groovy 1.7</h3><br />Many fixes and enhancements went into the Groovy 1.7 release, but perhaps two are the most significant for Grails developers:<br /><ol><br /><li>Anonymous and inner classes now supported - so integration with frameworks like Wicket should be much easier.</li><br /><li>Power asserts - you can now use the Groovy <tt>assert</tt> keyword instead of the JUnit/TestNG alternatives to get impressive diagnostic information on why an assertion failed. My favourite new feature!</li><br /></ol><br /><h3>Dirty checking</h3><br />No, this has nothing to do with household chores! As many of you are aware, Hibernate will automatically check whether a domain instance has been modified and persist the changes at the end of the session. GORM now allows you access to this feature via the <tt>isDirty()</tt> method:</p>
+<pre><code class="prettyprint groovy">def book = Book.get(10)
+assert !book.dirty
+
+book.title = &quot;Unknown&quot;
+assert book.dirty
+assert book.isDirty(&quot;title&quot;)
+assert !book.isDirty(&quot;author&quot;)
+</code></pre><p>See how you can also check whether individual fields have been modified?<br /><h3>Global layouts</h3><br />As you probably know, Grails allows you to apply layouts to views either explicitly, via a <tt>&lt;meta&gt;</tt> tag, or by convention. What it didn&rsquo;t allow you to do is specify a default layout for views as a fallback option. That deficiency has now been rectified and you can specify the default layout either via a setting in Config.groovy:</p>
+<pre><code class="prettyprint groovy">grails.sitemesh.default.layout = &#39;defaultLayout&#39;
+</code></pre><p>or by creating the file <tt>grails-app/views/layouts/application.gsp</tt>. The first approach would pick up the layout from <tt>grails-app/views/layouts/defaultLayout.gsp</tt>.<br /><h3>JUnit 4</h3><br />For all those testing fans out there, Grails finally comes with JUnit 4 by default, so you can now annotate your test cases to your heart&rsquo;s content.</p><p>With that, I&rsquo;ll wrap up this instalment of Grails 1.3 features. I hope you can make good use of the named queries! Next time, I&rsquo;ll look at in-place plugins.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 323;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

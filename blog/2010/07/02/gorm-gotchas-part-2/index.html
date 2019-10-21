@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>GORM Gotchas (Part 2)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="GORM Gotchas (Part 2)" />
+<meta name="twitter:description" content="&lt;p&gt;In &lt;a href=&quot;/blog/2010/06/23/gorm-gotchas-part-1&quot;&gt;part 1 of this series&lt;/a&gt;, I introduced you to some of the subtleties associated with persisting domain instances with GORM. This time, I’m going to tackle relationships with particular focus on &lt;tt&gt;hasMany&lt;/tt&gt; and &lt;tt&gt;belongsTo&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;GORM provides only a few basic elements for defining relationships between domain classes, but they are sufficient to describe most needs. When I give training courses on Grails, it always surprises me how few slides cover relationships. As you can imagine, this apparent simplicity does hide some subtle behaviour that can trip up the unwary. Let’s start with the most basic of relationships: the many-to-one.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="GORM Gotchas (Part 2)" />
+<meta property="og:description" content="&lt;p&gt;In &lt;a href=&quot;/blog/2010/06/23/gorm-gotchas-part-1&quot;&gt;part 1 of this series&lt;/a&gt;, I introduced you to some of the subtleties associated with persisting domain instances with GORM. This time, I’m going to tackle relationships with particular focus on &lt;tt&gt;hasMany&lt;/tt&gt; and &lt;tt&gt;belongsTo&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;GORM provides only a few basic elements for defining relationships between domain classes, but they are sufficient to describe most needs. When I give training courses on Grails, it always surprises me how few slides cover relationships. As you can imagine, this apparent simplicity does hide some subtle behaviour that can trip up the unwary. Let’s start with the most basic of relationships: the many-to-one.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-07-02 10:21:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">GORM Gotchas (Part 2)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-07-02 10:21:00.0">July 02, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="334" href="/blog/2010/07/02/gorm-gotchas-part-2#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In <a href="/blog/2010/06/23/gorm-gotchas-part-1">part 1 of this series</a>, I introduced you to some of the subtleties associated with persisting domain instances with GORM. This time, I&rsquo;m going to tackle relationships with particular focus on <tt>hasMany</tt> and <tt>belongsTo</tt>.</p><p>GORM provides only a few basic elements for defining relationships between domain classes, but they are sufficient to describe most needs. When I give training courses on Grails, it always surprises me how few slides cover relationships. As you can imagine, this apparent simplicity does hide some subtle behaviour that can trip up the unwary. Let&rsquo;s start with the most basic of relationships: the many-to-one.</p>
+<h2>Many-to-one</h2><p>Let&rsquo;s say I have the following two domain classes:</p>
+<pre><code class="prettyprint groovy">class Location {
+    String city
+}
+
+class Author {
+    String name
+    Location location
+}
+</code></pre><p>When you see an <tt>Author</tt> domain class, you just know that a <tt>Book</tt> one can&rsquo;t be far behind. It&rsquo;s true, there will be a <tt>Book</tt> class too, but for now let&rsquo;s just concentrate on the two domain classes above and the many-to-one <tt>location</tt> relationship.</p><p>It looks simple, right? And it is. Just set the <tt>location</tt> property to a <tt>Location</tt> instance and you have linked an author to a location. But see what happens when we run the following code in the Grails console:</p>
+<pre><code class="prettyprint groovy">def a = new Author(name: &quot;Niall Ferguson&quot;, location: new Location(city: &quot;Boston&quot;))
+a.save()
+</code></pre><p>An exception is thrown. If you look at the ultimate &ldquo;caused by&rdquo; exception, you&rsquo;ll see the message &ldquo;not-null property references a null or transient value: Author.location&rdquo;. What&rsquo;s going on?</p><p>The bit about a &ldquo;transient value&rdquo; is the key here. A transient instance is one that isn&rsquo;t attached to a Hibernate session. As you can see from the code, we are setting the <tt>Author.location</tt> property to a new <tt>Location</tt> instance, not one retrieved from the database. Hence the instance is transient. The obvious fix is to make the <tt>Location</tt> instance persistent by saving it:</p>
+<pre><code class="prettyprint groovy">def l = new Location(city: &quot;Boston&quot;)
+l.save()
+
+def a = new Author(name: &quot;Niall Ferguson&quot;, location: l)
+a.save()
+</code></pre><p>So if our many-to-one properties must have persistent instances as values, why do so many GORM examples look like our original code, where we created a new <tt>Location</tt> instance? It&rsquo;s because domain classes usually use the <tt>belongsTo</tt> property in situations like this.</p>
+<h3>Cascading with <tt>belongsTo</tt></h3><p>Whenever you deal with relationships in Hibernate, you need to have a good grasp of what is meant by cascading. That holds true for GORM as well. Cascading determines what type of actions, when applied to a domain instance, also apply to the relations of that instance. For example, given the model above, is the author&rsquo;s location saved when we save the author? Is the location deleted when we delete the author? What about if we delete the location? Is the associated author also deleted?</p><p>Saves and deletes are the most common actions connected with cascading, and they&rsquo;re the only ones you really need to understand. So if you go back to the previous section, you&rsquo;ll understand that the <tt>Location</tt> instance isn&rsquo;t saved with the author because cascading is not in operation for that <tt>Author -&gt; Location</tt> relationship. If we now change <tt>Location</tt> to this:</p>
+<pre><code class="prettyprint groovy">class Location {
+    String city
+
+    static belongsTo = Author
+}
+</code></pre><p>we will find that the exception disappears and the <tt>Location</tt> instance is saved along with the author. The <tt>belongsTo</tt> line ensures that saves are cascaded from <tt>Author</tt> to <tt>Location</tt>. As the documentation says, it also cascades deletes as well, so if you delete an author, its associated location will be deleted too. However, saving or deleting a location does not save or delete the author.</p>
+<h3>Which <tt>belongsTo</tt>?</h3><p>One thing that often confuses people is that <tt>belongsTo</tt> supports two different syntaxes. The one used above simply defines cascading between two classes, while the alternative also adds a corresponding back reference, automatically turning the relationship into a bidirectional one:</p>
+<pre><code class="prettyprint groovy">class Location {
+    String city
+
+    static belongsTo = [ author: Author ]
+}
+</code></pre><p>In this case, an <tt>author</tt> property is added to <tt>Location</tt> at the same time as the cascading is defined. The advantage of this syntax is that you can define multiple cascading relationships.</p><p>One thing you may notice if you use the latter syntax is that when you save a new <tt>Author</tt> with a location, Grails automatically sets the <tt>Location</tt>&rsquo;s <tt>author</tt> property to the <tt>Author</tt> instance. In other words, the back reference is initialised without you having to do it explicitly.</p><p>Before I move on to collections, I&rsquo;d like to say one last thing about the many-to-one relationship. Sometimes people think that adding a back reference as we have done above turns the relationship into a one-to-one. In fact, it&rsquo;s not technically a one-to-one unless you add a uniqueness constraint on one side of the relationship or the other. For example:</p>
+<pre><code class="prettyprint groovy">class Author {
+    String name
+    Location location
+
+    static constraints = {
+        location(unique: true)
+    }
+}
+</code></pre><p>Of course, it doesn&rsquo;t make sense to turn the <tt>Author - Location</tt> relationship into a one-to-one in this particular case, but hopefully you can see how a one-to-one is defined.</p><p>The many-to-one relationship is pretty straightforward once you understand how <tt>belongsTo</tt> works. Relationships involving collections, on the other hand, can throw up a few unpleasant surprises if you&rsquo;re not used to Hibernate.</p>
+<h2>Collections (one-to-many/many-to-many)</h2><p>Collections are the natural way to model one-to-many relationships in an object-oriented language and GORM makes using them pretty easy considering what&rsquo;s happening behind the scenes. Nonetheless, this is definitely one area where the impedance mismatch between object-oriented languages and relational databases raises its ugly head. For a start, you have to remember that your in-memory data can be different to that in the database.</p>
+<h3>Domain instance collections vs DB records</h3><p>When you have a collection on a domain instance, you&rsquo;re dealing with in-memory objects. This means that you can deal with it just like any other collection of objects. You can iterate over it and you can modify it. Then at some point you will want to persist any changes to the database, which you can do by saving the object that has the collection. I&rsquo;ll come back to that shortly, but first I&rsquo;d like to demonstrate some of the subtleties associated with this disconnect between your collection of objects and the actual data. To do that, I&rsquo;m going to introduce the <tt>Book</tt> class:</p>
+<pre><code class="prettyprint groovy">class Book {
+    String title
+
+    static constraints = {
+        title(blank: false)
+    }
+}
+
+class Author {
+    String name
+    Location location
+
+    static hasMany = [ books: Book ]
+}
+</code></pre><p>This creates a uni-directional (<tt>Book</tt> does not have a back reference to <tt>Author</tt>) one-to-many relationship, where an author has zero or more books. Now let&rsquo;s say I execute this code in the Grails console (a wonderful tool for experimenting with GORM):</p>
+<pre><code class="prettyprint groovy">def a = new Author(name: &quot;Niall Ferguson&quot;, location: new Location(city: &quot;Boston&quot;))
+a.save(flush: true)
+
+a.addToBooks(title: &quot;Colossus&quot;)
+a.addToBooks(title: &quot;Empire&quot;)
+
+println a.books*.title
+println Book.list()*.title
+</code></pre><p>The output will look like this:<br /><pre><br />[Empire, Colossus]
+[]<br /></pre><br />So you can print the collection of books, but they aren&rsquo;t in the database yet. You can even insert <tt>a.save()</tt> after the second <tt>a.addToBooks()</tt> to no apparent effect. Remember from the previous article that I said calling <tt>save()</tt> does not guarantee immediate persistence of the data? This is a concrete example of that. If you want to see the new books in your query, you&rsquo;ll have to add an explicit flush:</p>
+<pre><code class="prettyprint groovy">...
+a.addToBooks(title: &quot;Colossus&quot;)
+a.addToBooks(title: &quot;Empire&quot;)
+a.save(flush: true)   // &lt;---- This line added
+
+println a.books*.title
+println Book.list()*.title
+</code></pre><p>The two <tt>println</tt> statement will then output the same books, although not necessarily in the same order. Another symptom of this discrepancy between the in-memory collection and the database data is demonstrated if you replace the <tt>println</tt> statements with:</p>
+<pre><code class="prettyprint groovy">println a.books*.id
+</code></pre><p>Even after a <tt>save()</tt> (without an explicit flush), this will print <tt>null</tt>s. It&rsquo;s only when you flush the session that the child domain instances have their IDs set. This is quite different to the many-to-one case we saw earlier, where you didn&rsquo;t need an explicit flush for the <tt>Location</tt> instance to be persisted to the database! It&rsquo;s important to realise that difference exists, otherwise you&rsquo;ll be in for a hard time.</p><p>As a little aside in case you&rsquo;re following the examples in the Grails console yourself, be aware that anything you save when you run a script in the console will still be there when you execute the next script. The data is only cleared when you restart the console. Also, the session is always flushed on completion of the script.</p><p>OK, back to collections. The examples above exhibit some interesting behaviour that I want to talk about next. Why were the <tt>Book</tt> instances persisted to the database even though I didn&rsquo;t define a <tt>belongsTo</tt> on <tt>Book</tt>?</p>
+<h3>Cascading</h3><p>As with other relationships, mastering collections means mastering their cascading behaviour. The first thing to note is that saves are always cascaded from the parent to its children, even if there is no <tt>belongsTo</tt> specified. If that&rsquo;s the case, is there any point to using <tt>belongsTo</tt>? Yes.</p><p>Consider what happens if we execute this code in the console after we have added the author and his books:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+a.delete(flush: true)
+
+println Author.list()*.name
+println Book.list()*.title
+</code></pre><p>The output looks like this:<br /><pre><br />[]<br />[Empire, Colossus]<br /></pre><br />In other words, the author has been deleted, but the books haven&rsquo;t. That&rsquo;s where <tt>belongsTo</tt> comes in: it ensures that deletes are cascaded as well as saves. Simply by adding the line <tt>static belongsTo = Author</tt> to <tt>Book</tt>, the above code will print empty lists for <tt>Author</tt> <em>and</em> <tt>Book</tt>. Simple, right? In this case, yes, but the real fun is only just beginning.</p><p>Aside: see how we&rsquo;re forcing a flush of the session in the example above? If we don&rsquo;t, <tt>Author.list()</tt> may display the author that&rsquo;s just been deleted, simply because the change may not have been persisted by that point.</p>
+<h3>Deleting children</h3><p>Deleting something like an <tt>Author</tt> instance and having GORM delete the children automatically is straightforward. But what if you just want to delete one or more of the author&rsquo;s books, not the author himself? You might try this:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+a.books*.delete()
+</code></pre><p>thinking that this will delete all the books. But in fact this code will generate an exception:<br /><pre><br />org.springframework.dao.InvalidDataAccessApiUsageException: deleted object would be re-saved by cascade (remove deleted object from associations): [Book#1]; &hellip;<br /> at org.springframework.orm.hibernate3.SessionFactoryUtils.convertHibernateAccessException(SessionFactoryUtils.java:657)<br /> at org.springframework.orm.hibernate3.HibernateAccessor.convertHibernateAccessException(HibernateAccessor.java:412)<br /> at org.springframework.orm.hibernate3.HibernateTemplate.doExecute(HibernateTemplate.java:411)<br /> at org.springframework.orm.hibernate3.HibernateTemplate.executeWithNativeSession(HibernateTemplate.java:374)<br /> at org.springframework.orm.hibernate3.HibernateTemplate.flush(HibernateTemplate.java:881)<br /> at ConsoleScript7.run(ConsoleScript7:3)<br />Caused by: org.hibernate.ObjectDeletedException: deleted object would be re-saved by cascade (remove deleted object from associations): [Book#1]<br /></pre><br />Wow, a useful stacktrace message! Yes, the problem is that the books are still in the author&rsquo;s collection, so when the session is flushed, they will be recreated. Remember, not only are saves cascaded, but modified domain instances are automatically persisted (because of Hibernate&rsquo;s dirty-checking).</p><p>The solution, as the exception message explains, is to remove the books from the collection:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+a.books.clear()
+</code></pre><p>Except this isn&rsquo;t a solution, because the books are still in the database. They are simply no longer associated with the author. OK, so we need to explicitly delete them as well:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+a.books.each { book -&gt;
+    a.removeFromBooks(book)
+    book.delete()
+}
+</code></pre><p>Oops, now we get a <tt>ConcurrentModificationException</tt> because we are removing books from the author&rsquo;s collection while we&rsquo;re iterating over it. Standard Java gotcha that one. We can side step that by creating a copy of the collection:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+def l = []
+l += a.books
+
+l.each { book -&gt;
+    a.removeFromBooks(book)
+    book.delete()
+}
+</code></pre><p>That works, but boy does it require some effort.</p><p>You also have to be careful if you have a bidirectional relationship, for example if your <tt>belongsTo</tt> uses this sytnax: <tt>static belongsTo = [ author: Author ]</tt>. If we remove the books from the collection without deleting them like so:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+def l = []
+l += a.books
+
+l.each { book -&gt;
+    a.removeFromBooks(book)
+}
+</code></pre><p>we&rsquo;ll get a &ldquo;not-null property references a null or transient value: Book.author&rdquo; error. As I&rsquo;ll explain later, that&rsquo;s because the books have had their <tt>author</tt> property set to <tt>null</tt>. Since the property is not nullable, this triggers a validation error. It&rsquo;s enough to drive anyone crazy!</p><p>Fear not, for there is a solution. If we add this mapping to <tt>Author</tt>:</p>
+<pre><code class="prettyprint groovy">static mapping = {
+    books cascade: &quot;all-delete-orphan&quot;
+}
+</code></pre><p>then any book that is removed from its author will automatically be deleted by GORM. The last code sample, where we remove all the books from the collection, will now work. In fact, if the relationship is unidirectional, you can reduce the code substantially:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+a.books.clear()
+</code></pre><p>This will remove all the books and delete them in one fell swoop!</p><p>The moral of this story is a simple one: if you use <tt>belongsTo</tt> with a collection, explicitly set the cascade type to &ldquo;all-delete-orphan&rdquo; in the parent&rsquo;s <tt>mapping</tt> block. In fact, there&rsquo;s a strong case for making this the default behaviour for <tt>belongsTo</tt> and one-to-many relationships in GORM.</p><p>This raises an interesting question: why doesn&rsquo;t the <tt>clear()</tt> method work on a bidirectional relationship? I&rsquo;m not 100% sure, but I believe it&rsquo;s because the books retain a back reference to the author. To understand why that would affect the behaviour of <tt>clear()</tt>, you must first realise that GORM maps unidirectional and bidirectional one-to-many relationships to database tables differently. For unidirectional relationships, GORM creates a join table by default, so when you clear the collection of books, the records are simply removed from that join table. Bidirectional relationships are mapped using a straight foreign key on the child table, i.e. the book table in our example. A diagram should make that clearer:</p><p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/one-to-many-mappings.png" alt="one-to-many-mappings" title="one-to-many-mappings" width="553" height="338" class="aligncenter size-full wp-image-5084" /></p><p>When you clear the collection of books, that foreign key is still there because GORM doesn&rsquo;t clear the value of the <tt>author</tt> property. Hence it&rsquo;s as if the collection was never emptied.</p><p>That&rsquo;s almost it for collections. I&rsquo;d just like to tie up this section with a quick look at the <tt>addTo*()</tt> and <tt>removeFrom*()</tt> methods.</p>
+<h3><tt>addTo*()</tt> vs <tt>&lt;&lt;</tt></h3><p>In my examples, I have used the <tt>addTo*()</tt> and <tt>removeFrom*()</tt> dynamic methods provided by GORM. Why is that? After all, if these are standard Java collections, can&rsquo;t we just use code like this:</p>
+<pre><code class="prettyprint groovy">def a = Author.get(1)
+a.books &lt;&lt; new Book(title: &quot;Colossus&quot;)
+</code></pre><p>Sure we can, but there are some subtle benefits to the GORM methods. Consider this code:</p>
+<pre><code class="prettyprint groovy">def a = new Author(name: &quot;Niall Ferguson&quot;, location: new Location(city: &quot;Boston&quot;))
+a.books &lt;&lt; new Book(title: &quot;Colossus&quot;)
+a.save()
+</code></pre><p>Doesn&rsquo;t seem to be anything wrong with that, does there? And yet, if you run the code, you&rsquo;ll get a <tt>NullPointerException</tt> because the <tt>books</tt> collection is not yet initialised. That&rsquo;s quite different to the behaviour you see when you fetch the author from the database, for example using <tt>get()</tt>. In that case, we can happily append items to the <tt>books</tt> collection. We only run into this problem because we are creating the author via <tt>new</tt>. If you use the <tt>addTo*()</tt> method instead, you don&rsquo;t have to worry about this issue at all because it&rsquo;s null-safe.</p><p>Now consider the example where we fetch the author using <tt>get()</tt> before appending a new book to its collection. If the relationship is bidirectional, we&rsquo;ll hit a &ldquo;property not-null or transient&rdquo; exception, because the book&rsquo;s <tt>author</tt> property hasn&rsquo;t been set. If you use the standard collection methods, you have to initialise back references manually. With the <tt>addTo*()</tt> method, this is done for you.</p><p>The last feature of the <tt>addTo*()</tt> method is the implicit creation of the correct domain class. Notice in our examples how we just pass the initial property values for the books to the method, rather than explicitly instantiating <tt>Book</tt>? That&rsquo;s because the method can infer from the <tt>hasMany</tt> property what type the collection contains. Neat, huh?</p><p>The <tt>removeFrom*()</tt> method is less useful, but it does clear back references. Of course, this works best with the &ldquo;all-delete-orphan&rdquo; cascade option as I discussed earlier.</p><p>The last type of relationship to consider is the many-to-many.</p>
+<h3>Many-to-many</h3><p>If you want, you can get GORM to manage many-to-many relationships for you. There are a few things you need to be aware of if you do, though:</p><h1><a href="#deletes-do-not-cascade-period" class="anchor" name="deletes-do-not-cascade-period"></a>Deletes do not cascade, period.</h1><h1><a href="#one-side-of-the-relationship-em-must-em-have-a-tt-belongsto-tt-but-it-usually-doesn-rsquo-t-matter-which-side-has-it" class="anchor" name="one-side-of-the-relationship-em-must-em-have-a-tt-belongsto-tt-but-it-usually-doesn-rsquo-t-matter-which-side-has-it"></a>One side of the relationship <em>must</em> have a <tt>belongsTo</tt>, but it usually doesn&rsquo;t matter which side has it.</h1><h1><a href="#the-tt-belongsto-tt-only-affects-the-direction-of-cascading-saves-it-em-does-not-cause-cascading-deletes-em" class="anchor" name="the-tt-belongsto-tt-only-affects-the-direction-of-cascading-saves-it-em-does-not-cause-cascading-deletes-em"></a>The <tt>belongsTo</tt> only affects the direction of cascading saves - it <em>does not cause cascading deletes</em></h1><h1><a href="#a-join-table-is-always-used-but-you-cannot-store-any-extra-information-on-it" class="anchor" name="a-join-table-is-always-used-but-you-cannot-store-any-extra-information-on-it"></a>A join table is always used, but you cannot store any extra information on it.</h1><p>Sorry to labour the point on cascading deletes, but it&rsquo;s important to understand that the behaviour is quite different from the many-to-one and one-to-many relationships. It&rsquo;s also important to understand the last point: lots of many-to-many relationships have associated information. For example, a user may have many roles and a role may have many users. But the user may have different roles in different projects, hence the project is associated with the relationship itself. In these cases, you&rsquo;re better off managing the many-to-many relationship yourself.</p>
+<h2>Summary</h2><p>Well, that&rsquo;s probably the longest article I&rsquo;ve written so far, but you&rsquo;ve reached the end. Congratulations! Don&rsquo;t worry if you haven&rsquo;t managed to digest everything in one sitting, you can always refer back to it.</p><p>I think GORM does a great job of providing a nice abstraction for dealing with database relationships in an object-oriented way, but as you&rsquo;ve seen, you can&rsquo;t really forget that you are ultimately dealing with a database. Armed with the information provided in this article, though, you should have no problems coping with the basics of GORM collections. Hopefully that will mean you can enjoy working with one-to-many relationships in your applications and reaping the benefits.</p><p>You may not believe it, but I haven&rsquo;t covered everything you need to know about collections yet. There are still some interesting issues to cover around lazy-loading, but I&rsquo;ll talk you through those in the next article.</p><p>Until next time!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 334;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

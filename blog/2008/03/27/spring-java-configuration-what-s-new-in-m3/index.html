@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Java Configuration - What&#39;s New in M3</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Java Configuration - What&#39;s New in M3" />
+<meta name="twitter:description" content="&lt;p&gt;Today marks the third milestone release of the &lt;a href=&quot;http://springframework.org/javaconfig&quot;&gt;Spring Java Configuration project&lt;/a&gt; (JavaConfig for short). The release contains numerous bug fixes and new features - I’ll highlight a few of the most interesting changes below, but first let me give a quick refresher as to what JavaConfig is all about.&lt;/p&gt;
+&lt;p&gt;If you have any experience with Spring, the following snippet of XML configuration will likely be familiar. Let’s assume we’re looking at a file named &lt;span style=&quot;font-family:courier&quot;&gt;application-config.xml&lt;/span&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;prettyprint xml&quot;&gt;&lt;br&gt;&amp;lt;beans&amp;gt;
+	&amp;lt;bean id=&quot;orderService&quot; class=&quot;com.acme.OrderService&quot;/&amp;gt;
+		&amp;lt;constructor-arg ref=&quot;orderRepository&quot;/&amp;gt;
+	&amp;lt;/bean&amp;gt;
+	&amp;lt;bean id=&quot;orderRepository&quot; class=&quot;com.acme.OrderRepository&quot;/&amp;gt;
+		&amp;lt;constructor-arg ref=&quot;dataSource&quot;/&amp;gt;
+	&amp;lt;/bean&amp;gt;
+&amp;lt;/beans&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+" />
+<meta name="twitter:creator" content="@cbeams" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+
+<meta property="og:title" content="Spring Java Configuration - What&#39;s New in M3" />
+<meta property="og:image" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;Today marks the third milestone release of the &lt;a href=&quot;http://springframework.org/javaconfig&quot;&gt;Spring Java Configuration project&lt;/a&gt; (JavaConfig for short). The release contains numerous bug fixes and new features - I’ll highlight a few of the most interesting changes below, but first let me give a quick refresher as to what JavaConfig is all about.&lt;/p&gt;
+&lt;p&gt;If you have any experience with Spring, the following snippet of XML configuration will likely be familiar. Let’s assume we’re looking at a file named &lt;span style=&quot;font-family:courier&quot;&gt;application-config.xml&lt;/span&gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;prettyprint xml&quot;&gt;&lt;br&gt;&amp;lt;beans&amp;gt;
+	&amp;lt;bean id=&quot;orderService&quot; class=&quot;com.acme.OrderService&quot;/&amp;gt;
+		&amp;lt;constructor-arg ref=&quot;orderRepository&quot;/&amp;gt;
+	&amp;lt;/bean&amp;gt;
+	&amp;lt;bean id=&quot;orderRepository&quot; class=&quot;com.acme.OrderRepository&quot;/&amp;gt;
+		&amp;lt;constructor-arg ref=&quot;dataSource&quot;/&amp;gt;
+	&amp;lt;/bean&amp;gt;
+&amp;lt;/beans&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-03-27 00:23:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Java Configuration - What&#39;s New in M3</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=20&amp;d=mm" />
+<span class="author">Chris Beams</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-03-27 00:23:00.0">March 27, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="142" href="/blog/2008/03/27/spring-java-configuration-what-s-new-in-m3#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Today marks the third milestone release of the <a href="http://springframework.org/javaconfig">Spring Java Configuration project</a> (JavaConfig for short). The release contains numerous bug fixes and new features - I&rsquo;ll highlight a few of the most interesting changes below, but first let me give a quick refresher as to what JavaConfig is all about.</p><p>If you have any experience with Spring, the following snippet of XML configuration will likely be familiar. Let&rsquo;s assume we&rsquo;re looking at a file named <span style="font-family:courier">application-config.xml</span>:</p>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
+	&lt;bean id=&quot;orderService&quot; class=&quot;com.acme.OrderService&quot;/&gt;
+		&lt;constructor-arg ref=&quot;orderRepository&quot;/&gt;
+	&lt;/bean&gt;
+	&lt;bean id=&quot;orderRepository&quot; class=&quot;com.acme.OrderRepository&quot;/&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
+&lt;/beans&gt;
+</code></pre><p>Of course, this XML configuration will ultimately serve as a set of instructions for a Spring <span style="font-family:courier">ApplicationContext</span> to instantiate and configure our beans:</p>
+<pre><code class="prettyprint java"><br />ApplicationContext ctx = new ClassPathXmlApplicationContext(&quot;application-config.xml&quot;);
+OrderService orderService = (OrderService) ctx.getBean(&quot;orderService&quot;);
+</code></pre><p>JavaConfig simply provides another mechanism to configure the Spring IoC container, this time in pure Java rather than requiring XML to get the job done. Let&rsquo;s port the configuration above to JavaConfig:</p>
+<pre><code class="prettyprint java"><br />@Configuration
+public class ApplicationConfig {
+	public @Bean OrderService orderService() {
+		return new OrderService(orderRepository());
+	}
+
+	public @Bean OrderRepository orderRepository() {
+		return new OrderRepository(dataSource());
+	}
+
+	public @Bean DataSource dataSource() {
+		// instantiate and return an new DataSource ...
+	}
+}
+</code></pre><p>Like the original XML file, this class is simply a set of instructions as to how to construct our application&rsquo;s various components. We&rsquo;ll supply these instructions to an <span style="font-family:courier">ApplicationContext</span> implementation specifically designed to read and execute Java-based configuration instructions:</p>
+<pre><code class="prettyprint java"><br />JavaConfigApplicationContext ctx = new JavaConfigApplicationContext(ApplicationConfig.class);
+OrderService orderService = ctx.getBean(OrderService.class);
+</code></pre><p>And that&rsquo;s it! Well, almost. Of course there&rsquo;s a lot more to JavaConfig, but for the most part the feature set is 1:1 with what&rsquo;s available in Spring&rsquo;s XML config. For full details on how to use JavaConfig, take a look at the <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/">reference documentation</a>. If you&rsquo;re new to JavaConfig, be sure to check out the <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/quick-start.html">quick start</a> section.</p><p>At any rate, the benefits of JavaConfig are straightforward:<br /><ul><br /> <li>It&rsquo;s pure Java, so there&rsquo;s no XML required</li><br /> <li>You get all the benefits of object-orientation in your configuration code</li><br /> <li>It&rsquo;s type-safe and refactoring-friendly</li><br /> <li>You still get the full power of the core Spring IoC container</li><br /></ul></p><p>With that in mind, let&rsquo;s take a look at what&rsquo;s changed in the M3 release:</p>
+<h5><span style="font-family:courier">AnnotationApplicationContext</span> deprecated</h5><p>Hardly a &lsquo;new feature&rsquo;, but this change is important to mention because much of what I&rsquo;ll discuss below revolves around <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/JavaConfigApplicationContext.html"><span style="font-family:courier">JavaConfigApplicationContext</span></a>, the successor to <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/AnnotationApplicationContext.html"><span style="font-family:courier">AnnotationApplicationContext</span></a>. <em>Why was this change made?</em> <span style="font-family:courier">AnnotationApplicationContext</span> posed a significant naming collision with Spring 2.5&rsquo;s <em>Annotation-Driven Injection</em> facility. JavaConfig presents a different approach to configuration than Annotation-Driven Injection, so we wanted to make this distinction clear by renaming the class entirely. <span style="font-family:courier">AnnotationApplicationContext</span> will remain deprecated until the 1.0.0.rc1 release, at which point it will be removed permanently.</p>
+<h5>Type-safety improvements</h5><p>While the above-mentioned <span style="font-family:courier">JavaConfigApplicationContext</span> behaves largely like it&rsquo;s predecessor, it also introduces type-safe <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/JavaConfigApplicationContext.html#getBean(java.lang.Class)"><span style="font-family:courier">getBean()</span></a> methods that take full advantage of generics. The following code now works (and from this point forward is the preferred approach to use with JavaConfig):</p>
+<pre><code class="prettyprint java"><br />JavaConfigApplicationContext context = new JavaConfigApplicationContext(AppConfig.class);
+OrderService orderService = context.getBean(OrderService.class);
+</code></pre><p>Look ma, no casting! And no string-based lookups, either. Of course, this will beg the question, <em>&ldquo;what if two or more objects of type <span style="font-family:courier">OrderService</span> have been configured in the context?&rdquo;</em> This is a situtation that could easily occur, and there are multiple ways to address it. For brevity in this post, I&rsquo;ll simply refer those interested to take a look at the <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/creating-bean-definitions.html#typesafe-getbean">disambiguation options</a> section of the reference documentation.</p><p>These type-safe getBean() methods have also been fitted onto the <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/support/ConfigurationSupport.html"><span style="font-family:courier">ConfigurationSupport</span></a> base class, such that the following is possible:</p>
+<pre><code class="prettyprint java"><br />@Configuration
+public class ApplicationConfig extends ConfigurationSupport {
+	public @Bean OrderRepository orderRepository() {
+		return new JdbcOrderRepository(this.getBean(DataSource.class));
+	}
+}
+</code></pre>
+<h5>Major documentation update</h5><p>We&rsquo;ve worked hard to bring JavaConfig&rsquo;s documentation up to par with the quality for which Spring is famous. As linked above, the reference documentation is available in <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html">HTML</a> as well as <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/pdf/">PDF</a> formats. Note that this documentation is also packaged as part of the regular <a href="https://sourceforge.net/project/showfiles.php?group_id=73357&amp;package_id=213222&amp;release_id=587200">zip distributions</a> available via SourceForge. As with all the additions in M3, your feedback on the documentation will help improve it as the project moves forward to its 1.0 GA release.</p>
+<h5>Support for JavaConfig in the web tier</h5><p>Prior to this release, JavaConfig had to be &lsquo;bootstrapped&rsquo; via XML in order to be used in conjunction with Spring&rsquo;s <span style="font-family:courier">ContextLoaderListener</span> and <span style="font-family:courier">DispatcherServlet</span> classes. To address this limitation, <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/JavaConfigWebApplicationContext.html"><span style="font-family:courier">JavaConfigWebApplicationContext</span></a> has been added. Simply specify this class as the <span style="font-family:courier">contextClass</span> parameter in your <span style="font-family:courier">web.xml</span>, and you can use your <span style="font-family:courier">@Configuration</span> classes directly:</p>
+<pre><code class="prettyprint xml"><br />&lt;web-app&gt;
+    &lt;!-- Configure ContextLoaderListener to use JavaConfigWebApplicationContext
+         instead of the default XmlWebApplicationContext --&gt;
+    &lt;context-param&gt;
+        &lt;param-name&gt;contextClass&lt;/param-name&gt;
+        &lt;param-value&gt;org.springframework.config.java.context.JavaConfigWebApplicationContext&lt;/param-value&gt;
+    &lt;/context-param&gt;
+    &lt;!-- Configuration locations must consist of one or more comma- or space-delimited
+         fully-qualified @Configuration classes --&gt;
+    &lt;context-param&gt;
+        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+        &lt;param-value&gt;example.RootApplicationConfig&lt;/param-value&gt;
+    &lt;/context-param&gt;
+    &lt;!-- Bootstrap the root application context as usual using ContextLoaderListener --&gt;
+    &lt;listener&gt;
+        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
+    &lt;/listener&gt;
+    &lt;!-- Declare a Spring MVC DispatcherServlet as usual --&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;dispatcher-servlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+        &lt;!-- Configure DispatcherServlet to use JavaConfigWebApplicationContext
+             instead of the default XmlWebApplicationContext --&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;contextClass&lt;/param-name&gt;
+            &lt;param-value&gt;org.springframework.config.java.context.JavaConfigWebApplicationContext&lt;/param-value&gt;
+        &lt;/init-param&gt;
+        &lt;!-- Again, config locations must consist of one or more comma- or space-delimited
+             and fully-qualified @Configuration classes --&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+            &lt;param-value&gt;example.web.WebBeansConfig&lt;/param-value&gt;
+        &lt;/init-param&gt;
+    &lt;/servlet&gt;
+&lt;/web-app&gt;
+</code></pre><p>In practice, it is likely that many folks will want to continue using a combination of XML and JavaConfig, especially in web applications. This approach still works just fine (see <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/combining-config-approaches.html">combining configuration approaches</a>), but it was important to the team that we offer users a truly &ldquo;XML-free&rdquo; approach if they so desire it. This change rounds out that possibility.</p>
+<h5>Modularity improvements with new <span style="font-family:courier">@Import</span> annotation</h5><p>Much like Spring XML config&rsquo;s &lt;import/&gt; element, it is now possible to have one <span style="font-family:courier">@Configuration</span> class import another (and thus all its bean definitions):</p>
+<pre><code class="prettyprint java"><br />@Configuration
+public class FooConfig {
+	public @Bean Foo foo() { ... }
+	public @Bean Bar bar() { ... }
+}
+
+@Import(FooConfig.class)
+@Configuration
+public class ApplicationConfig {
+	public @Bean ServiceA serviceA() { ... }
+}
+
+JavaConfigApplicationContext ctx = new JavaConfigApplicationContext(ApplicationConfig.class);
+// foo, bar, and serviceA beans will all be available
+ctx.getBean(ServiceA.class); // works
+ctx.getBean(Foo.class); // works too
+</code></pre><p>This functionality simply provides another tool for effectively modularizing <span style="font-family:courier">@Configuration</span> classes.</p>
+<h5>Externalizing values with <span style="font-family:courier">@ExternalValue</span> and <span style="font-family:courier">@ResourceBundles</span></h5><p>Several have suggested introducing functionality in JavaConfig equivalent to that of <span style="font-family:courier">PropertyPlaceholderConfigurer</span> for the purpose of accessing values in properties files during configuration. M3 provides just that. Let&rsquo;s assume we have a typical <span style="font-family:courier">DataSource</span> that needs its JDBC url, username and password. As per usual, these values are stored in a properties file. For the example below, that properties file will be available in our classpath at <span style="font-family:courier">com/acme/datasource.properties</span>. Contents of that file are as follows:</p>
+<pre><code class="prettyprint code">datasource.url=jdbc:localhost:...
+datasource.username=scott
+datasource.password=tiger
+</code></pre><p>Using <span style="font-family:courier">@ResourceBundles</span> and <span style="font-family:courier">@ExternalValue</span>, we can now access these properties from within JavaConfig:</p>
+<pre><code class="prettyprint java"><br />@Configuration
+@ResourceBundles(&quot;classpath:/com/acme/datasource&quot;)
+public abstract class ApplicationConfig {
+	public @Bean OrderService orderService() {
+		return new OrderServiceImpl(orderRepository());
+	}
+
+	public @Bean OrderRepository orderRepository() {
+		return new JdbcOrderRepository(dataSource());
+	}
+
+	public @Bean DataSource dataSource() {
+		return new DriverManagerDataSource(url(), username(), password());
+	}
+
+	abstract @ExternalValue(&quot;datasource.url&quot;) String url();
+	abstract @ExternalValue(&quot;datasource.username&quot;) String username();
+	abstract @ExternalValue(&quot;datasource.password&quot;) String password();
+}
+</code></pre><p>A couple of things to note here: see how the value of the <span style="font-family:courier">@ResourceBundles</span> annotation doesn&rsquo;t end in <span style="font-family:courier">.properties</span>? This is because JavaConfig is using Spring&rsquo;s internationalization infrastructure underneath, and will look for variations on <span style="font-family:courier">datasource.properties</span> such as <span style="font-family:courier">datasource_en.properties</span> according to the current locale. Also, while this example supplied string values to the <span style="font-family:courier">@ExternalValue</span> annotation, the default is to look up properties based on the method name. So, if we hadn&rsquo;t supplied <span style="font-family:courier">@ExternalValue(&ldquo;datasource.url&rdquo;) String url()</span>, and rather just <span style="font-family:courier">@ExternalValue String url()</span>, JavaConfig would have looked for a property named &lsquo;url&rsquo;.</p>
+<h5>What's next?</h5><p>A number of users have been asking when we&rsquo;ll see a 1.0 release of JavaConfig, and with good reason - it&rsquo;s been a long time coming! There remain a number of important changes, both regarding internals as well as the public API that must be addressed before we&rsquo;re ready to call this &lsquo;production quality&rsquo; software. Expect to see more frequent milestones and release candidates in the coming weeks. Bottom line: JavaConfig is now and will continue to be fully supported going forward. If you&rsquo;d like to keep an eye on progress, please visit JavaConfig&rsquo;s <a href="http://jira.springframework.org/browse/SJC">JIRA issue tracking</a>, especially the <a href="http://jira.springframework.org/browse/SJC?report=com.atlassian.jira.plugin.system.project:roadmap-panel">road map</a> view.</p>
+<h5>Feedback Requested!</h5><p>If you&rsquo;ve made it this far through the post it&rsquo;s a safe bet you&rsquo;re at least <em>interested</em> in JavaConfig :) So take the next step! <a href="https://sourceforge.net/project/showfiles.php?group_id=73357&amp;package_id=213222&amp;release_id=587200">Download the release</a>, <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/">read the documentation</a>, give it a spin and <a href="http://jira.springframework.org/browse/SJC">let us know what you think</a>.</p><p><em>[<strong>Update 3/27</strong>: Post was accidentally deleted, and so re-posted - apologies to those who had already written comments, as they were deleted in the process.]</em><br /><em>[<strong>Update 4/4</strong>: fixed a typo in the sample web.xml.]</em></p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 142;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

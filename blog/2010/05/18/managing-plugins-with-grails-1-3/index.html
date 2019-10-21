@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Managing plugins with Grails 1.3</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Managing plugins with Grails 1.3" />
+<meta name="twitter:description" content="&lt;p&gt;For a long time, managing Grails dependencies simply meant putting them in your application’s &lt;tt&gt;lib&lt;/tt&gt; directory. Then came Grails 1.2 and the dependency DSL: you could finally declare your dependencies and have Grails automatically download them and make them available to your app. Great!&lt;/p&gt;
+&lt;p&gt;Now, Grails 1.3 has brought the dependency DSL to the realm of plugins.&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;So what?&lt;/h3&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;ol&gt;
+ &lt;br&gt; 
+ &lt;li&gt;setting up a suitable Subversion server to act as a Grails plugin repository is not simple; and&lt;/li&gt;
+ &lt;br&gt; 
+ &lt;li&gt;you can’t control what dependencies a plugin brings into your application.&lt;/li&gt;
+ &lt;br&gt;
+&lt;/ol&gt;
+" />
+
+<meta property="og:title" content="Managing plugins with Grails 1.3" />
+<meta property="og:description" content="&lt;p&gt;For a long time, managing Grails dependencies simply meant putting them in your application’s &lt;tt&gt;lib&lt;/tt&gt; directory. Then came Grails 1.2 and the dependency DSL: you could finally declare your dependencies and have Grails automatically download them and make them available to your app. Great!&lt;/p&gt;
+&lt;p&gt;Now, Grails 1.3 has brought the dependency DSL to the realm of plugins.&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;So what?&lt;/h3&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;ol&gt;
+ &lt;br&gt; 
+ &lt;li&gt;setting up a suitable Subversion server to act as a Grails plugin repository is not simple; and&lt;/li&gt;
+ &lt;br&gt; 
+ &lt;li&gt;you can’t control what dependencies a plugin brings into your application.&lt;/li&gt;
+ &lt;br&gt;
+&lt;/ol&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-05-18 07:29:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Managing plugins with Grails 1.3</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-05-18 07:29:00.0">May 18, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="319" href="/blog/2010/05/18/managing-plugins-with-grails-1-3#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>For a long time, managing Grails dependencies simply meant putting them in your application&rsquo;s <tt>lib</tt> directory. Then came Grails 1.2 and the dependency DSL: you could finally declare your dependencies and have Grails automatically download them and make them available to your app. Great!</p><p>Now, Grails 1.3 has brought the dependency DSL to the realm of plugins.<br /><h3>So what?</h3><br />Users have often faced two issues with the plugin system up till now:<br /><ol><br /> <li>setting up a suitable Subversion server to act as a Grails plugin repository is not simple; and</li><br /> <li>you can&rsquo;t control what dependencies a plugin brings into your application.</li><br /></ol><br />The first of these doesn&rsquo;t particularly apply to individual developers, but it&rsquo;s a bigger deal for companies where access to the internet may be restricted or where they want more control over the &ldquo;latest&rdquo; versions of libraries and plugins. How much better it would be if they could use a repository manager like <a href="http://nexus.sonatype.org/">Nexus</a> or <a href="http://www.jfrog.org/">Artifactory</a>.</p><p>As for the dependencies, some plugins include libraries you don&rsquo;t need or (even worse) break your application. With the dependency DSL, you can explicitly exclude problematic libraries.</p><p>Those are some of the reasons why this change might be important to you. So how do you use the new feature?<br /><h3>The dependency two-step</h3><br />To properly demonstrate the utility of Grails&rsquo; dependency management, we must set up a local repository. For this article, we&rsquo;ll use Artifactory. You could equally use Nexus or any other tool for creating Maven-compatible repositories.</p><p>I&rsquo;ll assume that Artifactory is already installed and running - for details of getting to this stage, check out its website and in particular the <a href="http://www.jfrog.org/screencast.php?id=2FGHwZSAqog">&ldquo;One minute Artifactory&rdquo; screencast</a>. At this point we have a local repository, but it&rsquo;s not serving any artifacts yet. Let&rsquo;s fix that.</p><p>I&rsquo;m going to add the &lsquo;db-util&rsquo; plugin and the &lsquo;commons-digester&rsquo; library. You can try with any plugins or JARs you have available. Simply navigate to the &lsquo;Deploy&rsquo; tab of Artifactory (having logged in with username &ldquo;admin&rdquo;, password &ldquo;password&rdquo;), choose the appropriate files, and upload them. I grabbed the files:<br /><pre> $USER_HOME/.ivy2/cache/commons-digester/commons-digester/jars/commons-digester-2.0.jar<br /> $USER_HOME/.grails/1.2.1/plugins/db-util-0.4.zip</pre><br />and added them via the Artifactory UI:<br /><a href="http://www.cacoethes.co.uk/blog/wp-content/uploads/2010/05/artifactory-upload.png"><img class="aligncenter size-full wp-image-264" title="artifactory-upload" src="http://www.cacoethes.co.uk/blog/wp-content/uploads/2010/05/artifactory-upload.png" alt="" width="680" height="410" /></a></p><p>Note that the UI allows you to specify the target repository for the upload. I chose &lsquo;plugins-releases-local&rsquo; for the &lsquo;db-util&rsquo; plugin and &lsquo;libs-releases-local&rsquo; for &lsquo;commons-digester&rsquo;. Also, before committing the plugin artifact, I set its groupId to &lsquo;org.grails.plugins&rsquo; and its artifactId to &lsquo;db-util&rsquo; (the default values are both &lsquo;grails-db-util&rsquo;). The &lsquo;org.grails.plugins&rsquo; groupId is the one that Grails assumes for plugin dependencies. Note also how the artifactId doesn&rsquo;t include the &ldquo;grails-&rdquo; prefix.</p><p>Those two artifacts are now available locally to any of your Grails applications. Now we need to configure the repository and dependencies in our Grails application.<br /><h3>The dependency DSL</h3><br />The next bit is surprisingly straightforward. We need to do two things:<br /><ol><br /> <li>configure Grails to download plugins and JARs from our Artifactory repository; and</li><br /> <li>specify our dependencies.</li><br /></ol><br />Just as with Grails 1.2, this is done in the <tt>grails-app/conf/BuildConfig.groovy</tt>. Here are the relevant sections in a sample Grails application:</p>
+<pre><code class="prettyprint groovy">grails.project.dependency.resolution = {
+    ...
+    log &quot;warn&quot;
+    repositories {
+        grailsPlugins()
+        grailsHome()
+        mavenRepo &quot;http://localhost:8081/artifactory/libs-releases-local/&quot;
+        mavenRepo &quot;http://localhost:8081/artifactory/plugins-releases-local/&quot;
+        grailsCentral()
+    }
+    plugins {
+        build &quot;org.grails.plugins:db-util:0.4&quot;
+    }
+    dependencies {
+        compile &quot;commons-digester:commons-digester:2.0&quot;
+    }
+}
+</code></pre><p>So, in the <tt>repositories</tt> section you add a <tt>mavenRepo</tt> entry for each &ldquo;repository&rdquo; exposed by the Artifactory server. Note that in this case, we add both the &lsquo;libs-releases-local&rsquo; repository and the &lsquo;plugins-releases-local&rsquo; one.</p><p>The new addition to the DSL is the <tt>plugins</tt> section, which is (unsurprisingly) for declaring Grails plugins. It has exactly the same syntax as the <tt>dependencies</tt> section. So, &lsquo;db-util&rsquo; is declared under <tt>plugins</tt> and &lsquo;commons-digester&rsquo; is declared under <tt>dependencies</tt>.</p><p>That&rsquo;s all you have to do. If you now execute <tt>grails run-app</tt>, you&rsquo;ll see the some output like this:<br /><pre><br />&hellip;<br />Resolving dependencies&hellip;<br />Downloading: <a href="http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom">http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom.sha1">http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom.sha1</a> &hellip;<br />Download complete.<br />&hellip;<br />Downloading new plugins. Please wait&hellip; &hellip;<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom.sha1">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom.sha1</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip.sha1">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip.sha1</a> &hellip;<br />Download complete.<br />Installing zip /home/pal20/.ivy2/cache/org.grails.plugins/db-util/zips/db-util-0.4.zip&hellip;<br />&hellip;<br /></pre><br />The &lsquo;db-util&rsquo; plugin is installed and the &lsquo;commons-digester&rsquo; JAR included on the classpath. Simple.</p><p>If you run into issues with the dependency resolution, then you can dial up the logging by replacing the <tt>log &ldquo;warn&rdquo;</tt> line in BuildConfig.groovy with <tt>log &ldquo;info&rdquo;</tt> or even <tt>log &ldquo;debug&rdquo;</tt>.</p><p>Of course, sometimes you will want to host your own plugins or customised/patched versions of public one. The existing <tt>release-plugin</tt> command only works with old-style Subversion repositories, so what can you do?<br /><h3>Publishing plugins to Maven-compatible repositories</h3><br />Grails core doesn&rsquo;t help here, but then it doesn&rsquo;t need to. There is a Grails plugin dedicated to publishing Grails applications and plugins to Maven-compatible repositories: the <a href="http://grails.org/plugin/maven-publisher">Maven Publisher Plugin</a>.</p><p>Install this in your plugin project, add the following entry to your BuildConfig.groovy file:</p>
+<pre><code class="prettyprint groovy">grails.project.dependency.distribution = {
+    remoteRepository(id: &quot;pluginSnapshots&quot;, url: &quot;http://localhost:8081/artifactory/plugins-snapshots-local/&quot;) {
+        authentication username: &quot;admin&quot;, password: &quot;password&quot;
+    }
+}
+</code></pre><p>and then run<br /><code><tt>grails maven-deploy &ndash;repository=pluginSnapshots</tt></code><br />Voila! Your plugin will be deployed to the local Artifactory &lsquo;plugins-snapshots-local&rsquo; repository with a groupId of <tt>org.grails.plugins</tt>. Note that the value you pass for the <tt>&ndash;repository</tt> argument should match the &lsquo;id&rsquo; of a remote repository defined in the <tt>grails.project.dependency.distribution</tt> closure in BuildConfig.groovy.</p><p>You can fine tune the deployment, for example by using a pom.xml file with a <tt>&lt;distributionManagement&gt;</tt> element or by adding a <tt>groupId</tt> property to the plugin descriptor, but the basic steps are all straightforward.</p><p>All that&rsquo;s left to explain is where the dependency information is held. For example, the dependencies for normal artifacts (such as JAR libraries) are stored in a metadata file like pom.xml. Grails plugins are different. Their JAR dependencies are inside the zip package in a dependencies.groovy file. As for plugin dependencies, you define these as before in the <tt>dependsOn</tt> field in the plugin descriptor. These are then translated into dependency declarations in your plugin&rsquo;s generated pom.xml file (which is stored alongside the plugin zip file in the repository).</p><p>And that really is all there is to it. You can now provide your own, easy-to-manage Maven-compatible repository so that your team members no longer have to hit the internet every time they need a plugin or dependency. You can also inject some consistency into your projects by controlling which versions of Grails plugins are available. And you can easily patch public plugins and make those versions available to your team locally, while you wait for the fixes to make it into an official release.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 319;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

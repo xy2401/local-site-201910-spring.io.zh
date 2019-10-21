@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>React.js and Spring Data REST: Part 4 - Events</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="React.js and Spring Data REST: Part 4 - Events" />
+<meta name="twitter:description" content="&lt;div id=&quot;preamble&quot;&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;admonitionblock note&quot;&gt; 
+   &lt;table&gt; 
+    &lt;tbody&gt; 
+     &lt;tr&gt; 
+      &lt;td class=&quot;icon&quot;&gt; &lt;i class=&quot;fa icon-note&quot; title=&quot;Note&quot;&gt;&lt;/i&gt; &lt;/td&gt; 
+      &lt;td class=&quot;content&quot;&gt;To see updates to this code, visit our &lt;a href=&quot;https://spring.io/guides/tutorials/react-and-spring-data-rest/&quot;&gt;React.js and Spring Data REST tutorial&lt;/a&gt;.&lt;/td&gt; 
+     &lt;/tr&gt; 
+    &lt;/tbody&gt; 
+   &lt;/table&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In the &lt;a href=&quot;https://spring.io/blog/2015/09/29/react-js-and-spring-data-rest-part-3-conditional-operations&quot;&gt;previous session&lt;/a&gt;, you introduced conditional updates to avoid collisions with other users when editing the same data. You also learned how to version data on the backend with optimistic locking. You got a tip off if someone edited the same record so you could refresh the page and get the update.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;That’s good. But do you know what’s even better? Having the UI dynamically respond when other people update the resources.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In this session you’ll learn how to use Spring Data REST’s built in event system to detect changes in the backend and publish updates to ALL users through Spring’s WebSocket support. Then you’ll be able to dynamically adjust clients as the data updates.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Feel free to &lt;a href=&quot;https://github.com/gregturn/react-and-spring-data-rest/tree/master/events&quot;&gt;grab the code&lt;/a&gt; from this repository and follow along. This session is based on the previous session’s app with extra things added.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@gregturn" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200" />
+
+<meta property="og:title" content="React.js and Spring Data REST: Part 4 - Events" />
+<meta property="og:image" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200" />
+<meta property="og:description" content="&lt;div id=&quot;preamble&quot;&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;admonitionblock note&quot;&gt; 
+   &lt;table&gt; 
+    &lt;tbody&gt; 
+     &lt;tr&gt; 
+      &lt;td class=&quot;icon&quot;&gt; &lt;i class=&quot;fa icon-note&quot; title=&quot;Note&quot;&gt;&lt;/i&gt; &lt;/td&gt; 
+      &lt;td class=&quot;content&quot;&gt;To see updates to this code, visit our &lt;a href=&quot;https://spring.io/guides/tutorials/react-and-spring-data-rest/&quot;&gt;React.js and Spring Data REST tutorial&lt;/a&gt;.&lt;/td&gt; 
+     &lt;/tr&gt; 
+    &lt;/tbody&gt; 
+   &lt;/table&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In the &lt;a href=&quot;https://spring.io/blog/2015/09/29/react-js-and-spring-data-rest-part-3-conditional-operations&quot;&gt;previous session&lt;/a&gt;, you introduced conditional updates to avoid collisions with other users when editing the same data. You also learned how to version data on the backend with optimistic locking. You got a tip off if someone edited the same record so you could refresh the page and get the update.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;That’s good. But do you know what’s even better? Having the UI dynamically respond when other people update the resources.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In this session you’ll learn how to use Spring Data REST’s built in event system to detect changes in the backend and publish updates to ALL users through Spring’s WebSocket support. Then you’ll be able to dynamically adjust clients as the data updates.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Feel free to &lt;a href=&quot;https://github.com/gregturn/react-and-spring-data-rest/tree/master/events&quot;&gt;grab the code&lt;/a&gt; from this repository and follow along. This session is based on the previous session’s app with extra things added.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-10-13 07:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">React.js and Spring Data REST: Part 4 - Events</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/gturnquist">Greg Turnquist</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-10-13 07:00:00.0">October 13, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2245" href="/blog/2015/10/13/react-js-and-spring-data-rest-part-4-events#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content">To see updates to this code, visit our <a href="https://spring.io/guides/tutorials/react-and-spring-data-rest/">React.js and Spring Data REST tutorial</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph">
+<p>In the <a href="https://spring.io/blog/2015/09/29/react-js-and-spring-data-rest-part-3-conditional-operations">previous session</a>, you introduced conditional updates to avoid collisions with other users when editing the same data. You also learned how to version data on the backend with optimistic locking. You got a tip off if someone edited the same record so you could refresh the page and get the update.</p>
+</div>
+<div class="paragraph">
+<p>That&#8217;s good. But do you know what&#8217;s even better? Having the UI dynamically respond when other people update the resources.</p>
+</div>
+<div class="paragraph">
+<p>In this session you&#8217;ll learn how to use Spring Data REST&#8217;s built in event system to detect changes in the backend and publish updates to ALL users through Spring&#8217;s WebSocket support. Then you&#8217;ll be able to dynamically adjust clients as the data updates.</p>
+</div>
+<div class="paragraph">
+<p>Feel free to <a href="https://github.com/gregturn/react-and-spring-data-rest/tree/master/events">grab the code</a> from this repository and follow along. This session is based on the previous session&#8217;s app with extra things added.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adding_spring_websocket_support_to_the_project">Adding Spring WebSocket support to the project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before getting underway, you need to add a dependency to your project&#8217;s pom.xml file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-websocket&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This bring in Spring Boot&#8217;s WebSocket starter.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuring_websockets_with_spring">Configuring WebSockets with Spring</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#websocket">Spring comes with powerful WebSocket support</a>. One thing to recognize is that a WebSocket is a very low level protocol. It does little more than offer the means to transmit data between client and server. The recommendation is to use a sub-protocol (STOMP for this session) to actually encode data and routes.</p>
+</div>
+<div class="paragraph">
+<p>The follow code is used to configure WebSocket support on the server side:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Component
+@EnableWebSocketMessageBroker
+public class WebSocketConfiguration extends AbstractWebSocketMessageBrokerConfigurer {
+
+	static final String MESSAGE_PREFIX = "/topic";
+
+	@Override
+	public void registerStompEndpoints(StompEndpointRegistry registry) {
+		registry.addEndpoint("/payroll").withSockJS();
+	}
+
+	@Override
+	public void configureMessageBroker(MessageBrokerRegistry registry) {
+		registry.enableSimpleBroker(MESSAGE_PREFIX);
+		registry.setApplicationDestinationPrefixes("/app");
+	}
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<code>@EnableWebSocketMessageBroker</code> turns on WebSocket support.
+</li>
+<li>
+<code>AbstractWebSocketMessageBrokerConfigurer</code> provides a convenient base class to configure basic features.
+</li>
+<li>
+<strong>MESSAGE_PREFIX</strong> is the prefix you will prepend to every message&#8217;s route.
+</li>
+<li>
+<code>registerStompEndpoints()</code> is used to configure the endpoint on the backend for clients and server to link (<code>/payroll</code>).
+</li>
+<li>
+<code>configureMessageBroker()</code> is used to configure the broker used to relay messages between server and client.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>With this configuration, it&#8217;s now possible to tap into Spring Data REST events and publish them over a WebSocket.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_subscribing_to_spring_data_rest_events">Subscribing to Spring Data REST events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Data REST generates several <a href="https://docs.spring.io/spring-data/rest/docs/current/reference/html/#events">application events</a> based on actions occurring on the repositories. The follow code shows how to subscribe to some of these events:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Component
+@RepositoryEventHandler(Employee.class)
+public class EventHandler {
+
+	private final SimpMessagingTemplate websocket;
+
+	private final EntityLinks entityLinks;
+
+	@Autowired
+	public EventHandler(SimpMessagingTemplate websocket, 
+				EntityLinks entityLinks) {
+		this.websocket = websocket;
+		this.entityLinks = entityLinks;
+	}
+
+	@HandleAfterCreate
+	public void newEmployee(Employee employee) {
+		this.websocket.convertAndSend(
+		  MESSAGE_PREFIX + "/newEmployee", getPath(employee));
+	}
+
+	@HandleAfterDelete
+	public void deleteEmployee(Employee employee) {
+		this.websocket.convertAndSend(
+		  MESSAGE_PREFIX + "/deleteEmployee", getPath(employee));
+	}
+
+	@HandleAfterSave
+	public void updateEmployee(Employee employee) {
+		this.websocket.convertAndSend(
+		  MESSAGE_PREFIX + "/updateEmployee", getPath(employee));
+	}
+
+	/**
+	 * Take an {@link Employee} and get the URI using 
+	 * Spring Data REST's {@link EntityLinks}.
+	 *
+	 * @param employee
+	 */
+	private String getPath(Employee employee) {
+	  return this.entityLinks.linkForSingleResource(employee.getClass(),
+			employee.getId()).toUri().getPath();
+	}
+
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<code>@RepositoryEventHandler(Employee.class)</code> flags this class to trap events based on <strong>employees</strong>.
+</li>
+<li>
+<code>SimpMessagingTemplate</code> and <code>EntityLinks</code> are autowired from the application context.
+</li>
+<li>
+The <code>@HandleXYZ</code> annotations flag the methods that need to listen to. These methods must be public.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each of these handler methods invokes <code>SimpMessagingTemplate.convertAndSend()</code> to transmit a message over the WebSocket. This is a pub-sub approach so that one message is relayed to every attached consumer.</p>
+</div>
+<div class="paragraph">
+<p>The route of each message is different, allowing multiple messages to be sent to distinct receivers on the client while only needing one open WebSocket, a resource-efficient approach.</p>
+</div>
+<div class="paragraph">
+<p><code>getPath()</code> uses Spring Data REST&#8217;s <code>EntityLinks</code> to look up the path for a given class type and id. To serve the client&#8217;s needs, this <code>Link</code> object is converted to a Java URI with its path extracted.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<code>EntityLinks</code> comes with several utility methods to programmatically find the paths of various resources, whether single or for collections.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In essense, you are listening for create, update, and delete events, and after they are completed, sending notice of them to all clients. It&#8217;s also possible to intercept such operations BEFORE they happen, and perhaps log them, block them for some reason, or decorate the domain objects with extra information. (In the next session, we&#8217;ll see a VERY handy use for this!)</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuring_a_javascript_websocket">Configuring a JavaScript WebSocket</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Next step is to write some client-side code to consume WebSocket events. The follow chunk in them main app pulls in a module.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var stompClient = require('./websocket-listener')</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>That module is shown below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">define(function(require) {
+	'use strict';
+
+	var SockJS = require('sockjs-client'); <b class="conum">(1)</b>
+	require('stomp-websocket'); <b class="conum">(2)</b>
+
+	return {
+		register: register
+	};
+
+	function register(registrations) {
+		var socket = SockJS('/payroll'); <b class="conum">(3)</b>
+		var stompClient = Stomp.over(socket);
+		stompClient.connect({}, function(frame) {
+			registrations.forEach(function (registration) { <b class="conum">(4)</b>
+			  stompClient.subscribe(registration.route, registration.callback);
+			});
+		});
+	}
+
+});</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+You pull in the SockJS JavaScript library for talking over WebSockets.
+</li>
+<li>
+You pull in the stomp-websocket JavaScript library to use the STOMP sub-protocol.
+</li>
+<li>
+Here is where the WebSocket is pointed at the application&#8217;s <code>/payroll</code> endpoint.
+</li>
+<li>
+Iterate over the array of <code>registrations</code> supplied so each can subscribe for callback as messages arrive.
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Each registration entry has a <code>route</code> and a <code>callback</code>. In the next section, you can see how to register event handlers.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_registering_for_websocket_events">Registering for WebSocket events</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In React, a component&#8217;s <code>componentDidMount()</code> is the function that gets called after it has been rendered in the DOM. That is also the right time to register for WebSocket events, because the component is now online and ready for business. Checkout the code below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">componentDidMount: function () {
+    this.loadFromServer(this.state.pageSize);
+    stompClient.register([
+        {route: '/topic/newEmployee', callback: this.refreshAndGoToLastPage},
+        {route: '/topic/updateEmployee', callback: this.refreshCurrentPage},
+        {route: '/topic/deleteEmployee', callback: this.refreshCurrentPage}
+    ]);
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The first line is the same as before, where all the employees are fetched from the server using page size. The second line shows an array of JavaScript objects being registered for WebSocket events, each with a <code>route</code> and a <code>callback</code>.</p>
+</div>
+<div class="paragraph">
+<p>When a new employee is created, the behavior is to refresh the data set and then use the paging links to navigate to the <strong>last</strong> page. Why refresh the data before navigating to the end? It&#8217;s possible that adding a new record causes a new page to get created. While it&#8217;s possible to calculate if this will happen, it subverts the point of hypermedia. Instead of cobbling together customize page counts, it&#8217;s better to use existing links and only go down that road if there is a performance-driving reason to do so.</p>
+</div>
+<div class="paragraph">
+<p>When an employee is updated or deleted, the behavior is to refresh the current page. When you update a record, it impacts the page your are viewing. When you delete a record on the current page, a record from the next page will get pulled into the current one, hence the need to also refresh the current page.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+There is no requirement for these WebSocket messages to start with <code>/topic</code>. It is simply a common convention that indicates pub-sub semantics.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In the next section, you can see the actual operations to perform these operations.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reacting_to_websocket_events_and_updating_the_ui_state">Reacting to WebSocket events and updating the UI state</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following chunk of code contains the two callbacks used to update UI state when a WebSocket event is received.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">refreshAndGoToLastPage: function (message) {
+    follow(client, root, [{
+        rel: 'employees',
+        params: {size: this.state.pageSize}
+    }]).done(response =&gt; {
+        this.onNavigate(response.entity._links.last.href);
+    })
+},
+
+refreshCurrentPage: function (message) {
+    follow(client, root, [{
+        rel: 'employees',
+        params: {
+            size: this.state.pageSize,
+            page: this.state.page.number
+        }
+    }]).then(employeeCollection =&gt; {
+        this.links = employeeCollection.entity._links;
+        this.page = employeeCollection.entity.page;
+
+        return employeeCollection.entity._embedded.employees.map(employee =&gt; {
+            return client({
+                method: 'GET',
+                path: employee._links.self.href
+            })
+        });
+    }).then(employeePromises =&gt; {
+        return when.all(employeePromises);
+    }).then(employees =&gt; {
+        this.setState({
+            page: this.page,
+            employees: employees,
+            attributes: Object.keys(this.schema.properties),
+            pageSize: this.state.pageSize,
+            links: this.links
+        });
+    });
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>refreshAndGoToLastPage()</code> uses the familiar <code>follow()</code> function to navigate to the <strong>employees</strong> link with the <strong>size</strong> parameter applied, plugging in <code>this.state.pageSize</code>. When the response is received, you then invoke the same <code>onNavigate()</code> function from the last session, and jump to the <strong>last</strong> page, the one where the new record will be found.</p>
+</div>
+<div class="paragraph">
+<p><code>refreshCurrentPage()</code> also uses the <code>follow()</code> function but applies <code>this.state.pageSize</code> to <strong>size</strong> and <code>this.state.page.number</code> to <strong>page</strong>. This fetches the same page you are currently looking at and updates the state accordingly.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+This behavior tells every client to refresh their current page when an update or delete message is sent. It&#8217;s possible that their current page may have nothing to do with the current event. However, it can be tricky to figure that out. What if the record that was deleted was on page two and you are looking at page three? Every entry would change. But is this desired behavior at all? Maybe, maybe not.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_moving_state_management_out_of_the_local_updates">Moving state management out of the local updates</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before you finish this section, there is something to recognize. You just added a new way for the state in the UI to get updated: when a WebSocket message arrives. But the old way to update the state is still there.</p>
+</div>
+<div class="paragraph">
+<p>To simplify your code&#8217;s management of state, remove the old way. In other words, submit your <strong>POST</strong>, <strong>PUT</strong>, and <strong>DELETE</strong> calls, but don&#8217;t use their results to update the UI&#8217;s state. Instead, wait for the WebSocket event to circle back and then do the update.</p>
+</div>
+<div class="paragraph">
+<p>The follow chunk of code shows the same <code>onCreate()</code> function as the previous session, only simplified:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">onCreate: function (newEmployee) {
+    follow(client, root, ['employees']).done(response =&gt; {
+        client({
+            method: 'POST',
+            path: response.entity._links.self.href,
+            entity: newEmployee,
+            headers: {'Content-Type': 'application/json'}
+        })
+    })
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here, the <code>follow()</code> function is used to get to the <strong>employees</strong> link, and then the <strong>POST</strong> operation is applied. Notice how <code>client({method: 'GET' &#8230;&#8203;})</code> has no <code>then()</code> or <code>done()</code> like before? The event handler to listen for updates is now found in <code>refreshAndGoToLastPage()</code> which you just looked at.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_putting_it_all_together">Putting it all together</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With all these mods in place, fire up the app (<code>./mvnw spring-boot:run</code>) and poke around with it. Open up two browser tabs and resize so you can see them both. Start making updates in one and see how they instantly update the other tab. Open up your phone and visit the same page. Find a friend and ask him or her to do the same thing. You might find this type of dynamic updating more keen.</p>
+</div>
+<div class="paragraph">
+<p>Want a challenge? Try the exercise from the previous session where you open the same record in two different browser tabs. Try to update it in one and NOT see it update in the other. If it&#8217;s possible, the conditional PUT code should still protect you. But it may be trickier to pull that off!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_review">Review</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this session:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+You configured Spring&#8217;s WebSocket suport with SockJS fallback.
+</li>
+<li>
+You subscribed for create, update, and delete events from Spring Data REST to dynamically update the UI.
+</li>
+<li>
+You published the URI of affected REST resources along with a contextual message ("/topic/newEmployee", "/topic/updateEmployee", etc.).
+</li>
+<li>
+You registered WebSocket listeners in the UI to listen for these events.
+</li>
+<li>
+You wired the listeners to handlers to update the UI state.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>With all these features, it&#8217;s easy to run two browsers, side-by-side, and see how updating one ripples to the other.</p>
+</div>
+<div class="paragraph">
+<p>Issues?</p>
+</div>
+<div class="paragraph">
+<p>While multiple displays nicely update, polishing the precise behavior is warranted. For example, creating a new user will cause ALL users to jump to the end. Any thoughts on how this should be handled?</p>
+</div>
+<div class="paragraph">
+<p>Paging is useful, but offers a tricky state to manage. The costs are low on this sample app, and React at very efficient at updating the DOM without causing lots of flickering in the UI. But with a more complex app, not all of these approaches will fit.</p>
+</div>
+<div class="paragraph">
+<p>When designing with paging in mind, you have to decide what is the expected behavior between clients and if there needs to updates or not. Depending on your requirements and performance of the system, the existing navigational hypermedia may be sufficent.</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2245;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

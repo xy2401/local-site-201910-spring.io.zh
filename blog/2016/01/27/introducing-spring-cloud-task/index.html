@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Introducing Spring Cloud Task</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Introducing Spring Cloud Task" />
+<meta name="twitter:description" content="&lt;p&gt;Today we are pleased to introduce a new project in the Spring portfolio, &lt;a href=&quot;http://cloud.spring.io/spring-cloud-task/&quot;&gt;Spring Cloud Task&lt;/a&gt;. Under the umbrella of the &lt;a href=&quot;http://projects.spring.io/spring-cloud/&quot;&gt;Spring Cloud&lt;/a&gt; grouping of projects and the sister project of &lt;a href=&quot;http://cloud.spring.io/spring-cloud-stream/&quot;&gt;Spring Cloud Stream&lt;/a&gt;, Spring Cloud Task aims to bring functionality required to support short lived microservices to Spring Boot based applications. With this blog post, we are releasing our first milestone of the project and are eager for your input and feedback.&lt;/p&gt;
+&lt;h2&gt;The Goals of Spring Cloud Task&lt;/h2&gt;
+&lt;p&gt;In most cases, the modern cloud environment is designed around the execution of processes that are not expected to end (think web applications or stream modules). If they do, it&#39;s considered a failure by the platform and they are typically restarted. While many platforms do have some method to execute a process that is expected to end (a batch job for example), the results of that execution are typically not maintained in a consumable way. Yet for mission critical applications, even though they are short lived, they still have the same non-functional requirements long lived processes have.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@michaelminella" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ab8031806cdd258238e67411157d215a?s=200" />
+
+<meta property="og:title" content="Introducing Spring Cloud Task" />
+<meta property="og:image" content="https://gravatar.com/avatar/ab8031806cdd258238e67411157d215a?s=200" />
+<meta property="og:description" content="&lt;p&gt;Today we are pleased to introduce a new project in the Spring portfolio, &lt;a href=&quot;http://cloud.spring.io/spring-cloud-task/&quot;&gt;Spring Cloud Task&lt;/a&gt;. Under the umbrella of the &lt;a href=&quot;http://projects.spring.io/spring-cloud/&quot;&gt;Spring Cloud&lt;/a&gt; grouping of projects and the sister project of &lt;a href=&quot;http://cloud.spring.io/spring-cloud-stream/&quot;&gt;Spring Cloud Stream&lt;/a&gt;, Spring Cloud Task aims to bring functionality required to support short lived microservices to Spring Boot based applications. With this blog post, we are releasing our first milestone of the project and are eager for your input and feedback.&lt;/p&gt;
+&lt;h2&gt;The Goals of Spring Cloud Task&lt;/h2&gt;
+&lt;p&gt;In most cases, the modern cloud environment is designed around the execution of processes that are not expected to end (think web applications or stream modules). If they do, it&#39;s considered a failure by the platform and they are typically restarted. While many platforms do have some method to execute a process that is expected to end (a batch job for example), the results of that execution are typically not maintained in a consumable way. Yet for mission critical applications, even though they are short lived, they still have the same non-functional requirements long lived processes have.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2016-01-27 04:44:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category active content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Introducing Spring Cloud Task</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon releases"></div>
+<a class="category">Releases</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ab8031806cdd258238e67411157d215a?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mminella">Michael Minella</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2016-01-27 04:44:00.0">January 27, 2016</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2357" href="/blog/2016/01/27/introducing-spring-cloud-task#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Today we are pleased to introduce a new project in the Spring portfolio, <a href="https://cloud.spring.io/spring-cloud-task/">Spring Cloud Task</a>. Under the umbrella of the <a href="https://projects.spring.io/spring-cloud/">Spring Cloud</a> grouping of projects and the sister project of <a href="https://cloud.spring.io/spring-cloud-stream/">Spring Cloud Stream</a>, Spring Cloud Task aims to bring functionality required to support short lived microservices to Spring Boot based applications. With this blog post, we are releasing our first milestone of the project and are eager for your input and feedback.</p>
+<h2>The Goals of Spring Cloud Task</h2>
+<p>In most cases, the modern cloud environment is designed around the execution of processes that are not expected to end (think web applications or stream modules). If they do, it's considered a failure by the platform and they are typically restarted. While many platforms do have some method to execute a process that is expected to end (a batch job for example), the results of that execution are typically not maintained in a consumable way. Yet for mission critical applications, even though they are short lived, they still have the same non-functional requirements long lived processes have.</p>
+<p>While this functionality is useful in a cloud environment, the same issues can arise in a traditional deployment model as well. When executing Spring Boot applications via a scheduler like cron, it can be useful to be able to monitor the results of the application after it’s completion.</p>
+<p>A Spring Cloud Task takes the approach that a Spring Boot application can have a start and an end and still be production grade. Batch applications are just one example of where short lived processes can be helpful.</p>
+<h2>Getting Started</h2>
+<p>In this first release of Spring Cloud Task, we introduce the basics of the configuration mechanisms as well as a repository to record what happens when a task is executed. Those who are familiar with <a href="https://projects.spring.io/spring-batch/">Spring Batch</a> and its job repository should find the general paradigms of Spring Cloud Task familiar.</p>
+<p>To get familiar with Spring Cloud Task, the easiest way is to write an application. The documentation walks you through the creation of an initial task and its execution. You can read more about that <a href="https://docs.spring.io/spring-cloud-task/1.0.0.M1/reference/htmlsingle/#getting-started-developing-first-task">here</a>.</p>
+<h2>Where we're going</h2>
+<p>Tasks will be a new primitive within <a href="https://cloud.spring.io/spring-cloud-dataflow/">Spring Cloud Data Flow</a> in the coming releases allowing users to execute virtually any Spring Boot application as a short lived task. This provides the flexibility to run everything from a simple <code>CommandLineRunner</code> to a full batch job in dynamic way, allowing resources to be consumed on demand and returned once complete. The upcoming releases including Spring Cloud Task 1.0 GA which we plan for just before Spring Cloud Data Flow goes 1.0 GA, will be adding features to support that effort.</p>
+<h2>Tell us what you think!</h2>
+<p>Spring Cloud Task is a new and exciting project that we feel fills an under served area of enterprise development. However, we want to know what you think. Please let us know via the issues in <a href="https://github.com/spring-cloud/spring-cloud-task/issues">Github Issues</a>, <a href="https://stackoverflow.com/questions/tagged/spring-cloud">StackOverflow</a>, or directly on <a href="https://twitter.com/springcentral">Twitter</a>!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2357;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

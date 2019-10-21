@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Building Spring 3</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Building Spring 3" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;em&gt;UPDATE - Feb 21 ’12: Spring Framework has &lt;a href=&quot;http://github.com/SpringSource/spring-framework&quot;&gt;moved to GitHub&lt;/a&gt;, and for 3.2.x development has moved from Ant to Gradle. Take a look at the &lt;a href=&quot;https://github.com/SpringSource/spring-framework#building_from_source&quot;&gt;building from source&lt;/a&gt; section of the README there for (greatly simplified!) instructions.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;As Juergen &lt;a href=&quot;http://blog.springsource.com/2009/02/25/spring-framework-30-m2-released/&quot;&gt;announced last week&lt;/a&gt;, Spring 3.0 Milestone 2 is now available. In this post, I’ll show you in six steps how to download and build the latest Spring 3 sources and get a development environment up and running in Eclipse.&lt;/p&gt;
+&lt;p&gt;We’ll wrap up by discussing the best ways to follow Spring 3 development, how to file bugs and improvement requests, and considerations for compiling against locally-built Spring 3 binaries in a Maven environment.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@cbeams" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+
+<meta property="og:title" content="Building Spring 3" />
+<meta property="og:image" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;&lt;em&gt;UPDATE - Feb 21 ’12: Spring Framework has &lt;a href=&quot;http://github.com/SpringSource/spring-framework&quot;&gt;moved to GitHub&lt;/a&gt;, and for 3.2.x development has moved from Ant to Gradle. Take a look at the &lt;a href=&quot;https://github.com/SpringSource/spring-framework#building_from_source&quot;&gt;building from source&lt;/a&gt; section of the README there for (greatly simplified!) instructions.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;As Juergen &lt;a href=&quot;http://blog.springsource.com/2009/02/25/spring-framework-30-m2-released/&quot;&gt;announced last week&lt;/a&gt;, Spring 3.0 Milestone 2 is now available. In this post, I’ll show you in six steps how to download and build the latest Spring 3 sources and get a development environment up and running in Eclipse.&lt;/p&gt;
+&lt;p&gt;We’ll wrap up by discussing the best ways to follow Spring 3 development, how to file bugs and improvement requests, and considerations for compiling against locally-built Spring 3 binaries in a Maven environment.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2009-03-03 08:17:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Building Spring 3</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=20&amp;d=mm" />
+<span class="author">Chris Beams</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2009-03-03 08:17:00.0">March 03, 2009</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="208" href="/blog/2009/03/03/building-spring-3#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p><em>UPDATE - Feb 21 &rsquo;12: Spring Framework has <a href="https://github.com/SpringSource/spring-framework">moved to GitHub</a>, and for 3.2.x development has moved from Ant to Gradle. Take a look at the <a href="https://github.com/SpringSource/spring-framework#building_from_source">building from source</a> section of the README there for (greatly simplified!) instructions.</em></p>
+<h2>Introduction</h2><p>As Juergen <a href="http://blog.springsource.com/2009/02/25/spring-framework-30-m2-released/">announced last week</a>, Spring 3.0 Milestone 2 is now available. In this post, I&rsquo;ll show you in six steps how to download and build the latest Spring 3 sources and get a development environment up and running in Eclipse.</p><p>We&rsquo;ll wrap up by discussing the best ways to follow Spring 3 development, how to file bugs and improvement requests, and considerations for compiling against locally-built Spring 3 binaries in a Maven environment.</p><p><br /><h2>Prerequisites</h2></p><p>Make sure you&rsquo;ve got each of the following before beginning the steps below:</p>
+<ul>
+<li>Subversion client, version 1.5 or better</li>
+<li>Java 6 or better (Spring 3 requires Java 5 to run, but requires Java 6 to build)</li>
+<li>Ant 1.7 or better</li>
+<li>Eclipse (3.3 or 3.4 will do) or optionally, the latest <a href="http://www.springsource.com/products/suite/sts">SpringSource Tool Suite</a></li>
+</ul><p><br /><h2>Step 1: Check out the sources</h2></p><p>As you may already be aware, Spring sources are now hosted at springsource.org and, unlike previous versions of Spring that were controlled under CVS, Spring 3 is now managed using Subversion.</p><p>Before we check out the sources, let&rsquo;s take a quick look at the layout of the repository.</p><p><code><a href="/cdn-cgi/l/email-protection#3d5e1b1e040506581b1e450b0c061b1e450b59061b1e450a0e061b1e0b09061b1e0c0d0a061b1e040a061b1e0c0d08061b1e0c0f0f061b1e0c0d0c06531b1e0805061b1e450a5806">c&#98;e&#x61;&#x6d;&#x73;&#64;&#107;&#97;&#105;&#122;&#101;n&#58;&#x7e;</a>$ svn ls <a href="https://src.springsource.org/svn/spring-framework">https://src.springsource.org/svn/spring-framework</a><br />branches/<br />tags/<br />trunk/<br /></code></p><p>As you can see, the repository is laid out in conventional Subversion form, with branches, tags and trunk directories. Should you need to sync up to a particular milestone or release, you can always find them in the tags/ directory:</p><p><code><a href="/cdn-cgi/l/email-protection#e6c0c5dfdfddc0c59ed0d4ddc0c59ed0d3dd87c0c59ed082ddc0c59ed1d5ddc0c59ed2d6ddc0c5d7d6d1dd87c0c59ed0dfddc0c59ed187ddc0c5d7d6d7ddc0c59ed083ddc0c59ed587ddc0c5d7d4d0dd">&#99;&#x62;&#x65;a&#x6d;&#x73;&#x40;&#107;a&#x69;&#x7a;&#101;&#x6e;&#x3a;&#126;</a>$ svn ls <a href="https://src.springsource.org/svn/spring-framework/tags">https://src.springsource.org/svn/spring-framework/tags</a><br />spring-framework-3.0.0.M1/<br />spring-framework-3.0.0.M2/<br /></code></p><p>Let&rsquo;s sync up to the latest and greatest under trunk/:</p><p><code><a href="/cdn-cgi/l/email-protection#ae888d979795888dd6989c95888dd6989b95888d979995888d9f9e9795888d9f9f9b95ee888dd698cc95888d979995888dd6989795d4888dd6989b95888dd698cb95888d9b9695888d9f9c9895">&#99;&#x62;&#x65;&#97;&#109;&#115;@&#x6b;&#97;&#x69;z&#x65;&#x6e;&#58;&#126;</a>$ svn co <a href="https://src.springsource.org/svn/spring-framework/trunk">https://src.springsource.org/svn/spring-framework/trunk</a> spring-framework<br />&hellip;<br /></code></p><p>When the checkout is complete, you&rsquo;ll find the following directory listing:</p><p><code><br /><a href="/cdn-cgi/l/email-protection#9abcb9a3a3a1bcb9a3a2a1bcb9e2acafa1bcb9a3ada1bcb9e2acfea1bcb9ababafa1bcb9e2aeaaa1bcb9abaaada1fbbcb9e2aca3a1bcb9aba8a8a1bcb9abaaaba1f4bcb9e2a9fba1bcb9e2adffa1">&#99;&#98;&#x65;&#97;&#x6d;&#115;&#x40;&#107;a&#x69;&#122;&#101;n&#x3a;&#x7e;</a>$ cd spring-framework<br /><a href="/cdn-cgi/l/email-protection#6244411a54515944415b5a5944415352535903444153525b5944411a555159220944415b555944411a545b5944415350505944411a54575944415353525944411a5103591c444156555944415353575944411a55525944411a55505944415352575944411a5407594441535251594f44415352505944411a55505903444153525b5944411a54575944411a5555590d44411a55505944411a540059">&#x63;&#98;&#101;a&#109;&#x73;@k&#97;&#x69;&#122;&#x65;&#110;&#x3a;~&#47;&#115;&#x70;&#x72;&#105;&#x6e;&#103;-&#102;&#x72;a&#109;&#x65;&#x77;o&#x72;&#x6b;</a>$ ls -1<br />build-spring-framework<br />build.properties<br />ci-build.properties<br />org.springframework.agent<br />org.springframework.aop<br />org.springframework.aspects<br />org.springframework.beans<br />org.springframework.config.java<br />org.springframework.context<br />org.springframework.context.support<br />org.springframework.core<br />org.springframework.expression<br />org.springframework.instrument<br />org.springframework.instrument.classloading<br />org.springframework.integration-tests<br />org.springframework.jdbc<br />org.springframework.jms<br />org.springframework.orm<br />org.springframework.oxm<br />org.springframework.samples.petclinic<br />org.springframework.spring-library<br />org.springframework.test<br />org.springframework.transaction<br />org.springframework.web<br />org.springframework.web.portlet<br />org.springframework.web.servlet<br />spring-build<br />spring-framework.ipr<br />spring-framework.psf<br /></code></p><p>Experienced Spring hackers will notice right away that the directory structure looks a bit different than in previous versions. Spring&rsquo;s internal structure is much more modular now - each of the org.springframework.* directories represents an individual project or module, each with its own respective source directory, test suite and build artifact. This is good news when you&rsquo;re working on the framework: for example, a change to org.springframework.core can be unit tested independent of the thousands of unrelated unit tests in the other modules. This makes for a much more expedient and pleasurable development experience. It also means that finding existing unit tests tends to be a more intuitive process. Poke around for yourself and see what you think!</p><p><br /><h2>Step 2: Build</h2></p><p>Along with many of the other Spring projects, Spring 3 is built using a combination of Ant and Ivy that we refer to simply as &lsquo;Spring Build&rsquo;. Details of the build infrastructure aside, kicking off a build is simple:</p><p><code><br /><a href="/cdn-cgi/l/email-protection#d2b1f4f1ebeae9f4f1e3e2e3e9f4f1aae4e3e9f4f1e3e2ebe9f4f1aae5e1e9f4f1aae6e2e9f4f1e3e2e5e9f4f1aae4e3e9f4f1e3e2e7e9a8f4f1e3e2e3e9f4f1aae4b7e9f4f1e7eae9f4f1e3e0e4e9f4f1aae0b4e9a1f4f1aae5e2e9f4f1aae5e0e9f4f1e3e2e7e9f4f1aae4b7e9f4f1aae4e5e9f4f1aae0b6e9f4f1aae4e4e9f4f1e3e3e6e9f4f1aae4e3e9f4f1aae4b6e9b7a5f4f1e3e3e3e9f4f1e3e3e6e9f4f1aae4b0e9">c&#98;&#101;&#x61;&#109;&#x73;&#x40;&#107;&#x61;&#105;z&#101;&#x6e;&#58;&#126;&#x2f;s&#x70;&#x72;&#105;&#x6e;&#x67;&#x2d;&#x66;&#114;&#x61;&#x6d;ew&#111;&#114;&#x6b;</a>$ cd build-spring-framework<br /><a href="/cdn-cgi/l/email-protection#c7e1e4bff1f4fce1e4fefffce1e4f6f7f6fca6e1e4bff1a3fce1e4f6f6f2fce1e4f1f3fce1e4f6f7f0fce1e4bff1f6fce1e4f6f7f2fce1e4bff0a6fce1e4bff1f2fca9e1e4bff4a6fcb9e1e4bff5a1fce1e4bff0f4fce1e4bff0f7fcb5e1e4bff1fefce1e4f6f6f7fca0eaa1b5a6e1e4f6f7fefce1e4bff1f2fce1e4bff0f0fce1e4bff1a1fce1e4f6f6f3fce1e4bff1a5fce1e4bff5a1fce1e4fefffcb2e1e4bff1fefcaba3e1e4f3f2fce1e4f6f6f2fce1e4bff0f7fce1e4bff0f5fce1e4f6f7f2fce1e4f6f6f7fce1e4bff1f0fce1e4bff5a3fce1e4bff1f1fcb5e1e4fef0fce1e4f6f7fefca2e1e4bff0f0fce1e4f6f6f6fce1e4bff0f5fce1e4bff1a5fc">&#x63;&#98;&#101;a&#x6d;&#115;&#64;&#107;&#x61;&#105;&#x7a;&#x65;n&#x3a;~&#x2f;&#x73;&#x70;r&#x69;&#110;g-fra&#109;&#x65;&#x77;&#x6f;&#114;&#x6b;&#x2f;&#98;u&#x69;ld&#45;&#115;&#x70;&#x72;&#105;&#110;&#x67;&#x2d;&#x66;r&#97;&#109;e&#x77;&#111;&#x72;&#x6b;</a>$ ant<br />[&hellip;]<br />BUILD SUCCESSFUL<br /></code></p><p>This initial build will take 20 minutes or more, depending on your connection speed. You&rsquo;ll notice that Ivy downloads all dependencies transitively and automatically from the SpringSource Enterprise Bundle Repository and this can take some time.</p><p>While the build progresses, move on and complete steps 3-5 to set up your Eclipse/STS workspace.</p><p><br /><h2>Step 3: Set up a new workspace <em>(optional)</em></h2></p><p>Because we&rsquo;ll be changing the default JRE and introducing a new classpath variable, it&rsquo;s recommended that you set up a new workspace in Eclipse dedicated to Spring 3, but it&rsquo;s not strictly required. If you wish to skip this step and use an existing workspace, move on to step 4.</p><p>Go <strong>File &gt; Switch Workspace &gt; Other &hellip;</strong></p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/1-switch-wksp-menu.png" alt="1-switch-wksp-menu" title="1-switch-wksp-menu" width="663" height="460" class="alignnone size-full wp-image-1164" /></p><p>Specify a new location for your Spring 3 workspace. You may choose any directory; as you can see below, I&rsquo;ve chosen to create a &lsquo;workspace&rsquo; directory right within my spring checkout, just for convenience.</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/2-wksp-launcher.png" alt="2-wksp-launcher" title="2-wksp-launcher" width="594" height="253" class="alignnone size-full wp-image-1165" /></p><p><br /><h2>Step 4: Create the IVY_CACHE classpath variable</h2></p><p>In this step, we&rsquo;ll create a classpath variable in Eclipse that the various Spring 3 projects will use to determine the location of the jars they depend on. As we noticed earlier when watching the Ant build progress, Ivy is downloading a number of jars - those jars are being downloaded into the ivy-cache/repository directory under the root of your Spring checkout.</p><p>Open the global Preferences dialog</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/3-prefs-menu.png" alt="3-prefs-menu" title="3-prefs-menu" width="402" height="99" class="alignnone size-full wp-image-1166" /></p><p>Type &lsquo;classpath&rsquo; to narrow the list of menu items and choose &lsquo;Classpath Variables&rsquo;</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/4-classpath-vars.png" alt="4-classpath-vars" title="4-classpath-vars" width="631" height="628" class="alignnone size-full wp-image-1167" /></p><p>Click &lsquo;New&rsquo; to create a new classpath variable, and type in the following values </p><p><strong>Name:</strong> IVY_CACHE<br /><strong>Path:</strong> [your-checkout-root]/ivy-cache/repository</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/5-ivy-cache-var.png" alt="5-ivy-cache-var" title="5-ivy-cache-var" width="631" height="628" class="alignnone size-full wp-image-1168" /></p><p><br /><h2>Step 5: Set the workspace default JRE to Java 6</h2></p><p>As mentioned above, Spring 3 requires Java 6 to build. The easiest way to ensure this dependency is handled is to simply set the default JRE for your Eclipse workspace to Java 6. If this is already the case for your Eclipse installation, you may of course skip this step.</p><p>Once again, open the global Preferences dialog. This time, type in &ldquo;installed JRE&rdquo; to narrow down the options.</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/6-prefs-jre.png" alt="6-prefs-jre" title="6-prefs-jre" width="722" height="379" class="alignnone size-full wp-image-1169" /></p><p>Make sure that a 1.6 JVM is selected. If there is no 1.6 JVM listed in your Installed JREs, click &lsquo;Add&hellip;&rsquo; and point Eclipse to the location of Java 6 on your system.</p><p><br /><h2>Step 6: Import sources into Eclipse</h2></p><p>We&rsquo;re almost ready to import Spring sources; first let&rsquo;s make sure the build is complete. Look back at the window in which you started the build. It may still be progressing; if so, wait until it completes. When it finishes you should see the following:</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/7-build-success.png" alt="7-build-success" title="7-build-success" width="667" height="288" class="alignnone size-full wp-image-1170" /></p><p>Remember, your time will vary depending on your connection speed. Don&rsquo;t be surprised if the initial build takes a while!</p><p>When the build is complete, import the projects into Eclipse:</p><p>Go <strong>File &gt; Import</strong> and type in &ldquo;existing&rdquo; to narrow the options</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/8-import-dialog.png" alt="8-import-dialog" title="8-import-dialog" width="535" height="560" class="alignnone size-full wp-image-1171" /></p><p>Choose &ldquo;Existing Projects into Workspace&rdquo;. A file selection dialog will appear. Choose the root directory of your Spring 3 checkout. Eclipse will recurse through the directory and detect the .project files for each of the Spring 3 projects. When finished, you should see the following dialog:</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/9-import-projects.png" alt="9-import-projects" title="9-import-projects" width="535" height="803" class="alignnone size-full wp-image-1172" /></p><p>Uncheck the first, unlabeled checkbox and click Finish.</p><p>Wait while Eclipse imports the projects. When complete, you should see your Package Explorer populated as below, with 22 projects and no errors.</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/10-package-explorer.png" alt="10-package-explorer" title="10-package-explorer" width="358" height="480" class="alignnone size-full wp-image-1173" /></p><p>That&rsquo;s it! You&rsquo;ve now got the Spring 3 sources at your fingertips and you can browse and edit at will. Have fun!</p><p><br /><h2>Following Spring 3 development</h2></p><p>The best way to stay in touch with Spring development is to follow the subversion commits via RSS using SpringSource&rsquo;s Fisheye service.</p><p>Go to <a href="https://fisheye.springsource.org/browse/spring-framework/trunk"><a href="https://fisheye.springsource.org/browse/spring-framework/trunk">https://fisheye.springsource.org/browse/spring-framework/trunk</a></a>, and click the RSS icon in the upper right.</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/11-fisheye-rss.png" alt="11-fisheye-rss" title="11-fisheye-rss" width="764" height="272" class="alignnone size-full wp-image-1174" /></p><p>Note that you can subscribe to any node within the Spring source tree. So if there&rsquo;s a particular module or even individual package that you care about, you can receive notifications at any granularity you choose.</p><p>For quick reference, the RSS feed URL to follow all Spring 3 commits is <a href="https://fisheye.springsource.org/changelog/~rss/spring-framework/trunk/rss.xml"><a href="https://fisheye.springsource.org/changelog/~rss/spring-framework/trunk/rss.xml">https://fisheye.springsource.org/changelog/~rss/spring-framework/trunk/rss.xml</a></a>. Add that to your feed reader and you&rsquo;re good to go.</p><p><br /><h2>Providing feedback on Spring 3</h2></p><p>As the milestones progress and we get closer to Spring 3.0 GA, your feedback is ever more important. Should you find a bug or have an improvement request for an existing feature, please take a moment to visit <a href="http://jira.springsource.org"><a href="http://jira.springsource.org">http://jira.springsource.org</a></a> and create a new issue against the Spring Framework project.</p><p>If possible, please attach a simple JUnit test case that reproduces any bug. In the absence of that, please provide detailed reproduction steps.</p><p>Also, when reporting bugs or improvements, please don&rsquo;t hesitate to take a shot at implementing the change yourself and attaching a patch file. We love getting contributions from the community!</p><p>If you&rsquo;re using the <a href="http://subclipse.tigris.org/">Subclipse</a> Subversion plugin for Eclipse, it&rsquo;s quite easy to generate patch files:</p><p>From the context menu in the package explorer, go <strong>Team &gt; Create Patch&hellip;</strong></p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/12-team-patch-menu.png" alt="12-team-patch-menu" title="12-team-patch-menu" width="769" height="686" class="alignnone size-full wp-image-1175" /></p><p>In the Create Patch dialog, choose &lsquo;Save In File System&rsquo; and specify a file</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/13-create-patch-dialog.png" alt="13-create-patch-dialog" title="13-create-patch-dialog" width="590" height="471" class="alignnone size-full wp-image-1176" /></p><p>Click Next for advanced options and choose &lsquo;Project&rsquo; as the patch root.</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/03/14-patch-adv-options.png" alt="14-patch-adv-options" title="14-patch-adv-options" width="590" height="470" class="alignnone size-full wp-image-1177" /></p><p>Then attach the resulting patch file to your JIRA issue. You can rest assured that issues with patches have a natural kind of precedence ;)</p><p><br /><h2>Using locally built Spring 3 binaries in a Maven environment</h2></p><p>As a final note, Maven users will want to know how to most effectively install their locally built Spring 3 binaries into their local Maven repository.</p><p>From the root of your Spring checkout directory, or from within any individual module, you can use the &lsquo;install-maven-central&rsquo; target to automate copying artifacts from target/ to your local m2 repository.</p><p><code><br /><a href="/cdn-cgi/l/email-protection#cee8edf7f7f5e8edb6f8fcf5e8edfffefff5afa3e8edfffffbf5e8edb6fafef5e8edb6f8acf5e8edf7f9f5e8edfffefbf5e8edb6f9aff5e8edfffefff5e8edb6f8abf5e8edb6fdaff5e8edb6f9abf5e8edfaf9f5bdbee8edb6f9fcf5a7e8edfffffef5e8edb6f8f9f5e8edfafbf5e8edfffefcf5e8edb6f9fcf5e8edf7f9f5e8edfffef7f5e8edb6f8fbf5e8edb6f9f9f5a1e8edb6f9fcf5a5e8edfaf9f5e8edb6f8a8f5e8edb6f9fcf5e8edb6f8f9f5e8edb6fcabf5e8edfffffbf5e8edb6f9fef5e8edb6f9fcf5a7e8edfffffef5e8edb6f8f9f5e8edfffefcf5e8edfffffaf5e8edb6f8fff5e8edb6f8aaf5e8edb6f8fbf5e8edfffff7f5e8edb6f8a8f5e8edb6f9fcf5a5e8edfaf8f5ade8edfffffff5e8edb6f9fcf5e8edfffefff5">&#99;&#x62;&#101;am&#115;&#x40;&#x6b;&#97;&#105;&#x7a;&#101;&#x6e;&#x3a;&#x7e;&#47;sp&#x72;i&#110;&#x67;&#45;&#102;&#x72;&#97;&#109;&#x65;&#x77;o&#x72;k&#47;&#x6f;&#x72;&#x67;&#x2e;&#115;&#x70;&#x72;i&#110;&#x67;&#102;&#114;&#x61;&#x6d;&#x65;&#119;&#x6f;&#x72;k&#46;c&#111;&#x72;&#101;</a>$ ant install-maven-central<br />Buildfile: build.xml<br />[&hellip; snipped &hellip;]<br />install-maven-central:<br />[maven:install] [INFO] Installing /Users/cbeams/spring-framework/org.springframework.core/target/artifacts/org.springframework.core.jar to /Users/cbeams/.m2/repository/org/springframework/org.springframework.core/3.0.0.BUILD-20090302225538/org.springframework.core-3.0.0.BUILD-20090302225538.jar<br />[maven:install] [INFO] Installing /Users/cbeams/spring-framework/org.springframework.core/target/artifacts/org.springframework.core-sources.jar to /Users/cbeams/.m2/repository/org/springframework/org.springframework.core/3.0.0.BUILD-20090302225538/org.springframework.core-3.0.0.BUILD-20090302225538-sources.jar</p><p>BUILD SUCCESSFUL<br />Total time: 4 seconds<br /></code></p><p>You can combine the &lsquo;test&rsquo; and &lsquo;install-maven-central&rsquo; targets to achieve functionality roughly equivalent to &lsquo;mvn install&rsquo;:</p><p><code><br /><a href="/cdn-cgi/l/email-protection#8ea8adb7b7b5a8adf6b8bcb5a8adf6b8bbb5a8adf6b8bfb5a8adbfbeb7b5a8adbfbfbbb5a8adb8bab5a8adf6b8ecb5a8adf6b8bfb5a8adf6b8b7b5a8adbfbcbcb5a8adf6b8bbb5a8adbfbfbeb5b4a8adbfbcb8b5a1fdfea8adbfbfbab5a8adbfbebbb5a8adbfbfbeb5a8adf6b8b9b5a8adf6bceab5a8adf6b8b8b5fca8adf6b8bfb5a8adbfbeb7b5a8adbfbebfb5a8adf6b9b9b5a8adf6b8e8b5a8adbfbfbab5e5a8adbab9b5a8adf6b8e8b5a8adbfbfbab5e9a8adf6bcebb5a8adbfbfbbb5a8adf6b9beb5a8adf6b9bcb5a8adbfbebbb5a8adf6b8ebb5a8adbfbebdb5a8adbfbebcb5fcefe3a8adf6b8bbb5f9a8adf6b8e8b5a8adbfbfbab5e5a0a8adb7b7b5a8adbfbfbfb5a8adbfbfbab5eb">&#99;&#x62;&#x65;&#x61;&#109;&#115;&#64;&#x6b;&#x61;&#x69;&#122;&#x65;&#110;:&#126;/sp&#114;&#105;&#110;&#x67;&#x2d;&#x66;r&#x61;&#109;&#101;&#x77;&#x6f;&#114;k&#47;&#x6f;&#114;g&#x2e;&#115;&#x70;&#x72;&#105;&#x6e;&#103;&#102;ram&#x65;w&#x6f;&#114;k.&#99;&#111;&#114;e</a>$ ant test install-maven-central<br /></code></p><p>Note: &lsquo;install-maven-central&rsquo; assumes that your local repository is in the default location of $HOME/.m2/repository</p><p><br /><h2>Summary</h2></p><p>I hope you&rsquo;ve enjoyed this walk through the world of Spring 3 development, and I think you&rsquo;ll find that after the one-time setup detailed above it&rsquo;s easy to develop against Spring 3 sources. We encourage you to follow development and stay in touch with us via JIRA. Your feedback is and always has been the lifeblood of Spring, and we thank you for it. Keep it coming!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 208;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>POJO Aspects in Spring 2.0: A Simple Example</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="POJO Aspects in Spring 2.0: A Simple Example" />
+<meta name="twitter:description" content="&lt;p&gt;While the material in this post is quite simple, it will actually offer a glimpse of some rather significant new features in Spring 2.0. I hope that with a little imagination, you will be able to apply what you see here to far less trivial use cases of your own.&lt;/p&gt;
+&lt;p&gt;I am going to show 2 examples actually. The first will use a rather simple logger:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;prettyprint java&quot;&gt;&lt;br&gt;package example;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class SimpleLogger {
+
+  private static Log log = LogFactory.getLog(SimpleLogger.class);
+
+  public void logOneString(String s) {
+    log.info(&quot;string=&quot; + s);
+  }
+
+  public void logTwoStrings(String s1, String s2) {
+    log.info(&quot;string1=&quot; + s1 + &quot;,string2=&quot; + s2);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+" />
+<meta name="twitter:creator" content="@m_f_" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+
+<meta property="og:title" content="POJO Aspects in Spring 2.0: A Simple Example" />
+<meta property="og:image" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+<meta property="og:description" content="&lt;p&gt;While the material in this post is quite simple, it will actually offer a glimpse of some rather significant new features in Spring 2.0. I hope that with a little imagination, you will be able to apply what you see here to far less trivial use cases of your own.&lt;/p&gt;
+&lt;p&gt;I am going to show 2 examples actually. The first will use a rather simple logger:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;prettyprint java&quot;&gt;&lt;br&gt;package example;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class SimpleLogger {
+
+  private static Log log = LogFactory.getLog(SimpleLogger.class);
+
+  public void logOneString(String s) {
+    log.info(&quot;string=&quot; + s);
+  }
+
+  public void logTwoStrings(String s1, String s2) {
+    log.info(&quot;string1=&quot; + s1 + &quot;,string2=&quot; + s2);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2006-03-22 17:33:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">POJO Aspects in Spring 2.0: A Simple Example</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mfisher">Mark Fisher</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2006-03-22 17:33:00.0">March 22, 2006</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="7" href="/blog/2006/03/22/pojo-aspects-in-spring-2-0-a-simple-example#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>While the material in this post is quite simple, it will actually offer a glimpse of some rather significant new features in Spring 2.0. I hope that with a little imagination, you will be able to apply what you see here to far less trivial use cases of your own.</p><p>I am going to show 2 examples actually. The first will use a rather simple logger:</p>
+<pre><code class="prettyprint java"><br />package example;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class SimpleLogger {
+
+  private static Log log = LogFactory.getLog(SimpleLogger.class);
+
+  public void logOneString(String s) {
+    log.info(&quot;string=&quot; + s);
+  }
+
+  public void logTwoStrings(String s1, String s2) {
+    log.info(&quot;string1=&quot; + s1 + &quot;,string2=&quot; + s2);
+  }
+}
+</code></pre><p>I will be using AOP to apply logging to a string concatenation service. Here is the interface:</p>
+<pre><code class="prettyprint java"><br />package example;
+
+public interface ConcatService {
+  public String concat(String s1, String s2);
+}
+</code></pre><p>Öand an implementing Class:</p>
+<pre><code class="prettyprint java"><br />package example;
+
+public class ConcatServiceImpl implements ConcatService {
+
+  public String concat(String s1, String s2) {
+    return s1 + s2;
+  }
+}
+</code></pre><p>Alright - nothing is very exciting about this so far, but the most important thing to notice is that I am <i>only dealing with POJOs</i> up to this point.</p><p>Now, have a look at these bean definitions. Notice the usage of the new Spring 2.0 XML Schema and the ìaopî namespace in particular:</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans
+  xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+  xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+  &lt;aop:config&gt;
+    &lt;aop:aspect id=&quot;loggingAspect&quot; ref=&quot;simpleLogger&quot;&gt;
+      &lt;aop:before
+        method=&quot;logTwoStrings&quot;
+        pointcut=&quot;execution(* example..*Service.*(..)) and args(s1,s2)&quot;/&gt;
+      &lt;aop:after-returning
+        method=&quot;logOneString&quot;
+        returning=&quot;s&quot;
+        pointcut=&quot;execution(* example..*Service.*(..))&quot;/&gt;
+    &lt;/aop:aspect&gt;
+  &lt;/aop:config&gt;
+
+  &lt;bean id=&quot;simpleLogger&quot; class=&quot;example.SimpleLogger&quot;/&gt;
+
+  &lt;bean id=&quot;concatService&quot; class=&quot;example.ConcatServiceImpl&quot;/&gt;
+
+&lt;/beans&gt;
+</code></pre><p>The ìloggingAspectî is defined with a reference to ìsimpleLoggerî which you saw in the very first code snippet above. Again, the interesting thing is that it is a simple POJO - it doesnít implement any interfaces or follow any contract in order to be used as an aspect. In fact, you may very well have code like this lying around already. ;)</p><p>The ìloggingAspectî contains 2 kinds of advice. One is the ìbeforeî kind of advice, and the other is the ìafterReturningî kind. Next, you see that the advice actually maps to methods on the <tt>SimpleLogger</tt> POJO - <tt>logTwoStrings()</tt> for the <i>before</i> advice and <tt>logOneString()</tt> for the <i>afterReturning</i> advice. This option of declarative mapping to a POJO method is a useful alternative to implementing advice interfaces.</p><p>Finally, a quick word on binding and pointcuts. In the ìbeforeî advice, <i>args(s1,s2)</i> specifies that this pointcut will apply when there are 2 arguments which can be bound to the 2 <tt>String</tt> parameters of the <tt>logTwoStrings()</tt> method - and that is exactly what happens here as you will see in just a moment. In the ìafterReturningî case, the return value is going to bind to the single <tt>String</tt> parameter of the <tt>logOneString()</tt> method.</p><p>Now, for the pointcutsÖ the values in the ìpointcutî attributes above are actually standard AspectJ pointcut expressions. In this case, they define what methods will be advised. The ì*î is a wildcard, and the first ì..î signifies <i>any descendant package</i> while the second ì..î signifies <i>any number and type of parameters</i>. Essentially this pointcut will apply to any method of a Class that ends with ìServiceî regardless of its parameter type or count with any return value as long as it is somehow descending from the ìexampleî package. Okay, so maybe that doesnít seem quite so <i>simple</i> - but if it does at least sound interesting then you can read much more about the AspectJ expression language at the <a href=" http://www.eclipse.org/aspectj/">AspectJ</a> site.</p><p>NOTE: While AspectJ expressions are being used here, the advice is still applied via Springís <i>Proxy-based AOP</i> as opposed to AspectJ weaving. This means that an interceptor is able to add behavior at method execution joinpoints only. It is highly likely that method execution interception will satisfy a majority of your AOP use-cases. However, for applying advice at other joinpoints (such as field access), you may use the full power of AspectJ (which is beyond the scope of this post).</p><p>So, without further hesitationÖ here is a simple <tt>main()</tt> method to try it out:</p>
+<pre><code class="prettyprint java"><br />public static void main(String[] args) {
+  ApplicationContext context = new ClassPathXmlApplicationContext(&quot;example/simpleLoggerContext.xml&quot;);
+  ConcatService concatService = (ConcatService)context.getBean(&quot;concatService&quot;);
+  concatService.concat(&quot;some&quot;, &quot;thing&quot;);
+}
+</code></pre><p>And the result!:</p><p><code><pre><br />string1=some,string2=thing<br />string=something<br /></pre></code></p><p>Now, for the second exampleÖ</p><p>Of course, you may want to log more information, such as method arguments, the calling method itself, and so on. To show how to accomplish this, I will revise this <tt>SimpleLogger</tt> just a bit. The secret is in the <tt>JoinPoint</tt> class (and the <tt>StaticPart</tt> Class) which will now be provided to the methods of my new class, <tt>MethodLogger</tt>:</p>
+<pre><code class="prettyprint java"><br />package example;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.JoinPoint.StaticPart;
+
+public class MethodLogger {
+
+  private static Log log = LogFactory.getLog(MethodLogger.class);
+
+  public void logMethodEntry(JoinPoint joinPoint) {
+    Object[] args = joinPoint.getArgs();
+    String name = joinPoint.getSignature().toLongString();
+    StringBuffer sb = new StringBuffer(name + &quot; called with: [&quot;);
+    for(int i = 0; i &lt; args.length; i++) {
+      Object o = args[i];
+      sb.append(o);
+      sb.append((i == args.length - 1) ? &quot;]&quot; : &quot;, &quot;);
+    }
+    log.info(sb);
+  }
+
+  public void logMethodExit(StaticPart staticPart, Object result) {
+    String name = staticPart.getSignature().toLongString();
+    log.info(name + &quot; returning: [&quot; + result + &quot;]&quot;);
+  }
+}
+</code></pre><p>As you can see, the <tt>JoinPoint</tt> provides access to the runtime info that I need. In the <tt>logMethodExit()</tt> method, only the type is required, so the <tt>StaticPart</tt> is sufficient (it is actually part of the <tt>JoinPoint</tt> in that <tt>JoinPoint</tt> provides a <tt>getStaticPart()</tt> method). As a general rule, whenever you can do what you need to without accessing runtime info, then you should.</p><p>Here are the bean definitions for using the <tt>MethodLogger</tt>:</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans
+  xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+  xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+  &lt;aop:config&gt;
+    &lt;aop:pointcut id=&quot;servicePointcut&quot; expression=&quot;execution(* example..*Service+.*(..))&quot;/&gt;
+    &lt;aop:aspect id=&quot;loggingAspect&quot; ref=&quot;methodLogger&quot;&gt;
+      &lt;aop:before
+        method=&quot;logMethodEntry&quot;
+        pointcut-ref=&quot;servicePointcut&quot;/&gt;
+      &lt;aop:after-returning
+        method=&quot;logMethodExit&quot;
+        returning=&quot;result&quot;
+        pointcut-ref=&quot;servicePointcut&quot;/&gt;
+    &lt;/aop:aspect&gt;
+  &lt;/aop:config&gt;
+
+  &lt;bean id=&quot;methodLogger&quot; class=&quot;example.MethodLogger&quot;/&gt;
+
+  &lt;bean id=&quot;concatService&quot; class=&quot;example.ConcatServiceImpl&quot;/&gt;
+
+&lt;/beans&gt;
+</code></pre><p>Again, you see the aspects and advice. This time the ìpointcutî is defined separately and reused for both advice types. Perhaps the most interesting thing here is that there is no explicit binding for method parameters and no need to configure anything to recognize the <tt>JoinPoint</tt> or <tt>StaticPart</tt> parameters. In fact, you can always specify one of these as the first parameter of a method in order to have access to more information about the context of the methodís execution.</p><p>To run this example, I will use the same <tt>main()</tt> but this time passing the path of the new bean definition file into the <tt>ClassPathXmlApplicationContext</tt> constructor. Here is the result:</p><p><code><pre><br />public abstract java.lang.String example.ConcatService.concat(java.lang.String,java.lang.String) called with: [some, thing]<br />public abstract java.lang.String example.ConcatService.concat(java.lang.String,java.lang.String) returning: [something]<br /></pre></code></p><p>Thatís about it for this <i>simple</i> example. The main point to take away is that <i>POJO</i> services can be decorated with additional behavior by <i>POJO aspects</i>. In fact, in some cases the only thing making them aspects is the configuration. In other cases, when you need more runtime info, then the <tt>JoinPoint</tt> and <tt>StaticPart</tt> can be quite useful.</p><p>If you are interested in more complete coverage of this topic, visit <a href="http://www.aspectprogrammer.org/blogs/adrian/2006/01/typed_advice_in.html">this blog</a> by Adrian Colyer.</p><p>NOTE: In that post, you will see examples with &lt;aop:advice&gt; elements. In Spring 2.0 M3, those elements have been replaced with the more specific ones as used in this entry - such as: &lt;aop:before&gt;.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 7;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

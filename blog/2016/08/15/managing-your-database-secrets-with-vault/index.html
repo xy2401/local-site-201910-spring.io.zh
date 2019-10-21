@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Managing your Database Secrets with Vault</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Managing your Database Secrets with Vault" />
+<meta name="twitter:description" content="&lt;p&gt;In my previous post about &lt;a href=&quot;https://spring.io/blog/2016/06/24/managing-secrets-with-vault&quot;&gt;Managing Secrets with Vault&lt;/a&gt;, I introduced you to Vault and how to store arbitrary secrets using the generic secret backend. Vault can manage more than just secret data like API keys, passwords, and other sensitive string-like data. Today we’re taking a look at Vault’s integration with databases, services, and certificates.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#database-credentials-tend-to-be-static&quot; class=&quot;anchor&quot; name=&quot;database-credentials-tend-to-be-static&quot;&gt;&lt;/a&gt;Database credentials tend to be static&lt;/h2&gt;
+&lt;p&gt;When it comes to databases, the regular workflow of getting credentials applying for a database is asking some operator or a self-service tool to give you credentials so your application can log into the database. At this point, credentials are considered static. Credentials get usually changed in case the database is migrated or if there’s a security breach. &lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@mp911de" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/6494a9d91e9ffef9adc8253257f1b35e?s=200" />
+
+<meta property="og:title" content="Managing your Database Secrets with Vault" />
+<meta property="og:image" content="https://gravatar.com/avatar/6494a9d91e9ffef9adc8253257f1b35e?s=200" />
+<meta property="og:description" content="&lt;p&gt;In my previous post about &lt;a href=&quot;https://spring.io/blog/2016/06/24/managing-secrets-with-vault&quot;&gt;Managing Secrets with Vault&lt;/a&gt;, I introduced you to Vault and how to store arbitrary secrets using the generic secret backend. Vault can manage more than just secret data like API keys, passwords, and other sensitive string-like data. Today we’re taking a look at Vault’s integration with databases, services, and certificates.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#database-credentials-tend-to-be-static&quot; class=&quot;anchor&quot; name=&quot;database-credentials-tend-to-be-static&quot;&gt;&lt;/a&gt;Database credentials tend to be static&lt;/h2&gt;
+&lt;p&gt;When it comes to databases, the regular workflow of getting credentials applying for a database is asking some operator or a self-service tool to give you credentials so your application can log into the database. At this point, credentials are considered static. Credentials get usually changed in case the database is migrated or if there’s a security breach. &lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2016-08-15 06:29:03.253" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+ </form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Managing your Database Secrets with Vault</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/6494a9d91e9ffef9adc8253257f1b35e?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mp911de">Mark Paluch</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2016-08-15 06:29:03.253">August 15, 2016</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2561" href="/blog/2016/08/15/managing-your-database-secrets-with-vault#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In my previous post about <a href="https://spring.io/blog/2016/06/24/managing-secrets-with-vault">Managing Secrets with Vault</a>, I introduced you to Vault and how to store arbitrary secrets using the generic secret backend. Vault can manage more than just secret data like API keys, passwords, and other sensitive string-like data. Today we’re taking a look at Vault’s integration with databases, services, and certificates.</p><h2><a href="#database-credentials-tend-to-be-static" class="anchor" name="database-credentials-tend-to-be-static"></a>Database credentials tend to be static</h2>
+<p>When it comes to databases, the regular workflow of getting credentials applying for a database is asking some operator or a self-service tool to give you credentials so your application can log into the database. At this point, credentials are considered static. Credentials get usually changed in case the database is migrated or if there’s a security breach. </p>
+<p>With <a href="https://github.com/spring-cloud-incubator/spring-cloud-vault-config">Spring Cloud Vault</a> you can store username and password inside Vault instead your application configuration. <a href="https://cloud.spring.io/spring-cloud-config/">Spring Config Server</a> is also a good choice; it allows you to <a href="https://cloud.spring.io/spring-cloud-static/spring-cloud.html#_encryption_and_decryption">store encrypted secrets</a> in your config repository. Your credentials are protected.</p>
+<p>There&rsquo;s one caveat: Long-lived credentials are a good target for leakage. Leaked credentials can give access to an unintended party. A few databases implement restrictions on source hosts. In some cases, a database user can be restricted to a group of hosts. That restriction prevents access from other hosts. Still, every user and process that has access to a permitted machine can use the leaked credentials. But how do you discover that leakage? You might find the leak if your data was leaked to the public or the internet but that’s not always the case. For other cases, the unintended party may read or change your data, and it’s fairly sure the leak remains undiscovered for quite a while.</p>
+<p>Let’s make credentials short-lived.</p><h2><a href="#vault-and-databases" class="anchor" name="vault-and-databases"></a>Vault and Databases</h2>
+<p>Vault comes with a variety of integrations to different systems. Some of them integrate with <a href="https://www.vaultproject.io/docs/secrets/postgresql/index.html">PostgreSQL</a> and <a href="https://www.vaultproject.io/docs/secrets/mysql/index.html">MySQL</a> as secret backend. A secret backend can provide secrets. In this case, secret backend does not mean that secret data is stored in PosgreSQL/MySQL. It means that Vault can create (and revoke) users for databases on demand.</p>
+<p>To generate database credentials, you need to set up a role first. Roles control the permission context for database credentials generation. A role defines the permissions that are associated with the credentials. That concept maps well if you run different applications and each application requires different database permissions.<br />A role also defines the max lease time for obtained credentials. The lease is in Vault-speak the duration the credentials are valid. Vault revokes credentials from the database system once they are expired. Some databases, like PostgreSQL, have built-in support for password expiry with the <code>CREATE ROLE … VALID UNTIL …</code> clause.</p><h2><a href="#first-steps-with-vault-and-mysql" class="anchor" name="first-steps-with-vault-and-mysql"></a>First steps with Vault and MySQL</h2>
+<p>Now how to get started with Vault and MySQL?</p>
+<p>You need an initialized and unsealed Vault server and a running MySQL server. See the <a href="https://spring.io/blog/2016/06/24/managing-secrets-with-vault#wait-there-rsquo-s-hope">previous post</a> how to setup Vault.</p>
+<p>Then you can set up the MySQL backend along the connection details and role declaration:</p>
+<p>First, mount the <code>mysql</code> secret backend with </p>
+<pre><code class="prettyprint bash">$ vault mount mysql
+Successfully mounted &#39;mysql&#39; at &#39;mysql&#39;!
+</code></pre>
+<p>Each mount correlates to one MySQL server. If you want to generate credentials for multiple servers, then you need to mount the backend multiple times using different paths.</p>
+<p>Once the backend is mounted, you need to supply the control connection details that consist of a username/password combination and the host and port. The control connection is used to create and revoke users.</p>
+<pre><code class="prettyprint bash">$ vault write mysql/config/connection \
+	connection_url=&quot;root:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="22504d4d5662564152">[email&#160;protected]</a>(127.0.0.1:3306)/&quot;
+Success! Data written to: mysql/config/connection
+</code></pre>
+<p>The role contains the scripts for user creation and the authorization. You can include multiple commands if you wish to do so. Vault will execute these commands on each credential generation:</p>
+<pre><code class="prettyprint bash">$ vault write mysql/roles/readonly \
+	sql=&quot;CREATE USER &#39;{{name}}&#39;@&#39;%&#39; IDENTIFIED BY &#39;{{password}}&#39;;GRANT SELECT ON *.* TO &#39;{{name}}&#39;@&#39;%&#39;;&quot;
+Success! Data written to: mysql/roles/readonly
+</code></pre>
+<p>Vault is now ready to generate credentials for the <code>readonly</code> role. You can obtain credentials with</p>
+<pre><code class="prettyprint bash">$ vault read mysql/creds/readonly
+Key            	Value
+---            	-----
+lease_id       	mysql/creds/readonly/2e7cd1d0-e313-158e-c9a4-1dd3c3277642
+lease_duration 	2592000
+lease_renewable	true
+password       	04cf512a-57f8-d146-9cf5-ec2bd829ca8c
+username       	token-10a8b69f-a
+</code></pre>
+<p>and verify they work using the <code>mysql</code> console application:</p>
+<pre><code class="prettyprint bash">$ mysql -h 127.0.0.1 -utoken-10a8b69f-a -p04cf512a-57f8-d146-9cf5-ec2bd829ca8c
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 5
+...
+</code></pre>
+<p>Now that we know our Vault/MySQL integration is working we can use it inside a Spring Boot application with Spring Cloud Vault.</p>
+<p>Grab a Spring Boot project. <a href="https://start.spring.io">start.spring.io</a> is a good starting point.</p>
+<p>Include the Spring Cloud Vault Starter, the Database dependency, <code>spring-jdbc</code> and the MySQL driver in your project.<br />Add the following code to your build configuration file. These lines include all required dependencies.</p>
+<p><strong>Maven</strong></p>
+<pre><code class="prettyprint xml">&lt;dependency&gt;
+	&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+	&lt;artifactId&gt;spring-cloud-vault-starter-config&lt;/artifactId&gt;
+	&lt;version&gt;1.0.0.BUILD-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+	&lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+	&lt;artifactId&gt;spring-cloud-vault-config-databases&lt;/artifactId&gt;
+	&lt;version&gt;1.0.0.BUILD-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+	&lt;groupId&gt;org.springframework&lt;/groupId&gt;
+	&lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+	&lt;groupId&gt;mysql&lt;/groupId&gt;
+	&lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;repositories&gt;
+	&lt;repository&gt;
+		&lt;id&gt;spring-snapshots&lt;/id&gt;
+		&lt;name&gt;Spring Snapshots&lt;/name&gt;
+		&lt;url&gt;https://repo.spring.io/libs-snapshot&lt;/url&gt;
+		&lt;snapshots&gt;
+			&lt;enabled&gt;true&lt;/enabled&gt;
+		&lt;/snapshots&gt;
+	&lt;/repository&gt;
+&lt;/repositories&gt;
+</code></pre>
+<p><strong>Gradle</strong></p>
+<pre><code class="prettyprint">repositories {
+	maven {
+		url &#39;https://repo.spring.io/libs-snapshot&#39;
+	}
+}
+
+dependencies {
+	compile(&quot;org.springframework.cloud:spring-cloud-vault-starter-config:1.0.0.BUILD-SNAPSHOT&quot;)
+	compile(&quot;org.springframework.cloud:spring-cloud-vault-config-databases:1.0.0.BUILD-SNAPSHOT&quot;)
+	compile(&quot;org.springframework:spring-jdbc:4.3.1.RELEASE&quot;)
+	compile(&quot;mysql:mysql-connector-java:5.1.39&quot;)
+}
+</code></pre><h2><a href="#setup-the-configuration" class="anchor" name="setup-the-configuration"></a>Setup the configuration</h2>
+<p>Spring Cloud Vault uses by default the generic secret backend. In our case we don’t need the generic backend. So we need to disable the <code>generic</code> backend and enable the MySQL backend. All configuration needs to be specified in the bootstrap configuration. For this example we use <code>bootstrap.yml</code> in <code>src/main/resources</code>:</p>
+<pre><code class="prettyprint yml">spring.cloud.vault:
+		token: 9a63de21-8af7-311a-9a5a-151b6a0d4795
+		scheme: http
+		generic:
+			enabled: false
+		mysql:
+			enabled: true
+			role: readonly
+
+spring.datasource.url: jdbc:mysql://127.0.0.1:3306		
+</code></pre>
+<p>We don’t add any database credentials to the config file. These would usually be <code>spring.datasource.username</code> and <code>spring.datasource.password</code>. </p>
+<p>The <code>spring.cloud.vault.scheme</code> is set to <code>http</code> because we’ve started Vault in plaintext HTTP mode (<code>spring.cloud.vault.scheme</code> defaults to <code>https</code>). Don’t do this in production. Plaintext makes the whole secret story useless as all listeners on the network can see your secrets<br />Please note that the token used in the example is the root token. </p>
+<p>You can create new tokens with:</p>
+<pre><code class="prettyprint bash">$ vault token-create
+Key            	Value
+---            	-----
+token          	728d26ae-53a6-d8b6-d7a0-c5f62238ea55
+token_accessor 	2fd7dcba-39d0-04d3-8d6b-096c3529cf14
+token_duration 	0
+token_renewable	true
+token_policies 	[root]
+</code></pre>
+<p>That’s apparently all you need to do for the Vault MySQL integration with your Spring Boot application.</p>
+<p>Let’s quickly add some code to your application so you can test the integration with real code.</p>
+<pre><code class="prettyprint java"><br />@SpringBootApplication
+public class MySqlApplication {
+	public static void main(String[] args) {
+		SpringApplication.run(MySqlApplication.class, args);
+	}
+
+	@Autowired
+	DataSource dataSource;
+
+	@PostConstruct
+	private void postConstruct() throws Exception {
+
+		try (Connection connection = dataSource.getConnection();
+				Statement statement = connection.createStatement()) {
+				
+			ResultSet resultSet = statement.executeQuery(&quot;SELECT CURRENT_USER();&quot;);
+			resultSet.next();
+
+			System.out.println(&quot;Connection works with User: &quot; + resultSet.getString(1));
+
+			resultSet.close();
+		}
+	}
+</code></pre>
+<p>Then start your application. The code produces an output like:</p>
+<p><code>Connection works with User: token-...</code></p>
+<p>Spring Cloud Vault obtains database credentials at startup and stores those using the default property names so Spring Boot can pick these.</p><h2><a href="#other-services" class="anchor" name="other-services"></a>Other services</h2>
+<p>Vault supports several other integrations. We’ve built support for integrations we also support in Spring Boot.</p>
+<p>You can use the following services and databases:</p>
+<ul>
+<li>PostgreSQL and MySQL - Generates credentials to be used with JDBC and Spring Data JPA</li>
+<li>Apache Cassandra - Generates credentials to be used with the Datastax client and Spring Data Cassandra</li>
+<li>Hashicorp Consul - Generates an ACL token that can be used together with Spring Cloud Consul</li>
+<li>RabbitMQ - Generates credentials to be used with Spring AMQP</li>
+<li>Amazon AWS - Generates Access key and secret key to be used with Spring Cloud AWS</li>
+</ul>
+<p>You can view a complete example in our examples repository at <a href="https://github.com/mp911de/spring-cloud-vault-config-samples/tree/master/mysql">https://github.com/mp911de/spring-cloud-vault-config-samples</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2561;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

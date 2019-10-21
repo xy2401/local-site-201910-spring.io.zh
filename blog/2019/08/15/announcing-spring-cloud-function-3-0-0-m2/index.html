@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Announcing Spring Cloud Function 3.0.0.M2</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Announcing Spring Cloud Function 3.0.0.M2" />
+<meta name="twitter:description" content="&lt;p&gt;We are pleased to announce the second Milestone of the Spring Cloud Function 3.0.0.M2. &lt;/p&gt;
+&lt;blockquote&gt; 
+ &lt;p&gt;NOTE: Spring Cloud Function 3.0.0.M1 was primarily to establish compatibility with Spring Boot 2.2.x. and therefore went unannounced. &lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;p&gt;Spring Cloud Function 3.0.0.M2 modules are available for use in the &lt;a href=&quot;https://repo.spring.io/libs-milestone-local/org/springframework/cloud/&quot;&gt;Spring Milestone&lt;/a&gt; repository. &lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;#quick-highlights&quot; class=&quot;anchor&quot; name=&quot;quick-highlights&quot;&gt;&lt;/a&gt;Quick highlights:&lt;/h3&gt;
+&lt;ul&gt; 
+ &lt;li&gt;Spring Boot 2.2.x&lt;/li&gt; 
+ &lt;li&gt;Enhanced deployer (requires a separate blog)&lt;/li&gt; 
+&lt;/ul&gt;
+&lt;h3&gt;&lt;a href=&quot;#notable-features-and-enhancements&quot; class=&quot;anchor&quot; name=&quot;notable-features-and-enhancements&quot;&gt;&lt;/a&gt;Notable features and enhancements:&lt;/h3&gt;
+&lt;h5&gt;&lt;a href=&quot;#function-arity-multiple-inputs-outputs&quot; class=&quot;anchor&quot; name=&quot;function-arity-multiple-inputs-outputs&quot;&gt;&lt;/a&gt;Function arity (multiple inputs/outputs)&lt;/h5&gt;
+&lt;p&gt;One of the biggest features introduced with this milestone is support for functions with multiple inputs and outputs. Important thing to point out is that this feature only makes sense in reactive world where you may want to pass several streams to a function for purposes of doing some type of aggregate/merge operation on such streams. For conventional cases you can always send multiple arguments using a Collection of some type.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@z_oleg" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/b44844c62a496e582a467cf95806ae92?s=200" />
+
+<meta property="og:title" content="Announcing Spring Cloud Function 3.0.0.M2" />
+<meta property="og:image" content="https://gravatar.com/avatar/b44844c62a496e582a467cf95806ae92?s=200" />
+<meta property="og:description" content="&lt;p&gt;We are pleased to announce the second Milestone of the Spring Cloud Function 3.0.0.M2. &lt;/p&gt;
+&lt;blockquote&gt; 
+ &lt;p&gt;NOTE: Spring Cloud Function 3.0.0.M1 was primarily to establish compatibility with Spring Boot 2.2.x. and therefore went unannounced. &lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;p&gt;Spring Cloud Function 3.0.0.M2 modules are available for use in the &lt;a href=&quot;https://repo.spring.io/libs-milestone-local/org/springframework/cloud/&quot;&gt;Spring Milestone&lt;/a&gt; repository. &lt;/p&gt;
+&lt;h3&gt;&lt;a href=&quot;#quick-highlights&quot; class=&quot;anchor&quot; name=&quot;quick-highlights&quot;&gt;&lt;/a&gt;Quick highlights:&lt;/h3&gt;
+&lt;ul&gt; 
+ &lt;li&gt;Spring Boot 2.2.x&lt;/li&gt; 
+ &lt;li&gt;Enhanced deployer (requires a separate blog)&lt;/li&gt; 
+&lt;/ul&gt;
+&lt;h3&gt;&lt;a href=&quot;#notable-features-and-enhancements&quot; class=&quot;anchor&quot; name=&quot;notable-features-and-enhancements&quot;&gt;&lt;/a&gt;Notable features and enhancements:&lt;/h3&gt;
+&lt;h5&gt;&lt;a href=&quot;#function-arity-multiple-inputs-outputs&quot; class=&quot;anchor&quot; name=&quot;function-arity-multiple-inputs-outputs&quot;&gt;&lt;/a&gt;Function arity (multiple inputs/outputs)&lt;/h5&gt;
+&lt;p&gt;One of the biggest features introduced with this milestone is support for functions with multiple inputs and outputs. Important thing to point out is that this feature only makes sense in reactive world where you may want to pass several streams to a function for purposes of doing some type of aggregate/merge operation on such streams. For conventional cases you can always send multiple arguments using a Collection of some type.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-08-15 13:57:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Announcing Spring Cloud Function 3.0.0.M2</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/b44844c62a496e582a467cf95806ae92?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/olegz">Oleg Zhurakousky</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-08-15 13:57:00.0">August 15, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3773" href="/blog/2019/08/15/announcing-spring-cloud-function-3-0-0-m2#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>We are pleased to announce the second Milestone of the Spring Cloud Function 3.0.0.M2. </p>
+<blockquote>
+<p>NOTE: Spring Cloud Function 3.0.0.M1 was primarily to establish compatibility with Spring Boot 2.2.x. and therefore went unannounced. </p>
+</blockquote>
+<p>Spring Cloud Function 3.0.0.M2 modules are available for use in the <a href="https://repo.spring.io/libs-milestone-local/org/springframework/cloud/">Spring Milestone</a> repository. </p><h3><a href="#quick-highlights" class="anchor" name="quick-highlights"></a>Quick highlights:</h3>
+<ul>
+<li>Spring Boot 2.2.x</li>
+<li>Enhanced deployer (requires a separate blog)</li>
+</ul><h3><a href="#notable-features-and-enhancements" class="anchor" name="notable-features-and-enhancements"></a>Notable features and enhancements:</h3><h5><a href="#function-arity-multiple-inputs-outputs" class="anchor" name="function-arity-multiple-inputs-outputs"></a>Function arity (multiple inputs/outputs)</h5>
+<p>One of the biggest features introduced with this milestone is support for functions with multiple inputs and outputs. Important thing to point out is that this feature only makes sense in reactive world where you may want to pass several streams to a function for purposes of doing some type of aggregate/merge operation on such streams. For conventional cases you can always send multiple arguments using a Collection of some type.</p>
+<p>To represent multiple inputs/outputs in <em>the type safe way</em> to benefit from type conversion and other features mentioned earlier, we’ve chosen <code>Tuple</code> library from <a href="https://projectreactor.io/docs/core/release/api/index.html?reactor/util/function/Tuples.html">project reactor</a>, given that spring-cloud-function had it as a dependency at its core from its inception. However, in the future we also intend to support types like <code>BiFunction</code> as well as POJO-style functions if we can determine the arity and types of inputs and outputs through some type of convention. </p>
+<p>While the feature is new and in the process of being enhanced, it’s already being utilised by few internal projects and you can try it as well. Here is an example:</p>
+<p>Assume the following function:</p>
+<pre><code class="prettyprint java">@Bean
+public Function&lt;Tuple2&lt;Flux&lt;String&gt;, Flux&lt;Integer&gt;&gt;, Flux&lt;?&gt;[]&gt; repeater() {
+  return tuple -&gt; {
+    Flux&lt;String&gt; stringFlux = tuple.getT1();
+    Flux&lt;Integer&gt; integerFlux = tuple.getT2();
+
+    Flux&lt;Integer&gt; sharedIntFlux = integerFlux.publish().autoConnect(2);
+
+    Flux&lt;String&gt; repeated = stringFlux
+      .zipWith(sharedIntFlux)
+      .flatMap(t -&gt; 
+            Flux.fromIterable(Collections.nCopies(t.getT2(), t.getT1())));
+
+    Flux&lt;Integer&gt; sum = sharedIntFlux
+	.buffer(3, 1)
+	.map(l -&gt; l.stream().mapToInt(Integer::intValue).sum());
+
+    return new Flux[] { repeated, sum };
+  };
+}
+</code></pre>
+<p>You can invoke it as such:</p>
+<pre><code class="prettyprint java">Function&lt;Tuple2&lt;Flux&lt;String&gt;, Flux&lt;Integer&gt;&gt;, Flux&lt;?&gt;[]&gt; repeater = catalog.lookup(&quot;repeater&quot;);
+Flux&lt;String&gt; stringStream = Flux.just(&quot;one&quot;, &quot;two&quot;, &quot;three&quot;);
+Flux&lt;Integer&gt; intStream = Flux.just(3, 2, 1);
+Flux&lt;?&gt;[] result = repeater.apply(Tuples.of(stringStream, intStream));
+result[0].subscribe(System.out::println);
+result[1].subscribe(System.out::println);
+</code></pre>
+<p>There will be a separate blog on this subject in the future.</p><h5><a href="#choice-of-programming-styles-reactive-imperative" class="anchor" name="choice-of-programming-styles-reactive-imperative"></a>Choice of programming styles - reactive, imperative</h5>
+<p>As before, functions could be implemented in imperative or reactive style via <a href="https://projectreactor.io/">project reactor</a>. However, in the previous versions we would <em>always</em> apply reactive transformation on functions implemented using imperative style. For example, <code>Function&lt;Foo, Foo&gt;</code> would become <code>Function&lt;Flux&lt;Foo&gt;, Flux&lt;Foo&gt;&gt;</code>. With this release, this is no longer the case. Functions implemented in the imperative way could be looked up and invoked <em>as is</em> (imperative) or as <em>reactive</em>.<br />For example, let&rsquo;s assume the following configuration:</p>
+<pre><code class="prettyprint java">@Bean
+public Function&lt;String, String&gt; uppercase() {
+	return v -&gt; v.toUpperCase();
+}
+</code></pre>
+<p>You can access this function as it is written:</p>
+<pre><code class="prettyprint java">Function&lt;String, String&gt; function = functionCatalog.lookup(&quot;uppercase&quot;);
+</code></pre>
+<p>or as reactive equivalent:</p>
+<pre><code class="prettyprint java">Function&lt;Flux&lt;String&gt;, Flux&lt;String&gt;&gt; reactiveFunction = functionCatalog.lookup(&quot;uppercase&quot;);
+</code></pre>
+<p>Spring Cloud Function will automatically adapt.</p><h5><a href="#transparent-type-conversion-of-inputs-and-outputs" class="anchor" name="transparent-type-conversion-of-inputs-and-outputs"></a>Transparent type conversion of inputs and outputs.</h5>
+<p>One of the new features that comes with this milestone is transparent type conversion at the function core, so while some of it was already present in the web adapter, it is now available at the level of function invocation allowing any type of function consumers (not just web) to benefit from it. One of the primary benefits of this feature is realised when composing functions (for more on this later).<br />For example, assume the following functions: <code>Function&lt;Foo, Foo&gt; foo()</code> and <code>Function&lt;Bar, Bar&gt; bar()</code> composed as <code>foo|bar</code>. While it would not work in the previous versions given type incompatibility between output of one and input of another, it is supported now providing the appropriate <em>conversion strategies</em> are available.<br />Such <em>conversion strategies</em> are standard Spring&rsquo;s <code>ConversionService</code> and <code>MessageConverters</code>. And while we&rsquo;re still in the process of refining this feature and providing detailed documentation, the <code>ConversionService</code> and <code>MessageConverters</code> that work for most cases (e.g., JSON) are already initialised by default.</p>
+<p>For example, assume the following function configuration:</p>
+<pre><code class="prettyprint java">@Bean
+public Function&lt;Person, Person&gt; uppercasePerson() {
+  return person -&gt; {
+    return new Person(person.getName().toUpperCase(), person.getId());
+  };
+}
+</code></pre>
+<p>To benefit from <code>MessageConverters</code> we can invoke this function as <code>Function&lt;Message&lt;String&gt;, Person&gt;</code> (or byte[] as a payload) thus employing the available JSON <code>MessageConverter</code> to convert <code>String</code> to <code>Person</code> (see below).</p>
+<pre><code class="prettyprint java">Function&lt;Message&lt;String&gt;, Person&gt; uppercasePerson = catalog.lookup(&quot;uppercasePerson&quot;);
+Person person =  uppercasePerson.apply(MessageBuilder.withPayload(&quot;{\&quot;name\&quot;:\&quot;bill\&quot;,\&quot;id\&quot;:2}&quot;).build()); 
+</code></pre>
+<p>Keep in mind that for functions written using reactive style nothing changes and the same <em>conversion strategies</em> are applied.</p><h5><a href="#function-composition-and-adaptation" class="anchor" name="function-composition-and-adaptation"></a>Function composition and adaptation;</h5>
+<p>While function composition is not a new feature to Spring Cloud Function, it was refined with this milestone. </p>
+<p>As before, you can compose functions via &ldquo;|&rdquo; or &quot;,” characters. </p>
+<p>As an additional benefit you can compose functions with different programming styles (e.g., reactive and imperative), you can compose <em>Supplier</em> with <em>Function</em>, <em>Supplier</em> with <em>Consumer</em>, <em>Function</em> with <em>Consumer</em> etc., - we will adapt.<br />You can compose functions where output of the producer function does not match the input of the consumer function - we will convert.<br />There will be a separate blog on this subject in the future and we&rsquo;re also in the process of refining documentation.</p><h4><a href="#next-steps" class="anchor" name="next-steps"></a>Next Steps</h4>
+<p>As always, we welcome feedback and contributions, so please reach out to us on <a href="https://stackoverflow.com/questions/tagged/spring-cloud-function">Stackoverflow</a> or <a href="https://github.com/spring-cloud/spring-cloud-function/">GitHub</a> . </p>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3773;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

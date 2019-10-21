@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Getting started with Activiti and Spring Boot</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Getting started with Activiti and Spring Boot" />
+<meta name="twitter:description" content="&lt;blockquote&gt;
+ &lt;p&gt;This post is a guest post by Activiti co-founder and community &lt;a href=&quot;https://twitter.com/jbarrez&quot;&gt;member Joram Barrez (@jbarrez)&lt;/a&gt; who works for Alfresco. Thanks Joram! I’d like to see more of these community guest posts, so - as usual - don’t hesitate to &lt;a href=&quot;http://twitter.com/starbuxman&quot;&gt;ping me (@starbuxman)&lt;/a&gt; with ideas and contributions! -Josh&lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2&gt;&lt;a href=&quot;#introduction&quot; class=&quot;anchor&quot; name=&quot;introduction&quot;&gt;&lt;/a&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Activiti is an Apache-licensed business process management (BPM) engine. Such an engine has as core goal to take a process definition comprised of human tasks and service calls and execute those in a certain order, while exposing various API’s to start, manage and query data about process instances for that definition. Contrary to many of its competitors, Activiti is lightweight and integrates easily with any Java technology or project. All that, and it works at any scale - from just a few dozen to many thousands or even millions of process executions.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Getting started with Activiti and Spring Boot" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;blockquote&gt;
+ &lt;p&gt;This post is a guest post by Activiti co-founder and community &lt;a href=&quot;https://twitter.com/jbarrez&quot;&gt;member Joram Barrez (@jbarrez)&lt;/a&gt; who works for Alfresco. Thanks Joram! I’d like to see more of these community guest posts, so - as usual - don’t hesitate to &lt;a href=&quot;http://twitter.com/starbuxman&quot;&gt;ping me (@starbuxman)&lt;/a&gt; with ideas and contributions! -Josh&lt;/p&gt; 
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h2&gt;&lt;a href=&quot;#introduction&quot; class=&quot;anchor&quot; name=&quot;introduction&quot;&gt;&lt;/a&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Activiti is an Apache-licensed business process management (BPM) engine. Such an engine has as core goal to take a process definition comprised of human tasks and service calls and execute those in a certain order, while exposing various API’s to start, manage and query data about process instances for that definition. Contrary to many of its competitors, Activiti is lightweight and integrates easily with any Java technology or project. All that, and it works at any scale - from just a few dozen to many thousands or even millions of process executions.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-03-08 23:15:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Getting started with Activiti and Spring Boot</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-03-08 23:15:00.0">March 08, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2010" href="/blog/2015/03/08/getting-started-with-activiti-and-spring-boot#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><blockquote><p>This post is a guest post by Activiti co-founder and community <a href="https://twitter.com/jbarrez">member Joram Barrez (@jbarrez)</a> who works for Alfresco. Thanks Joram! I&rsquo;d like to see more of these community guest posts, so - as usual - don&rsquo;t hesitate to <a href="https://twitter.com/starbuxman">ping me (@starbuxman)</a> with ideas and contributions! -Josh</p>
+</blockquote>
+<hr /><h2><a href="#introduction" class="anchor" name="introduction"></a>Introduction</h2><p>Activiti is an Apache-licensed business process management (BPM) engine. Such an engine has as core goal to take a process definition comprised of human tasks and service calls and execute those in a certain order, while exposing various API&rsquo;s to start, manage and query data about process instances for that definition. Contrary to many of its competitors, Activiti is lightweight and integrates easily with any Java technology or project. All that, and it works at any scale - from just a few dozen to many thousands or even millions of process executions.</p><p><img src="https://raw.githubusercontent.com/joshlong/meh/master/activiti/activiti-logo.png" /></p><p>The source code of Activiti can be found on <a href="https://github.com/Activiti/Activiti">Github</a>. The project was founded and is sponsored by <a href="http://www.alfresco.com">Alfresco</a>, but enjoys contributions from all across the globe and industries.</p><p>A process definition is typically visualized as a flow-chart-like diagram. In recent years, the BPMN 2.0 standard (an OMG standard, like UML) has become the de-facto &lsquo;language&rsquo; of these diagrams. This standard defines how a certain shape on the diagram should be interpreted, both technically and business-wise and how it is stored, as a not-so-hipster XML file.. but luckily most of the tooling hides this for you. This is a standard, and you can use any number of compliant tools to design (and even run) your BPMN processes. That said, if you&rsquo;re asking me, there is no better choice than Activiti!</p><h2><a href="#spring-boot-integration" class="anchor" name="spring-boot-integration"></a>Spring Boot integration</h2><p>Activiti and Spring play nicely together. The convention-over-configuration approach in Spring Boot works nicely with Activiti&rsquo;s process engine is setup and use. Out of the box, you only need a database, as process executions can span anywhere from a few seconds to a couple of years. Obviously, as an intrinsic part of a process definition is calling and consuming data to and from various systems with all kinds of technologies. The simplicity of adding the needed dependencies and integrating various pieces of (boiler-plate) logic with Spring Boot really makes this child&rsquo;s play.</p><p>Using Spring Boot and Activiti in a microservice approach also makes a lot of sense. Spring Boot makes it easy to get a production-ready service up and running in no time and - in a distributed microservice architecture - Activiti processes can glue together various microservices while also weaving in human workflow (tasks and forms) to achieve a certain goal.</p><p>The Spring Boot integration in Activiti was created by Spring expert <a href="https://twitter.com/starbuxman">Josh Long</a>. Josh and I <a href="https://www.youtube.com/watch?v=0PV_8Lew3vg">did a webinar a couple of months ago</a> that should give you a good insight into the basics of the Activiti integration for Spring Boot. The <a href="http://activiti.org/userguide/index.html#springSpringBoot">Activiti user guide section on Spring Boot</a> is also a great starting place to get more information.</p><h2><a href="#getting-started" class="anchor" name="getting-started"></a>Getting Started</h2><p>The code for this example can be <a href="https://github.com/jbarrez/spring-boot-with-activiti-example">found in my Github repository</a>.</p><p>The process we&rsquo;ll implement here is a hiring process for a developer. It&rsquo;s simplified of course (as it needs to fit on this web page), but you should get the core concepts. Here&rsquo;s the diagram:</p><p><img src="https://raw.githubusercontent.com/joshlong/meh/master/activiti/hire-process.png" /> </p><p>As said in the introduction, all shapes here have a very specific interpretation thanks to the BPMN 2.0 standard. But even without knowledge of BPMN, the process is pretty easy to understand:</p>
+<ul>
+<li>When the process starts, the resume of the job applicant is stored in an external system.</li>
+<li>The process then waits until a telephone interview has been conducted. This is done by a user (see the little icon of a person in the corner).</li>
+<li>If the telephone interview wasn&rsquo;t all that, a polite rejection email is sent. Otherwise, both a tech interview and financial negotiation should happen.</li>
+<li>Note that at any point, the applicant can cancel. That&rsquo;s shown in the diagram as the event on the boundary of the big rectangle. When the event happens, everything inside will be killed and the process halts.</li>
+<li>If all goes well, a welcome email is sent.</li>
+</ul><p>This is the <a href="https://github.com/jbarrez/spring-boot-with-activiti-example/blob/master/src/main/resources/processes/Developer_Hiring.bpmn20.xml">BPMN for this process</a></p><p>Let&rsquo;s create a new Maven project, and add the dependencies needed to get Spring Boot, Activiti and a database. We&rsquo;ll use an in memory database to keep things simple.</p>
+<pre><code class="prettyprint xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.activiti&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-basic&lt;/artifactId&gt;
+    &lt;version&gt;${activiti.version}&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+    &lt;artifactId&gt;h2&lt;/artifactId&gt;
+    &lt;version&gt;1.4.185&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>So only two dependencies is what is needed to create a very first Spring Boot + Activiti application:</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+public class MyApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(MyApp.class, args);
+    } 
+}
+</code></pre><p>You could already run this application, it won&rsquo;t do anything functionally but behind the scenes it already</p>
+<ul>
+<li>creates an in-memory H2 database</li>
+<li>creates an Activiti process engine using that database</li>
+<li>exposes all Activiti services as Spring Beans</li>
+<li>configures tidbits here and there such as the Activiti async job executor, mail server, etc.</li>
+</ul><p>Let&rsquo;s get something running. Drop the BPMN 2.0 process definition into the <code>src/main/resources/processes</code> folder. All processes placed here will automatically be deployed (ie. parsed and made to be executable) to the Activiti engine. Let&rsquo;s keep things simple to start, and create a <code>CommanLineRunner</code> that will be executed when the app boots up:</p>
+<pre><code class="prettyprint java">@Bean
+CommandLineRunner init( final RepositoryService repositoryService,
+                              final RuntimeService runtimeService,
+                              final TaskService taskService) {
+
+    return new CommandLineRunner() {
+
+        public void run(String... strings) throws Exception {
+            Map&lt;String, Object&gt; variables = new HashMap&lt;String, Object&gt;();
+            variables.put(&quot;applicantName&quot;, &quot;John Doe&quot;);
+            variables.put(&quot;email&quot;, &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7f15101711511b101a3f1e1c0b1609160b16511c1012">[email&#160;protected]</a>&quot;);
+            variables.put(&quot;phoneNumber&quot;, &quot;123456789&quot;);
+            runtimeService.startProcessInstanceByKey(&quot;hireProcess&quot;, variables);
+        }
+    };
+}
+</code></pre><p>So what&rsquo;s happening here is that we create a map of all the variables needed to run the process and pass it when starting process. If you&rsquo;d check the process definition you&rsquo;ll see we reference those variables using <code>${variableName}</code> in many places (such as the task description).</p><p>The first step of the process is an automatic step (see the little cogwheel icon), implemented using an expression that uses a Spring Bean:</p><p><img src="https://raw.githubusercontent.com/joshlong/meh/master/activiti/servicetask.png" /> </p><p>which is implemented with</p>
+<pre><code class="prettyprint">activiti:expression=&quot;${resumeService.storeResume()}&quot;
+</code></pre><p>Of course, we need that bean or the process would not start. So let&rsquo;s create it:</p>
+<pre><code class="prettyprint">@Component
+public class ResumeService {
+
+    public void storeResume() {
+        System.out.println(&quot;Storing resume ...&quot;);
+    }
+
+}
+</code></pre><p>When running the application now, you&rsquo;ll see that the bean is called:</p>
+<pre><code class="prettyprint">  .   ____          _            __ _ _
+ /\\ / ___&#39;_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | &#39;_ | &#39;_| | &#39;_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  &#39;  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v1.2.0.RELEASE)
+
+2015-02-16 11:55:11.129  INFO 304 --- [           main] MyApp                                    : Starting MyApp on The-Activiti-Machine.local with PID 304 ...
+Storing resume ...
+2015-02-16 11:55:13.662  INFO 304 --- [           main] MyApp                                    : Started MyApp in 2.788 seconds (JVM running for 3.067)
+</code></pre><p>And that&rsquo;s it! Congrats with running your first process instance using Activiti in Spring Boot!</p><p>Let&rsquo;s spice things up a bit, and add following dependency to our pom.xml:</p>
+<pre><code class="prettyprint xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.activiti&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-rest-api&lt;/artifactId&gt;
+    &lt;version&gt;${activiti.version}}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>Having this on the classpath does a nifty thing: it takes the Activiti REST API (which is written in Spring MVC) and exposes this fully in your application. The REST API of Activiti <a href="http://activiti.org/userguide/index.html#_rest_api">is fully documented in the Activiti User Guide</a>.</p><p>The REST API is secured by basic auth, and won&rsquo;t have any users by default. Let&rsquo;s add an admin user to the system as shown below (add this to the MyApp class). Don&rsquo;t do this in a production system of course, there you&rsquo;ll want to hook in the authentication to LDAP or something else.</p>
+<pre><code class="prettyprint java">@Bean
+InitializingBean usersAndGroupsInitializer(final IdentityService identityService) {
+
+    return new InitializingBean() {
+        public void afterPropertiesSet() throws Exception {
+
+            Group group = identityService.newGroup(&quot;user&quot;);
+            group.setName(&quot;users&quot;);
+            group.setType(&quot;security-role&quot;);
+            identityService.saveGroup(group);
+
+            User admin = identityService.newUser(&quot;admin&quot;);
+            admin.setPassword(&quot;admin&quot;);
+            identityService.saveUser(admin);
+
+        }
+    };
+}
+</code></pre><p>Start the application. We can now start a process instance as we did in the CommandLineRunner, but now using REST:</p>
+<pre><code class="prettyprint sh">curl -u admin:admin -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;processDefinitionKey&quot;:&quot;hireProcess&quot;, &quot;variables&quot;: [ {&quot;name&quot;:&quot;applicantName&quot;, &quot;value&quot;:&quot;John Doe&quot;}, {&quot;name&quot;:&quot;email&quot;, &quot;value&quot;:&quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bed4d1d6d090dad1dbfedfd2d8ccdbcdddd190ddd1d3">[email&#160;protected]</a>&quot;}, {&quot;name&quot;:&quot;phoneNumber&quot;, &quot;value&quot;:&quot;1234567&quot;} ]}&#39; http://localhost:8080/runtime/process-instances
+</code></pre><p>Which returns us the json representation of the process instance:</p>
+<pre><code class="prettyprint sh">{
+     &quot;tenantId&quot;: &quot;&quot;,
+     &quot;url&quot;: &quot;http://localhost:8080/runtime/process-instances/5&quot;,
+     &quot;activityId&quot;: &quot;sid-42BAE58A-8FFB-4B02-AAED-E0D8EA5A7E39&quot;,
+     &quot;id&quot;: &quot;5&quot;,
+     &quot;processDefinitionUrl&quot;: &quot;http://localhost:8080/repository/process-definitions/hireProcess:1:4&quot;,
+     &quot;suspended&quot;: false,
+     &quot;completed&quot;: false,
+     &quot;ended&quot;: false,
+     &quot;businessKey&quot;: null,
+     &quot;variables&quot;: [],
+     &quot;processDefinitionId&quot;: &quot;hireProcess:1:4&quot;
+}
+</code></pre><p>I just want to stand still for a moment how cool this is. Just by adding one dependency, you&rsquo;re getting the whole Activiti REST API embedded in your application!</p><p>Let&rsquo;s make it even cooler, and add following dependency</p>
+<pre><code class="prettyprint">&lt;dependency&gt;
+    &lt;groupId&gt;org.activiti&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+    &lt;version&gt;${activiti.version}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>This adds a Spring Boot actuator endpoint for Activiti. If we restart the application, and hit <code>http://localhost:8080/activiti/</code>, we get some basic stats about our processes. With some imagination that in a live system you&rsquo;ve got many more process definitions deployed and executing, you can see how this is useful.</p><p>The same actuator is also registered as a JMX bean exposing similar information.</p>
+<pre><code class="prettyprint json">{
+    completedTaskCountToday: 0,
+    deployedProcessDefinitions: [
+       &quot;hireProcess (v1)&quot;
+    ],
+    processDefinitionCount: 1,
+   cachedProcessDefinitionCount: 1,
+   runningProcessInstanceCount: {
+       hireProcess (v1): 0
+    },
+    completedTaskCount: 0,
+    completedActivities: 0,
+    completedProcessInstanceCount: {
+        hireProcess (v1): 0
+    },
+    openTaskCount: 0
+}
+</code></pre><p>To finish our coding, let&rsquo;s create a dedicated REST endpoint for our hire process, that could be consumed by for example a javascript web application (out of scope for this article). So most likely, we&rsquo;ll have a form for the applicant to fill in the details we&rsquo;ve been passing programmatically above. And while we&rsquo;re at it, let&rsquo;s store the applicant information as a JPA entity. In that case, the data won&rsquo;t be stored in Activiti anymore, but in a separate table and referenced by Activiti when needed.</p><p>You probably guessed it by now, JPA support is enabled by adding a dependency:</p>
+<pre><code class="prettyprint xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.activiti&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-jpa&lt;/artifactId&gt;
+    &lt;version&gt;${activiti.version}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>and add the entity to the MyApp class:</p>
+<pre><code class="prettyprint java"><br />@Entity
+class Applicant {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    private String email;
+
+    private String phoneNumber;
+
+    // Getters and setters
+
+</code></pre><p>We&rsquo;ll also need a Repository for this Entity (put this in a separate file or also in MyApp). No need for any methods, the Repository magic from Spring will generate the methods we need for us.</p>
+<pre><code class="prettyprint java">public interface ApplicantRepository extends JpaRepository&lt;Applicant, Long&gt; {
+  // .. 
+}
+</code></pre><p>And now we can create the dedicated REST endpoint:</p>
+<pre><code class="prettyprint java "><br />@RestController
+public class MyRestController {
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private ApplicantRepository applicantRepository;
+
+    @RequestMapping(value=&quot;/start-hire-process&quot;, method= RequestMethod.POST, produces= MediaType.APPLICATION_JSON_VALUE)
+    public void startHireProcess(@RequestBody Map&lt;String, String&gt; data) {
+
+        Applicant applicant = new Applicant(data.get(&quot;name&quot;), data.get(&quot;email&quot;), data.get(&quot;phoneNumber&quot;));
+        applicantRepository.save(applicant);
+
+        Map&lt;String, Object&gt; variables = new HashMap&lt;String, Object&gt;();
+        variables.put(&quot;applicant&quot;, applicant);
+        runtimeService.startProcessInstanceByKey(&quot;hireProcessWithJpa&quot;, variables);
+    } 
+}
+</code></pre><p>Note we&rsquo;re now using a slightly different process called &lsquo;hireProcessWithJpa&rsquo;, which has a few tweaks in it to cope with the fact the data is now in a JPA entity. So for example, we can&rsquo;t use ${applicantName} anymore, but we now have to use ${applicant.name}.</p><p>Let&rsquo;s restart the application and start a new process instance:</p>
+<pre><code class="prettyprint sh">curl -u admin:admin -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;name&quot;:&quot;John Doe&quot;, &quot;email&quot;: &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fd97929593d3999298bd9c919b8f988e9e92d39e9290">[email&#160;protected]</a>&quot;, &quot;phoneNumber&quot;:&quot;123456789&quot;}&#39; http://localhost:8080/start-hire-process
+</code></pre><p>We can now go through our process. You could create a custom endpoints for this too, exposing different task queries with different forms &hellip; but I&rsquo;ll leave this to your imagination and use the default Activiti REST end points to walk through the process.</p><p>Let&rsquo;s see which task the process instance currently is at (you could pass in more detailed parameters here, for example the &lsquo;processInstanceId&rsquo; for better filtering):</p>
+<pre><code class="prettyprint sh">curl -u admin:admin -H &quot;Content-Type: application/json&quot; http://localhost:8080/runtime/tasks
+</code></pre><p>which returns</p>
+<pre><code class="prettyprint json">{
+     &quot;order&quot;: &quot;asc&quot;,
+     &quot;size&quot;: 1,
+     &quot;sort&quot;: &quot;id&quot;,
+     &quot;total&quot;: 1,
+     &quot;data&quot;: [{
+          &quot;id&quot;: &quot;14&quot;,
+          &quot;processInstanceId&quot;: &quot;8&quot;,
+          &quot;createTime&quot;: &quot;2015-02-16T13:11:26.078+01:00&quot;,
+          &quot;description&quot;: &quot;Conduct a telephone interview with John Doe. Phone number = 123456789&quot;,
+          &quot;name&quot;: &quot;Telephone interview&quot;
+          ...
+     }],
+     &quot;start&quot;: 0
+}
+</code></pre><p>So, our process is now at the <code>Telephone interview</code>. In a realistic application, there would be a task list and a form that could be filled in to complete this task. Let&rsquo;s complete this task (we have to set the <code>telephoneInterviewOutcome</code> variable as the exclusive gateway uses it to route the execution):</p>
+<pre><code class="prettyprint sh">curl -u admin:admin -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;action&quot; : &quot;complete&quot;, &quot;variables&quot;: [ {&quot;name&quot;:&quot;telephoneInterviewOutcome&quot;, &quot;value&quot;:true} ]}&#39; http://localhost:8080/runtime/tasks/14
+</code></pre><p>When we get the tasks again now, the process instance will have moved on to the two tasks in parallel in the subprocess (big rectangle):</p>
+<pre><code class="prettyprint json">{
+     &quot;order&quot;: &quot;asc&quot;,
+     &quot;size&quot;: 2,
+     &quot;sort&quot;: &quot;id&quot;,
+     &quot;total&quot;: 2,
+     &quot;data&quot;: [
+          {
+              ...
+               &quot;name&quot;: &quot;Tech interview&quot;
+          },
+          {
+              ...
+               &quot;name&quot;: &quot;Financial negotiation&quot;
+          }
+     ],
+     &quot;start&quot;: 0
+}
+</code></pre><p>We can now continue the rest of the process in a similar fashion, but I&rsquo;ll leave that to you to play around with.</p><h2><a href="#testing" class="anchor" name="testing"></a>Testing</h2><p>One of the strengths of using Activiti for creating business processes is that everything is simply Java. As a consequence, processes can be tested as regular Java code with unit tests. Spring Boot makes writing such test a breeze.</p><p>Here&rsquo;s how the unit test for the &ldquo;happy path&rdquo; looks like (while omitting <code>@Autowired</code> fields and test e-mail server setup). The code also shows the use of the Activiti API&rsquo;s for querying tasks for a given group and process instance.</p>
+<pre><code class="prettyprint java">@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = {MyApp.class})
+@WebAppConfiguration
+@IntegrationTest
+public class HireProcessTest {
+
+    @Test
+    public void testHappyPath() {
+
+        // Create test applicant
+        Applicant applicant = new Applicant(&quot;John Doe&quot;, &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="355f5a5d5b755456415c435c415c1b5a4752">[email&#160;protected]</a>&quot;, &quot;12344&quot;);
+        applicantRepository.save(applicant);
+
+        // Start process instance
+        Map&lt;String, Object&gt; variables = new HashMap&lt;String, Object&gt;();
+        variables.put(&quot;applicant&quot;, applicant);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(&quot;hireProcessWithJpa&quot;, variables);
+
+        // First, the &#39;phone interview&#39; should be active
+        Task task = taskService.createTaskQuery()
+                .processInstanceId(processInstance.getId())
+                .taskCandidateGroup(&quot;dev-managers&quot;)
+                .singleResult();
+        Assert.assertEquals(&quot;Telephone interview&quot;, task.getName());
+
+        // Completing the phone interview with success should trigger two new tasks
+        Map&lt;String, Object&gt; taskVariables = new HashMap&lt;String, Object&gt;();
+        taskVariables.put(&quot;telephoneInterviewOutcome&quot;, true);
+        taskService.complete(task.getId(), taskVariables);
+
+        List&lt;Task&gt; tasks = taskService.createTaskQuery()
+                .processInstanceId(processInstance.getId())
+                .orderByTaskName().asc()
+                .list();
+        Assert.assertEquals(2, tasks.size());
+        Assert.assertEquals(&quot;Financial negotiation&quot;, tasks.get(0).getName());
+        Assert.assertEquals(&quot;Tech interview&quot;, tasks.get(1).getName());
+
+        // Completing both should wrap up the subprocess, send out the &#39;welcome mail&#39; and end the process instance
+        taskVariables = new HashMap&lt;String, Object&gt;();
+        taskVariables.put(&quot;techOk&quot;, true);
+        taskService.complete(tasks.get(0).getId(), taskVariables);
+
+        taskVariables = new HashMap&lt;String, Object&gt;();
+        taskVariables.put(&quot;financialOk&quot;, true);
+        taskService.complete(tasks.get(1).getId(), taskVariables);
+
+        // Verify email
+        Assert.assertEquals(1, wiser.getMessages().size());
+
+        // Verify process completed
+        Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+
+    }
+</code></pre><h2><a href="#next-steps" class="anchor" name="next-steps"></a>Next steps</h2>
+<ul>
+<li>We haven&rsquo;t touched any of the tooling around Activiti. There is a bunch more than just the engine, like the Eclipse plugin to design processes, a free web <a href="https://activiti.alfresco.com">editor</a> in the cloud (also included in the <code>.zip</code> download you can get from <a href="http://activiti.org/"><code>Activiti&#39;s</code> site</a>, a web application that showcases many of the features of the engine, &hellip;</li>
+<li>The current release of Activiti (version 5.17.0) has integration with Spring Boot 1.1.6. However, the current master version is compatible with 1.2.1.</li>
+<li>Using Spring Boot 1.2.0 brings us sweet stuff like support for XA transactions with JTA. This means you can hook up your processes easily with JMS, JPA and Activiti logic all in the same transaction! ..Which brings us to the next point &hellip;</li>
+<li>In this example, we&rsquo;ve focussed heavily on human interactions (and barely touched it). But there&rsquo;s many things you can do around orchestrating systems too. The Spring Boot integration also has Spring Integration support you could leverage to do just that in a very neat way!</li>
+<li>And of course there is much much more about the BPMN 2.0 standard. Read more about it <a href="http://activiti.org/userguide/index.html#bpmnConstructs">in the Activiti docs</a>.</li>
+</ul></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2010;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

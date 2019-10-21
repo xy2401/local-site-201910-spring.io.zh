@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Introducing Spring Social&#39;s Service Provider Framework</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Introducing Spring Social&#39;s Service Provider Framework" />
+<meta name="twitter:description" content="&lt;p&gt;In my &lt;a href=&quot;http://blog.springsource.com/2010/11/03/socializing-spring-applications/&quot;&gt;previous post&lt;/a&gt;, I introduced you to Spring Social&#39;s Java bindings to popular Software-as-a-Service (SaaS) APIs such as Twitter, Facebook, LinkedIn, and TripIt. In addition to providing simple, strongly-typed Java methods for common API operations, these bindings ensure each HTTP request includes the credentials required to authorize your application to invoke the API on behalf of a user.&lt;/p&gt;
+&lt;p&gt;What my first post did not address was: &lt;em&gt;how do we manage the credentials required to invoke service APIs on behalf of users?&lt;/em&gt; I&#39;m pleased to say that we now have answers to that question.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@habuma" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200" />
+
+<meta property="og:title" content="Introducing Spring Social&#39;s Service Provider Framework" />
+<meta property="og:image" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200" />
+<meta property="og:description" content="&lt;p&gt;In my &lt;a href=&quot;http://blog.springsource.com/2010/11/03/socializing-spring-applications/&quot;&gt;previous post&lt;/a&gt;, I introduced you to Spring Social&#39;s Java bindings to popular Software-as-a-Service (SaaS) APIs such as Twitter, Facebook, LinkedIn, and TripIt. In addition to providing simple, strongly-typed Java methods for common API operations, these bindings ensure each HTTP request includes the credentials required to authorize your application to invoke the API on behalf of a user.&lt;/p&gt;
+&lt;p&gt;What my first post did not address was: &lt;em&gt;how do we manage the credentials required to invoke service APIs on behalf of users?&lt;/em&gt; I&#39;m pleased to say that we now have answers to that question.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-03-02 22:20:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Introducing Spring Social&#39;s Service Provider Framework</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/cwalls">Craig Walls</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-03-02 22:20:00.0">March 02, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="401" href="/blog/2011/03/02/introducing-spring-social-s-service-provider-framework#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In my <a href="http://blog.springsource.com/2010/11/03/socializing-spring-applications/">previous post</a>, I introduced you to Spring Social's Java bindings to popular Software-as-a-Service (SaaS) APIs such as Twitter, Facebook, LinkedIn, and TripIt. In addition to providing simple, strongly-typed Java methods for common API operations, these bindings ensure each HTTP request includes the credentials required to authorize your application to invoke the API on behalf of a user.</p>
+<p>What my first post did not address was: <em>how do we manage the credentials required to invoke service APIs on behalf of users?</em> I'm pleased to say that we now have answers to that question.</p>
+<p>Earlier this week, we announced the release of the second milestone of the Spring Social project. The most significant new feature in Spring Social 1.0.0.M2 is the introduction of a Service Provider "Connect" framework. Today I want to introduce you to this framework and show you how to use it to manage "connections" to SaaS providers.</p>
+<p>The examples in this article are from the <a href="https://github.com/SpringSource/spring-social-samples">Spring Social Showcase</a>. To follow along, clone the repository and follow the README to build and deploy the sample app.</p>
+<h3>Getting Spring Social</h3>
+<p>With the M2 release, Spring Social has been split into several modules:</p>
+<ul>
+<li><b>spring-social-core</b> - The service provider framework, OAuth support, and core classes.</li>
+<li><b>spring-social-web</b> - The connect controller and supporting types.</li>
+<li><b>spring-social-facebook</b> - A service provider implementation for connecting with Facebook and support for signing into an application via Facebook.</li>
+<li><b>spring-social-twitter</b> - A service provider implementation for connecting with Twitter and support for signing into an application via Twitter.</li></li>
+<li><b>spring-social-linkedin</b> - A service provider implementation for connecting with LinkedIn.</li>
+<li><b>spring-social-tripit</b> - A service provider implementation for connecting with TripIt.</li>
+<li><b>spring-social-github</b> - A service provider implementation for connecting with GitHub.</li>
+<li><b>spring-social-gowalla</b> - A service provider implementation for connecting with Gowalla.</li>
+<li><b>spring-social-test</b> - Support for testing service provider implementations and API bindings.</li>
+</ul>
+<p>Depending on your needs, you won't necessarily need all of these modules. At a minimum, you'll need the core module. You can add this to a Maven-built project with the following entry:</p>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.social&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-social-core&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.M2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>In the likely case that you'll be using Spring Social in a web application, you'll also need the web module:</p>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.social&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-social-web&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.M2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>Then, you'll need to add one or more of the provider modules. In our examples, we'll be talking about adding Twitter connectivity to an application, so we'll need the twitter module:</p>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.social&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-social-twitter&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.M2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>Since we're building off of a milestone release of Spring Social, we're going to need to add Spring's milestone repository to the pom.xml file:</p>
+<pre><code class="prettyprint xml"><br />&lt;repository&gt;
+	&lt;id&gt;org.springframework.maven.milestone&lt;/id&gt;
+	&lt;name&gt;Spring Maven Milestone Repository&lt;/name&gt;
+	&lt;url&gt;http://maven.springframework.org/milestone&lt;/url&gt;
+	&lt;snapshots&gt;&lt;enabled&gt;false&lt;/enabled&gt;&lt;/snapshots&gt;
+&lt;/repository&gt;
+</code></pre>
+<p>Note that although Spring Social 1.0.0.M2 has a compile-time dependency on Spring Framework 3.1, Spring Social also works fine with Spring Framework 3.0.x.</p>
+<p>With the dependencies addressed in our build, we're ready to add Twitter connectivity to the application.</p>
+<h3>Connecting with Twitter</h3>
+<p>To help understand what Spring Social's Service Provider "Connect" Framework brings to the table, let's take a quick tour through the showcase application.</p>
+<p>After signing into the showcase sample, the first thing you'll see are a list of the service providers that the showcase supports connectivity with: Twitter, Facebook, and TripIt. They should all show that your account is not yet connected to any of them.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase11.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase11.png" alt="" title="showcase1" width="666" height="424" class="alignnone size-full wp-image-8146" /></a></p>
+<p>If you click on the Twitter link, you'll be redirected to a connection status page and be given the opportunity to "Connect with Twitter". You'll also see a checkbox that, if checked, will post a tweet about Spring Social Showcase after connecting to Twitter.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase21.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase21.png" alt="" title="showcase2" width="689" height="447" class="alignnone size-full wp-image-8147" /></a></p>
+<p>After clicking the "Connect with Twitter" button (I'll let you decide whether or not to check the "Post tweet..." checkbox), you'll be redirected to Twitter's authorization page, which should look something like this:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase31.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase31.png" alt="" title="showcase3" width="844" height="584" class="alignnone size-full wp-image-8148" /></a></p>
+<p>The username and password fields won't be shown if you're already signed into Twitter. But in either case, you'll be given an opportunity to deny or allow the showcase example the right to access and update your data on Twitter. When you click on the "Allow" button to grant permission, Twitter will redirect back to the showcase application and a connection will be created between the showcase account and your Twitter profile. You'll be shown a connection status page, this time indicating that a connection exists.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase41.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase41.png" alt="" title="showcase4" width="692" height="439" class="alignnone size-full wp-image-8149" /></a></p>
+<p>At this point, you may choose to disconnect from Twitter if you'd like. But for now, return to the home page and you'll see that you are now connected to Twitter.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase51.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase51.png" alt="" title="showcase5" width="692" height="439" class="alignnone size-full wp-image-8150" /></a></p>
+<p>If you click on the "Twitter" link, with a connection available, you'll be taken to the Twitter Showcase page which displays, among other things, your profile image, Twitter display name, and Twitter screen name. You may also choose to connect another Twitter account from here (you may connect multiple provider accounts to a single application account), disconnect from Twitter, or post a tweet.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase61.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase61.png" alt="" title="showcase6" width="851" height="723" class="alignnone size-full wp-image-8151" /></a></p>
+<h3>The Service Provider "Connect" Framework</h3>
+<p>When you first clicked on the "Twitter" link in the showcase sample, you were shown a status connection page for Twitter. This page is served by Spring Social's <code>ConnectController</code>. <code>ConnectController</code> is a Spring MVC controller that handles the authorization process. In the case of Twitter, that's an OAuth 1 authorization flow. For OAuth 1, <code>ConnectController</code> supports the following flow:</p>
+<ul>
+<li><b>GET /connect/{provider ID}</b> - Displays a page with the connection status.</li>
+<li><b>POST /connect/{provider ID}</b> - Initiates the connection flow, requests a request token from the provider, and redirects to the provider's authorization page.</li>
+<li><b>GET /connect/{provider ID}?oauth_token={request token}&oauth_verifier={verifier}</b> - Handles the callback after authorization, exchanges the request token and verifier for an access token, and creates the connection.</li>
+<li><b>DELETE /connect/{provider ID}</b> - Disconnects from the provider.</li>
+</ul>
+<p><code>ConnectController</code> also supports OAuth 2's authorization flow. When authorizing against an OAuth 2 based provider like Facebook, <code>ConnectController</code>'s flow is slightly different:</p>
+<ul>
+<li><b>GET /connect/{provider ID}</b> - Displays a connection status page</li>
+<li><b>POST /connect/{provider ID}</b> - Initiates authorization with the provider, redirecting to the provider's signin and/or authorization page.</li>
+<li><b>GET /connect/{provider ID}?code={code}</b> - Handles the authorization callback from the provider, exchanges the code for an access token, and creates the connection.</li>
+<li><b>DELETE /connect/{provider ID}</b> - Disconnects from the provider</li>
+</ul>
+<p><code>ConnectController</code> can be configured in a Spring MVC application as simple as adding the following <code>&lt;bean&gt;</code> element:</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.social.web.connect.ConnectController&quot;&gt;
+    &lt;constructor-arg value=&quot;${application.url}&quot; /&gt;
+&lt;/bean&gt;
+</code></pre>
+<p>If you look at how <code>ConnectController</code> is configured in the showcase sample, however, you'll see that it has an <code>interceptors</code> property injected with a list of interceptor beans. Connect interceptors let you inject custom functionality into the connection flow. One of those interceptors, <code>TweetAfterConnectInterceptor</code>, is responsible for posting a tweet after you connect with Twitter. (See the <a href="http://static.springsource.org/spring-social/docs/1.0.0.M2/reference/html/connecting.html#connect-interceptors">reference documentation</a> for more information on connection interceptors.)</p>
+<p>When a request goes to <code>ConnectController</code>, it works with a service provider class to handle the behind-the-scenes interaction with the service. In the case of Twitter, that provider class is <code>TwitterServiceProvider</code> and is configured in Spring like this:</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.social.twitter.connect.TwitterServiceProvider&quot;&gt;
+    &lt;constructor-arg value=&quot;${twitter.appId}&quot; /&gt;
+    &lt;constructor-arg value=&quot;${twitter.appSecret}&quot; /&gt;
+    &lt;constructor-arg ref=&quot;connectionRepository&quot; /&gt;
+&lt;/bean&gt;
+</code></pre>
+<p><code>TwitterServiceProvider</code>, like all of Spring's service provider implementations, is constructed with the following arguments:</p>
+<ul>
+<li>The application's ID or consumer key.</li>
+<li>The application's secret or consumer secret.</li>
+<li>A reference to a connection repository bean used to persist connection details.</li>
+</ul>
+<p>You obtain the application's consumer key and secret when you register the application with the service provider. To register an application with Twitter go to <a href="https://dev.twitter.com/apps/new">https://dev.twitter.com/apps/new</a> and fill out the form. When you're done, Twitter will respond with a page showing details about your application, including the consumer key and consumer secret.</p>
+<p>In this case, the application's Twitter application ID and secret are expressed as placeholder variables to be resolved by a property placeholder configurer. It's recommended that you externalize these details, since you'll likely have a different ID/secret pair for your production deployment than you would for testing and development environments.</p>
+<p>Each of Spring's service provider classes has a provider ID (returned from its <code>getId()</code> method and different than its Spring bean ID). <code>ConnectController</code> will use that ID, as specified in the URL path, to choose the service provider it will work with when creating connections. For <code>TwitterServiceProvider</code>, the provider ID is "twitter". Mapping this ID to <code>ConnectController</code>'s request mappings, we get the following flow:</p>
+<ul>
+<li><b>GET /connect/twitter</b> - Displays the user's connection status with Twitter.</li>
+<li><b>POST /connect/twitter</b> - A request token is retrieved from Twitter and then redirects to the Twitter's authorization page. This is where the flow went to when you clicked the "Connect with Twitter" button.</li>
+<li><b>GET /connect/twitter?oauth_token={request token}&oauth_verifier={verifier}</b> - Handles the callback after authorization, exchanges the request token and verifier for an access token, and creates the connection.</li>
+<li><b>DELETE /connect/twitter</b> - Disconnects from Twitter. This is what happens when you click the "Disconnect" button.</li>
+</ul>
+<p>Once a connection has been established, it's important to store it away for future use so that you won't have to repeatedly ask your users to reauthorize your application. Therefore, <code>TwitterServiceProvider</code> relies on a connection repository to persist the connection information. Spring Social provides <code>JdbcConnectionRepository</code>, which persists connection details in a relational database. The <code>JdbcConnectionRepository</code> bean is configured like this:</p>
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;connectionRepository&quot; class=&quot;org.springframework.social.connect.jdbc.JdbcConnectionRepository&quot;&gt;
+    &lt;constructor-arg ref=&quot;dataSource&quot; /&gt;
+    &lt;constructor-arg ref=&quot;textEncryptor&quot; /&gt;
+&lt;/bean&gt;
+</code></pre>
+<p>The <code>JdbcConnectionRepository</code> depends on a data source through which it will access the database as well as an instance of Spring Security 3.1's <code>TextEncryptor</code> interface. It uses the text encryptor to encrypt the connection credentials (e.g., access token and secret) when storing them in the database. As a sample application, Spring Security's encryption needs are rather light, so it's wired with a no-op text encryptor:</p>
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;textEncryptor&quot; class=&quot;org.springframework.security.crypto.encrypt.Encryptors&quot; 
+      factory-method=&quot;noOpText&quot; /&gt;
+</code></pre>
+<p>(For production-level encryption, consider one of the other encryptors offered by Spring Security's <a href="http://static.springsource.org/spring-security/site/docs/3.1.x/apidocs/org/springframework/security/crypto/encrypt/Encryptors.html">Encryptors</a> static factory class.)</p>
+<h3>Working with connections</h3>
+<p>When you first signed into the Spring Social Showcase, it displayed a list of service providers and indicated that you were not connected with any of them. After going through the connection process with Twitter and returning to that page, it showed that a connection had been established.</p>
+<p>The showcase application's <code>HomeController</code> determines the connection status with each of the providers, by calling their <code>isConnected()</code> method:</p>
+<pre><code class="prettyprint java"><br />for (ServiceProvider&lt;?&gt; serviceProvider : serviceProviders) {
+	boolean connected = serviceProvider.isConnected(currentUser.getName());
+	model.addAttribute(serviceProvider.getId() + &quot;_status&quot;, connected ? &quot;Yes&quot; : &quot;No&quot;);
+}
+</code></pre>
+<p>The <code>isConnected()</code> method will return true if there is one or more connections between the given account and the service provider.</p>
+<p>You may also ask the provider for a list of connections by calling its <code>getConnections()</code> method:</p>
+<pre><code class="prettyprint java"><br />List&lt;ServiceProviderConnection&lt;TwitterApi&gt;&gt; connections = twitterProvider.getConnections(currentUser.getName());
+</code></pre>
+<p>From any one of those connections, you may retrieve the service API. For example, to get an instance of <code>TwitterApi</code> from the first connection:</p>
+<pre><code class="prettyprint java"><br />TwitterApi twitter = connections.get(0).getServiceApi();
+</code></pre>
+<p>With that <code>TwitterApi</code> object you may interact with Twitter, fetching timeline entries, posting tweets, or any of the other operations defined in the <code>TwitterApi</code> interface.</p>
+<p>A key thing to notice here is that at no point is it necessary for application code to deal directly with access tokens and secrets in order to interact with the service. The service provider framework deals with those details under the covers.</p>
+<h3>Summary</h3>
+<p>Spring Social 1.0.0.M2 brings a service provider framework to the table that greatly simplifies an application's role in obtaining authorization to access a service on behalf of a user and connecting the user's local application account to their account on the provider. Adding connection capabilities to a Spring application involves configuring a service provider as a bean in the Spring application context and Spring Social's <code>ConnectController</code> to handle the authorization process. The <a href="http://static.springsource.org/spring-social/docs/1.0.0.M2/reference/html/serviceprovider.html" target="_blank">reference documentation</a> has more information on using Spring Social's service provider framework.</p>
+<p>Although Spring Social 1.0.0.M2 only offers service provider implementations for 6 providers (Facebook, Twitter, LinkedIn, TripIt, GitHub, and Gowalla), the framework is easily extensible. In a followup article, I'll show you what goes into writing a custom service provider implementation, enabling you to use Spring Social's connection support for any provider you need to connect to.</p><p><p>As always, we are very interested in hearing your feedback. We encourage you to collaborate with us in the <a href="http://forum.springsource.org/forumdisplay.php?f=82" target="_blank">forum</a> or by submitting enhancement requests in <a href="http://jira.springsource.org/browse/SOCIAL" target="_blank">issue tracking</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 401;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+ <div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

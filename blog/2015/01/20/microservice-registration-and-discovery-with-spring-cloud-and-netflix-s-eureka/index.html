@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Microservice  Registration and Discovery with Spring Cloud and Netflix&#39;s Eureka</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Microservice  Registration and Discovery with Spring Cloud and Netflix&#39;s Eureka" />
+<meta name="twitter:description" content="&lt;p&gt;The microservice style of architecture is not so much about building individual services so much as it is making the &lt;em&gt;interactions between&lt;/em&gt; services reliable and failure-tolerant. While the focus on these interactions is new, the need for that focus is not. We’ve long known that services don’t operate in a vacuum. Even before cloud economics, we knew that - in a practical world - clients should be designed to be immune to service outages. The cloud makes it easy to think of capacity as ephemeral, fluid. The burden is on the client to manage this intrinsic complexity.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Microservice  Registration and Discovery with Spring Cloud and Netflix&#39;s Eureka" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;The microservice style of architecture is not so much about building individual services so much as it is making the &lt;em&gt;interactions between&lt;/em&gt; services reliable and failure-tolerant. While the focus on these interactions is new, the need for that focus is not. We’ve long known that services don’t operate in a vacuum. Even before cloud economics, we knew that - in a practical world - clients should be designed to be immune to service outages. The cloud makes it easy to think of capacity as ephemeral, fluid. The burden is on the client to manage this intrinsic complexity.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-01-20 09:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Microservice Registration and Discovery with Spring Cloud and Netflix&#39;s Eureka</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-01-20 09:00:00.0">January 20, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1934" href="/blog/2015/01/20/microservice-registration-and-discovery-with-spring-cloud-and-netflix-s-eureka#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>The microservice style of architecture is not so much about building individual services so much as it is making the <em>interactions between</em> services reliable and failure-tolerant. While the focus on these interactions is new, the need for that focus is not. We&rsquo;ve long known that services don&rsquo;t operate in a vacuum. Even before cloud economics, we knew that - in a practical world - clients should be designed to be immune to service outages. The cloud makes it easy to think of capacity as ephemeral, fluid. The burden is on the client to manage this intrinsic complexity.</p><p>In this post, we&rsquo;ll look at how <a href="https://cloud.spring.io">Spring Cloud</a> helps you manage that complexity with a service registry like Eureka and Consul and client-side load-balancing.</p><h2><a href="#the-cloud-rsquo-s-phone-book" class="anchor" name="the-cloud-rsquo-s-phone-book"></a>The Cloud&rsquo;s Phone Book</h2><p>A service registry is a phone book for your microservices. Each service registers itself with the service registry and tells the registry where it lives (host, port, node name) and perhaps other service-specific metadata - things that other services can use to make informed decisions about it. Clients can ask questions about the service topology (&ldquo;are there any &lsquo;fulfillment-services&rsquo; available, and if so, where?&rdquo;) and service capabilities (&ldquo;can you handle X, Y, and Z?&rdquo;). You probably already use a technology that has some notion of a cluster (Cassandra, Memcached, etc.), and that information is ideally stored in a service registry.</p><p>There <a href="http://jasonwilder.com/blog/2014/02/04/service-discovery-in-the-cloud/">are several popular options for service registries</a>. Netflix built and then open-sourced their own service registry, <a href="https://github.com/netflix/eureka">Eureka</a>. Another new, but increasingly popular option is <a href="https://consul.io">Consul</a>. We&rsquo;ll look principally at some of the integration between Spring Cloud and Netflix&rsquo;s Eureka service registry.</p><p>From the <a href="https://projects.spring.io/spring-cloud/">the Spring Cloud project page</a>: &ldquo;Spring Cloud provides tools for developers to quickly build some of the common patterns in distributed systems (e.g. configuration management, service discovery, circuit breakers, intelligent routing, micro-proxy, control bus, one-time tokens, global locks, leadership election, distributed sessions, cluster state). Coordination of distributed systems leads to boiler plate patterns, and using Spring Cloud developers can quickly stand up services and applications that implement those patterns. They will work well in any distributed environment, including the developer&rsquo;s own laptop, bare metal data centres, and managed platforms such as Cloud Foundry.&rdquo;</p><p>Spring Cloud already supports both Eureka and Consul, though I&rsquo;ll focus on Eureka in this post because it can be bootstrapped automatically in one of Spring Cloud&rsquo;s auto-configurations. Eureka is implemented on the JVM but Consul is implemented in Go.</p><h2><a href="#installing-eureka" class="anchor" name="installing-eureka"></a>Installing Eureka</h2><p>Standing up an instance of the Eureka service registry is easy if you have <code>org.springframework.boot:spring-cloud-starter-eureka-server</code> on your classpath.</p>
+<pre><code class="prettyprint java">package registry;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer
+public class Application {
+
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }
+}
+
+</code></pre><p>My nominal <code>src/main/resources/application.yml</code> looks like this these days.</p>
+<pre><code class="prettyprint yml">server:
+  port: ${PORT:8761}
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    server:
+      waitTimeInMsWhenSyncEmpty: 0
+
+</code></pre><p>The service&rsquo;s port is defaulted to the well-known 8761 if <a href="http://cloudfoundry.org/index.html">Cloud Foundry</a>&rsquo;s <code>VCAP_APPLICATION_PORT</code> environment variable isn&rsquo;t available. The rest of the configuration simply tells this instance to not register itself with the Eureka instance it finds, because that instance is.. itself. If you run it locally, you can point a browser to <code>http://localhost:8761</code> and monitor the registry from there.</p><h2><a href="#deploying-eureka" class="anchor" name="deploying-eureka"></a>Deploying Eureka</h2><p>Spring Cloud will startup a <a href="https://projects.spring.io/spring-cloud/spring-cloud.html#spring-cloud-eureka-server"> Eureka instance with its Spring Boot auto-configuration</a>. There are a couple of things to consider when deploying Eureka. First, you should <em>always</em> use a highly-available configuration in production. <a href="https://github.com/spring-cloud-samples/eureka">The Spring Cloud Eureka sample</a> shows how to deploy it in a highly-available configuration.</p><p>Clients need to know where to find the Eureka instance. If you have DNS then that might be one option, if you&rsquo;re not polluting too large a global namespace. If you&rsquo;re <a href="http://12factor.net/">running in a Platform-as-a-Service and embracing 12-Factor app style applications</a> then backing service credentials are configuration, and live external to the application, often exposed as environment variables. You can get the effect of having a Eureka service right now, though, by using Cloud Foundry&rsquo;s <code>cf</code> CLI <a href="https://docs.pivotal.io/pivotalcf/devguide/services/user-provided.html">to create <em>a user-provided service</em></a>.</p>
+<pre><code class="prettyprint">cf cups eureka-service -p &#39;{&quot;uri&quot;:&quot;http://host-of-your-eureka-setup&quot;}&#39;
+</code></pre><p>Point <code>host-of-your-eureka-setup</code> to a well-known host for your highly-available Eureka setup. I suspect we&rsquo;ll soon see a way to create Eureka as a backing service in the same way you might a PostgreSQL or ElasticSearch instance on <a href="https://www.pivotal.io/platform-as-a-service/pivotal-cf">Pivotal Cloud Foundry</a>.</p><p>Now that Eureka is up and running, let&rsquo;s use it to connect some services to each other!</p><h2><a href="#speak-for-yourself" class="anchor" name="speak-for-yourself"></a>Speak for Yourself</h2><p>Spring Cloud-based services have a <code>spring.application.name</code> property. It&rsquo;s used to pull down configuration from the Configuration server, to identify the service to Eureka, and is referenceable in numerous other contexts when building Spring Cloud-based applications. This value typically lives in <code>src/main/resources/bootstrap.(yml,properties)</code>, which is picked up earlier in the initialization than the normal <code>src/main/resources/application.(yml,properties)</code>. A service with <code>org.springframework.cloud:spring-cloud-starter-eureka</code> on the classpath will be registered with the Eureka registry by its <code>spring.application.name</code>.</p><p>The <code>src/main/resources/boostrap.yml</code> file for each of my services looks like this, where <code>my-service</code> is the service name that changes from service to service:</p>
+<pre><code class="prettyprint yaml">spring:
+  application:
+    name: my-service
+</code></pre><p>Spring Cloud uses the information in <code>bootstrap.yml</code> at service startup to discover the Eureka service registry and register the service and its <code>spring.application.name</code>, host, port, etc. You might wonder about that first bit. Spring Cloud attempts to look for it at a well-known address (<code>http://127.0.0.1:</code>), but you can change that. Here&rsquo;s my <code>src/main/resources/application.yml</code> for a nominal Spring Cloud microservice, though <a href="https://spring.io/blog/2015/01/13/configuring-it-all-out-or-12-factor-app-style-configuration-with-spring">there&rsquo;s no reason this couldn&rsquo;t live in the Spring Cloud configuration server</a>. There may be many instances identifying themselves as <code>my-service</code>; Eureka will append the process&rsquo; information to a list of registrations for the same ID.</p>
+<pre><code class="prettyprint yml"><br /><br />eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${vcap.services.eureka-service.credentials.uri:http://127.0.0.1:8761}/eureka/
+
+---
+spring:
+  profiles: cloud
+eureka:
+  instance:
+    hostname: ${APPLICATION_DOMAIN}
+    nonSecurePort: 80
+
+</code></pre><p>In this configuration, the Spring Cloud Eureka client knows to connect to the Eureka instance running on localhost <em>if</em> Cloud Foundry&rsquo;s <code>VCAP_SERVICES</code> environment variable doesn&rsquo;t exist or contain valid credentials.</p><p>The bit of configuration under the <code>---</code> delimiter is for when the application <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html">is run under the <code>cloud</code> Spring profile</a>. It&rsquo;s easy to set a profile using the <code>SPRING_PROFILES_ACTIVE</code> environment variable. You can configure Cloud Foundry environment variables in your <code>manifest.yml</code> or, <a href="https://github.com/pivotal-cf-experimental/lattice">on Cloud Foundry Lattice</a>, your <a href="https://docs.docker.com/reference/builder/">Docker file</a>.</p><p>The <code>cloud</code> profile specific configuration specifically tells the Eureka client how to register the service in the discovered Eureka registry. I do this because my services don&rsquo;t use fixed DNS. <code>APPLICATION_DOMAIN</code> is an environment variable I set in my deploy scripts that tells a service what its externally referenceable URI is.</p><p>Click refresh on the Eureka web UI after 30 seconds (as of this writing) and you&rsquo;ll see your web service(s) registered.</p><h2><a href="#client-side-load-balancing-with-ribbon" class="anchor" name="client-side-load-balancing-with-ribbon"></a>Client-Side Load Balancing with Ribbon</h2><p>Spring Cloud references other services through their <code>spring.application.name</code> value. Knowing this value can be handy in a lot of contexts when building Spring Cloud-based services.</p><p>The goal, you&rsquo;ll recall, is to let the <em>client</em> decide based on contextual information (which could change from client to client) which service instance it will connect to. Netflix has a Eureka-aware client-side load-balancing client called <a href="https://github.com/Netflix/ribbon">Ribbon</a> that Spring Cloud integrates extensively. Ribbon is a client library with built-in software load balancers. Let&rsquo;s look at an example that uses Eureka directly and then uses it through the Ribbon and Spring Cloud integration.</p>
+<pre><code class="prettyprint java">package passport;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+
+@SpringBootApplication
+@EnableEurekaClient
+@EnableFeignClients
+public class Application {
+
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(Application.class)
+                .web(false)
+                .run(args);
+    }
+}
+
+@Component
+class DiscoveryClientExample implements CommandLineRunner {
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
+
+    @Override
+    public void run(String... strings) throws Exception {
+        discoveryClient.getInstances(&quot;photo-service&quot;).forEach((ServiceInstance s) -&gt; {
+            System.out.println(ToStringBuilder.reflectionToString(s));
+        });
+        discoveryClient.getInstances(&quot;bookmark-service&quot;).forEach((ServiceInstance s) -&gt; {
+            System.out.println(ToStringBuilder.reflectionToString(s));
+        });
+    }
+}
+
+@Component
+class RestTemplateExample implements CommandLineRunner {
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Override
+    public void run(String... strings) throws Exception {
+        // use the &quot;smart&quot; Eureka-aware RestTemplate
+        ResponseEntity&lt;List&lt;Bookmark&gt;&gt; exchange =
+                this.restTemplate.exchange(
+                        &quot;http://bookmark-service/{userId}/bookmarks&quot;,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference&lt;List&lt;Bookmark&gt;&gt;() {
+                        },
+                        (Object) &quot;mstine&quot;);
+
+        exchange.getBody().forEach(System.out::println);
+    }
+
+}
+
+@Component
+class FeignExample implements CommandLineRunner {
+
+    @Autowired
+    private BookmarkClient bookmarkClient;
+
+    @Override
+    public void run(String... strings) throws Exception {
+        this.bookmarkClient.getBookmarks(&quot;jlong&quot;).forEach(System.out::println);
+    }
+}
+
+@FeignClient(&quot;bookmark-service&quot;)
+interface BookmarkClient {
+
+    @RequestMapping(method = RequestMethod.GET, value = &quot;/{userId}/bookmarks&quot;)
+    List&lt;Bookmark&gt; getBookmarks(@PathVariable(&quot;userId&quot;) String userId);
+}
+
+class Bookmark {
+    private Long id;
+    private String href, label, description, userId;
+
+    @Override
+    public String toString() {
+        return &quot;Bookmark{&quot; +
+                &quot;id=&quot; + id +
+                &quot;, href=&#39;&quot; + href + &#39;\&#39;&#39; +
+                &quot;, label=&#39;&quot; + label + &#39;\&#39;&#39; +
+                &quot;, description=&#39;&quot; + description + &#39;\&#39;&#39; +
+                &quot;, userId=&#39;&quot; + userId + &#39;\&#39;&#39; +
+                &#39;}&#39;;
+    }
+
+    public Bookmark() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getHref() {
+        return href;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+}
+</code></pre><p>The <code>DiscoveryClientExample</code> bean demonstrates using the Spring Cloud common <code>DiscoveryClient</code> to interrogate the services. The results contain information like the hostname and the port for each service.</p><p>The <code>RestTemplateExample</code> bean demonstrates the auto-configured Ribbon-aware <code>RestTemplate</code> instance. Note that the URI uses a service ID, not an actual hostname. The service ID from the URI is extracted and given to Ribbon which then uses a load-balancer to pick from among the registered instances in Eureka and, finally, the HTTP call is made to a real service instance.</p><p>The <code>FeignExample</code> bean demonstrates using the Spring Cloud Feign integration. <a href="https://github.com/Netflix/feign">Feign</a> is a handy project from Netflix that lets you describe a REST API client declaratively with annotations on an interface. In this case, we want to map the HTTP results from calls to the <code>bookmark-service</code> to the <code>BookmarkClient</code> Java interface. This mapping is configured in the <code>Application</code> class towards the top of the code page:</p>
+<pre><code class="prettyprint java">  @Bean
+  BookmarkClient bookmarkClient() {
+    return loadBalance(BookmarkClient.class, &quot;http://bookmark-service&quot;);
+  }
+
+</code></pre><p>The URI is a service reference, not an actual hostname. It&rsquo;s passed through the same processing as the URI given to the <code>RestTemplate</code> in the last example.</p><p>Pretty cool, eh? You can use the more basic <code>DiscoveryClient</code> API and make a call, or use the Ribbon and Eureka-aware <code>RestTemplate</code> or Feign-integrated client.</p><h2><a href="#review" class="anchor" name="review"></a>Review</h2>
+<ul>
+<li>Spring Cloud supports both the Eureka and Consul service registries (and perhaps more!)</li>
+<li>The <code>DiscoveryClient</code> API can be used to interactively query Eureka given a service ID.</li>
+<li>Ribbon is a client-side load balancer</li>
+<li>The <code>RestTemplate</code> can substitute service IDs for hostnames in URIs and can defer to Ribbon to pick a service.</li>
+<li>The Netflix Spring Cloud Feign integration makes it simple to create smart, Eureka-aware REST clients that uses Ribbon for client-side load-balacing to pick an available service instance.</li>
+</ul><h2><a href="#where-to-go-from-here" class="anchor" name="where-to-go-from-here"></a>Where to go from Here</h2><p>We&rsquo;ve only looked at service discovery and resolution with Eureka. Most of what we talked about here applies to Consul as well and indeed Consul has some features that Netflix doesn&rsquo;t have.</p><p>Round-robin load-balancing is just one option. You might instead require some notion of a leader node, and leadership election. Spring Cloud aims provides support for that kind of coordination, as well.</p><p>Service registration and client-side load-balancing are just <em>one</em> of the things that Spring Cloud does to promote more resilient service-to-service calls. We have <em>not</em> looked at its support single-sign on and security, distributed locks and leadership election, reliability patterns like the circuit breaker, and much more.</p><p><a href="https://github.com/joshlong/service-registration-and-discovery">The example code is all available online</a> so don&rsquo;t hesitate to the check out the example on your local machine or push it to Cloud Foundry using <a href="https://github.com/joshlong/service-registration-and-discovery/blob/master/cf.sh">the provided <code>cf.sh</code> script</a> and various <code>manifest.yml</code> files.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1934;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

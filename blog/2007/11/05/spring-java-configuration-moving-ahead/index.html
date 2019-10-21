@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Java Configuration Moving Ahead</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Java Configuration Moving Ahead" />
+<meta name="twitter:description" content="&lt;p&gt;Several users have asked whether we are committed to &lt;a href=&quot;http://www.springframework.org/javaconfig&quot;&gt;Spring Java Configuration&lt;/a&gt;, and how it sits with the &lt;a href=&quot;http://blog.interface21.com/main/2007/10/24/spring-25-rc1-is-here-introducing-new-configuration-approaches/&quot;&gt;annotation configuration option&lt;/a&gt; introduced in Spring 2.5. The answer is yes, we are committed to Java Config; and these two approaches are not mutually exclusive.&lt;/p&gt;
+&lt;p&gt;These two configuration approaches are quite different: the @Autowired annotation in the Spring Framework configures components using annotations in business objects, while Spring Java Config takes a unique approach of externalizing the annotations in dedicated configuration classes. Neither of these approaches is uniquely right or wrong, and they are compelling for different circumstances. There is even no reason that both couldn’t be used in the same application.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Spring Java Configuration Moving Ahead" />
+<meta property="og:description" content="&lt;p&gt;Several users have asked whether we are committed to &lt;a href=&quot;http://www.springframework.org/javaconfig&quot;&gt;Spring Java Configuration&lt;/a&gt;, and how it sits with the &lt;a href=&quot;http://blog.interface21.com/main/2007/10/24/spring-25-rc1-is-here-introducing-new-configuration-approaches/&quot;&gt;annotation configuration option&lt;/a&gt; introduced in Spring 2.5. The answer is yes, we are committed to Java Config; and these two approaches are not mutually exclusive.&lt;/p&gt;
+&lt;p&gt;These two configuration approaches are quite different: the @Autowired annotation in the Spring Framework configures components using annotations in business objects, while Spring Java Config takes a unique approach of externalizing the annotations in dedicated configuration classes. Neither of these approaches is uniquely right or wrong, and they are compelling for different circumstances. There is even no reason that both couldn’t be used in the same application.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2007-11-05 02:44:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Java Configuration Moving Ahead</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Rod Johnson</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2007-11-05 02:44:00.0">November 05, 2007</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="111" href="/blog/2007/11/05/spring-java-configuration-moving-ahead#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Several users have asked whether we are committed to <a href="http://www.springframework.org/javaconfig">Spring Java Configuration</a>, and how it sits with the <a href="http://blog.interface21.com/main/2007/10/24/spring-25-rc1-is-here-introducing-new-configuration-approaches/">annotation configuration option</a> introduced in Spring 2.5. The answer is yes, we are committed to Java Config; and these two approaches are not mutually exclusive.</p><p>These two configuration approaches are quite different: the @Autowired annotation in the Spring Framework configures components using annotations in business objects, while Spring Java Config takes a unique approach of externalizing the annotations in dedicated configuration classes. Neither of these approaches is uniquely right or wrong, and they are compelling for different circumstances. There is even no reason that both couldn&rsquo;t be used in the same application.</p><p>If you think that Spring = XML it&rsquo;s time to rethink. (It was never strictly accurate, in any case, as the Spring core container has always used its own Java metadata, and doesn&rsquo;t know about XML or any other representation.)</p><p>This brings us to an important philosophical principle: <i>our mission with Spring is to provide the best component model for enterprise Java</i>, setting the standard for flexibility to meet complex requirements, and providing a comprehensive solution to real-world problems. We don&rsquo;t believe that there is any one size fits all model for configuration, and we believe in accommodating choice, within our strong, extensible model. However you choose to define your Spring-managed objects, they&rsquo;re eligible for the same rich set of enterprise services, unequaled third party integrations, true AOP, many extension points etc.</p><p>Thus Spring 2.5&rsquo;s @Component and @Autowired annotations, which cause the container to autodetect Spring-managed objects, can happily coexist with Java Configuration, XML and other configuration options.</p><p>This reminds me: I am talking about ways of configuring the Spring container at <a href="http://qcon.infoq.com/sanfrancisco/conference/">QCon in San Francisco</a> later this week, and it should be interesting to get feedback. I&rsquo;ll see if I can post the slides here or on SpringFramework.org afterwards.</p><p>Spring Java Configuration was becalmed for a while due to Costin&rsquo;s commitment to <a href="http://www.springframework.org/osgi">Spring Dynamic Modules for OSGi</a>, but it&rsquo;s now on track. I have done quite a bit of work on it over the last few days: updating it to Spring 2.5; removing unused code; and adding an often requested new feature&ndash;the externalization of configuration values, as well as beans. </p><p>While M2 runs fine on 2.5RC1 (quite a statement of 2.5&rsquo;s backward compatibility, given the depth of JavaConfig&rsquo;s use of Spring IoC), it contained its own annotation scanning code (which the Spring Framework adopted and took forward), so moving to the later Spring version made sense.</p><p>The new configuration property externalization feature takes a suggestion in <a href="https://opensource.atlassian.com/projects/spring/browse/SJC-16">JIRA </a>to use abstract methods (thanks to Guillaume Duchesneau).</p><p>These methods are annotated with the new @ExternalValue annotation, as follows:</p><p><code lang="java"><br />@Configuration<br />@ResourceBundles(&ldquo;classpath:/com/yourcompany/yourpackage/basename&rdquo;)<br />static abstract class ConfigurationExample {</p>
+<pre><code class="prettyprint">@Bean
+public Person john() {
+    Person john= new Person();
+    john.setName(getName());
+    john.setAge(methodWithArbitraryNameReturningAge());       
+    john.setBusy(busy());
+    return john;
+}
+
+    // Property name defaults to method name.
+    // In the case of a getter method, it&#39;s the property name--
+    // &quot;name&quot; in this case
+@ExternalValue
+public abstract String getName();
+
+
+    // Property name is taken from annotation value
+@ExternalValue(&quot;age&quot;)                  
+public abstract int methodWithArbitraryNameReturningAge();
+
+@ExternalValue
+protected abstract boolean busy();
+</code></pre><p>}<br /></code></p><p>Spring Java Config subclasses such classes to implement those methods to return the externalized properties at runtime. (It subclasses configuration classes anyway, for other reasons, such as caching singleton bean method return values.) The methods can be public or protected.</p><p>The @ResourceBundles annotation on the configuration class identifies one or more resource bundles to use to resolve values, which can be identified through the method name or through an explicit String value on the annotation. The locations are Spring resource location Strings.</p><p>Methods annotated with @ExternalBean can be concrete, in which case the actual return value will be used if no external value is found, like this:<br /><code lang="java"><br />@ExternalValue<br />public int otherNumber() {<br /> return 25;<br />}<br /></code><br />This usage means that value is externalizable, but externalizing it is optional, as with a bean property with a usable default.</p><p>As you would expect, the properties file for the example looks like this:</p><p><code><br />name=John Doe<br />age=45<br />busy=false<br /></code></p><p>The underlying mechanism is designed to be extensible, so properties files are not the only option, and we will provide additional options in future releases. The abstract method approach allows for dynamically sourced values: for example, from a database, or custom, from another system. </p><p>Right now, the example only works from SVN, but we are planning a M3 release this month. Moving forward, <a href="http://www.interface21.com/people/cbeams.html">Chris Beams</a>, a new Interface21 consultant based in Seattle, will be working on this project. At Interface21, we believe that all our technical staff should do everything we do as a company: developing products, consulting and training. Product developers deliver some training and consulting; service delivery staff work on projects. This ensures that everyone gets to contribute to the open source projects we all care about, and that everyone stays grounded in real world business requirements, rather than developing infrastructure in glorious isolation (a danger seen in J2EE in the past). Chris does mainly consulting and training, but he will be &ldquo;aligned&rdquo; with Spring Java Config, making it his main development focus, so he should be spending significant time on development, with help from Costin and myself.</p><p>How long it takes to get Spring Java Config to 1.0 final partly depends on you. We need feedback on usage in anger; we need feature requests (although we&rsquo;ll probably want to keep the scope manageable for 1.0); and we need help in prioritization. If you want this, tell us and we&rsquo;ll listen!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 111;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

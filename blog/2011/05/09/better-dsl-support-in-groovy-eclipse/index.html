@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Better DSL support in Groovy-Eclipse</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Better DSL support in Groovy-Eclipse" />
+<meta name="twitter:description" content="&lt;p&gt;The Groovy language is an excellent platform for creating domain specific languages (DSLs). A good DSL can make programs more concise and expressive as well as make programmers more productive. However, until now these DSLs were not directly supported by Groovy-Eclipse in the editor. When DSLs are used heavily, standard IDE features like content assist, search, hovers, and navigation lose their value. For a while now, it has been possible to write an Eclipse plugin to extend Groovy-Eclipse, but this is a heavy-weight approach that requires specific knowledge of the Eclipse APIs. Now that Groovy-Eclipse supports &lt;em&gt;DSL descriptors&lt;/em&gt; (DSLDs), supporting custom DSLs in Groovy-Eclipse will become significantly easier.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@werdnagreb" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=200" />
+
+<meta property="og:title" content="Better DSL support in Groovy-Eclipse" />
+<meta property="og:image" content="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=200" />
+<meta property="og:description" content="&lt;p&gt;The Groovy language is an excellent platform for creating domain specific languages (DSLs). A good DSL can make programs more concise and expressive as well as make programmers more productive. However, until now these DSLs were not directly supported by Groovy-Eclipse in the editor. When DSLs are used heavily, standard IDE features like content assist, search, hovers, and navigation lose their value. For a while now, it has been possible to write an Eclipse plugin to extend Groovy-Eclipse, but this is a heavy-weight approach that requires specific knowledge of the Eclipse APIs. Now that Groovy-Eclipse supports &lt;em&gt;DSL descriptors&lt;/em&gt; (DSLDs), supporting custom DSLs in Groovy-Eclipse will become significantly easier.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-05-09 03:57:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Better DSL support in Groovy-Eclipse</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=20&amp;d=mm" />
+<span class="author">Andrew Eisenberg</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-05-09 03:57:00.0">May 09, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="416" href="/blog/2011/05/09/better-dsl-support-in-groovy-eclipse#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>The Groovy language is an excellent platform for creating domain specific languages (DSLs). A good DSL can make programs more concise and expressive as well as make programmers more productive. However, until now these DSLs were not directly supported by Groovy-Eclipse in the editor. When DSLs are used heavily, standard IDE features like content assist, search, hovers, and navigation lose their value. For a while now, it has been possible to write an Eclipse plugin to extend Groovy-Eclipse, but this is a heavy-weight approach that requires specific knowledge of the Eclipse APIs. Now that Groovy-Eclipse supports <em>DSL descriptors</em> (DSLDs), supporting custom DSLs in Groovy-Eclipse will become significantly easier.</p>
+<h2>A simple example</h2><p>Consider <a href="https://joesgroovyblog.blogspot.com/2007/09/and-miles-to-go-before-i-sleep.html">this DSL</a> described by Joachim Baumann. He creates a simple DSL for working with distances. Using this DSL, you can write things like this to calculate the total distance travelled:</p>
+<pre><code class="prettyprint groovy"><br />3.m + 2.yd + 2.mi - 1.km
+</code></pre><p>This is a simple and expressive DSL, but when you type this into a Groovy Editor in Groovy-Eclipse (for conciseness, assume that <code>$url</code> is defined elsewhere):</p><p>[caption id=&ldquo;attachment_8774&rdquo; align=&ldquo;aligncenter&rdquo; width=&ldquo;179&rdquo;]<a href="http://blog.springsource.com/wp-content/uploads/2011/05/underlines.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/underlines.png" alt="Custom DSL not recognized in Groovy-Eclipse" title="underlines for unrecognized DSL" width="179" height="26" class="size-full wp-image-8774" /></a>[/caption]</p><p>You see underlines and no hovers, meaning that the editor cannot statically resolve the DSL&rsquo;s expressions. Using a DSLD, it is possible <em>teach</em> the editor some of the semantics behind these custom DSLs as well as provide documentation for hovers:</p><p>[caption id=&ldquo;attachment_8775&rdquo; align=&ldquo;aligncenter&rdquo; width=&ldquo;683&rdquo;]<a href="http://blog.springsource.com/wp-content/uploads/2011/05/no_underline_with_hover.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/no_underline_with_hover.png" alt="DSL in editor with documentation and no underlines" title="no_underline_with_hover" width="683" height="76" class="size-full wp-image-8775" /></a>[/caption]</p><p>To create the DSL descriptor for the distance DSL, you simply need to add a file to your Groovy project with a <em>.dsld</em> file extension and the following contents:</p>
+<pre><code class="prettyprint groovy"><br />currentType( subType( Number ) ).accept {   
+   property name:&quot;m&quot;, type:&quot;Distance&quot;, 
+    doc: &quot;&quot;&quot;A &lt;code&gt;meter&lt;/code&gt; from &lt;a href=&quot;$url&quot;&gt;$url&lt;/a&gt;&quot;&quot;&quot;
+}
+</code></pre><p>This script says <em>whenever the type currently being evaluated in the editor is a subtype of <code>java.lang.Number</code>, add the &lsquo;<code>m</code>&rsquo; property to it whose type is <code>Distance</code></em>. The <code>currentType(subType(Number))</code> piece is called the <em>pointcut</em> and the code block with the call to <code>property</code> is called a <em>contribution block</em>. More on these concept later.</p><p>This script snippet above is not the complete DSLD. It only adds the &lsquo;<code>m</code>&rsquo; property. To complete the implementation, you can take advantage of the full power of Groovy syntax:</p>
+<pre><code class="prettyprint groovy"><br />currentType( subType( Number ) ).accept {   
+    [ m: &quot;meter&quot;,  yd: &quot;yard&quot;,  cm: &quot;centimerter&quot;,  mi: &quot;mile&quot;,  km: &quot;kilometer&quot;].each {
+      property name:it.key, type:&quot;Distance&quot;, 
+        doc: &quot;&quot;&quot;A &lt;code&gt;${it.value}&lt;/code&gt; from &lt;a href=&quot;$url&quot;&gt;$url&lt;/a&gt;&quot;&quot;&quot;
+    }
+}
+</code></pre><p>This simple example shows that a relatively small script can create some powerful DSL support.</p>
+<h2>Anatomy of a DSLD</h2><p>DSLDs enhance Groovy-Eclipse&rsquo;s <a href="https://contraptionsforprogramming.blogspot.com/2009/11/how-type-inferencing-for-groovy-in.html">type inferencing engine</a> that runs in the background while editing. DSLDs are evaluated by the IDE and queried by the inferencing engine as necessary.</p><p>A DSLD script contains a set of <strong>pointcuts</strong> that are each associated with one or more <strong>contribution blocks</strong>. A pointcut roughly describes <em>where</em> type inferencing needs to be enhanced (i.e., which types in which contexts) and a contribution block describes <em>how</em> it is enhanced (i.e., which properties and methods should be added).</p><p>Many pointcuts are available and they are described in detail with examples in the <a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse#DSLDescriptorsforGroovy-Eclipse-Pointcuts">DSLD documentation</a>. The set of available pointcuts is likely to expand in future versions of DSLD as we start to learn how people will be creating scripts and what kind of operations they require.</p><p>Contribution blocks are Groovy code blocks that are associated with a pointcut through the <code>accept</code> method. The two main operations you can do inside of a contribution block are <code>property</code>, which we have introduced earlier, and <code>method</code>, which adds a method to the type being analyzed in the contribution block.</p><p>The term <em>pointcut</em> is borrowed from <a href="http://www.jroller.com/colyer/entry/the_ted_neward_challenge_aop">Aspect-Oriented programming</a> (AOP). Actually, DSLD <a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse#DSLDescriptorsforGroovy-Eclipse-Moreformally">can be considered</a> an AOP language. The major difference between DSLD and typical AOP langauges like <a href="https://eclipse.org/aspectj">AspectJ</a> is that DSLD operates on the abstract syntax tree of a program being edited, while languages like AspectJ operates on the Java byte code of a compiled program.</p>
+<h2>Getting started with DSLDs</h2><p>There is full DSLD documentation on the <a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse">wiki at Codehaus</a>. Here, I will briefly describe how to get started with DSLDs. To get started:</p>
+<ol>
+<li>Install the latest nightly build of Groovy-Eclipse using this update site:
+<code>http://dist.codehaus.org/groovy/distributions/greclipse/snapshot/e3.6/</code></li>
+<li>Inside of a new or existing Groovy-Eclipse project, copy the DSLD
+Meta script into a source folder of the project. This script provides
+editing support for DSLD files themselves and is <a href="http://docs.codehaus.org/download/attachments/204275718/DSLD_meta_script.dsld">available here</a></li>
+<li>Create a new DSLD script using the wizard: File -> New -> Groovy
+DSL Descriptor:
+<a href="http://blog.springsource.com/wp-content/uploads/2011/05/DSLD_wizard.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/DSLD_wizard.png" alt="DSLD Wizard" title="DSLD Wizard" width="212" height="94" class="aligncenter size-full wp-image-8780" /></a></li>
+<li>In the newly created file, uncomment the sample text.
+```groovy
+currentType(subType('groovy.lang.GroovyObject')).accept {
+property name : 'newProp', type : String,
+provider : 'Sample DSL',
+doc : 'This is a sample. You should see this in content assist for all GroovyObjects:<pre>newProp</pre>'
+}
+```
+Inside the DSLD you should see content assist and hovers specific to DSLDs (this comes from the meta-DSLD script added in step 2). It will look something like this:
+<a href="http://blog.springsource.com/wp-content/uploads/2011/05/in_dsld_file.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/in_dsld_file.png" alt="Contents of DSLD file with hover" title="In DSLD file" width="592" height="290" class="aligncenter size-full wp-image-8782" /></a></li>
+<li>Now, you can create a new Groovy script and play around with the DSLD you just created. You can type:
+```groovy
+this.newProp
+```
+</li>
+You should see that <code>newProp</code> is properly highlighted and that hovering will show the documentation from the DSLD, and it should look something like this:
+<a href="http://blog.springsource.com/wp-content/uploads/2011/05/sample.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/sample.png" alt="Using the sample DSLD in a file" title="sample" width="532" height="108" class="aligncenter size-full wp-image-8793" /></a>
+</li>
+<li>You can make changes to the DSLD. After saving the changes will immediately be picked up in all your Groovy scripts and files.</li>
+<li>Congratulations! You have now implemented your first DSLD.</li>
+</ol><p>You can view and manage all of the DSLDs in your workspace from the Groovy -&gt; DSLD preference page:<br /><a href="http://blog.springsource.com/wp-content/uploads/2011/05/preferences_page.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/preferences_page.png" alt="DSLD Preference page" title="DSLD Preference page" width="762" height="466" class="aligncenter size-full wp-image-8783" /></a></p><p>From here, you can enable/disable individual scripts as well as choose which scripts to edit.</p><p><strong>Important:</strong> since finding and fixing errors when implementing DSLDs can be a bit cryptic, it is strongly recommended that you do the following:<br /><ul><br /> <li>Open the Eclipse error log</li><br /> <li>Open the <a href="http://groovy.codehaus.org/Groovy-Eclipse+2.1.1+New+and+Noteworthy#Groovy-Eclipse2.1.1NewandNoteworthy-GroovyEventConsole">Groovy Event Console</a></li><br /></ul></p><p>Compile and runtime problems with your script will be shown in one of these two places.</p>
+<h2>A DSLD for the Grails constraint language</h2><p>For a larger example, let&rsquo;s look at the Grails framework. The <a href="http://grails.org/doc/latest/ref/Constraints/Usage.html">Grails constraint DSL </a> provides a declarative way to validate Grails domain classes. It is clear and succinct, but without direct editing support for this DSL, Grails programmers rely on external documentation and may not be aware of syntax errors until runtime. We can create a DSLD to solve this problem</p>
+<pre><code class="prettyprint groovy"><br />// only available in STS 2.7.0 and above
+supportsVersion(grailsTooling:&quot;2.7.0&quot;)
+
+
+// a generic grails artifact is a class that is in a grails project, is not a script and is in one of the &#39;grails-app&#39; folders
+def grailsArtifact = { String folder -&gt; 
+	sourceFolderOfCurrentType(&quot;grails-app/&quot; + folder) &amp; 
+	nature(&quot;com.springsource.sts.grails.core.nature&quot;) &amp; (~isScript())
+}
+ 
+// define the various kinds of grails artifacts
+def domainClass = grailsArtifact(&quot;domain&quot;)
+// we only require domainClass, but we can also reference other kinds of artifacts here
+def controllerClass = grailsArtifact(&quot;controllers&quot;)
+def serviceClass = grailsArtifact(&quot;services&quot;)
+def taglibClass = grailsArtifact(&quot;taglib&quot;)
+
+ 
+// constraints
+// The constraints DSL is only applicable inside of the static &quot;constraints&quot; field declaration
+inClosure() &amp; (domainClass &amp; enclosingField(name(&quot;constraints&quot;) &amp; isStatic()) &amp; 
+		(bind(props : properties()) &amp; // &#39;bind&#39; props to the collection of properties in the domain class
+		currentTypeIsEnclosingType())).accept {
+
+	provider = &quot;Grails Constraints DSL&quot;  // this value will appear in content assist
+
+	// for each non-static property, there are numerous constraints &quot;methods&quot; that are available
+	// define them all here
+	for (prop in props) {
+		if (prop.isStatic()) {
+			continue
+		}
+		if (prop.type == ClassHelper.STRING_TYPE) {
+			method isStatic: true, name: prop.name, params: [blank:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [creditCard:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [email:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [url:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [matches:String], useNamedArgs:true
+		} else if (prop.type.name == Date.name) {
+			method isStatic: true, name: prop.name, params: [max:Date], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [min:Date], useNamedArgs:true
+		} else if (ClassHelper.isNumberType(prop.type)) {
+			method isStatic: true, name: prop.name, params: [max:Number], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [min:Number], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [scale:Number], useNamedArgs:true
+		} else if (prop.type.implementsInterface(ClassHelper.LIST_TYPE)) {
+			method isStatic: true, name: prop.name, params: [maxSize:Number], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [minSize:Number], useNamedArgs:true
+		}
+		method isStatic: true, name: prop.name, params: [unique:Boolean], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [size:Integer], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [notEqual:Object], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [nullable:Boolean], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [range:Range], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [inList:List], useNamedArgs:true
+	}
+}
+</code></pre><p>If you copy the DSLD script above and add it to a DSLD file in your Grails project, the constraints language will be taught to STS. For example, in the following simple domain class, you get this for content assist inside of the constraints block:<br /><a href="http://blog.springsource.com/wp-content/uploads/2011/05/constraints.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/constraints.png" alt="Using the constraints DSL" title="Using the constraints DSL" width="518" height="523" class="aligncenter size-full wp-image-8794" /></a></p><p>The above script can be tweaked to add custom documentation.</p>
+<h2>I use Groovy, but I don't create my own DSLs. Why should I care about DSLDs?</h2><p>Even though the majority of Groovy and Grails users do not implement their own DSLs, they consume DSLs (in <a href="http://grails.org">Grails</a>, <a href="http://groovy.codehaus.org/Gaelyk">Gaelyk</a>, through <a href="http://groovy.codehaus.org/Builders">builders</a>, etc.). So, even though most STS users won&rsquo;t be creating their own DSLDs, they will be benefiting from DSLDs created by others. We will be working hard with library and DSL developers in order to create common DSLDs for different pieces of the Groovy ecosystem. </p><p>You can expect to see a significant increase in support for the popular Groovy-based frameworks in upcoming versions of Groovy-Eclipse.</p>
+<h2>The current state of DSLD</h2><p>The core implementation of the DSLD language is now available for use, but we will be tweaking it as we learn more about what users require and the kinds of DSLs that they want to support. We will be implementing more pointcuts, expanding on the documentation, and working to ship some standard DSLDs with Groovy-Eclipse itself.</p><p>Please try out some of the DSLDs introduced here or on the <a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse">wiki</a> and give us feedback on this blog post, at our <a href="http://jira.codehaus.org/browse/GRECLIPSE">issue tracker</a>, or on the <a href="http://xircles.codehaus.org/lists/eclipse-plugin-user@groovy.codehaus.org">Groovy-Eclipse mailing list</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 416;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

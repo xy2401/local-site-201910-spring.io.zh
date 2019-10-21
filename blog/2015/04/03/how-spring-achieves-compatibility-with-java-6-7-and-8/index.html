@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>How Spring achieves compatibility with Java 6, 7 and 8</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="How Spring achieves compatibility with Java 6, 7 and 8" />
+<meta name="twitter:description" content="&lt;p&gt;As of Spring Framework 4.0, Java 8 is supported as a first-class citizen and we’ve seen some confusion in the Spring community since then. How do we manage to support Java 8 and remain compatible with Java 6 and Java 7 after all? This blog post provides some insight into how we’re handling this within the framework codebase.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#java-8-language-features-vs-java-8-apis&quot; class=&quot;anchor&quot; name=&quot;java-8-language-features-vs-java-8-apis&quot;&gt;&lt;/a&gt;Java 8 language features vs. Java 8 APIs&lt;/h2&gt;
+&lt;p&gt;First, a distinction must be made between using new language features and new APIs in a given Java generation such as Java 8. If a class uses a Java 8 language feature such as a lambda expression, it has to be compiled with &lt;code&gt;-source 1.8 -target 1.8&lt;/code&gt; and therefore the whole compilation unit will only work on Java 8+. However, if a particular class in a library optionally uses a new Java 8 interface such as &lt;code&gt;java.util.stream.Stream&lt;/code&gt;, the library can still run on a previous Java generation as long as it is being compiled with e.g. &lt;code&gt;-source 1.6 -target 1.6&lt;/code&gt; - and as long as the use of that particular &lt;code&gt;Stream&lt;/code&gt;-based class is guarded to only kick in when actually running on Java 8+. As you may have guessed, we’re making extensive use of such arrangements within the Spring Framework codebase!&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@snicoll" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/33d0963a20138828608f3f61927545b8?s=200" />
+
+<meta property="og:title" content="How Spring achieves compatibility with Java 6, 7 and 8" />
+<meta property="og:image" content="https://gravatar.com/avatar/33d0963a20138828608f3f61927545b8?s=200" />
+<meta property="og:description" content="&lt;p&gt;As of Spring Framework 4.0, Java 8 is supported as a first-class citizen and we’ve seen some confusion in the Spring community since then. How do we manage to support Java 8 and remain compatible with Java 6 and Java 7 after all? This blog post provides some insight into how we’re handling this within the framework codebase.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#java-8-language-features-vs-java-8-apis&quot; class=&quot;anchor&quot; name=&quot;java-8-language-features-vs-java-8-apis&quot;&gt;&lt;/a&gt;Java 8 language features vs. Java 8 APIs&lt;/h2&gt;
+&lt;p&gt;First, a distinction must be made between using new language features and new APIs in a given Java generation such as Java 8. If a class uses a Java 8 language feature such as a lambda expression, it has to be compiled with &lt;code&gt;-source 1.8 -target 1.8&lt;/code&gt; and therefore the whole compilation unit will only work on Java 8+. However, if a particular class in a library optionally uses a new Java 8 interface such as &lt;code&gt;java.util.stream.Stream&lt;/code&gt;, the library can still run on a previous Java generation as long as it is being compiled with e.g. &lt;code&gt;-source 1.6 -target 1.6&lt;/code&gt; - and as long as the use of that particular &lt;code&gt;Stream&lt;/code&gt;-based class is guarded to only kick in when actually running on Java 8+. As you may have guessed, we’re making extensive use of such arrangements within the Spring Framework codebase!&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-04-03 13:58:52.977" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">How Spring achieves compatibility with Java 6, 7 and 8</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/33d0963a20138828608f3f61927545b8?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/snicoll">Stéphane Nicoll</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-04-03 13:58:52.977">April 03, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2063" href="/blog/2015/04/03/how-spring-achieves-compatibility-with-java-6-7-and-8#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>As of Spring Framework 4.0, Java 8 is supported as a first-class citizen and we&rsquo;ve seen some confusion in the Spring community since then. How do we manage to support Java 8 and remain compatible with Java 6 and Java 7 after all? This blog post provides some insight into how we&rsquo;re handling this within the framework codebase.</p><h2><a href="#java-8-language-features-vs-java-8-apis" class="anchor" name="java-8-language-features-vs-java-8-apis"></a>Java 8 language features vs. Java 8 APIs</h2><p>First, a distinction must be made between using new language features and new APIs in a given Java generation such as Java 8. If a class uses a Java 8 language feature such as a lambda expression, it has to be compiled with <code>-source 1.8 -target 1.8</code> and therefore the whole compilation unit will only work on Java 8+. However, if a particular class in a library optionally uses a new Java 8 interface such as <code>java.util.stream.Stream</code>, the library can still run on a previous Java generation as long as it is being compiled with e.g. <code>-source 1.6 -target 1.6</code> - and as long as the use of that particular <code>Stream</code>-based class is guarded to only kick in when actually running on Java 8+. As you may have guessed, we&rsquo;re making extensive use of such arrangements within the Spring Framework codebase!</p><p>We&rsquo;ve advertised how Spring Framework 4.0 naturally fits with Java 8 lambdas. For instance, retrieving the catalog of a given JDBC connection with a <a href="https://github.com/spring-projects/spring-framework/blob/8472a2b2/spring-jdbc/src/main/java/org/springframework/jdbc/core/ConnectionCallback.java"><code>ConnectionCallback</code></a> can be written as follows:</p>
+<pre><code class="prettyprint java">jdbcTemplate.execute(connection -&gt; connection.getCatalog())
+</code></pre><p>In fact, Spring Framework had now-so-called functional interfaces for years and we did not have to change any of those APIs to be compliant with Java 8&rsquo;s compiler rules for functional interfaces. Lambda-based code such as the above, calling into Spring APIs, can be used in any Spring application - which then requires a Java 8 runtime, obviously. However, if you choose to write such code with a traditional inner class approach, against the very same Spring APIs in the very same Spring version, you can do so as well with a Java 6+ runtime:</p>
+<pre><code class="prettyprint">jdbcTemplate.execute(new ConnectionCallback&lt;String&gt;() {
+    @Override
+    public String doInConnection(Connection con) throws SQLException {
+        return con.getCatalog();
+    }
+});
+</code></pre><p>The bottom line is that the choice is yours: We carefully designed Spring Framework 4.x to be naturally compatible with Java 6, 7 and 8, with the same Spring jars and no special setup steps. We don&rsquo;t use any Java 8 language features in our own code, so we can compile our framework codebase with <code>-source 1.6 -target 1.6</code>, and we autodetect and automatically activate many Java 8 API features (if available at runtime) within that codebase arrangement. Your application code may then choose to use Java 6, 7 or 8 language level itself, interacting with our framework arrangement and naturally getting the most out of the JDK that you happen to be using - without any extra setup, just through combining Spring with your JDK at runtime.</p><h2><a href="#which-java-8-api-features-do-we-support" class="anchor" name="which-java-8-api-features-do-we-support"></a>Which Java 8 API features do we support?</h2><p>We have dedicated support for a number of Java 8 specific API features such as <code>java.util.Optional</code>, <code>java.util.stream.Stream</code>, <code>java.time</code> (JSR-310), repeatable annotations, method/constructor parameter names, and even the <code>java.util.Base64</code> utility class. Those features get reflectively detected when you choose to use them in your own application classes, with the Spring Framework conditionally activating its support for those Java 8 features, e.g. registering default converters for <code>Optional</code> and <code>Stream</code> when Java 8 is present at runtime.</p><p>Let&rsquo;s have a look at an example. In the upcoming Spring Framework 4.2, if you define a value of type <code>Collection</code> or array, you can inject it as a <code>Stream</code> and we will convert that for you. You can find the full code of <a href="https://github.com/spring-projects/spring-framework/blob/228d9db4/spring-core/src/main/java/org/springframework/core/convert/support/StreamConverter.java"><code>StreamConverter</code> on github</a> but here&rsquo;s an excerpt:</p>
+<pre><code class="prettyprint java">import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.core.convert.*;
+import org.springframework.lang.UsesJava8;
+
+@UsesJava8
+public class StreamConverter implements ConditionalGenericConverter {
+    ....
+}
+</code></pre><p><code>StreamConverter</code> is an isolated class using Java 8 specific APIs, so what we need to do now is to conditionally add <code>StreamConverter</code> to <a href="https://github.com/spring-projects/spring-framework/blob/018adb04/spring-core/src/main/java/org/springframework/core/convert/support/DefaultConversionService.java"><code>DefaultConverterService</code></a> if Java 8 is present at runtime.</p>
+<pre><code class="prettyprint java">public class DefaultConversionService extends GenericConversionService {
+
+    /** Java 8&#39;s java.util.stream.Stream class available? */
+    private static final boolean streamAvailable = ClassUtils.isPresent(
+            &quot;java.util.stream.Stream&quot;, 
+            DefaultConversionService.class.getClassLoader());
+
+    private static void addCollectionConverters(
+            ConverterRegistry converterRegistry) {
+        ...
+
+        if (streamAvailable) {
+            converterRegistry.addConverter(
+                    new StreamConverter(conversionService));
+        }
+    }
+}
+</code></pre><p>We conditionally check if the API is present at runtime and make a decision based on that, with you as a user simply experiencing fully Java 8 adapted setup by default. This is somewhat similar to the <a href="https://github.com/spring-projects/spring-boot/tree/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/condition">conditions infrastructure</a> in Spring Boot except it is more low-level and internal. </p><h2><a href="#checking-java-6-compatibility" class="anchor" name="checking-java-6-compatibility"></a>Checking Java 6 compatibility</h2><p>Since we are using Java 8 specific APIs in several isolated places, we need JDK 8 to compile the framework codebase overall. As a result, there is a risk that we accidentally introduce Java 8 specific API calls in places where we need to remain Java 6 compatible.</p><p>Fortunately, our CI build plan is configured to execute <a href="http://mojo.codehaus.org/animal-sniffer/">Animal Sniffer</a> with each build. This checks our code against a given Java API <em>signature</em> (in our case Java 6 update 18) and fails the build if some incorrect usage happens to be found. So what about legitimate use cases then where we do need to call Java 7 or 8 APIs? You can configure the sniffer to exclude a list of classes or, better yet, provide a set of annotations that <em>flag</em> such exceptional cases. </p><p>That&rsquo;s exactly what the <a href="https://github.com/spring-projects/spring-framework/blob/f7b46539/spring-core/src/main/java/org/springframework/lang/UsesJava8.java"><code>@UsesJava8</code></a> annotation on <code>StreamConverter</code> (see above) indicates: It demarcates the whole class as an exception to the Java 6 API compatibility rule. You can flag an inner class or even a method in a similar manner. By looking at our usage of that annotation, we know all the places where Java 7/8 specific APIs are used in our codebase.</p><p>The Animal Sniffer configuration is pretty straightforward: check out <a href="https://github.com/spring-projects/spring-framework/blob/f926f6cb3e95affdd87ed5c06ac0450d0ada2aec/build.gradle#L143">our build</a> or <a href="http://mojo.codehaus.org/animal-sniffer/">the official documentation</a> for more details. </p><h2><a href="#wrapping-up" class="anchor" name="wrapping-up"></a>Wrapping Up</h2><p>We chose not to use any Java 7 or Java 8 language features in our own codebase in order to give you the flexibility to write your Spring 4 applications for Java 6, 7 or 8. At the same time, we allow you to experience a very natural approach if you decide to use Java 8, with the Spring Framework essentially appearing as Java 8 based to you in such a scenario. </p><p>Fortunately, Java 8&rsquo;s functional interface convention isn&rsquo;t new for us. Many existing Spring APIs can be seamlessly used with Java 8 lambdas since they are naturally following the same convention. New Java 8 APIs such as <code>java.time</code> (JSR-310), <code>Optional</code> and <code>Stream</code> are automatically supported by the framework if you choose to use them in your own code. </p><p>On a forward-looking note, as of 4.2, our codebase is even being checked with early JDK 9 builds already! This will lead to a unique situation in the framework once JDK 9 becomes generally available next year: supporting <em>four</em> Java generations in the same release line - your choice of JDK 6, 7, 8 or 9 in combination with the same Spring Framework generation!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2063;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

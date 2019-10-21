@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Using Cloud Foundry Services with Spring: Part 3 - the &lt;cloud&gt; namespace</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Using Cloud Foundry Services with Spring: Part 3 - the &lt;cloud&gt; namespace" />
+<meta name="twitter:description" content="&lt;p&gt;We saw in the previous blog post &lt;a href=&quot;http://blog.springsource.com/2011/11/04/using-cloud-foundry-services-with-spring-part-2-auto-reconfiguration/&quot;&gt;Using Cloud Foundry Services with Spring: Part 2 - Auto-reconfiguration&lt;/a&gt; that when you deploy a Spring application, your use of data services will be detected, and your application will automatically be re-configured to use the cloud services available to your application. This works great for simple applications and demos, but if you have a serious production application you probably want to have more control. You also need more control if you have multiple services of the same type. Ramnivas hinted at this saying that you can opt out of auto-reconfiguration by explicitly using the cloud data service factory beans like &lt;code&gt;CloudMongoDbFactoryBean&lt;/code&gt;, &lt;code&gt;CloudRedisConnectionFactoryBean&lt;/code&gt; etc. The easiest way to do this is to use the &lt;code&gt;&amp;lt;cloud&amp;gt;&lt;/code&gt; namespace for your service definitions. This blog post will cover this namespace in more detail.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@trisberg" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/c2ce75a3d51fc3a2d86a3643d2e90033?s=200" />
+
+<meta property="og:title" content="Using Cloud Foundry Services with Spring: Part 3 - the &lt;cloud&gt; namespace" />
+<meta property="og:image" content="https://gravatar.com/avatar/c2ce75a3d51fc3a2d86a3643d2e90033?s=200" />
+<meta property="og:description" content="&lt;p&gt;We saw in the previous blog post &lt;a href=&quot;http://blog.springsource.com/2011/11/04/using-cloud-foundry-services-with-spring-part-2-auto-reconfiguration/&quot;&gt;Using Cloud Foundry Services with Spring: Part 2 - Auto-reconfiguration&lt;/a&gt; that when you deploy a Spring application, your use of data services will be detected, and your application will automatically be re-configured to use the cloud services available to your application. This works great for simple applications and demos, but if you have a serious production application you probably want to have more control. You also need more control if you have multiple services of the same type. Ramnivas hinted at this saying that you can opt out of auto-reconfiguration by explicitly using the cloud data service factory beans like &lt;code&gt;CloudMongoDbFactoryBean&lt;/code&gt;, &lt;code&gt;CloudRedisConnectionFactoryBean&lt;/code&gt; etc. The easiest way to do this is to use the &lt;code&gt;&amp;lt;cloud&amp;gt;&lt;/code&gt; namespace for your service definitions. This blog post will cover this namespace in more detail.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-11-09 14:58:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Using Cloud Foundry Services with Spring: Part 3 - the &lt;cloud&gt; namespace</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/c2ce75a3d51fc3a2d86a3643d2e90033?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/trisberg">Thomas Risberg</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-11-09 14:58:00.0">November 09, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="448" href="/blog/2011/11/09/using-cloud-foundry-services-with-spring-part-3-the-cloud-namespace#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>We saw in the previous blog post <a href="http://blog.springsource.com/2011/11/04/using-cloud-foundry-services-with-spring-part-2-auto-reconfiguration/">Using Cloud Foundry Services with Spring: Part 2 - Auto-reconfiguration</a> that when you deploy a Spring application, your use of data services will be detected, and your application will automatically be re-configured to use the cloud services available to your application. This works great for simple applications and demos, but if you have a serious production application you probably want to have more control. You also need more control if you have multiple services of the same type. Ramnivas hinted at this saying that you can opt out of auto-reconfiguration by explicitly using the cloud data service factory beans like <code>CloudMongoDbFactoryBean</code>, <code>CloudRedisConnectionFactoryBean</code> etc. The easiest way to do this is to use the <code>&lt;cloud&gt;</code> namespace for your service definitions. This blog post will cover this namespace in more detail.</p>
+<h2>Including the <code>&lt;cloud&gt;</code> namespace in your application.</h2><p>You need to include the org.cloudfoundry:cloudfoundry-runtime dependency in your build. If you are using Maven add this dependency to your pom.xml:</p>
+<pre><code class="prettyprint xml"><br />&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.cloudfoundry&lt;/groupId&gt;
+        &lt;artifactId&gt;cloudfoundry-runtime&lt;/artifactId&gt;
+        &lt;version&gt;0.8.1&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;!-- additional dependency declarations --&gt;
+&lt;/dependencies&gt;
+</code></pre><p>You will also need to have the Spring Framework Milestone Repository in your pom.xml. Simply add this repository declaration to your repositories:</p>
+<pre><code class="prettyprint xml"><br />&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;org.springframework.maven.milestone&lt;/id&gt;
+        &lt;name&gt;Spring Framework Maven Milestone Repository&lt;/name&gt;
+        &lt;url&gt;http://maven.springframework.org/milestone&lt;/url&gt;
+    &lt;/repository&gt;
+
+    &lt;!-- additional repository declarations --&gt;
+&lt;/repositories&gt;
+</code></pre><p>Now we are ready to add the <code>&lt;cloud&gt;</code> namespace to our application context files. We need to declare the namespace (line 5) and also provide the schema location (line 8). Once we have this declared we can use the <code>&lt;cloud&gt;</code> namespace elements in our xml file (line 10). Here is the complete example::</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+  xmlns:cloud=&quot;http://schema.cloudfoundry.org/spring&quot;
+  xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	http://schema.cloudfoundry.org/spring http://schema.cloudfoundry.org/spring/cloudfoundry-spring-0.8.xsd&quot;&gt;
+
+    &lt;cloud:mongo-db-factory id=&quot;mongoDbFactory&quot;&gt;
+
+    &lt;bean id=&quot;mongoTemplate&quot; class=&quot;org.springframework.data.mongodb.core.MongoTemplate&quot;&gt;
+        &lt;constructor-arg ref=&quot;mongoDbFactory&quot;/&gt; 	
+    &lt;/bean&gt;
+
+    &lt;!-- more beans for your app --&gt;
+
+&lt;/beans&gt;
+</code></pre><p>The rest of this blog post covers all the available namespace elements and their configuration options.</p>
+<h2>Available Namespace Elements</h2>
+<h3><code>&lt;cloud:data-source&gt;</code></h3><p>The <code>&lt;cloud:data-source&gt;</code> element provides a convenient way to configure the JDBC <code>DataSource</code> for your Spring application.</p><p>Basic attributes:</p>
+<ul>
+<li><strong>id</strong> - defaults to service name</li>
+<li><strong>service-name</strong> - only needed if you have multiple relational database services bound to the app</li>
+</ul><p><br /></p><p>A simple example <code>DataSource</code> configuration to be injected into a <code>JdbcTemplate</code> would look like this, with the only attribute used specifying the id of the datasource bean.</p>
+<pre><code class="prettyprint xml"><br />&lt;cloud:data-source id=&quot;dataSource&quot; /&gt;
+
+&lt;bean id=&quot;jdbcTemplate&quot; class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
+  &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;
+&lt;/bean&gt;
+</code></pre><p>There are sub-elements that can be used to configure specific connections and pool settings. The <code>&lt;cloud:data-source&gt;</code> namespace element supports the most commonly used configuration options via the <code>&lt;cloud:connection&gt;</code> and <code>&lt;cloud:pool&gt;</code> sub-elements. The supported options are explained bellow:</p><p><strong><code>&lt;cloud:connection&gt;</code> options</strong></p>
+<table border="1">
+<tbody>
+<tr>
+<th>Namespace attribute</th>
+<th>Description</th>
+<th>Type</th>
+</tr>
+<tr>
+<td>properties</td>
+<td>The connection properties that will be sent to the JDBC driver when establishing new connections. Format of the string must be "propertyName=property;"</td>
+<td>string</td>
+</tr>
+<tbody>
+</table><p><br /></p><p><strong><code>&lt;cloud:pool&gt;</code> options</strong></p>
+<table border="1">
+<tbody>
+<tr>
+<th>Namespace attribute</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+<tr>
+<td>pool-size</td>
+<td>Either the maximum number of connections in the pool or a range specifying minimum and maximum size separated by a dash.</td>
+<td>int</td>
+<td>Uses the default settings of the Apache Commons Pool which are 0 for min and 8 for max size</td>
+</tr>
+<tr>
+<td>max-wait-time</td>
+<td>The maximum number of milliseconds that the pool will wait (when there are no available connections) for a connection to be returned before throwing an exception. -1 indicates unlimited wait.</td>
+<td>int</td>
+<td>Uses the default setting of the Apache Commons Pool which is unlimited (-1)</td>
+</tr>
+<tbody>
+</table><p><br /></p><p>Here is an example of a <code>DataSource</code> configuration with additional settings specified:</p>
+<pre><code class="prettyprint xml"><br />&lt;cloud:data-source id=&quot;mydatasource&quot;&gt;
+    &lt;cloud:connection properties=&quot;charset=utf-8;&quot; /&gt;
+    &lt;cloud:pool pool-size=&quot;5-10&quot; max-wait-time=&quot;2000&quot; /&gt;
+&lt;/cloud:data-source&gt;
+</code></pre>
+<h3><code>&lt;cloud:mongo-db-factory&gt;</code></h3><p>The <code>&lt;cloud:mongo-db-factory&gt;</code> element provides a convenient way to configure the MongoDB connection factory for your Spring application.</p><p>Basic attributes:</p>
+<ul>
+<li><strong>id</strong> - defaults to service name</li>
+<li><strong>service-name</strong> - only needed if you have multiple MongoDB services bound to the app</li>
+<li><strong>write-concern</strong> - the WriteConcern to use for all DB connections created (NONE, NORMAL, SAFE, FSYNC_SAFE). If this is not specified then no WriteConcern will be set for the DB connections and all writes will default to NORMAL</li>
+</ul><p><br /></p><p>The values for the write-concern attribute correspond to the values available in the <code>com.mongodb.WriteConcern</code> class.</p>
+<table border="1">
+<tbody>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>NONE</td>
+<td>No exceptions are raised, even for network issues</td>
+</tr>
+<tr>
+<td>NORMAL</td>
+<td>Exceptions are raised for network issues, but not server errors</td>
+</tr>
+<tr>
+<td>SAFE</td>
+<td>Exceptions are raised for network issues, and server errors; waits on a server for the write operation</td>
+</tr>
+<tr>
+<td>FSYNC_SAFE</td>
+<td>Exceptions are raised for network issues, and server errors and the write operation waits for the server to flush the data to disk</td>
+</tr>
+<tbody>
+</table><p><br /></p><p>A simple example <code>MongoDbFactory</code> configuration to be injected into a <code>MongoTemplate</code> would look like this, with the only attribute used specifying the id of the mongoDbFactory bean.</p>
+<pre><code class="prettyprint xml"><br />&lt;cloud:mongo-db-factory id=&quot;mongoDbFactory&quot; /&gt;
+
+&lt;bean id=&quot;mongoTemplate&quot; class=&quot;org.springframework.data.mongodb.core.MongoTemplate&quot;&gt;
+    &lt;constructor-arg ref=&quot;mongoDbFactory&quot;/&gt; 	
+&lt;/bean&gt;
+</code></pre><p>There are some advanced configuration attributes that are available using the <code>&lt;cloud:mongo-options&gt;</code> sub-element and they are listed below.</p><p><strong><code>&lt;cloud:mongo-options&gt;</code></strong></p>
+<table border="1">
+<tbody>
+<tr>
+<th>Namespace attribute</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+<tr>
+<td>connections-per-host</td>
+<td>The maximum number of connections allowed per host for the Mongo instance. Those connections will be kept in a pool when idle. Once the pool is exhausted, any operation requiring a connection will block waiting for an available connection.</td>
+<td>int</td>
+<td>The Mongo driver has a default of 10</td>
+</tr>
+<tr>
+<td>max-wait-time</td>
+<td>The maximum wait time in ms that a thread may wait for a connection to become available.</td>
+<td>int</td>
+<td>The Mongo driver has a default of 120000</td>
+</tr>
+<tbody>
+</table><p><br /></p><p>Here is an example of a <code>MongoDbFactory</code> configuration with additional settings specified:</p>
+<pre><code class="prettyprint xml"><br />&lt;cloud:mongo-db-factory id=&quot;mongoDbFactory&quot; write-concern=&quot;FSYNC_SAFE&quot;&gt;
+    &lt;cloud:mongo-options connections-per-host=&quot;10&quot; max-wait-time=&quot;2000&quot; /&gt;
+&lt;/cloud:mongo-db-factory&gt;
+</code></pre>
+<h3><code>&lt;cloud:redis-connection-factory&gt;</code></h3><p>The <code>&lt;cloud:redis-connection-factory&gt;</code> element provides a convenient way to configure the Redis connection factory for your Spring application.</p><p>Available attributes:</p>
+<ul>
+<li><strong>id</strong> - defaults to service name</li>
+<li><strong>service-name</strong> - only needed if you have multiple Redis services bound to the app</li>
+</ul><p><br /></p><p>A simple example <code>RedisConnectionFactory</code> configuration to be injected into a <code>RedisTemplate</code> would look like this, with the only attribute used specifying the id of the redisConnectionFactory bean.</p>
+<pre><code class="prettyprint xml"><br />&lt;cloud:redis-connection-factory id=&quot;redisConnectionFactory&quot; /&gt;
+
+&lt;bean id=&quot;redisTemplate&quot; class=&quot;org.springframework.data.redis.core.StringRedisTemplate&quot;&gt;
+    &lt;property name=&quot;connection-factory&quot; ref=&quot;redisConnectionFactory&quot;/&gt;
+&lt;/bean&gt;
+</code></pre><p>The advanced configuration attributes that are available via the <code>&lt;cloud:pool&gt;</code> sub-element are listed below.</p><p><strong><code>&lt;cloud:pool&gt;</code> options</strong></p>
+<table border="1">
+<tbody>
+<tr>
+<th>Namespace attribute</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+<tr>
+<td>pool-size</td>
+<td>Either the maximum number of connections in the pool or a range specifying minimum and maximum size separated by a dash.</td>
+<td>int</td>
+<td>Uses the default settings of the Apache Commons Pool which are 0 for min and 8 for max size</td>
+</tr>
+<tr>
+<td>max-wait-time</td>
+<td>The maximum number of milliseconds that the pool will wait (when there are no available connections) for a connection to be returned before throwing an exception.</td>
+<td>int</td>
+<td>Uses the default setting of the Apache Commons Pool which is unlimited (-1)</td>
+</tr>
+<tbody>
+</table><p><br /></p><p>Here is an example of a <code>RedisConnectionFactory</code> configuration with additional settings specified:</p>
+<pre><code class="prettyprint xml"><br />&lt;&lt;cloud:redis-connection-factory id=&quot;myRedisConnectionFactory&quot;&gt;
+    &lt;cloud:pool pool-size=&quot;5-10&quot; max-wait-time=&quot;2000&quot; /&gt;
+&lt;/cloud:redis-connection-factory&gt;
+</code></pre>
+<h3><code>&lt;cloud:rabbit-connection-factory&gt;</code></h3><p>The <code>&lt;cloud:rabbit-connection-factory&gt;</code> element provides a convenient way to configure the RabbitMQ connection factory for your Spring application.</p><p>Available attributes:</p>
+<ul>
+<li><strong>id</strong> - defaults to service name</li>
+<li><strong>service-name</strong> - only needed if you have multiple RabbitMQ services bound to the app</li>
+</ul><p><br /></p><p>A simple example <code>RabbitConnectionFactory</code> configuration to be injected into a <code>RabbitTemplate</code> would look like this, with the only attribute used specifying the id of the rabbitConnectionFactory bean. This example uses the <code>&lt;rabbit&gt;</code> namespace in addition to the <code>&lt;cloud&gt;</code> one.</p>
+<pre><code class="prettyprint xml"><br />&lt;cloud:rabbit-connection-factory id=&quot;rabbitConnectionFactory&quot; /&gt;
+
+&lt;rabbit:template id=&quot;rabbitTemplate&quot;
+    connection-factory=&quot;rabbitConnectionFactory&quot; /&gt;
+</code></pre><p>The advanced configuration attributes that are available via the <code>&lt;cloud:rabbit-options&gt;</code> are listed below.</p><p><strong><code>&lt;cloud:rabbit-options&gt;</code></strong></p>
+<table border="1">
+<tbody>
+<tr>
+<th>Namespace attribute</th>
+<th>Description</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+<tr>
+<td>channel-cache-size</td>
+<td>The size of the channel cache.</td>
+<td>int</td>
+<td>The default is 1</td>
+</tr>
+<tbody>
+</table><p><br /></p><p>Here is an example of a <code>RabbitConnectionFactory</code> configuration with additional settings specified:</p>
+<pre><code class="prettyprint xml"><br />&lt;cloud:rabbit-connection-factory id=&quot;myRedisConnectionFactory&quot;&gt;
+    &lt;cloud:rabbit-options channel-cache-size=&quot;10&quot; /&gt;
+&lt;/cloud:rabbit-connection-factory&gt;
+</code></pre>
+<h3><code>&lt;cloud:service-scan&gt;</code></h3><p>The <code>&lt;cloud:service-scan&gt;</code> element scans all services bound to the application and creates a bean of an appropriate type for each. You can think of this element as a cloud extension of <code>&lt;context:component-scan&gt;</code> in core Spring, which scans the classpath for beans with certain annotations and creates a bean for each. The <code>&lt;cloud:service-scan&gt;</code> is especially useful during the initial phases of application development, where you want immediate access to service beans without adding a <code>&lt;cloud&gt;</code> element for each new service bound.</p><p>Once you include a <code>&lt;cloud:service-scan&gt;</code> element in application context, then in your Java code, simply add <code>@Autowired</code> dependencies for each bound service:</p>
+<pre><code class="prettyprint java"><br />@Autowired DataSource dataSource;
+@Autowired ConnectionFactory rabbitConnectionFactory;
+@Autowired RedisConnectionFactory redisConnectionFactory;
+@Autowired MongoDbFactory mongoDbFactory;
+</code></pre><p>Voila! You have access to all services without breaking a sweat.</p><p>The above style works as long as you have only one service of each type bound to the application. In other cases, you need to use<br />the <code>@Qualifier</code> to specify the service name (each automatically created bean is named after the associated service name).</p>
+<pre><code class="prettyprint java"><br />@Autowired @Qualifier(&quot;inventory-db&quot;) DataSource inventoryDataSource;
+@Autowired @Qualifier(&quot;pricing-db&quot;) DataSource pricingDataSource;
+</code></pre><p>Here, the <code>inventoryDataSource</code> bean will be bound to the <code>inventory-db</code> service and the <code>pricingDataSource</code> bean will be bound to the <code>pricing-db</code> service.</p>
+<h3><code>&lt;cloud:properties&gt;</code></h3><p>Available attributes:</p>
+<ul>
+<li><strong>id</strong> - the name of the Properties bean</li>
+</ul><p>The <code>&lt;cloud:properties&gt;</code> element exposes basic information about services that can be consumed with Spring’s property placeholder support. The properties exposed match those automatically enabled for a Spring 3.1 application. We will talk about the property form in the next blog.</p>
+<h2>Conclusion</h2><p>The cloud namespace supports an easy mechanism to connect to cloud services. Developers often desire to deploy the same application (the same ‘bits’) in local Tomcat/tcServer, local cloud, and CloudFoundry.com. Spring 3.1’s profile support is tailor-made to support such a possibility. In the next blog, Scott Andrews will explain how.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 448;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+ &copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

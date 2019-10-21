@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Message Flow Tracing with AspectJ and JMX</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Message Flow Tracing with AspectJ and JMX" />
+<meta name="twitter:description" content="&lt;p&gt;In a project that I used to work on we had a system that would receive messages from a device and make decisions on whether that information would be passed to the user. There were multiple decision levels and one of the problems we always found ourselves asking was if a message was being lost on it’s way through the system.&lt;/p&gt;
+&lt;p&gt;Before we moved to Spring, it was nearly impossible to tell the answer to that question. Attempts were made to use logging, but the sheer volume of messages that decisions were made on made it tedious at best. Other attempts were made using debuggers but a combination of the volume and the timing changes led to only intermittent success.&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
+
+<meta property="og:title" content="Message Flow Tracing with AspectJ and JMX" />
+<meta property="og:image" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
+<meta property="og:description" content="&lt;p&gt;In a project that I used to work on we had a system that would receive messages from a device and make decisions on whether that information would be passed to the user. There were multiple decision levels and one of the problems we always found ourselves asking was if a message was being lost on it’s way through the system.&lt;/p&gt;
+&lt;p&gt;Before we moved to Spring, it was nearly impossible to tell the answer to that question. Attempts were made to use logging, but the sheer volume of messages that decisions were made on made it tedious at best. Other attempts were made using debuggers but a combination of the volume and the timing changes led to only intermittent success.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2006-04-25 23:55:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Message Flow Tracing with AspectJ and JMX</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/bhale">Ben Hale</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2006-04-25 23:55:00.0">April 25, 2006</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3" href="/blog/2006/04/25/message-flow-tracing-with-aspectj-and-jmx#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In a project that I used to work on we had a system that would receive messages from a device and make decisions on whether that information would be passed to the user. There were multiple decision levels and one of the problems we always found ourselves asking was if a message was being lost on it&rsquo;s way through the system.</p><p>Before we moved to Spring, it was nearly impossible to tell the answer to that question. Attempts were made to use logging, but the sheer volume of messages that decisions were made on made it tedious at best. Other attempts were made using debuggers but a combination of the volume and the timing changes led to only intermittent success.</p><p>Unfortunately I left before we could implement a more suitable solution but if I had, here is what it probably would have been like. At the end I&rsquo;ll discuss some of the extensions that might be useful in this kind of effort.</p><p>To start, we&rsquo;ve got a set of interfaces and their implementations:</p>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+public interface Component1 {
+
+	void forwardCall();
+
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+import java.util.Random;
+
+public class DefaultComponent1 implements Component1 {
+	
+	private Component2 child;
+
+	private Random r = new Random();
+	
+	public DefaultComponent1(Component2 child) {
+		this.child = child;
+	}
+
+	public void forwardCall() {
+		if (r.nextBoolean()) {
+			child.forwardCall();
+		}
+	}
+
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+public interface Component2 {
+
+	void forwardCall();
+
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+import java.util.Random;
+
+public class DefaultComponent2 implements Component2 {
+	
+	private Component3 child;
+
+	private Random r = new Random();
+	
+	public DefaultComponent2(Component3 child) {
+		this.child = child;
+	}
+
+	public void forwardCall() {
+		if (r.nextBoolean()) {
+			child.forwardCall();
+		}
+	}
+
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+public interface Component3 {
+
+	void forwardCall();
+
+}
+</code></pre>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+public class DefaultComponent3 implements Component3 {
+
+	public void forwardCall() {
+	}
+
+}
+</code></pre><p>This is a very simple example, but the gist is that using the <span style="font-family:courier">fowardCall()</span> method messages are passed 50% of the time to the next child component (ascending numerical order in this case). Note that there is no logic involving tracing in these POJOs.</p><p>To implement our tracing behaviors, we&rsquo;d like to have a set of counters; one for each component. In addition we&rsquo;d like ways to reset the counters, start and stop monitoring, and determine if monitoring is happening. To do this we implement a class with the counters.</p>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
+
+@ManagedResource
+public class FlowTracer {
+
+	private long component1Count = 0;
+
+	private long component2Count = 0;
+
+	private long component3Count = 0;
+
+	private boolean tracing = false;
+
+	@ManagedAttribute
+	public long getComponent1Count() {
+		return this.component1Count;
+	}
+
+	@ManagedAttribute
+	public long getComponent2Count() {
+		return this.component2Count;
+	}
+
+	@ManagedAttribute
+	public long getComponent3Count() {
+		return this.component3Count;
+	}
+
+	@ManagedAttribute
+	public boolean getTracing() {
+		return this.tracing;
+	}
+
+	public void incrementComponent1Count() {
+		if (this.tracing) {
+			component1Count++;
+		}
+	}
+
+	public void incrementComponent2Count() {
+		if (this.tracing) {
+			component2Count++;
+		}
+	}
+
+	public void incrementComponent3Count() {
+		if (tracing) {
+			component3Count++;
+		}
+	}
+
+	@ManagedOperation
+	public void resetAllComponentCount() {
+		resetComponent1Count();
+		resetComponent2Count();
+		resetComponent3Count();
+	}
+
+	@ManagedOperation
+	public void resetComponent1Count() {
+		this.component1Count = 0;
+	}
+
+	@ManagedOperation
+	public void resetComponent2Count() {
+		this.component2Count = 0;
+	}
+
+	@ManagedOperation
+	public void resetComponent3Count() {
+		this.component3Count = 0;
+	}
+
+	@ManagedOperation
+	public void startTracing() {
+		tracing = true;
+	}
+
+	@ManagedOperation
+	public void stopTracing() {
+		tracing = false;
+	}
+}
+</code></pre><p>The methods and their contents are pretty straight forward for this class. What may be new to you are the annotations on this class. These annotations are used by Spring&rsquo;s JMX support to automatically build up MBean management interfaces when each bean is deployed to the JMX MBeanServer.</p>
+<ul>
+<li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jmx/export/annotation/ManagedResource.html" style="font-family:courier">ManagedResource</a>: Declares that this class should be exposed as a JMX MBean
+<li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jmx/export/annotation/ManagedAttribute.html" style="font-family:courier">ManagedAttribute</a>: Declares that the JavaBean property represented by this getter/setter should be a MBean attribute. You need to annotate both the getter and setter if you want read and write access to this attribute.
+<li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jmx/export/annotation/ManagedOperation.html" style="font-family:courier">ManagedOperation</a>: Declares that this method should be exposed as an MBean operation
+</ul><p>Finally it&rsquo;s a matter of wiring the whole thing together. First, we wire together the components that make up the flow. Next we declare the aspects that will put the tracer on each of the components. In this case we are using the very sweet AspectJ pointcut language. Finally we setup the JMX exporter to autodetect instances of classes that have the <span style="font-family:courier">@ManagedResource</span> annotation on them.</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
+
+	&lt;!-- Components --&gt;
+	&lt;bean id=&quot;component3&quot; class=&quot;flowtracingexample.DefaultComponent3&quot; /&gt;
+
+	&lt;bean id=&quot;component2&quot;
+		class=&quot;flowtracingexample.DefaultComponent2&quot;&gt;
+		&lt;constructor-arg ref=&quot;component3&quot; /&gt;
+	&lt;/bean&gt;
+
+	&lt;bean id=&quot;component1&quot;
+		class=&quot;flowtracingexample.DefaultComponent1&quot;&gt;
+		&lt;constructor-arg ref=&quot;component2&quot; /&gt;
+	&lt;/bean&gt;
+
+	&lt;!-- Aspect --&gt;
+	&lt;bean id=&quot;flowTracer&quot; class=&quot;flowtracingexample.FlowTracer&quot; /&gt;
+
+	&lt;aop:config&gt;
+		&lt;aop:aspect id=&quot;component1Aspect&quot; ref=&quot;flowTracer&quot;&gt;
+			&lt;aop:before method=&quot;incrementComponent1Count&quot;
+				pointcut=&quot;execution(public void flowtracingexample.Component1.forwardCall())&quot; /&gt;
+		&lt;/aop:aspect&gt;
+
+		&lt;aop:aspect id=&quot;component2Aspect&quot; ref=&quot;flowTracer&quot;&gt;
+			&lt;aop:before method=&quot;incrementComponent2Count&quot;
+				pointcut=&quot;execution(public void flowtracingexample.Component2.forwardCall())&quot; /&gt;
+		&lt;/aop:aspect&gt;
+
+		&lt;aop:aspect id=&quot;component3Aspect&quot; ref=&quot;flowTracer&quot;&gt;
+			&lt;aop:before method=&quot;incrementComponent3Count&quot;
+				pointcut=&quot;execution(public void flowtracingexample.Component3.forwardCall())&quot; /&gt;
+		&lt;/aop:aspect&gt;
+	&lt;/aop:config&gt;
+
+	&lt;!-- JMX --&gt;
+	&lt;bean class=&quot;org.springframework.jmx.export.MBeanExporter&quot;&gt;
+		&lt;property name=&quot;autodetectModeName&quot; value=&quot;AUTODETECT_ALL&quot; /&gt;
+		&lt;property name=&quot;assembler&quot;&gt;
+			&lt;bean
+				class=&quot;org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler&quot;&gt;
+				&lt;property name=&quot;attributeSource&quot;&gt;
+					&lt;bean
+						class=&quot;org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource&quot; /&gt;
+				&lt;/property&gt;
+			&lt;/bean&gt;
+		&lt;/property&gt;
+		&lt;property name=&quot;namingStrategy&quot;&gt;
+			&lt;bean
+				class=&quot;org.springframework.jmx.export.naming.IdentityNamingStrategy&quot; /&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><p>The next things that we need to do is have a driver class. In this case the driver class just sends a message at some random delay under 750ms.</p>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
+
+import java.io.IOException;
+import java.util.Random;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class FlowTracingExample {
+
+	public static void main(String[] args) throws InterruptedException,
+			IOException {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+				&quot;classpath:flowtracingexample/applicationContext.xml&quot;);
+
+		Component1 comp = (Component1) ctx.getBean(&quot;component1&quot;);
+		Random r = new Random();
+
+		System.out.print(&quot;Ready...&quot;);
+		 System.in.read();
+
+		for (;;) {
+			comp.forwardCall();
+			Thread.sleep(r.nextInt(750));
+		}
+	}
+}
+</code></pre><p>In my case, I&rsquo;m going to run this application with the Java VM Management running since it gives me a free MBean server (and I like the pretty memory graphs). If you haven&rsquo;t heard of this, it&rsquo;s <a href="http://java.sun.com/developer/technicalArticles/J2SE/jconsole.html">a system property in Java 5 VMs</a> that causes the VM to use JMX to manage itself. It has beans for memory consumption, threading, and a million other things. You start it simply by putting <span style="font-family:courier">-Dcom.sun.management.jmxremote</span> on the command line of your running application. In another nifty Java 5 addition, I&rsquo;m going to use <span style="font-family:courier">jconsole</span> to display my results.</p><p>Based on my rusty math skills, over the long term, I&rsquo;d expect to see Component 1 called 100%, Component 2 called 50%, and Component 3 called 25% of the time. Lets see:</p><p><img id="image13" src="http://blog.interface21.com/main/wp-content/uploads/2006/04/tracing.png" alt="Tracing Screen Shot" /></p><p>It&rsquo;s good to see that I remember my probabilities right. The best part is this still meets good design principals. For example, none of the components know anything about the tracing because that&rsquo;s not what they do. As well, all of the tracing requirements for this subsystem are contained in one class and have one implementation meeting the 1:1 requirements to implementation goal of AOP. Finally, with the ability to turn off the tracing, any performance impact is more or less neutralized. I know, I know incrementing an integer isn&rsquo;t that expensive, but if you&rsquo;re tracing did something expensive, it&rsquo;s nice to have and you don&rsquo;t have to worry if you want to send it into production; you can simply disable the monitoring until your customer calls in for support.</p><p>So the graphs sure are pretty and maybe even tell you stuff if you know your expected percentages, but what else could you do? How about the last 100 messages to go by and their decisions? How about a log of the reason that a message was dropped? How about correlation between drop decisions and the absence of a message at the end of the pipe? Wouldn&rsquo;t it be nice to know that a message had been lost (perhaps due to a threading issue) because you never intentionally dropped it but it didn&rsquo;t make it to the end within 500ms of its entry? Along that same line, how about an email to the admin if the time it takes to get from one end of the pipe to the other gets over 250ms?</p><p>The tracing/monitoring possibilities are endless (and pluggable!). What will you do with it?</p><p>And of course, <a id="p12" href="http://blog.interface21.com/main/wp-content/uploads/2006/04/flowtracingexample.zip" title="FlowTracingExample">the source code</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

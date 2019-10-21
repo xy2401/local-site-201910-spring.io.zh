@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>GORM Gotchas (Part 3)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="GORM Gotchas (Part 3)" />
+<meta name="twitter:description" content="&lt;p&gt;It’s great to hear that people are finding these articles useful, so it’s with great pleasure that I add another to the series. This time I’m going to talk about associations again, but with the focus on when they are loaded into memory.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;Update 2 Aug 2010&lt;/b&gt; I have added more information on eager fetching with one-to-many relationships because there are some issues you need to be aware of.&lt;/p&gt;
+&lt;h2&gt;It&#39;s cool to be lazy&lt;/h2&gt;
+&lt;p&gt;One of the first things people learn about GORM relationships is that they are loaded lazily by default. In other words, when you fetch a domain instance from the database, none of its relations will be loaded. Instead, GORM will only load a relation when you actually use it.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="GORM Gotchas (Part 3)" />
+<meta property="og:description" content="&lt;p&gt;It’s great to hear that people are finding these articles useful, so it’s with great pleasure that I add another to the series. This time I’m going to talk about associations again, but with the focus on when they are loaded into memory.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;Update 2 Aug 2010&lt;/b&gt; I have added more information on eager fetching with one-to-many relationships because there are some issues you need to be aware of.&lt;/p&gt;
+&lt;h2&gt;It&#39;s cool to be lazy&lt;/h2&gt;
+&lt;p&gt;One of the first things people learn about GORM relationships is that they are loaded lazily by default. In other words, when you fetch a domain instance from the database, none of its relations will be loaded. Instead, GORM will only load a relation when you actually use it.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-07-28 15:10:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">GORM Gotchas (Part 3)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-07-28 15:10:00.0">July 28, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="344" href="/blog/2010/07/28/gorm-gotchas-part-3#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>It&rsquo;s great to hear that people are finding these articles useful, so it&rsquo;s with great pleasure that I add another to the series. This time I&rsquo;m going to talk about associations again, but with the focus on when they are loaded into memory.</p><p><b>Update 2 Aug 2010</b> I have added more information on eager fetching with one-to-many relationships because there are some issues you need to be aware of.</p>
+<h2>It's cool to be lazy</h2><p>One of the first things people learn about GORM relationships is that they are loaded lazily by default. In other words, when you fetch a domain instance from the database, none of its relations will be loaded. Instead, GORM will only load a relation when you actually use it.</p><p>Let&rsquo;s make this a bit more concrete by considering the example from the previous article:</p>
+<pre><code class="prettyprint groovy">class Location {
+    String city
+}
+
+class Book {
+    String title
+
+    static constraints = {
+        title(blank: false)
+    }
+}
+
+class Author {
+    String name
+    Location location
+
+    static hasMany = [ books: Book ]
+}
+</code></pre><p>If we fetch an <tt>Author</tt> instance, the only information we can use without another query being executed is the author&rsquo;s name. When we try to get the associated location or the books, more queries are kicked off to get the extra data we need.</p><p>This is really the only sensible default option, particularly with complex models that have long chains of associations. If eager fetching were the default, you could feasibly end up pulling in half the data from the database simply by fetching a single instance.</p><p>Nonetheless, this option is not without cost. I&rsquo;ll look at three side-effects of lazy associations so that you know what they are, can recognise the symptoms, and can fix any problems resulting from those side-effects.</p>
+<h3>Proxies</h3><p>Lazy loading of associations involves some magic. After all, you don&rsquo;t want the <tt>location</tt> property above to return <tt>null</tt>, do you? So Hibernate uses proxies and custom collection classes to provide transparent access to the lazy-loaded collections and associations - you don&rsquo;t have to worry about the fact they&rsquo;re not in memory yet. Normally these proxies do a great job of hiding the work that goes on behind the scenes, but occasionally the implementation leaks through.</p><p>As an example, consider this domain model:</p>
+<pre><code class="prettyprint groovy">class Pet {
+    String name
+}
+
+class Dog extends Pet {
+}
+</code></pre><p>It&rsquo;s a very simple inheritance hierarchy, so you wouldn&rsquo;t expect any nasty surprises. Now imagine that we have a <tt>Dog</tt> instance in the database with an ID of 1. What do you think will happen with the following code?</p>
+<pre><code class="prettyprint groovy">def pet = Pet.load(1)
+assert pet instanceof Dog
+</code></pre><p>Intuitively, this should work. After all, the pet with ID 1 is a <tt>Dog</tt>. So why does the assertion fail? Instead of fetching the underlying instance from the database, the <tt>load()</tt> method returns a proxy that executes the required query on demand, for example when you try to access a property other than <tt>id</tt>. This proxy is a dynamic subclass of <tt>Pet</tt> rather than <tt>Dog</tt> so the <tt>instanceof</tt> check fails. It continues to fail even after the instance is loaded from the database! In diagrammatic form:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2010/07/hibernate-proxy.png"><img src="http://blog.springsource.com/wp-content/uploads/2010/07/hibernate-proxy.png" alt="" title="hibernate-proxy" width="540" height="179" class="aligncenter size-full wp-image-5309" /></a></p><p>Changing <tt>Pet.load()</tt> to <tt>Dog.load()</tt> will fix the problem, since the proxy will then be a dynamic subclass of <tt>Dog</tt>. You can also make it work by relacing <tt>load()</tt> with <tt>get()</tt>, because the implementation of the latter automatically unwraps the proxy and returns the underlying <tt>Dog</tt> instance. In fact, Grails works hard to perform this automatic unwrapping in many other situations, so you&rsquo;re unlikely to come across the issue. That&rsquo;s one of the reasons it comes as such as surprise when you do.</p><p>There is one other scenario that may cause some heartache, although it should be fairly rare. Imagine you have another class, <tt>Person</tt>, that has a relationship to <tt>Pet</tt> like so:</p>
+<pre><code class="prettyprint groovy">class Person {
+    String name
+    Pet pet
+}
+</code></pre><p>The <tt>pet</tt> relationship is lazy, so when you get the <tt>Person</tt> instance, the <tt>pet</tt> property will be a proxy. Normally this is hidden from you by GORM, but check out the behaviour of the following:</p>
+<pre><code class="prettyprint groovy">def p = Person.get(1)
+assert p.pet instanceof Dog
+assert Pet.get(1) instanceof Dog
+assert Pet.findById(1) instanceof Dog
+assert Pet.list()[0] instanceof Dog
+</code></pre><p>Assuming that we have one <tt>Person</tt> instance and one <tt>Pet</tt> instance that&rsquo;s a <tt>Dog</tt>, and assuming that the two are related via the <tt>pet</tt> property, the first three assertions will succeed but the last one will not. Get rid of the other lines of code and suddenly that assertion will succeed. Huh?</p><p>This behaviour is undoubtedly confusing, but its roots lie in the Hibernate session. When you retrieve the <tt>Person</tt> from the database, its <tt>pet</tt> property is a proxy. That proxy is stored in the session and represents the <tt>Pet</tt> instance with ID 1. Now, the Hibernate session guarantees that no matter how many times you retrieve a particular domain instance from within a single session, Hibernate will return you the exact same object. So when we call <tt>Pet.get(1)</tt>, <em>Hibernate</em> gives us the proxy. The reason the corresponding assertion succeeds is that GORM automatically unwraps the proxy. The same happens for <tt>findBy*()</tt> and any other queries that can only return a single instance.</p><p>However, GORM does not unwrap proxies for the results of <tt>list()</tt>, <tt>findAllBy*()</tt>, and other queries that can return multiple results. So <tt>Pet.list()[0]</tt> returns us the unwrapped proxy instance. If the <tt>Person</tt> isn&rsquo;t fetched first, <tt>Pet.list()</tt> will return the real instances: the proxy isn&rsquo;t in the session this time, so the query isn&rsquo;t obliged to return it.</p><p>You can protect yourself against this problem in a couple of ways. First, you can use the dynamic <tt>instanceOf()</tt> method instead of the <tt>instanceof</tt> operator. It&rsquo;s available on all GORM domain instances and is proxy-aware: <tt>Pet.get(1).instanceOf(Dog)</tt>. Second, declare variables using <tt>def</tt> rather than static domain class types, otherwise you may see class cast exceptions. So, rather than</p>
+<pre><code class="prettyprint groovy">Person p = Person.get(1)
+Dog dog = Pet.list()[0]    // Throws ClassCastException!
+</code></pre><p>use</p>
+<pre><code class="prettyprint groovy">def p = Person.get(1)
+def dog = Pet.list()[0]
+</code></pre><p>With this approach, you will still be able to access any properties or methods that are specific to <tt>Dog</tt>, even though you&rsquo;re working with a proxy.</p><p>It has to be said, GORM does an amazing job of shielding developers from proxies. They only rarely leak through to your application code, particularly with more recent versions of Grails. Still, some people will run into issues with them so it&rsquo;s useful to be aware what the symptoms are and why they occur.</p><p>I showed in the last example how the behaviour of the session combined with lazy loading can produce some interesting results. That combination also lies behind a more common error: the <tt> org.hibernate.LazyInitializationException</tt>.</p>
+<h3>Lazy loading and the session</h3><p>As I&rsquo;ve already mentioned, when you have a lazily loaded relationship Hibernate has to execute an extra query if you then want to navigate that relationship at a later date. In the normal course of events this isn&rsquo;t a problem (unless you&rsquo;re worried about performance) since Hibernate does it transparently. But what happens if you try to access the relationship in a different session?</p><p>Let&rsquo;s say you have loaded the <tt>Author</tt> instance with ID 1 in a controller action and stored it in the HTTP session. At this point, no code has touched the <tt>books</tt> collection. On the next request, the user goes to a URL that corresponds to this controller action:</p>
+<pre><code class="prettyprint groovy">class MyController {
+    def index = {
+        if (session.author) {
+            render &quot;Author ${session.author.name} has written the books: ${session.author.books*.title}&quot;
+        else {
+            render &quot;No author in session&quot;
+        }
+    }
+    ...
+}
+</code></pre><p>The intention here is that if our HTTP session contains an <tt>author</tt> variable, the action renders the titles of that author&rsquo;s books. Except in this case it doesn&rsquo;t. It throws a <tt>LazyInitializationException</tt> instead.</p><p>The problem is that the <tt>Author</tt> instance is what we call a <em>detached object</em>. It was loaded in one Hibernate session, but then that session was closed at the end of the request. Once an object&rsquo;s session is closed, it becomes detached and you cannot access any properties on it that will result in a query.</p><p>&ldquo;But a session is open in my action, so why the problem?&rdquo; I hear you cry. That&rsquo;s a good question. Unfortunately, this is a new Hibernate session and it doesn&rsquo;t know anything about our <tt>Author</tt> instance. Only when the object is explicitly attached to the new session will you be able to access its lazy associations. There are several techniques for doing just that:</p>
+<pre><code class="prettyprint groovy">def author = session.author
+
+// Re-attach object to session, but don&#39;t sync the data with the database.
+author.attach()
+
+// Re-attach object, but merge any changes with the data in the database.
+// You *must* use the instance returned by the merge() method.
+author = author.merge()
+</code></pre><p>The <tt>attach()</tt> method is useful in cases where the domain instance is unlikely to have changed in the database since the detached object was retrieved. If that data may have changed, then you&rsquo;ll have to be careful. Check the <a href="http://grails.org/doc/latest/">Grails reference guide</a> for information on the behaviour of <tt>merge()</tt> and <tt>refresh()</tt>.</p><p>Now If you get a <tt>LazyInitializationException</tt>, you&rsquo;ll know that it&rsquo;s because your domain object is not attached to a Hibernate session. You&rsquo;ll also have a good idea of how to resolve the issue, although I&rsquo;ll introduce another approach to solving the problem soon. Before I get to that, I want to have a look at another classic side effect of lazy initialisation: the N + 1 select problem.</p>
+<h3>N + 1 selects</h3><p>Let&rsquo;s go back to the author/book/location example from earlier in the article. Imagine we have four authors in the database and we run the following code:</p>
+<pre><code class="prettyprint groovy">Author.list().each { author -&gt;
+    println author.location.city
+}
+</code></pre><p>How many queries will be executed? The answer is five: one to get all the authors, and then one per author to retrieve the corresponding location. This is known as the N + 1 select problem and it&rsquo;s very easy to write code that suffers from it. The example above certainly looks harmless enough at first glance.</p><p>During development this isn&rsquo;t really a problem, but executing so many queries will harm the responsiveness of your application when it&rsquo;s deployed to production. Because of this, it&rsquo;s a good idea to analyse the database usage for your application before it&rsquo;s opened up to end users. The simplest approach is to enable Hibernate logging in <tt>grails-app/conf/DataSource.groovy</tt>, which ensures that all queries are logged to stdout:</p>
+<pre><code class="prettyprint groovy">dataSource {
+    ...
+    loggingSql = true
+}
+</code></pre><p>You can of course enable it on a per-environment basis. An alternative approach is to use a special database driver like <a href="http://www.p6spy.com/">P6Spy</a> that intercepts the queries and logs them.</p><p>So how do you avoid these extra queries? By fetching associations eagerly rather than lazily. This approach also solves the other issues related to lazy loading that I&rsquo;ve mentioned.</p>
+<h3>Being eager</h3><p>GORM allows you to override the default lazy loading behaviour on a per-relationship basis. For example, we can configure GORM to always load an author&rsquo;s location along with the author via this mapping:</p>
+<pre><code class="prettyprint groovy">class Author {
+    String name
+    Location location
+
+    static hasMany = [ books: Book ]
+
+    static mapping = {
+        location fetch: &#39;join&#39;
+    }
+}
+</code></pre><p>In this case, not only is the location loaded with the author, but it&rsquo;s retrieved in the same query using a SQL join. So this code:</p>
+<pre><code class="prettyprint groovy">Author.list().each { a -&gt;
+    println a.location.city
+}
+</code></pre><p>will only result in a single query. You can also use the <tt>lazy: false</tt> option in place of <tt>fetch: &lsquo;join&rsquo;</tt> but that will result in an extra query to load the location. In other words, the association is loaded eagerly, but with a separate SQL select. Most of the time you&rsquo;ll probably want to use <tt>fetch: &lsquo;join&rsquo;</tt> to minimise the number of queries that are executed, but sometimes it can be the more expensive approach. It really depends on your model.</p><p>There are other options, but I won&rsquo;t go into them here. They are fully documented in sections 5.3.4 and 5.5.2.8 of the <a href="http://grails.org/doc/latest">Grails user guide</a> if you want to know more (although I would wait for the 1.3.4 release of Grails, which will come with some important documentation updates).</p><p>The downside to configuring eager loading in the domain class mapping is that the association will <em>always</em> be loaded eagerly. But what if you only need that information occasionally? Any page that just wants to display an author&rsquo;s name will be slowed down unnecessarily because the location must also be loaded. The cost may be low for a simple association like this, but it will be greater for collections. That&rsquo;s why you also have the option to eagerly load associations on a per-query basis.</p><p>Queries are context sensitive, so they&rsquo;re the ideal place to specify whether particular associations should be eagerly loaded or not. Let&rsquo;s say we&rsquo;ve reverted to the default behaviour for <tt>Author</tt> and now we want to get all authors and display their cities. In this context, we obviously want to retrieve the locations when we get the authors. Here&rsquo;s how:</p>
+<pre><code class="prettyprint groovy">Author.list(fetch: [location: &#39;join&#39;]).each { a -&gt;
+    println a.location.city
+}
+</code></pre><p>All we&rsquo;ve done is add a <tt>fetch</tt> argument to the query with a map of association names -&gt; fetch modes. If the code also displayed the titles of the authors&rsquo; books, we&rsquo;d add the <tt>books</tt> association to the map too. The dynamic finders support the exact same <tt>fetch</tt> option:</p>
+<pre><code class="prettyprint groovy">Author.findAllByNameLike(&quot;John%&quot;, [ sort: &#39;name&#39;, order: &#39;asc&#39;, fetch: [location: &#39;join&#39;] ]).each { a-&gt;
+    ...
+}
+</code></pre><p>We can also achieve the same thing with criteria queries:</p>
+<pre><code class="prettyprint groovy">def authors = Author.withCriteria {
+    like(&quot;name&quot;, &quot;John%&quot;)
+    join &quot;location&quot;
+}
+</code></pre><p>All of the above applies to one-to-many relationships too, but there are some extra considerations you need to take into account.</p>
+<h4>Eager loading of one-to-manies</h4><p>I said above that you would typically want to use joins when eagerly fetching associations, but this rule of thumb doesn&rsquo;t work well with one-to-many relationships. To understand why, consider this query:</p>
+<pre><code class="prettyprint groovy">Author.list(max: 2, fetch: [ books: &#39;join&#39; ])
+</code></pre><p>In all likelihood, this will return only one <tt>Author</tt> instance. That&rsquo;s probably not the behaviour you expect or want. So what&rsquo;s happening?</p><p>Under the hood Hibernate is using a left outer join to fetch the books for each author. That means you get duplicate <tt>Author</tt> instances: one for each book the author is associated with. If you don&rsquo;t have the <tt>max</tt> option there, you won&rsquo;t see those duplicates because GORM removes them. But the trouble is the <tt>max</tt> option is applied to the result <em>before</em> the duplicates are removed. So in the example above, Hibernate only returns two results, both of which are likely to have the same author. GORM then removes the duplicate and you end up with a single <tt>Author</tt> instance.</p><p>This problem occurs both with the domain class mapping configuration and criteria queries. In fact, criteria queries won&rsquo;t by default remove the duplicates from the results! There&rsquo;s only one sensible solution to this confusion: always use the &lsquo;select&rsquo; mode for one-to-many relationships. For example, in domain mappings use <tt>lazy: false</tt>:</p>
+<pre><code class="prettyprint groovy">class Author {
+    ...
+    static hasMany = [ books: Book ]
+
+    static mapping = {
+        location fetch: &#39;join&#39;
+        books lazy: false
+    }
+}
+</code></pre><p>In queries, use the appropriate setting depending on whether you&rsquo;re using dynamic finders or criteria queries:</p>
+<pre><code class="prettyprint groovy">import org.hibernate.FetchMode
+
+Author.list(fetch: [ books: &#39;select&#39; ])
+
+Author.withCriteria {
+    fetchMode &quot;books&quot;, FetchMode.SELECT
+}
+</code></pre><p>Yes, you will end up with an extra query to fetch the collection, but it&rsquo;s only one and you gain consistency and simplicity. If you find you really need to reduce the number of queries, then you can always fall back to HQL.</p><p>Apart from the situation with one-to-manies, eager fetching in GORM is straightforward and if you follow the principle of using the &lsquo;select&rsquo; fetch mode for one-to-manies, the same applies to those. The main effort goes into profiling an application&rsquo;s database access to determine where associations should be fetched eagerly or specifically with a join. Just beware premature optimisation!</p>
+<h3>Wrapping up</h3><p>As you&rsquo;ve seen, lazy loading of associations raises a variety of issues, particularly when combined with the Hibernate session. Despite those issues, lazy loading is an important feature that remains a sensible default for object graphs. The problems that tend to crop up are easily identified once you know about them and are typically easy to solve too. And if nothing springs to mind, you can always fall back to judicious use of eager loading.</p><p>All that said, as the Grails version number has gone up, users have progressively become less and less likely to come across these issues. When you consider what&rsquo;s happening behind the scenes with Hibernate, that&rsquo;s a pretty impressive trick!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 344;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

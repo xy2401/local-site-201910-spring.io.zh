@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Microservices with Spring</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Microservices with Spring" />
+<meta name="twitter:description" content="&lt;h1&gt;&lt;a href=&quot;#introduction&quot; class=&quot;anchor&quot; name=&quot;introduction&quot;&gt;&lt;/a&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;NOTE:&lt;/strong&gt; &lt;em&gt;&lt;a href=&quot;#recent-updates&quot;&gt;Revised July 2019&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;A simple example of setting up a microservices system using Spring, Spring Boot and Spring Cloud.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://martinfowler.com/articles/microservices.html&quot;&gt;Microservices&lt;/a&gt; allow large systems to be built up from a number of collaborating components. It does at the process level what Spring has always done at the component level: loosely coupled processes instead of loosely coupled components.&lt;/p&gt;
+&lt;a href=&quot;https://raw.githubusercontent.com/paulc4/microservices-demo/master/shopping-system.jpg&quot;&gt;&lt;img src=&quot;https://raw.githubusercontent.com/paulc4/microservices-demo/master/shopping-system.jpg&quot; title=&quot;Click to enlarge&quot; alt=&quot;Shopping Application&quot; style=&quot;width: 400px; float: right; margin: 0px 5px 5px 10px&quot;&gt;&lt;/a&gt;
+&lt;p&gt;For example imagine an online shop with separate microservices for user-accounts, product-catalog order-processing and shopping carts:&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200" />
+
+<meta property="og:title" content="Microservices with Spring" />
+<meta property="og:image" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200" />
+<meta property="og:description" content="&lt;h1&gt;&lt;a href=&quot;#introduction&quot; class=&quot;anchor&quot; name=&quot;introduction&quot;&gt;&lt;/a&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;NOTE:&lt;/strong&gt; &lt;em&gt;&lt;a href=&quot;#recent-updates&quot;&gt;Revised July 2019&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;A simple example of setting up a microservices system using Spring, Spring Boot and Spring Cloud.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://martinfowler.com/articles/microservices.html&quot;&gt;Microservices&lt;/a&gt; allow large systems to be built up from a number of collaborating components. It does at the process level what Spring has always done at the component level: loosely coupled processes instead of loosely coupled components.&lt;/p&gt;
+&lt;a href=&quot;https://raw.githubusercontent.com/paulc4/microservices-demo/master/shopping-system.jpg&quot;&gt;&lt;img src=&quot;https://raw.githubusercontent.com/paulc4/microservices-demo/master/shopping-system.jpg&quot; title=&quot;Click to enlarge&quot; alt=&quot;Shopping Application&quot; style=&quot;width: 400px; float: right; margin: 0px 5px 5px 10px&quot;&gt;&lt;/a&gt;
+&lt;p&gt;For example imagine an online shop with separate microservices for user-accounts, product-catalog order-processing and shopping carts:&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-07-14 06:28:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Microservices with Spring</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=20&amp;d=mm" />
+<span class="author">Paul Chapman</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-07-14 06:28:00.0">July 14, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2181" href="/blog/2015/07/14/microservices-with-spring#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><h1><a href="#introduction" class="anchor" name="introduction"></a>Introduction</h1>
+<p><strong>NOTE:</strong> <em><a href="#recent-updates">Revised July 2019</a></em></p>
+<p>A simple example of setting up a microservices system using Spring, Spring Boot and Spring Cloud.</p>
+<p><a href="http://martinfowler.com/articles/microservices.html">Microservices</a> allow large systems to be built up from a number of collaborating components. It does at the process level what Spring has always done at the component level: loosely coupled processes instead of loosely coupled components.</p>
+<a href="https://raw.githubusercontent.com/paulc4/microservices-demo/master/shopping-system.jpg"><img src="https://raw.githubusercontent.com/paulc4/microservices-demo/master/shopping-system.jpg" title="Click to enlarge" alt="Shopping Application" style="width: 400px; float: right; margin: 0px 5px 5px 10px" /></a>
+<p>For example imagine an online shop with separate microservices for user-accounts, product-catalog order-processing and shopping carts:</p>
+<p>Inevitably there are a number of moving parts that you have to setup and configure to build such a system. How to get them working together is not obvious - you need to have good familiarity with Spring Boot since Spring Cloud leverages it heavily, several Netflix or other OSS projects are required and, of course, there is some Spring configuration &ldquo;magic&rdquo;!</p>
+<a href="https://raw.githubusercontent.com/paulc4/microservices-demo/master/mini-system.jpg"><img src="https://raw.githubusercontent.com/paulc4/microservices-demo/master/mini-system.jpg" title="Click to enlarge" alt="Demo Application" style="width: 400px; float: left; margin: 5px 10px 5px 0" /></a>
+<p>In this article I aim to clarify how things work by building the simplest possible system step-by-step. Therefore, I will only implement a small part of the big system - the user account service.</p>
+<p>The <em>Web-Application</em> will make requests to the <em>Account-Service</em> microservice using a RESTful API. We will also need to add a <em>discovery</em> service &ndash; so the other processes can find each other.</p>
+<p>The code for this application is here: <a href="https://github.com/paulc4/microservices-demo">https://github.com/paulc4/microservices-demo</a>.</p>
+<p>The description of how it works is deliberately detailed. Impatient readers may prefer to simply look at the <a href="https://github.com/paulc4/microservices-demo">code</a>. Note that it contains <em>three</em> microservices in a single project.</p><h2><a href="#learn-more" class="anchor" name="learn-more"></a>Learn More</h2>
+<ul>
+<li>Sign up for <a href="https://springoneplatform.io/">SpringOne Platform 2019</a> – the premier conference for building scalable microservice applications with Spring. This year we&rsquo;re in Austin, TX from October 7th to 10th. Use the discount code <strong>S1P_Save200</strong> to save money on your ticket. Need help convincing your manager? Use <a href="https://springoneplatform.io/2019/convince-your-manager">this page</a>.</li>
+<li>Get the free eBook <a href="https://content.pivotal.io/ebooks/migrating-to-cloud-native-application-architectures">Migrating to Cloud-Native Architectures</a> by Matt Stine</li>
+<li>This <a href="https://content.pivotal.io/webinars/mar-21-tools-and-recipes-to-replatform-monolithic-apps-to-modern-cloud-environments-webinar">webinar</a> discusses tools and recipes to help you re-platform your monolithic apps to modern cloud environments.</li>
+</ul>
+<a name="recent-updates" /><h2><a href="#updates-june-2018" class="anchor" name="updates-june-2018"></a>Updates (June 2018)</h2>
+<p>A number of changes since I originally wrote this blog:</p>
+<ol>
+<li>A <a href="#configuration-options">discussion</a> of using multiple instances of the same service on the same host.. Demo application updated to match.</li>
+<li>A <a href="#load-balanced-resttemplate">discussion</a> of <code>@LoadBalanced</code> - how this works <em>has changed</em> since the <em>Brixton</em> release-train (<a href="https://projects.spring.io/spring-cloud">Spring Cloud</a> 1.1.0.RELEASE).</li>
+<li>Refactored <a href="#accountsconfiguration-class">configuration</a> of Accounts microservice into its own class <code>AccountsConfiguration</code>.</li>
+<li>Upgraded to Spring Boot 2, so a few Boot classes have changed package.</li>
+<li>Upgraded <a href="#running-the-system">demo application</a> to Spring Cloud <em>Finchley</em> release-train (including various fixes from the comments at the end - thanks for the feedback).</li>
+<li>The Eureka server dependency has changed to <code>spring-cloud-starter-netflix-eureka-server</code>.</li>
+</ol>
+<p>Previous version, using Spring Boot 1.5.10 and Spring Cloud Edgeware SR3, is available as git tag v1.2.0.</p>
+<p>&nbsp;</p>
+<p><em>OK, let&rsquo;s get started &hellip;</em></p><h1><a href="#service-registration" class="anchor" name="service-registration"></a>Service Registration</h1>
+<p>When you have multiple processes working together they need to find each other. If you have ever used Java&rsquo;s RMI mechanism you may recall that it relied on a central registry so that RMI processes could find each other. Microservices has the same requirement.</p>
+<p>The developers at Netflix had this problem when building their systems and created a registration server called Eureka (&ldquo;I have found it&rdquo; in Greek). Fortunately for us, they made their discovery server open-source and Spring has incorporated into Spring Cloud, making it even easier to run up a Eureka server. Here is the <em>complete</em> discovery-server application:</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+@EnableEurekaServer
+public class ServiceRegistrationServer {
+
+  public static void main(String[] args) {
+    // Tell Boot to look for registration-server.yml
+    System.setProperty(&quot;spring.config.name&quot;, &quot;registration-server&quot;);
+    SpringApplication.run(ServiceRegistrationServer.class, args);
+  }
+}
+</code></pre>
+<p>It really is that simple!</p>
+<p>Spring Cloud is built on Spring Boot and utilizes parent and starter POMs. The important parts of the <a href="https://github.com/paulc4/microservices-demo/blob/master/pom.xml">POM</a> are:</p>
+<pre><code class="prettyprint xml">    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.0.1.RELEASE&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;!-- Setup Spring Boot --&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;!-- Setup Spring MVC &amp; REST, use Embedded Tomcat --&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;!-- Spring Cloud starter --&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;!-- Eureka for service registration --&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-eureka-server&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+   &lt;!-- Spring Cloud dependencies --&gt;
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;Finchley.RELEASE&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+</code></pre>
+<p>This POM has changed since I originally wrote the article to use Spring Boot as its parent not Spring Cloud. Spring Cloud dependencies are provided via the dependency management section.</p>
+<p>An sample gradle build file is also included in the github code.</p>
+
+<style>
+.infoblock {
+border: 1px solid #AAF;
+    background-color: white;
+    color: #303030;
+    margin: 0 0 0 0.5em;
+    padding: 0.5em 0 0.5em 1em;
+    float: right;
+    font-size: 88%;
+    width: 45%
+}
+</style>
+<div class="infoblock">
+<p style="margin: 0 0 0 0;">
+<b>Note: </b> <i>Finchley.RELEASE</i> is the current "release train" - a set of co-ordinated releases -- see note on Spring Cloud <a href="https://projects.spring.io/spring-cloud/#release-trains">home page</a>.
+</p>
+</div>
+<p>By default Spring Boot applications look for an <code>application.properties</code> or <code>application.yml</code> file for configuration. By setting the <code>spring.config.name</code> property we can tell Spring Boot to look for a different file - useful if you have multiple Spring Boot applications in the same project - as I will do shortly.</p>
+<p>This application looks for <code>registration-server.properties</code> or <code>registration-server.yml</code>. Here is the relevant configuration from <code>registration-server.yml</code>:</p>
+<pre><code class="prettyprint yml"># Configure this Discovery Server
+eureka:
+  instance:
+    hostname: localhost
+  client:  # Not a client, don&#39;t register with yourself (unless running
+           # multiple discovery servers for redundancy)
+    registerWithEureka: false
+    fetchRegistry: false
+
+server:
+  port: 1111   # HTTP (Tomcat) port
+</code></pre>
+<p>By default Eureka runs on port 8761, but here we will use port <code>1111</code> instead. Also by including the registration code in my process I might be a server or a client. The configuration specifies that I am not a client and stops the server process trying to register with itself.</p>
+
+<div class="infoblock">
+<h2 style="margin: 10px 0 15px -1em">Using Consul</h2>
+<p style="margin-bottom: 10px">
+Spring Cloud also supports <a href="https://www.consul.io">Consul</a> as an alternative to Eureka. You start the Consul Agent (its registration server) using a script and then clients use it to find their microservices. For details, see this blog <a href="https://spring.io/blog/2015/05/27/spring-cloud-consul-1-0-0-m1-available-now">article</a> or project <a href="https://cloud.spring.io/spring-cloud-consul">home page</a>.
+</p>
+</div>
+<p>Try running the <em>RegistrationServer</em> now (see <a href="#running-the-system">below</a> for help on running the application). You can open the Eureka dashboard here: <a href="http://localhost:1111">http://localhost:1111</a> and the section showing Applications will be empty.</p>
+<p>From now on we will refer to the <em>discovery-server</em> since it could be Eureka or Consul (see side panel).</p><h1><a href="#creating-a-microservice-em-account-service-em" class="anchor" name="creating-a-microservice-em-account-service-em"></a>Creating a Microservice: <em>Account-Service</em></h1>
+<p>A microservice is a stand-alone process that handles a well-defined requirement. </p>
+<a href="https://raw.githubusercontent.com/paulc4/microservices-demo/master/beans-vs-processes.jpg"><img src="https://raw.githubusercontent.com/paulc4/microservices-demo/master/beans-vs-processes.jpg" title="Click to enlarge" alt="Beans vs Processes" style="width: 400px; float: right; margin: 10px 0 5px 15px" /></a>
+<p>When configuring applications with Spring we emphasize Loose Coupling and Tight Cohesion, These are not new concepts (Larry Constantine is credited with first defining these in the late 1960s - <a href="https://en.wikipedia.org/wiki/Cohesion_%28computer_science%29">reference</a>) but now we are applying them, not to interacting components (Spring Beans), but to interacting processes.</p>
+<p>In this example, I have a simple Account management microservice that uses Spring Data to implement a JPA <code>AccountRepository</code> and Spring REST to provide a RESTful interface to account information. In most respects this is a straightforward Spring Boot application.</p>
+<p>What makes it special is that it registers itself with the <em>discovery-server</em> at start-up. Here is the Spring Boot startup class:</p>
+<pre><code class="prettyprint java">@EnableAutoConfiguration
+@EnableDiscoveryClient
+@Import(AccountsWebApplication.class)
+public class AccountsServer {
+
+    @Autowired
+    AccountRepository accountRepository;
+
+    public static void main(String[] args) {
+        // Will configure using accounts-server.yml
+        System.setProperty(&quot;spring.config.name&quot;, &quot;accounts-server&quot;);
+
+        SpringApplication.run(AccountsServer.class, args);
+    }
+}
+</code></pre>
+<p>The annotations do the work:</p>
+<ol>
+<li><code>@EnableAutoConfiguration</code> - defines this as a Spring Boot application.</li>
+<li><code>@EnableDiscoveryClient</code> - this enables service registration and discovery. In this case, this process registers itself with the <em>discovery-server</em> service using its application name (see below).</li>
+<li><code>@Import(AccountsWebApplication.class)</code> - this Java Configuration class sets up everything else (see <a href="#accountswebapplication-configuration">below</a> for more details).</li>
+</ol>
+<p>What makes this a microservice is the registration with the <em>discovery-server</em> via <code>@EnableDiscoveryClient</code> and its YML configuration completes the setup:</p>
+<pre><code class="prettyprint yml"># Spring properties
+spring:
+  application:
+     name: accounts-service
+
+# Discovery Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:1111/eureka/
+
+# HTTP Server
+server:
+  port: 2222   # HTTP (Tomcat) port
+</code></pre>
+<p>Note that this file</p>
+<ol>
+<li>Sets the application name as <code>accounts-service</code>. This service registers under this name and can also be accessed by this name - see below.</li>
+<li>Specifies a custom port to listen on (2222). All my processes are using Tomcat, they can&rsquo;t all listen on port 8080.</li>
+<li>The URL of the Eureka Service process - from the previous section.</li>
+</ol>
+<a href="https://raw.githubusercontent.com/paulc4/microservices-demo/master/dashboard.png"><img src="https://raw.githubusercontent.com/paulc4/microservices-demo/master/dashboard.png" title="Click to enlarge" alt="Eureka Dashboard" style="width: 450px; float: right; margin: 0px 5px 5px 10px" /></a>
+<p>Run the <em>AccountsService</em> application now and let it finish initializing. Refresh the dashboard <a href="http://localhost:1111">http://localhost:1111</a> and you should see the ACCOUNTS-SERVICE listed under Applications. Registration takes up to 30 seconds (by default) so be patient - check the log output from <em>RegistrationService</em></p>
+
+<div class="infoblock">
+<p style="margin: 0 0 0 0;">
+<b>Warning: </b>Do not try to display XML output using the internal web-viewer of Eclipse/STS because it cannot do so. Use your favorite web browser instead.
+</p>
+</div>
+<p>For more detail, go here: <a href="http://localhost:1111/eureka/apps/">http://localhost:1111/eureka/apps/</a> and you should see something like this:</p>
+<pre><code class="prettyprint xml">&lt;applications&gt;
+    &lt;versions__delta&gt;1&lt;/versions__delta&gt;
+    &lt;apps__hashcode&gt;UP_1_&lt;/apps__hashcode&gt;
+    &lt;application&gt;
+        &lt;name&gt;ACCOUNTS-SERVICE&lt;/name&gt;
+        &lt;instance&gt;
+            &lt;hostName&gt;autgchapmp1m1.corp.emc.com&lt;/hostName&gt;
+            &lt;app&gt;ACCOUNTS-SERVICE&lt;/app&gt;
+            &lt;ipAddr&gt;172.16.84.1&lt;/ipAddr&gt;&lt;status&gt;UP&lt;/status&gt;
+            &lt;overriddenstatus&gt;UNKNOWN&lt;/overriddenstatus&gt;
+            &lt;port enabled=&quot;true&quot;&gt;3344&lt;/port&gt;
+            &lt;securePort enabled=&quot;false&quot;&gt;443&lt;/securePort&gt;
+            ...
+        &lt;/instance&gt;
+    &lt;/application&gt;
+&lt;/applications&gt;
+
+</code></pre>
+<p>Alternatively go to <a href="http://localhost:1111/eureka/apps/ACCOUNTS-SERVICE">http://localhost:1111/eureka/apps/ACCOUNTS-SERVICE</a> and see just the details for <em>AccountsService</em> - if it&rsquo;s not registered you will get a 404. </p><h2><a href="#configuration-options" class="anchor" name="configuration-options"></a>Configuration Options</h2>
+<p><strong>Registration Time:</strong> Registration takes up to 30s because that is the default client refresh time. You can change this by setting the <code>eureka.instance.leaseRenewalIntervalInSeconds</code> property to a smaller number (in the demo application I have set it to 5). This <em>is not recommended</em> in <a href="https://cloud.spring.io/spring-cloud-static/docs/1.0.x/spring-cloud.html#_why_is_it_so_slow_to_register_a_service">production</a>. See <a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/373">also</a>.</p>
+<pre><code class="prettyprint yml">eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 5         # DO NOT DO THIS IN PRODUCTION
+</code></pre>
+<p><strong>Registration Id:</strong> A process (microservice) registers with the discovery-service using a unique id. If another process registers with the <em>same</em> id, it is treated as a restart (for example some sort of failover or recovery) and the first process registration is discarded. This gives us the fault-tolerant system we desire. </p>
+<p>To run multiple instances of the <em>same</em> process (for load-balancing and resilience) they need to register with a unique id. When I first wrote this blog, that was automatic and since the <em>Brixton</em> release-train, it is again.</p>
+<p>Under the <em>Angel</em> release train, the instance-id, used by a client to register with a discovery server, was derived from the client&rsquo;s service name (the same as the Spring application name) and also the client&rsquo;s host name. The same processes running on the same host would therefore have the same id, so only one could ever register.</p>
+<p>Fortunately you could set the id property manually via the client&rsquo;s Eureka metadata map, like this:</p>
+<pre><code class="prettyprint yml">eureka:
+  instance:
+    metadataMap:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+</code></pre>
+<p>Since the <em>Brixton</em> release train, <em>this is now the default</em>. So what does it do?</p>
+<p>We are setting the <code>instanceId</code> to <code>application-name:instance_id</code>, but if <code>instance_id</code> is not defined, we will use <code>application-name::server-port</code> instead. Note that the <code>spring.application.instance_id</code> is <em>only</em> set when using Cloud Foundry but it conveniently provides a unique id number for each instance of the same application. We can do something similar when running elsewhere by using the server-port (since different instances on the same machine <em>must</em> listen on different ports. Another example you will often see is <code>${spring.application.name}:${spring.application.instance_id:${random.value}}</code> but I personally find using the port number makes each instance easy to identify - the random values are just long strings that don&rsquo;t mean anything.</p>
+<p><strong>Note:</strong> The syntax <code>${x:${y}}</code> is Spring property shorthand for <code>${x} != null ? ${x} : ${y}</code>.</p>
+<p>Since the <em>Brixton</em> release there is also a dedicated property for this:</p>
+<pre><code class="prettyprint yml">eureka:
+  instance:
+    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+</code></pre><h1><a href="#accessing-the-microservice-em-web-service-em" class="anchor" name="accessing-the-microservice-em-web-service-em"></a>Accessing the Microservice: <em>Web-Service</em></h1>
+<p>To consume a RESTful service, Spring provides the <code>RestTemplate</code> class. This allows you to send HTTP requests to a RESTful server and fetch data in a number of formats - such as JSON and XML.</p>
+
+<div class="infoblock" style="width: 50%">
+<p style="margin: 0 0 0 0">
+<b>Note: </b>The Accounts microservice provides a RESTful interface over HTTP, but any suitable protocol could be used. Messaging using <a href="https://rabbitmq.docs.pivotal.io">AMQP</a> or JMS is an obvious alternative (in
+which case the Discovery Server is no longer needed - instead processes need to know the
+names of the queues to talk to, consider using the <a href="https://cloud.spring.io/spring-cloud-config/">Spring Cloud Configuration Server<a> for this).
+</p>
+</div>
+<p>Which formats can be used depends on the presence of marshaling classes on the classpath - for example JAXB is always detected since it is a standard part of Java. JSON is supported if Jackson jars are present in the classpath.</p>
+<p>A microservice (discovery) client can use a <code>RestTemplate</code> and Spring will automatically configure it to be microservice aware (more of this in a moment).</p><h2><a href="#encapsulating-microservice-access" class="anchor" name="encapsulating-microservice-access"></a>Encapsulating Microservice Access</h2>
+<p>Here is part of the <code>WebAccountService</code> for my <em>client</em> application:</p>
+<pre><code class="prettyprint java">@Service
+public class WebAccountsService {
+
+    @Autowired        // NO LONGER auto-created by Spring Cloud (see below)
+    @LoadBalanced     // Explicitly request the load-balanced template
+                      // with Ribbon built-in
+    protected RestTemplate restTemplate; 
+
+    protected String serviceUrl;
+
+    public WebAccountsService(String serviceUrl) {
+        this.serviceUrl = serviceUrl.startsWith(&quot;http&quot;) ?
+               serviceUrl : &quot;http://&quot; + serviceUrl;
+    }
+
+    public Account getByNumber(String accountNumber) {
+        Account account = restTemplate.getForObject(serviceUrl
+                + &quot;/accounts/{number}&quot;, Account.class, accountNumber);
+
+        if (account == null)
+            throw new AccountNotFoundException(accountNumber);
+        else
+            return account;
+    }
+    ...
+}
+</code></pre>
+<p>Note that my <code>WebAccountService</code> is just a wrapper for the RestTemplate fetching data from the microservice. The interesting parts are the <code>serviceUrl</code> and the <code>RestTemplate</code>.</p><h2><a href="#accessing-the-microservice" class="anchor" name="accessing-the-microservice"></a>Accessing the Microservice</h2>
+<p>As shown below, the <code>serviceUrl</code> is provided by the main program to the <code>WebAccountController</code> (which in turn passes it to the <code>WebAccountService</code>):</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+@EnableDiscoveryClient
+@ComponentScan(useDefaultFilters=false)  // Disable component scanner
+public class WebServer {
+
+    // Case insensitive: could also use: http://accounts-service
+    public static final String ACCOUNTS_SERVICE_URL
+                                        = &quot;http://ACCOUNTS-SERVICE&quot;;
+
+    public static void main(String[] args) {
+        // Will configure using web-server.yml
+        System.setProperty(&quot;spring.config.name&quot;, &quot;web-server&quot;);
+        SpringApplication.run(WebServer.class, args);
+    }
+
+    @LoadBalanced    // Make sure to create the load-balanced template
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    /**
+     * Account service calls microservice internally using provided URL.
+     */
+    @Bean
+    public WebAccountsService accountsService() {
+        return new WebAccountsService(ACCOUNTS_SERVICE_URL);
+    }
+
+    @Bean
+    public WebAccountsController accountsController() {
+         return new WebAccountsController
+                       (accountsService());  // plug in account-service
+    }
+}
+</code></pre>
+<p>A few points to note:</p>
+<ol>
+<li>The <code>WebController</code> is a typical Spring MVC view-based controller returning HTML. The application uses Thymeleaf as the view-technology (for generating dynamic HTML)</li>
+<li><code>WebServer</code> is also a <code>@EnableDiscoveryClient</code> but in this case as well as registering itself with the <em>discovery-server</em> (which is not necessary since it offers no services of its own) it uses Eureka to locate the account service.</li>
+<li>The default component-scanner setup inherited from Spring Boot looks for <code>@Component</code> classes and, in this case, finds my <code>WebAccountController</code> and tries to create it. However, I want to create it myself, so I disable the scanner like this <code>@ComponentScan(useDefaultFilters=false)</code>.</li>
+<li>The <em>service-url</em> I am passing to the <code>WebAccountController</code> is the name the service used to register itself with the <em>discovery-server</em> - by default this is the same as the <code>spring.application.name</code> for the process which is <code>account-service</code> - see <code>account-service.yml</code> above. The use of upper-case is not required but it does help emphasize that <em>ACCOUNTS-SERVICE</em> is a logical host (that will be obtained via discovery) not an actual host.</li>
+</ol><h2><a href="#load-balanced-resttemplate" class="anchor" name="load-balanced-resttemplate"></a>Load Balanced RestTemplate</h2>
+<p>The <code>RestTemplate</code> bean will be intercepted and auto-configured by Spring Cloud (due to the <code>@LoadBalanced</code> annotation) to use a custom <code>HttpRequestClient</code> that uses Netflix <a href="http://techblog.netflix.com/2013/01/announcing-ribbon-tying-netflix-mid.html">Ribbon</a> to do the microservice lookup. Ribbon is also a load-balancer so if you have multiple instances of a service available, it picks one for you. (Neither Eureka nor Consul on their own perform load-balancing so we use Ribbon to do it instead).</p>
+<p><strong>Note:</strong> From the <em>Brixton</em> Release Train (Spring Cloud 1.1.0.RELEASE), the RestTemplate is no longer created automatically. Originally it was created for you, which caused confusion and potential conflicts (sometimes Spring can be <em>too</em> helpful!).</p>
+<p>Note that this instance is qualified using <code>@LoadBalanced</code>. (The <a href="https://github.com/spring-cloud/spring-cloud-commons/blob/master/spring-cloud-commons/src/main/java/org/springframework/cloud/client/loadbalancer/LoadBalanced.java">annotation</a> is itself annotated with <code>@Qualifier</code> - see <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/html/beans.html#beans-autowired-annotation-qualifiers">here</a> for details). Thus if you have more than one RestTemplate bean, you can make sure to inject the right one, like this:</p>
+<pre><code class="prettyprint java">    @Autowired
+    @LoadBalanced     // Make sure to inject the load-balanced template
+    protected RestTemplate restTemplate;
+</code></pre>
+<p>If you look in the <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/spring-cloud-netflix-core/src/main/java/org/springframework/cloud/netflix/ribbon/RibbonClientHttpRequestFactory.java">RibbonClientHttpRequestFactory</a> you will see this code:</p>
+<pre><code class="prettyprint java">    String serviceId = originalUri.getHost();
+    ServiceInstance instance =
+             loadBalancer.choose(serviceId);  // loadBalancer uses Ribbon
+    ... if instance non-null (service exists) ...
+    URI uri = loadBalancer.reconstructURI(instance, originalUri);
+</code></pre>
+<p>The <code>loadBalancer</code> takes the logical service-name (as registered with the <em>discovery-server</em>) and converts it to the actual hostname of the chosen microservice.</p>
+<p>A <code>RestTemplate</code> instance is thread-safe and can be used to access any number of services in different parts of your application (for example, I might have a <code>CustomerService</code> wrapping the same <code>RestTemplate</code> instance accessing a customer data microservice).</p><h2><a href="#configuration" class="anchor" name="configuration"></a>Configuration</h2>
+<p>Below the relevant configuration from <code>web-server.yml</code>. It is used to:</p>
+<ol>
+<li>Set the application name</li>
+<li>Define the URL for accessing the discovery server</li>
+<li>Set the Tomcat port to 3333</li>
+</ol>
+<pre><code class="prettyprint yml"># Spring Properties
+spring:
+  application:
+     name: web-service
+
+# Discovery Server Access
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:1111/eureka/
+
+# HTTP Server
+server:
+  port: 3333   # HTTP (Tomcat) port
+</code></pre>
+<a name="running-the-system" /><h1><a href="#how-to-run-the-demo" class="anchor" name="how-to-run-the-demo"></a>How to Run the Demo</h1>
+<p>A small demo of this system is at <a href="https://github.com/paulc4/microservices-demo">http://github.com/paulc4/microservices-demo</a>. Clone it and either load into your favorite IDE or use maven directly. Suggestions on how to run the demo are included in the <a href="https://github.com/paulc4/microservices-demo/blob/master/README.md">README</a> on the project homepage.</p>
+<hr style="height:6px" /><h1><a href="#extra-notes" class="anchor" name="extra-notes"></a>Extra Notes</h1>
+<p>Some notes about Spring Boot usage by these applications. If you are not familiar with Spring Boot, this explains some of the &ldquo;magic&rdquo;!</p><h2><a href="#view-templating-engines" class="anchor" name="view-templating-engines"></a>View Templating Engines</h2>
+<p>The Eureka dashboard (inside <code>RegistrationServer</code>) is implemented using FreeMarker templates but the other two applications use Thymeleaf. To make sure each uses the right view engine, there is extra configuration in each YML file.</p>
+<p>This is at the end of <code>registration-server.yml</code> to disable Thymeleaf.</p>
+<pre><code class="prettyprint yml">...
+# Discovery Server Dashboard uses FreeMarker.  Don&#39;t want Thymeleaf templates
+spring:
+  thymeleaf:
+    enabled: false     # Disable Thymeleaf spring:
+</code></pre>
+<p>Since both <code>AccountService</code> and <code>WebService</code> use thymeleaf, we also need to point each at their own templates. Here is part of <code>account-server.yml</code>:</p>
+<pre><code class="prettyprint yml"># Spring properties
+spring:
+  application:
+     name: accounts-service  # Service registers under this name
+  freemarker:
+    enabled: false      # Ignore Eureka dashboard FreeMarker templates
+  thymeleaf:
+    cache: false        # Allow Thymeleaf templates to be reloaded at runtime
+    prefix: classpath:/accounts-server/templates/
+                        # Template location for this application only
+...
+</code></pre>
+<p><code>web-server.yml</code> is similar but its templates are defined by</p>
+<pre><code class="prettyprint yml">   prefix: classpath:/web-server/templates/
+</code></pre>
+<p>Note the / on the end of each <code>spring.thymeleaf.prefix</code> classpath - this is <em>crucial</em>.</p><h2><a href="#command-line-execution" class="anchor" name="command-line-execution"></a>Command-Line Execution</h2>
+<p>The jar is compiled to automatically run <code>io.pivotal.microservices.services.Main</code> when invoked from the command-line - see <a href="https://github.com/paulc4/microservices-demo/blob/master/src/main/java/io/pivotal/microservices/services/Main.java">Main.java</a>.</p>
+<p>The Spring Boot option to set the <code>start-class</code> can be seen in the <a href="https://github.com/paulc4/microservices-demo/blob/master/pom.xml">POM</a>:</p>
+<pre><code class="prettyprint xml">    &lt;properties&gt;
+        &lt;!-- Stand-alone RESTFul application for testing only --&gt;
+        &lt;start-class&gt;io.pivotal.microservices.services.Main&lt;/start-class&gt;
+    &lt;/properties&gt;
+</code></pre><h2><a href="#accountsconfiguration-class" class="anchor" name="accountsconfiguration-class"></a>AccountsConfiguration class</h2>
+<pre><code class="prettyprint java">@SpringBootApplication
+@EntityScan(&quot;io.pivotal.microservices.accounts&quot;)
+@EnableJpaRepositories(&quot;io.pivotal.microservices.accounts&quot;)
+@PropertySource(&quot;classpath:db-config.properties&quot;)
+public class AccountsWebApplication {
+...
+}
+</code></pre>
+<p>This is the main configuration class for AccountService which is a classic Spring Boot application using Spring Data. The annotations do most of the work:</p>
+<ol>
+<li><code>@SpringBootApplication</code> - defines this as a Spring Boot application. This convenient annotation combines <code>@EnableAutoConfiguration</code>, <code>@Configuration</code> and <code>@ComponentScan</code> (which, by default, causes Spring to search the package containing this class, and its sub-packages, for components - potential Spring Beans: <code>AccountController</code> and <code>AccountRepository</code>) .</li>
+<li><code>@EntityScan(&quot;io.pivotal.microservices.accounts&quot;)</code> - because I am using JPA, I need to specify where the <code>@Entity</code> classes are. Normally this is an option you specify in JPA&rsquo;s <code>persistence.xml</code> or when creating a <code>LocalContainerEntityManagerFactoryBean</code>. Spring Boot will create this factory-bean for me because the <code>spring-boot-starter-data-jpa</code> dependency is on the class path. So an alternative way of specifying where to find the <code>@Entity</code> classes is by using<code>@EntityScan</code>. This will find <code>Account</code>.</li>
+<li><code>@EnableJpaRepositories(&quot;io.pivotal.microservices.accounts&quot;)</code>- look for classes extending Spring Data&rsquo;s <code>Repository</code> marker interface and automatically implement them using JPA - see <a href="https://projects.spring.io/spring-data-jpa">Spring Data JPA</a>.</li>
+<li><code>@PropertySource(&quot;classpath:db-config.properties&quot;)</code> - properties to configure my <code>DataSource</code> &ndash; see <a href="https://github.com/paulc4/microservices-demo/blob/master/src/main/resources/db-config.properties">db-config.properties</a>.</li>
+</ol><h2><a href="#configuring-properties" class="anchor" name="configuring-properties"></a>Configuring Properties</h2>
+<p>As mentioned above, Spring Boot applications look for either <code>application.properties</code> or <code>application.yml</code> to configure themselves. Since all three servers used in this application are in the same project, they would automatically use the same configuration.</p>
+<p>To avoid that, each specifies an alternative file by setting the <code>spring.config.name</code> property.</p>
+<p>For example here is part of <code>WebServer.java</code>.</p>
+<pre><code class="prettyprint java">public static void main(String[] args) {
+  // Tell server to look for web-server.properties or web-server.yml
+  System.setProperty(&quot;spring.config.name&quot;, &quot;web-server&quot;);
+  SpringApplication.run(WebServer.class, args);
+}
+</code></pre>
+<p>At runtime, the application will find and use <code>web-server.yml</code> in <code>src/main/resources</code>.</p><h2><a href="#logging" class="anchor" name="logging"></a>Logging</h2>
+<p>Spring Boot sets up INFO level logging for Spring by default. Since we need to examine the logs for evidence of our microservices working, I have raised the level to WARN to reduce the amount of logging.</p>
+<p>To do this, the logging level would need to be specified in each of the <code>xxxx-server.yml</code> configuration files. This is usually the best place to define them as logging properties <em>cannot</em> be specified in property files (logging has already been initialized before @PropertySource directives are processed). There is a note on this in the Spring Boot manual, but it&rsquo;s easy to miss.</p>
+<p>Rather than duplicate the logging configuration in each YAML file, I instead opted to put it in the logback configuration file, since Spring Boot uses logback - see <a href="https://github.com/paulc4/microservices-demo/blob/master/src/main/resources/logback.xml">src/main/resources/logback.xml</a>. All three services will share the same <code>logback.xml</code>.</p>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2181;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

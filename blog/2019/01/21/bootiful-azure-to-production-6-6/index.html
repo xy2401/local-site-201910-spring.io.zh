@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Bootiful Azure: To Production (6/6)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Bootiful Azure: To Production (6/6)" />
+<meta name="twitter:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;This is part 6 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series &lt;a href=&quot;https://github.com/joshlong/bootiful-azure-article&quot;&gt;on Github&lt;/a&gt;. Hit me up on &lt;a href=&quot;http://twitter.com/Starbuxman&quot;&gt;Twitter (@starbuxman)&lt;/a&gt; as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my &lt;a href=&quot;http://twitter.com/SpringTipsLive&quot;&gt;Spring Tips (@SpringTipsLive)&lt;/a&gt; installment, &lt;a href=&quot;https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure&quot;&gt;&lt;em&gt;Bootiful Azure&lt;/em&gt;&lt;/a&gt;&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Bootiful Azure: To Production (6/6)" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;This is part 6 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series &lt;a href=&quot;https://github.com/joshlong/bootiful-azure-article&quot;&gt;on Github&lt;/a&gt;. Hit me up on &lt;a href=&quot;http://twitter.com/Starbuxman&quot;&gt;Twitter (@starbuxman)&lt;/a&gt; as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my &lt;a href=&quot;http://twitter.com/SpringTipsLive&quot;&gt;Spring Tips (@SpringTipsLive)&lt;/a&gt; installment, &lt;a href=&quot;https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure&quot;&gt;&lt;em&gt;Bootiful Azure&lt;/em&gt;&lt;/a&gt;&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-01-21 00:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Bootiful Azure: To Production (6/6)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-01-21 00:00:00.0">January 21, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3516" href="/blog/2019/01/21/bootiful-azure-to-production-6-6#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><blockquote>
+<p>This is part 6 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn&rsquo;t have put this together without input from Microsoft&rsquo;s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series <a href="https://github.com/joshlong/bootiful-azure-article">on Github</a>. Hit me up on <a href="https://twitter.com/Starbuxman">Twitter (@starbuxman)</a> as you&rsquo;re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my <a href="https://twitter.com/SpringTipsLive">Spring Tips (@SpringTipsLive)</a> installment, <a href="https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure"><em>Bootiful Azure</em></a></p>
+</blockquote>
+<p>Here are all the installments: </p>
+<ul>
+<li><a href="https://spring.io/blog/2019/01/03/bootiful-azure-taking-your-first-steps-with-microsoft-azure-1-6">Bootiful Azure: Taking Your First Steps with Microsoft Azure</a></li>
+<li><a href="https://spring.io/blog/2019/01/07/bootiful-azure-sql-based-data-access-with-microsoft-sql-server-2-6">Bootiful Azure: SQL-based data access with Microsoft SQL Server</a></li>
+<li><a href="https://spring.io/blog/2019/01/10/bootiful-azure-global-scale-data-access-with-cosmosdb-3-6">Bootiful Azure: Global Scale Data Access with CosmosDB</a></li>
+<li><a href="https://spring.io/blog/2019/01/14/bootiful-azure-integration-with-azure-service-bus-4-6">Bootiful Azure: Integration with Azure Service Bus</a></li>
+<li><a href="https://spring.io/blog/2019/01/17/bootiful-azure-object-storage-service-5-6">Bootiful Azure: Object Storage Service</a></li>
+<li><a href="https://spring.io/blog/2019/01/21/bootiful-azure-to-production-6-6">Bootiful Azure: To Production!</a></li>
+</ul>
+<p>This last post in our series looking at Microsoft Azure is really a quick wrapup post that looks at things to keep in mind when deploying an application built with Spring Boot and Micosoft Azure to production.</p><h2><a href="#secure-configuration" class="anchor" name="secure-configuration"></a>Secure Configuration</h2>
+<p>We&rsquo;ve developed the application with ease and aplomb from the comfort of our local machines, plugging in the relevant confuguration values as we need them. Trouble is, these are often very sensitie values tht shouldn&rsquo;t be left laying around on the filesystem at rest, unencrypted. There are a <em>number</em> of good solutions for this. You could of course deploy the Spring Cloud Config Service itself. If you&rsquo;re running <a href="https://pivotal.io/partners/microsoft">Pivotal Cloud Foundry on Microsoft Azure (or otherwise)</a>, this is the recommended way because it&rsquo;s a one-liner to get it deployed and working. You could of course deploy <a href="https://www.hashicorp.com/resources/introduction-to-using-hashicorp-vault-with-azure">Hashicorp Vault and use Spring Cloud Vault</a>. Or, you could store the keys and values in Microsoft&rsquo;s <a href="https://azure.microsoft.com/en-us/services/key-vault/">own Key Vault service</a>. In order to effectively use Key Vault you&rsquo;ll need to get into configuring Microsoft Active Directory which, while not something I&rsquo;d wish on you or your loved ones, dear reader, is something in which I&rsquo;m <em>quite</em> interested.</p><h2><a href="#microsoft-active-directory" class="anchor" name="microsoft-active-directory"></a>Microsoft Active Directory</h2>
+<p>In my 20+ years of helping organizations build software I&rsquo;ve seen nary a handful that <em>weren&rsquo;t</em> using Microsoft Active Directory even if only from the LDAP interface. Sure, I hope Google Apps gains more traction in the enterprise, but let&rsquo;s be very clear: Active Directory is <em>the</em> prevailing standard in enterprise IT. It is a way of life, even if you and I probably don&rsquo;t have to worry about it all that often in our idealized world of application development. And for good reason! It integrates the entire Windows desktop experience for the business professional. It&rsquo;s the beating heart of the Office365 story and it&rsquo;s the way organization organizes and self structures itself. Want to know if you got that promotion? Check Active Directory! Want to know where someone is seated? Check Active Directory! Want to force password resets? Maintain enterprise-wide audit logs? <em>Fire someone</em>? Check Active Directory! You may think your organizations runs Active Directory but lets be clear: it runs your organization.</p>
+<p>Active Directory is a directoy server. It provides a tree of users, organizations and more. It acts as identity manager for technologies like Microsoft CRM, Microsoft SQL Server, Microsoft Office and even Microsoft Windows itself. You can describe users, their rights and roles, and so much more in Active Directory. Which brings us back around. Microsoft Azure runs Active Directory for you! You can import and configure all the relevant information for your Microsoft Active Directory install right from the platform. <a href="https://azure.microsoft.com/en-us/blog/spring-security-azure-ad/">There&rsquo;s even a Spring Boot starter to connect Microsoft Azure to your OAuth-delegating Spring Boot- and Spring Security-powered applications</a>. Could you deploy and manage something like Microsoft SQL Server or Microsoft Active Directory yourself? Sure. But, <em>should you</em>?</p><h2><a href="#application-insights" class="anchor" name="application-insights"></a>Application Insights</h2>
+<p>As you scale out and spin up more microservices you&rsquo;ll introduce more and more moving parts and it becomes all the more critical to be able to observe the movement of data from one node to another in the system. Here, the Microsoft Application Insights integration for Spring applications - which is for the moment at least delivered separate from the main Spring integration for Microsoft Azure - makes using it an cinch! Add <code>com.microsoft.azure</code>: <code>applicationinsights-spring-boot-starter</code> : <code>1.1.0-BETA</code> to your build file.</p>
+<p>You can script the creation of an Application Insights subscription, like this: </p>
+<pre><code class="prettyprint shell">#!/usr/bin/env bash
+
+rg=$1
+appname=${rg}-appinsights
+
+az resource create \
+    --resource-group $rg \
+    --resource-type &quot;Microsoft.Insights/components&quot; \
+    --name $appname \
+    --location &quot;South Central US&quot; \
+    --properties &#39;{&quot;ApplicationId&quot;:&quot;bootiful&quot;,&quot;Application_Type&quot;:&quot;web&quot;}&#39;
+</code></pre>
+<p>That&rsquo;ll create a subscription and bind it to the <code>bootiful</code> resource group. Use the following command to access the resulting key (assuming the same <code>$rg</code> and <code>$appname</code> variables are in scope):</p>
+<pre><code class="prettyprint shell">az resource show -g $rg -n $appname --resource-type &quot;Microsoft.Insights/components&quot; --query properties.InstrumentationKey
+</code></pre>
+<p>You&rsquo;ll then need to specify the <code>azure.application-insights.instrumentation-key</code> and to give your application a <code>spring.application.name</code> name. Which, to be fair, you should do anyway. That&rsquo;s it! Restart your application, drive some traffic through an HTTP endpoint in your application (even just running on <code>localhost</code>) and then login to the Microsoft Application Insights dashboard and watch the instrumentation in action!</p><h2><a href="#cloud-foundry" class="anchor" name="cloud-foundry"></a>Cloud Foundry</h2>
+<p>You shouldn&rsquo;t run software that you can&rsquo;t charge for. Pivotal legend <a href="https://twitter.com/WattersJames">James Watters</a> often talks about work that&rsquo;s &ldquo;below the value line,&rdquo; and the idea that technologists and executives should focus on work that&rsquo;s above that value line for a given organization. The average organization has enough problems. Running commodity software like MySQL or Kafka shouldn&rsquo;t be among them. Running things that don&rsquo;t differentiate your business shouldn&rsquo;t be among them. It&rsquo;ll cost infinitely less, over enough time, to pay someone to run that, whatever <em>that</em> is, for you if someone else can do a competent job. Ideally, whoever ends up running that software should have a vested interest in running those things well. Most organizations have a mission anything but configuring SSL, or debugging MySQL replication issues. It is virtually always cheaper to let someone else do that for you. </p>
+<p>If you are trying to do something standard, then you should absolutely rely on standardized tools. Why use a cloud vendor&rsquo;s lockin-ware to run a Java or Node-based application when you could use something like Cloud Foundry or Kubernetes, for which the hiring pool is larger, the cost can be virtually nill, and the ease of use is on-par or better than whatever the cloud vendor is offering?</p>
+<p>This is a big part of the reason that Microsoft and Pivotal have such a great relationship. Enterprise customers understand that for some workloads the public cloud is a foregone conclusion, but they don&rsquo;t want to be locked in. Optionality is valuable. Being able to move to a different platform is valuable. Agility - the ability to respond to change - is <em>valuable</em>. We see this all the time; Google Cloud Platform&rsquo;s prices were for some workload-types cheaper than Amazon Web Services at its debuts. Some public cloud vendors have availability zones in regions you might want to be in that others dont. Increasingly, organizations embark upon hybrid cloud or mutlicloud strategies, knowing that their workloads will vary, and their availability demands will vary. As much as possible, these organizations want to reduce the cost of operationalizing, securing, training-up and deploying to the varities of cloud infrastructure.</p>
+<p>Pivotal Cloud Foundry is a natural choice here; it allows organizations to deploy reliably to any of a number of cloud platforms and, as easily, and when necessary, drop down to platform-specific services. This fact is one of the reasons that Microsoft named Pivotal partner of the year in 2017 and 2018. Pivotal Cloud Foundry, our distribution of the Apache 2 licensed open-source Cloud Foundry project, helps drive resource usage on Microsoft Azure and does so in as portable a way possible while still surfacing that which is valuable and unique.</p>
+<p>I&rsquo;m all for using something like Microsoft Azure to simplify the work of standing up infrastructure where Microsoft can provide a differentiated experience. But running a Java process or a Node.js process? Stick to de-facto standard infrastructure like Cloud Foundry or Kubernetes. It&rsquo;s fairly trivial to get Cloud Foundry deployed on top of Microsoft Azure and, once deployed, it&rsquo;s trivial to deploy Spring Boot applications there. It&rsquo;s often as simple as <code>cf push -p my.jar</code>. You&rsquo;ll need the Cloud Foundry CLI, <a href="https://docs.cloudfoundry.org/cf-cli/install-go-cli.html">of course</a>.</p>
+<p>In the world of Cloud Foundry a <em>service broker</em> is an HTTP API with which the Cloud Foundry platform interacts to manage the provisoning and lifecycle of&hellip; <em>something</em>. It could be a database like MySQL or a message queue like Apache Kafka. It could be an Active Directory installation or a CosmosDB connection. It could be any of a number of things. The Microsoft and Pivotal teams have worked hand-in-hand to ensure that the service broker options for users running Pivotal Cloud Foundry on Microsoft Azure support <a href="https://docs.pivotal.io/partners/azure-sb/index.html">the tentpole services in as convenient a way possible</a>. This list includes Microsoft Azure services like Azure Storage, Azure Redis Cache, Azure Service Bus, Azure Event Hubs, Azure SQL Databases (SQL Server, PostgreSQL and MySQL) and failover groups, and Azure CosmosDB. </p>
+<p>You can inspect the Cloud Foundry service catalog by issuing a <code>cf marketplace</code> command on the CLI. It&rsquo;ll show you all the relevant services and you can then choose to provision an instance of the service and its associated plan. A plan describes the particular levels of service you can expect from a service broker resource and is naturally specific to each service broker on offer.</p>
+<p>Let&rsquo;s say you have a Spring Boot application deployed to Cloud Foundry, given the logical name <code>myapp</code>:</p>
+<pre><code class="prettyprint shell">&gt; cf push -p my.jar --no-start myapp
+</code></pre>
+<p>Suppose you wanted to provision an instance of Microsoft SQL Server for your application, and you wanted to be able to reference that database, logically, as <code>mydb</code>. Your session might look like this. The following command would provision an instance of SQL Server, with parameters specified via inline JSON or a <code>.json</code> file path, and assign it a logical name <code>mydb</code>.</p>
+<pre><code class="prettyprint shell">&gt; cf create-service azure-sqldb basic mydb -c &#39;{&quot;sqlServerName&quot;: &quot;Bootiful&quot;}&#39;
+</code></pre>
+<p>The service would soon be provisioned and usable from within an application. You&rsquo;d just need to bind the service to your application, so that the relevant connectivity information could be injected into the application&rsquo;s environment as an environment variable.</p>
+<pre><code class="prettyprint shell">cf bind-service myapp mydb
+cf restart myapp
+</code></pre>
+<p>Now your running Spring Boot application would have an environment variable, <code>VCAP_SERVICES</code>, whose contents would include the connection information for the just-provisioned service. It&rsquo;d look something like this:</p>
+<pre><code class="prettyprint json">&quot;VCAP_SERVICES&quot;: {
+  &quot;azure-sqldb&quot;: [
+    {
+      &quot;credentials&quot;: {
+        &quot;sqldbName&quot;: &quot;fake-database&quot;,
+        &quot;sqlServerName&quot;: &quot;fake-server&quot;,
+        &quot;sqlServerFullyQualifiedDomainName&quot;: &quot;fake-server.database.windows.net&quot;,
+        &quot;databaseLogin&quot;: &quot;ulrich&quot;,
+        &quot;databaseLoginPassword&quot;: &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fd88cc8fc59e95adbd8e8e">[email&#160;protected]</a>&quot;,
+        &quot;jdbcUrl&quot;: &quot;jdbc:sqlserver://fake-server.database.windows.net:1433;database=fake-database;user=fake-admin;password=fake-password;Encrypt=true;TrustServerCertificate=false;HostNameInCertificate=*.database.windows.net;loginTimeout=30&quot;,
+        &quot;jdbcUrlForAuditingEnabled&quot;: &quot;jdbc:sqlserver://fake-server.database.secure.windows.net:1433;database=fake-database;user=fake-admin;password=fake-password;Encrypt=true;TrustServerCertificate=false;HostNameInCertificate=*.database.secure.windows.net;loginTimeout=30&quot;,
+        &quot;hostname&quot;: &quot;fake-server.database.windows.net&quot;,
+        &quot;port&quot;: 1433,
+        &quot;name&quot;: &quot;fake-database&quot;,
+        &quot;username&quot;: &quot;ulrich&quot;,
+        &quot;password&quot;: &quot;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="acd99dde94cfc4fcecdfdf">[email&#160;protected]</a>&quot;,
+        &quot;uri&quot;: &quot;mssql://ulrich:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="473276357f242f17073434">[email&#160;protected]</a>@fake-server.database.windows.net:1433/fake-database?encrypt=true&amp;TrustServerCertificate=false&amp;HostNameInCertificate=*.database.windows.net&quot;
+      }
+    }
+  ]
+}
+</code></pre>
+<p>In Spring Boot, you could reference these properties using a flattened property access syntax, e.g.: <code>vcap.services.mydb.credentials.jdbcUrl</code>. A common pattern here is to run applications in the cloud with a Spring profile active. Say, <code>cloud</code>? That way you could put a config file in your code under <code>application-cloud.properties</code> and that property file would be loaded when the application starts up in Cloud Foundry. You could put default, local configuration in <code>application-default.properties</code>. So, when Spring Boot starts with no profile specified it&rsquo;ll load the configuration in <code>application-default.properties</code>. When running in Cloud Foundry on Azure it&rsquo;d load the configuration in <code>application-cloud.properties</code>. You could thus add the following to your <code>application-default.properties</code> file.</p>
+<pre><code class="prettyprint properties">spring.datasource.url=${vcap.services.mydb.credentials.jdbcUrl}
+</code></pre>
+<p>Bootiful!</p><h2><a href="#the-next-steps" class="anchor" name="the-next-steps"></a>The Next Steps</h2>
+<p>We&rsquo;ve only just begun to scratch the surface of what&rsquo;s possible with Spring, Microsoft Azure and Cloud Foundry in this and the posts before it. What should be clear is that there&rsquo;s a nice symbiosis here, each technology making the layer below it even more powerful. It&rsquo;s no wonder that a ton of Azure&rsquo;s workloads are Linux, Spring Boot and Cloud Foundry-based: these things work well together. For those who want to learn even more about Spring on Microsoft Azure, check <a href="https://docs.microsoft.com/en-us/java/azure/spring-framework/?view=azure-java-stable">out the resource portal from Azure</a></p></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3516;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

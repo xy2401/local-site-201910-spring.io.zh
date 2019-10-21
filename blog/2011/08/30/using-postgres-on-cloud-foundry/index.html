@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Using Postgres on Cloud Foundry</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Using Postgres on Cloud Foundry" />
+<meta name="twitter:description" content="&lt;p&gt;When the new open source Platform-as-a-Service (PaaS) offering &lt;a title=&quot;Cloud Foundry&quot; href=&quot;http://cloudfoundry.com&quot;&gt;Cloud Foundry&lt;/a&gt; from VMware launched earlier this year, it included a relational database service powered by MySQL along with the NOSQL options of MongoDB and Redis. One of the promises of the Open PaaS is to provide choice both in languages and frameworks you can develop with and in the database services that are available to use. We now have a new relational database service using &lt;a title=&quot;PostgreSQL&quot; href=&quot;http://postgresql.org&quot;&gt;PostgreSQL&lt;/a&gt; available. This is great since we can now choose between the two most popular open source relational databases. PostgreSQL is is a very robust and reliable database that has been around for a long time so it definitely has been battle tested.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@trisberg" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/c2ce75a3d51fc3a2d86a3643d2e90033?s=200" />
+
+<meta property="og:title" content="Using Postgres on Cloud Foundry" />
+<meta property="og:image" content="https://gravatar.com/avatar/c2ce75a3d51fc3a2d86a3643d2e90033?s=200" />
+<meta property="og:description" content="&lt;p&gt;When the new open source Platform-as-a-Service (PaaS) offering &lt;a title=&quot;Cloud Foundry&quot; href=&quot;http://cloudfoundry.com&quot;&gt;Cloud Foundry&lt;/a&gt; from VMware launched earlier this year, it included a relational database service powered by MySQL along with the NOSQL options of MongoDB and Redis. One of the promises of the Open PaaS is to provide choice both in languages and frameworks you can develop with and in the database services that are available to use. We now have a new relational database service using &lt;a title=&quot;PostgreSQL&quot; href=&quot;http://postgresql.org&quot;&gt;PostgreSQL&lt;/a&gt; available. This is great since we can now choose between the two most popular open source relational databases. PostgreSQL is is a very robust and reliable database that has been around for a long time so it definitely has been battle tested.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-08-30 18:06:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Using Postgres on Cloud Foundry</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/c2ce75a3d51fc3a2d86a3643d2e90033?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/trisberg">Thomas Risberg</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-08-30 18:06:00.0">August 30, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="438" href="/blog/2011/08/30/using-postgres-on-cloud-foundry#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>When the new open source Platform-as-a-Service (PaaS) offering <a title="Cloud Foundry" href="http://cloudfoundry.com">Cloud Foundry</a> from VMware launched earlier this year, it included a relational database service powered by MySQL along with the NOSQL options of MongoDB and Redis. One of the promises of the Open PaaS is to provide choice both in languages and frameworks you can develop with and in the database services that are available to use. We now have a new relational database service using <a title="PostgreSQL" href="https://postgresql.org">PostgreSQL</a> available. This is great since we can now choose between the two most popular open source relational databases. PostgreSQL is is a very robust and reliable database that has been around for a long time so it definitely has been battle tested.</p>
+<h3>vFabric Postgres on Cloud Foundry</h3><p>The new PostgreSQL service is an excellent option for our relational database needs. PostgreSQL was originally developed and optimized to run on physical machines. Now that we are running our databases in the cloud it makes sense to optimize them for that environment. This is exactly what VMware has done for Postgres by creating a version that is optimized for the virtualized cloud environment. To power the PostgreSQL service on <a href="http://cloudfoundry.com/">cloudfoundry.com</a> the Cloud Foundry team is using vFabric Postgres 9.0, a vSphere-optimized version of Postgres. The vFabric Postgres product is part of the <a href="https://finance.yahoo.com/news/VMware-Introduces-New-iw-1888124214.html?x=0">recently announced</a> <a href="https://www.vmware.com/products/datacenter-virtualization/vfabric-data-director/">vFabric Data Director</a>, which is a new database provisioning and operations solution designed to deliver a Database-as-a-Service model for the enterprise. The first database supported on Data Director is vFabric Postgres. </p><p>So, is there any difference between vFabric Postgres and regular PostgreSQL from a developers perspective? No, they are functionally identical. You use the same JDBC driver and SQL syntax. The changes made are internal and related to delivering the elasticity and performance required for the cloud.</p>
+<h3>Building a Book Shelf sample app with Roo</h3><p>To get started using PostgreSQL on Cloud Foundry you first need an account on Cloud Foundry. Once that is taken care of we can start developing our first database application. The fastest way to write a Spring application is by using <a title="Spring Roo" href="http://www.springsource.org/roo">Spring Roo</a> which is Spring’s rapid application development tool for Java developers. This of course means that you need to <a href="http://www.springsource.org/roo/guide?w=intro#intro-installation">install Roo</a> and the <a href="http://www.springsource.org/roo/guide?w=base-cloud-foundry">Cloud Foundry add-on</a>.</p><p>Now that we have all the prerequisites in place we can get started. First create a directory for the application and open the Roo shell. Once that is opened we can create our project.</p>
+<pre><code class="prettyprint text"><br />roo&gt; project --topLevelPackage org.springsource.data.demo.bookshelf
+</code></pre><p>Now we are ready to configure the persistence options for our Roo app. I&rsquo;ll select Hibernate as the JPA provider and Postgres as the database. There is no need to provide any custom connection properties since we will be running this application in Cloud Foundry. The connection details are automatically managed for us.</p>
+<pre><code class="prettyprint text"><br />org.springsource.data.demo.bookshelf roo&gt; persistence setup --provider HIBERNATE --database POSTGRES
+</code></pre><p>Next we need to create our Entity class for this brief example. I&rsquo;ll create a Book class that will be part of my new BookShelf application. I&rsquo;m just going to create the Book class for now and will add the Author and any other classes some time in the future.</p>
+<pre><code class="prettyprint text"><br />org.springsource.data.demo.bookshelf roo&gt; entity --class ~.domain.Book
+~.domain.Book roo&gt; field string --fieldName title --sizeMax 200
+~.domain.Book roo&gt; field string --fieldName isbn --sizeMax 20
+~.domain.Book roo&gt; field date --fieldName published --type java.util.Date
+~.domain.Book roo&gt; field number --fieldName price --type java.math.BigDecimal
+</code></pre><p>Once this is taken care of we are ready to create the web application with a controller for our Book class.</p>
+<pre><code class="prettyprint text"><br />~.domain.Book roo&gt; controller all --package ~.web
+</code></pre><p>We are done, pretty painless if you ask me. Now we need to package everything up, connect to Cloud Foundry and deploy the app.</p>
+<pre><code class="prettyprint text"><br />~.web roo&gt; perform package
+~.web roo&gt; cloud foundry login
+~.web roo&gt; cloud foundry deploy --appName bookshelf --path /target/bookshelf-0.1.0.BUILD-SNAPSHOT.war
+</code></pre><p>Once the deploy completes we should be able to list our current set of applications</p>
+<pre><code class="prettyprint text"><br />~.web roo&gt; cloud foundry list apps
+
+================================================ Applications ================================================
+
+Name                      Status      Instances     Services             URLs
+----                      ------      ---------     --------             ----
+bookshelf                 STOPPED     1                                  bookshelf.cloudfoundry.com
+</code></pre>
+<h3>Connecting the app to PostgreSQL on Cloud Foundry</h3><p>Now we get to the fun part. As you saw above, the application is in a stopped status. We can&rsquo;t start it now since we have not created our database and bound it to the application yet. So let&rsquo;s do that now, but first let&rsquo;s see what data services are available.</p>
+<pre><code class="prettyprint text"><br />~.web roo&gt; cloud foundry list services
+
+=================== System Services ====================
+
+Service        Version     Description
+-------        -------     -----------
+rabbitmq       2.4         RabbitMQ messaging service
+mongodb        1.8         MongoDB NoSQL store
+redis          2.2         Redis key-value store service
+postgresql     9.0         PostgreSQL database service (vFabric)
+mysql          5.1         MySQL database service
+</code></pre><p>Great, we do have PostgreSQL available as an option. So, let&rsquo;s create a database service instance, bind it to the app and start the app.</p>
+<pre><code class="prettyprint text"><br />~.web roo&gt; cloud foundry create service --serviceName books --serviceType postgresql
+~.web roo&gt; cloud foundry bind service --serviceName books --appName bookshelf
+~.web roo&gt; cloud foundry start app --appName bookshelf
+</code></pre><p>Let&rsquo;s see what we get when visiting <a href="http://bookshelf.cloudfoundry.com"><a href="http://bookshelf.cloudfoundry.com">http://bookshelf.cloudfoundry.com</a></a></p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf.png"><img class="alignnone size-full wp-image-9598" style="border: 1px solid black;" title="bookshelf" src="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf.png" alt="bookshelf screen" width="95%" /></a></p><p>So the app is up and running and we can add and view the books on our bookshelf.</p>
+<h3>More about PostgreSQL on Cloud Foundry</h3><p>We saw in the example above that we can connect our applications to PostgreSQL. But how do we know if we are running against a regular PostgreSQL install or vFabric Postgres? One way of determining this is to examine the output of the version() function. It typically says something like &ldquo;PostgreSQL 9.0.4 on x86_64-pc-linux-gnu, compiled by GCC gcc-4.4.real (Ubuntu 4.4.3-4ubuntu5) 4.4.3, 64-bit&rdquo;. Since the Postgres database running on <a href="http://cloudfoundry.com/">cloudfoundry.com</a> is based on vFabric Postgres 9.0 we actually see a return value saying &ldquo;[PostgreSQL 9.0.4 ] vPostgres 1.0 release-v build&rdquo;. Let&rsquo;s see if we can easily add a page to our web app to display some database information. I&rsquo;ll create a DatabaseInfo controller that I can modify.</p>
+<pre><code class="prettyprint text"><br />~.web roo&gt; controller class ~.web.DatabaseInfoController
+</code></pre><p>This creates a controller <em>(bookshelf/src/main/java/org/springsource/data/demo/bookshelf/web/DatabaseInfoController.java)</em> that I&rsquo;ve added a DataSource and some database info retrieval code to in the index method.</p>
+<pre><code class="prettyprint java"><br />@RequestMapping(&quot;/databaseinfo/**&quot;)
+@Controller
+public class DatabaseInfoController {
+
+   @Autowired
+   DataSource dataSource;
+
+    @RequestMapping
+    public void get(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = &quot;{id}&quot;)
+    public void post(@PathVariable Long id, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+    }
+
+    @RequestMapping
+    public String index(ModelMap modelMap) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    	String userInfo = jdbcTemplate.queryForObject(&quot;select user&quot;, String.class);
+    	String urlInfo = &quot;?&quot;;
+    	if (dataSource instanceof BasicDataSource) {
+    	    urlInfo = ((BasicDataSource) dataSource).getUrl();
+	}
+	String versionInfo = jdbcTemplate.queryForObject(&quot;select version()&quot;, String.class);
+        modelMap.put(&quot;userInfo&quot;, userInfo);
+        modelMap.put(&quot;urlInfo&quot;, urlInfo);
+        modelMap.put(&quot;versionInfo&quot;, versionInfo);
+        return &quot;databaseinfo/index&quot;;
+    }
+}
+</code></pre><p>There is also a JSP file <em>(bookshelf/src/main/webapp/WEB-INF/views/databaseinfo/index.jspx)</em> that is used by this controller and that needs to have some code added.</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;div xmlns:jsp=&quot;http://java.sun.com/JSP/Page&quot; xmlns:spring=&quot;http://www.springframework.org/tags&quot; xmlns:util=&quot;urn:jsptagdir:/WEB-INF/tags/util&quot; version=&quot;2.0&quot;&gt;
+  &lt;jsp:directive.page contentType=&quot;text/html;charset=UTF-8&quot;/&gt;
+  &lt;jsp:output omit-xml-declaration=&quot;yes&quot;/&gt;
+  &lt;spring:message code=&quot;label_databaseinfo_index&quot; htmlEscape=&quot;false&quot; var=&quot;title&quot;/&gt;
+  &lt;util:panel id=&quot;title&quot; title=&quot;${title}&quot;&gt;
+    &lt;spring:message code=&quot;application_name&quot; htmlEscape=&quot;false&quot; var=&quot;app_name&quot;/&gt;
+    &lt;h3&gt;
+      &lt;spring:message arguments=&quot;${app_name}&quot; code=&quot;welcome_titlepane&quot;/&gt;
+    &lt;/h3&gt;
+    &lt;p&gt;  The database user is ${userInfo}. &lt;/p&gt;
+    &lt;p&gt;  The dataSource URL is ${urlInfo}. &lt;/p&gt;
+    &lt;p&gt;  The database version is ${versionInfo}. &lt;/p&gt;
+  &lt;/util:panel&gt;
+&lt;/div&gt;
+</code></pre><p>Now we can build and deploy the modified application to the cloud.</p>
+<pre><code class="prettyprint text"><br />~.web roo&gt; perform package
+~.web roo&gt; cloud foundry deploy --appName bookshelf --path /target/bookshelf-0.1.0.BUILD-SNAPSHOT.war
+</code></pre><p>Accessing the application we can see a new link to the <a href="http://bookshelf.cloudfoundry.com/databaseinfo/index">Database Info Controller View</a> that returns the following page:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf-dbinfo1.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf-dbinfo1.png" alt="bookshelf db info" title="bookshelf-dbinfo" width="95%" class="alignnone size-full wp-image-9639" /></a></p><p>As you can see we are using vFabric Postgres in our cloud deployed app.<br /><h3>Can I run vFabric Postgres in my own server or private cloud?</h3><br />Yes, you can get vFabric Postgres for development or production. You will also need the companion product <a href="https://www.vmware.com/products/datacenter-virtualization/vfabric-data-director/">vFabric Data Director</a> to manage the database instances. vFabric Data Director is a software solution that enables you to provide Database-as-a-Service (DBaaS) for your cloud. It is designed for the cloud environment and is capable of managing thousands of databases while offering application developers self-service database management.</p><p>See <a href="https://jkshah.blogspot.com/2011/08/vmware-vfabric-data-director-vfabric.html">Jignesh Shah&rsquo;s blog</a> for more info on this new product.</p>
+<p>&nbsp;</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 438;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Practical Use of Spring Batch and Spring Integration</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Practical Use of Spring Batch and Spring Integration" />
+<meta name="twitter:description" content="&lt;p&gt;There are some common concerns of users of &lt;a href=&quot;http://www.springframework.org/spring-batch&quot;&gt;Spring Batch&lt;/a&gt; and &lt;a href=&quot;http://www.springframework.org/spring-integration&quot;&gt;Spring Integration&lt;/a&gt;, and we get asked a lot about how they fit together. &lt;a href=&quot;http://www.springframework.org/spring-batch-admin&quot;&gt;Spring Batch Admin&lt;/a&gt; 1.0.0.M2 was released recently, and it makes heavy use of Spring Integration, so it is a good vehicle for looking at some specific use cases, and that is what we plan to do in this article. &lt;/p&gt;
+&lt;h2&gt;Spring Batch Integration&lt;/h2&gt;
+&lt;p&gt;Part of the 1.0.0.M2 release was the &lt;a href=&quot;http://www.springframework.org/spring-batch-admin/spring-batch-integration&quot;&gt;Spring Batch Integration&lt;/a&gt; module, recently migrated from Spring Batch and given a new home with Batch Admin. Many of the Batch-Integration cross over use cases are either implemented or demonstrated in Spring Batch Integration. The reason for the new home is that Batch Admin uses a lot of the features of Batch Integration, and so aligning the release cycle of those projects makes more sense.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@david_syer" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+
+<meta property="og:title" content="Practical Use of Spring Batch and Spring Integration" />
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta property="og:description" content="&lt;p&gt;There are some common concerns of users of &lt;a href=&quot;http://www.springframework.org/spring-batch&quot;&gt;Spring Batch&lt;/a&gt; and &lt;a href=&quot;http://www.springframework.org/spring-integration&quot;&gt;Spring Integration&lt;/a&gt;, and we get asked a lot about how they fit together. &lt;a href=&quot;http://www.springframework.org/spring-batch-admin&quot;&gt;Spring Batch Admin&lt;/a&gt; 1.0.0.M2 was released recently, and it makes heavy use of Spring Integration, so it is a good vehicle for looking at some specific use cases, and that is what we plan to do in this article. &lt;/p&gt;
+&lt;h2&gt;Spring Batch Integration&lt;/h2&gt;
+&lt;p&gt;Part of the 1.0.0.M2 release was the &lt;a href=&quot;http://www.springframework.org/spring-batch-admin/spring-batch-integration&quot;&gt;Spring Batch Integration&lt;/a&gt; module, recently migrated from Spring Batch and given a new home with Batch Admin. Many of the Batch-Integration cross over use cases are either implemented or demonstrated in Spring Batch Integration. The reason for the new home is that Batch Admin uses a lot of the features of Batch Integration, and so aligning the release cycle of those projects makes more sense.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-02-15 09:07:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Practical Use of Spring Batch and Spring Integration</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-02-15 09:07:00.0">February 15, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="306" href="/blog/2010/02/15/practical-use-of-spring-batch-and-spring-integration#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>There are some common concerns of users of <a href="http://www.springframework.org/spring-batch">Spring Batch</a> and <a href="http://www.springframework.org/spring-integration">Spring Integration</a>, and we get asked a lot about how they fit together. <a href="http://www.springframework.org/spring-batch-admin">Spring Batch Admin</a> 1.0.0.M2 was released recently, and it makes heavy use of Spring Integration, so it is a good vehicle for looking at some specific use cases, and that is what we plan to do in this article. </p>
+<h2>Spring Batch Integration</h2><p>Part of the 1.0.0.M2 release was the <a href="http://www.springframework.org/spring-batch-admin/spring-batch-integration">Spring Batch Integration</a> module, recently migrated from Spring Batch and given a new home with Batch Admin. Many of the Batch-Integration cross over use cases are either implemented or demonstrated in Spring Batch Integration. The reason for the new home is that Batch Admin uses a lot of the features of Batch Integration, and so aligning the release cycle of those projects makes more sense.</p>
+<h2>Spring Batch Admin</h2><p><a href="http://www.springframework.org/spring-batch-admin">Spring Batch Admin</a> is an open source project from SpringSource. It aims to provide developers with a Web UI and tools for building their own UI to interact with Spring Batch jobs (launching, stopping, investigating causes of failure etc.). The recent milestone release is fairly complete as far as planned functionality goes for 1.0, but if you have ideas or contributions to make, please visit the <a href="http://forum.springframework.org/forumdisplay.php?f=41">forum</a> and the <a href="http://jira.springframework.org/browse/BATCHADM">issue tracker</a> and get involved in the community.</p><p>The target runtime out of the box is a single instance of a servlet container (e.g. SpringSource tc Server), and in that container the system works with zero or no configuration. But we want to be able to support customisations and extensions of the basic use cases, including scaling the deployment up to a cluster of servers, and Spring Integration is proving to be the key to a lot of the extension points.</p>
+<h2>Combining Batch and Integration</h2><p>The line between Spring Batch and Spring Integration is not always clear, but there are guidelines that one can follow. Principally, these are: think about granularity, and apply common patterns. Some of those common patterns are described in this article. More are implemented (and may be the subject of future articles) in Spring Batch Integration and Spring Batch Admin.</p><p>Adding messaging to a batch process enables automation of operations, and also separation and strategising of key concerns. For example a message might trigger a job to execute, and then the sending of the message can be exposed in a variety of ways. Or when a job completes or fails that might trigger a message to be sent, and the consumers of those messages might have operational concerns that have nothing to do with the application itself.</p><p>The other way round works too: messaging can also be embedded in a job, but that is out of the scope of this article. For example: reading or writing items for processing via channels.</p><p>Here are some use cases that are implemented in Batch Admin using Spring Integration and Spring Batch Integration.</p>
+<h2>Pattern: Message Trigger</h2><p>The beauty of Spring Integration is the separation of concerns between message producers and message consumers, and a good concrete example of that is the ability for a message to trigger a Job execution. In this case the consumer is completely generic, and a very thin wrapper around a standard Spring Batch <tt>JobLauncher</tt> (code here is from the Spring Batch Integration <a href="http://static.springsource.org/spring-batch-admin/apidocs/index.html"><tt>JobLaunchingMessageHandler</tt></a>):</p>
+<pre><code class="prettyprint java">@ServiceActivator
+public JobExecution launch(JobLaunchRequest request) {
+
+    Job job = request.getJob();
+    JobParameters jobParameters = request.getJobParameters();
+
+    return jobLauncher.run(job, jobParameters);
+    
+}
+</code></pre><p>As you can see from the code snippet above, the wrapper is so thin it hardly merits a mention, but its virtue is that it has a very clear and obvious reponsibility and is easily testable in isolation. The <tt>JobLaunchRequest</tt> object is a special wrapper for the input parameters to a <tt>JobLauncher</tt>, so that they can form the payload of a message in Spring Integration.</p><p>The <tt>JobLaunchingMessageHandler</tt> is hooked up to a <tt>MessageChannel</tt> in Spring Batch Admin (in the Manager jar <tt>/META-INF/bootstrap/integration/launch-context.xml</tt>):</p>
+<pre><code class="prettyprint xml">&lt;service-activator input-channel=&quot;job-requests&quot;&gt;
+    &lt;beans:bean class=&quot;org.springframework.batch.integration.launch.JobLaunchingMessageHandler&quot;&gt;
+        &lt;beans:constructor-arg ref=&quot;jobLauncher&quot; /&gt;
+    &lt;/beans:bean&gt;
+&lt;/service-activator&gt;
+</code></pre><p>That&rsquo;s the consumer side of this integration pattern completed. It is a local approach, in that it isn&rsquo;t particularly well suited to remote invocation because the <tt>JobLaunchRequest</tt> is intentionally not <tt>Serializable</tt> (because the <tt>Job</tt> is not).</p><p>To launch a <tt>Job</tt> locally all we need to do is create a producer and use it to send a <tt>JobLaunchRequest</tt> to the <tt>job-requests</tt> channel. There is an integration test in the Batch Admin Manager module that does just this, but the real power of the integration approach here is the ability to strategise the requests and have them come from a variety of different producers.</p>
+<h2>Pattern: Channel Reuse</h2><p>A message can be sent to the <tt>job-requests</tt> channel in Batch Admin in a number of ways. To break out of the local invocation and expose the job remotely all that is needed is to adapt an incoming request in some other form to a <tt>JobLaunchRequest</tt>, and Spring Integration makes this really easy. This is the basic scenario for a pattern we call Channel Reuse. Examples are:</p>
+<h3>HTTP: Browser</h3><p>The Spring Integration HTTP adapter module can be used to accept an input message over HTTP:</p>
+<pre><code class="prettyprint xml">&lt;http:inbound-channel-adapter name=&quot;/job-requests&quot; channel=&quot;job-launches&quot; 
+    request-mapper=&quot;bodyInboundRequestMapper&quot; view=&quot;reload-job-executions&quot; /&gt;
+</code></pre><p>This snippet can be found in the Batch Admin Manager module (<tt>META-INF/servlet/integration-servlet.xml</tt>). It exposes an endpoint URL <tt><a href="http://.../batch/job-requests">http://.../batch/job-requests</a></tt> which we can use to send a request for a job execution by submiting a form in a browser. </p><p>The request in principle can be in any form we like because we can transform the message downstream of this adapter and upstream of the <tt>JobLaunchingMessageHandler</tt>. In Spring Batch Admin the transformation is done on the output from the adapter by another POJO message handler (<a href="http://static.springsource.org/spring-batch-admin/apidocs/org/springframework/batch/admin/integration/StringToJobLaunchRequestAdapter.html"><tt>StringToJobLaunchRequestAdapter</tt></a>).</p>
+<h3>HTTP: Command line</h3><p>The same HTTP adapter that was used above can be used to launch a job remotely from a UN*X command line. This is a really great way to use Spring Integration HTTP adapters: you can automate a lot of operations using simple shell scripts. E.g. this would work if the application was deployed locally with a job called &ldquo;staging&rdquo;:</p>
+<pre><code class="prettyprint plain">$ echo staging[input.file=foo] | curl -v -d @- -H &quot;Content-Type: text/plain&quot; \
+  http://localhost:8080/springone-web-demo/batch/job-requests
+</code></pre><p>The job named &ldquo;staging&rdquo; is launched with one parameter (<tt>input.file=foo</tt>), where <tt>foo</tt> is the absolute path of a file to read as input. The job is configured with an item reader like this:</p>
+<pre><code class="prettyprint xml">&lt;bean id=&quot;reader&quot; class=&quot;org.springframework.batch.item.file.FlatFileItemReader&quot; scope=&quot;step&quot;&gt;
+    &lt;property name=&quot;linesToSkip&quot; value=&quot;1&quot; /&gt;
+    &lt;property name=&quot;lineMapper&quot;&gt;
+        &lt;bean class=&quot;org.springframework.batch.item.file.mapping.PassThroughLineMapper&quot;/&gt;
+    &lt;/property&gt;
+    &lt;property name=&quot;resource&quot; value=&quot;#{jobParameters[input.file]}&quot; /&gt;
+&lt;/bean&gt;
+</code></pre><p>(This snippet is not in the Spring Batch Admin sample, but it was in the demo that we gave at Spring One Americas 2009.)</p>
+<h3>File polling</h3><p>Spring Integration can poll for files in a directory (using the file adapters module). The message generated just needs to be adapted for the <tt>job-requests</tt> channel. Spring Batch Admin does this in a simple message handler (<tt>FileToJobLaunchRequestAdapte</tt>):</p>
+<pre><code class="prettyprint java">public JobLaunchRequest adapt(File file) throws NoSuchJobException {
+    JobParameters jobParameters = new JobParametersBuilder().addString(
+            &quot;input.file&quot;, file.getAbsolutePath()).toJobParameters();
+    return new JobLaunchRequest(job, jobParameters);
+}
+</code></pre><p>This simple POJO method is declared as a <tt>@ServiceActivator</tt> (it could have been a <tt>@Transformer</tt>), and so it can be inserted in a message handling chain just before the <tt>JobLaunchingMessageHandler</tt> to tranform a <tt>File</tt> into a <tt>JobLaunchRequest</tt>.</p>
+<h3>Restart</h3><p>A failed job can usually be restarted in Spring Batch, and this feature is available through a web browser in the Spring Batch Admin UI. It is also available on the command line, or for anyone who can send a message to a Spring Integration channel called <tt>job-restarts</tt>:</p>
+<pre><code class="prettyprint xml">&lt;channel id=&quot;job-restarts&quot; /&gt;
+    &lt;service-activator input-channel=&quot;job-restarts&quot; output-channel=&quot;job-requests&quot;&gt;
+    &lt;beans:bean class=&quot;org.springframework.batch.admin.integration.JobNameToJobRestartRequestAdapter&quot;&gt;
+        &lt;beans:property name=&quot;jobLocator&quot; ref=&quot;jobRegistry&quot; /&gt;
+        &lt;beans:property name=&quot;jobExplorer&quot; ref=&quot;jobExplorer&quot; /&gt;
+    &lt;/beans:bean&gt;
+&lt;/service-activator&gt;
+</code></pre><p>All this channel requires is the job name, and it has been exposed as an HTTP inbound endpoint, so from a UN*X command line you might do this:</p>
+<pre><code class="prettyprint plain">$ echo staging | curl -v -d @- -H &quot;Content-Type: text/plain&quot; \
+  http://localhost:8080/springone-web-demo/batch/job-restarts
+</code></pre>
+<h3>Retry</h3><p>If a job fails repeatedly with a recoverable error (like a timeout or network glitch in a call to a remote service) maybe you would like to have it restarted automatically. Retry can be dealt with at a low level inside the job using some features of Spring Batch, but to retry the whole job requires some manipulation of the runtime. This could be accomplished simply with Spring Integration, now that the <tt>job-requests</tt> channel is accepting launch requests. The endpoint for this would act as a filter, looking for failure conditions in the job that are known to be retryable, and then as a restart trasformer (like the example above). So a chain like this would work:</p>
+<pre><code class="prettyprint xml">&lt;chain input-channel=&quot;input-files&quot; output-channel=&quot;job-requests&quot; 
+        xmlns=&quot;http://www.springframework.org/schema/integration&quot;&gt;
+    &lt;filter&gt;
+        &lt;bean class=&quot;...RetryableJobExecutionFilter&quot; 
+            xmlns=&quot;http://www.springframework.org/schema/beans&quot;&gt;
+            &lt;property name=&quot;pattern&quot; value=&quot;(&amp;amp;s).*TimeoutException.*&quot; /&gt;
+        &lt;/bean&gt;
+	&lt;/filter&gt;
+    &lt;service-activator&gt;
+        &lt;bean class=&quot;org.springframework.batch.admin.integration.FileToJobLaunchRequestAdapter&quot; 
+            xmlns=&quot;http://www.springframework.org/schema/beans&quot;&gt;
+            &lt;property name=&quot;job&quot; ref=&quot;job1&quot; /&gt;
+        &lt;/bean&gt;
+    &lt;/service-activator&gt;
+&lt;/chain&gt;
+</code></pre><p>where the <tt>RetryableJobExecutionFilter</tt> might be implemented like this</p>
+<pre><code class="prettyprint java">public boolean isRetryable(JobExecution jobExecution) {
+    boolean retryable = false;
+    for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+        if (stepExecution.getStatus().isLessThan(BatchStatus.STOPPED)) {
+            continue;
+        }
+        if (stepExecution.getExitStatus().getExitDescription().matches(pattern)) {
+            retryable = true;
+            break;
+        }
+    }
+    return retryable;
+}
+</code></pre><p>This example was in our Spring One demo; it is not in Spring Batch Admin, although it is trivial to implement for any specific filter that you need.</p>
+<h2>Input File Uploads</h2><p>File uploads into the application are supported directly through the Spring Batch Admin UI. It isn&rsquo;t recommended to use an HTTP POST to upload large files, mainly because the application has to buffer the contents in memory, but this is a nice feature for uploading small or medium sized datasets for processing by Spring Batch. </p><p>The sample application actually doesn&rsquo;t use the file poller from Spring Integration (but it is available for clients who want to configure it as described above); rather it uses a direct message trigger once the file is uploaded. The strategy is for the Manager module to upload a file and then send a message to a publish-subscribe channel (<tt>input-files</tt>). </p><p>Any job that can use the input file just has to have an upstream component subscribe to that channel and pass on the file if it is of interest. This is done in the sample by filtering the file by its parent directory name:</p>
+<pre><code class="prettyprint xml">&lt;chain input-channel=&quot;input-files&quot; output-channel=&quot;job-requests&quot; 
+        xmlns=&quot;http://www.springframework.org/schema/integration&quot;&gt;
+    &lt;filter expression=&quot;payload.parent.name==&#39;sample&#39;&quot; /&gt;
+    &lt;service-activator&gt;
+        &lt;bean class=&quot;org.springframework.batch.admin.integration.FileToJobLaunchRequestAdapter&quot; 
+            xmlns=&quot;http://www.springframework.org/schema/beans&quot;&gt;
+            &lt;property name=&quot;job&quot; ref=&quot;job1&quot; /&gt;
+        &lt;/bean&gt;
+    &lt;/service-activator&gt;
+&lt;/chain&gt;
+</code></pre><p>If the input file has a parent directory (which can be set in the Web UI) &ldquo;sample&rdquo; then it is piped into the service activator which converts it to a <tt>JobLaunchRequest</tt> and sends it on for processing by the <tt>JobLaunchingMessageHandler</tt> as already discussed).</p>
+<h3>Pattern: POJO Message Handling</h3><p>Sending a file to the <tt>input-files</tt> channel is done in the Batch Admin Manager, in the best tradition of Spring applications, through simple POJO and interface-based components. There is a <tt>FileService</tt> interface and a local implementation which uses a temporary directory to marshal the files coming in over HTTP. Once a file is uploaded it is sent by the service through a simple messaging gateway with a custom interface:</p>
+<pre><code class="prettyprint java">public interface FileSender {
+    
+    void send(File file);
+
+}
+</code></pre><p>The interface has no implementation (except stubs in unit tests) because Spring Integration can provide one:</p>
+<pre><code class="prettyprint xml">&lt;gateway id=&quot;fileSender&quot; 
+    service-interface=&quot;org.springframework.batch.admin.service.FileSender&quot;
+    default-request-channel=&quot;input-files&quot; /&gt;
+
+&lt;beans:bean class=&quot;org.springframework.batch.admin.service.LocalFileService&quot;&gt;
+    &lt;beans:property name=&quot;fileSender&quot; ref=&quot;fileSender&quot; /&gt;
+&lt;/beans:bean&gt;
+
+</code></pre>
+<h2>Configuration File Uploads</h2><p>Spring Batch Admin allows the user to upload Spring configuration files for jobs to launch and manage from the UI. This is really useful for re-parameterising a job at run time, for instance when running a suite of performance tests to measure the effect of various performance tweaks, like changing the commit interval in a step.</p><p>To accept the confuration files for input we use a message channel, so that it can be re-used by multiple different input methods. The configurations come in on a channel called <tt>job-configurations</tt>:</p>
+<pre><code class="prettyprint xml">&lt;service-activator input-channel=&quot;job-configurations&quot; output-channel=&quot;job-registrations&quot;&gt;
+	&lt;beans:bean class=&quot;org.springframework.batch.admin.integration.JobConfigurationResourceLoader&quot;&gt;
+		&lt;beans:property name=&quot;jobRegistry&quot; ref=&quot;jobRegistry&quot; /&gt;
+	&lt;/beans:bean&gt;
+&lt;/service-activator&gt;
+</code></pre><p>The service activator here just accepts a Spring <tt>Resource</tt> and treats it as a configuration file: loading an <tt>ApplicationContext</tt>, scanning it for <tt>Job</tt> components and registering them in the registry provided. Once in the registry the jobs can be launched from the main Jobs menu in the UI, or via the <tt>job-requests</tt> channel, as described above.</p><p>Just like input files, the configuration files can come over HTTP, in this case as file attachments or as plain text parameters, and also through file polling. The polling use case is implemented in the Manager module, so its worth having a quick look at that to see how it works. In <tt>META-INF/bootstrap/integration/configuration-context.xml</tt> we find this:</p>
+<pre><code class="prettyprint xml">&lt;file:inbound-channel-adapter directory=&quot;target/config&quot; channel=&quot;job-configuration-files&quot;
+	filename-pattern=&quot;.*\.xml&quot;&gt;
+	&lt;poller max-messages-per-poll=&quot;1&quot;&gt;
+		&lt;cron-trigger expression=&quot;5/1 * * * * *&quot; /&gt;
+	&lt;/poller&gt;
+&lt;/file:inbound-channel-adapter&gt;
+</code></pre><p>The adapter is going to poll a directory (here hard-coded for demo purposes to &ldquo;target/config&rdquo; but would be parameterised in a real application) and look for files whose name ends in &ldquo;.xml&rdquo;. When a file matching that pattern arrives it is sent (as a <tt>java.io.File</tt>) to the <tt>job-configuration-files</tt> channel. The message is transformed from there so that the <tt>File</tt> becomes a <tt>Resource</tt> and it can be sent to the <tt>job-configurations</tt> channel.</p>
+<h2>Pattern: Informational Messages</h2><p>Once you start using Spring Integration messages for driving a lot of application features, it is often useful to be able to tap into the flows of messages for informational or reporting purposes. For instance it would be useful to send a message when a job starts, stops (completes or fails). This is easy to do with a <tt>MessagePublishingInterceptor</tt> from Spring Integration. In the Spring Batch Admin Manager the interceptor is configured to send job execution messages:</p>
+<pre><code class="prettyprint xml"><br />&lt;aop:config&gt;
+	&lt;aop:advisor advice-ref=&quot;jobMessagePublishingInterceptor&quot; pointcut=&quot;execution(* *..Job+.execute(..))&quot; /&gt;
+&lt;/aop:config&gt;
+
+&lt;bean id=&quot;jobMessagePublishingInterceptor&quot; class=&quot;org.springframework.integration.aop.MessagePublishingInterceptor&quot;
+	xmlns=&quot;http://www.springframework.org/schema/beans&quot;&gt;
+	&lt;constructor-arg index=&quot;0&quot;&gt;
+		&lt;bean class=&quot;org.springframework.batch.admin.integration.TrivialExpressionSource&quot; p:payload=&quot;#args[execution]&quot; /&gt;
+	&lt;/constructor-arg&gt;
+	&lt;property name=&quot;defaultChannel&quot; ref=&quot;job-operator&quot; /&gt;
+&lt;/bean&gt;
+
+</code></pre><p>Every time a <tt>Job</tt> is executed the AOP advisor passes the argument value (a <tt>JobExecution</tt>) to the <tt>job-operator</tt> channel. Interested parties can then subscribe to that channel and pick up the information about recently executed messages. Spring Batch Admin does nothing with those messages out of the box, except log them on teh console, and list them in the UI so they can be inspected. Clients who build their own application on top of Spring Batch Admin might find the messages useful to notify operators or a reporting system about the outcome of the job.</p><p>Setting up informational messages can have the side effect of opening up new application features: the Job retry feature described above was implemented for Spring One by hooking an endpoint up to listen to the <tt>job-operator</tt> channel.</p>
+<h2>What Next?</h2><p>We hope this article has given you some insight into some of the ways that Spring Integration can be used in a Batch application. Nearly all of the code sample above are in Spring Batch Admin in some form, but this is by no means the end of the story, and there are plenty more examples in the Spring Batch Integration and Spring Batch Admin projects. Visit the <a href="http://www.springframework.org/spring-batch-admin/spring-batch-integration">Batch Admin</a> website for more information and to find out where to get the code to play with. There is also a <a href="http://www.infoq.com/presentations/Automating-Operations">video on InfoQ</a> of some of the topics in this article presented at Spring One by the Spring Batch and the Spring Integration leads (Dave Syer and Mark Fisher).</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 306;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

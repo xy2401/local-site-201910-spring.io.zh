@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Using Cloud Foundry from STS</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Using Cloud Foundry from STS" />
+<meta name="twitter:description" content="&lt;p&gt;By now you probably heard about &lt;a href=&quot;http://www.cloudfoundry.com&quot;&gt;Cloud Foundry&lt;/a&gt;, the open PaaS from VMware that was announced yesterday; if not make sure to check out the&lt;a href=&quot;http://www.youtube.com/user/vmwaretv?feature=mhum#p/c/71331D676E1D17CA&quot;&gt; recording of the webcast&lt;/a&gt;. Eventually you have already read earlier blog posts introducing the &lt;a href=&quot;http://blog.springsource.com/2011/04/12/cloud-foundry-for-spring-developers/&quot;&gt;Spring support for Cloud Foundry&lt;/a&gt;, the add-on for &lt;a href=&quot;http://blog.springsource.com/2011/04/12/roo-cloud-foundry-productivity-in-the-cloud/&quot;&gt;Spring Roo&lt;/a&gt; and the &lt;a href=&quot;http://blog.springsource.com/2011/04/12/one-step-deployment-with-grails-and-cloud-foundry/&quot;&gt;Grails plug-in&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;With this post I’d like to introduce the Eclipse-based support for Cloud Foundry that lets you manage your cloud deployments, including configuration of Services and service bindings, application scaling, access to file resources and much more.&lt;br&gt;&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@cdupuis" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/aa61393fa6484a17e0ed0ca8a533d501?s=200" />
+
+<meta property="og:title" content="Using Cloud Foundry from STS" />
+<meta property="og:image" content="https://gravatar.com/avatar/aa61393fa6484a17e0ed0ca8a533d501?s=200" />
+<meta property="og:description" content="&lt;p&gt;By now you probably heard about &lt;a href=&quot;http://www.cloudfoundry.com&quot;&gt;Cloud Foundry&lt;/a&gt;, the open PaaS from VMware that was announced yesterday; if not make sure to check out the&lt;a href=&quot;http://www.youtube.com/user/vmwaretv?feature=mhum#p/c/71331D676E1D17CA&quot;&gt; recording of the webcast&lt;/a&gt;. Eventually you have already read earlier blog posts introducing the &lt;a href=&quot;http://blog.springsource.com/2011/04/12/cloud-foundry-for-spring-developers/&quot;&gt;Spring support for Cloud Foundry&lt;/a&gt;, the add-on for &lt;a href=&quot;http://blog.springsource.com/2011/04/12/roo-cloud-foundry-productivity-in-the-cloud/&quot;&gt;Spring Roo&lt;/a&gt; and the &lt;a href=&quot;http://blog.springsource.com/2011/04/12/one-step-deployment-with-grails-and-cloud-foundry/&quot;&gt;Grails plug-in&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;With this post I’d like to introduce the Eclipse-based support for Cloud Foundry that lets you manage your cloud deployments, including configuration of Services and service bindings, application scaling, access to file resources and much more.&lt;br&gt;&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-04-13 10:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+ <button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Using Cloud Foundry from STS</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/aa61393fa6484a17e0ed0ca8a533d501?s=20&amp;d=mm" />
+<span class="author">Christian Dupuis</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-04-13 10:00:00.0">April 13, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="410" href="/blog/2011/04/13/using-cloud-foundry-from-sts#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>By now you probably heard about <a href="http://www.cloudfoundry.com">Cloud Foundry</a>, the open PaaS from VMware that was announced yesterday; if not make sure to check out the<a href="https://www.youtube.com/user/vmwaretv?feature=mhum#p/c/71331D676E1D17CA"> recording of the webcast</a>. Eventually you have already read earlier blog posts introducing the <a href="http://blog.springsource.com/2011/04/12/cloud-foundry-for-spring-developers/">Spring support for Cloud Foundry</a>, the add-on for <a href="http://blog.springsource.com/2011/04/12/roo-cloud-foundry-productivity-in-the-cloud/">Spring Roo</a> and the <a href="http://blog.springsource.com/2011/04/12/one-step-deployment-with-grails-and-cloud-foundry/">Grails plug-in</a>.</p><p>With this post I’d like to introduce the Eclipse-based support for Cloud Foundry that lets you manage your cloud deployments, including configuration of Services and service bindings, application scaling, access to file resources and much more.<br /><h2>Installing the Cloud Foundry for Eclipse and STS</h2><br />There are three options to install the Cloud Foundry plugin into SpringSource Tool Suite (STS) and plain Eclipse. I will go through those options step-by-step in order to help you get started quickly.<br /><h3>Installing through the STS Extension Install</h3><br />Probably the easiest way to get started with the Cloud Foundry plugin is by installing it into a pre-installed copy of STS. You should have at least version 2.5.1.RELEASE installed; 2.6.1.SR1 is better. STS for various supported operating systems can be found on the <a href="http://www.springsource.com/downloads/sts">download page</a>.</p><p>Within STS select “Help &gt; Dashboard” and click on the Extension tab at the bottom of the Dashboard. Wait for the extension listing to be loaded and select “Cloud Foundry Integration” from the “Server and Clouds” category; click “Install” to launch the installation procedure.<br /><p style="text-align: center;"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/1.png"><img class="aligncenter size-full wp-image-8562" style="margin: 0 5px; padding: 4px; border: 1px solid #ccc;" title="1" src="http://blog.springsource.com/wp-content/uploads/2011/04/1.png" alt="" width="90%" height="" /></a></p><br />From here on you can just follow the steps of the installation wizard. Along the way you need to review and accept the license agreement and restart STS to finalize the installation. After restarting STS you’re ready to connect to Cloud Foundry.<br /><h3>Installing from Eclipse Marketplace</h3><br />The Cloud Foundry plugin can quite easily be installed into plain Eclipse installations. To make sure that all dependencies can be satisfied during installation you should start be installing the “Eclipse IDE for JEE Developers” package. This package can be downloaded from the <a href="https://www.eclipse.org/downloads/">Eclipse download page</a> or from the <a href="http://www.springsource.com/products/eclipse-downloads">SpringSource member distribution page</a>.</p><p>Start the installation by launching the Eclipse Marketplace client by selecting “Help &gt; Eclipse Marketplace”. Type “cloud foundry” into the search field and select “Go”. This will find the “Cloud Foundry Integration” which you can install by clicking the “Install” button next to the listing in the search results.<br /><p style="text-align: center;"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/2.png"><img class="aligncenter size-full wp-image-8564" style="margin: 0 5px; padding: 4px; border: 1px solid #ccc;" title="2" src="http://blog.springsource.com/wp-content/uploads/2011/04/2.png" alt="" width="574" height="562" /></a></p><br />Again, now you just need to follow the steps in the software installation wizard; accept the license terms, eventually agree to install un-signed content and restart Eclipse when being asked to do so. After restarting your Eclipse you’re ready to connect to Cloud Foundry and deploy your first application from inside your development environment.<br /><h3>Manual install from Update Site</h3><br />If you don’t like or can’t use the STS Extension Install mechanism or Eclipse Marketplace Client you can install the integration plugin manually from the following update site:</p><p><code><a href="http://dist.springsource.com/milestone/TOOLS/cloud/e3.6">http://dist.springsource.com/milestone/TOOLS/cloud/e3.6</a></code></p><p>Please note: the update site does not support directory indexing. Therefore you’ll get a “Access Denied” error message when hitting the URL with your web browser.<br /><h2>Connecting to Cloud Foundry</h2><br />The Cloud Foundry Integration plugin tightly integrates the cloud into the Web Tools Project (WTP) Server infrastructure. This is the most commonly known approach to deploying Java web applications from Eclipse. Most of you probably used the Servers View to deploy to a local Tomcat or tc Server instance.</p><p>With the Cloud Foundry Integration for Eclipse you will continue to use the Servers view to deploy your applications to the cloud. To start we first need to create a new WTP Server. This server represents your Cloud Foundry account and you’ll be able to connect to your Cloud Foundry account; much like using “vmc target ; vmc login” from the command line.</p><p>The following steps guide you through the process of connecting to Cloud Foundry:<br /><ul><br /> <li>Open the “Servers” view from “Window &gt; Show view … &gt; Other … &gt; Servers”</li><br /> <li>Right click in the “Servers” view and select “New &gt; Server”</li><br /> <li>Select “Cloud Foundry” from the “VMware” category and click “Next&quot;</li><br /> <li>Enter your account information and select the cloud you want to connect to. If you have a Cloud Foundry account select “VMware Cloud Foundry – <a href="http://api.cloudfoundry.com”">http://api.cloudfoundry.com”</a> from the URL drop-down box. You can also use the Cloud Foundry Integration with a local installation of Cloud Foundry. Finally press “Validate Account” to check if the connection can be established successfully.</li><br /> <li>Click “Finish” to close the “New Server” wizard</li><br /></ul><br /><p style="text-align: center;"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/3.png"><img class="aligncenter size-full wp-image-8565" style="margin: 0 5px; padding: 4px; border: 1px solid #ccc;" title="3" src="http://blog.springsource.com/wp-content/uploads/2011/04/3.png" alt="" width="605" height="402" /></a></p><br />After finishing the “New Server” wizard you should see a new entry in the “Servers” view for Cloud Foundry. The connection to Cloud Foundry will automatically be established and you’ll see your deployed applications below the Cloud Foundry server node in the Servers view.<br /><p style="text-align: center;"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/4.png"><img class="aligncenter size-full wp-image-8569" style="margin: 0 5px; padding: 4px; border: 1px solid #ccc;" title="4" src="http://blog.springsource.com/wp-content/uploads/2011/04/4.png" alt="" width="471" height="160" /></a></p><br />You may notice that the “Start” and “Stop” actions in the view’s toolbar are disabled. Instead you’ll find “Connect” and “Disconnect” actions in the context menu when right-clicking the Cloud Foundry server.<br /><h3>Deploying Applications</h3><br />Deploying applications to Cloud Foundry is now just a question of dropping the application onto the Cloud Foundry server in the “Servers” view. Alternatively you could use the “Add and Remove …” action from the server’s context-menu.</p><p>Once the application has been added to Cloud Foundry it can be started: right-click the application in the “Servers” view and select “Start”. This will bring up the application deployment wizard that allows you specify the application name, URL and memory reservation. We’ll add more configuration options in the future.</p><p>After clicking “Finish” the plugin will upload and start the application on Cloud Foundry. You can review the status of your application deployment by double-clicking the application in the “Servers” view. This brings up the “Server Editor” that has been extended to show Cloud Foundry specific information.<br /><p style="text-align: center;"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/5.png"><img class="aligncenter size-full wp-image-8570" style="margin: 0 5px; padding: 4px; border: 1px solid #ccc;" title="5" src="http://blog.springsource.com/wp-content/uploads/2011/04/5.png" alt="" width="471" height="160" /></a></p></p>
+<h3>Service Provisioning and Binding</h3><p>The application that you want to deploy likely needs to access Services provided by Cloud Foundry. To initially provision the services you can use the “Server Editor”: on the “Applications” tab press the “Add service” action from the toolbar of “Services” section.</p><p>Once the services are provisioned to your Cloud Foundry account, you can bind them to your applications. To do so just drag and drop the services you want to bind to certain application to “Application Services” table on the right side of the “Server Editor”. If your application needs to access services during startup and would fail to start without the services being available, bind the services before you start your application.<br /><h3>Remote File Access</h3><br />The Cloud Foundry Integration for Eclipse provides access to remote file resources, much like “vmc files ” and “vmc logs &ndash;all”. Click the “Remote Systems View” link on the bottom right of the application details pane in the “Server Editor”. This brings up the &ldquo;Remote Systems&rdquo; view which will let you browse the file tree and open files, e.g. log files, directly from within Eclipse.<br /><p style="text-align: center;"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/6.png"><img class="aligncenter size-full wp-image-8571" style="margin: 0 5px; padding: 4px; border: 1px solid #ccc;" title="6" src="http://blog.springsource.com/wp-content/uploads/2011/04/6.png" alt="" width="439" height="236" /></a></p></p>
+<h2>What's next</h2><p>We&rsquo;ll continue to improve the Cloud Foundry Eclipse support over the coming weeks. As always we very much value community feedback. Therefore please take some time to check out the plugin and let us know what you think.</p><p>In case you find any issues please raise JIRAs in the <a href="https://issuetracker.springsource.com/browse/STS">STS issue tracker</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 410;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

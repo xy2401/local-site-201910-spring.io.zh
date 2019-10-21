@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Notes on Reactive Programming Part II: Writing Some Code</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Notes on Reactive Programming Part II: Writing Some Code" />
+<meta name="twitter:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this article we continue the series on &lt;a href=&quot;https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape&quot;&gt;Reactive Programming&lt;/a&gt;, and we concentrate on explaining some concepts through actual code samples. The end result should be that you understand a bit better what makes Reactive different, and what makes it functional. The examples here are quite abstract, but they give you a way to think about the APIs and the programming style, and start to get a feel for how it is different. We will see the elements of Reactive, and learn how to control the flow of data, and process in background threads if necessary.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@david_syer" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+
+<meta property="og:title" content="Notes on Reactive Programming Part II: Writing Some Code" />
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta property="og:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this article we continue the series on &lt;a href=&quot;https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape&quot;&gt;Reactive Programming&lt;/a&gt;, and we concentrate on explaining some concepts through actual code samples. The end result should be that you understand a bit better what makes Reactive different, and what makes it functional. The examples here are quite abstract, but they give you a way to think about the APIs and the programming style, and start to get a feel for how it is different. We will see the elements of Reactive, and learn how to control the flow of data, and process in background threads if necessary.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2016-06-13 14:57:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Notes on Reactive Programming Part II: Writing Some Code</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2016-06-13 14:57:00.0">June 13, 2016</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2510" href="/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div class="paragraph">
+<p>In this article we continue the series on <a href="https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape">Reactive Programming</a>, and we concentrate on explaining some concepts through actual code samples. The end result should be that you understand a bit better what makes Reactive different, and what makes it functional. The examples here are quite abstract, but they give you a way to think about the APIs and the programming style, and start to get a feel for how it is different. We will see the elements of Reactive, and learn how to control the flow of data, and process in background threads if necessary.</p>
+</div>
+<div class="sect1">
+<h2 id="setting-up-a-project"><a class="anchor" href="#setting-up-a-project"></a>Setting Up a Project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use the Reactor libraries to illustrate the points we need to make. The code could just as easily be written with other tools. If you want to play with the code and see it working without having to copy-paste anything, there are working samples with tests in <a href="https://github.com/dsyer/reactive-notes">Github</a>.</p>
+</div>
+<div class="paragraph">
+<p>To get started grab a blank project from <a href="https://start.spring.io" class="bare">https://start.spring.io</a> and add the Reactor Core dependency. With Maven</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">		&lt;dependency&gt;
+			&lt;groupId&gt;io.projectreactor&lt;/groupId&gt;
+			&lt;artifactId&gt;reactor-core&lt;/artifactId&gt;
+			&lt;version&gt;3.0.0.RC2&lt;/version&gt;
+		&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With Gradle it&#8217;s very similar:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">    compile 'io.projectreactor:reactor-core:3.0.0.RC2'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now let&#8217;s write some code.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-makes-it-functional"><a class="anchor" href="#what-makes-it-functional"></a>What Makes it Functional?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The basic building block of Reactive is a sequence of events, and two protagonists, a publisher and a subscriber to those events. It&#8217;s also OK to call a sequence a "stream" because that&#8217;s what it is. If we need to, we will use the word "stream" with a small "s", but Java 8 has a <code>java.util.Stream</code> which is different, so try not to get confused. We will try to concentrate the narrative on the publisher and subscriber anyway (that&#8217;s what Reactive Streams does).</p>
+</div>
+<div class="paragraph">
+<p>Reactor is the library we are going to use in samples, so we&#8217;ll stick to the notation there, and call the publisher a <code>Flux</code> (it implements the interface <code>Publisher</code> from Reactive Streams). The RxJava library is very similar and has a lot of parallel features, so in that case we would be talking about an <code>Observable</code> instead, but the code would be very similar. (Reactor 2.0 called it a <code>Stream</code> which is confusing if we need to talk about Java 8 <code>Streams</code> as well, so we&#8217;ll only use the new code in Reactor 3.0.)</p>
+</div>
+<div class="sect2">
+<h3 id="generators"><a class="anchor" href="#generators"></a>Generators</h3>
+<div class="paragraph">
+<p>A <code>Flux</code> is a publisher of a sequence of events of a specific POJO type, so it is generic, i.e. <code>Flux&lt;T&gt;</code> is a publisher of <code>T</code>. <code>Flux</code> has some static convenience methods to create instances of itself from a variety of sources. For example, to create a <code>Flux</code> from an array:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux&lt;String&gt; flux = Flux.just("red", "white", "blue");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We just generated a <code>Flux</code>, and now we can do stuff with it. There are actually only two things you can do with it: operate on it (transform it, or combine it with other sequences), subscribe to it (it&#8217;s a publisher).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="single-valued-sequences"><a class="anchor" href="#single-valued-sequences"></a>Single Valued Sequences</h3>
+<div class="paragraph">
+<p>Often you encounter a sequence that you know has only one or zero elements, for example a repository method that finds an entity by its id. Reactor has a <code>Mono</code> type representing a single valued or empty <code>Flux</code>. <code>Mono</code> has a very similar API to <code>Flux</code> but more focused because not all operators make sense for single-valued sequences. RxJava also has a bolt on (in version 1.x) called <code>Single</code>, and also <code>Completable</code> for an empty sequence. The empty sequence in Reactor is <code>Mono&lt;Void&gt;</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="operators"><a class="anchor" href="#operators"></a>Operators</h3>
+<div class="paragraph">
+<p>There are a <em>lot</em> of methods on a <code>Flux</code> and nearly all of them are operators. We aren&#8217;t going to look at them all here because there are better places to look for that (like the Javadocs). We only need to get a flavour for what an operator is, and what it can do for you.</p>
+</div>
+<div class="paragraph">
+<p>For instance, to ask for the internal events inside a <code>Flux</code> to be logged to standard out, you can call the <code>.log()</code> method. Or you can transform it using a <code>map()</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux&lt;String&gt; flux = Flux.just("red", "white", "blue");
+
+Flux&lt;String&gt; upper = flux
+  .log()
+  .map(String::toUpperCase);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this code we transformed the strings in the input by converting them to upper case. So far, so trivial.</p>
+</div>
+<div class="paragraph">
+<p>What&#8217;s interesting about this little sample&#8201;&#8212;&#8201;mind blowing, even, if you&#8217;re not used to it&#8201;&#8212;&#8201;is that no data have been processed yet. Nothing has even been logged because literally, nothing happened (try it and you will see). Calling operators on a <code>Flux</code> amounts to building a plan of execution for later. It is completely declarative, and it&#8217;s why people call it "functional". The logic implemented in the operators is only executed when data starts to flow, and that doesn&#8217;t happen until someone subscribes to the <code>Flux</code> (or equivalently to the <code>Publisher</code>).</p>
+</div>
+<div class="paragraph">
+<p>The same declarative, functional approach to processing a sequence of data exists in all Reactive libraries, and also in Java 8 <code>Streams</code>. Consider this, similar looking code, using a <code>Stream</code> with the same contents as the <code>Flux</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Stream&lt;String&gt; stream = Streams.of("red", "white", "blue");
+Stream&lt;String&gt; upper = stream.map(value -&gt; {
+    System.out.println(value);
+    return value.toUpperCase();
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The observation we made about <code>Flux</code> applies here: no data is processed, it&#8217;s just a plan of execution. There are, however, some important differences between <code>Flux</code> and <code>Stream</code>, which make <code>Stream</code> an inappropriate API for Reactive use cases. <code>Flux</code> has a lot more operators, much of which is just convenience, but the real difference comes when you want to consume the data, so that&#8217;s what we need to look at next.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+There is a useful blog by Sebastien Deleuze on <a href="https://spring.io/blog/2016/04/19/understanding-reactive-types">Reactive Types</a>, where he describes the differences between the various streaming and reactive APIs by looking at the types they define, and how you would use them. The differences between <code>Flux</code> and <code>Stream</code> are highlighted there in more detail.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="subscribers"><a class="anchor" href="#subscribers"></a>Subscribers</h3>
+<div class="paragraph">
+<p>To make the data flow you have to subscribe to the <code>Flux</code> using one of the <code>subscribe()</code> methods. Only those methods make the data flow. They reach back through the chain of operators you declared on your sequence (if any) and request the publisher to start creating data. In the sample samples we have been working with, this means the underlying collection of strings is iterated. In more complicated use case it might trigger a file to be read from the filesystem, or a pull from a database or a call to an HTTP service.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a call to <code>subscribe()</code> in action:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.just("red", "white", "blue")
+  .log()
+  .map(String::toUpperCase)
+.subscribe();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>09:17:59.665 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ea988f8b899e8598c48985988fc49a9f88868399828f98c4ac869f92a39e8f988b88868fcea39e8f988b88868fb99f88998998839a9e838584aad98c8c89df8b8c">[email&#160;protected]</a>1)
+09:17:59.666 [main] INFO reactor.core.publisher.FluxLog -  request(unbounded)
+09:17:59.666 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
+09:17:59.667 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
+09:17:59.667 [main] INFO reactor.core.publisher.FluxLog -  onNext(blue)
+09:17:59.667 [main] INFO reactor.core.publisher.FluxLog -  onComplete()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So we can see from this that the effect of <code>subscribe()</code> without an argument, is to request the publisher to send <em>all</em> data&#8201;&#8212;&#8201;there&#8217;s only one <code>request()</code> logged and it&#8217;s "unbounded". We can also see callbacks for each item that is published (<code>onNext()</code>), for the end of the sequence (<code>onComplete()</code>), and for the original subscription (<code>onSubscribe()</code>). If you needed to you could listen for those events yourself using the <code>doOn*()</code> methods in <code>Flux</code>, which are themselves operators, not subscribers, so they don&#8217;t cause any data to flow on their own.</p>
+</div>
+<div class="paragraph">
+<p>The <code>subscribe()</code> method is overloaded, and the other variants give you different options to control what happens. One important and convenient form is <code>subscribe()</code> with callbacks as arguments. The first argument is a <code>Consumer</code>, which gives you a callback with each of the items, and you can also optionally add a <code>Consumer</code> for an error if there is one, and a vanilla <code>Runnable</code> to execute when the sequence is complete. For example, just with the per-item callback:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.just("red", "white", "blue")
+    .log()
+    .map(String::toUpperCase)
+.subscribe(System.out::println);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s the output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>09:56:12.680 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="67150206041308154904081502491712050b0e140f021549210b121f261515061e43261515061e3412051404150e17130e080927525e015e5e0206">[email&#160;protected]</a>)
+09:56:12.682 [main] INFO reactor.core.publisher.FluxLog -  request(unbounded)
+09:56:12.682 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
+RED
+09:56:12.682 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
+WHITE
+09:56:12.682 [main] INFO reactor.core.publisher.FluxLog -  onNext(blue)
+BLUE
+09:56:12.682 [main] INFO reactor.core.publisher.FluxLog -  onComplete()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We could control the flow of data, and make it "bounded", in a variety of ways. The raw API for control is the <code>Subscription</code> you get from a <code>Subscriber</code>. The equivalent long form of the short call to <code>subscribe()</code> above is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">.subscribe(new Subscriber&lt;String&gt;() {
+
+    @Override
+    public void onSubscribe(Subscription s) {
+        s.request(Long.MAX_VALUE);
+    }
+    @Override
+    public void onNext(String t) {
+        System.out.println(t);
+    }
+    @Override
+    public void onError(Throwable t) {
+    }
+    @Override
+    public void onComplete() {
+    }
+
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To control the flow, e.g. to consume at most 2 items at a time, you could use the <code>Subscription</code> more intelligently:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">.subscribe(new Subscriber&lt;String&gt;() {
+
+    private long count = 0;
+    private Subscription subscription;
+
+    @Override
+    public void onSubscribe(Subscription subscription) {
+        this.subscription = subscription;
+        subscription.request(2);
+    }
+
+    @Override
+    public void onNext(String t) {
+        count++;
+        if (count&gt;=2) {
+            count = 0;
+            subscription.request(2);
+        }
+     }
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This <code>Subscriber</code> is "batching" items 2 at a time. It&#8217;s a common use case so you might think about extracting the implementation to a convenience class, and that would make the code more readable too. The output looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>09:47:13.562 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="186a7d797b6c776a367b776a7d36686d7a74716b707d6a365e746d60596a6a79613c596a6a79614b6d7a6b7b6a71686c717776582e29202b2a212a21">[email&#160;protected]</a>)
+09:47:13.564 [main] INFO reactor.core.publisher.FluxLog -  request(2)
+09:47:13.564 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
+09:47:13.565 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
+09:47:13.565 [main] INFO reactor.core.publisher.FluxLog -  request(2)
+09:47:13.565 [main] INFO reactor.core.publisher.FluxLog -  onNext(blue)
+09:47:13.565 [main] INFO reactor.core.publisher.FluxLog -  onComplete()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In fact the batching subscriber is such a common use case that there are convenience methods already available in <code>Flux</code>. The batching example above can be implemented like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.just("red", "white", "blue")
+  .log()
+  .map(String::toUpperCase)
+.subscribe(null, 2);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(note the call to <code>subscribe()</code> with a request limit). Here&#8217;s the output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>10:25:43.739 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bac8dfdbd9ced5c894d9d5c8df94cacfd8d6d3c9d2dfc894fcd6cfc2fbc8c8dbc39efbc8c8dbc3e9cfd8c9d9c8d3caced3d5d4fa8e8c8c8ddbdf8f8c">[email&#160;protected]</a>)
+10:25:43.740 [main] INFO reactor.core.publisher.FluxLog -  request(2)
+10:25:43.740 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
+10:25:43.741 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
+10:25:43.741 [main] INFO reactor.core.publisher.FluxLog -  request(2)
+10:25:43.741 [main] INFO reactor.core.publisher.FluxLog -  onNext(blue)
+10:25:43.741 [main] INFO reactor.core.publisher.FluxLog -  onComplete()</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+A library that will process sequences for you, like Spring Reactive Web, can handle the subscriptions. It&#8217;s good to be able to push these concerns down the stack because it saves you from cluttering your code with non-business logic, making it more readable and easier to test and maintain. So as a rule, it is a good thing if you can <strong>avoid subscribing</strong> to a sequence, or at least push that code into a processing layer, and out of the business logic.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="threads-schedulers-and-background-processing"><a class="anchor" href="#threads-schedulers-and-background-processing"></a>Threads, Schedulers and Background Processing</h3>
+<div class="paragraph">
+<p>An interesting feature of all the logs above is that they are all on the "main" thread, which is the thread of the caller to <code>subscribe()</code>. This highlights an important point: Reactor is extremely frugal with threads, because that gives you the greatest chance of the best possible performance. That might be a surprising statement if you&#8217;ve been wrangling threads and thread pools and asynchronous executions for the last 5 years, trying to squeeze more juice out of your services. But it&#8217;s true: in the absence of any imperative to switch threads, even if the JVM is optimized to handle threads very efficiently, it is always faster to do computation on a single thread. Reactor has handed you the keys to control all the asynchronous processing, and it assumes you know what you are doing.</p>
+</div>
+<div class="paragraph">
+<p><code>Flux</code> provides a few configurer methods that control the thread boundaries. For example, you can configure the subscriptions to be handled in a background thread using <code>Flux.subscribeOn()</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.just("red", "white", "blue")
+  .log()
+  .map(String::toUpperCase)
+  .subscribeOn(Schedulers.parallel())
+.subscribe(null, 2);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>the result can be seen in the output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>13:43:41.279 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3547505456415a471b565a47501b454057595c465d50471b7359404d744747544c11744747544c6640574656475c45415c5a5b75000d030306535606">[email&#160;protected]</a>)
+13:43:41.280 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  request(2)
+13:43:41.281 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onNext(red)
+13:43:41.281 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onNext(white)
+13:43:41.281 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  request(2)
+13:43:41.281 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onNext(blue)
+13:43:41.281 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onComplete()</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+if you write this code yourself, or copy-paste it, remember to wait for the processing to stop before the JVM exits.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Note that the subscription, and all the processing, takes place on a single background thread "parallel-1-1"&#8201;&#8212;&#8201;this is because we asked for the subscriber to our main <code>Flux</code> to be in the background. This is fine if the item processing is CPU intensive (but pointless being in a background thread, in point of fact, since you pay for the context switch but don&#8217;t get the results any faster). You might also want to be able to perform item processing that is I/O intensive and possibly blocking. In this case, you would want to get it done as quickly as possible without blocking the caller. A thread pool is still your friend, and that&#8217;s what you get from <code>Schedulers.parallel()</code>. To switch the processing of the individual items to separate threads (up to the limit of the pool) we need to break them out into separate publishers, and for each of those publishers ask for the result in a background thread. One way to do this is with an operator called <code>flatMap()</code>, which maps the items to a <code>Publisher</code> (potentially of a different type), and then back to a sequence of the new type:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.just("red", "white", "blue")
+  .log()
+  .flatMap(value -&gt;
+     Mono.just(value.toUpperCase())
+       .subscribeOn(Schedulers.parallel()),
+     2)
+.subscribe(value -&gt; {
+  log.info("Consumed: " + value);
+})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note here the use of <code>flatMap()</code> to push the items down into a "child" publisher, where we can control the subscription per item instead of for the whole sequence. Reactor has built in default behaviour to hang onto a single thread as long as possible, so we need to be explicit if we want it to process specific items or groups of items in a background thread. Actually, this is one of a handful of recognized tricks for forcing parallel processing (see the <a href="https://github.com/reactor/reactive-streams-commons/issues/21">Reactive Gems</a> issue for more detail).</p>
+</div>
+<div class="paragraph">
+<p>The output looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>15:24:36.596 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c2e393d3f28332e723f332e39722c293e30352f34392e721a3029241528392e3d3e3039781528392e3d3e30390f293e2f3f2e352c283533321c6a3a6d3a3e3d6d">[email&#160;protected]</a>7)
+15:24:36.610 [main] INFO reactor.core.publisher.FluxLog -  request(2)
+15:24:36.610 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
+15:24:36.613 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
+15:24:36.613 [parallel-1-1] INFO com.example.FluxFeaturesTests - Consumed: RED
+15:24:36.613 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  request(1)
+15:24:36.613 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onNext(blue)
+15:24:36.613 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onComplete()
+15:24:36.614 [parallel-3-1] INFO com.example.FluxFeaturesTests - Consumed: BLUE
+15:24:36.617 [parallel-2-1] INFO com.example.FluxFeaturesTests - Consumed: WHITE</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice that there are now multiple threads consuming the items, and the concurrency hint in the <code>flatMap()</code> ensures that there are 2 items being processed at any given time, as long as they are available. We see <code>request(1)</code> a lot because the system is trying to keep 2 items in the pipeline, and generally they don&#8217;t finish processing at the same time. Reactor tries to be very smart here in fact, and it pre-fetches items from the upstream <code>Publisher</code> to try to eliminate waiting time for the subscriber (we aren&#8217;t seeing that here because the numbers are low&#8201;&#8212;&#8201;we are only processing 3 items).</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+Three items ("red", "white", "blue") might be too few to convincingly see more than one background thread, so it might be better to generate more data. You could do that with a random number generator, for instance.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>Flux</code> also has a <code>publishOn()</code> method which is the same, but for the listeners (i.e. <code>onNext()</code> or consumer callbacks) instead of for the subscriber itself:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.just("red", "white", "blue")
+  .log()
+  .map(String::toUpperCase)
+  .subscribeOn(Schedulers.newParallel("sub"))
+  .publishOn(Schedulers.newParallel("pub"), 2)
+.subscribe(value -&gt; {
+    log.info("Consumed: " + value);
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>15:12:09.750 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d1f080c0e19021f430e021f08431d180f01041e05081f432b0118152419081f0c0f0108492419081f0c0f01083e180f1e0e1f041d190402032d5c5a5f0809585a">[email&#160;protected]</a>)
+15:12:09.758 [sub-1-1] INFO reactor.core.publisher.FluxLog -  request(2)
+15:12:09.759 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onNext(red)
+15:12:09.759 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onNext(white)
+15:12:09.770 [pub-1-1] INFO com.example.FluxFeaturesTests - Consumed: RED
+15:12:09.771 [pub-1-1] INFO com.example.FluxFeaturesTests - Consumed: WHITE
+15:12:09.777 [sub-1-1] INFO reactor.core.publisher.FluxLog -  request(2)
+15:12:09.777 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onNext(blue)
+15:12:09.777 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onComplete()
+15:12:09.783 [pub-1-1] INFO com.example.FluxFeaturesTests - Consumed: BLUE</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice that the consumer callbacks (logging "Consumed: &#8230;&#8203;") are on the publisher thread <code>pub-1-1</code>. If you take out the <code>subscribeOn()</code> call, you might see all of the 2nd chunk of data processed on the <code>pub-1-1</code> thread as well. This, again, is Reactor being frugal with threads&#8201;&#8212;&#8201;if there&#8217;s no explicit request to switch threads it stays on the same one for the next call, whatever that is.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+We changed the code in this sample from <code>subscribe(null, 2)</code> to adding a <code>prefetch=2</code> to the <code>publishOn()</code>. In this case the fetch size hint in <code>subscribe()</code> would have been ignored.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="extractors-the-subscribers-from-the-dark-side"><a class="anchor" href="#extractors-the-subscribers-from-the-dark-side"></a>Extractors: The Subscribers from the Dark Side</h3>
+<div class="paragraph">
+<p>There is another way to subscribe to a sequence, which is to call <code>Mono.block()</code> or <code>Mono.toFuture()</code> or <code>Flux.toStream()</code> (these are the "extractor" methods&#8201;&#8212;&#8201;they get you out of the Reactive types into a less flexible, blocking abstraction). <code>Flux</code> also has converters <code>collectList()</code> and <code>collectMap()</code> that convert from <code>Flux</code> to <code>Mono</code>. They don&#8217;t actually subscribe to the sequence, but they do throw away any control you might have had over the suscription at the level of the individual items.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+A good rule of thumb is "<strong>never call an extractor</strong>". There are some exceptions (otherwise the methods would not exist). One notable exception is in tests because it&#8217;s useful to be able to block to allow results to accumulate.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>These methods are there as an escape hatch to bridge from Reactive to blocking; if you need to adapt to a legacy API, for instance Spring MVC. When you call <code>Mono.block()</code> you throw away all the benefits of the Reactive Streams. This is the key difference between Reactive Streams and Java 8 <code>Streams</code>&#8201;&#8212;&#8201;the native Java <code>Stream</code> only has the "all or nothing" subscription model, the equivalent of <code>Mono.block()</code>. Of course <code>subscribe()</code> can block the calling thread as well, so it&#8217;s just as dangerous as the converter methods, but you have more control&#8201;&#8212;&#8201;you can prevent it from blocking by using <code>subscribeOn()</code> and you can drip the items through by applying back pressure and periodically deciding whether to continue.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this article we have covered the basics of the Reactive Streams and Reactor APIs. If you need to know more there are plenty of places to look, but there&#8217;s no substitute for hands on coding, so use the code in <a href="https://github.com/dsyer/reactive-notes">GitHub</a> (for this article in tests in the project called "flux"), or head over to the <a href="https://github.com/reactor/lite-rx-api-hands-on">Lite RX Hands On</a> workshop. So far, really this is just overhead, and we haven&#8217;t learned much that we couldn&#8217;t have done in a more obvious way using non-Reactive tools. The <a href="https://spring.io/blog/2016/07/20/notes-on-reactive-programming-part-iii-a-simple-http-server-application">next article</a> in the series will dig a little deeper into the blocking, dispatching and asynchronous sides of the Reactive model, and show you what opportunities there are to reap the real benefits.</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2510;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

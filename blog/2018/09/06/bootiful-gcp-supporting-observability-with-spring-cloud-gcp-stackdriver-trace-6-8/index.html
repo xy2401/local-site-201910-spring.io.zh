@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Bootiful GCP: Supporting Observability with Spring Cloud GCP Stackdriver Trace (6/8)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Bootiful GCP: Supporting Observability with Spring Cloud GCP Stackdriver Trace (6/8)" />
+<meta name="twitter:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;Hi Spring fans! In this brief series we’re going to look at the Spring Cloud integration for Google Cloud Platform, called Spring Cloud GCP. &lt;a href=&quot;https://cloud.spring.io/spring-cloud-gcp/&quot;&gt;Spring Cloud GCP&lt;/a&gt; represents a joint effort between Google and Pivotal that endeavors to provide a first class experience for Spring Cloud developers when using the Google Cloud Platform. Pivotal Cloud Foundry users will enjoy an even &lt;a href=&quot;https://docs.pivotal.io/partners/gcp-sb/index.html&quot;&gt;easier integration with the GCP service broker&lt;/a&gt;. These installments were written with help from Google Cloud Developer Advocate, and my buddy, &lt;a href=&quot;http://twitter.com/saturnism&quot;&gt;Ray Tsang&lt;/a&gt;. You can also catch a walkthrough of Spring Cloud GCP in our Google Next 2018 session, &lt;a href=&quot;https://www.youtube.com/watch?v=2Jo3vy7iQf8&quot;&gt;Bootiful Google Cloud Platform&lt;/a&gt;. Thanks buddy!&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Bootiful GCP: Supporting Observability with Spring Cloud GCP Stackdriver Trace (6/8)" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;Hi Spring fans! In this brief series we’re going to look at the Spring Cloud integration for Google Cloud Platform, called Spring Cloud GCP. &lt;a href=&quot;https://cloud.spring.io/spring-cloud-gcp/&quot;&gt;Spring Cloud GCP&lt;/a&gt; represents a joint effort between Google and Pivotal that endeavors to provide a first class experience for Spring Cloud developers when using the Google Cloud Platform. Pivotal Cloud Foundry users will enjoy an even &lt;a href=&quot;https://docs.pivotal.io/partners/gcp-sb/index.html&quot;&gt;easier integration with the GCP service broker&lt;/a&gt;. These installments were written with help from Google Cloud Developer Advocate, and my buddy, &lt;a href=&quot;http://twitter.com/saturnism&quot;&gt;Ray Tsang&lt;/a&gt;. You can also catch a walkthrough of Spring Cloud GCP in our Google Next 2018 session, &lt;a href=&quot;https://www.youtube.com/watch?v=2Jo3vy7iQf8&quot;&gt;Bootiful Google Cloud Platform&lt;/a&gt;. Thanks buddy!&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2018-09-06 00:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Bootiful GCP: Supporting Observability with Spring Cloud GCP Stackdriver Trace (6/8)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2018-09-06 00:00:00.0">September 06, 2018</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3368" href="/blog/2018/09/06/bootiful-gcp-supporting-observability-with-spring-cloud-gcp-stackdriver-trace-6-8#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><blockquote>
+<p>Hi Spring fans! In this brief series we’re going to look at the Spring Cloud integration for Google Cloud Platform, called Spring Cloud GCP. <a href="https://cloud.spring.io/spring-cloud-gcp/">Spring Cloud GCP</a> represents a joint effort between Google and Pivotal that endeavors to provide a first class experience for Spring Cloud developers when using the Google Cloud Platform. Pivotal Cloud Foundry users will enjoy an even <a href="https://docs.pivotal.io/partners/gcp-sb/index.html">easier integration with the GCP service broker</a>. These installments were written with help from Google Cloud Developer Advocate, and my buddy, <a href="https://twitter.com/saturnism">Ray Tsang</a>. You can also catch a walkthrough of Spring Cloud GCP in our Google Next 2018 session, <a href="https://www.youtube.com/watch?v=2Jo3vy7iQf8">Bootiful Google Cloud Platform</a>. Thanks buddy!</p>
+</blockquote>
+<p>There are eight posts in the series. Here they all are: </p>
+<ul>
+<li><a href="https://spring.io/blog/2018/08/20/bootiful-gcp-getting-started-with-spring-cloud-for-google-cloud-platform-1-8">Bootiful GCP: Getting Started with Spring Cloud for Google Cloud Platform (1/8)</a></li>
+<li><a href="https://spring.io/blog/2018/08/23/bootiful-gcp-relational-data-access-with-spring-cloud-gcp-2-8">Bootiful GCP: Relational Data Access with Spring Cloud GCP (2/8)</a></li>
+<li><a href="https://spring.io/blog/2018/08/27/bootiful-gcp-globally-consistent-data-access-with-spanner-3-8">Bootiful GCP: Globally Consistent Data Access with Spanner (3/8)</a></li>
+<li><a href="https://spring.io/blog/2018/08/30/bootiful-gcp-integration-with-google-cloud-pub-sub-4-8">Bootiful GCP: Integration with Google Cloud Pub/Sub (4/8)</a></li>
+<li><a href="https://spring.io/blog/2018/09/03/bootiful-gcp-runtime-configuration-with-spring-cloud-gcp-runtime-config-5-8">Bootiful GCP: Runtime Configuration with Spring Cloud GCP Runtime Config (5/8)</a></li>
+<li><a href="https://spring.io/blog/2018/09/06/bootiful-gcp-supporting-observability-with-spring-cloud-gcp-stackdriver-trace-6-8">Bootiful GCP: Supporting Observability with Spring Cloud GCP Stackdriver Trace (6/8)<br /></a></li>
+<li><a href="https://spring.io/blog/2018/09/10/bootiful-gcp-use-spring-cloud-gcp-to-connect-to-other-gcp-services-7-8">Bootiful GCP: Use Spring Cloud GCP to Connect to Other GCP Services (7/8)<br /> </a></li>
+<li><a href="https://spring.io/blog/2018/09/13/bootiful-gcp-to-production-8-8">Bootiful GCP: To Production! (8/8)</a></li>
+</ul>
+<p>As we move more and more applications to the cloud, and introduce more and more microservices, the complexity of understanding what’s gone wrong - and <em>where??</em> - grows. Distributed tracing addresses this problem. Distributed tracing, in theory, is a simple chore. For every request that enters or exits the system.. for every ingres or egress int he system, attach a UUID if one isnt already present and if it is present then propagate it. Unfortunately, this sort of logic is tedious and hard to get right as requests move from one node to another, synchronously and asynchrously, across thread and network boundaries. Spring Cloud Sleuth addresses this problem and provides an SPI into which backend distributed tracing systems, like OpenZipkin and Google Cloud Stack Driver, can plugin.</p>
+<p>As with all GCP APIs, we must first enable this one.</p>
+<pre><code class="prettyprint shell">gcloud services enable cloudtrace.googleapis.com
+</code></pre>
+<p>We’re going to setup a trivial REST API and a trivial REST client, and use the Spring Cloud GCP Stack Driver support to make short work of tracing those interactions.</p>
+<p>Let’s first look at our trivial REST API. Start a new project (using the skeletal <code>pom.xml</code> from above) and add <code>org.springframework.boot</code> : <code>spring-boot-starter-web</code> and <code>org.springframework.cloud</code> : <code>spring-cloud-gcp-starter-trace</code>. Our REST API (well, endpoint, anyway) will return a &ldquo;greetings, <em>a name here</em>!&rdquo; whenever <code>http://localhost:8080/greeting/{id}}</code> is invoked. Here’s the code for the service, first:</p>
+<pre><code class="prettyprint java">package com.example.gcp.trace;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@SpringBootApplication
+public class TraceServiceApplication {
+
+        @GetMapping(&quot;/greeting/{id}&quot;)
+        String greet(@PathVariable String id) {
+                return &quot;greetings, &quot; + id + &quot;!&quot;;
+        }
+
+        public static void main(String args[]) {
+                SpringApplication.run(TraceServiceApplication.class, args);
+        }
+}
+</code></pre>
+<p>The configuration is arguably more interesting.</p>
+<p><strong>src/main/resources/application.properties.</strong></p>
+<pre><code class="prettyprint properties">spring.cloud.gcp.trace.enabled=true
+
+
+spring.sleuth.sampler.probability=1
+spring.sleuth.web.skipPattern=(^cleanup.*|.+favicon.*)
+
+
+server.port=8081
+
+
+spring.application.name=trace-service
+</code></pre>
+<ul>
+<li>we are opting-in to the trace support for Spring Cloud GCP. You could disable it when running the code on localhost but enable it in production with this flag.</li>
+<li>these properties tell Spring Cloud Sleuth to trace everything (a &ldquo;probability&rdquo; of 1.0 means 100% of all observed requests will be sampled and traced).</li>
+<li>if you’re running this demo on the same machine then you’ll want to avoid port conflicts in the client</li>
+<li><code>spring.application.name</code> is our application’s logical name and it can be used in distinguishing it from other applications in trace trees, service registries, etc.</li>
+</ul>
+<p>The client lobs a hundred HTTP requests when the application starts up. The <code>RestTemplate</code> it uses has been post-processed by the Spring Cloud Sleuth auto-configuration to intercept and trace all HTTP calls.</p>
+<pre><code class="prettyprint java">package com.example.gcp.trace;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cloud.sleuth.annotation.NewSpan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.stream.IntStream;
+
+@Slf4j
+@SpringBootApplication
+public class TraceClientApplication {
+
+        @Component
+        public static class Client {
+
+                private final RestTemplate restTemplate;
+
+                public Client(RestTemplate restTemplate) {
+                        this.restTemplate = restTemplate;
+                }
+
+                @EventListener(ApplicationReadyEvent.class)
+                @NewSpan(&quot;client&quot;) 
+                public void before() {
+                        IntStream
+                            .range(0, 100)
+                            .mapToObj(i -&gt;
+                                restTemplate
+                                    .getForEntity(&quot;http://localhost:8081/greeting/{id}&quot;, String.class, i)
+                                    .getBody())
+                            .forEach(response -&gt; log.info(&quot;result: &quot; + response));
+                }
+        }
+
+        @Bean
+        RestTemplate restTemplate() {
+                return new RestTemplate();
+        }
+
+        public static void main(String args[]) {
+                SpringApplication.run(TraceClientApplication.class, args);
+        }
+}
+</code></pre>
+<ul>
+<li>the client is a straightforward use of <code>RestTemplate</code> to connect to our service. If we wanted to send 100 requests with no shared parent span, we wouldn’t need <code>@NewSpan</code>. If we’d had 100 requests arrive from the outside and hit an HTTP endpoint in the client and that endpoint then resulted in 100 requests going to the service, we’d have a shared overarching span. A single trace with multiple spans.</li>
+</ul>
+<p>And the configuration for this node is virtually identical to that of the service.</p>
+<pre><code class="prettyprint properties">spring.cloud.gcp.trace.enabled=true
+
+spring.sleuth.sampler.probability=1
+spring.sleuth.web.skipPattern=(^cleanup.*|.+favicon.*)
+
+spring.application.name=trace-client
+
+server.port=8080
+</code></pre>
+<ul>
+<li>enable Spring Cloud GCP tracing..</li>
+<li>ensure that all requests are traced</li>
+<li>give our client a logical name</li>
+<li>and start on a different port than the service</li>
+</ul>
+<p>In order to see this in action, you’ll need to start the service, then the client, and then make your way over to the <a href="https://console.cloud.google.com/">Google Cloud Console</a>. Click on the &ldquo;Hamburger&rdquo;menu on the left hand side of the screen and click on STACKDRIVER → TRACE. There you’ll be given the ability to inspect the requests that just flew through your services.</p>
+<p><img src="https://pbs.twimg.com/media/Dk6aAXJU0AAe5Md.jpg:large" alt="Looking at trace information in the Google Cloud Console" /></p>
+<p>Stackdriver is the umbrella name for a host of services including monitoring, tracing, and - and this is <em>so wicked cool!</em> - live debugging of running applications. You could easily spend a lot more time - you <em>should</em>! - in this section of the console. Suffice it to say that Google is <em>gets</em> observability and that’s reflected in their services.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3368;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

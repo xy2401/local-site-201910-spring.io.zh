@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring 3.1 M1: Cache Abstraction</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring 3.1 M1: Cache Abstraction" />
+<meta name="twitter:description" content="&lt;p&gt;One of the major &lt;a href=&quot;http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released/&quot;&gt;features&lt;/a&gt; added in Spring Framework 3.1 M1 is the generic cache abstraction for transparently applying caching to Spring applications. Just like the &lt;a href=&quot;http://static.springsource.org/spring/docs/3.1.0.M1/spring-framework-reference/html/transaction.html&quot;&gt;transaction&lt;/a&gt; support, the caching abstraction allows consistent use of various caching solutions with minimal impact on the code.&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Purpose&lt;/h3&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Cache&quot;&gt;Cache&lt;/a&gt;s are in general used to improve application performance by transparently serving frequently accessed data in a faster fashion such as serving data from local memory rather than from the network. Many of you have already used caching, whether knowingly or not: most ORM/JPA frameworks provide dedicated caching functionality (also known as the 2nd-level cache). Spring 3.1 M1 however introduces a generic cache mechanism that can be applied to any Java class, method or library: one can use it in conjunction with an existing caching infrastructure, to add caching to APIs without such support (for example JDBC) or simply to improve the performance of a slow, time-consuming and resource-hungry method.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Spring 3.1 M1: Cache Abstraction" />
+<meta property="og:description" content="&lt;p&gt;One of the major &lt;a href=&quot;http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released/&quot;&gt;features&lt;/a&gt; added in Spring Framework 3.1 M1 is the generic cache abstraction for transparently applying caching to Spring applications. Just like the &lt;a href=&quot;http://static.springsource.org/spring/docs/3.1.0.M1/spring-framework-reference/html/transaction.html&quot;&gt;transaction&lt;/a&gt; support, the caching abstraction allows consistent use of various caching solutions with minimal impact on the code.&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Purpose&lt;/h3&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Cache&quot;&gt;Cache&lt;/a&gt;s are in general used to improve application performance by transparently serving frequently accessed data in a faster fashion such as serving data from local memory rather than from the network. Many of you have already used caching, whether knowingly or not: most ORM/JPA frameworks provide dedicated caching functionality (also known as the 2nd-level cache). Spring 3.1 M1 however introduces a generic cache mechanism that can be applied to any Java class, method or library: one can use it in conjunction with an existing caching infrastructure, to add caching to APIs without such support (for example JDBC) or simply to improve the performance of a slow, time-consuming and resource-hungry method.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-02-23 09:10:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring 3.1 M1: Cache Abstraction</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Costin Leau</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-02-23 09:10:00.0">February 23, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="398" href="/blog/2011/02/23/spring-3-1-m1-cache-abstraction#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>One of the major <a href="http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released/">features</a> added in Spring Framework 3.1 M1 is the generic cache abstraction for transparently applying caching to Spring applications. Just like the <a href="http://static.springsource.org/spring/docs/3.1.0.M1/spring-framework-reference/html/transaction.html">transaction</a> support, the caching abstraction allows consistent use of various caching solutions with minimal impact on the code.<br /><h3>Purpose</h3></p><p><a href="https://en.wikipedia.org/wiki/Cache">Cache</a>s are in general used to improve application performance by transparently serving frequently accessed data in a faster fashion such as serving data from local memory rather than from the network. Many of you have already used caching, whether knowingly or not: most ORM/JPA frameworks provide dedicated caching functionality (also known as the 2nd-level cache). Spring 3.1 M1 however introduces a generic cache mechanism that can be applied to any Java class, method or library: one can use it in conjunction with an existing caching infrastructure, to add caching to APIs without such support (for example JDBC) or simply to improve the performance of a slow, time-consuming and resource-hungry method.</p>
+<h3>Meet <code>@Cacheable</code>, <code>@CacheEvict</code> and SpEL</h3><p>Let us see what it takes to cache an arbitrary method:</p>
+<pre><code class="prettyprint java">@Cacheable(&quot;books&quot;)
+public Book findBook(ISBN isbn) {...}
+</code></pre><p>By marking the method with the <code>@Cacheable</code> annotation, we tell the container that the <code>findBook</code> method is backed by the cache entry <code>books</code>. That is each time the method is called, a cache lookup is performed using as key the method parameters (in this case the <code>isbn</code> argument). If a value is found, it will be returned and the method execution skipped. However, if the key is not found, the method is executed as usual and its result stored in the cache so the next time the method is invoked, the result can be returned without actually executing the (expensive or slow) method.</p><p>In practice not all methods have only one argument or, worse yet, the parameters are not suitable as cache keys - take for example a variation of the method above:</p>
+<pre><code class="prettyprint java">public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+</code></pre><p>In such cases, one can use Spring 3 Spring Expression Language or <a href="http://static.springsource.org/spring/docs/3.1.0.M1/spring-framework-reference/html/expressions.html">SpEL</a> to cherry pick the proper arguments, navigate the object tree</p>
+<pre><code class="prettyprint java">// use property &#39;rawNumber&#39; on isbn argument as key
+@Cacheable(value=&quot;book&quot;, key=&quot;#isbn.rawNumber&quot;)
+public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+</code></pre><p>or compute the key on the fly, even call arbitrary methods without having to write any code:</p>
+<pre><code class="prettyprint java">// get the key by calling someType#hash(isbn)
+@Cacheable(value=&quot;book&quot;, key=&quot;T(someType).hash(#isbn)&quot;)
+public Book findBook(ISBN isbn, boolean checkWarehouse, boolean includeUsed)
+</code></pre><p>Additionally, one can specify when or if the caching should occur: whether the cache should be inspected or completely disregarded and the method executed normally. It&rsquo;s up to the developer to decide what the criteria is: can be anything from the key size or type to the time of day or result of arbitrary methods: SpEL supports it all:</p>
+<pre><code class="prettyprint java">// cache only names shorter then 32 chars
+@Cacheable(value=&quot;book&quot;, condition=&quot;#name.length &lt; 32&quot;)
+public Book findBook(String name)
+</code></pre>
+<pre><code class="prettyprint java">// do not cache on weekends
+@Cacheable(value=&quot;book&quot;, condition=&quot;!T(TimeUtils).isWeekend()&quot;)
+public Book findBook(String name)
+</code></pre><p>The cache abstraction also supports eviction of cache entries or of an entire cache through the <code>@CacheEvict</code> annotation. To evict a cache once it becomes invalid (for example because the cached data has been updated) one can use the following:</p>
+<pre><code class="prettyprint java">// evict all cache entries
+@CacheEvict(value = &quot;books&quot;, allEntries=true)
+public void loadBooks(InputStream batch)
+</code></pre><p>Once the annotations are in place, one can simply &ldquo;enable&rdquo; the caching functionality with one line (or three if you count the schema declaration):</p>
+<pre><code class="prettyprint xml">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+  xmlns:cache=&quot;http://www.springframework.org/schema/cache&quot;
+   xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd&quot;&gt;
+  
+  &lt;cache:annotation-driven /&gt;
+  ...
+&lt;/beans&gt;
+</code></pre><p>Just like the rest of the <code>annotation-driven</code> element, the cache one uses defaults in its simplest form but can be used to pick between proxy and byte-code weaving of cached classes or to wire in the desired cache implementation.</p>
+<h3>Declaring a cache implementation</h3><p>So far, we discussed the declarative aspect of the caching abstraction: how to add and remove data from the cache based on your POJOs. But what are the backing cache implementations that one can use?<br />Out of the box, Spring provides integration with <a href="http://ehcache.org/">ehcache</a> and JDK <code>ConcurrentHashMap</code> great for small, non-distributed environments or testing:</p>
+<pre><code class="prettyprint xml">&lt;!-- generic cache manager --&gt;
+&lt;bean id=&quot;cacheManager&quot; class=&quot;org.springframework.cache.support.SimpleCacheManager&quot;&gt;
+  &lt;property name=&quot;caches&quot;&gt;
+    &lt;set&gt;
+      &lt;bean class=&quot;org.springframework.cache.concurrent.ConcurrentCacheFactoryBean&quot; p:name=&quot;default&quot;/&gt;
+      &lt;bean class=&quot;org.springframework.cache.concurrent.ConcurrentCacheFactoryBean&quot; p:name=&quot;books&quot;/&gt;
+    &lt;/set&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p><a name="whatabout"></a><h3>What about [xx] library - when will it be supported ?</h3><br />For the moment we do not plan to support other caching libraries inside Spring Framework simply because of the sheer number of options out there, the dependency impact (many are bigger in size than the cache abstraction), and the maintenance and licensing issues. To plug-in a custom cache provider, we encourage developers to look at the caching SPI <a href="http://static.springsource.org/spring/docs/3.1.0.M1/javadoc-api/index.html?org/springframework/cache/package-summary.html">package</a> and its two interfaces: <a href="http://static.springsource.org/spring/docs/3.1.0.M1/javadoc-api/index.html?org/springframework/cache/CacheManager.html">CacheManager</a> and <a href="http://static.springsource.org/spring/docs/3.1.0.M1/javadoc-api/index.html?org/springframework/cache/Cache.html">Cache</a>. Besides the implementations available out of the box, one can look at the <a href="http://www.gemstone.com/products/gemfire">GemFire</a> <a href="https://github.com/SpringSource/spring-gemfire/tree/1.1.0-dev/src/main/java/org/springframework/data/gemfire/support">implementation</a>, scheduled for the next major release version of <a href="http://www.springsource.org/spring-gemfire">Spring GemFire</a>.</p>
+<h3>How does the caching abstraction compare to other caches (e.g. JPA 2nd-level cache) ?</h3><p>In general, the two caching mechanisms can happily coexist as long as the developer pays attention to any domain overlap. Taking the example of the JPA 2nd-level cache, one can used it for data access through JPA while using Spring caching for the web-tier or remote service calls. One can go a step further by reusing the backed cache between the two mechanisms if that applies.</p>
+<h3>Summary</h3><p>I hope you enjoyed this quick introductory entry to the new caching feature in Spring 3.1. For more information, please see the relevant reference documentation <a href="http://static.springsource.org/spring/docs/3.1.0.M1/spring-framework-reference/html/cache.html">chapter</a> and the SPI <a href="http://static.springsource.org/spring/docs/3.1.0.M1/javadoc-api/index.html?org/springframework/cache/package-summary.html">javadoc</a>. And do let us know what you think - we are interested in your feedback! You can reach us through the <a href="http://forum.springframework.org/index.php">forum</a>, blog post comments, our issue <a href="https://jira.springsource.org/browse/SPR#selectedTab=com.atlassian.jira.plugin.system.project%3Aissues-panel">tracker</a> or yours truly on <a href="https://twitter.com/costinl">Twitter</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 398;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

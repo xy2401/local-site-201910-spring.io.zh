@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Deploying GWT Applications in SpringSource dm Server - Part 2</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Deploying GWT Applications in SpringSource dm Server - Part 2" />
+<meta name="twitter:description" content="&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This is the second in a series of three blogs describing a step-by-step approach to building and deploying GWT applications in the &lt;a href=&quot;http://www.springsource.com/products/suite/dmserver&quot; target=&quot;_blank&quot;&gt;SpringSource dm Server™&lt;/a&gt;. The first blog looked at the process of creating a simple WAR file from a sample GWT application. This next blog will look at turning the WAR file we created in &lt;a href=&quot;http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/&quot; target=&quot;_blank&quot;&gt;Part 1&lt;/a&gt; into a &lt;a href=&quot;http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars&quot; target=&quot;_blank&quot;&gt;“Shared Libraries”&lt;/a&gt; WAR. This means that we are going to externalize the GWT dependencies of our application into an OSGi bundle so that it can be shared by any number of GWT applications. You can think of it as extending our dm Server with GWT remoting capabilities.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Deploying GWT Applications in SpringSource dm Server - Part 2" />
+<meta property="og:description" content="&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This is the second in a series of three blogs describing a step-by-step approach to building and deploying GWT applications in the &lt;a href=&quot;http://www.springsource.com/products/suite/dmserver&quot; target=&quot;_blank&quot;&gt;SpringSource dm Server™&lt;/a&gt;. The first blog looked at the process of creating a simple WAR file from a sample GWT application. This next blog will look at turning the WAR file we created in &lt;a href=&quot;http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/&quot; target=&quot;_blank&quot;&gt;Part 1&lt;/a&gt; into a &lt;a href=&quot;http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars&quot; target=&quot;_blank&quot;&gt;“Shared Libraries”&lt;/a&gt; WAR. This means that we are going to externalize the GWT dependencies of our application into an OSGi bundle so that it can be shared by any number of GWT applications. You can think of it as extending our dm Server with GWT remoting capabilities.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2008-11-24 23:38:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Deploying GWT Applications in SpringSource dm Server - Part 2</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Ben Corrie</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2008-11-24 23:38:00.0">November 24, 2008</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="185" href="/blog/2008/11/24/deploying-gwt-applications-in-springsource-dm-server-part-2#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><h2>Introduction</h2><p>This is the second in a series of three blogs describing a step-by-step approach to building and deploying GWT applications in the <a href="http://www.springsource.com/products/suite/dmserver" target="_blank">SpringSource dm Server™</a>. The first blog looked at the process of creating a simple WAR file from a sample GWT application. This next blog will look at turning the WAR file we created in <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a> into a <a href="http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/htmlsingle/programmer-guide.html#architecture-wars" target="_blank">&ldquo;Shared Libraries&rdquo;</a> WAR. This means that we are going to externalize the GWT dependencies of our application into an OSGi bundle so that it can be shared by any number of GWT applications. You can think of it as extending our dm Server with GWT remoting capabilities.</p><p>As mentioned in <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a>, I am not using the <a href="http://www.springframework.org/" target="_blank">Spring Framework</a> in this second blog posting, rather I am focusing on the <a href="http://www.springsource.com/products/suite/dmserver" target="_blank">SpringSource dm Server™</a> and <a href="http://www.springsource.com/products/suite/sts">SpringSource Tool Suite</a> to deploy &ldquo;pure&rdquo; GWT.</p><p>Please also see <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a> for the background to the GWT <a href="https://code.google.com/docreader/#p=google-web-toolkit-doc-1-5&amp;s=google-web-toolkit-doc-1-5&amp;t=GettingStarted" target="_blank">StockWatcher</a> sample and the software I&rsquo;m using.<br /><h2>Quick Catch Up</h2><br />In <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a>, we built the GWT StockWatcher sample application from scratch as an Eclipse project and then generated the code into a Dynamic Web project which we then deployed into dm Server. Finally, we exported the Dynamic Web project into a WAR file and deployed it outside of STS.</p><p>The step by step approach described here will build on what we did in <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a>, rather than start over. The only thing we did in <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a> that we&rsquo;re now going to change is to remove the explicit dependency on the <tt>gwt-servlet.jar</tt> library.<br /><h2>Step 1: Turn our GWT dependency into a OSGi bundle</h2><br />Firstly, a little more background. The whole concept of the &ldquo;Shared Libraries&rdquo; approach is to create a map of dependencies within the dm Server using explicit imports and exports between OSGi bundles. With a small WAR such as our StockWatcher sample, this is mostly just an interesting academic exercise. However, given that many commercial web projects ship in large WAR files which are packaged with tens or even hundreds of dependent jar files, breaking out these dependencies into shareable resources not only makes sense from a footprint perspective, but also makes the packaging, versioning and maintenance of the applications significantly less painful.</p><p>The good news is that much of work to create these dependencies has already been done for you. The <a href="http://www.springsource.com/repository/app/" target="_blank">SpringSource Enterprise Bundle Repository</a> contains &ldquo;bundlized&rdquo; versions of most common libraries. However, at the time of writing, our GWT dependency is an example of a library that you have to turn into a bundle yourself. Fortunately for us, Eclipse 3.4 makes the process very simple.<br /><p style="padding-left: 30px;">- Right click in the Project explorer and select &ldquo;New&rdquo; -&gt; &ldquo;Other&rdquo; -&gt; &ldquo;Plug-in Development&rdquo; -&gt; &ldquo;Plug-in from existing Jar archives&rdquo;.<br />- Click &ldquo;Add external&rdquo; and browse for <tt>gwt-servlet.jar</tt>.<br />- Click &ldquo;Next&rdquo; and call the project &ldquo;com.google.gwt&rdquo;.<br />- Set the plugin version to reflect the GWT version, in this case it&rsquo;s 1.5.3.<br />- Select &ldquo;Analyze library contents and add dependencies&rdquo;<br />- Select the Equinox OSGi framework</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-21.png"><img class="alignnone size-full wp-image-576" title="Importing gwt-servlet" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-21.png" alt="" /></a></p><p>Click &ldquo;Finish&rdquo; and don&rsquo;t bother switching to the Plug-in development perspective. We&rsquo;re just going to export our bundle straight out again.</p><p>You should now see an overview of the generated <tt>MANIFEST.MF</tt> file, which is where a bundle&rsquo;s dependencies are defined. You&rsquo;ll see in the &ldquo;Runtime&rdquo; tab that the tool has added all of the <tt>com.google.gwt..</tt> packages as exports. You&rsquo;ll also see in the &ldquo;Dependencies&rdquo; tab that it has worked out that this bundle requires a couple of <tt>javax.servlet..</tt> packages and a <tt>junit</tt> package.</p><p>We&rsquo;ll remove the JUnit dependency for now as it will be unresolved by default in dm Server. Of course if we wanted we could add a JUnit bundle to dm Server to satisfy the dependency or alternatively we could make the dependency optional by adding <tt>required:=optional</tt>. Select the <tt>junit.framework</tt> package, click &ldquo;Remove&rdquo; and then save.<br /><p style="padding-left: 30px;">It&rsquo;s worth pointing out that this is a crude way of turning a JAR file into a bundle and it is not guaranteed to work in all circumstances. For one thing, we may not want all of our packages to be exported. More significantly however, there are one or two source-level gotchas which may not play well in OSGi, such as the use of <tt>Class.forName()</tt>. If in doubt, always go first to the <a href="http://www.springsource.com/repository/app/" target="_blank">SpringSource Enterprise Bundle Repository</a> rather than trying to roll your own.</p></p><p>Finally, we need to export our Plug-in project as an OSGi bundle. Select &ldquo;Export&rdquo; -&gt; &ldquo;Plug-in development&rdquo; -&gt; &ldquo;Deployable plug-ins and fragments&rdquo;. Select a convenient location as the output directory.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-51.png"><img class="alignnone size-full wp-image-578" title="Exporting the gwt-server plugin" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-51.png" alt="" /></a></p><p>We should now see a file in <tt>&lt;export path&gt;/plugins/com.google.gwt_1.5.3.jar</tt>. The next step is to rename the file to make it consistent with the format of the other named bundles in dm Server: simply change the underscore to a dash: <tt>com.google.gwt-1.5.3.jar</tt>. Without this change, the current version of STS won&rsquo;t recognise the bundle version. If you want to skip this step, you can download it <a href="http://blog.springsource.com/wp-content/uploads/2008/10/comgooglegwt-153jar.zip">here</a>.</p><p>Finally, copy the bundle into the dm Server bundle repository: <tt>&lt;dm Server installation root&gt;/repository/bundles/usr</tt>. Any bundle in here can be a dependency of other bundles in dm Server, but importantly it will also be visible as a dependency in STS, as we&rsquo;ll see in the next step.</p><p>At this point, you can delete the com.google.gwt project from the workspace as it has served its purpose.<br /><h2>Step 2: Migrate our WAR project to the new OSGi bundle</h2><br />Hopefully, you should now have a dm Server installation with a <tt>com.google.gwt-1.5.3.jar</tt> in its repository.</p><p>The next step is to break our application!</p><p>Right-click on StockWatcherWar, select &ldquo;Properties&rdquo; -&gt; &ldquo;Java EE Module Dependencies&rdquo;, unselect the <tt>gwt-server.jar</tt> file and click on &ldquo;OK&rdquo;. We&rsquo;ve now removed our WAR&rsquo;s explicit dependency on GWT and caused a number of new problems for ourselves, most of which are compiler errors.</p><p>So we need to turn our Dynamic Web project into a dm Server bundle so that it can explicitly import the dependencies it needs from our newly created GWT bundle. To do this, right-click on StockWatcherWar and select &ldquo;Spring Tools&rdquo; -&gt; &ldquo;Add OSGi Bundle Project Nature&rdquo;. You should notice that the project now carries an all-important &ldquo;S&rdquo; symbol and the <tt>MANIFEST.MF</tt> has also changed character:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-6a.png"><img class="alignnone size-full wp-image-583" title="Manifest nature" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-6a.png" alt="" /></a></p><p>It&rsquo;s broken because it doesn&rsquo;t look like a bundle manifest. Let&rsquo;s add some sane defaults (you can either cut-and-paste the following, or use the fields in the tabs). Note that you can also use ctrl-space in the editor to prompt you with valid options.</p><p><tt></tt><br /><p style="padding-left: 30px;"><tt>Manifest-Version: 1.0<br />Bundle-ManifestVersion: 2<br />Bundle-Name: com.google.sample.stockwatcher<br />Bundle-SymbolicName: com.google.sample.stockwatcher<br />Bundle-Version: 1.0.0<br />Bundle-Description: Shared Libraries StockWatcher demo</tt></p><p>So this has fixed one problem, in that our bundle manifest now looks sane. However, we haven&rsquo;t yet defined the dependency on the GWT bundle, so we&rsquo;ve still got a number of compiler errors.</p><p>Select the &ldquo;Dependencies&rdquo; tab and click on &ldquo;Add&rdquo;. Right at the top, you should see that a com.google.gwt bundle has magically appeared. Now, it&rsquo;s important to understand that the GWT bundle appearing in this list has nothing to do with the plug-in project we created in Step 1. If you delete that project from the workspace, the bundle will still appear. It works because the dm Server installation is set as the project&rsquo;s runtime and the tooling is therefore looking in the dm Server&rsquo;s repository for any bundles which you may want to import. If this hasn&rsquo;t worked, then either the GWT bundle wasn&rsquo;t copied to the correct location or the WAR project&rsquo;s runtime wasn&rsquo;t set to dm Server. Check the latter in &ldquo;Properties&rdquo; -&gt; &ldquo;Targeted Runtimes&rdquo;.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-7a.png"><img class="alignnone size-full wp-image-584" title="picture-7a" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-7a.png" alt="" /></a></p><p>Next, select the GWT bundle, click on &ldquo;OK&rdquo; and then save the manifest. You should now see the GWT bundle added to a new classpath element called &ldquo;Bundle Dependencies&rdquo;:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-8a.png"><img class="alignnone size-full wp-image-585" title="Bundle dependencies" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-8a.png" alt="" /></a></p><p>You should now notice that most of the errors have been resolved, but a couple are still outstanding. This is because our GWT bundle has a dependency on the <tt>javax.servlet</tt> APIs and until we have those classes available, the type hierarchy is incomplete.<br /><p style="padding-left: 30px;">So why didn&rsquo;t we have this problem previously when we just had <tt>gwt-servlet.jar</tt> in our build path? Well, before we made our changes, our WAR would pick up everything on its build path, which includes all of the JARs made available by the dm Server Target Runtime. However, you may have noticed that when we added the OSGi Bundle Project Nature, the dm Server JARs on the build path disappeared. This is because, by becoming an OSGi bundle, we have entered a different world of dependencies where imports and exports must be declared explicitly.</p></p><p>Declaring our dependency on the <tt>javax.servlet</tt> APIs is a simple matter of importing another bundle. You&rsquo;ll see it in the list as <tt>com.springsource.javax.servlet</tt>. Once you&rsquo;ve added the two bundles, save the manifest and you should now see all errors resolved. Phew!</p><p>If we navigate now to the MANIFEST.MF tab, we can see the effect of all of our button pushing: A green &ldquo;Import-Bundle&rdquo; entry in the manifest. Note that we could just as easily have used ctrl-space after &ldquo;Import-Bundle&rdquo; and it would have suggested all possible imports:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/10/picture-10a.png"><img class="alignnone size-full wp-image-588" title="Editing the manifest" src="http://blog.springsource.com/wp-content/uploads/2008/10/picture-10a.png" alt="" /></a></p><p>If you want to see my projects, you can download a zipped up copy <a href="http://blog.springsource.com/wp-content/uploads/2008/11/stockwatcherwarslproj.zip">here</a>. It includes Runtime Configurations to launch in hosted mode with the embedded Tomcat, hosted mode with dm Server and to launch the GWT compiler. Note that hosted mode with the embedded Tomcat works fine without having to modify the bundle WAR project. This is because the <tt>javax.servlet</tt> packages from dm Server are no longer on the build path. To use my projects, you&rsquo;ll need the <tt>GWT_ROOT_INSTALL</tt> variable and you may need to select your dm Server Target Runtime instance, as described in <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a>.<br /><h2>Step 3: Deploy onto dm Server</h2><br />The steps to deploy our &ldquo;Shared Libraries&rdquo; application are exactly the same as Steps 7 and 8 in <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a>, so there&rsquo;s no point going through those in detail again. The key difference of course is that we&rsquo;ve successfully broken out our dependencies into a library which can be shared by multiple GWT applications. If you download my <a href="http://blog.springsource.com/wp-content/uploads/2008/11/stockwatcherwar1.zip">StockWatcher Shared Libraries WAR</a>, you&rsquo;ll see that it&rsquo;s now 290k instead of 890k.</p><p>Just for fun, let&rsquo;s have a peek under the covers and look at our bundles interacting.</p><p>When dm Server starts up, it notifies you that its OSGi console can be accessed using a telnet client:</p><p><tt>[2008-10-27 16:48:04.266] main                     &lt;SPOF0001I&gt; OSGi telnet console available on port 2401.</tt></p><p>Let&rsquo;s open up a terminal window and see what we can find out:<br /><p style="padding-left: 30px;"><tt>&gt; telnet localhost 2401<br />Trying ::1&hellip;<br />Connected to localhost.<br />Escape character is &lsquo;^]&rsquo;.</tt><br /><p style="padding-left: 30px;"><tt>osgi&gt;</tt></p></p><p>You can get a list of the commands available to the Equinox console by typing help. There is also a useful DeveloperWorks article about it you can read <a href="https://www.ibm.com/developerworks/library/os-ecl-osgiconsole/index.html" target="_blank">here</a>.</p><p>Typing <tt>ss</tt> gives us a list of all the running plugins:<br /><p style="padding-left: 30px;"><tt>osgi&gt; ss</tt></p><br /><p style="padding-left: 30px;"><tt>Framework is launched.</tt></p></p><p><p style="padding-left: 30px;"><tt>id    State       Bundle<br />&hellip; .<br />73    ACTIVE      com.google.sample.stockwatcher_1.0.0<br />74    ACTIVE      com.google.gwt_1.5.3<br /></tt></p><p>Typing <tt>packages 74</tt> gives us all of the exported packages from the GWT bundle. It shows that all of the exported packages are being imported by the StockWatcherWar bundle. This is a result of our use of &ldquo;Import-Bundle&rdquo;. As it happens, the only packages our StockWatcherWar actually requires are <tt>com.google.gwt.user.client.rpc</tt> and <tt>com.google.gwt.user.server.rpc</tt>. If we&rsquo;d wanted to, we could instead have been more selective by using &ldquo;Import-Package&rdquo; to import these packages explicitly. This is described in the <a href="http://static.springsource.com/projects/dm-server/1.0.x/programmer-guide/html/ch05.html" target="_blank">dm Server Programmer Guide</a>.<br /><p style="padding-left: 30px;"><tt><a href="file:////Users/bcorrie/dmServer-1.0.0/springsource-dm-server-1.0.0.RELEASE/work/com.springsource.server.deployer/Module/StockWatcherWar.war-0/StockWatcherWar.war">file:////Users/bcorrie/dmServer-1.0.0/springsource-dm-server-1.0.0.RELEASE/work/com.springsource.server.deployer/Module/StockWatcherWar.war-0/StockWatcherWar.war</a> [73] imports<br />com.google.gwt.i18n.client.constants; version=&ldquo;0.0.0&rdquo;&lt;<a href="file:////Users/bcorrie/dmServer-1.0.0/springsource-dm-server-1.0.0.RELEASE/repository/bundles/usr/com.google.gwt-1.5.3.jar">file:////Users/bcorrie/dmServer-1.0.0/springsource-dm-server-1.0.0.RELEASE/repository/bundles/usr/com.google.gwt-1.5.3.jar</a> [74]&gt;</tt><br /><h2>Step 4: Deploying other GWT applications on the shared library</h2><br />It&rsquo;s worth noting that not all GWT applications need to use <tt>gwt-servlet.jar</tt>. Only GWT applications which use some form of remoting have a dependency on this library. Google ship a number of sample applications in their distribution, most of which generate into just javascript and html and are therefore deployed with no Java code. Turning these samples into a WAR file is a simple matter of running the Compile script into a Dynamic Web project as described in <a href="http://blog.springsource.com/2008/11/07/deploying-gwt-applications-in-springsource-dm-server-part-1/" target="_blank">Part 1</a> Step 5 and then creating a suitable web.xml.</p><p>However, one example included with the GWT distribution which does use some simple remoting is called DynaTable. Using the same steps and principles described in these blogs, I turned this sample into a Shared Libraries WAR file. To see what I did, you can download the zipped up <a href="http://blog.springsource.com/wp-content/uploads/2008/11/dynatableslproj.zip">projects</a> or <a href="http://blog.springsource.com/wp-content/uploads/2008/11/dynatablewar.zip">WAR file</a> and have a look. This very simply demonstrates the principle of running multiple applications in dm Server, both of which are sharing the GWT bundle we created.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2008/11/picture-1b.png"><img class="alignnone size-full wp-image-677" title="Two applications running" src="http://blog.springsource.com/wp-content/uploads/2008/11/picture-1b.png" alt="" /></a><br /><h2>Looking forward to Part 3</h2><br />In the final blog in this series, we will modularize our StockWatcher sample further, abstracting out its services into bundles which can be hotswapped in and out of the running server.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 185;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

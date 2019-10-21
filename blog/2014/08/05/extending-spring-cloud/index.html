@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Extending Spring Cloud</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Extending Spring Cloud" />
+<meta name="twitter:description" content="&lt;p&gt;One of the most interesting capabilities of Spring Cloud is its extensibility. You can extend it to support additional clouds, enhance already supported clouds, support new services, new service connectors–all without modifying the Spring Cloud code itself. In this blog, we explore this capability. If you haven’t done so already, please read the &lt;a href=&quot;https://spring.io/blog/2014/06/03/introducing-spring-cloud&quot;&gt;first&lt;/a&gt; and &lt;a href=&quot;https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically&quot;&gt;second&lt;/a&gt; blog in this series to acquire sufficient background.&lt;/p&gt;
+&lt;h1&gt;&lt;a href=&quot;#the-three-axes-of-extensibility&quot; class=&quot;anchor&quot; name=&quot;the-three-axes-of-extensibility&quot;&gt;&lt;/a&gt;The three axes of extensibility&lt;/h1&gt;
+&lt;p&gt;Spring Cloud provides extensibility along three orthogonal directions. You may extend it in one of these directions and orthogonality ensures that you continue to benefit from the others.&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/8fa7e069d3807412499606915fddc108?s=200" />
+
+<meta property="og:title" content="Extending Spring Cloud" />
+<meta property="og:image" content="https://gravatar.com/avatar/8fa7e069d3807412499606915fddc108?s=200" />
+<meta property="og:description" content="&lt;p&gt;One of the most interesting capabilities of Spring Cloud is its extensibility. You can extend it to support additional clouds, enhance already supported clouds, support new services, new service connectors–all without modifying the Spring Cloud code itself. In this blog, we explore this capability. If you haven’t done so already, please read the &lt;a href=&quot;https://spring.io/blog/2014/06/03/introducing-spring-cloud&quot;&gt;first&lt;/a&gt; and &lt;a href=&quot;https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically&quot;&gt;second&lt;/a&gt; blog in this series to acquire sufficient background.&lt;/p&gt;
+&lt;h1&gt;&lt;a href=&quot;#the-three-axes-of-extensibility&quot; class=&quot;anchor&quot; name=&quot;the-three-axes-of-extensibility&quot;&gt;&lt;/a&gt;The three axes of extensibility&lt;/h1&gt;
+&lt;p&gt;Spring Cloud provides extensibility along three orthogonal directions. You may extend it in one of these directions and orthogonality ensures that you continue to benefit from the others.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2014-08-05 16:33:30.926" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Extending Spring Cloud</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/8fa7e069d3807412499606915fddc108?s=20&amp;d=mm" />
+<span class="author">Ramnivas Laddad</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2014-08-05 16:33:30.926">August 05, 2014</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1697" href="/blog/2014/08/05/extending-spring-cloud#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>One of the most interesting capabilities of Spring Cloud is its extensibility. You can extend it to support additional clouds, enhance already supported clouds, support new services, new service connectors&ndash;all without modifying the Spring Cloud code itself. In this blog, we explore this capability. If you haven’t done so already, please read the <a href="https://spring.io/blog/2014/06/03/introducing-spring-cloud">first</a> and <a href="https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically">second</a> blog in this series to acquire sufficient background.</p><h1><a href="#the-three-axes-of-extensibility" class="anchor" name="the-three-axes-of-extensibility"></a>The three axes of extensibility</h1><p>Spring Cloud provides extensibility along three orthogonal directions. You may extend it in one of these directions and orthogonality ensures that you continue to benefit from the others.</p>
+<ol>
+<li><p><strong>Cloud Platforms</strong>: While Spring Cloud supports Cloud Foundry, Heroku, and a Local Config cloud (to test locally in a cloud-like environment), you aren’t limited by these choices. You can add your own cloud platform and take advantage of the rest of Spring Cloud capability such as Spring Java Config.</p></li>
+<li><p><strong>Cloud Services</strong>: Cloud platforms offer a variety of services ranging from relational databases to messaging. Services offered by each cloud platform vary a lot, even for multiple installations of the same platform. This is especially true for PaaS offerings such as Cloud Foundry, where private instances of Cloud Foundry tend to have services specific to each installation. Spring Cloud offers an easy way to extend to services beyond its core offering. Just like cloud platform extensibility, you don’t have to change Spring Cloud code to extend it to new services and you continue to take advantage of the other parts.</p></li>
+<li><p><strong>Frameworks</strong>: Spring Cloud currently supports Spring frameworks through the <a href="https://github.com/spring-projects/spring-cloud/tree/master/spring-cloud-spring-service-connector">spring-service-connector</a> module. However, except for that module, nothing in Spring Cloud depends on Spring. As such, you should be able to either use other parts from any JVM-based framework or extend it for a framework by adding a new module.</p></li>
+</ol><p>In the <a href="https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically">previous blog</a>, we looked at how you would use <code>CloudFactory</code> and <code>Cloud</code> to programmatically use Spring Cloud. When it comes to extensibility, you will not be working with either of these; instead you will implement other types in the core module. Let’s take a look at them.</p><h1><a href="#cloud-platform-extensibility" class="anchor" name="cloud-platform-extensibility"></a>Cloud Platform Extensibility</h1><p>The main type you will need to be familiar with to extend Spring Cloud to a new cloud platform is <code>CloudConnector</code>, which is a simple three-method interface:</p>
+<pre><code class="prettyprint java">public interface CloudConnector {
+	boolean isInMatchingCloud();
+	ApplicationInstanceInfo getApplicationInstanceInfo();
+	List&lt;ServiceInfo&gt; getServiceInfos();
+}
+</code></pre><p>The <code>isInMatchingCloud()</code> method should examine its environment to decide if it is operating in the right environment. For example, the Cloud Foundry connector checks the existence of the <code>VCAP_APPLICATION</code> environment variable, whereas the Heroku connector looks for the existence of the <code>DYNO</code> environment variable. The <code>getApplicationInstanceInfo()</code> method returns information about the current application instance (app name, host, port, and application properties). The most interesting method <code>getServiceInfos()</code> returns a list with each element containing enough information so that applications know how to connect to each service. Exact information contained in each <code>ServiceInfo</code> object is left up to each implementation (the <code>ServiceInfo</code> as such defines only one method: <code>getId()</code>).</p><p>Once you create an implementation of <code>CloudConnector</code>, you need to make Spring Cloud aware of it. For all extension points, Spring Cloud uses a uniform mechanism based on <a href="https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html">ServiceLoader</a>. As applied to Spring Cloud for platform extensibility, it boils down to including a file named <code>/META-INF/services/org.springframework.cloud.CloudConnector</code> with an entry with the fully-qualified name of the implementation class. Typically, you will bundle this file along with your implementation and supporting classes. Then all an app has to do is include this jar on the classpath.</p><h1><a href="#service-extensibility" class="anchor" name="service-extensibility"></a>Service Extensibility</h1><p>The <code>ServiceInfoCreator</code> interface provides an extension point to work with a new service.</p>
+<pre><code class="prettyprint java">public interface ServiceInfoCreator&lt;SI extends ServiceInfo, SD&gt; {
+    public boolean accept(SD serviceData);
+    public SI createServiceInfo(SD serviceData);
+}
+</code></pre><p>The generic parameter <code>SI</code> defines the kind of <code>ServiceInfo</code> it will create, whereas the <code>SD</code> parameter defines the raw service data type it can work with. The raw service data type depends on the cloud platform. For example, in Cloud Found, it will be a <code>Map</code> based on the <code>VCAP_SERVICES</code> environment variable, whereas in Heroku, it will be a pair containing the service-specific environment variables and its value. Since the raw data type depends on the platform, so does implementations of <code>ServiceInfoCreator</code>. The <code>accept()</code> method examines the service data and determines if it can deal with it. For example, it can look at the URL scheme and determine if it can consume that service data. If it can, the <code>createServiceInfo()</code> must return a <code>ServiceInfo</code> object. If it is a completely new service, you may also have to implement <code>ServiceInfo</code> for that, else you can use one of the existing ones.</p><p>Once you have implemented a <code>ServiceInfoCreator</code>, you will have to let Spring Cloud know about it. This follows the same idea as discussed earlier for cloud platform extensibility. In this case, the file name you use is <code>CloudConnector</code> dependent. For Cloud Foundry, it is <code>/META-INF/services/org.springframework.cloud.cloudfoundry.CloudFoundryServiceInfoCreator</code> (theoretically, a <code>CloudConnector</code> implementation may decide to use another extension mechanism, but Spring Cloud doesn’t recommend that).</p><p>As discussed in the previous blog, a cloud app developer may decide to work directly with a <code>ServiceInfo</code> object. As such, if you just implement a <code>ServiceInfoCreator</code>, you would have provided some benefit already. However, working with a raw <code>ServiceInfo</code> object may not be appreciated by many developers focused on developing apps, so you will implement the next extension as well.</p><h1><a href="#framework-extensibility" class="anchor" name="framework-extensibility"></a>Framework Extensibility</h1><p>The last extensibility point is <code>ServiceConnectorCreator</code>. Its job is to transform <code>ServiceInfo</code> into a service connector that is suitable for consumption in the framework the app is using. For example, it could transform <code>MysqlServiceInfo</code> into a <code>DataSource</code> object. Out of the box, Spring Cloud supports connectors for <code>DataSource</code> and a few <a href="https://projects.spring.io/spring-data">Spring Data</a> and <a href="https://projects.spring.io/spring-amqp">Spring AMQP</a> types. If you wish to extend Spring Cloud to other frameworks or if you wanted to support other Spring Data types (such as Neo4J, Elasticsearch, Cassandra) or Spring-compatible types (such as S3) not yet supported directly by Spring Cloud, this is the extension point you need.</p>
+<pre><code class="prettyprint java">public interface ServiceConnectorCreator&lt;SC, SI extends ServiceInfo&gt; {
+    SC create(SI serviceInfo, ServiceConnectorConfig serviceConnectorConfig);
+    ...
+}
+</code></pre><p>There are a couple more methods; however, you will normally extend the <code>AbstractServiceConnectorCreator</code> that takes care of implementing those. </p><p>The <code>SC</code> generic parameter to <code>ServiceConnectorCreator</code> is bound to the type of connector it will create, such as <code>DataSource</code>, whereas the <code>SI</code> parameter signifies the type of <code>ServiceInfo</code> it can work with.</p><p>The <code>create()</code> method is supplied with a <code>ServiceInfo</code> object and a configuration object, that carries service-specific info such as pooling parameters. It needs to use these parameters to create an appropriate connector.</p><p>Once the implementation is ready, just put it in a file named <code>/META-INF/services/org.springframework.cloud.service.ServiceConnectorCreator</code>. Spring Cloud will use the Service Loader mechanism described earlier.</p><h1><a href="#summary" class="anchor" name="summary"></a>Summary</h1><p>As you can see Spring Cloud offers substantial extensibility along cloud platform, services, and framework axis. Next time, you come across a new kind of these, you should be able to extend Spring Cloud to work with them. If you open-source your extensions, let us know, so that we can showcase it for others to benefit. If it is a common enough extension, consider making a pull request.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1697;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

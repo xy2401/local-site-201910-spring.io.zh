@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Annotation-Driven Dependency Injection in Spring 2.1</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Annotation-Driven Dependency Injection in Spring 2.1" />
+<meta name="twitter:description" content="&lt;p&gt; Spring 2.0 introduced annotation support and annotation-aware configuration options that can be leveraged by Spring users who are developing with Java 5 (or later versions): &lt;/p&gt;
+&lt;table&gt; 
+ &lt;tbody&gt;
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/transaction/annotation/Transactional.html&quot;&gt;@Transactional&lt;/a&gt;&lt;/th&gt; 
+   &lt;td&gt;for demarcating and configuring transaction definitions&lt;/td&gt; 
+  &lt;/tr&gt; 
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://www.eclipse.org/aspectj/doc/released/aspectj5rt-api/org/aspectj/lang/annotation/Aspect.html&quot;&gt;@Aspect&lt;/a&gt; (AspectJ)&lt;/th&gt; 
+   &lt;td&gt;for defining aspects along with @Pointcut definitions and advice (@Before, @After, @Around)&lt;/td&gt; 
+  &lt;/tr&gt; 
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/stereotype/Repository.html&quot;&gt;@Repository&lt;/a&gt;&lt;/th&gt; 
+   &lt;td&gt;for indicating a class that is operating as a repository (a.k.a. Data Access Object or DAO)&lt;/td&gt; 
+  &lt;/tr&gt; 
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/beans/factory/annotation/Required.html&quot;&gt;@Required&lt;/a&gt;&lt;/th&gt; 
+   &lt;td&gt;for enforcing annotated bean properties are provided a value&lt;/td&gt; 
+  &lt;/tr&gt; 
+ &lt;/tbody&gt;
+&lt;/table&gt;
+" />
+<meta name="twitter:creator" content="@m_f_" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+
+<meta property="og:title" content="Annotation-Driven Dependency Injection in Spring 2.1" />
+<meta property="og:image" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+<meta property="og:description" content="&lt;p&gt; Spring 2.0 introduced annotation support and annotation-aware configuration options that can be leveraged by Spring users who are developing with Java 5 (or later versions): &lt;/p&gt;
+&lt;table&gt; 
+ &lt;tbody&gt;
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/transaction/annotation/Transactional.html&quot;&gt;@Transactional&lt;/a&gt;&lt;/th&gt; 
+   &lt;td&gt;for demarcating and configuring transaction definitions&lt;/td&gt; 
+  &lt;/tr&gt; 
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://www.eclipse.org/aspectj/doc/released/aspectj5rt-api/org/aspectj/lang/annotation/Aspect.html&quot;&gt;@Aspect&lt;/a&gt; (AspectJ)&lt;/th&gt; 
+   &lt;td&gt;for defining aspects along with @Pointcut definitions and advice (@Before, @After, @Around)&lt;/td&gt; 
+  &lt;/tr&gt; 
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/stereotype/Repository.html&quot;&gt;@Repository&lt;/a&gt;&lt;/th&gt; 
+   &lt;td&gt;for indicating a class that is operating as a repository (a.k.a. Data Access Object or DAO)&lt;/td&gt; 
+  &lt;/tr&gt; 
+  &lt;tr&gt; 
+   &lt;th&gt;&lt;a href=&quot;http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/beans/factory/annotation/Required.html&quot;&gt;@Required&lt;/a&gt;&lt;/th&gt; 
+   &lt;td&gt;for enforcing annotated bean properties are provided a value&lt;/td&gt; 
+  &lt;/tr&gt; 
+ &lt;/tbody&gt;
+&lt;/table&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2007-05-14 17:35:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Annotation-Driven Dependency Injection in Spring 2.1</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mfisher">Mark Fisher</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2007-05-14 17:35:00.0">May 14, 2007</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="74" href="/blog/2007/05/14/annotation-driven-dependency-injection-in-spring-2-1#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>
+Spring 2.0 introduced annotation support and annotation-aware configuration options that can be leveraged by Spring users who are developing with Java 5 (or later versions):
+<table>
+<tr>
+<th><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/transaction/annotation/Transactional.html">@Transactional</a></th>
+<td>for demarcating and configuring transaction definitions</td>
+</tr>
+<tr>
+<th><a href="https://www.eclipse.org/aspectj/doc/released/aspectj5rt-api/org/aspectj/lang/annotation/Aspect.html">@Aspect</a> (AspectJ)</th>
+<td>for defining aspects along with @Pointcut definitions and advice (@Before, @After, @Around)</td>
+</tr>
+<tr>
+<th><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/stereotype/Repository.html">@Repository</a></th>
+<td>for indicating a class that is operating as a repository (a.k.a. Data Access Object or DAO)</td>
+</tr>
+<tr>
+<th><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/beans/factory/annotation/Required.html">@Required</a></th>
+<td>for enforcing annotated bean properties are provided a value</td>
+</tr>
+</table>
+</p>
+<p>
+With Spring 2.1, this theme of annotation-driven configuration has been significantly extended and will continue to evolve as we progress toward the RC1 release. In fact, it is now possible to drive Spring's dependency injection via annotations. Furthermore, Spring can <em>discover</em> beans that need to be configured within an application context.
+</p>
+<p>
+This blog entry will serve as a tutorial-style introduction to the basic features in 10 easy-to-follow steps. I will follow up later in the week with information on some more advanced features and customization options. If you are interested in alternative configuration options, you should also check out the <a href="http://www.springframework.org/javaconfig">Spring Java Configuration</a> project and <a href="http://blog.interface21.com/main/2006/11/28/a-java-configuration-option-for-spring/">this blog</a>.
+</p>
+<p>
+This tutorial requires at least Java 5, and Java 6 is recommended (otherwise there is a single requirement at the end of step 1).
+</p>
+<h2>Step 1:</h2>
+<p>
+Grab <a href="https://downloads.sourceforge.net/springframework/spring-framework-2.1-m1-with-dependencies.zip">spring-framework-2.1-m1-with-dependencies.zip</a>. After extracting the archive, you will find the spring.jar and spring-mock.jar in the 'dist' directory. Add them to your CLASSPATH as well as the following (paths shown are relative to the 'lib' directory of the extracted 2.1-m1 archive):
+<ul>
+<li>asm/asm-2.2.3.jar</li>
+<li>asm/asm-commons-2.2.3.jar</li>
+<li>aspectj/aspectjweaver.jar</li>
+<li>hsqldb/hsqldb.jar</li>
+<li>jakarta-commons/commons-logging.jar</li>
+<li>log4j/log4j-1.2.14.jar</li>
+</ul>
+(NOTE: If you are not running on Java 6, you will also need to add j2ee/common-annotations.jar)
+</p>
+<h2>Step 2:</h2><p>Provide the interfaces and classes for the example. I have tried to keep it as simple as possible yet capable of demonstrating the main functionality. I am including all of the code and configuration in a single &ldquo;blog&rdquo; package. I would encourage following that same guideline so that the examples work as-is; otherwise, be sure to make the necessary modifications. First, the <em>GreetingService</em> interface:</p>
+<pre><code class="prettyprint java"><br />public interface GreetingService {
+    String greet(String name);
+}
+</code></pre><p>Then, a simple implementation:</p>
+<pre><code class="prettyprint java"><br />public class GreetingServiceImpl implements GreetingService {
+    private MessageRepository messageRepository;
+
+    public void setMessageRepository(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
+
+    public String greet(String name) {
+        Locale locale = Locale.getDefault();
+        String message = messageRepository.getMessage(locale.getDisplayLanguage());
+        return message + &quot; &quot; + name;
+    }
+}
+</code></pre><p>Since the service depends upon a <em>MessageRepository</em>, define that interface next:</p>
+<pre><code class="prettyprint java"><br />public interface MessageRepository {
+    String getMessage(String language);
+}
+</code></pre><p>And for now, a stub implementation:</p>
+<pre><code class="prettyprint java"><br />public class StubMessageRepository implements MessageRepository {
+    Map&lt;String,String&gt; messages = new HashMap&lt;String,String&gt;();
+
+    public void initialize() {
+        messages.put(&quot;English&quot;, &quot;Welcome&quot;);
+        messages.put(&quot;Deutsch&quot;, &quot;Willkommen&quot;);
+    }
+
+    public String getMessage(String language) {
+        return messages.get(language);
+    }
+}
+</code></pre><p></p></p>
+<h2>Step 3:</h2>
+<p>
+Define the beans for a Spring application context. Notice, that I am including a new 'context' namespace (NOTE: the 'aop' namespace is also included here and will be used in the final step):
+```xml
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.1.xsd">
+<bean class="blog.GreetingServiceImpl" />
+<bean class="blog.StubMessageRepository" />
+</beans>
+```
+Obviously this configuration looks a little sparse. As you can probably guess, the 'context' namespace will soon play a role.
+</p>
+<h2>Step 4:</h2><p>Provide a simple test case leveraging Spring&rsquo;s base support class:</p>
+<pre><code class="prettyprint java"><br />public class GreetingServiceImplTests extends AbstractDependencyInjectionSpringContextTests {
+    private GreetingService greetingService;
+
+    public void setGreetingService(GreetingService greetingService) {
+        this.greetingService = greetingService;
+    }
+
+    @Override
+    protected String[] getConfigLocations() {
+        return new String[] { &quot;/blog/applicationContext.xml&quot; };
+    }
+
+    public void testEnglishWelcome() {
+        Locale.setDefault(Locale.ENGLISH);
+        String name = &quot;Spring Community&quot;;
+        String greeting = greetingService.greet(name);
+        assertEquals(&quot;Welcome &quot; + name, greeting);
+    }
+
+    public void testGermanWelcome() {
+        Locale.setDefault(Locale.GERMAN);
+        String name = &quot;Spring Community&quot;;
+        String greeting = greetingService.greet(name);
+        assertEquals(&quot;Willkommen &quot; + name, greeting);
+    }
+}
+</code></pre><p>Try running the tests and notice that they fail with a NullPointerException. This is to be expected since the GreetingServiceImpl has not been provided a MessageRepository. In the next two steps, you will add annotations to drive the dependency injection and initialization respectively.<br /></p></p>
+<h2>Step 5:</h2><p>Provide an @Autowired annotation on the GreetingServiceImpl&rsquo;s setter method, such as:</p>
+<pre><code class="prettyprint java"><br />@Autowired
+public void setMessageRepository(MessageRepository messageRepository) {
+    this.messageRepository = messageRepository;
+}
+</code></pre><p>Then, add the &lsquo;annotation-config&rsquo; element (from the new &lsquo;context&rsquo; namespace) to your configuration:</p>
+<pre><code class="prettyprint xml"><br />&lt;beans ... &gt;
+    
+    &lt;context:annotation-config/&gt;
+
+    &lt;bean class=&quot;blog.GreetingServiceImpl&quot;/&gt;
+
+    &lt;bean class=&quot;blog.StubMessageRepository&quot;/&gt;
+
+&lt;/beans&gt; 
+</code></pre><p>Rerun the tests. They will still fail, but if you look closely it&rsquo;s a new problem. The assertions fail, because the messages being returned are null. That means that the &lsquo;messageRepository&rsquo; property <em>has</em> been set on the greeting service! Now, the StubMessageRepository simply needs to be initialized.<br /></p></p>
+<h2>Step 6:</h2><p>Spring provides a couple options for initialization callbacks: Spring&rsquo;s InitializingBean interface or an &lsquo;init-method&rsquo; declaration within XML. As of Spring 2.1, JSR-250 annotations are supported - providing yet another option: @PostConstruct (and the @PreDestroy annotation can be used for destruction callbacks as you will see shortly). In the StubMessageRepository, add the annotation to the <em>initialize</em> method:</p>
+<pre><code class="prettyprint java"><br />@PostConstruct
+public void initialize() {
+    messages.put(&quot;English&quot;, &quot;Welcome&quot;);
+    messages.put(&quot;Deutsch&quot;, &quot;Willkommen&quot;);
+}
+</code></pre><p>Rerun the tests. This time they should pass!<br /></p></p>
+<h2>Step 7:</h2>
+<p>
+The @Autowired annotation can also be used for constructor-based injection. If you'd like to experiment with that option, remove the setter method from the GreetingServiceImpl and add this constructor instead (then rerun the tests):
+```java
+@Autowired
+public GreetingServiceImpl(MessageRepository messageRepository) {
+this.messageRepository = messageRepository;
+}
+```
+If preferred, you can even use field-injection. Remove the constructor, add the annotation directly to the field, and rerun the tests. The code should look like this:
+```java
+@Autowired
+private MessageRepository messageRepository;
+```
+</p>
+<h2>Step 8:</h2>
+<p>
+Add a JDBC-based repository implementation of the MessageRepository:
+```java
+public class JdbcMessageRepository implements MessageRepository {
+private SimpleJdbcTemplate jdbcTemplate;
+@PostConstruct
+public void setUpDatabase() {
+jdbcTemplate.update("create table messages (language varchar(20), message varchar(100))");
+jdbcTemplate.update("insert into messages (language, message) values ('English', 'Welcome')");
+jdbcTemplate.update("insert into messages (language, message) values ('Deutsch', 'Willkommen')");
+}
+@PreDestroy
+public void tearDownDatabase() {
+jdbcTemplate.update("drop table messages");
+}
+public String getMessage(String language) {
+return jdbcTemplate.queryForObject("select message from messages where language = ?", String.class, language);
+}
+}
+```
+Notice that in addition to @PostConstruct for initialization, this is using @PreDestroy to mark a method to be called on destruction. One thing is unclear from this implementation: how will the SimpleJdbcTemplate be provided? One option would be to provide a bean definition for the template. Another option would be to somehow provide a DataSource implementation to the template's constructor. Add the following (annotated) method:
+```java
+@Autowired
+public void createTemplate(DataSource dataSource) {
+this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+}
+```
+This demonstrates dependency injection working with an arbitrary method (not a traditional 'setter'). This will be tested in the course of the next step.
+</p>
+<h2>Step 9:</h2>
+<p>
+In Spring 2.1, "candidate" beans can even be discovered rather than provided explicitly in the XML as above. Certain annotations are recognized by default. This includes the @Repository annotation as well as a new @Component annotation. Add those two annotations to JdbcMessageRepository and GreetingServiceImpl respectively:
+```java
+@Repository
+public class JdbcMessageRepository implements MessageRepository { ... }
+```
+```java
+@Component
+public class GreetingServiceImpl implements GreetingService { ... }
+```
+Then modify the XML file by removing the existing explicit bean definitions and simply adding a <em>component-scan</em> tag:
+```xml
+<beans ...>
+<context:component-scan base-package="blog" />
+</beans>
+```
+Then, add just the DataSource bean definition and the new tag for configuring property placeholders:
+```xml
+<beans ...>
+<context:component-scan base-package="blog" />
+<context:property-placeholder location="classpath:blog/jdbc.properties" />
+<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+<property name="driverClassName" value="${jdbc.driver}" />
+<property name="url" value="${jdbc.url}" />
+<property name="username" value="${jdbc.username}" />
+<property name="password" value="${jdbc.password}" />
+</bean>
+</beans>
+```
+... and the jdbc.properties file itself:
+```java
+jdbc.driver=org.hsqldb.jdbcDriver
+jdbc.url=jdbc:hsqldb:mem:blog
+jdbc.username=sa
+jdbc.password=
+```
+Rerun the tests, and you should see the green bar even though only the data source has been defined in XML.
+</p>
+<h2>Step 10:</h2>
+<p>
+Finally, add an aspect (the @Aspect annotations are also automatically detected by default):
+```java
+@Aspect
+public class ServiceInvocationLogger {
+private int invocationCount;
+@Pointcut("execution(* blog.*Service+.*(..))")
+public void serviceInvocation() {}
+@Before("serviceInvocation()")
+public void log() {
+invocationCount++;
+System.out.println("service invocation #" + invocationCount);
+}
+}
+```
+And to activate automatic proxy generation, simply add the following tag to the xml:
+```xml
+<aop:aspectj-autoproxy />
+```
+Rerun the tests, and you should see the log messages!
+</p>
+<p>
+NOTE: the scanning and configuration process can be initiated without any XML and can be customized (e.g. detect your own annotations and/or types). I will discuss those features and more in the next post.
+</p>
+<p>
+In the mean time, I hope this post will serve its purpose well - providing hands-on experience with these new Spring 2.1 features. As always, we are looking forward to feedback from the community, so please feel free to leave comments!
+</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 74;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

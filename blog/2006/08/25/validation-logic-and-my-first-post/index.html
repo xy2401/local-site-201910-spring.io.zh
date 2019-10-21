@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Validation logic (and my first post!)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Validation logic (and my first post!)" />
+<meta name="twitter:description" content="&lt;p&gt;Hey all!&lt;/p&gt;
+&lt;p&gt;This is my first post since I joined Interface21 last month. My previous &lt;a target=&quot;_blank&quot; title=&quot;blog&quot; href=&quot;http://blogs.warwick.ac.uk/colinyates&quot;&gt;blog&lt;/a&gt; is now officially deprecated and I won’t be updating it anymore.&lt;/p&gt;
+&lt;p&gt;So what is the subject of my first post (except to introduce myself)?&amp;nbsp; Validation logic.&amp;nbsp; It won’t be a walkthrough of how to perform validation in the Spring framework, rather it will discuss a particular bug bear of mine :)&lt;/p&gt;
+&lt;p&gt;In particular, I would like to discuss exactly what should go into validation logic.&amp;nbsp; It seems to be a no-brainer answer; “logic to validate the specified data”.&amp;nbsp; OK, that &lt;em&gt;is&lt;/em&gt; a no-brainer but read on :).&lt;br&gt;As you know, the Spring framework provides a nice abstraction layer for your validation, via the &lt;a title=&quot;Errors&quot; target=&quot;_blank&quot; href=&quot;http://www.springframework.org/docs/api/org/springframework/validation/Errors.html&quot;&gt;Errors &lt;/a&gt;and &lt;a target=&quot;_blank&quot; title=&quot;Validator&quot; href=&quot;http://www.springframework.org/docs/api/org/springframework/validation/Validator.html&quot;&gt;Validator&lt;/a&gt; interfaces.&amp;nbsp; In particular the Validator is where you apply your business specific validation rules to your populated domain object.&amp;nbsp; Spring’s excellent binding support is responsible for updating your domain model based on some input, the validator is responsible for ensuring that the populated domain model is &lt;em&gt;semantically&lt;/em&gt; correct.&lt;br&gt;So what is my bug bear?&amp;nbsp; Time and time again I keep running across applications that allow validation logic to trickle out of the validator and into the controllers (for web apps), or even worse into the middle tier.&amp;nbsp; Just before people start taking issue; I am not saying validation doesn’t belong in the middle tier, I am saying that the Validator is the place to put validation logic!&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Validation logic (and my first post!)" />
+<meta property="og:description" content="&lt;p&gt;Hey all!&lt;/p&gt;
+&lt;p&gt;This is my first post since I joined Interface21 last month. My previous &lt;a target=&quot;_blank&quot; title=&quot;blog&quot; href=&quot;http://blogs.warwick.ac.uk/colinyates&quot;&gt;blog&lt;/a&gt; is now officially deprecated and I won’t be updating it anymore.&lt;/p&gt;
+&lt;p&gt;So what is the subject of my first post (except to introduce myself)?&amp;nbsp; Validation logic.&amp;nbsp; It won’t be a walkthrough of how to perform validation in the Spring framework, rather it will discuss a particular bug bear of mine :)&lt;/p&gt;
+&lt;p&gt;In particular, I would like to discuss exactly what should go into validation logic.&amp;nbsp; It seems to be a no-brainer answer; “logic to validate the specified data”.&amp;nbsp; OK, that &lt;em&gt;is&lt;/em&gt; a no-brainer but read on :).&lt;br&gt;As you know, the Spring framework provides a nice abstraction layer for your validation, via the &lt;a title=&quot;Errors&quot; target=&quot;_blank&quot; href=&quot;http://www.springframework.org/docs/api/org/springframework/validation/Errors.html&quot;&gt;Errors &lt;/a&gt;and &lt;a target=&quot;_blank&quot; title=&quot;Validator&quot; href=&quot;http://www.springframework.org/docs/api/org/springframework/validation/Validator.html&quot;&gt;Validator&lt;/a&gt; interfaces.&amp;nbsp; In particular the Validator is where you apply your business specific validation rules to your populated domain object.&amp;nbsp; Spring’s excellent binding support is responsible for updating your domain model based on some input, the validator is responsible for ensuring that the populated domain model is &lt;em&gt;semantically&lt;/em&gt; correct.&lt;br&gt;So what is my bug bear?&amp;nbsp; Time and time again I keep running across applications that allow validation logic to trickle out of the validator and into the controllers (for web apps), or even worse into the middle tier.&amp;nbsp; Just before people start taking issue; I am not saying validation doesn’t belong in the middle tier, I am saying that the Validator is the place to put validation logic!&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2006-08-25 13:45:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Validation logic (and my first post!)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Colin Yates</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2006-08-25 13:45:00.0">August 25, 2006</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="22" href="/blog/2006/08/25/validation-logic-and-my-first-post#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Hey all!</p><p>This is my first post since I joined Interface21 last month. My previous <a target="_blank" title="blog" href="http://blogs.warwick.ac.uk/colinyates">blog</a> is now officially deprecated and I won&rsquo;t be updating it anymore.</p><p>So what is the subject of my first post (except to introduce myself)?  Validation logic.  It won&rsquo;t be a walkthrough of how to perform validation in the Spring framework, rather it will discuss a particular bug bear of mine :)</p><p>In particular, I would like to discuss exactly what should go into validation logic.  It seems to be a no-brainer answer; &ldquo;logic to validate the specified data&rdquo;.  OK, that <em>is</em> a no-brainer but read on :).<br />As you know, the Spring framework provides a nice abstraction layer for your validation, via the <a title="Errors" target="_blank" href="http://www.springframework.org/docs/api/org/springframework/validation/Errors.html">Errors </a>and <a target="_blank" title="Validator" href="http://www.springframework.org/docs/api/org/springframework/validation/Validator.html">Validator</a> interfaces.  In particular the Validator is where you apply your business specific validation rules to your populated domain object.  Spring&rsquo;s excellent binding support is responsible for updating your domain model based on some input, the validator is responsible for ensuring that the populated domain model is <em>semantically</em> correct.<br />So what is my bug bear?  Time and time again I keep running across applications that allow validation logic to trickle out of the validator and into the controllers (for web apps), or even worse into the middle tier.  Just before people start taking issue; I am not saying validation doesn&rsquo;t belong in the middle tier, I am saying that the Validator is the place to put validation logic!</p><p>The most common example of this is when you are adding a new entity, say a User.  Typically the validator will perform a number of &ldquo;simple&rdquo; checks (fields are not null, text fields are longer than 25 characters etc.).  The controller (for example) will then call the middle tier (userService.add(user)) and catch DuplicateKeyException (or a strongly typed DuplicateUserException) exception.  If this exception is thrown the controller will then populate the errors object and then re-display the form.</p><p>So what&rsquo;s wrong with that picture?  Quite simply the fact that some validation is now <em>implicitly</em> being done with the raising of the DuplicateKeyException indicating that validation has failed!.  The DB (in this example) is validating the data to ensure it is unique before inserting it, and if not it throws the exception.</p><p>My point (that I am admittedly being very verbose in making ;)) is that this is all validation logic which belongs in the Validator.  Moving this uniqueness check into the validator <strong>where it belongs(!)</strong> enables a number of benefits:<br /><ul><br /> <li>It is a much cleaner, and more intuitive implementation; where do you look for validation logic?  In the validator.</li><br /> <li>The validator implementation is now <em>truly</em> re-usable.  Previously the validator was actually only validating some of the data.</li><br /> <li>Unit testing for a unique user is done within the validation unit tests.  This is much easier than unit testing the controller which would require mocking up an Errors, HttpServletRequest, HttpServletResponse (which is actually pretty easy, but still&hellip;.) etc..  The number of objects that need to be mocked to test a validator is the Errors object, the DAO and your domain model.</li><br /> <li>The onSubmit method in the Controller now honours the contract specified by SimpleFormController (which states it is only called when validation succeeds), so the code is much cleaner.</li><br /></ul><br />This isn&rsquo;t rocket science, but a lot of people just don&rsquo;t &ldquo;get&rdquo; it.  I think it is probably because they view the validator as the place to validate that the request parameters are correct.  Sure you do that on the domain model itself, but that is still their mindset.  It isn&rsquo;t.  It is all about applying <em>all</em> your <em>business</em> validation rules.</p><p>Note: there is an argument that states you are repeating your validation logic; the DB knows what is and isn&rsquo;t unique, so why duplicate that logic in the controller?  Well, the point is that you <em>are</em> duplicating that logic, you are using the throwing of a DuplicateXXXException to indicate the validation failure, so this isn&rsquo;t really a valid argument.</p><p>There is also another argument that states that this isn&rsquo;t 100% guaranteed to catch <em>all</em> (in this case) duplicate keys.  And that is true.  There is a small window of opportunity after the validation has been called but before the middle tier call is made in which another process could sneak in and create the unique row, but this is a very <em>very</em> small window (typically milliseconds), and an OptimisticLockingException would probably thrown anyway.  Also consider the nature of the data.  It is highly unlikely that a single unique entitiy would be created by two different threads at the same time.  If it does happen, fine.  Let the exception trickle up to the container because it really is now an <em>exceptional</em> condition.</p><p>Rant over.</p><p>P.S.  The rest of my blog posts will probably be just as verbose :)</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 22;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

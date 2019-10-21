@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Binding applications to HashiCorp&#39;s Vault with Spring in Cloud Foundry</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Binding applications to HashiCorp&#39;s Vault with Spring in Cloud Foundry" />
+<meta name="twitter:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this article, we will dive in how to bind a Spring application to &lt;a href=&quot;https://github.com/hashicorp/vault-service-broker&quot;&gt;HashiCorp’s Vault service broker on Cloud Foundry&lt;/a&gt;.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Spring Boot provides a lot of autoconfiguration and external binding features, some of which are relevant to Cloud Foundry, and many of which are not. &lt;a href=&quot;http://cloud.spring.io/spring-cloud-connectors/&quot;&gt;Spring Cloud Connectors&lt;/a&gt; is a library that you can use in your application if you want to create your own components programmatically, but it doesn’t do anything “magical” by itself.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Spring Cloud Connectors lays the foundation for connectors that integrate with various Cloud services. It has ships components that allow correct middleware configuration. Using CloudFoundry’s java buildpack comes with an “auto-reconfiguration” feature that tries to ease the burden of moving simple applications to the cloud.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@mp911de" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/6494a9d91e9ffef9adc8253257f1b35e?s=200" />
+
+<meta property="og:title" content="Binding applications to HashiCorp&#39;s Vault with Spring in Cloud Foundry" />
+<meta property="og:image" content="https://gravatar.com/avatar/6494a9d91e9ffef9adc8253257f1b35e?s=200" />
+<meta property="og:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;In this article, we will dive in how to bind a Spring application to &lt;a href=&quot;https://github.com/hashicorp/vault-service-broker&quot;&gt;HashiCorp’s Vault service broker on Cloud Foundry&lt;/a&gt;.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Spring Boot provides a lot of autoconfiguration and external binding features, some of which are relevant to Cloud Foundry, and many of which are not. &lt;a href=&quot;http://cloud.spring.io/spring-cloud-connectors/&quot;&gt;Spring Cloud Connectors&lt;/a&gt; is a library that you can use in your application if you want to create your own components programmatically, but it doesn’t do anything “magical” by itself.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Spring Cloud Connectors lays the foundation for connectors that integrate with various Cloud services. It has ships components that allow correct middleware configuration. Using CloudFoundry’s java buildpack comes with an “auto-reconfiguration” feature that tries to ease the burden of moving simple applications to the cloud.&lt;/p&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2017-11-28 12:10:52.335" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+ <a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Binding applications to HashiCorp&#39;s Vault with Spring in Cloud Foundry</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/6494a9d91e9ffef9adc8253257f1b35e?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mp911de">Mark Paluch</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2017-11-28 12:10:52.335">November 28, 2017</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3101" href="/blog/2017/11/28/binding-applications-to-hashicorp-s-vault-with-spring-in-cloud-foundry#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div class="paragraph">
+<p>In this article, we will dive in how to bind a Spring application to <a href="https://github.com/hashicorp/vault-service-broker">HashiCorp&#8217;s Vault service broker on Cloud Foundry</a>.</p>
+</div>
+<div class="paragraph">
+<p>Spring Boot provides a lot of autoconfiguration and external binding features, some of which are relevant to Cloud Foundry, and many of which are not. <a href="https://cloud.spring.io/spring-cloud-connectors/">Spring Cloud Connectors</a> is a library that you can use in your application if you want to create your own components programmatically, but it doesn’t do anything “magical” by itself.</p>
+</div>
+<div class="paragraph">
+<p>Spring Cloud Connectors lays the foundation for connectors that integrate with various Cloud services. It has ships components that allow correct middleware configuration. Using CloudFoundry’s java buildpack comes with an “auto-reconfiguration” feature that tries to ease the burden of moving simple applications to the cloud.</p>
+</div>
+<div class="paragraph">
+<p>The key to correctly configuring middleware services, like HashiCorp’s Vault, is to understand what each of these tools provides, how they influence each other at runtime. The goal should be a smooth transition from local execution of an application on a developer’s desktop to a test environment in Cloud Foundry, and ultimately to production in CloudFoundry (or otherwise) with no changes in source code or packaging, per the twelve-factor application guidelines.</p>
+</div>
+<div class="sect1">
+<h2 id="the-libraries"><a class="anchor" href="#the-libraries"></a>The libraries</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Vault connectors ship with four libraries:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>spring-cloud-vault-connector-core</code> provides common bits used by the other three libraries.</p>
+</li>
+<li>
+<p><code>spring-cloud-vault-spring-connector</code> configures Spring Framework and Spring Boot (Spring Cloud)-based applications with a Vault connector.</p>
+</li>
+<li>
+<p><code>spring-cloud-vault-cloudfoundry-connector</code> is required to pick up CloudFoundry&#8217;s service configuration and provide the service configuration to the actual Spring connector.</p>
+</li>
+<li>
+<p><code>spring-cloud-vault-localconfig-connector</code> lets you provide a property-based configuration if you want to configure the service yourself, e.g. within a CI or local runtime environment without providing additional code to distinguish between cloud and non-cloud runtimes.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependencies&gt;
+
+  &lt;dependency&gt;
+    &lt;groupId&gt;io.pivotal.spring.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-vault-connector-core&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.RELEASE&lt;/version&gt;
+  &lt;/dependency&gt;
+
+  &lt;dependency&gt;
+    &lt;groupId&gt;io.pivotal.spring.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-vault-spring-connector&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.RELEASE&lt;/version&gt;
+  &lt;/dependency&gt;
+
+  &lt;!-- If you intend to deploy the app on CloudFoundry, add the following --&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;io.pivotal.spring.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-vault-cloudfoundry-connector&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.RELEASE&lt;/version&gt;
+  &lt;/dependency&gt;
+
+  &lt;!-- If you want to test your application locally, add the following --&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;io.pivotal.spring.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-vault-localconfig-connector&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.RELEASE&lt;/version&gt;
+  &lt;/dependency&gt;
+
+&lt;/dependencies&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="your-application"><a class="anchor" href="#your-application"></a>Your application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you&#8217;re using Spring Boot and Spring Cloud Vault, then you can actually get away with not doing anything else besides dropping in the Spring and CloudFoundry connector.</p>
+</div>
+<div class="paragraph">
+<p>The Spring connector comes with a <a href="https://github.com/pivotal-cf/spring-cloud-vault-connector/blob/e675cfbb0ae2fa3e83bcb2d4f49589ff6be9bdf9/spring-cloud-vault-spring-connector/src/main/java/io/pivotal/spring/cloud/vault/config/java/VaultConnectorBootstrapConfiguration.java">bootstrap configuration</a> that uses the token and endpoint from the service configuration to configure Spring&#8217;s Vault client. Spring Cloud Vault configures a property source by default that points to <code>${spring.application.name}/${profile-name}</code>. HashiCorp&#8217;s service broker configures generic backends in the application, space and organization namespace. The connector picks up the backends and shared backends (in the mentioned order) to obtain its configuration properties from these backends.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@SpringBootApplication
+public class HelloWorldApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(HelloWorldApplication.class, args);
+  }
+
+  static class MyComponent {
+
+    public MyComponent(@Value("${some-property}") String someProperty, <b class="conum">(1)</b>
+                        VaultOperations vaultOperations) {             <b class="conum">(2)</b>
+      // …
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Inject a configuration property directly. Spring attempts to resolve the property from its <code>Environment</code> that is configured with Vault&#8217;s <code>PropertySource</code>s.</p>
+</li>
+<li>
+<p>Inject <code>VaultOperations</code> configured to use the connected Vault service.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If your application is purely Spring Framework-based or a Spring Boot application without Spring Cloud Vault, then enabling <code>@ServiceScan</code> on one of your configuration classes is sufficient to pick up authentication and endpoint.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class CloudFoundryApplication {
+
+  @Configuration
+  @ServiceScan                                                            <b class="conum">(1)</b>
+  static class VaultConfig {
+  }
+
+  public static void main(String[] args) {
+
+    GenericApplicationContext ctx =
+                    new AnnotationConfigApplicationContext(VaultConnectorsConfig.class,
+                                            VaultConfig.class);
+
+    ctx.start();
+
+    VaultOperations vaultOperations = ctx.getBean(VaultOperations.class); <b class="conum">(2)</b>
+
+    ctx.stop();
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p><code>@ServiceScan</code> enables scanning for services that are bound to your application. It creates beans for all found services.</p>
+</li>
+<li>
+<p><code>VaultOperations</code> was created by the service scan so you can use it directly in your application.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Do you rather want to configure your bean yourself without activating <code>@ServiceScan</code> or your want to provide a customized client configuration? Then use <code>Cloud</code> directly. The <code>Cloud</code> object gives you access to the service information and lets you create <code>VaultTemplate</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Configuration
+class VaultConfig {
+
+  @Bean
+  public Cloud cloud() {                                                  <b class="conum">(1)</b>
+    return new CloudFactory().getCloud();
+  }
+
+  @Bean
+  public SslConfiguration sslConfiguration() {                            <b class="conum">(2)</b>
+    return SslConfiguration.forTrustStore(…);
+  }
+
+  @Bean
+  VaultOperations vaultOperations() {                                     <b class="conum">(3)</b>
+
+    VaultServiceInfo vaultServiceInfo = (VaultServiceInfo) cloud()
+          .getServiceInfos(VaultOperations.class).get(0);
+
+    VaultServiceConnectorConfig config = VaultServiceConnectorConfig.builder()
+                .sslConfiguration(sslConfiguration())
+                .build();
+
+    return cloud().getSingletonServiceConnector(VaultOperations.class, config);
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>The <code>Cloud</code> object parses bound service. Registering it as bean requires parsing onlly once without the need to re-parse the services each time you need a <code>Cloud</code> object.</p>
+</li>
+<li>
+<p>Going forward with your configuration, it can be required to customize SSL or client configuration options. Here&#8217;s an example how to supply a trust store for Spring&#8217;s Vault client.</p>
+</li>
+<li>
+<p>The cloud object exposes methods to create service connectors. Pass the <code>VaultServiceConnectorConfig</code> along the <code>VaultOperations</code> service type to these methods to create a template API instance. The <code>Cloud</code> object gives you also access to the service information carrying details about authentication and the managed Vault backends.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="hashicorp-s-vault-service-broker"><a class="anchor" href="#hashicorp-s-vault-service-broker"></a>HashiCorp&#8217;s Vault service broker</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>HashiCorp provides a <a href="https://github.com/hashicorp/vault-service-broker">service broker to configure Vault services</a> that can be bound to your application. It uses Token-based authentication and spins up a couple of backends. These are, in particular:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a <code>generic</code> secret backend exclusive to the application instances</p>
+</li>
+<li>
+<p>a <code>transit</code> backend exclusive to the application instances</p>
+</li>
+<li>
+<p>a shared <code>generic</code> secret backend in the scope of your space</p>
+</li>
+<li>
+<p>a shared <code>generic</code> secret backend in the scope of your organization</p>
+</li>
+<li>
+<p>a set of policies per application to e.g. restrict the shared org backend to read-only for the application.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Details about the service instance are provided via <code>VCAP_SERVICES</code>, an environment variable visible to your application. Typically, it would look like:</p>
+</div>
+<div id="vcap" class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-json" data-lang="json">{
+"hashicorp-vault": [
+    {
+    "credentials": {
+      "address": "https://your-server:8200/",
+      "auth": {
+          "token": "00000000-0000-0000-0000-000000000000"
+      },
+      "backends": {
+          "generic": "cf/20fffe9d-d8d1-4825-9977-1426840a13db/secret",
+          "transit": "cf/20fffe9d-d8d1-4825-9977-1426840a13db/transit"
+      },
+      "backends_shared": {
+          "organization": "cf/1a558498-59ad-488c-b395-8b983aacb7da/secret",
+          "space": "cf/d007583f-5617-4b02-a5a7-550648827cfa/secret"
+      }
+    },
+    "label": "hashicorp-vault",
+    "name": "hashicorp-vault",
+    }
+]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The token is managed and refreshed by the service broker and should not be touched by the application. Revoking the token will shut down access of all your application instances within the bound application.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="wait-what-about-localconfig"><a class="anchor" href="#wait-what-about-localconfig"></a>Wait, what about LocalConfig?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Oh, right, thanks for the reminder. Once in a while you want to test your application locally before deploying it to the Cloud or you don&#8217;t want to use the service bindings. Spring Cloud Vault LocalConfig Connector fits exactly this purpose. It allows you to specify a configuration property that is picked up by the connector and provides the same set of configuration keys as <code>VCAP_SERVICES</code> on CloudFoundry.</p>
+</div>
+<div class="paragraph">
+<p>Bootstrap configuration requires at least two keys set:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>spring.cloud.appId</code>: Application identifier name. Any descriptive application name (maybe even <code>${spring.application.name}</code>) will do the job.</p>
+</li>
+<li>
+<p>A key below the <code>spring.cloud.</code> namespace set to a HTTP/HTTPS url.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-properties" data-lang="properties">spring.application.name=…
+
+spring.cloud.appId=your-app-id
+spring.cloud.my-vault-service=http://localhost:8200?token=my-token
+                &amp;backend.generic=cf/secret
+                &amp;backend.transit=cf/transit
+                &amp;shared_backend.space=cf/space</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or written as YAML:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-yaml" data-lang="yaml">spring.application.name: …
+
+spring.cloud:
+    appId: your-app-id
+    my-vault-service: http://localhost:8200?token=my-token
+                      &amp;backend.generic=cf/secret
+                      &amp;backend.transit=cf/transit
+                      &amp;shared_backend.space=cf/space</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You might have noticed that the URL looks a bit different than your usual Vault endpoint prefix URL. The connector requires additional configuration options which are represented as query parameters. The connector only uses scheme, host and port to configure the endpoint. The additional query parameters represent the keys which are usually transported via <code>VCAP_SERVICES</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>token</code> the authentication token (required)</p>
+</li>
+<li>
+<p><code>backend.(.*)</code> Context path to a dedicated backend. The property key after <code>backend.</code> represents the dedicated backend name.</p>
+</li>
+<li>
+<p><code>shared_backend.(.*)</code> Context path to a shared backend. The property key after <code>shared_backend.</code> represents the shared backend name.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can configure multiple backends and shared backends.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="can-i-connect-to-hashicorp-s-vault-without-connector-libraries"><a class="anchor" href="#can-i-connect-to-hashicorp-s-vault-without-connector-libraries"></a>Can I connect to HashiCorp&#8217;s Vault without connector libraries?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Yes, you can! In scenarios where you want to keep more control over what&#8217;s going on, or you want to omit additional dependencies there&#8217;s another possibility how you can connect to Vault.
+Spring Boot ships with <a href="https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/cloud/CloudFoundryVcapEnvironmentPostProcessor.html"><code>CloudFoundryVcapEnvironmentPostProcessor</code></a> that exports CloudFoundry&#8217;s <code>VCAP</code> variables through property sources to your application. These properties are prefixed with <code>vcap.application</code> for <code>VCAP_APPLICATION</code> respective <code>vcap.services</code> for <code>VCAP_SERVICES</code>. You can reference VCAP properties in your configuration like any other property.</p>
+</div>
+<div class="paragraph">
+<p>Configuring a Vault connection through <code>VCAP_SERVICES</code> requires knowledge over the <a href="#vcap">actual structure of <code>VCAP_SERVICES</code></a>. Configuring the URL and token authentication are the only two properties required to get Spring Boot with Spring Cloud Vault working. From the example <a href="#vcap">above</a>, your bootstrap configuration would look like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-properties" data-lang="properties">spring.application.name=…
+
+spring.cloud.vault.url=${vcap.services.hashicorp-vault.credentials.address}
+spring.cloud.vault.token=${vcap.services.hashicorp-vault.auth.token}
+spring.cloud.vault.generic.backend=${vcap.services.hashicorp-vault.credentials.backend.generic}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or written as YAML:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-yaml" data-lang="yaml">spring.application.name: …
+
+spring.cloud.vault:
+    url: ${vcap.services.hashicorp-vault.credentials.address}
+    token: ${vcap.services.hashicorp-vault.auth.token}
+    generic.backend: ${vcap.services.hashicorp-vault.credentials.backend.generic}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You have full control without any additional auto-configuration library. Using properties allows you to leverage profiles for conditional activation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="further-resources"><a class="anchor" href="#further-resources"></a>Further resources</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Spring Vault: <a href="https://projects.spring.io/spring-vault/" class="bare">https://projects.spring.io/spring-vault/</a></p>
+</li>
+<li>
+<p>Spring Cloud Vault: <a href="https://cloud.spring.io/spring-cloud-vault/" class="bare">https://cloud.spring.io/spring-cloud-vault/</a></p>
+</li>
+<li>
+<p>Spring Cloud Connectors: <a href="https://cloud.spring.io/spring-cloud-connectors/" class="bare">http://cloud.spring.io/spring-cloud-connectors/</a></p>
+</li>
+<li>
+<p>Spring Vault and Spring Cloud Vault samples: <a href="https://github.com/mp911de/spring-cloud-vault-config-samples" class="bare">https://github.com/mp911de/spring-cloud-vault-config-samples</a></p>
+</li>
+<li>
+<p>Project repository: <a href="https://github.com/pivotal-cf/spring-cloud-vault-connector" class="bare">https://github.com/pivotal-cf/spring-cloud-vault-connector</a></p>
+</li>
+<li>
+<p><a href="https://spring.io/team/dsyer">Dave Syer</a>'s excellent article aboud bound data services on CloudFoundry: <a href="https://spring.io/blog/2015/04/27/binding-to-data-services-with-spring-boot-in-cloud-foundry" class="bare">https://spring.io/blog/2015/04/27/binding-to-data-services-with-spring-boot-in-cloud-foundry</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3101;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

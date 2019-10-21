@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Introduction to the OSGi Web Container</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Introduction to the OSGi Web Container" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;b&gt;Updated:&lt;/b&gt; added version control instructions for Git.&lt;/p&gt;
+&lt;p&gt;For the last few months I’ve been working with Subbarao Meduri, Graham Charters, Hal Hildebrand and others from the OSGi Enterprise Expert Group on the RFC66 Web Container specification. The Web Container specification defines how WAR files can be deployed on an OSGi service platform in a standard way. &lt;/p&gt;
+&lt;p&gt;This is extremely interesting for us, because dm Server has supported WAR files for nearly 18 months now and we are excited to be able to work towards a standard model. As an end user, you’ll be able to deploy WAR files on OSGi without depending on proprietary APIs or features.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Introduction to the OSGi Web Container" />
+<meta property="og:description" content="&lt;p&gt;&lt;b&gt;Updated:&lt;/b&gt; added version control instructions for Git.&lt;/p&gt;
+&lt;p&gt;For the last few months I’ve been working with Subbarao Meduri, Graham Charters, Hal Hildebrand and others from the OSGi Enterprise Expert Group on the RFC66 Web Container specification. The Web Container specification defines how WAR files can be deployed on an OSGi service platform in a standard way. &lt;/p&gt;
+&lt;p&gt;This is extremely interesting for us, because dm Server has supported WAR files for nearly 18 months now and we are excited to be able to work towards a standard model. As an end user, you’ll be able to deploy WAR files on OSGi without depending on proprietary APIs or features.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2009-05-27 10:25:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Introduction to the OSGi Web Container</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Rob Harrop</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2009-05-27 10:25:00.0">May 27, 2009</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="238" href="/blog/2009/05/27/introduction-to-the-osgi-web-container#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p><b>Updated:</b> added version control instructions for Git.</p><p>For the last few months I&rsquo;ve been working with Subbarao Meduri, Graham Charters, Hal Hildebrand and others from the OSGi Enterprise Expert Group on the RFC66 Web Container specification. The Web Container specification defines how WAR files can be deployed on an OSGi service platform in a standard way. </p><p>This is extremely interesting for us, because dm Server has supported WAR files for nearly 18 months now and we are excited to be able to work towards a standard model. As an end user, you&rsquo;ll be able to deploy WAR files on OSGi without depending on proprietary APIs or features.</p><p>SpringSource is responsible for writing the Web Container reference implementation, and I&rsquo;ve been working on this over the last few weeks. In this blog, I&rsquo;ll describe the main features of the Web Container specification and discuss the steps you need to get started with the RI code. I am not permitted to post the specification document, but I&rsquo;ll outline the most important points. </p><p>At the moment, there is no binary distribution for the RI, but it is really easy to get started by building from source.</p>
+<h3>Main Features in Web Container</h3><p>The most interesting features supported by the Web Container are:</p>
+<ul>
+<li>Installation of WAR files</li>
+<li>Installation of Web Application Bundles (WABs)</li>
+<li>Web application lifecycle control using an extender</li>
+<li>Control of configuration properties using URL parameters</li>
+</ul>
+<h3>Installing WAR Files</h3><p>For me, the most exciting feature of the Web Container is the ability to deploy WAR files directly into OSGi <em>without having to change your code</em>. (WAR files that use JNDI cannot be used without changes to your code, because JNDI is not currently part of the specification. There is work underway to fix this, so I don&rsquo;t expect this limitation to exist forever.)</p><p>To install a WAR file into OSGi, you simply prepend <span style="font-family: monospace">webbundle:</span> to the file location when calling <span style="font-family: monospace">BundleContext.installBundle</span> or when using your platform&rsquo;s console. For example, in Equinox I can do this:</p><p><code><br /> install webbundle:file:formtags.war<br /></code></p><p>Of course, this requires that you have a Web Container implementation installed into your OSGi platform.</p><p>The Web Container performs various transformations on the WAR to ensure that is has a symbolic name, version and the necessary imports for it to work. The Web Container will also update the bundle classpath to add <span style="font-family: monospace">WEB-INF/classes</span> and every JAR file in <span style="font-family: monospace">WEB-INF/lib</span>.</p>
+<h3>Installing Web Application Bundles (WABs)</h3><p>If you don&rsquo;t want to rely on Web Container to transform your WAR files, then you can bypass the transformation stage entirely. Simply, add the appropriate manifest headers yourself and install the bundle directly, omitting the <span style="font-family: monospace">webbundle</span> protocol. </p><p>WABs cannot have any entries on the bundle class path that are not under <span style="font-family: monospace">WEB-INF</span>. This is to prevent any of your application classes being visible as resources in your web application. It is likely that other restrictions will arise for WABs, but these are yet to be finalized. </p>
+<h3>Lifecycle control using an extender</h3><p>The Web Container uses the <a href="http://www.osgi.org/blog/2007/02/osgi-extender-model.html">extender model</a> to control web application lifecycle. Web applications are started when the corresponding bundle is started, and stopped when that bundle is stopped. </p><p>In Equinox, this means I can start and stop my web application directly from the console. For example, if the formtags.war bundle above is given bundle ID 50:</p><p><code><br /> start 50<br /> &hellip; Tomcat output &hellip;<br /> stop 50<br /></code></p>
+<h3>Controlling configuration using URL parameters</h3><p>WAR file configuration can be controlled by appending certain supported configuration properties to the install URL. </p><p>For example, to control the context path of the web application, you can add the <span style="font-family: monospace">Web-ContextPath</span> option:</p><p><code><br /> install webbundle:file:formtags.war?Web-ContextPath=ftags<br /></code></p><p>Or to control the generated Bundle-SymbolicName header:</p><p><code><br /> install webbundle:file:formtags.war?Bundle-SymbolicName=ftags.bundle<br /></code></p>
+<h3>Web Container and dm Server</h3><p>The code in the Web Container RI is mostly taken from and inspired by the code in dm Server, However, the RI <em>does not</em> require full dm Server. We&rsquo;ll be replacing the current web code in dm Server with the Web Container RI and we&rsquo;ll also be adopting Web Container as the recommended approach for building web applications on OSGi.</p>
+<h3>Introduction to the Reference Implementation</h3><p>The Web Container RI uses Tomcat as the servlet container implementation. The RI itself is made up of four bundles. The <span style="font-family: monospace">core</span> bundle contains all the code that is servlet container-independent. The <span style="font-family: monospace">tomcat</span> bundle contains the Tomcat specific code. The <span style="font-family: monospace">tomcat.fragment</span> bundle contains the default Tomcat configuration and is attached to the Tomcat Catalina bundle as a fragment. The <span style="font-family: monospace">extender</span> bundle contains all the extender behaviour and can be removed if you prefer to manage web application lifecycle manually.</p>
+<h3>Building the Reference Implementation</h3><p>To get running with the RI you need to build it from source. The source can be obtained directly from Git:</p><p><code><br /> git clone <a href="git://git.springsource.org/osgi-web-container/osgi-web-container.git">git://git.springsource.org/osgi-web-container/osgi-web-container.git</a><br /></code></p><p>Once the code is checked out, you can build it and test it using the commands below:</p><p><code><br /> cd build-web-container<br /> ant clean test collect<br /></code></p><p>If the tests fail for you, please raise a <a href="https://issuetracker.springsource.com">JIRA</a>. After a successful build you can run the Web Container and install some WAR files.</p>
+<h3>Running the Reference Implementation</h3><p>I&rsquo;m using <a href="http://paxrunner.ops4j.org/display/paxrunner">PAX Runner</a> to run the Web Container RI. My PAX Runner configuration runs the Web Container using the built binaries and Ivy-managed dependencies. </p><p>In the <span style="font-family: monospace">build-web-container</span> directory you&rsquo;ll find a file called <span style="font-family: monospace">runner.bundles</span>. This file can be used to instruct PAX Runner to install all the bundles needed by the Web Container:</p><p><code><br /> pax-run &ndash;platform=equinox &ndash;snapshot runner.bundles<br /></code></p><p>This command starts Equinox using PAX Runner. The <span style="font-family: monospace">&ndash;snapshot</span> flag tells PAX Runner to download the latest stream stable build of Equinox - one that implements the latest known OSGi 4.2 specification.</p><p>Once Equinox starts issue the <span style="font-family: monospace">ss</span> command to verify that the bundles are installed, you should see around 45 bundles installed and running.</p>
+<h3>Installing an application</h3><p>I&rsquo;m using the FormTags WAR sample from dm Server for testing. You can download this from <a href="http://www.springsource.org/dmserver">here</a>.</p><p>If I try to install the FormTags application directly, things don&rsquo;t quite work out as expected:</p><p><code><br /> install webbundle:file:formtags.war<br /> Bundle id is 48<br /> start 48<br /></code></p><p>After running start, I get an error complaining about <span style="font-family: monospace">ClassNotFoundException</span> for some class in the <span style="font-family: monospace">org.xml.sax</span> package. The issue here is that WAR files are only given 4 imports by default: <span style="font-family: monospace">javax.servlet</span>, <span style="font-family: monospace">javax.servlet.http</span>, <span style="font-family: monospace">javax.servlet.jsp</span> and <span style="font-family: monospace">javax.servlet.tagext</span>.</p><p>It is relatively easy to get around this using the <span style="font-family: monospace">Import-Package</span> URL parameter:</p><p><code><br /> uninstall 48<br /> install webbundle:file:/Users/robharrop/tmp/formtags.war?Import-Package=org.xml.sax,org.xml.sax.helpers,javax.xml.parsers,org.w3c.dom<br /> Bundle id is 49<br /> start 49<br /></code></p><p>Here I&rsquo;m specifying the extra package imports needed by the FormTags application. This time, this application starts successfully and can be accessed from within the web browser at <a href="http://localhost:8080/formtags"><a href="http://localhost:8080/formtags">http://localhost:8080/formtags</a></a>.</p><p>In dm Server, the WAR file gets an import for every package exported by the system bundle, which means common system types are automatically available. I think this is a useful feature and I&rsquo;m interested in knowing if you agree or if you prefer manually controlling access to system packages.</p>
+<h3>What next?</h3><p>The Web Container specification is still moving and I&rsquo;m trying to keep the RI in sync. I&rsquo;m working on moving dm Server to use the Web Container RI in place of its own web support and I&rsquo;ll have more to say on that in the coming weeks.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 238;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

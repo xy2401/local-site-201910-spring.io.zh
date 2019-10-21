@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Using a shared parent application context in a multi-war Spring application</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Using a shared parent application context in a multi-war Spring application" />
+<meta name="twitter:description" content="&lt;p&gt;Last month I gave a Core Spring training in Turkey. At the end of the course I discussed the architecture for an application that some of the participants were going to build after completing the course. This application would consist of an ear file with several war files inside, and the question came up if it was possible to define a single ApplicationContext that could be used as a shared parent to the WebApplicationContexts of all war files. This context would hold bean definitions for services, DAOs and other beans that were not specific to a single web module.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Using a shared parent application context in a multi-war Spring application" />
+<meta property="og:description" content="&lt;p&gt;Last month I gave a Core Spring training in Turkey. At the end of the course I discussed the architecture for an application that some of the participants were going to build after completing the course. This application would consist of an ear file with several war files inside, and the question came up if it was possible to define a single ApplicationContext that could be used as a shared parent to the WebApplicationContexts of all war files. This context would hold bean definitions for services, DAOs and other beans that were not specific to a single web module.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2007-06-11 21:26:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Using a shared parent application context in a multi-war Spring application</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Joris Kuipers</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2007-06-11 21:26:00.0">June 11, 2007</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="86" href="/blog/2007/06/11/using-a-shared-parent-application-context-in-a-multi-war-spring-application#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Last month I gave a Core Spring training in Turkey. At the end of the course I discussed the architecture for an application that some of the participants were going to build after completing the course. This application would consist of an ear file with several war files inside, and the question came up if it was possible to define a single ApplicationContext that could be used as a shared parent to the WebApplicationContexts of all war files. This context would hold bean definitions for services, DAOs and other beans that were not specific to a single web module.</p><p>Actually, Spring makes it very easy to do this, but neither the course nor the reference manual explain in detail how to use this feature from your web application. I therefore wrote a short sample app that illustrates how this works, which I will discuss here in my first blog entry.</p>
+<h4>The ContextLoader and SingletonBeanFactoryLocator classes</h4><p>In a typical Spring web application, you use a ContextLoaderListener (or, if you&rsquo;re using a Servlet 2.2 / 2.3 container, a ContextLoaderServlet) to bootstrap a WebApplicationContext. You configure the ContextLoader used by this class through context parameters in your web.xml. If you&rsquo;ve used this, you&rsquo;re probably familiar with the <tt>contextConfigLocation</tt> parameter, that let&rsquo;s you specify which files make up the WebApplicationContext to construct. </p><p>As it turns out, there is another parameter that you can use to get the desired functionality in a declaritive fashion: <b><tt>parentContextKey</tt></b>. Using this, you instruct the ContextLoader to use another class called ContextSingletonBeanFactoryLocator to search for a bean named by the value of <tt>parentContextKey</tt>, defined in a configuration file whose name matches a certain pattern. By default, this pattern is &lsquo;classpath*:beanRefContext.xml&rsquo;, meaning all files called beanRefContext on the classpath. (For a plain SingletonBeanFactoryLocator it&rsquo;s &lsquo;classpath*:beanRefFactory.xml&rsquo;)<br />This bean must be an ApplicationContext itself, and this context will become the parent context for the WebApplicationContext created by the ContextLoader. However, if this context already exists then that one will be used and no new context will be created (hence the name <b>Singleton</b>BeanFactoryLocator).</p><p>Let&rsquo;s see what this means: first, we need a separate jar in our ear that holds the code for the services, DAOs, etc. Inside this jar we place a beanRefContext.xml file that holds a single bean-definition for an ApplicationContext. Typically, this will be a ClassPathXmlApplicationContext. Then that bean definition will refer to one or more &lsquo;regular&rsquo; bean configuration files that contain the service beans and other stuff to be used by the code from your war files; something like this:</p>
+<pre><code class="prettyprint xml"><br />&lt;!-- contents of beanRefContext.xml: 
+       notice that the bean id is the value specified by the parentContextKey param --&gt;
+&lt;bean id=&quot;ear.context&quot; class=&quot;org.springframework.context.support.ClassPathXmlApplicationContext&quot;&gt;
+    &lt;constructor-arg&gt;
+        &lt;list&gt;
+            &lt;value&gt;services-context.xml&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/constructor-arg&gt;
+&lt;/bean&gt;
+</code></pre><p>Finally, we need to make this jar available on the classpath of the war files using the <tt>Class-Path</tt> entry in the MANIFEST.MF file of each war.</p>
+<h4>Why would you want to use this?</h4><p>A simpler solution is to skip the <tt>parentContextKey</tt> and to load the shared bean definition files from each war using the <tt>contextConfigLocation</tt> parameter. This way, each war will have its own instance of each shared bean. For simple stateless beans, such as typical services, this is actually a fine solution. </p><p>However, instantiating a new instance of each shared bean for each war can have several drawbacks: a common example is creating a Hibernate SessionFactory. This is often an expensive process, so to prevent your startup time getting out of hand the described solution will ensure that this is done only once. Another advantage of having a single instance of your SessionFactory is that it can safely act as a second level cache: you don&rsquo;t want multiple copies of that hanging around in a single application!<br />In general, if you have stateful beans that should really be used as a singleton (in the Spring sense, i.e. one instance per application as opposed to per JVM) you should define them in a single context accessed by the other contexts.</p>
+<h4>The sample</h4><p>I&rsquo;ve included the sample, both as an <a href="http://assets.spring.io.s3.amazonaws.com/wp/wp-content/uploads/2007/06/multiple-contexts-sample.zip">ear file</a> and as <a href="http://assets.spring.io.s3.amazonaws.com/wp/wp-content/uploads/2007/06/multiple-contexts-sample-src.zip">source</a>. In order to upload the ear, I had to give it a .zip extension: please rename the file to .ear before deploying it!. The source is actually an Eclipse workspace, so you can easily import and review it (it requires WTP and is configured for <a href="http://www.springide.org">Spring IDE</a>). All Spring jars needed are included. After you&rsquo;ve deployed the app, go to the URLs /web1 and /web2 to see the output of a servlet in the first and the second war file. The <tt>toString()</tt> of the service will prove that the wars really use the same instance of the shared service.</p>
+<h4>More info</h4><p>The best info on this feature is in Spring&rsquo;s excellent API documentation: have a look at the JavaDoc for the <a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/web/context/ContextLoader.html#loadParentContext(javax.servlet.ServletContext)">ContextLoader.loadParentContext</a> method and the <a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/beans/factory/access/SingletonBeanFactoryLocator.html">SingletonBeanFactoryLocator</a> class. These docs contain further info on how to configure your web.xml and how to write the beanRefFactory.xml. </p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 86;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

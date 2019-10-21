@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>EIP &#39;Loan Broker&#39; Reference Implementation (Part 1)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="EIP &#39;Loan Broker&#39; Reference Implementation (Part 1)" />
+<meta name="twitter:description" content="&lt;p&gt;We are pleased to announce the first installment of the ‘Loan Broker’ Reference Implementation.&lt;br&gt;&lt;a href=&quot;http://www.enterpriseintegrationpatterns.com/ComposedMessagingExample.html&quot;&gt;‘Loan Broker’&lt;/a&gt; concept has become a de-facto reference domain for showcasing &lt;a href=&quot;http://www.eaipatterns.com/&quot; target=&quot;_blank&quot;&gt;Enterprise Integration Patterns&lt;/a&gt; (EIP) - &lt;em&gt;by Gregor Hohpe ad Bobby Woolf&lt;/em&gt;, and this installment of the Loan Broker RI demonstrates how &lt;em&gt;Enterprise Integration Patterns&lt;/em&gt; are realized and applied using &lt;a href=&quot;http://www.springsource.org/spring-integration&quot; target=&quot;_blank&quot;&gt;Spring Integration&lt;/a&gt; (SI) framework.&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;br&gt;
+&lt;img class=&quot;size-full wp-image-4406 alignleft&quot; title=&quot;lb-pipesFilters&quot; src=&quot;http://blog.springsource.com/wp-content/uploads/2010/03/lb-pipesFilters.png&quot; alt=&quot;lb-pipesFilters&quot; width=&quot;387&quot; height=&quot;95&quot;&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;At the core of EIP architecture are the very simple yet powerful concepts of &lt;a href=&quot;http://www.eaipatterns.com/PipesAndFilters.html&quot; target=&quot;_blank&quot;&gt;Pipes and Filters&lt;/a&gt; and &lt;a href=&quot;http://www.eaipatterns.com/Message.html&quot; target=&quot;_blank&quot;&gt;Message&lt;/a&gt;. Endpoints (Filters) are connected with one another via Channels (Pipes). The producing endpoint sends Message to the Channel and the Message is retrieved by the Consuming endpoint.&amp;nbsp; This architecture is meant to define various mechanisms that describe &lt;strong&gt;How&lt;/strong&gt;&lt;em&gt; &lt;/em&gt;information is exchanged between the endpoints, without any awareness of &lt;strong&gt;What&lt;/strong&gt; those endpoints are or &lt;strong&gt;What&lt;/strong&gt; information they are exchanging, thus providing for a very &lt;em&gt;loosely coupled and flexible collaboration model while also, decoupling &lt;span style=&quot;text-decoration: underline;&quot;&gt;Integration concerns&lt;/span&gt; from &lt;span style=&quot;text-decoration: underline;&quot;&gt;Business concerns&lt;/span&gt;&lt;/em&gt;. EIP extends this architecture by further defining:&lt;br&gt;&lt;/p&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/50af47c68e5c7282005f2a8983f443f5?s=200" />
+
+<meta property="og:title" content="EIP &#39;Loan Broker&#39; Reference Implementation (Part 1)" />
+<meta property="og:image" content="https://gravatar.com/avatar/50af47c68e5c7282005f2a8983f443f5?s=200" />
+<meta property="og:description" content="&lt;p&gt;We are pleased to announce the first installment of the ‘Loan Broker’ Reference Implementation.&lt;br&gt;&lt;a href=&quot;http://www.enterpriseintegrationpatterns.com/ComposedMessagingExample.html&quot;&gt;‘Loan Broker’&lt;/a&gt; concept has become a de-facto reference domain for showcasing &lt;a href=&quot;http://www.eaipatterns.com/&quot; target=&quot;_blank&quot;&gt;Enterprise Integration Patterns&lt;/a&gt; (EIP) - &lt;em&gt;by Gregor Hohpe ad Bobby Woolf&lt;/em&gt;, and this installment of the Loan Broker RI demonstrates how &lt;em&gt;Enterprise Integration Patterns&lt;/em&gt; are realized and applied using &lt;a href=&quot;http://www.springsource.org/spring-integration&quot; target=&quot;_blank&quot;&gt;Spring Integration&lt;/a&gt; (SI) framework.&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;br&gt;
+&lt;img class=&quot;size-full wp-image-4406 alignleft&quot; title=&quot;lb-pipesFilters&quot; src=&quot;http://blog.springsource.com/wp-content/uploads/2010/03/lb-pipesFilters.png&quot; alt=&quot;lb-pipesFilters&quot; width=&quot;387&quot; height=&quot;95&quot;&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;At the core of EIP architecture are the very simple yet powerful concepts of &lt;a href=&quot;http://www.eaipatterns.com/PipesAndFilters.html&quot; target=&quot;_blank&quot;&gt;Pipes and Filters&lt;/a&gt; and &lt;a href=&quot;http://www.eaipatterns.com/Message.html&quot; target=&quot;_blank&quot;&gt;Message&lt;/a&gt;. Endpoints (Filters) are connected with one another via Channels (Pipes). The producing endpoint sends Message to the Channel and the Message is retrieved by the Consuming endpoint.&amp;nbsp; This architecture is meant to define various mechanisms that describe &lt;strong&gt;How&lt;/strong&gt;&lt;em&gt; &lt;/em&gt;information is exchanged between the endpoints, without any awareness of &lt;strong&gt;What&lt;/strong&gt; those endpoints are or &lt;strong&gt;What&lt;/strong&gt; information they are exchanging, thus providing for a very &lt;em&gt;loosely coupled and flexible collaboration model while also, decoupling &lt;span style=&quot;text-decoration: underline;&quot;&gt;Integration concerns&lt;/span&gt; from &lt;span style=&quot;text-decoration: underline;&quot;&gt;Business concerns&lt;/span&gt;&lt;/em&gt;. EIP extends this architecture by further defining:&lt;br&gt;&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-03-19 00:18:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">EIP &#39;Loan Broker&#39; Reference Implementation (Part 1)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/50af47c68e5c7282005f2a8983f443f5?s=20&amp;d=mm" />
+<span class="author">Oleg Zhurakousky</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-03-19 00:18:00.0">March 19, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="310" href="/blog/2010/03/19/eip-loan-broker-reference-implementation-part-1#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>We are pleased to announce the first installment of the &lsquo;Loan Broker&rsquo; Reference Implementation.<br /><a href="http://www.enterpriseintegrationpatterns.com/ComposedMessagingExample.html">&lsquo;Loan Broker&rsquo;</a> concept has become a de-facto reference domain for showcasing <a href="http://www.eaipatterns.com/" target="_blank">Enterprise Integration Patterns</a> (EIP) - <em>by Gregor Hohpe ad Bobby Woolf</em>, and this installment of the Loan Broker RI demonstrates how <em>Enterprise Integration Patterns</em> are realized and applied using <a href="http://www.springsource.org/spring-integration" target="_blank">Spring Integration</a> (SI) framework.<br /><h3>Introduction</h3><br /><img class="size-full wp-image-4406 alignleft" title="lb-pipesFilters" src="http://blog.springsource.com/wp-content/uploads/2010/03/lb-pipesFilters.png" alt="lb-pipesFilters" width="387" height="95" /></p><p>At the core of EIP architecture are the very simple yet powerful concepts of <a href="http://www.eaipatterns.com/PipesAndFilters.html" target="_blank">Pipes and Filters</a> and <a href="http://www.eaipatterns.com/Message.html" target="_blank">Message</a>. Endpoints (Filters) are connected with one another via Channels (Pipes). The producing endpoint sends Message to the Channel and the Message is retrieved by the Consuming endpoint.  This architecture is meant to define various mechanisms that describe <strong>How</strong><em> </em>information is exchanged between the endpoints, without any awareness of <strong>What</strong> those endpoints are or <strong>What</strong> information they are exchanging, thus providing for a very <em>loosely coupled and flexible collaboration model while also, decoupling <span style="text-decoration: underline;">Integration concerns</span> from <span style="text-decoration: underline;">Business concerns</span></em>. EIP extends this architecture by further defining:<br /><ul><br /> <li><em>the types of <span style="text-decoration: underline;">pipes</span> (Point-to-Point Channel, Publish-Subscribe Channel, Channel Adapter, etc.)</em></li><br /> <li><em>the core <span style="text-decoration: underline;">filters</span> and patterns around <span style="text-decoration: underline;">how filters collaborate with pipes</span></em><em> (Message Router, Splitters and Aggregators, various Message Transformation patterns, etc.)</em></li><br /></ul><br /><blockquote><strong>The Spring Integration (SI) messaging framework is designed to provide a POJO-based programming model built on top of Enterprise Integration Patterns.</strong></blockquote><br /><h3>Use Case</h3><br />The details and variations of this use case are very nicely described in <a href="http://www.enterpriseintegrationpatterns.com/ComposedMessagingExample.html">Chapter 9 of the EIP Book</a>, but here is the brief summary;<br />A Consumer while shopping for the best Loan Quote(s) subscribes to the services of a Loan Broker, which handles details such as:<br /><ol><br /> <li><em>Consumer pre-screening (e.g., obtain and review the consumer&rsquo;s Credit history)</em></li><br /> <li><em>Determine the most appropriate Banks (e.g., based on consumer&rsquo;s credit history/score)</em></li><br /> <li><em>Send a Loan quote request to each selected Bank</em></li><br /> <li><em>Collect responses from each Bank</em></li><br /> <li><em>Filter responses and determine the best quote(s), based on consumer&rsquo;s requirements.</em></li><br /> <li><em>Pass the Loan quote(s) back to the consumer.</em></li><br /></ol><br />Obviously the real process of obtaining a loan quote is a bit more complex, but since our goal here is to demonstrate how Enterprise Integration Patterns are realized and implemented within SI, the use case has been simplified to concentrate only on the Integration aspects of the process. It is not an attempt to give you an advice in consumer finances.<br /><img class="size-full wp-image-4273 alignleft" title="loan-broker-1" src="http://blog.springsource.com/wp-content/uploads/2010/03/loan-broker-1.png" alt="loan-broker-1" width="348" height="135" /><br />As you can see, by hiring a Loan Broker, the consumer is isolated from the details of the Loan Broker&rsquo;s operations, and each Loan Broker&rsquo;s operations may defer from one another to maintain competitive advantage, so whatever we assemble/implement must be flexible so any changes could be introduced quickly and painlessly.<br />Speaking of change, this first installment of the Loan Broker RI does not actually talk to any &lsquo;imaginary&rsquo; Banks or Credit bureaus. Those services are stubbed out. Our goal here is to assemble, orchestrate and test the <em>integration aspect</em> of the process as a whole. Only then can we start thinking about wiring such process to the real services. We will do this in Part 2, where you&rsquo;ll realize the true benefit of separating <em>integration</em> and <em>business</em> concerns. You will see, that the process and configuration describing this process <span style="text-decoration: underline;">will not change</span> regardless of the number of Banks a particular Loan Broker is dealing with, or the type of communication media (or protocols) used (JMS, WS, TCP, etc.) to communicate with these Banks.<br /><h3>Design</h3><br />As you analyze the 6 requirements above you&rsquo;ll quickly see that they all fall into the category of Integration concerns. For example, in the consumer pre-screening step we need to gather additional information about the consumer and the consumer&rsquo;s desires and <em>enrich</em> the loan request with additional meta information. We then have to <em>filter</em> such information to <em>select</em> the most appropriate list of Banks, and so on. <em>Enrich, filter, select</em> - these are all <em>integration concerns</em> for which EIP defines a solution in the form of patterns. SI provides an implementation of these patterns. </p><p><strong>Submit Loan Quote request - <a href="http://www.eaipatterns.com/MessagingGateway.html" target="_blank">Messaging Gateway</a></strong></p><p><img class="size-full wp-image-4378 alignleft" title="lb-gateway" src="http://blog.springsource.com/wp-content/uploads/2010/03/lb-gateway1.png" alt="lb-gateway" width="304" height="73" /></p><p>The Messaging Gateway pattern provides a simple mechanism to access messaging systems, including our Loan Broker. In SI you define the Gateway as a Plain Old Java Interface (no need to provide an implementation), configure it via the XML <em><strong>&lt;gateway&gt;</strong></em> element or via annotation and use it as any other Spring bean. SI will take care of delegating and mapping method invocations to the Messaging infrastructure by generating a Message (payload is mapped to an input parameter of the method) and sending it to the designated channel.</p><p><em><a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/src/main/java/org/springframework/integration/loanbroker/LoanBrokerGateway.java" target="_blank">LoanBrokerGateway.java</a></em> is the interface representing the Message Gateway used by the consumer</p><p><em>Gateway XML configuration:</em></p>
+<pre><code class="prettyprint xml">&lt;int:gateway id=&quot;loanBrokerGateway&quot;
+		     default-request-channel=&quot;loanBrokerPreProcessingChannel&quot;
+		     service-interface=&quot;org.springframework.integration.loanbroker.LoanBrokerGateway&quot;/&gt;
+</code></pre><p>In the above configuration whenever any method is invoked on the &lsquo;<strong>loanBrokerGateway</strong>&rsquo; bean, a Message will be constructed and sent to the &lsquo;<strong>loanBrokerPreProcessingChannel</strong>&rsquo;.</p><p>Our definition of the Messaging Gateway (<a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/src/main/java/org/springframework/integration/loanbroker/LoanBrokerGateway.java" target="_blank">LoanBrokerGateway.java</a>) gives the consumer two ways to interact with the Loan Broker. The Consumer might request a single(best) quote by invoking the <em>getLoanQuote(loanRequest)</em> method, or all quotes via a call to <em>getAllLoanQuotes(loanRequest)</em> method. This means that our Loan Broker must be aware of the type of the Loan request. We also know there are some pre-screening steps such as getting and evaluating the consumer&rsquo;s credit score, simply because some premiere Banks will only typically accept quote requests from consumers that meet a minimum credit score requirement.<br /><blockquote>Essentially, this whole process resembles doctors visit where before seeing the real doctor you meet the nurse who takes your temperature, blood pressure etc., writing up a list of &lsquo;meta information&rsquo; the doctor will need.</blockquote><br />In EIP  a <em>Message</em> is a simple structure which consists of a <em>Message Payload </em>and <em>Message Headers</em>. <em>Message Headers </em>are a great mechanism to store meta information related to the <em>Message</em>. So how can we enrich our Message with the additional information? EIP defines the <a href="http://www.enterpriseintegrationpatterns.com/DataEnricher.html">Content Enricher</a> pattern which describes how to augment a <em>Message</em> with additional information. Spring Integration provides a <em><strong>&lt;header-enricher&gt;</strong></em> element allowing you to quickly enrich a Message in-transit. But since our Loan Broker must perform several tasks before sending out the quote, it would be nice if there were also a mechanism to compose a process from a set of individual and independent tasks.</p><p><strong>Loan Request Pre-screeening – <a href="http://www.eaipatterns.com/DistributionAggregate.html" target="_blank">Composed Message Processor </a> and <a href="http://www.enterpriseintegrationpatterns.com/DataEnricher.html">Content Enricher</a></strong></p><p>The <em>Composed Message Processor</em> pattern describes rules around building endpoints that maintain control over message flow which consists of multiple message processors. In our case the pre-screening flow consists of 3 steps: <em>a) determine the the type of the loan request;</em> <em>b) obtain consumer&rsquo;s credit history and score;</em> <em>c) determine (based on some criteria) the list of channels (each channel corresponds to an individual bank)</em>.</p><p>Spring Integration allows you to compose complex processors via the <strong>&lt;chain&gt;</strong> element</p>
+<pre><code class="prettyprint xml">&lt;int:chain id=&quot;preScreening&quot; input-channel=&quot;loanBrokerPreProcessingChannel&quot; output-channel=&quot;banksDistributionChannel&quot;&gt;
+	&lt;int:header-enricher&gt;
+		&lt;int:header name=&quot;RESPONSE_TYPE&quot;
+			expression=&quot;headers.history.iterator().next().attributes[&#39;method&#39;].equals(&#39;getLoanQuote&#39;) ? &#39;BEST&#39; : &#39;ALL&#39;&quot; /&gt;
+	&lt;/int:header-enricher&gt;
+	&lt;int:header-enricher&gt;
+		&lt;int:header name=&quot;CREDIT_SCORE&quot; ref=&quot;creditBureau&quot; method=&quot;getCreditScore&quot;/&gt;
+	&lt;/int:header-enricher&gt;
+	&lt;int:header-enricher&gt;
+		&lt;int:header name=&quot;BANKS&quot; ref=&quot;bankSelector&quot; method=&quot;selectBankChannels&quot;/&gt;
+	&lt;/int:header-enricher&gt;
+&lt;/int:chain&gt;
+</code></pre><p><img class="size-full wp-image-4379 alignleft" title="lb-chain" src="http://blog.springsource.com/wp-content/uploads/2010/03/lb-chain1.png" alt="lb-chain" width="526" height="79" /></p><p>This will create a bean &rsquo;<strong>preScreening</strong>&quot; as an SI <em>chain</em> endpoint, which also defines an <em>input/</em><em>output</em>-<em>channel</em> to receive and send messages. The above <em>chain</em> is composed with 3 <em>header-enricher</em> processors. The first one will set <strong>RESPONSE_TYPE</strong> header by utilizing <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/expressions.html" target="_blank">SpEL</a> while accessing the <a href="http://www.eaipatterns.com/MessageHistory.html" target="_blank">Message History</a> and determining this header&rsquo;s value based on the Gateway method invoked. <blockquote>This example illustrates how SpEL can be used to perform simple evaluations while determining the header value, but we do not advocate using SpEL to perform complex business logic</blockquote>Next we have a <em>header-enricher</em> which is mapped to a process responsible for getting the credit score from the Credit Bureau (currently stub <a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/src/main/java/org/springframework/integration/loanbroker/stubs/CreditBureauStub.java" target="_blank">CreditBureauStub</a>) and set the <strong>CREDIT_SCORE </strong>header. The last <em>header-enricher</em> uses the <a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/src/main/java/org/springframework/integration/loanbroker/BanksChannelSelector.java" target="_blank">BankChannelSelector</a> (see the <a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/src/main/resources/loan-broker-config.xml" target="_blank">bankSelector</a> config).The implementation of the <em>BankChannelSelector.selectBankChannels(..)</em> method takes a Message as input and returns a Set&lt;String&gt; value containing the name of channels, which will be set as the <strong>BANKS</strong> header.<br />This completes our pre-screening process, our Loan Broker is now ready to send a loan request to each selected Bank via the <em>banksDistributionChannel</em>.</p><p>The <strong>BANKS</strong> header defines the dynamically generated and filtered list of channels each of which acts as a recipient representing a Bank. We need an endpoint that allows us to send the same <em>Message</em> to all recipients.</p><p><strong>Distribute Loan Quote Requests to Selected Banks -<a href="http://www.eaipatterns.com/RecipientList.html" target="_blank"> Recipient List</a></strong></p><p><img class="size-full wp-image-4387 alignleft" title="lb-recipientList" src="http://blog.springsource.com/wp-content/uploads/2010/03/lb-recipientList.png" alt="lb-recipientList" width="518" height="179" /><br />EIP defines various types of routing patterns which all derive from <a href="http://www.eaipatterns.com/MessageRouter.html" target="_blank">Message Router</a>. One of them is the <a href="http://www.eaipatterns.com/RecipientList.html" target="_blank">Recipient List</a> router, which routes a message to all recipients in the list. SI provides a <strong>&lt;router&gt;</strong> element that allows us to configure a router which, in our case, will receive a <em>Message</em> from the <em>bankDistributionChannel</em>. This router will get the list of bank channels from the <strong>BANKS</strong> <em>Message Header</em> via a SpEL expression (this list is set in the pre-screening step), and will distribute the <em>Message</em> to these <em>channels</em>.</p><p>The XML Configuration below shows how this router is configured:</p>
+<pre><code class="prettyprint xml">&lt;int:router id=&quot;bankRecipientListRouter&quot; input-channel=&quot;banksDistributionChannel&quot; 
+								expression=&quot;headers[&#39;BANKS&#39;]&quot; 
+								apply-sequence=&quot;true&quot;/&gt;
+</code></pre>
+<blockquote>You can clearly see how we are assembling Loan Broker by connecting various endpoints (Filters) via channels (Pipes), while passing Messages. You can also see that we are accomplishing it through POJO-based programming techniques, barely using the Spring Integration API (only BankChannelSelector.java). SI takes care of interfacing our POJOs with the Messaging infrastructure.</blockquote><p>One last thing the Loan Broker needs to to is to receive the loan quotes form the banks, aggregate them by consumer (we don&rsquo;t want to show quotes from one consumer to another), assemble the response based on the consumer&rsquo;s selection criteria (single best quote or all quotes) and reply back to the consumer.</p><p><strong>Aggregating Loan Quote Responses - <a href="http://www.eaipatterns.com/Aggregator.html" target="_blank">Aggregator</a></strong></p><p>An Aggregator pattern describes an endpoint which groups related <em>Messages</em> into a single <em>Message</em>. Criteria and rules can be provided to determine an <em>aggregation</em> and <em>correlation</em> strategy. SI provides several implementations of the Aggregator pattern as well as a convenient name-space based configuration.</p><p><img class="size-full wp-image-4410 alignleft" title="lb-complete" src="http://blog.springsource.com/wp-content/uploads/2010/03/lb-complete.png" alt="lb-complete" width="521" height="180" /></p><p>Our Loan Broker defines a <em>&lsquo;<strong>loanQuoteAggregator</strong></em>&rsquo; bean via the <em><strong>&lt;aggregator&gt;</strong></em> element which provides a default <em>aggregator</em> and <em>correlation</em> strategy. The default correlation strategy correlates messages based on the <em>$corelationId</em> header (see <a href="http://www.eaipatterns.com/CorrelationIdentifier.html" target="_blank">Correlation Identifier</a> pattern). What&rsquo;s interesting is that we never provided the value for this header.  It was set earlier by the Recipient List router automatically, when it generated a separate Message for each Bank.</p><p>Once the Messages are correlated they are released to the actual Aggregator implementation. Although default Aggregator is provided by SI, its strategy (gather the list of payloads from all Messages and construct a new Message with this List as payload) does not satisfy our requirement. The reason is that our consumer might require a single best quote or all quotes. To communicate the consumer&rsquo;s request, earlier in the process we set the RESPONSE_TYPE header. Now we have to evaluate this header and return either <em>all the quotes</em> (the default aggregation strategy would work) or the <em>best quote</em> (the default aggregation strategy will not work because we have to determine which loan quote is the best).</p>
+<pre><code class="prettyprint xml">&lt;int:aggregator id=&quot;loanQuoteAggregator&quot; input-channel=&quot;quotesAggregationChannel&quot; method=&quot;aggregateQuotes&quot;&gt;
+	&lt;bean class=&quot;org.springframework.integration.loanbroker.LoanQuoteAggregator&quot;/&gt;
+&lt;/int:aggregator&gt;
+</code></pre><p>Obviously selecting the best quote could be based on complex criteria and would influence the complexity of the aggregator, but for now we are making it simple. If consumer wants the best quote we will select a quote with the lowest interest rate. To accomplish that the <a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/src/main/java/org/springframework/integration/loanbroker/LoanQuoteAggregator.java" target="_blank">LoanQuoteAggregator.java</a> will sort all the quotes and return the first one. The <a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/src/main/java/org/springframework/integration/loanbroker/domain/LoanQuote.java" target="_blank">LoanQuote.java</a> implements Comparable which compares quotes based on the <em>rate</em> attribute. </p><p>Once the response Message is created it is sent to the <em>default-reply-channel</em> of the Messaging Gateway (thus the consumer) which started the process. Our consumer got the Loan Quote!</p><p>One important thing to notice is that we have not defined a <i>default-reply-channel</i> attribute on <em><strong>&lt;gateway&gt;</strong></em> element. In fact we have not defined a single <em>channel</em> explicitly. Similar to other Messaging systems, SI will auto-create <em>input</em> and default <em>reply</em> channels as needed, giving you yet another way to further simplify Spring Application Context configuration.<br /><h3>Conclusion</h3><br />This reference implementation of the &lsquo;Loan Broker&rsquo; use case was accomplished using the Spring Integration framework; a POJO-based, light weight, embeddable messaging framework with a loosely coupled programming model intended to simplify integration of heterogeneous systems without requiring a heavy-weight ESB-like engine or proprietary development and deployment environment. It is build on top of <em><strong>Enterprise Integration Patterns</strong></em>. <em>&ldquo;Patterns are meant to describe &rdquo;building blocks&ldquo; for YOUR solution - they are not meant to be solutions in of themselves. Patterns therefore lend themselves to be best implemented by lightweight, embeddable frameworks that serve to support your solution, not heavy, commercial-off-the shelf products that aim to control it. This is where the big vendors have all gone wrong with SOA&hellip;&rdquo; - <a href="http://www.infoq.com/articles/Spring-Integration-Joshua-Long#view_38115" target="_blank">Tom McCuch</a> (SpringSource) commenting on InfoQ article by <a href="http://www.infoq.com/articles/Spring-Integration-Joshua-Long" target="_blank">Joshua Long</a></em>.<br />Integration concerns exist in all types of applications (server based and not) and should not require change in design, testing and deployment strategy if such applications need to integrate with one another. I (the developer) should not be porting my SWT or console-based application to an ESB-like server or implementing proprietary interfaces simply because I have an integration concern. I would simply like to have a framework that allows me to address these concerns whenever I have them with minimal to no changes to my code or infrastructure. <em>Spring Integration</em> is that framework.</p><p>In the next installment we&rsquo;ll demonstrate various remoting adapters and techniques available in Spring Integration by substituting our stubbed services with these adapters and will introduce an asynchronous style of integration that is relevant to the &lsquo;Loan Broker&rsquo; use case. </p><p><strong>Resources</strong>:</p><p>The &lsquo;Loan Broker&rsquo; Reference Implementation is available with the release of <a href="http://www.springsource.org/spring-integration" target="_blank">Spring Integration 2.0.M3</a> (see the Downloads section). It is distributed as an independent Eclipse/Maven project. You can also check it out as a project from our Subversion repository.<br /><blockquote>$&gt; svn co <a href="https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/">https://src.springframework.org/svn/spring-integration/trunk/spring-integration-samples/loan-broker/</a> loan-broker<br />$&gt; cd loan-broker<br />$&gt; mvn install</blockquote></p><p><strong>Relevant Links</strong>:<br /><a href="http://www.springsource.org/spring-integration" target="_blank">Spring Integration</a><br /><a href="https://www.manning.com/fisher/" target="_blank">Spring Integration in Action</a><br /><a href="http://www.eaipatterns.com/index.html" target="_blank">Enterprise Integration Patterns</a><br /><a href="http://www.infoq.com/articles/Spring-Integration-Joshua-Long" target="_blank">Getting Started With Spring Integration (Joshua Long)</a><br /><a href="https://tom-mccuch.blogspot.com/" target="_blank">Agile SOA - Part 1, 2 and 3 (Tom McCuch)</a></p><p>Thanks to Gary Russel <em>(Spring Source, SI comitter)</em> and Dave Turanski <em>(Spring Source)</em> for helping out with this blog!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 310;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

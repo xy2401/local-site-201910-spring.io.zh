@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Adding an Atom view to an application using Spring&#39;s REST support</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Adding an Atom view to an application using Spring&#39;s REST support" />
+<meta name="twitter:description" content="&lt;p&gt;In Spring 3.0, Spring MVC will be augmented with REST support. This post describes how to use the REST support to implement an AtomView on top of a simple sample application. Follow this step-by-step process to see how easy it is to implement an AtomView on top of a simple application with the new REST support in Spring MVC.&lt;/p&gt;
+&lt;h2&gt;Step 1: Download the application skeleton&lt;/h2&gt;
+&lt;p&gt;Attached to this blog entry, near the bottom, you will find a simple download that holds a skeleton for a web application. Inside, you will find all Spring 3.0 binaries needed for this application, plus a few extras needed for the Atom functionality. The Spring binaries are based on a nightly build and might be replaced with the final builds once Spring 3.0 has gone final.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Adding an Atom view to an application using Spring&#39;s REST support" />
+<meta property="og:description" content="&lt;p&gt;In Spring 3.0, Spring MVC will be augmented with REST support. This post describes how to use the REST support to implement an AtomView on top of a simple sample application. Follow this step-by-step process to see how easy it is to implement an AtomView on top of a simple application with the new REST support in Spring MVC.&lt;/p&gt;
+&lt;h2&gt;Step 1: Download the application skeleton&lt;/h2&gt;
+&lt;p&gt;Attached to this blog entry, near the bottom, you will find a simple download that holds a skeleton for a web application. Inside, you will find all Spring 3.0 binaries needed for this application, plus a few extras needed for the Atom functionality. The Spring binaries are based on a nightly build and might be replaced with the final builds once Spring 3.0 has gone final.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2009-03-16 22:07:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Adding an Atom view to an application using Spring&#39;s REST support</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Alef Arendsen</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2009-03-16 22:07:00.0">March 16, 2009</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="204" href="/blog/2009/03/16/adding-an-atom-view-to-an-application-using-spring-s-rest-support#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>In Spring 3.0, Spring MVC will be augmented with REST support. This post describes how to use the REST support to implement an AtomView on top of a simple sample application. Follow this step-by-step process to see how easy it is to implement an AtomView on top of a simple application with the new REST support in Spring MVC.</p>
+<h2>Step 1: Download the application skeleton</h2><p>Attached to this blog entry, near the bottom, you will find a simple download that holds a skeleton for a web application. Inside, you will find all Spring 3.0 binaries needed for this application, plus a few extras needed for the Atom functionality. The Spring binaries are based on a nightly build and might be replaced with the final builds once Spring 3.0 has gone final.</p><p>Next, load up the project in Eclipse, using the &lsquo;Import &gt; Import Existing Projects into Workspace&rsquo; wizard (from the File menu). The application is a simple Eclipse Dynamic Web Project with all the infrastructure for Spring MVC setup. So if you are familiar to Spring MVC, this shouldn&rsquo;t be too big of a deal.</p>
+<h2>Step 2: Review the setup of the application</h2><p>In /WEB-INF/web.xml you will find the Spring MVC DispatcherServlet being defined. It loads up an application context from the /WEB-INF/rest-servlet.xml file. This file in its turn, contains a component scanner that scan for @Components (also @Controllers) in the com.springsource.samples.rest package.</p><p>Next, in the com.springsource.samples.rest package, you will find a ContentController with two controller methods.</p>
+<pre><code class="prettyprint java"><br />@Controller
+public class ContentController {
+	
+	private List&lt;SampleContent&gt; contentList = new ArrayList&lt;SampleContent&gt;();
+	
+	@RequestMapping(value=&quot;/content.*&quot;, method=RequestMethod.GET)
+	public ModelAndView getContent() {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName(&quot;content&quot;);
+		mav.addObject(&quot;sampleContentList&quot;, contentList);
+		return mav;
+	}
+	
+	@RequestMapping(value=&quot;/content.html&quot;, method=RequestMethod.POST)
+	public String addContent() {
+		contentList.add(SampleContent.generateContent(&quot;Alef Arendsen&quot;, new Date()));
+		return &quot;redirect:content.html&quot;;
+	}
+}
+</code></pre><p>The first handler returns a list of SampleContent items. The second handler adds a new SampleContent item, by using the SampleContent.generateContent() method. The first handler reacts to GET requests, the second handler reacts to POST requests. The methods themselves have been annotated with @RequestMapping annotations to do this.</p><p>In the rest-servlet.xml application context file, in addition to the component scanner, you will also a ViewResolver, in this case an InternalResourceViewResolver. It will take care of the translation between the view name (&lsquo;content&rsquo; in the case of the getContent() handler) and the JSP page.</p><p>After having deployed this to for example Tomcat, you should be able to go to <a href="http://localhost:8080/spring-rest/rest"><a href="http://localhost:8080/spring-rest/rest">http://localhost:8080/spring-rest/rest</a></a>. Thiswill redirect you to /rest/content, a URL that is picked up by the handler.</p>
+<h2>Step 3: Implementing the AtomView</h2><p>To implement the AtomView, we will use the Rome project, available from <a href="https://rome.dev.java.net/"><a href="https://rome.dev.java.net/">https://rome.dev.java.net/</a></a>. In the original set up of the application, view names are translated by the view resolver to instances of InternalResourceView, which in this case will render JSPs. We are going to create our own dedicated instance of the View interface, rendering Atom feeds instead.</p><p>Create a class called SampleContentAtomView in the com.springsource.samples.rest package and paste in the following code. The code uses the Atom support classes from Spring MVC and the document object model for Atom feeds from the Rome project.</p>
+<pre><code class="prettyprint java"><br />public class SampleContentAtomView extends AbstractAtomFeedView {
+
+	@Override
+	protected void buildFeedMetadata(Map&lt;String, Object&gt; model, Feed feed, HttpServletRequest request) {
+		feed.setId(&quot;tag:springsource.com&quot;);
+		feed.setTitle(&quot;Sample Content&quot;);
+		@SuppressWarnings(&quot;unchecked&quot;)
+		List&lt;SampleContent&gt; contentList = (List&lt;SampleContent&gt;)model.get(&quot;sampleContentList&quot;);
+		for (SampleContent content : contentList) {
+			Date date = content.getPublicationDate();
+			if (feed.getUpdated() == null || date.compareTo(feed.getUpdated()) &gt; 0) {
+				feed.setUpdated(date);
+			}
+		}
+	}
+
+	@Override
+	protected List&lt;Entry&gt; buildFeedEntries(Map&lt;String, Object&gt; model,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		@SuppressWarnings(&quot;unchecked&quot;)
+		List&lt;SampleContent&gt; contentList = (List&lt;SampleContent&gt;)model.get(&quot;sampleContentList&quot;);
+		List&lt;Entry&gt; entries = new ArrayList&lt;Entry&gt;(contentList.size());
+
+		for (SampleContent content : contentList) {
+			Entry entry = new Entry();
+			String date = String.format(&quot;%1$tY-%1$tm-%1$td&quot;, content.getPublicationDate());
+			// see http://diveintomark.org/archives/2004/05/28/howto-atom-id#other
+			 entry.setId(String.format(&quot;tag:springsource.com,%s:%d&quot;, date, content.getId()));
+			entry.setTitle(String.format(&quot;On %s, %s wrote&quot;, date, content.getAuthor()));
+			entry.setUpdated(content.getPublicationDate());
+
+			Content summary = new Content();
+			summary.setValue(content.getText());
+			entry.setSummary(summary);
+			
+			entries.add(entry);
+		}
+
+		return entries;
+
+	}
+}
+</code></pre>
+<h2>Step 4: Setting up content negotiation</h2><p>The skeleton web application already provided the HTML view and now we have also implemented the view generating an Atom feed. The last thing we need to do is make sure requests for the Atom feed actually will render using the SampleContentAtomView and the JSP will be rendered when an HTML view is requested.</p><p>In a perfect world, a client would ask for a certain representation it prefers using the Accept HTTP header. The Accept HTTP header (as defined by the HTTP specification) can take one or more media types and should be sent by the browser (or any HTTP client for that matter) to indicate what kind of representation it prefers. An appropriate media type for an Atom feed for example would be &lsquo;application/atom+xml&rsquo;, while HTML views might just send &lsquo;text/html&rsquo; or &lsquo;text/xhtml&rsquo; as the Accept header. There is a slight problem with this however. Browsers, typically have a fixed set of media types they send along as the Accept HTTP header and there&rsquo;s no way (aside from using JavaScript) to modify the Accept header sent along by the browser. That&rsquo;s why the file extension is a good alternative to indicate to a server what representation you want.</p><p>Spring 3.0 features a ContentNegotiatingViewResolver that can work with both the extension as well as the Accept header. After it&rsquo;s figured out an appropriate media type, it delegates to a set of other view resolvers to do this for us. The following needs to be pasted into rest-servlet.xml to get this to work. As you can see, the ContentNegotiatingViewResolver will delegate to a a BeanNameViewResolver (resolving to the SampleContentAtomView if needed) or an InternalResourceViewResolver. The snippet below should, by the way, replace the InternalResourceViewResolver that was already configured in your rest-servlet.xml file.</p><p>The ContentNegotiatingViewResolver looks at the file extension first and after that the Accept header is used (this is by the way customizable to a certain degree). We have to map the appropriate extensions to the appropriate media types. In this example, we map .html to the media type text/html and we map .atom to application/atom+xml. This will make sure the appropriate views are rendered.</p><p>If a .atom request comes in, the ContentNegotiatingViewResolver will look for a view that matches the application/atom+xml media type. The view resolver will look for a view rendering content with media type text/html is an .html request comes in.</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.web.servlet.view.ContentNegotiatingViewResolver&quot;&gt;
+	&lt;property name=&quot;mediaTypes&quot;&gt;
+		&lt;map&gt;
+			&lt;entry key=&quot;atom&quot; value=&quot;application/atom+xml&quot;/&gt;
+			&lt;entry key=&quot;html&quot; value=&quot;text/html&quot;/&gt;
+		&lt;/map&gt;
+	&lt;/property&gt;
+	&lt;property name=&quot;viewResolvers&quot;&gt;
+		&lt;list&gt;
+			&lt;bean class=&quot;org.springframework.web.servlet.view.BeanNameViewResolver&quot;/&gt;
+			&lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+				&lt;property name=&quot;prefix&quot; value=&quot;/WEB-INF/jsp/&quot;/&gt;
+				&lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;/&gt;
+			&lt;/bean&gt;
+		&lt;/list&gt;
+	&lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;content&quot; class=&quot;com.springsource.samples.rest.SampleContentAtomView&quot;/&gt;
+</code></pre><p>After having put this in your application context, giving the server a restart should do the trick. Go to <a href="http://localhost:8080/spring-rest/rest/content.html"><a href="http://localhost:8080/spring-rest/rest/content.html">http://localhost:8080/spring-rest/rest/content.html</a></a> to view all content items and to generate new ones. Go to <a href="http://localhost:8080/spring-rest/rest/content.atom"><a href="http://localhost:8080/spring-rest/rest/content.atom">http://localhost:8080/spring-rest/rest/content.atom</a></a> to subscribe to the Atom feed.</p><p>I hope this little blog entry showed you how simple it can be to add an Atom feed to your application. In addition to Atom, Spring has view support classes for rendering PDF and Excel files, JSON representations and XML documents. Check them out and let us know what you think!</p>
+<h2>The downloads</h2><p>As promised, here are the downloads. Note that the projects are based on a nightly build of Spring. For more recent versions, make of Spring 3.0, make sure to check <a href="http://www.springsource.org">www.springsource.org</a>.</p>
+<ul>
+<li><a href='http://blog.springsource.com/wp-content/uploads/2009/02/spring-rest1.zip'>The skeleton webapp</a></li>
+<li><a href='http://blog.springsource.com/wp-content/uploads/2009/02/spring-rest.zip'>The webapp with all the code in there</a></li>
+</ul></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 204;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

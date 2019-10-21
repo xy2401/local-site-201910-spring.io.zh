@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Getting Started with Redis, Spring Data &amp; Cloud Foundry</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Getting Started with Redis, Spring Data &amp; Cloud Foundry" />
+<meta name="twitter:description" content="&lt;p&gt;One of the drivers behind the popularity of &lt;a href=&quot;http://en.wikipedia.org/wiki/NoSQL_%28concept%29&quot;&gt;NoSQL&lt;/a&gt; solutions is performance (especially) under heavy loads. Due to their data model, key value stores lead the pack, providing lightweight yet flexible means of working with data. In this entry, I am going to quickly showcase what it takes to work with a key value store (Redis) using Spring (Spring Redis) through one of Spring Data samples (RetwisJ) and deploy the app into the &lt;a href=&quot;http://en.wikipedia.org/wiki/Cloud_computing&quot;&gt;cloud&lt;/a&gt; (through Cloud Foundry) to share it with the world. I am going even further by using Windows, as a deployment platform for a change.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Getting Started with Redis, Spring Data &amp; Cloud Foundry" />
+<meta property="og:description" content="&lt;p&gt;One of the drivers behind the popularity of &lt;a href=&quot;http://en.wikipedia.org/wiki/NoSQL_%28concept%29&quot;&gt;NoSQL&lt;/a&gt; solutions is performance (especially) under heavy loads. Due to their data model, key value stores lead the pack, providing lightweight yet flexible means of working with data. In this entry, I am going to quickly showcase what it takes to work with a key value store (Redis) using Spring (Spring Redis) through one of Spring Data samples (RetwisJ) and deploy the app into the &lt;a href=&quot;http://en.wikipedia.org/wiki/Cloud_computing&quot;&gt;cloud&lt;/a&gt; (through Cloud Foundry) to share it with the world. I am going even further by using Windows, as a deployment platform for a change.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-04-27 10:45:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+ </div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Getting Started with Redis, Spring Data &amp; Cloud Foundry</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Costin Leau</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-04-27 10:45:00.0">April 27, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="414" href="/blog/2011/04/27/getting-started-with-redis-spring-data-cloud-foundry#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>One of the drivers behind the popularity of <a href="https://en.wikipedia.org/wiki/NoSQL_%28concept%29">NoSQL</a> solutions is performance (especially) under heavy loads. Due to their data model, key value stores lead the pack, providing lightweight yet flexible means of working with data. In this entry, I am going to quickly showcase what it takes to work with a key value store (Redis) using Spring (Spring Redis) through one of Spring Data samples (RetwisJ) and deploy the app into the <a href="https://en.wikipedia.org/wiki/Cloud_computing">cloud</a> (through Cloud Foundry) to share it with the world. I am going even further by using Windows, as a deployment platform for a change.</p>
+<h3>Redis</h3><p>A popular <a href="http://redis.io/topics/whos-using-redis">choice</a> among key-value stores is <a href="http://redis.io">Redis</a>, an open source, crazy fast database written in ANSI C weighting around 200 KB (yes, <strong>kilo</strong>-bytes) for the server or 400 KB for the entire package (includes a command-line client and some administration utilities) and available virtually on all major platforms which also makes it the choice for the sample. Note that a Redis instance is not needed unless one wants to run the sample locally. If so, for Windows users (such as the author) yours truly uses (and recommends) <a href="https://github.com/dmajkic/redis">this</a> pre-packed version available in both 32-bit and 64-bit flavours.</p>
+<h3>Spring and NoSQL</h3><p>If you are using NoSQL from a Java environment, take a look at <a href="http://www.springsource.org/spring-data">Spring Data</a>: it&rsquo;s not a project by itself but rather an umbrella of projects embracing the various new data access technologies such as non-relational databases (like Redis or MongoDB), map-reduce frameworks (think Hadoop) and cloud-base data services for Java apps. Spring Data promotes the <em>classic</em> Spring values, enhancing developer productivity by removing the API noise, boiler-plate code and resource management and offering a consistent programming model. It builds on top of existing Spring features and projects (such as inversion of control, life-cycle management, type conversion, portable data access exceptions, caching and so on) so one can add it right away, with minimal effort in her application. And of course, just like the rest of the Spring projects, it is open source and available under Apache license.</p>
+<h3>Spring Data Redis</h3><p>In the case of Redis, Spring Data offers dedicated support through the Spring Data Redis or simply <a href="http://www.springsource.org/spring-data/redis">Spring Redis</a> project. It offers both low-level and high-level features ranging from portable Redis client abstractions (allowing different Redis clients such as Jedis, JRedis or RJC to be changed with literally one configuration line) to Redis-backed atomic collections or counters or pub-sub support. The project <a href="http://static.springsource.org/spring-data/data-keyvalue/docs/current/reference/html/#redis">reference</a> documentation covers these topics in great detail.</p>
+<h3>RetwisJ, YATC - Yet Another Twitter Clone</h3>
+<p style="font-size:90%"><i>RetwisJ source code, including the code in this blog, can be downloaded at Spring Data Key Value <a href="https://github.com/SpringSource/spring-data-keyvalue-examples">sample project</a>. Further more, documentation is available at <a href="http://static.springsource.org/spring-data/data-keyvalue/examples/retwisj/current/">here</a></i></p><p>RetwisJ can be seen as the Java port of Redis&rsquo; <a href="http://redis.io/topics/twitter-clone">Retwis</a> sample: a simple Twitter-clone that demonstrates how one can replace expensive joins in a traditional, relational database with Redis flexible data model (such as set <a href="http://redis.io/topics/data-types-intro">intersections</a>).</p><p>Migrating from a table-like mindset to key-value associations might seem difficult but it is not: rather then storing multiple values under one key one can store each value under &quot;similar keys; in fact, relationships themselves can be stored as such. As explained in the <a href="http://static.springsource.org/spring-data/data-keyvalue/examples/retwisj/current/#retwisj:structure">docs</a>, rather then creating a table for users (containing one column for user name, one for password and so on) one can just store the items through a Redis hash (or map) and instead of creating an index to store relationship between entries, it can add a separate, reverse or lookup key for it.<br />So the following table structure (users) can be deployed as the following key-value pairs :<br /><code><br /><table><br /><tr><br /><td><br /><table border="1" align="left" summary="RDBMS Table"><br /><tr><th>Key</th><th>Username</th><th>Password</th></tr><br /><tbody><br /><tr><td>1</td><td>springrod</td><td>interface21</td></tr><br /><tr><td>2</td><td>costinl</td><td>this is fun</td></tr><br /></tbody><br /></table><br /></td><br /><td><br />&nbsp; becomes &nbsp;<br /></td><br /><td><br /><table border="1" align="center" summary="Redis Keys"><br /><tr><th>Key</th><th>Type</th><th>Value</th></tr><br /><tr><td>uid:1</td><td>hash</td><td>{name: springrod, pass: interface21}</td></tr><br /><tr><td>uid:2</td><td>hash</td><td>{name: costinl, pass: secret}</td></tr><br /></table><br /></td><br /></tr><br /></table><br /></code></p><p>In a similar fashion, the association table between followers and the followee (or target) can be mapped through Redis Sets. So rather then performing table joins, one can simply do set intersection. Redis rich data models (Sets, Z-Sets (or sorted sets), Lists and Hashes) map nicely onto the Java collections through Spring Redis which provides corresponding <tt>java.util</tt> implementations on top of Redis. This means one can traverse, lookup or modify lists and set by using well known interfaces without having to manually issue any Redis commands. </p><p>To wit:</p>
+<pre><code class="prettyprint java">private RedisSet&lt;String&gt; following(String uid) {
+   return new DefaultRedisSet&lt;String&gt;(KeyUtils.following(uid), template);
+}
+      
+public Collection&lt;String&gt; commonFollowers(String uid, String targetUid) {
+   Set&lt;String&gt; followers = following(uid).
+       intersectAndStore(following(targetUid),
+       KeyUtils.commonFollowers(uid, targetUid));
+   ...
+}
+</code></pre><p>For general-purpose data access, the central Spring Redis is <tt>RedisTemplate</tt> which allows everything from easy, one-line manipulations of rich objects, serialization (be it byte array, XML or Jackson based) or message publication to advanced querying capabilities and data fetching (such as avoiding the infamous N+1 problem through Redis SORT/GET pattern). </p>
+<pre><code class="prettyprint java">// adding entries into a hash
+BoundHashOperations&lt;String, String, String&gt; userOps = template.boundHashOps(KeyUtils.uid(uid));
+userOps.put(&quot;name&quot;, name);
+userOps.put(&quot;pass&quot;, password);
+valueOps.set(KeyUtils.user(name), uid);
+</code></pre><p>For a more in-depth explanation of the data-model and the sample, consult the RetwisJ <a href="http://static.springsource.org/spring-data/data-keyvalue/examples/retwisj/current/">documentation</a>.</p>
+<h3>Connecting to Redis</h3><p>A common problem Java users face when connecting to Redis is what <a href="http://redis.io/clients">client</a> (or driver) to use. Spring Redis supports three different libraries (<a href="https://github.com/xetorthio/jedis">Jedis</a>, <a href="https://github.com/alphazero/jredis">JRedis</a> and <a href="https://github.com/e-mzungu/rjc">RJC</a>) in a consistent manner so one can switch between them without having to rewrite any code whatsoever. Let&rsquo;s pick up Jedis and see how the application configuration looks like:</p>
+<pre><code class="prettyprint xml">&lt;beans&gt;
+  &lt;context:property-placeholder location=&quot;classpath:redis.properties&quot;/&gt;
+
+  &lt;!-- Redis client --&gt;
+  &lt;bean id=&quot;connectionFactory&quot; class=&quot;org.springframework.data.keyvalue.redis.connection.jedis.JedisConnectionFactory&quot;
+		p:host-name=&quot;${redis.hostname}&quot; p:port=&quot;${redis.port}&quot; p:password=&quot;${redis.password}&quot;/&gt;
+
+	&lt;bean id=&quot;redisTemplate&quot; class=&quot;org.springframework.data.keyvalue.redis.core.StringRedisTemplate&quot; 
+		p:connection-factory-ref=&quot;connectionFactory&quot;/&gt;
+
+	&lt;context:annotation-config /&gt;
+	&lt;context:component-scan base-package=&quot;org.springframework.data.redis.samples&quot;/&gt;
+
+&lt;/beans&gt;
+</code></pre><p>Pretty straight forward - we declare the driver and the Redis properties (replaced at runtime through the property placeholder from <tt>redis.properties</tt>), we enable annotation configuration and scan the classpath for beans.</p><p>From a deployment perspective, RetwisJ is just a web application, a WAR that can be deployed in any (Servlet 2.5) web container such as Tomcat. It is made of a simple Spring <tt>@MVC</tt> controller, one <tt>Repository</tt> class and two domain objects: <tt>Post</tt> and <tt>User</tt>. To follow the Retwis example, even the security will be handled through Redis rather then the container <tt>HttpSession</tt> - this demonstrates not just another use-case for key-value stores but also improves scalability since Redis (and thus the user data) is distributed out of the box.</p><p>To build it, simple type in the root folder:</p>
+<pre><code class="prettyprint code">./gradlew build
+</code></pre><p>And to run it deploy the resulting war (<tt>build/libs/retwisj.war</tt>) into your web container of choice.</p>
+<h3>Deploying RetwisJ into Cloud Foundry</h3>
+<p style="font-size:90%"><i>The Cloud Foundry ready RetwisJ example is available in the dedicated sample <a href="https://github.com/SpringSource/cloudfoundry-samples">repository</a></i></p><p>Deploying the WAR above into Cloud Foundry is pretty straight-forward - you only need an account (you can sign up for <em>free</em> <a href="http://www.cloudfoundry.com/">here</a>). Once you do, you can use that to deploy your app either through STS (as described in detail in the previous <a href="http://blog.springsource.com/2011/04/13/using-cloud-foundry-from-sts/">entries</a>) or the command-line (<tt>vmc</tt>) which is what I will use in this post.</p><p>Since we are using Redis, we need to replace our local instance properties with the ones suitable for Cloud Foundry which are exposed as environmental properties. As mentioned in these <a href="https://github.com/SpringSource/cloudfoundry-samples/wiki/Cloud-foundry-environment-variables">docs</a>, there is dedicated Spring support through the <tt><a href="http://schema.cloudfoundry.org/spring/cloudfoundry-spring.xsd">cloud</a></tt> namespace.</p><p>We can use this so rather then reading the Redis properties from a local file, we can feed from them from the environment:</p>
+<pre><code class="prettyprint xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+		xmlns:p=&quot;http://www.springframework.org/schema/p&quot;
+		xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+		xmlns:cloud=&quot;http://schema.cloudfoundry.org/spring&quot;
+		xsi:schemaLocation=&quot;
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+      http://schema.cloudfoundry.org/spring http://schema.cloudfoundry.org/spring/cloudfoundry-spring.xsd&quot;&gt;
+
+  	&lt;cloud:service-properties id=&quot;cfoundryEnv&quot; /&gt;
+  	&lt;context:property-placeholder properties-ref=&quot;cfoundryEnv&quot;/&gt;
+	  
+    &lt;bean id=&quot;connectionFactory&quot; class=&quot;org.springframework.data.keyvalue.redis.connection.jedis.JedisConnectionFactory&quot;
+      p:host-name=&quot;${redis.hostname}&quot; p:port=&quot;${redis.port}&quot; p:password=&quot;${redis.password}&quot;/&gt;
+
+</code></pre><p>The property names do not have to change - we can name (<i>redis</i> in this case) the Redis instances bound to an app and use that to minimize the changes between the local environment and the cloud.</p><p>Note that this is just one option out of many: you can use Spring 3.1 <a href="http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released/">profiles</a> to automatically do the switch, use the cloud namespace to automatically have a <tt>RedisConnectionFactory</tt> created for you or automatically wired it into your app. See this <a href="https://github.com/SpringSource/cloudfoundry-samples/wiki/Spring">section</a> for more information on the various features available.</p><p>Now let&rsquo;s deploy our Twitter-clone into the cloud!</p><p>For command-line aficionados like myself, Cloud Foundry offers the <tt>vmc</tt> utility, which allows you to interact with the Cloud Foundry instance.<br />It&rsquo;s written in Ruby so one needs Ruby and Ruby Gem installed -see the <a href="https://www.ruby-lang.org/en/downloads/ ">downloads</a> page for a suitable package for your OS. For Windows, the excellent <a href="http://rubyinstaller.org/">RubyInstaller</a> in either installer or zip form solves the problem quite nicely by offer native integration (no need to use Cygwin or the like if you don&rsquo;t want to). If the <tt>gem</tt> command is not available, download it from the official <a href="https://rubygems.org/">site</a>, unzip it and you are good to go:<br /><p style="font-size:90%"><i>See the getting started <a href="http://support.cloudfoundry.com/entries/20012337-getting-started-guide-command-line-vmc-users">guide</a> for more information on available commands</i></p></p>
+<pre><code class="prettyprint code">q:\&gt;gem install vmc
+Successfully installed vmc-0.3.10
+1 gem installed
+Installing ri documentation for vmc-0.3.10...
+Installing RDoc documentation for vmc-0.3.10...
+</code></pre><p>Log into our account:</p>
+<pre><code class="prettyprint code">Q:\&gt;vmc target api.cloudfoundry.com
+Succesfully targeted to [http://api.cloudfoundry.com]
+
+Q:\&gt;vmc login
+Email: &lt;signup email&gt;
+Password: **************
+Successfully logged into [http://api.cloudfoundry.com]
+</code></pre><p>The last step is simply to upload our WAR:</p>
+<pre><code class="prettyprint code"><br />Q:\&gt;dir /B
+retwisj.war
+
+Q:\&gt;vmc push
+Would you like to deploy from the current directory? [Yn]: y
+Application Name: my-retwisj
+Application Deployed URL: &#39;my-retwisj.cloudfoundry.com&#39;?
+Detected a Java SpringSource Spring Application, is this correct? [Yn]: y
+Memory Reservation [Default:512M] (64M, 128M, 256M, 512M or 1G)
+Creating Application: OK
+Would you like to bind any services to &#39;my-retwisj&#39;? [yN]: y
+The following system services are available::
+1. mongodb
+2. mysql
+3. rabbitmq
+4. redis
+Please select one you wish to provision: 4
+Specify the name of the service [redis-866fb]: redis
+Creating Service: OK
+Binding Service: OK
+Uploading Application:
+  Checking for available resources: OK
+  Processing resources: OK
+  Packing application: OK
+  Uploading (32K): OK
+Push Status: OK
+
+Staging Application: OK
+
+Starting Application: OK
+
+Q:\&gt;vmc apps
+
++-------------+----+---------+------------------------------+-------------+
+| Application | #  | Health  | URLS                         | Services    |
++-------------+----+---------+------------------------------+-------------+
+| my-retwisj  | 1  | RUNNING | my-retwisj.cloudfoundry.com  | redis       |
++-------------+----+---------+------------------------------+-------------+
+</code></pre><p>The process above should not take longer then 1 minute even on a slow connection (this blog <a href="http://blog.cloudfoundry.com/post/4737632136/what-happens-when-you-vmc-push-an-application-to-cloud">entry</a> offers insight into what is going during the <tt>push</tt> operation). You might have noticed that only 32K are uploaded; that is not a mistake, <tt>vmc</tt> is smart enough to determine the files it already knows above (such as the ones already deployed) and those that have actually changed.</p><p>And that&rsquo;s it! - just point your browser at the URL above and enjoy your RetwisJ sample. The &lsquo;official&rsquo; live instance is available at <a href="http://retwisj.cloudfoundry.com/"><a href="http://retwisj.cloudfoundry.com/">http://retwisj.cloudfoundry.com/</a></a></p>
+<h3>Wrapping up</h3><p>This entry covered quite a big of ground: Redis, Spring Data and Cloud Foundry deployment. I hope this shows how easy it is to get started and how powerful the combination is whether in your local environment or in the cloud.<br />And this is just the start! Expect more functionality to be added in Spring Redis (which is soon approaching RC status) as well as into Cloud Foundry whether it is more services or better tooling.</p><p>Try them out and let us know what you think and need!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 414;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

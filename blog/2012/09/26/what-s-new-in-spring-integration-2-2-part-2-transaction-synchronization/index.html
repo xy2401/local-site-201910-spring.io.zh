@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>What&#39;s New in Spring Integration 2.2 (Part 2 - Transaction Synchronization)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="What&#39;s New in Spring Integration 2.2 (Part 2 - Transaction Synchronization)" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;br&gt;
+&lt;a href=&quot;http://www.springsource.org/node/3665&quot;&gt;Release Candidate 1&lt;/a&gt;
+&lt;a href=&quot;http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/&quot;&gt;first part&lt;/a&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Spring Integration 2.2 introduces extended support for synchronizing non-transactional resources with transactions.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;h3&gt;Background&lt;/h3&gt;
+&lt;br&gt;
+&lt;a href=&quot;http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/transaction.html#tx-resource-synchronization&quot;&gt;first class support for synchronizing resources with transactions&lt;/a&gt;
+&lt;a href=&quot;http://www.javaworld.com/javaworld/jw-01-2009/jw-01-spring-transactions.html&quot;&gt;JavaWorld article&lt;/a&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;It is often used, for example, to synchronize a JMS commit with a JDBC commit.&lt;/p&gt;
+&lt;p&gt;Spring Integration has long supported this feature, by defining a &lt;code&gt;&amp;lt;transactional/&amp;gt;&lt;/code&gt; element on a poller. This release takes this feature one step further, by allowing synchronization of non-transactional resources with a transaction.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@gprussell" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/d84a5be5451df53118f5d2dedd1ef0fb?s=200" />
+
+<meta property="og:title" content="What&#39;s New in Spring Integration 2.2 (Part 2 - Transaction Synchronization)" />
+<meta property="og:image" content="https://gravatar.com/avatar/d84a5be5451df53118f5d2dedd1ef0fb?s=200" />
+<meta property="og:description" content="&lt;p&gt;&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;br&gt;
+&lt;a href=&quot;http://www.springsource.org/node/3665&quot;&gt;Release Candidate 1&lt;/a&gt;
+&lt;a href=&quot;http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/&quot;&gt;first part&lt;/a&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Spring Integration 2.2 introduces extended support for synchronizing non-transactional resources with transactions.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;h3&gt;Background&lt;/h3&gt;
+&lt;br&gt;
+&lt;a href=&quot;http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/transaction.html#tx-resource-synchronization&quot;&gt;first class support for synchronizing resources with transactions&lt;/a&gt;
+&lt;a href=&quot;http://www.javaworld.com/javaworld/jw-01-2009/jw-01-spring-transactions.html&quot;&gt;JavaWorld article&lt;/a&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;It is often used, for example, to synchronize a JMS commit with a JDBC commit.&lt;/p&gt;
+&lt;p&gt;Spring Integration has long supported this feature, by defining a &lt;code&gt;&amp;lt;transactional/&amp;gt;&lt;/code&gt; element on a poller. This release takes this feature one step further, by allowing synchronization of non-transactional resources with a transaction.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2012-09-26 09:31:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">What&#39;s New in Spring Integration 2.2 (Part 2 - Transaction Synchronization)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/d84a5be5451df53118f5d2dedd1ef0fb?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/grussell">Gary Russell</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2012-09-26 09:31:00.0">September 26, 2012</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="486" href="/blog/2012/09/26/what-s-new-in-spring-integration-2-2-part-2-transaction-synchronization#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p><H3>Introduction</H3><br />This is the second part in a series of blog posts highlighting some of the new features available in Spring Integration 2.2 following the recent release of <a href="http://www.springsource.org/node/3665">Release Candidate 1</a>. The <a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">first part</a> talks about the MongoDB adapters.</p><p>Spring Integration 2.2 introduces extended support for synchronizing non-transactional resources with transactions.</p><p><H3>Background</H3><br />Spring has provided <a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/transaction.html#tx-resource-synchronization">first class support for synchronizing resources with transactions</a> for many years. In many cases, this facility is used to synchronize transactions managed by multiple transaction managers, in order to implement the &lsquo;Best Efforts 1PC&rsquo; pattern described in Dave Syer&rsquo;s excellent <a href="http://www.javaworld.com/javaworld/jw-01-2009/jw-01-spring-transactions.html">JavaWorld article</a>.</p><p>It is often used, for example, to synchronize a JMS commit with a JDBC commit.</p><p>Spring Integration has long supported this feature, by defining a <code>&lt;transactional/&gt;</code> element on a poller. This release takes this feature one step further, by allowing synchronization of non-transactional resources with a transaction.</p><p>For example, consider a <code>&lt;file:inbound-channel-adapter/&gt;</code> and an Integration application that reads a file when it appears in a directory, and updates a database. This feature allows us to configure different actions to be taken if the transaction commits or rolls back.</p><p>We will also show how these &ldquo;post processing&rdquo; actions can be configured to occur, even if there is not a real transactional resource involved.</p><p><H3>Caveat</H3></p><p>The feature does NOT make an inherently non-transaction resource (such as a simple file system) transactional; rather, it simply allows us to synchronize file system (or other) activities with a transaction.</p><p><H3>Internals</H3></p><p>The fundamental component of the Spring transaction synchronization feature is an object that implements <code>TransactionSynchronization</code>. Such an object has a number of callbacks that the framework invokes during synchronization (examples include <code>afterCommit</code>, <code>afterRollback</code>).</p><p>Spring Integration 2.2 introduces the concept of a <code>TransactionSynchronizationFactory</code>. This factory is responsible for creating a <code>TransactionSynchronization</code> object for each message. A default implementation is provided that allows the execution of SpEL expressions against the message as part of transaction synchronization.</p><p><H3>Configuration</H3></p><p>Let&rsquo;s continue with the file system example. In order to enable transaction synchronization, we simply add a reference to a <code>TransactionSynchronizationFactory</code> on the <code>&lt;transactional/&gt;</code> element, and define a factory along with the SpEL expressions we wish to evaluate during transaction synchronization.</p>
+<pre><code class="prettyprint xml">&lt;int-file:inbound-channel-adaper ...&gt;
+    &lt;poller fixed-rate=&quot;1000&quot;&gt;
+        &lt;transactional synchronization-factory=&quot;syncFactory&quot;/&gt;
+    &lt;/poller&gt;
+&lt;/int-file:inbound-channel-adapter&gt;
+
+&lt;int:transaction-synchronization-factory id=&quot;syncFactory&quot;&gt;
+	&lt;int:after-commit expression=&quot;payload.renameTo(&#39;/successful/&#39; + payload.name&quot; /&gt;
+	&lt;int:after-rollback expression=&quot;payload.renameTo(&#39;/failed&#39;/ + payload.name&quot; /&gt;
+&lt;/int:transaction-synchronization-factory&gt;
+</code></pre><p>As you can see, we rename the original inbound file, putting the file into a different directory, depending on whether the associated transaction commits or rolls back. Optionally, the result of the evaluation can be sent to a <code>channel</code> defined using the &lsquo;channel&rsquo; attribute on the child elements of the transaction-synchronization-factory. </p><p>(Note: The &ldquo;before-commit&rdquo; element is also available which can also be used to affect whether the commit is actually completed or not).</p><p><H3>Pseudo Transactions</H3></p><p>As can be seen above, we now have a convenient mechanism to perform some action before or after a transaction commits, or after it rolls back. But, what if we have a flow that does not involve a transactional resource at all? For example: <code>file:inbound-adapter&lt;-poller-&gt;transformer-&gt;ftp:outbound adapter</code>.</p><p>Let&rsquo;s say we want to rename the input file, depending on success or failure of the ftp file transfer of the transformed file. In order to accommodate this use case, we have introduced the <code>PseudoTransactionManager</code>. This class implements <code>PlatformTransactionManager</code> for the sole purpose of allowing the use of the above synchronization techniques, even if there is no real transaction involved. Simply add the <code>&lt;transactional/&gt;</code> element as before, giving it a reference to a <code>PseudoTransactionManager</code> (or use the default bean id of &lsquo;transactionManager&rsquo;).</p><p><H3>Conclusion</H3></p><p>With Spring Integration 2.2, users now have the ability to perform appropriate actions, normally affecting the original input source, after a flow completes (either successfully, or otherwise). This can be synchronized with a transaction on some other transactional resource, or even in cases where there is no real transaction involved.</p><p>A sample application exploring these features is provided <a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/tx-synch">here</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 486;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Introducing Spring Sync</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Introducing Spring Sync" />
+<meta name="twitter:description" content="&lt;p&gt;Earlier today, I announced the first milestone release of Spring Sync, a new project that addresses efficient communication between client applications and Spring backends by employing patch-based exchanges. As this is a new project, I thought it would be a good time to show you what Spring Sync can do.&lt;/p&gt;
+&lt;p&gt;The examples given here refer to the &lt;a href=&quot;https://github.com/spring-projects/spring-sync-samples/tree/master/spring-rest-todos&quot;&gt;Spring REST Todos&lt;/a&gt; example and/or the &lt;code&gt;Todo&lt;/code&gt; class in that example project.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#creating-and-applying-patches&quot; class=&quot;anchor&quot; name=&quot;creating-and-applying-patches&quot;&gt;&lt;/a&gt;Creating and applying patches&lt;/h2&gt;
+&lt;p&gt;At its lowest level, Spring Sync provides a library for producing and applying patches to Java objects. The &lt;code&gt;Patch&lt;/code&gt; class is the centerpiece of this library, capturing the changes that can be applied to an object to bring it in sync with another object. &lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@habuma" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200" />
+
+<meta property="og:title" content="Introducing Spring Sync" />
+<meta property="og:image" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200" />
+<meta property="og:description" content="&lt;p&gt;Earlier today, I announced the first milestone release of Spring Sync, a new project that addresses efficient communication between client applications and Spring backends by employing patch-based exchanges. As this is a new project, I thought it would be a good time to show you what Spring Sync can do.&lt;/p&gt;
+&lt;p&gt;The examples given here refer to the &lt;a href=&quot;https://github.com/spring-projects/spring-sync-samples/tree/master/spring-rest-todos&quot;&gt;Spring REST Todos&lt;/a&gt; example and/or the &lt;code&gt;Todo&lt;/code&gt; class in that example project.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;#creating-and-applying-patches&quot; class=&quot;anchor&quot; name=&quot;creating-and-applying-patches&quot;&gt;&lt;/a&gt;Creating and applying patches&lt;/h2&gt;
+&lt;p&gt;At its lowest level, Spring Sync provides a library for producing and applying patches to Java objects. The &lt;code&gt;Patch&lt;/code&gt; class is the centerpiece of this library, capturing the changes that can be applied to an object to bring it in sync with another object. &lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2014-10-22 17:05:09.478" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Introducing Spring Sync</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/cwalls">Craig Walls</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2014-10-22 17:05:09.478">October 22, 2014</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1791" href="/blog/2014/10/22/introducing-spring-sync#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Earlier today, I announced the first milestone release of Spring Sync, a new project that addresses efficient communication between client applications and Spring backends by employing patch-based exchanges. As this is a new project, I thought it would be a good time to show you what Spring Sync can do.</p><p>The examples given here refer to the <a href="https://github.com/spring-projects/spring-sync-samples/tree/master/spring-rest-todos">Spring REST Todos</a> example and/or the <code>Todo</code> class in that example project.</p><h2><a href="#creating-and-applying-patches" class="anchor" name="creating-and-applying-patches"></a>Creating and applying patches</h2><p>At its lowest level, Spring Sync provides a library for producing and applying patches to Java objects. The <code>Patch</code> class is the centerpiece of this library, capturing the changes that can be applied to an object to bring it in sync with another object. </p><p>The <code>Patch</code> class aims to be generic, not associated directly with any particular representation of a patch. That said, it is inspired by <a href="https://tools.ietf.org/html/rfc6902">JSON Patch</a> and Spring Sync provides support for creating and serializing <code>Patch</code> instances as JSON Patch. Future versions of Spring Sync may include support for other patch representations.</p><p>The easiest way to create a patch is to perform a difference between two Java objects:</p>
+<pre><code class="prettyprint java">Todo original = ...;
+Todo modified = ...;
+Patch patch = Diff.diff(original, modified);
+</code></pre><p>Here, the <code>Diff.diff()</code> method will compare the two <code>Todo</code> objects and produce a <code>Patch</code> that describes the difference between them.</p><p>Once you have a <code>Patch</code>, it can be applied to an object by passing in the object to the <code>apply()</code> method:</p>
+<pre><code class="prettyprint java">Todo patched = patch.apply(original, Todo.class);
+</code></pre><p>Note that the <code>diff()</code> and <code>apply()</code> methods are the inverse of each other. Therefore, the patched <code>Todo</code> in these examples should be identical to the modified <code>Todo</code> after applying the patch to the original.</p><p>As I mentioned, <code>Patch</code> is decoupled from any particular patch representation. But Spring Sync offers <code>JsonPatchMaker</code> as a utility class to convert <code>Patch</code> objects to/from Jackson <code>JsonNode</code> instances where the <code>JsonNode</code> is an <code>ArrayNode</code> containing zero or more operations per the JSON Patch specification. For example, to convert a <code>Patch</code> to a <code>JsonNode</code> containing JSON Patch:</p>
+<pre><code class="prettyprint java">JsonNode jsonPatchNode = JsonPatchMaker.toJsonNode(patch);
+</code></pre><p>Similarly, a <code>Patch</code> object can be created from a <code>JsonNode</code> like this:</p>
+<pre><code class="prettyprint java">Patch patch = JsonPatchMaker.fromJsonNode(jsonPatchNode);
+</code></pre><p>Note that <code>JsonPatchMaker</code> is a temporary solution to (de)serializing <code>Patch</code> objects to/from JSON Patch. It will be replaced with a more permanent solution in a later release.</p><h2><a href="#applying-differential-synchronization" class="anchor" name="applying-differential-synchronization"></a>Applying Differential Synchronization</h2><p>Creating patches requires that you have both before and after instances of an object from which to calculate the difference. Although it doesn&rsquo;t refer to them as &ldquo;before&rdquo; and &ldquo;after&rdquo;, the <a href="https://neil.fraser.name/writing/sync/eng047-fraser.pdf">Differential Synchronization</a> algorithm described in a paper by Neil Fraser essentially defines a controller manner by which patches can be created, shared, and applied between two or more network nodes (perhaps client and server, but not necessarily applicable only to client-server scenarios).</p><p>When applying Differential Synchronization, each node maintains two copies of a resource: </p>
+<ul>
+<li>The local node&rsquo;s own working copy that it may change.</li>
+<li>A shadow copy which is the local node&rsquo;s understanding of what a remote node&rsquo;s working copy looks like.</li>
+</ul><p>The node may make any changes it needs to it&rsquo;s local copy of the resource. Periodically, the node will produce a patch by comparing the local node with the shadow copy it maintains for the remote node. It then sends the patch to the remote node. Once the patch is sent, the node copies its local copy over the shadow, assuming that the remote node will apply the patch and therefore its understanding of the remote node&rsquo;s resource is in sync with the local resource.</p><p>Upon receiving a patch, a node must apply the patch to the shadow that it keeps for the node that sent the patch and to its own local copy (which may have had changes itself).</p><p>Spring Sync supports Differential Synchronization through its <code>DiffSync</code> class. To create a <code>DiffSync</code>, you must supply it with a <code>ShadowStore</code> and the object type that it can apply patches for:</p>
+<pre><code class="prettyprint java">ShadowStore shadowStore = new MapBasedShadowStore();
+shadowStore.setRemoteNodeId(&quot;remoteNode&quot;);
+DiffSync diffSync = new DiffSync(shadowStore, Todo.class);
+</code></pre><p>Once you have a <code>DiffSync</code> in hand, you can use it to apply a <code>Patch</code> to an object:</p>
+<pre><code class="prettyprint java">Todo patched = diffSync.apply(patch, todo);
+</code></pre><p>The <code>apply()</code> method will apply the patch to both the given object as well as the shadow copy of that same object. If no shadow copy has yet been created, it will create one by deep-cloning the given object.</p><p>The <code>ShadowStore</code> is where <code>DiffSync</code> maintains its copy of shadow copies for a remote node. For any given node, there may be multiple shadow stores, one for each remote node it deals with. As you can see in the example, its <code>remoteNodeId</code> property is set to uniquely identify the remote node. In a client-server topology, the server may use the session ID to identify the remote node. Meanwhile, the clients (which are probably only sharing the resource with one central server) may use any identifier they want to identify the server node.</p><p><code>DiffSync</code> can also be used to create a <code>Patch</code> from a stored shadow copy:</p>
+<pre><code class="prettyprint java">Patch patch = diffSync.diff(todo);
+</code></pre><p>When creating a patch, the stored shadow will be retrieved from the <code>ShadowStore</code> and compared with the given object. In keeping with the Differential Synchronization flow, the given object will be copied over the shadow once the patch is produced.</p><p>It&rsquo;s worth noting that <code>DiffSync</code> works with <code>Patch</code> objects which are decoupled from any particular patch representation. Therefore, <code>DiffSync</code> itself is decoupled from the patch representation as well.</p><h2><a href="#taking-diffsync-to-the-web" class="anchor" name="taking-diffsync-to-the-web"></a>Taking DiffSync to the web</h2><p>Creating and applying patches on a single node is somewhat pointless. Where Differential Synchronization really shines is when two or more nodes are sharing and manipulating the same resource and you need each node to remain in sync (as much as is reasonable). Therefore, Spring Sync also offers <code>DiffSyncController</code> a Spring MVC controller that handles <a href="https://tools.ietf.org/html/rfc5789">HTTP PATCH</a> requests, applying Differential Synchronization to a resource.</p><p>The easiest way to configure <code>DiffSyncController</code> is to create a Spring configuration class that is annotated with <code>@EnableDifferentialSynchronization</code> and extend the <code>DiffSyncConfigurerAdapter</code> class:</p>
+<pre><code class="prettyprint java">@Configuration
+@EnableDifferentialSynchronization
+public class DiffSyncConfig extends DiffSyncConfigurerAdapter {
+
+	@Autowired
+	private PagingAndSortingRepository&lt;Todo, Long&gt; repo;
+	
+	@Override
+	public void addPersistenceCallbacks(PersistenceCallbackRegistry registry) {
+		registry.addPersistenceCallback(new JpaPersistenceCallback&lt;Todo&gt;(repo, Todo.class));
+	}
+	
+}
+</code></pre><p>Among other things, <code>@EnableDifferentialSynchronization</code> declares a <code>DiffSyncController</code> bean, providing it with a <code>PersistenceCallbackRegistry</code> and a <code>ShadowStore</code>. </p><p>The <code>PersistenceCallbackRegistry</code> is a registry of <code>PersistenceCallback</code> objects through which <code>DiffSyncController</code> will retrieve and persist resources it patches. The <code>PersistenceCallback</code> interface enables <code>DiffSyncController</code> to be decoupled from the application-specific persistence choices for the resource. As an example, here&rsquo;s an implementation of <code>PersistenceCallback</code> that works with a <a href="https://projects.spring.io/spring-data/">Spring Data</a> <code>CrudRepository</code> to persist <code>Todo</code> objects:</p>
+<pre><code class="prettyprint java">package org.springframework.sync.diffsync.web;
+
+import java.util.List;
+
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.sync.diffsync.PersistenceCallback;
+
+class JpaPersistenceCallback&lt;T&gt; implements PersistenceCallback&lt;T&gt; {
+	
+	private final CrudRepository&lt;T, Long&gt; repo;
+	private Class&lt;T&gt; entityType;
+
+	public JpaPersistenceCallback(CrudRepository&lt;T, Long&gt; repo, Class&lt;T&gt; entityType) {
+		this.repo = repo;
+		this.entityType = entityType;
+	}
+	
+	@Override
+	public List&lt;T&gt; findAll() {
+		return (List&lt;T&gt;) repo.findAll();
+	}
+	
+	@Override
+	public T findOne(String id) {
+		return repo.findOne(Long.valueOf(id));
+	}
+	
+	@Override
+	public void persistChange(T itemToSave) {
+		repo.save(itemToSave);
+	}
+	
+	@Override
+	public void persistChanges(List&lt;T&gt; itemsToSave, List&lt;T&gt; itemsToDelete) {
+		repo.save(itemsToSave);
+		repo.delete(itemsToDelete);
+	}
+
+	@Override
+	public Class&lt;T&gt; getEntityType() {
+		return entityType;
+	}
+	
+}
+</code></pre><p>As for the <code>ShadowStore</code> given to <code>DiffSyncController</code>, it will be a <code>MapBasedShadowStore</code> by default. But you can override the <code>getShadowStore()</code> method from <code>DiffSyncConfigurerAdapter</code> to specify a different shadow store implementation. For example, you may configure a Redis-based shadow store like this:</p>
+<pre><code class="prettyprint java">@Autowired
+private RedisOperations&lt;String, Object&gt; redisTemplate;
+
+@Override
+public ShadowStore getShadowStore() {
+	return new RedisShadowStore(redisTemplate);
+}
+</code></pre><p>Regardless of which implementation of <code>ShadowStore</code> you choose, a session-scoped bean will be declared, ensuring that each client will receive their own instance of the shadow store.</p><p>As it handles PATCH requests, <code>DiffSyncController</code> will apply one cycle of the Differential Sychronization flow:</p>
+<ol>
+<li>It will apply the patch to the server copy of the resource and to the shadow copy for the client who sent the PATCH.</li>
+<li>It will create a new patch by comparing its local resource with the shadow copy.</li>
+<li>It will replace the shadow copy with the local copy of the resource.</li>
+<li>It will send the new patch on the response to the client.</li>
+</ol><p>Just like <code>Patch</code> and <code>DiffSync</code>, <code>DiffSyncController</code> is decoupled from any particular patch format. Spring Sync does provide <code>JsonPatchHttpMessageConverter</code>, however, so that <code>DiffSyncController</code> can receive and response with JSON Patch-formated patches, given &ldquo;application/json-patch+json&rdquo; as the content type. </p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>Conclusion</h2><p>As you&rsquo;ve seen here, Spring Sync aims to provide a means of efficient communication and synchronization between a client and a server (or any set of nodes that share a resource). It provides low-level support for producing and applying patches as well as higher-level support for working with Differential Synchronization. Although it comes with support for JSON Patch, it is largely independent of any specific patch format.</p><p>This is just the beginning. Among other things, we&rsquo;re looking to&hellip;</p>
+<ul>
+<li>Complement <code>DiffSyncController</code>&rsquo;s HTTP-based Differential Synchronization with WebSocket/STOMP for full-duplex patch communication.</li>
+<li>Continued refinement of the Differential Synchronization implementation to support resource versioning and other techniques to avoid patching conflicts.</li>
+<li>Support for using Spring Sync in client-side Android applications.</li>
+</ul><p>Keep an eye on the project and let us know what you think. Feel free to <a href="https://github.com/spring-projects/spring-sync/issues">submit bug reports and improvements</a> and we certainly welcome you to <a href="https://github.com/spring-projects/spring-sync">fork the code</a> and submit pull requests.</p><p>If you&rsquo;d like to read more about Spring Sync, then have a look at these resources:</p>
+<ul>
+<li><a href="http://www.slideshare.net/briancavalier/differential-sync-and-json-patch-s2-gx-2014">Differential Sychronization and JSON Patch</a> : The presentation that Brian Cavalier and I gave at SpringOne/2GX in September.</li>
+<li><a href="https://spring.io/blog/2014/10/08/streaming-json-patch-from-spring-to-a-react-ui">Streaming JSON Patch from Spring to a React UI</a> : An article by Brian Cavalier that leverages Spring Sync on the server-side for producing patches.</li>
+<li><a href="https://github.com/spring-projects/spring-sync-samples/tree/master/spring-rest-todos">Spring REST Todos</a> : An Todos list example employing Spring Sync on the server with <a href="https://github.com/cujojs/jiff">jiff.js</a> and <a href="https://github.com/briancavalier/fabulous">fabulous.js</a> on the client.</li>
+</ul></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1791;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

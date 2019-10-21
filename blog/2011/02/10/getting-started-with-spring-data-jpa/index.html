@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Getting started with Spring Data JPA</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Getting started with Spring Data JPA" />
+<meta name="twitter:description" content="&lt;p&gt;As we have just released the first milestone of the Spring Data JPA project I’d like to give you a quick introduction into its features. As you probably know, the Spring framework provides support to build a JPA based data access layer. So what does Spring Data JPA add to this base support? To answer that question I’d like to start with the data access components for a sample domain implemented using plain JPA + Spring and point out areas that leave room for improvement. After we’ve done that I will refactor the implementations to use the Spring Data JPA features to address these problem areas. The sample project as well as a step by step guide of the refactoring steps can be found on &lt;a href=&quot;https://github.com/spring-projects/spring-data-examples/tree/master/jpa/showcase&quot;&gt;Github&lt;/a&gt;.&lt;br&gt;&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@odrotbohm" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/977c74bb044a9d4fa90b305824eda390?s=200" />
+
+<meta property="og:title" content="Getting started with Spring Data JPA" />
+<meta property="og:image" content="https://gravatar.com/avatar/977c74bb044a9d4fa90b305824eda390?s=200" />
+<meta property="og:description" content="&lt;p&gt;As we have just released the first milestone of the Spring Data JPA project I’d like to give you a quick introduction into its features. As you probably know, the Spring framework provides support to build a JPA based data access layer. So what does Spring Data JPA add to this base support? To answer that question I’d like to start with the data access components for a sample domain implemented using plain JPA + Spring and point out areas that leave room for improvement. After we’ve done that I will refactor the implementations to use the Spring Data JPA features to address these problem areas. The sample project as well as a step by step guide of the refactoring steps can be found on &lt;a href=&quot;https://github.com/spring-projects/spring-data-examples/tree/master/jpa/showcase&quot;&gt;Github&lt;/a&gt;.&lt;br&gt;&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-02-10 21:10:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Getting started with Spring Data JPA</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/977c74bb044a9d4fa90b305824eda390?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/ogierke">Oliver Drotbohm</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-02-10 21:10:00.0">February 10, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="391" href="/blog/2011/02/10/getting-started-with-spring-data-jpa#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>As we have just released the first milestone of the Spring Data JPA project I’d like to give you a quick introduction into its features. As you probably know, the Spring framework provides support to build a JPA based data access layer. So what does Spring Data JPA add to this base support? To answer that question I&rsquo;d like to start with the data access components for a sample domain implemented using plain JPA + Spring and point out areas that leave room for improvement. After we&rsquo;ve done that I will refactor the implementations to use the Spring Data JPA features to address these problem areas. The sample project as well as a step by step guide of the refactoring steps can be found on <a href="https://github.com/spring-projects/spring-data-examples/tree/master/jpa/showcase">Github</a>.<br /><h3>The domain</h3><br />To keep things simple we start with a tiny well-known domain: we have <code>Customer</code>s that have <code>Account</code>s.</p>
+<pre><code class="prettyprint java">@Entity
+public class Customer {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  private String firstname;
+  private String lastname;
+
+  // … methods omitted
+}
+</code></pre>
+<pre><code class="prettyprint java">@Entity
+public class Account {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  @ManyToOne
+  private Customer customer;
+
+  @Temporal(TemporalType.DATE)
+  private Date expiryDate;
+
+  // … methods omitted
+}
+</code></pre>
+<p>The <code>Account</code> has an expiry date that we will use at a later stage. Beyond that there&rsquo;s nothing really special about the classes or the mapping - it uses plain JPA annotations. Now let&rsquo;s take a look at the component managing <code>Account</code> objects:</p>
+<pre><code class="prettyprint java">@Repository
+@Transactional(readOnly = true)
+class AccountServiceImpl implements AccountService {
+
+  @PersistenceContext
+  private EntityManager em;
+
+  @Override
+  @Transactional
+  public Account save(Account account) {
+
+    if (account.getId() == null) {
+      em.persist(account);
+      return account;
+    } else {
+      return em.merge(account);
+    }
+  }
+
+  @Override
+  public List&lt;Account&gt; findByCustomer(Customer customer) {
+
+    TypedQuery query = em.createQuery(&quot;select a from Account a where a.customer = ?1&quot;, Account.class);
+    query.setParameter(1, customer);
+
+    return query.getResultList();
+  }
+}
+</code></pre>
+<p>I deliberately named the class <code>*Service</code> to avoid name clashes as we will introduce a repository layer when we start refactoring. But conceptually the class here is a repository rather than a service. So what do we have here actually?</p>
+<p>The class is annotated with <code>@Repository</code> to enable exception translation from JPA exceptions to Spring&rsquo;s <code>DataAccessException</code> hierarchy. Beyond that we use <code>@Transactional</code> to make sure the <code>save(…)</code> operation is running in a transaction and to allow setting the <code>readOnly</code>-flag (at the class level) for <code>findByCustomer(…)</code>. This causes some performance optimizations inside the persistence provider as well as on the database level.</p>
+<p>As we want to free the clients from the decision whether to call <code>merge(…)</code> or <code>persist(…)</code> on the <code>EntityManager</code> we use the <code>id</code>-field of the <code>Account</code> to decide whether we consider an <code>Account</code> object as new or not. This logic could of course be extracted into a common superclass as we probably don&rsquo;t want to repeat this code for every domain object specific repository implementation. The query method is quite straight forward as well: we create a query, bind a parameter and execute the query to get a result. It&rsquo;s almost so straight forward that one could regard the implementation code as boilerplate as with a little bit of imagination it&rsquo;s derivable from the method signature: we expect a <code>List</code> of <code>Account</code>s, the query is quite close to the method name and we simply bind the method parameter to it. So as you can see, there‘s room for improvement.<br /><h3>Spring Data repository support</h3></p>
+<p>Before we start refactoring the implementation, note that the sample project contains test cases that can be run in the course of the refactoring to verify the code still works. Let&rsquo;s now see how we can improve the implementation. </p>
+<p>Spring Data JPA provides a repository programming model that starts with an interface per managed domain object:</p>
+<pre><code class="prettyprint java">public interface AccountRepository extends JpaRepository&lt;Account, Long&gt; { … }
+</code></pre>
+<p>Defining this interface serves two purposes: First, by extending <code>JpaRepository</code> we get a bunch of generic CRUD methods into our type that allows saving <code>Account</code>s, deleting them and so on. Second, this will allow the Spring Data JPA repository infrastructure to scan the classpath for this interface and create a Spring bean for it. </p>
+<p>To have Spring create a bean that implements this interface, all you need to do is use the Spring JPA namespace and activate the repository support using the appropriate element:</p>
+<pre><code class="prettyprint xml">&lt;jpa:repositories base-package=&quot;com.acme.repositories&quot; /&gt;
+</code></pre>
+<p>This scans all packages below <code>com.acme.repositories</code> for interfaces extending <code>JpaRepository</code> and creates a Spring bean for it that is backed by an implementation of <code>SimpleJpaRepository</code>. Let&rsquo;s take a first step and refactor our <code>AccountService</code> implementation a little bit to use our newly introduced repository interface:</p>
+<pre><code class="prettyprint java">@Repository
+@Transactional(readOnly = true)
+class AccountServiceImpl implements AccountService {
+
+  @PersistenceContext
+  private EntityManager em;
+
+  @Autowired
+  private AccountRepository repository;
+
+  @Override
+  @Transactional
+  public Account save(Account account) {
+    return repository.save(account);
+  }
+
+  @Override
+  public List&lt;Account&gt; findByCustomer(Customer customer) {
+
+    TypedQuery query = em.createQuery(&quot;select a from Account a where a.customer = ?1&quot;, Account.class);
+    query.setParameter(1, customer);
+
+    return query.getResultList();
+  }
+}
+</code></pre>
+<p>After this refactoring, we simply delegate the call to <code>save(…)</code> to the repository. By default the repository implementation will consider an entity new if its <code>id</code>-property is <code>null</code> just like you saw in the previous example (note, you can can gain more detailed control over that decision if necessary). Additionally, we can get rid of the <code>@Transactional</code> annotation for the method as the CRUD methods of the Spring Data JPA repository implementation are already annotated with <code>@Transactional</code>.</p>
+<p>Next we will refactor the query method. Let’s follow the same delegating strategy for the query method as with the save method. We introduce a query method on the repository interface and have our original method delegate to that newly introduced method: </p>
+<pre><code class="prettyprint java">@Transactional(readOnly = true) 
+public interface AccountRepository extends JpaRepository&lt;Account, Long&gt; {
+
+  List&lt;Account&gt; findByCustomer(Customer customer); 
+}
+</code></pre>
+<pre><code class="prettyprint java">@Repository
+@Transactional(readOnly = true)
+class AccountServiceImpl implements AccountService {
+
+  @Autowired
+  private AccountRepository repository;
+
+  @Override
+  @Transactional
+  public Account save(Account account) {
+    return repository.save(account);
+  }
+
+  @Override
+  public List&lt;Account&gt; findByCustomer(Customer customer) {
+    return repository.findByCustomer(Customer customer);
+  }
+}
+</code></pre>
+<p>Let me add a quick note on the transaction handling here. In this very simple case we could remove the <code>@Transactional</code> annotations from the <code>AccountServiceImpl</code> class entirely as the repository&rsquo;s CRUD methods are transactional and the query method is marked with <code>@Transactional(readOnly = true)</code> at the repository interface already. The current setup, with methods at the service level marked as transactional (even if not needed for this case), is best because it is explicitly clear when looking at the service level that operations are happening in a transaction. Beyond that, if a service layer method was modified to do multiple calls to repository methods all the code would still execute inside a single transaction as the repository&rsquo;s inner transactions would simply join the outer one started at the service layer. The transactional behavior of the repositories and possibilities to tweak it are documented in detail in the <a href="http://static.springsource.org/spring-data/data-jpa/docs/1.0.0.M1/reference/html/#transactions">reference documentation</a>.</p>
+<p>Try to run the test case again and see that it works. Stop, we didn&rsquo;t provide any implementation for <code>findByCustomer(…)</code> right? How does this work?</p>
+<h3>Query methods</h3>
+<p>When Spring Data JPA creates the Spring bean instance for the <code>AccountRepository</code> interface it inspects all query methods defined in it and derives a query for each of them. By default Spring Data JPA will automatically parses the method name and creates a query from it. The query is implemented using the JPA criteria API. In this case the <code>findByCustomer(…)</code> method is logically equivalent to the JPQL query <code>select a from Account a where a.customer = ?1</code>. The parser that analyzes the method name supports quite a large set of keywords such as <code>And</code>, <code>Or</code>, <code>GreaterThan</code>, <code>LessThan</code>, <code>Like</code>, <code>IsNull</code>, <code>Not</code> and so on. You can also add <code>OrderBy</code> clauses if you like. For a detailed overview please check out the <a href="http://static.springsource.org/spring-data/data-jpa/docs/1.0.0.M1/reference/html/#jpa.query-methods.query-creation">reference documentation</a>. This mechanism gives us a query method programming model like you&rsquo;re used to from Grails or Spring Roo.</p>
+<p>Now let&rsquo;s suppose you want to be explicit about the query to be used. To do so you can either declare a JPA named query that follows a naming convention (in this case <code>Account.findByCustomer</code>) in an annotation on the entity or in your <code>orm.xml</code>. Alternatively you can annotate your repository method with <code>@Query</code>:</p>
+<pre><code class="prettyprint java">@Transactional(readOnly = true)
+public interface AccountRepository extends JpaRepository&lt;Account, Long&gt; {
+
+  @Query(&quot;&lt;JPQ statement here&gt;&quot;)
+  List&lt;Account&gt; findByCustomer(Customer customer); 
+}
+</code></pre>
+<p>Now let&rsquo;s do a before/after comparison of the <code>CustomerServiceImpl</code> applying the features that we&rsquo;ve seen so far:</p>
+<pre><code class="prettyprint java">@Repository
+@Transactional(readOnly = true)
+public class CustomerServiceImpl implements CustomerService {
+
+  @PersistenceContext
+  private EntityManager em;
+
+  @Override
+  public Customer findById(Long id) {
+    return em.find(Customer.class, id);
+  }
+
+  @Override
+  public List&lt;Customer&gt; findAll() {
+    return em.createQuery(&quot;select c from Customer c&quot;, Customer.class).getResultList();
+  }
+
+  @Override
+  public List&lt;Customer&gt; findAll(int page, int pageSize) {
+
+    TypedQuery query = em.createQuery(&quot;select c from Customer c&quot;, Customer.class);
+
+    query.setFirstResult(page * pageSize);
+    query.setMaxResults(pageSize);
+
+    return query.getResultList();
+  }
+
+  @Override
+  @Transactional
+  public Customer save(Customer customer) {
+
+    // Is new?
+    if (customer.getId() == null) {
+      em.persist(customer);
+      return customer;
+    } else {
+      return em.merge(customer);
+    }
+  }
+
+  @Override
+  public List&lt;Customer&gt; findByLastname(String lastname, int page, int pageSize) {
+
+    TypedQuery query = em.createQuery(&quot;select c from Customer c where c.lastname = ?1&quot;, Customer.class);
+
+    query.setParameter(1, lastname);
+    query.setFirstResult(page * pageSize);
+    query.setMaxResults(pageSize);
+
+    return query.getResultList();
+  }
+}
+</code></pre>
+<p>Okay, let&rsquo;s create the <code>CustomerRepository</code> and eliminate the CRUD methods first:</p>
+<pre><code class="prettyprint java">@Transactional(readOnly = true)
+public interface CustomerRepository extends JpaRepository&lt;Customer, Long&gt; { … }
+</code></pre>
+<pre><code class="prettyprint java">@Repository
+@Transactional(readOnly = true)
+public class CustomerServiceImpl implements CustomerService {
+
+  @PersistenceContext
+  private EntityManager em;
+
+  @Autowired
+  private CustomerRepository repository;
+
+  @Override
+  public Customer findById(Long id) {
+    return repository.findById(id);
+  }
+
+  @Override
+  public List&lt;Customer&gt; findAll() {
+    return repository.findAll();
+  }
+
+  @Override
+  public List&lt;Customer&gt; findAll(int page, int pageSize) {
+
+    TypedQuery query = em.createQuery(&quot;select c from Customer c&quot;, Customer.class);
+
+    query.setFirstResult(page * pageSize);
+    query.setMaxResults(pageSize);
+
+    return query.getResultList();
+  }
+
+  @Override
+  @Transactional
+  public Customer save(Customer customer) {
+    return repository.save(customer);
+  }
+
+  @Override
+  public List&lt;Customer&gt; findByLastname(String lastname, int page, int pageSize) {
+
+    TypedQuery query = em.createQuery(&quot;select c from Customer c where c.lastname = ?1&quot;, Customer.class);
+
+    query.setParameter(1, lastname);
+    query.setFirstResult(page * pageSize);
+    query.setMaxResults(pageSize);
+
+    return query.getResultList();
+  }
+}
+</code></pre>
+<p>So far so good. What is left right now are two methods that deal with a common scenario: you don&rsquo;t want to access all entities of a given query but rather only a page of them (e.g. page 1 by a page size of 10). Right now this is addressed with two integers that limit the query appropriately. There are two issues with this. Both integers together actually represent a concept, which is not made explicit here. Beyond that we return a simple <code>List</code> so we lose metadata information about the actual page of data: is it the first page? Is it the last one? How many pages are there in total? Spring Data provides an abstraction consisting of two interfaces: <code>Pageable</code> (to capture pagination request information) as well as <code>Page</code> (to capture the result as well as meta-information). So let&rsquo;s try to add <code>findByLastname(…)</code> to the repository interface and rewrite <code>findAll(…)</code> and <code>findByLastname(…)</code> as follows:</p>
+<pre><code class="prettyprint java">@Transactional(readOnly = true) 
+public interface CustomerRepository extends JpaRepository&lt;Customer, Long&gt; {
+
+  Page&lt;Customer&gt; findByLastname(String lastname, Pageable pageable); 
+}
+</code></pre>
+<pre><code class="prettyprint java">@Override 
+public Page&lt;Customer&gt; findAll(Pageable pageable) {
+  return repository.findAll(pageable);
+}
+
+@Override
+public Page&lt;Customer&gt; findByLastname(String lastname, Pageable pageable) {
+  return repository.findByLastname(lastname, pageable); 
+}
+</code></pre>
+<p>Make sure you adapt the test cases according to the signature changes but then they should run fine. There are two things this boils down to here: we have CRUD methods supporting pagination and the query execution mechanism is aware of <code>Pageable</code> parameters as well. At this stage our wrapping classes actually become obsolete as a client could have used our repository interfaces directly. We got rid of the entire implementation code.</p>
+<h3>Summary</h3>
+<p>In the course of this blog post we have reduced the amount of code to be written for repositories to two interfaces with 3 methods and a single line of XML:</p>
+<pre><code class="prettyprint java">@Transactional(readOnly = true) 
+public interface CustomerRepository extends JpaRepository&lt;Customer, Long&gt; {
+
+    Page&lt;Customer&gt; findByLastname(String lastname, Pageable pageable); 
+}
+</code></pre>
+<pre><code class="prettyprint java">@Transactional(readOnly = true)
+public interface AccountRepository extends JpaRepository&lt;Account, Long&gt; {
+
+    List&lt;Account&gt; findByCustomer(Customer customer); 
+}
+</code></pre>
+<pre><code class="prettyprint xml">&lt;jpa:repositories base-package=&quot;com.acme.repositories&quot; /&gt;
+</code></pre>
+<p>We have type safe CRUD methods, query execution and pagination built right in. The cool thing is that this is not only working for JPA based repositories but also for non-relational databases. The first non-relational database to support this approach will be MongoDB as part of the Spring Data Document release in a few days. You will get the exact same features for Mongo DB and we&rsquo;re working on support for other data bases as well.. There are also additional features to be explored (e.g. entity auditing, integration of custom data access code) which we will walk through in upcoming blog posts.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 391;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

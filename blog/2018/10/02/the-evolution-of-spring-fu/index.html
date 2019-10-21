@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>The evolution of Spring Fu</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="The evolution of Spring Fu" />
+<meta name="twitter:description" content="&lt;p&gt;I take the opportunity of a short stop between &lt;a href=&quot;https://springoneplatform.io&quot;&gt;SpringOne platform&lt;/a&gt; where I gave the first talk about Spring Fu and &lt;a href=&quot;https://kotlinconf.com/&quot;&gt;Kotlinconf&lt;/a&gt; to give an overview of the evolution of this project, summarize the current status and share what could be the next steps.&lt;/p&gt;
+&lt;p&gt;Early June, I announced a new experimental project named &lt;a href=&quot;https://github.com/spring-projects/spring-fu&quot;&gt;Spring Fu&lt;/a&gt;, with the goal to experiment on a new kind of API to configure Spring applications using Kotlin DSL and functional configuration.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot; data-cards=&quot;hidden&quot; data-lang=&quot;en&quot;&gt;
+ &lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Today, I am proud to announce a new experimental project: Spring Fu. It is a &lt;a href=&quot;https://twitter.com/kotlin?ref_src=twsrc%5Etfw&quot;&gt;@Kotlin&lt;/a&gt; micro-framework that makes it easy to create lightweight Spring-powered applications with functional APIs instead of annotations. We are looking for feedback. &lt;a href=&quot;https://t.co/R15wJ1gD8K&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://t.co/R15wJ1gD8K&quot;&gt;https://t.co/R15wJ1gD8K&lt;/a&gt; &lt;a href=&quot;https://t.co/ScljoPZ8rW&quot;&gt;pic.twitter.com/ScljoPZ8rW&lt;/a&gt;&lt;/p&gt;— Sébastien Deleuze (@sdeleuze) 
+ &lt;a href=&quot;https://twitter.com/sdeleuze/status/1005072964822487040?ref_src=twsrc%5Etfw&quot;&gt;June 8, 2018&lt;/a&gt;
+&lt;/blockquote&gt;
+" />
+<meta name="twitter:creator" content="@sdeleuze" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/5778521f67d80de0ee3b213e4f159a59?s=200" />
+
+<meta property="og:title" content="The evolution of Spring Fu" />
+<meta property="og:image" content="https://gravatar.com/avatar/5778521f67d80de0ee3b213e4f159a59?s=200" />
+<meta property="og:description" content="&lt;p&gt;I take the opportunity of a short stop between &lt;a href=&quot;https://springoneplatform.io&quot;&gt;SpringOne platform&lt;/a&gt; where I gave the first talk about Spring Fu and &lt;a href=&quot;https://kotlinconf.com/&quot;&gt;Kotlinconf&lt;/a&gt; to give an overview of the evolution of this project, summarize the current status and share what could be the next steps.&lt;/p&gt;
+&lt;p&gt;Early June, I announced a new experimental project named &lt;a href=&quot;https://github.com/spring-projects/spring-fu&quot;&gt;Spring Fu&lt;/a&gt;, with the goal to experiment on a new kind of API to configure Spring applications using Kotlin DSL and functional configuration.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;blockquote class=&quot;twitter-tweet&quot; data-cards=&quot;hidden&quot; data-lang=&quot;en&quot;&gt;
+ &lt;p lang=&quot;en&quot; dir=&quot;ltr&quot;&gt;Today, I am proud to announce a new experimental project: Spring Fu. It is a &lt;a href=&quot;https://twitter.com/kotlin?ref_src=twsrc%5Etfw&quot;&gt;@Kotlin&lt;/a&gt; micro-framework that makes it easy to create lightweight Spring-powered applications with functional APIs instead of annotations. We are looking for feedback. &lt;a href=&quot;https://t.co/R15wJ1gD8K&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://t.co/R15wJ1gD8K&quot;&gt;https://t.co/R15wJ1gD8K&lt;/a&gt; &lt;a href=&quot;https://t.co/ScljoPZ8rW&quot;&gt;pic.twitter.com/ScljoPZ8rW&lt;/a&gt;&lt;/p&gt;— Sébastien Deleuze (@sdeleuze) 
+ &lt;a href=&quot;https://twitter.com/sdeleuze/status/1005072964822487040?ref_src=twsrc%5Etfw&quot;&gt;June 8, 2018&lt;/a&gt;
+&lt;/blockquote&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2018-10-02 14:06:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">The evolution of Spring Fu</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/5778521f67d80de0ee3b213e4f159a59?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/sdeleuze">Sébastien Deleuze</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2018-10-02 14:06:00.0">October 02, 2018</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3420" href="/blog/2018/10/02/the-evolution-of-spring-fu#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>I take the opportunity of a short stop between <a href="https://springoneplatform.io">SpringOne platform</a> where I gave the first talk about Spring Fu and <a href="https://kotlinconf.com/">Kotlinconf</a> to give an overview of the evolution of this project, summarize the current status and share what could be the next steps.</p>
+<p>Early June, I announced a new experimental project named <a href="https://github.com/spring-projects/spring-fu">Spring Fu</a>, with the goal to experiment on a new kind of API to configure Spring applications using Kotlin DSL and functional configuration.</p>
+<p><blockquote class="twitter-tweet" data-cards="hidden" data-lang="en"><p lang="en" dir="ltr">Today, I am proud to announce a new experimental project: Spring Fu. It is a <a href="https://twitter.com/kotlin?ref_src=twsrc%5Etfw">@Kotlin</a> micro-framework that makes it easy to create lightweight Spring-powered applications with functional APIs instead of annotations. We are looking for feedback. <a href="https://t.co/R15wJ1gD8K"><a href="https://t.co/R15wJ1gD8K">https://t.co/R15wJ1gD8K</a></a> <a href="https://t.co/ScljoPZ8rW">pic.twitter.com/ScljoPZ8rW</a></p>&mdash; Sébastien Deleuze (@sdeleuze) <a href="https://twitter.com/sdeleuze/status/1005072964822487040?ref_src=twsrc%5Etfw">June 8, 2018</a></blockquote><br /><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+<p>I must admit I was not expecting the huge wave of feedback that followed, and I would like to thank the Spring community for such warm welcome. I have continued since to work on the project in order to turn this first POC based on raw Spring Framework API into an incubator for new Spring functional features.</p><h2><a href="#kofu-configuration" class="anchor" name="kofu-configuration"></a>Kofu configuration</h2>
+<p>The Kotlin DSL is now based on Spring Boot infrastructure and is called Kofu (for <strong>Ko</strong>tlin and <strong>fu</strong>nctional). It allows to configure Spring Boot applications with a Kotlin DSL and lambdas instead of annotations and have following characteristics:<br /> - Explicit configuration via a Kotlin DSL<br /> - Based on Spring Boot infrastructure used in a functional way<br /> - No feature enabled based on classpath detection<br /> - Both declarative and programmatic<br /> - Faster startup and lower memory consumption<br /> - Minimal reflection &amp; annotations usage<br /> - Pure lambdas, no CGLIB proxy</p>
+<p>A typical Spring Boot application configured with Kofu configuration looks like that:</p>
+<pre><code class="prettyprint kotlin">val app = application {
+  import(beans)
+  listener&lt;ApplicationReadyEvent&gt; {
+    ref&lt;UserRepository&gt;().init()
+  }
+  properties&lt;SampleProperties&gt;(&quot;sample&quot;)
+  server {
+    port = if (profiles.contains(&quot;test&quot;)) 8181 else 8080
+    mustache()
+    codecs {
+      string()
+      jackson {
+        indentOutput = true
+      }
+    }
+    import(::routes)
+  }
+  mongodb {
+    embedded()
+  }
+}
+
+val beans = beans {
+  bean&lt;UserRepository&gt;()
+  bean&lt;UserHandler&gt;()
+}
+
+fun routes(userHandler: UserHandler) = router {
+  GET(&quot;/&quot;, userHandler::listView)
+  GET(&quot;/api/user&quot;, userHandler::listApi)
+  GET(&quot;/conf&quot;, userHandler::conf)
+}
+
+fun main() = app.run()
+</code></pre>
+<p>In order to use it, you &ldquo;just&rdquo; have to add a <code>org.springframework.fu:spring-boot-kofu</code> dependency to a Spring Boot 2.1 application. As the current version number <code>0.0.2</code> suggests it, be aware that for now the API is not stable yet, not suitable for production and that the scope is limited to a subset of what Spring Boot supports.</p>
+<p>But feel free to play with it, send feedback and try this new way of configuring Spring Boot applications which is functional, discoverable via your IDE auto-complete and <a href="https://repo.spring.io/milestone/org/springframework/fu/spring-boot-kofu/0.0.2/spring-boot-kofu-0.0.2-javadoc.jar!/kofu/org.springframework.boot.kofu/application.html">documented</a>.</p>
+<p>Kofu is not better or worse than auto-config, it is just different. I believe it could be a way for Spring Boot to reach developers who prefer a more explicit configuration model and those who are coming from other backgrounds like Kotlin, Go, Node or Ruby.</p><h2><a href="#jafu-configuration" class="anchor" name="jafu-configuration"></a>Jafu configuration</h2>
+<p>Initially limited to Kotlin, one of the main feedback I received was from Java developers interested in this explicit DSL approach as well, so I worked on a Java equivalent and ended up with this Jafu (for <strong>Ja</strong>va and <strong>fu</strong>nctional) DSL.</p>
+<pre><code class="prettyprint java">public class JafuApplication {
+
+  public static SpringApplication app = application(app -&gt; {
+    app.beans(beans -&gt; {
+      beans.bean(SampleService.class);
+      beans.bean(SampleHandler.class);
+    });
+    app.server(server -&gt; server.router(router -&gt; {
+      SampleHandler sampleHandler = app.ref(SampleHandler.class);
+      router.GET(&quot;/&quot;, sampleHandler::hello);
+      router.resources(&quot;/**&quot;, new ClassPathResource(&quot;static/&quot;));
+    }));
+  });
+
+  public static void main (String[] args) {
+    app.run(args);
+  }
+}
+</code></pre>
+<p>This is currently just a POC but I plan to reach feature parity shortly with Kofu and develop the 2 DSLs in parallel. The lack of <a href="https://kotlinlang.org/docs/reference/type-safe-builders.html">type-safe builders</a>, <a href="https://kotlinlang.org/docs/reference/inline-functions.html#reified-type-parameters">reified type parameters</a> or <a href="https://kotlinlang.org/docs/reference/extensions.html#extensions">extension mechanism</a> will make Jafu more verbose and less extensible than Kofu, but despite these limitations, I find Jafu pretty nice and usable.</p>
+<p>For users only interested by the performance increase linked to the usage of a functional bean registration infrastructure, it is worth to notice than <a href="https://github.com/dsyer">Dave Syer</a> is currently <a href="https://github.com/dsyer/spring-init-experiment">experimenting</a> on solutions that would make it possible to leverage functional bean registration efficiency with regular Spring Boot applications based on annotations.</p><h2><a href="#running-spring-applications-as-native-executable" class="anchor" name="running-spring-applications-as-native-executable"></a>Running Spring applications as native executable</h2>
+<p><a href="https://www.graalvm.org/">GraalVM</a> is a new virtual machine developed by Oracle, which allows among other features, to compile JVM bytecode to native executable via <a href="https://github.com/oracle/graal/tree/master/substratevm">Substratevm</a>.</p>
+<p>Spring Framework 5.1 provides some <a href="https://jira.spring.io/browse/SPR-16991">initial support</a> for GraalVM native images, but we are really at the beginning of the story. GraalVM team need to fix various issues raised by Dave in order to get everything working as expected, and the ecosystem needs to adap to this new platform which has different constraints and characteristics.</p>
+<p>But GraalVM team is listening our feedback, and Spring application support has progressed significantly these last months. It is already possible to compile a basic Spring Boot reactive application with Kofu configuration as a native executable that runs almost instantly!</p>
+<p><blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I&#39;m playing with spring-fu at Dulles airport.<br>Look how fast it is! It&#39;s insane.., <a href="https://t.co/CTyKEr4d4O">pic.twitter.com/CTyKEr4d4O</a></p>&mdash; Toshiaki Maki (@making) <a href="https://twitter.com/making/status/1045683585389277184?ref_src=twsrc%5Etfw">September 28, 2018</a></blockquote><br /><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p><h2><a href="#coroutines-support" class="anchor" name="coroutines-support"></a>Coroutines support</h2>
+<p>Like said before, the main goal of Spring Fu is to incubate features that will be integrated in current top level projects like Spring Framework, Spring Data and Spring Boot.</p>
+<p>Spring Fu is currently incubating coroutines support for Spring WebFlux and Spring Data in order to be able to leverage Spring Reactive stack in a more imperative style fashion. This mainly targets developers who want to leverage the scalability of such stack without requiring all the power of reactive API.</p>
+<pre><code class="prettyprint kotlin">class UserRepository(private val mongo: CoroutinesMongoTemplate) {
+	suspend fun count(): Long = mongo.count&lt;User&gt;()
+	suspend fun findAll(): List&lt;User&gt; = mongo.findAll&lt;User&gt;()
+	suspend fun findOne(id: String): User? = mongo.findById&lt;User&gt;(id)
+	suspend fun deleteAll() = mongo.remove&lt;User&gt;()
+	suspend fun save(user: User): User? = mongo.save(user)
+}
+</code></pre>
+<p>Be aware that while coroutines are considered final as of Kotlin 1.3, there is still a major missing piece in <code>kotlinx-coroutines</code> since it does not provide any type to deal with cold streams. We will need this missing abstraction in order to be able to expose our reactive foundations with a coroutines API, see <a href="https://github.com/Kotlin/kotlinx.coroutines/issues/254">kotlinx.coroutines#254</a> for more details.</p>
+<p>Notice that we should be able to <a href="https://github.com/Kotlin/kotlinx.coroutines/issues/284">pass context between coroutines and reactor types</a> in order to allow pretty powerful use cases like reactive security and transactions.</p>
+<p><a href="https://github.com/konrad-kaminski">Konrad Kaminski</a> who contributed the original Spring coroutines support via his great <a href="https://github.com/konrad-kaminski/spring-kotlin-coroutine">spring-kotlin-coroutine</a> project will shortly join Spring Fu to work on this feature with me.</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>Conclusion</h2>
+<p>I have just released <a href="https://github.com/spring-projects/spring-fu/releases/tag/v0.0.2">Spring Fu 0.0.2</a> which provides an improved Kofu DSL and introduces <a href="https://jira.spring.io/browse/SPR-17312">autowiring of function parameters</a>. Feel free to try it and to provide feedback.</p>
+<p>Upcoming <a href="https://github.com/spring-projects/spring-fu/milestone/4">Spring Fu 0.0.3</a> will provide feature parity between Kofu and Jafu configurations.</p>
+<p>We already have <a href="https://github.com/spring-projects/spring-fu/graphs/contributors">10+ community contributors</a> who submitted pull requests to Spring Fu, so if you have some ideas you could maybe be the next ;-)</p>
+<p>Looking forward meeting you in my upcoming Spring Fu talks at <a href="https://jfuture.by/">JFuture</a> (Minsk), <a href="http://springfest2018.springframework.jp/">Spring Fest</a> (Tokyo) and <a href="https://dvbe18.confinabox.com/talk/TZU-3777/What's_cooking_in_Spring_Fu%3F">Devoxx</a> (Antwerpen).</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3420;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

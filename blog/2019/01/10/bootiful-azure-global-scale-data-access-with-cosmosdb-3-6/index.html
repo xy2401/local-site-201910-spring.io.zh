@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Bootiful Azure: Global Scale Data Access with CosmosDB (3/6)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Bootiful Azure: Global Scale Data Access with CosmosDB (3/6)" />
+<meta name="twitter:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;This is part 3 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series &lt;a href=&quot;https://github.com/joshlong/bootiful-azure-article&quot;&gt;on Github&lt;/a&gt;. Hit me up on &lt;a href=&quot;http://twitter.com/Starbuxman&quot;&gt;Twitter (@starbuxman)&lt;/a&gt; as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my &lt;a href=&quot;http://twitter.com/SpringTipsLive&quot;&gt;Spring Tips (@SpringTipsLive)&lt;/a&gt; installment, &lt;a href=&quot;https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure&quot;&gt;&lt;em&gt;Bootiful Azure&lt;/em&gt;&lt;/a&gt;&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Bootiful Azure: Global Scale Data Access with CosmosDB (3/6)" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;This is part 3 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series &lt;a href=&quot;https://github.com/joshlong/bootiful-azure-article&quot;&gt;on Github&lt;/a&gt;. Hit me up on &lt;a href=&quot;http://twitter.com/Starbuxman&quot;&gt;Twitter (@starbuxman)&lt;/a&gt; as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my &lt;a href=&quot;http://twitter.com/SpringTipsLive&quot;&gt;Spring Tips (@SpringTipsLive)&lt;/a&gt; installment, &lt;a href=&quot;https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure&quot;&gt;&lt;em&gt;Bootiful Azure&lt;/em&gt;&lt;/a&gt;&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-01-10 00:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Bootiful Azure: Global Scale Data Access with CosmosDB (3/6)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-01-10 00:00:00.0">January 10, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3519" href="/blog/2019/01/10/bootiful-azure-global-scale-data-access-with-cosmosdb-3-6#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><blockquote>
+<p>This is part 3 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn&rsquo;t have put this together without input from Microsoft&rsquo;s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series <a href="https://github.com/joshlong/bootiful-azure-article">on Github</a>. Hit me up on <a href="https://twitter.com/Starbuxman">Twitter (@starbuxman)</a> as you&rsquo;re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my <a href="https://twitter.com/SpringTipsLive">Spring Tips (@SpringTipsLive)</a> installment, <a href="https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure"><em>Bootiful Azure</em></a></p>
+</blockquote>
+<p>Here are all the installments: </p>
+<ul>
+<li><a href="https://spring.io/blog/2019/01/03/bootiful-azure-taking-your-first-steps-with-microsoft-azure-1-6">Bootiful Azure: Taking Your First Steps with Microsoft Azure</a></li>
+<li><a href="https://spring.io/blog/2019/01/07/bootiful-azure-sql-based-data-access-with-microsoft-sql-server-2-6">Bootiful Azure: SQL-based data access with Microsoft SQL Server</a></li>
+<li><a href="https://spring.io/blog/2019/01/10/bootiful-azure-global-scale-data-access-with-cosmosdb-3-6">Bootiful Azure: Global Scale Data Access with CosmosDB</a></li>
+<li><a href="https://spring.io/blog/2019/01/14/bootiful-azure-integration-with-azure-service-bus-4-6">Bootiful Azure: Integration with Azure Service Bus</a></li>
+<li><a href="https://spring.io/blog/2019/01/17/bootiful-azure-object-storage-service-5-6">Bootiful Azure: Object Storage Service</a></li>
+<li><a href="https://spring.io/blog/2019/01/21/bootiful-azure-to-production-6-6">Bootiful Azure: To Production!</a></li>
+</ul>
+<p>I can hear you thinking - yes, not even your feintest thoughts escape me! - that while you like Microsoft SQL Server as much as the next developer, it&rsquo;s something you could&rsquo;ve run yourself, on any platform (cloud or otherwise!). You don&rsquo;t <em>need</em> Microsoft to run it for you. To which I say, &ldquo;yep!&rdquo; (but it sure is nice that Microsoft runs it for us, isn&rsquo;t it?)</p>
+<p>I concede the point. What can Azure do for you? You don&rsquo;t need to look much further than Microsoft Azure CosmosDB. CosmosDB refers to a suite of technologies. It describes a single product that can be used in multiple ways. It&rsquo;s a single, multi-model, multi-modal database that supports document data, SQL queries, graph data access, and more.</p>
+<p>Per <a href="https://azure.microsoft.com/en-us/services/cosmos-db/">the product web page</a>: CosmosDB was built from the ground up with global distribution and horizontal scale at its core. guarantees single-digit-millisecond read and write latencies at the 99th percentile, and guarantees 99.999 high availability with multi-homing anywhere in the world—all backed by industry-leading, comprehensive service level agreements (SLAs).</p><h2><a href="#items-and-containers" class="anchor" name="items-and-containers"></a>Items and Containers</h2>
+<p>Internally, CosmosDB stores &ldquo;items&rdquo; in &ldquo;containers.&rdquo; But you don&rsquo;t necessarily deal with items or containers as the concepts will surfaced in the language oft he data model you&rsquo;re using to consume the data. If you&rsquo;re using it as a document store, like MongoDB, then items would be mapped to documents in collections, for example.</p>
+<p>Containers are grouped into databases, which are a sort of namespace above containers. Containers enforce unique key constraints to ensure integrity of the data. But containers do so much more. You can ask each container for a feed of what&rsquo;s changed; you could power Change Data Capture (CDC) schemes using this feed. You could use the feed for event sourcing. The feed is itself persisted so you can <em>replay</em> changes, if you like.</p>
+<p>You can specify time-to-live (TTL) values for the containers, as well, letting CosmosDB automatically expunge existing records after a certain period. You could also override the TTL for specific items, too. </p><h2><a href="#a-mutli-model-multi-paradigm-datastore" class="anchor" name="a-mutli-model-multi-paradigm-datastore"></a>A Mutli-Model, Multi-Paradigm Datastore</h2>
+<p>First of all, CosmosDB is schemaless. Keep that mind when using it - it can have some important ramifications if you&rsquo;re not prepared. </p>
+<p>CosmosDB supports a multi-model, multi-paradigm approach to building applications. Clients can talk to the HTTP REST API and drive it using a SQL-like language for queries. You can create, update and delete containers using the SQL API, too.</p>
+<p>You can talk to CosmosDB using the MongoDB API, supporting collections as container and documents as items.</p>
+<p>You can talk to it using the Gremlin API supporting graphs and containers and nodes and edges as items. According to the Gremlin website, &ldquo;Gremlin is the graph traversal language of Apache TinkerPop. Gremlin is a functional, data-flow language that enables users to succinctly express complex traversals on (or queries of) their application&rsquo;s property graph.&rdquo; So, it&rsquo;s basically a way to traverse data in a graph.</p>
+<p>You can talk to CosmosDB using the Cassandra API supporting tables as containers and rows as items. The Cassandra API even supports the Cassandra query language (CQL).</p>
+<p>You can <em>also</em> talk to it using the Azure Table Storage API supporting tables as containers and items as&hellip; well.. <em>items</em>.</p>
+<p>CosmosDB also embeds a JavaScript engine so you can use JavaScript to define triggers, user-defined functions that can be called from, and augment, the SQL query language, and stored procedures. Stored procedures can manage a number of actions in a single ACID-compliant transaction. </p><h2><a href="#configuring-cosmosdb-on-microsoft-azure" class="anchor" name="configuring-cosmosdb-on-microsoft-azure"></a>Configuring CosmosDB on Microsoft Azure</h2>
+<p>You&rsquo;ll need to first create a (potentially geographically distributed) instance of CosmosDB and then create a database instance within. Then, you&rsquo;ll need to create a collection to store the records. Here&rsquo;s a script. The only notable thing is that we don&rsquo;t have to specify the firewall exemptions as we did in the SQL Server example. It just works (TM).</p>
+<pre><code class="prettyprint shell">#!/bin/bash
+
+# the name of the resource group
+export rg=$1
+export adminlogin=${rg}-cosmosdb
+
+location=&#39;southcentralus&#39;
+accountname=${adminlogin}
+databasename=bootiful
+containername=reservations
+
+# Create a SQL API Cosmos DB account with session consistency and multi-master enabled
+az cosmosdb create \
+    --resource-group $rg \
+    --name $adminlogin \
+    --kind GlobalDocumentDB \
+    --default-consistency-level &quot;Session&quot; 
+
+# Create a database
+az cosmosdb database create \
+    --resource-group $rg \
+    --name $adminlogin \
+    --db-name $databasename
+
+# Create a SQL API container with a partition key and 1000 RU/s
+az cosmosdb collection create \
+    --resource-group $rg \
+    --collection-name $containername \
+    --name $adminlogin \
+    --db-name $databasename \
+    --partition-key-path /id \
+    --throughput 1000
+</code></pre>
+<p>In this script we could&rsquo;ve specified the regions in which want the new database made available. You can also do this conveniently from the Azure Portal, through a handy map. Just click a region and it&rsquo;ll take care of the rest! </p>
+<p>Also, note the resulting <code>$adminlogin</code> value for later. </p>
+<p>Now, you&rsquo;ll need to lay hands on the required configuration strings to connect your application to your new database and its data. You could sift through the output of the previous commands, but the following incantation is so much easier.</p>
+<pre><code class="prettyprint shell">az cosmosdb list-keys --resource-group bootiful --name bootiful-cosmosdb
+</code></pre>
+<p>You&rsquo;ll need to note the value of the resulting <code>primaryMasterKey</code> attribute from the previous command in order to later connect to CosmosDB. </p><h2><a href="#introducing-cosmosdb-into-your-spring-application" class="anchor" name="introducing-cosmosdb-into-your-spring-application"></a>Introducing CosmosDB into your Spring Application</h2>
+<p>Let&rsquo;s look at CosmosDB&rsquo;s use in a Spring application. You <em>could</em>, in theory, talk to CosmosDB through the appropriate abstractions for the aforementioned technologies (like MongoDB and Cassandra). I prefer to use the Spring Data CosmosDB abstraction, whose starter dependency you&rsquo;ll need to add to the build file. </p>
+<p>CosmosDB was historically called DocumentDB. If you see those names, they are almost interchangeable. For historical reasons, you&rsquo;ll need to add the Maven starter dependency that references that old project name, <code>com.microsoft.azure</code>:<code>azure-documentdb-spring-boot-starter</code>, to your build file.</p>
+<p>Then you&rsquo;ll have to configure the relevant connection information. You could add something like the following to your application&rsquo;s <code>application.properties</code> file.</p>
+<pre><code class="prettyprint java">azure.documentdb.database=bootiful
+azure.documentdb.key=THIS_IS_THE_KEY_FROM_BEFORE
+azure.documentdb.uri=https://ADMINLOGIN.documents.azure.com:443/
+</code></pre>
+<p>The <code>database</code> property refers to the database (<code>bootiful</code>, because we used the resource group name as the database name) within the logical CosmosDB instance (<code>bootiful-cosmosdb</code>, which is what we specified with <code>$adminlogin</code> in our script). The key refers to the <code>primaryMasterKey</code> value from the <code>az cosmosdb list-keys</code> command. Replace the property values with the relevant and appropriate string values.</p>
+<p>I ran this project just fine on a macOS based system, but I hit an odd issue when running it on my Ubuntu 18.10-based system. There&rsquo;s an oddity in the way that the Spring client libraries for CosmosDB gather telemetry that results in a NPE. If you encounter this, add the following to <code>src/main/resources/application.properties</code> to disable the telemetry.</p>
+<pre><code class="prettyprint properties">cosmosdb.telemetryAllowed=false 
+</code></pre>
+<p>Next, you should define a Spring Data entity to map to the records in the CosmosDB collection, <code>reservations</code>. </p>
+<pre><code class="prettyprint java">package com.example.bootifulazure;
+
+import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
+import com.microsoft.azure.spring.data.cosmosdb.core.mapping.PartitionKey;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Document(collection = &quot;reservations&quot;)
+class Reservation {
+
+        @PartitionKey
+        private String id;
+        private String name;
+}
+</code></pre>
+<p>Mostly, this looks like any other Lombok-annotated POJO you&rsquo;ve ever seen. Of particular note is that the entity uses <code>@Document</code> from the Spring Data CosmosDB module to specify the <code>reservations</code> collection to which this entity maps. The entity uses a CosmosDB-specific annotation, <code>@PartitionKey</code>, to signal to the database which field to use when deciding to partition (logically or physically) possibly related data in a container. It&rsquo;s good practice to use a <code>String</code> for the partition key. Monotonically incrementing primary keys aren&rsquo;t a great idea in planet-scale distributed systems! </p>
+<p>Now, define the Spring Data repository building on the <code>DocumentDbRepository</code>.</p>
+<pre><code class="prettyprint java  ">package com.example.bootifulazure;
+
+import com.microsoft.azure.spring.data.cosmosdb.repository.DocumentDbRepository;
+
+interface ReservationRepository extends DocumentDbRepository&lt;Reservation, String&gt; {
+}
+</code></pre>
+<p>The <code>DocumentDbRepository</code> might be new, but this should be otherwise straightforward.</p>
+<pre><code class="prettyprint java">package com.example.bootifulazure;
+
+import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+import java.util.stream.Stream;
+
+@Log4j2
+@Component
+class CosmosDbDemo {
+
+    private final ReservationRepository rr;
+
+    CosmosDbDemo(ReservationRepository rr) {
+        this.rr = rr;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void demo() throws Exception {
+
+        this.rr.deleteAll();
+
+        Stream.of(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;)
+            .map(name -&gt; new Reservation(UUID.randomUUID().toString(), name))
+            .map(this.rr::save)
+            .forEach(log::info);
+
+    }
+}
+</code></pre></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3519;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

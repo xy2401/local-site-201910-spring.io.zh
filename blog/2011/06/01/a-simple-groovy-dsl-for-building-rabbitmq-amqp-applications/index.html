@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>A Simple Groovy DSL for building RabbitMQ AMQP Applications</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="A Simple Groovy DSL for building RabbitMQ AMQP Applications" />
+<meta name="twitter:description" content="&lt;p&gt;Asynchronous applications can sometimes be a challenge while you’re developing them since you usually need two separate components to see the full message publication and consumption lifecycle. It often happens that you write a consumer that can dump messages to System.out or your log file, just so you can make sure your publisher is doing the right thing. It would be really handy if you could mock the message publication and consumption interaction in a single component so you could actually see what’s going on.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@j_brisbin" />
+<meta name="twitter:image:src" content="http://gravatar.com/avatar/5500b5cf634f9a3921e4619778a1425f?s=200" />
+
+<meta property="og:title" content="A Simple Groovy DSL for building RabbitMQ AMQP Applications" />
+<meta property="og:image" content="http://gravatar.com/avatar/5500b5cf634f9a3921e4619778a1425f?s=200" />
+<meta property="og:description" content="&lt;p&gt;Asynchronous applications can sometimes be a challenge while you’re developing them since you usually need two separate components to see the full message publication and consumption lifecycle. It often happens that you write a consumer that can dump messages to System.out or your log file, just so you can make sure your publisher is doing the right thing. It would be really handy if you could mock the message publication and consumption interaction in a single component so you could actually see what’s going on.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-06-01 14:10:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">A Simple Groovy DSL for building RabbitMQ AMQP Applications</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/5500b5cf634f9a3921e4619778a1425f?s=20&amp;d=mm" />
+<span class="author">Jon Brisbin</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-06-01 14:10:00.0">June 01, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="417" href="/blog/2011/06/01/a-simple-groovy-dsl-for-building-rabbitmq-amqp-applications#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Asynchronous applications can sometimes be a challenge while you&rsquo;re developing them since you usually need two separate components to see the full message publication and consumption lifecycle. It often happens that you write a consumer that can dump messages to System.out or your log file, just so you can make sure your publisher is doing the right thing. It would be really handy if you could mock the message publication and consumption interaction in a single component so you could actually see what&rsquo;s going on.</p><p>The RabbitMQ Groovy DSL aims to help with this by providing a very concise and easy-to-use DSL language for creating message consumers and producers so you can quickly mock message interaction between components without writing any boilerplate code.</p>
+<h3>Working with Exchanges</h3><p>The top level node in the RabbitMQ DSL is the <code>exchange</code> node. Besides setting a name that is inherited by nodes inside its scope, it also declares the exchange in your broker.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+  
+}
+</code></pre><p>By default, it will declare a <code>direct</code> exchange. The other exchange types are supported through the <code>type</code> property.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;, type: &quot;topic&quot;) {
+  
+}
+</code></pre><p>Whenever you use the <code>queue</code>, <code>consume</code>, or <code>publish</code> nodes (which we&rsquo;ll discuss in a minute) inside the exchange node&rsquo;s scope, the name of your exchange will be &ldquo;inherited&rdquo; from this node so you don&rsquo;t have to repeat it.</p>
+<h3>Working with Queues</h3><p>The next logical step in working toward sending and receiving messages in your mock application is to declaring a queue into which your messages will be delivered. You do this with the <code>queue</code> node.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+  queue(name: &quot;myqueue&quot;, routingKey: &quot;test&quot;) {
+    
+  }
+  
+}
+</code></pre><p>Declaring this queue inside the <code>exchange</code> node&rsquo;s scope will also cause it to be bound to the enclosing exchange. The value of the <code>routingKey</code> property will be used in declaring this binding.</p><p>This example uses a named queue but you can also get an anonymous, server-generated queue by setting the <code>name</code> property to null.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+  queue(name: null, routingKey: &quot;test&quot;) {
+    
+  }
+  
+}
+</code></pre><p>The name of this anonymous queue is tracked internally, so as long as you declare your consumers and publishers within this node&rsquo;s scope, you won&rsquo;t need to know what it is. If, however, you want to write some helper functions that need the name of the anonymous queue, simply set your node to a variable. The value of this variable will be a Spring AMQP <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/api/org/springframework/amqp/core/Queue.html">Queue</a> object which has a property on it named, ironically enough: <code>name</code>.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+  Q = queue(name: null, routingKey: &quot;test&quot;) {
+    
+  }
+  
+  println &quot;queue name is: ${Q.name}&quot;
+  
+}
+</code></pre>
+<h3>Creating Queue Consumers</h3><p>To deal with incoming messages, you need to declare a consumer. The DSL for consumers is extremely flexible in how you attach code to be executed whenever a message is received. Under the covers, consume is simply a Spring AMQP <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/api/org/springframework/amqp/rabbit/listener/SimpleMessageListenerContainer.html">SimpleMessageListenerContainer</a>) and the consume node that represents this takes a couple different forms.</p>
+<h4>Using a Groovy Closure</h4><p>The simplest way to declare a consumer is to just use a Closure as the method to be executed whenever a message is received. The only parameter to this closure will be a Spring AMQP <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/api/org/springframework/amqp/core/Message.html">Message</a> object.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+  queue(name: null, routingKey: &quot;test&quot;) {
+    
+    consume { msg -&gt;
+      // Handle the message body here, which will always be a byte array
+      String bodyAsString = new String(msg.body)
+      println &quot;msg body: ${bodyAsString}&quot;
+    }
+    
+  }
+  
+}
+</code></pre>
+<h4>Using an event</h4><p>The RabbitMQ Groovy DSL is actually full-featured enough to write a complete, production application, though we&rsquo;re only really focussing on mocking an application in this article. One of the features of the DSL is the concept of events. Events are dispatched at certain, fixed times during the lifecycle of a message (before and after publishing a message and when an error occurs), and custom events can be handled as message consumers.</p><p>To declare an event handler, you can use the <code>on</code> node (which, by convention, you probably want at the top of your source file).</p>
+<pre><code class="prettyprint groovy"><br />mq.on   error: { err -&gt; err.printStackTrace() },	
+      myevent: { msg -&gt; println &quot;myevent: ${new String(msg.body)}&quot; }
+</code></pre><p>This declares two event handlers: one for any exceptions that occur and one we can delegate to whenever we receive a message. Since all we&rsquo;re doing in this case is printing the message to System.out, we can easily share code between consumers.</p><p>To tell our consumer to use this event handler whenever a message is received, we use the <code>onmessage</code> property of our <code>consume</code> node. </p>
+<pre><code class="prettyprint groovy"><br />mq.on   error: { err -&gt; err.printStackTrace() },	
+      myevent: { msg -&gt; println &quot;myevent: ${new String(msg.body)}&quot; }
+
+mq.exchange(name: &quot;myexchange&quot;) {
+
+  queue(name: null, routingKey: &quot;test&quot;) {
+    
+    consume onmessage: &quot;myevent&quot;
+    
+  }
+  
+}
+</code></pre>
+<h4>Using a Closure, a MessageListener, or a POJO</h4><p>You can set the onmessage property to more than just a String, however. For flexibilty, you can set it to one of:</p>
+<ul>
+<li>A String of the event to synchronously dispatch to.</li>
+<li>A Groovy Closure to execute directly.</li>
+<li>A Spring AMQP <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/api/org/springframework/amqp/core/MessageListener.html">MessageListener</a> implementation.</li>
+<li>A POJO which will be wrapped by a Spring AMQP <a href="http://static.springsource.org/spring-amqp/docs/1.0.x/api/org/springframework/amqp/rabbit/listener/adapter/MessageListenerAdapter.html">MessageListenerAdapter</a>.</li>
+</ul>
+<h4>Continuing to listen for messages</h4><p>Your consumer will continue to listen for messages unless you either return a <code>false</code> or a null value from your Closure or event handler. To keep your consumer active and waiting for messages, simply return <code>true</code> or non-null.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+  queue(name: null, routingKey: &quot;test&quot;) {
+    
+    consume { msg -&gt;
+      // Handle the message body here, which will always be a byte array
+      String bodyAsString = new String(msg.body)
+      println &quot;msg body: ${bodyAsString}&quot;
+      // Keep listening for messages and don&#39;t exit
+      return true
+    }
+    
+  }
+  
+}
+</code></pre><p>If you return <code>false</code> or null from your Closure, the consumer will exit. </p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+  queue(name: null, routingKey: &quot;test&quot;) {
+    
+    consume { msg -&gt;
+      // Handle the message body here, which will always be a byte array
+      String bodyAsString = new String(msg.body)
+      println &quot;msg body: ${bodyAsString}&quot;
+      // I&#39;m done with you, please exit
+      return false
+    }
+    
+  }
+  
+}
+</code></pre><p>The command-line executor uses a system of reference counting to determine whether any consumers are still active or not. Returning <code>false</code> or null from standard Groovy Closures will tell the caller to stop the consumer&rsquo;s internal <code>MessageListenerContainer</code>. Something to watch out for when using a <code>MessageListener</code> implementation, however, is that you will have to shutdown the consumer yourself.</p><p>The <code>consume</code> DSL node will return a special <code>Consumer</code> object, which exposes a method named <code>shutdown</code> which is responsible for shutting down the <code>MessageListenerContainer</code>. If you&rsquo;re implementing a <code>MessageListener</code> yourself, you&rsquo;ll have to call this method whenever you want your consumer to exit, otherwise the system won&rsquo;t know when you&rsquo;re finished and won&rsquo;t ever shut your consumer down for you.</p><p>Set the <code>consume</code> node to a variable and call the <code>shutdown</code> method on it.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+	def consumer
+	def listener = [
+    onMessage: { msg -&gt;
+      println &quot;Invoked from a standard MessageListener&quot;
+      consumer?.shutdown()
+    }
+  ] as MessageListener
+
+	queue(name: null, routingKey: &quot;test.key&quot;) {
+		consumer = consume onmessage: listener
+	}
+  
+}
+</code></pre>
+<h3>Publishing Messages</h3><p>Publishing messages with the DSL is just as easy as consuming them. There are basically two variations on <code>publish</code>.</p>
+<pre><code class="prettyprint groovy"><br />mq.exchange(name: &quot;myexchange&quot;) {
+
+  // Return a String, a byte array, or an instance of a Spring AMQP Message
+	publish(routingKey: &quot;test.key&quot;) {
+		&quot;this is from a publish&quot;
+	}
+
+  // Write raw bytes to a ByteArrayOutputStream
+	publish(routingKey: &quot;test2.key&quot;, myHeaderValue: &quot;customHeader&quot;, contentType: &quot;text/plain&quot;) { out -&gt;
+		out.write(&quot;these are test bytes&quot;.bytes)
+	}
+  
+}
+</code></pre><p>In the first sample, we pass back a String (we could also use a <code>byte[]</code>) that is used as the body of the message. In the second example, we set standard message headers (in this case <code>contentType</code>) as well as custom application headers, and we can write to a <code>ByteArrayOutputStream</code> that gets passed to our Closure.</p>
+<h3>Wrapping it All Together</h3><p>Note that you don&rsquo;t have to split up publishing and consuming into two separate source files. You can include both functions right alongside one another to get a good visual on what it is you&rsquo;re trying to accomplish with messaging in the first place.</p>
+<pre><code class="prettyprint groovy"><br />mq.on error: { err -&gt; err.printStackTrace() }
+
+mq.exchange(name: &quot;myexchange&quot;) {
+
+  queue(name: null, routingKey: &quot;test&quot;) {
+    consume { msg -&gt;
+      // Handle the message body here, which will always be a byte array
+      String bodyAsString = new String(msg.body)
+      println &quot;msg body: ${bodyAsString}&quot;
+    }    
+  }
+
+	publish(routingKey: &quot;test&quot;) {
+		&quot;this is from a publish&quot;
+	}
+  
+}
+</code></pre><p>Though we&rsquo;ve concentrated on mocking applications that might later be built-out more robustly using pure Java (or even another language entirely), the RabbitMQ DSL is also handy for writing simple maintenance applications, or any messaging application where you need message consumption and publication but you don&rsquo;t want to expend a lot of effort to write a full-blown messaging application.</p>
+<h3>Where do I get it?</h3><p>The RabbitMQ DSL is available on GitHub and is Apache-licensed. Installation instructions are in the README.</p>
+<ul>
+<li><a href="https://github.com/jbrisbin/rabbitmq-dsl">https://github.com/jbrisbin/rabbitmq-dsl</a></li>
+</ul><p>And thanks to a recent contribution from <a href="https://github.com/jkuipers">Joris Kuipers</a>, you can get <a href="http://blog.springsource.com/2011/05/08/better-dsl-support-in-groovy-eclipse/">some IDE completion support</a> in Eclipse and STS using the included <a href="https://github.com/jbrisbin/rabbitmq-dsl/blob/master/src/main/groovy/rabbitmq.dsld">rabbitmq.dsld</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 417;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+ </a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

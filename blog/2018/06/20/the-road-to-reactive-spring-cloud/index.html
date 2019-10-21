@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>The Road to Reactive Spring Cloud</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="The Road to Reactive Spring Cloud" />
+<meta name="twitter:description" content="&lt;p&gt;The new &lt;a href=&quot;https://spring.io/blog/2018/06/19/spring-cloud-finchley-release-is-available&quot;&gt;Spring Cloud Finchley GA release&lt;/a&gt; is jam-packed with good stuff and represents a major milestone in the journey to reactive microservices. I couldn’t possibly list everything so I refer you to the fresh-from-the-oven release announcement by Spencer Gibb. Instead, in this post, I want to focus on the road we have taken to &lt;em&gt;reactive&lt;/em&gt; Spring Cloud.&lt;/p&gt;
+&lt;p&gt;We released &lt;a href=&quot;https://spring.io/blog/2017/09/28/spring-framework-5-0-goes-ga&quot;&gt;Spring Framework 5 in September 2017&lt;/a&gt;. This was the first release to introduce new Reactive programming support to help build more robust, scalable services. It builds upon the Pivotal Reactor project, our reactive streams compatible reactive runtime. Spring Framework 5 also includes a &lt;em&gt;ton&lt;/em&gt; of new features, and I won’t try to list them all, either, choosing instead to focus on reactive support here. What is reactive programming? Why does it matter? Well, it matters when you’re building networked services.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="The Road to Reactive Spring Cloud" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;The new &lt;a href=&quot;https://spring.io/blog/2018/06/19/spring-cloud-finchley-release-is-available&quot;&gt;Spring Cloud Finchley GA release&lt;/a&gt; is jam-packed with good stuff and represents a major milestone in the journey to reactive microservices. I couldn’t possibly list everything so I refer you to the fresh-from-the-oven release announcement by Spencer Gibb. Instead, in this post, I want to focus on the road we have taken to &lt;em&gt;reactive&lt;/em&gt; Spring Cloud.&lt;/p&gt;
+&lt;p&gt;We released &lt;a href=&quot;https://spring.io/blog/2017/09/28/spring-framework-5-0-goes-ga&quot;&gt;Spring Framework 5 in September 2017&lt;/a&gt;. This was the first release to introduce new Reactive programming support to help build more robust, scalable services. It builds upon the Pivotal Reactor project, our reactive streams compatible reactive runtime. Spring Framework 5 also includes a &lt;em&gt;ton&lt;/em&gt; of new features, and I won’t try to list them all, either, choosing instead to focus on reactive support here. What is reactive programming? Why does it matter? Well, it matters when you’re building networked services.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2018-06-20 07:34:37.559" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">The Road to Reactive Spring Cloud</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2018-06-20 07:34:37.559">June 20, 2018</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3313" href="/blog/2018/06/20/the-road-to-reactive-spring-cloud#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>The new <a href="https://spring.io/blog/2018/06/19/spring-cloud-finchley-release-is-available">Spring Cloud Finchley GA release</a> is jam-packed with good stuff and represents a major milestone in the journey to reactive microservices. I couldn&rsquo;t possibly list everything so I refer you to the fresh-from-the-oven release announcement by Spencer Gibb. Instead, in this post, I want to focus on the road we have taken to <em>reactive</em> Spring Cloud.</p>
+<p>We released <a href="https://spring.io/blog/2017/09/28/spring-framework-5-0-goes-ga">Spring Framework 5 in September 2017</a>. This was the first release to introduce new Reactive programming support to help build more robust, scalable services. It builds upon the Pivotal Reactor project, our reactive streams compatible reactive runtime. Spring Framework 5 also includes a <em>ton</em> of new features, and I won&rsquo;t try to list them all, either, choosing instead to focus on reactive support here. What is reactive programming? Why does it matter? Well, it matters when you&rsquo;re building networked services.</p>
+<p>In short, the fundamentals for of service integration in Spring have been refreshed to fully embrace Reactive Programming. So, what is &ldquo;reactive programming&rdquo;? Reactive programming is a recognition that, as soon as you start to conduct more data over the wire, to saturate your IO buffers with API calls, you spend more time in any given request doing IO.</p>
+<p>IO isn&rsquo;t a problem in of itself. IO traditionally blocks - a thread must wait for an <code>InputStream</code> to produce new <code>byte</code>s. (typically in a while loop <code>read()</code> &rsquo;ing buffers of <code>byte</code>s). As a thread waits, it can&rsquo;t be repurposed for anything else. Threads are expensive!</p>
+<p>Think about how a traditional server, implemented in Java or any other platform that has the same approach to threading, works. If you have 100 threads in your web server&rsquo;s threadpool, and 101 requests arrive, then that last extra request will not be served until one of the others finish processing their requests. If the others can finish (and thus free up the thread they&rsquo;re monopolizing) before that 101th request arrives, great! There&rsquo;s possibly no need for reactive programming. If you can free up threads faster than new requests arrive, and the time spent in those threads is mostly due to input/output, then there is no need for reactive programming.</p>
+<p>As you move to a world of microservices, of big-data, and long-lived sessions (for example in websockets and server-sent events and any other long-lived server side state), then you will start to conduct more data over the wire.</p>
+<p>This coupling, of threads to IO, is unnecessary. Your operating system has had support for &lsquo;backgrounding&rsquo; IO, and notifying you when you should be involved, for decades. Indeed, <a href="https://www.ibm.com/developerworks/java/tutorials/j-nio/j-nio.html">Java 1.4 (from the early 2000s) supports NIO (Channels)</a> which give us this asynchronous IO mechanism.</p>
+<p>In this world, something manages the IO and calls your code back when it should be involved. If there&rsquo;s any latency, that thread is free to move on and handle other requests. It&rsquo;s not blocking. Instead of your code <em>pulling</em> bytes out of an <code>InputStream</code>, the bytes will be <em>pushed</em> to it asynchronously. You invert, effectively, the interaction with the source of data.</p>
+<p>Lots of projects, like RxJava from @NetflixOSS, @ProjectReactor from @Pivotal, @vertx_project from Eclipse, and @akkateam from @lightbend , have seek to provide a programming model that supports this new asynchronous reality. There&rsquo;s common ground and out of ths common ground was born the Reactive Streams spec, which these projects support all support.</p>
+<p>The Reactive Streams specification supports the <code>Publisher</code> type which publishes items to subscribers. <code>Subscribers</code> consume items when their <code>onNextIT)</code> method is called. When a subscriber subscribes, it&rsquo;s given a <code>Subscription</code>, which it can use to signal how many records it can handle. This last bit-the ability to specify exactly how many records a subscriber is prepared to handle at once-is <em>flow control</em>. The <code>Publisher</code> can&rsquo;t overwhelm the <code>Subscriber</code>. This promotes stability. In the context of reactive programming, flow control is called <em>backpressure</em>.</p>
+<p>There&rsquo;s a final interface, <code>Processor</code>, which is simply a bridge; it implements both <code>Publisher</code> and a <code>Subscriber</code>. Project Reactor supports two <code>Publisher</code> specializations: <code>Flux</code>, which emits 0-N items, and <code>Mono</code>, which emits a single item, or no item.</p>
+<p>This is a fundamental re-thinking of the way IO happens and as such it requires integration at every layer above; in the data access layer, the security layer, in Boot and in the microservices layer.</p>
+<p>Spring Framework 5 also includes a net-new reactive web runtime (and even supports the Netty project) called Spring WebFlux. It even includes new, functional reactive endpoints. I did a Spring Tips video on this waaaay back in 2016!</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/JjrAmhlTjug" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<p>Spring WebFlux builds upon the reactive streams specification and so can interoperate with any other supporting library. Here&rsquo;s a Spring Tips video in which I demonstrate using reactive Spring Webflux with Lightbend&rsquo;s Akka Streams (and Scala).</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/E_YZwrv-zTk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<p>The new Spring WebFlux component model is reactive and asynchronous, first. It supports the asynchronous case, like websockets and server sent events, in the same way as you might traditionally handle the synchronous case. You end up having one kind of thing. Want to send a short JSON stanza with 10 records in a few nano seconds? Use a <code>Publisher</code>! Want to produce server-sent events Here&rsquo;s a Spring Tips video on server sent events.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2To3_mYT2hc" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<p>And here&rsquo;s a Spring Tips video on reactive websockets.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/GlvyHIqT3K4" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<p>The new release also includes a new reactive HTTP client, called <code>WebClient</code>. I did a Spring Tips video on this, as well!</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/leZdgr-O4LE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<p><a href="https://spring.io/blog/2017/10/02/spring-data-release-train-kay-goes-ga">Spring Data Kay</a> supports reactive data-access through templates and repositories for the data access technologies that have asynchronous IO support. Here&rsquo;s an example using Reactive Spring Data MongoDB.</p>
+<pre><code class="prettyprint Java"><br />interface ReservationRepository extends ReactiveMongoRepository&lt;Reservation, String&gt; {
+
+		Flux&lt;Reservation&gt; findByEmail(String email);
+}
+
+@Document
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+class Reservation {
+		@Id
+		private String id;
+		private String email;
+}
+</code></pre>
+<p><a href="https://spring.io/blog/2017/11/28/spring-security-5-0-0-release-released">Spring Security 5</a> supports reactive authentication and authorization for traditional use cases (as demonstrated below) and OAuth:</p>
+<pre><code class="prettyprint java"><br />  @Bean
+  MapReactiveUserDetailsService authentication() {
+    // don&#39;t do this! this is a hardcoded username and password and it
+    // would literally pain Spring Security lead @rob_winch to see this!
+    //
+    return new MapReactiveUserDetailsService(
+      User.withDefaultPasswordEncoder().username(&quot;user&quot;).password(&quot;pw&quot;).roles(&quot;USER&quot;).build());
+  }
+
+  @Bean
+  SecurityWebFilterChain authorization(ServerHttpSecurity security) {
+  //@formatter:off
+  return security
+  .csrf().disable()
+  .httpBasic()
+  .and()
+  .authorizeExchange()
+    .pathMatchers(&quot;/proxy&quot;).authenticated()
+    .anyExchange().permitAll()
+  .and()
+  .build();
+  //@formatter:on
+  }
+
+</code></pre>
+<p><a href="https://spring.io/blog/2018/03/01/spring-boot-2-0-goes-ga">Spring Boot 2</a> pulls all of that together so that things like building REST endpoints, using the Actuator, managing security, and everything else &ldquo;just works&rdquo; whether you choose to use Spring WebFlux or Spring MVC.</p>
+<p>It also means a lot of shaky ground, from a codebase change perspective, for the Spring Cloud team to navigate, which is what makes this release SO momentous.</p>
+<p>Thew new release strings reactive programming in seamlessly across existing concerns: service registration, discovery, security, CDC(T) and testing, messaging, micro-proxy support, circuit breakers, and so much more. Let&rsquo;s look at some examples.</p>
+<p>You can use the new reactive <code>WebClient</code> and have it resolve hosts using any of the service registries supported by Spring Cloud&rsquo;s <code>DiscoveryClient</code> abstraction (Netflix Eureka, Hashicorp Consul, Apache Zookeeper, Cloud Foundry, etc.).</p>
+<pre><code class="prettyprint java"><br />@Bean
+WebClient client(LoadBalancerExchangeFilterFunction eff) {
+  return WebClient.builder().filter(eff).build();
+}
+</code></pre>
+<p>You can then use that reactive, service-registry aware <code>WebClient</code>. In the following example, <code>reservation-service</code> is a service registered in the service registry, not an actual hostname.</p>
+<pre><code class="prettyprint java"><br />Publisher&lt;String&gt; emails = client
+	.get()
+	.uri(&quot;http://reservation-service/reservations&quot;)
+	.retrieve()
+	.bodyToFlux(Reservation.class)
+	.map(Reservation::getEmail);
+
+</code></pre>
+<p>You can consume messages coming off a topic or queue in Kafka or RabbitMQ, respectively, using the reactive support in Spring Cloud Stream, too.</p>
+<pre><code class="prettyprint Java"><br />@Configuration  
+@EnableBinding(Sink.class)
+public class MyStreamListener {
+
+  @StreamListener
+  public void incoming (@Input(Sink.INPUT) Flux&lt;String&gt; names ) {
+    names
+     .map ( x-&gt; new Reservation( null, x))
+     .flatMap ( this.reservationRepository::save )
+     .subscribe( x -&gt; log.info( &quot;saved &quot; + x.toString()));
+   }
+ }
+
+</code></pre>
+<p>You can protect and isolate potentially errant service calls using the Hystrix circuit breaker with reactive <code>Publisher</code>s. In the following example, I make an HTTP call using the reactive <code>WebClient</code> that <em>may</em> fail. If it fails, I want to be able to provide a fallback <code>Publisher</code> to return, instead. That&rsquo;s what will happen. It&rsquo;s almost as important as what <em>doesn&rsquo;t</em> happen. My code doesn&rsquo;t throw an exception. It degrades gracefully. That circuit breaker has smarts. It has state. If enough successive attempts to make that call should fail, the circuit breaker will eventually switch to the fallback Publisher, directly. If the downstream service should come back online (which it will if you use Cloud Foundry), then it&rsquo;ll eventually re-register itself with the registry, the registry will send out a heartbeat event and the heartbeat event will be used to invalidate the local <em>view</em> of the services in th registry. The client will see that there are new instances in the registry and it&rsquo;ll reset the circuit breaker, to closed, and allow the next call to go through which, hopefully, will succeed.</p>
+<pre><code class="prettyprint Java"><br /><br />Publisher&lt;String&gt; emails = client
+  .get()
+  .uri(&quot;http://reservation-service/reservations&quot;)
+  .retrieve()
+  .bodyToFlux(Reservation.class)
+  .map(Reservation::getEmail);
+
+Publisher&lt;String&gt; fallback = HystrixCommands
+  .from( emails )
+  .eager()
+  .commandName(&quot;emails&quot;)
+  .fallback ( Flux.just (&quot;EEK!&quot;) )
+  .build();
+
+</code></pre>
+<p>While it&rsquo;s nice to be able to use these existing technologies in a reactive context, what&rsquo;s most exciting is what new possibilities reactive programming opens up! Two new projects, Spring Cloud Gateway and Spring Cloud Function, both benefit immensely from it.</p>
+<p>Let&rsquo;s look at those, even if ever so briefly.</p>
+<p><a href="https://cloud.spring.io/spring-cloud-gateway/">Spring Cloud Gateway</a> is our net-new reactive API gateway. It builds on top of the reactive support in Spring. After all, its job is to conduct requests from clients to downstream services. This is a perfect use case (and demand) for reactive programming. I did a Spring Tips video on it, as well.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/TwVtlNX-2Hs" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<p>Here&rsquo;s an example of using Spring Cloud Gateway to proxy a request from <code>:9999/proxy</code> to a service (resolved and load-balanced through the service registry) and rate limited. (NB: this config could live in (refreshable) configuration in the Spring Cloud Config Server or really any source for which you can create a <code>Flux&lt;Route&gt;</code>.)</p>
+<p>This example limits each <em>authenticated</em> user to 100 requests per second. You don&rsquo;t need Spring Security to use the gateway, but as configured it&rsquo;s implied.</p>
+<pre><code class="prettyprint Java">@Bean
+RouteLocator gateway (RouteLocatorBuilder rlb, RedisRateLimiter rrl) {
+  return rlb
+    .routes()
+    .route( spec -&gt;
+      spec
+       .path(&quot;/rl&quot;)
+       .flters( fs -&gt; fs
+         .requestRateLimiter( c -&gt; c.setRateLimiter( this.redisRateLimiter() ))
+         .setPath(&quot;/reservations&quot;)
+       )
+       .uri(&quot;lb://reservation-service/&quot;)
+    )
+    .build();
+}
+
+
+@Bean // 100 reqs per second, burstable to 150
+RedisRateLimiter redisRateLimiter (){
+  return new RedisRateLimiter(100, 150);
+}
+</code></pre>
+<p><a href="https://cloud.spring.io/spring-cloud-function/">Spring Cloud Function</a> is our new function-as-a-service abstraction. It adapts plain-&rsquo;ol-functions into the types required by different function-as-a-service runtimes. It can be used on, among many others, AWS Lambda, Microsoft Azure, and of course our very own <a href="http://projectRiff.io">Project Riff</a>. Project Riff is an Apache 2 licensed, Kubernetes-based polyglot function-as-a-service runtime. I did a Spring Tips video on both Spring Cloud Function and Project Riff, as well.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/E55oAtOhWZU" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<p>Using it couldn&rsquo;t be easier! You need to create <code>java.util.function.Function&lt;I,O&gt;</code> instances. both <code>I</code> and <code>O</code>, in this case, could be <code>Publisher&lt;X&gt;</code>s!</p>
+<pre><code class="prettyprint">package com.example.uppercase;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import reactor.core.publisher.Flux;
+
+import java.util.function.Function;
+
+@SpringBootApplication
+public class UppercaseApplication {
+
+		@Bean
+		Function&lt;Flux&lt;String&gt;, Flux&lt;String&gt;&gt; uppercase() {
+				return incoming -&gt; incoming.map(String::toUpperCase);
+		}
+
+		public static void main(String[] args) {
+				SpringApplication.run(UppercaseApplication.class, args);
+		}
+}
+</code></pre>
+<p>As you have hopefully gathered by now, reactive programming has well and truly arrived in Spring! Spring Cloud is the last major project that needed to support it for a holistic discussion of reactive programming. But this is not the end of the story, at all. Indeed, we&rsquo;re JUST getting started! Stay tuned. :-)</p>
+<p>We&rsquo;ll be talking about reactive programming and reactive Spring Cloud-based microservices, among many other things, at the upcoming SpringOne Platform event. <a href="https://springoneplatform.io/">Join us</a>!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3313;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

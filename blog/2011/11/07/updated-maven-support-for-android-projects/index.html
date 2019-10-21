@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Updated Maven Support for Android Projects</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Updated Maven Support for Android Projects" />
+<meta name="twitter:description" content="&lt;p&gt;It has been a while since my initial posts on using &lt;a href=&quot;http://blog.springsource.com/author/rclarkson/&quot;&gt;Maven with Spring Android&lt;/a&gt;, and the state of the tools has changed somewhat. With the recent release of the &lt;a href=&quot;http://developer.android.com/sdk/android-4.0.html&quot;&gt;SDK for Android 4.0&lt;/a&gt; and &lt;a href=&quot;http://developer.android.com/sdk/tools-notes.html&quot;&gt;revision 14 of the Android Development Tools (ADT)&lt;/a&gt;, Google made &lt;a href=&quot;http://android-developers.blogspot.com/2011/10/changes-to-library-projects-in-android.html&quot;&gt;several changes&lt;/a&gt; that impacted the third party Maven plugin support for building Android projects. Fortunately, the teams behind the &lt;a href=&quot;http://code.google.com/p/maven-android-plugin/&quot;&gt;Android Maven Plugin&lt;/a&gt;, and the &lt;a href=&quot;http://rgladwell.github.com/m2e-android/&quot;&gt;Android Configurator for M2E&lt;/a&gt; have been hard at work to support these latest changes in the Android tools. If you have tried to run the &lt;a href=&quot;https://github.com/SpringSource/spring-android-samples&quot;&gt;Spring Android Samples&lt;/a&gt; recently, then you probably noticed the projects would not build. In this post, I will illustrate the configuration changes necessary to utilize the latest Maven plugins and Eclipse support in the Spring Android Showcase project.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@royclarkson" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=200" />
+
+<meta property="og:title" content="Updated Maven Support for Android Projects" />
+<meta property="og:image" content="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=200" />
+<meta property="og:description" content="&lt;p&gt;It has been a while since my initial posts on using &lt;a href=&quot;http://blog.springsource.com/author/rclarkson/&quot;&gt;Maven with Spring Android&lt;/a&gt;, and the state of the tools has changed somewhat. With the recent release of the &lt;a href=&quot;http://developer.android.com/sdk/android-4.0.html&quot;&gt;SDK for Android 4.0&lt;/a&gt; and &lt;a href=&quot;http://developer.android.com/sdk/tools-notes.html&quot;&gt;revision 14 of the Android Development Tools (ADT)&lt;/a&gt;, Google made &lt;a href=&quot;http://android-developers.blogspot.com/2011/10/changes-to-library-projects-in-android.html&quot;&gt;several changes&lt;/a&gt; that impacted the third party Maven plugin support for building Android projects. Fortunately, the teams behind the &lt;a href=&quot;http://code.google.com/p/maven-android-plugin/&quot;&gt;Android Maven Plugin&lt;/a&gt;, and the &lt;a href=&quot;http://rgladwell.github.com/m2e-android/&quot;&gt;Android Configurator for M2E&lt;/a&gt; have been hard at work to support these latest changes in the Android tools. If you have tried to run the &lt;a href=&quot;https://github.com/SpringSource/spring-android-samples&quot;&gt;Spring Android Samples&lt;/a&gt; recently, then you probably noticed the projects would not build. In this post, I will illustrate the configuration changes necessary to utilize the latest Maven plugins and Eclipse support in the Spring Android Showcase project.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-11-07 23:02:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Updated Maven Support for Android Projects</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/rclarkson">Roy Clarkson</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-11-07 23:02:00.0">November 07, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="449" href="/blog/2011/11/07/updated-maven-support-for-android-projects#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>It has been a while since my initial posts on using <a href="http://blog.springsource.com/author/rclarkson/">Maven with Spring Android</a>, and the state of the tools has changed somewhat. With the recent release of the <a href="https://developer.android.com/sdk/android-4.0.html">SDK for Android 4.0</a> and <a href="https://developer.android.com/sdk/tools-notes.html">revision 14 of the Android Development Tools (ADT)</a>, Google made <a href="https://android-developers.blogspot.com/2011/10/changes-to-library-projects-in-android.html">several changes</a> that impacted the third party Maven plugin support for building Android projects. Fortunately, the teams behind the <a href="https://code.google.com/p/maven-android-plugin/">Android Maven Plugin</a>, and the <a href="https://rgladwell.github.com/m2e-android/">Android Configurator for M2E</a> have been hard at work to support these latest changes in the Android tools. If you have tried to run the <a href="https://github.com/SpringSource/spring-android-samples">Spring Android Samples</a> recently, then you probably noticed the projects would not build. In this post, I will illustrate the configuration changes necessary to utilize the latest Maven plugins and Eclipse support in the Spring Android Showcase project.</p>
+<h3>Android Maven Plugin</h3>
+<p>As of version 3.0.0-alpha-11, The Maven Android Plugin now has a new name, and is now called the Android Maven Plugin. The latest version, <a href="https://code.google.com/p/maven-android-plugin/wiki/Changelog">3.0.0-alpha-13</a> fixes the build issue with Android SDK r14.</p>
+<h4>Update the Plugin</h4>
+<p>To update your plugin version, make the following changes to the artifactId and version.</p>
+<pre><code class="prettyprint xml"><br />&lt;plugin&gt;
+    &lt;groupId&gt;com.jayway.maven.plugins.android.generation2&lt;/groupId&gt;
+    &lt;artifactId&gt;android-maven-plugin&lt;/artifactId&gt;
+    &lt;version&gt;3.0.0-alpha-13&lt;/version&gt;
+    &lt;configuration&gt;
+        &lt;sdk&gt;
+            &lt;platform&gt;${android-platform}&lt;/platform&gt;
+        &lt;/sdk&gt;
+        &lt;deleteConflictingFiles&gt;true&lt;/deleteConflictingFiles&gt;
+        &lt;undeployBeforeDeploy&gt;true&lt;/undeployBeforeDeploy&gt;
+    &lt;/configuration&gt;
+    &lt;extensions&gt;true&lt;/extensions&gt;
+&lt;/plugin&gt;
+</code></pre>
+<p>Once modified, you can now run maven from the command line to build your project.</p>
+<pre><code class="prettyprint sourcecode">mvn clean install
+</code></pre>
+<h4>Potential Build Errors</h4>
+<p>It is possible that your project will receive a few build errors when you try to build with the new plugin.</p>
+<h5>java.lang.OutOfMemoryError</h5>
+<p>When I updated the Spring Android Showcase client, the build failed with the following:</p>
+<pre><code class="prettyprint sourcecode">[INFO] UNEXPECTED TOP-LEVEL ERROR:
+[INFO] java.lang.OutOfMemoryError: Java heap space
+[INFO] 	at com.android.dx.ssa.SsaBasicBlock.&lt;init&gt;(SsaBasicBlock.java:130)
+[INFO] 	at com.android.dx.ssa.SsaBasicBlock.newFromRop(SsaBasicBlock.java:148)
+[INFO] 	at com.android.dx.ssa.SsaMethod.convertRopToSsaBlocks(SsaMethod.java:174)
+[INFO] 	at com.android.dx.ssa.SsaMethod.newFromRopMethod(SsaMethod.java:104)
+[INFO] 	at com.android.dx.ssa.SsaConverter.convertToSsaMethod(SsaConverter.java:45)
+[INFO] 	at com.android.dx.ssa.Optimizer.optimize(Optimizer.java:99)
+[INFO] 	at com.android.dx.ssa.Optimizer.optimize(Optimizer.java:73)
+[INFO] 	at com.android.dx.dex.cf.CfTranslator.processMethods(CfTranslator.java:273)
+[INFO] 	at com.android.dx.dex.cf.CfTranslator.translate0(CfTranslator.java:134)
+[INFO] 	at com.android.dx.dex.cf.CfTranslator.translate(CfTranslator.java:87)
+[INFO] 	at com.android.dx.command.dexer.Main.processClass(Main.java:483)
+[INFO] 	at com.android.dx.command.dexer.Main.processFileBytes(Main.java:455)
+[INFO] 	at com.android.dx.command.dexer.Main.access$400(Main.java:67)
+[INFO] 	at com.android.dx.command.dexer.Main$1.processFileBytes(Main.java:394)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processOne(ClassPathOpener.java:135)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processDirectory(ClassPathOpener.java:191)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processOne(ClassPathOpener.java:123)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processDirectory(ClassPathOpener.java:191)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processOne(ClassPathOpener.java:123)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processDirectory(ClassPathOpener.java:191)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processOne(ClassPathOpener.java:123)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processDirectory(ClassPathOpener.java:191)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.processOne(ClassPathOpener.java:123)
+[INFO] 	at com.android.dx.cf.direct.ClassPathOpener.process(ClassPathOpener.java:109)
+[INFO] 	at com.android.dx.command.dexer.Main.processOne(Main.java:418)
+[INFO] 	at com.android.dx.command.dexer.Main.processAllFiles(Main.java:329)
+[INFO] 	at com.android.dx.command.dexer.Main.run(Main.java:206)
+[INFO] 	at com.android.dx.command.dexer.Main.main(Main.java:174)
+[INFO] 	at com.android.dx.command.Main.main(Main.java:95)
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 37.252s
+[INFO] Finished at: Mon Nov 07 13:02:13 EST 2011
+[INFO] Final Memory: 13M/81M
+[INFO] ------------------------------------------------------------------------
+</code></pre>
+<p>To resolve this issue, you can simply add the following jvmArgument to the plugin declaration. This will increase the available memory for the build.</p>
+<pre><code class="prettyprint xml"><br />&lt;plugin&gt;
+    &lt;groupId&gt;com.jayway.maven.plugins.android.generation2&lt;/groupId&gt;
+    &lt;artifactId&gt;android-maven-plugin&lt;/artifactId&gt;
+    &lt;version&gt;3.0.0-alpha-13&lt;/version&gt;
+    &lt;configuration&gt;
+        &lt;sdk&gt;
+            &lt;platform&gt;${android-platform}&lt;/platform&gt;
+        &lt;/sdk&gt;
+        &lt;dex&gt;
+            &lt;jvmArguments&gt;
+                &lt;jvmArgument&gt;-Xms256m&lt;/jvmArgument&gt;
+                &lt;jvmArgument&gt;-Xmx512m&lt;/jvmArgument&gt;
+            &lt;/jvmArguments&gt;
+        &lt;/dex&gt;
+        &lt;deleteConflictingFiles&gt;true&lt;/deleteConflictingFiles&gt;
+        &lt;undeployBeforeDeploy&gt;true&lt;/undeployBeforeDeploy&gt;
+    &lt;/configuration&gt;
+    &lt;extensions&gt;true&lt;/extensions&gt;
+&lt;/plugin&gt;
+</code></pre>
+<h5>Error while processing transient dependencies</h5>
+<p><a href="http://www.springsource.org/spring-android/news/1.0.0.m4-released">Spring Android 1.0.0.M4</a> is built against the <a href="https://code.google.com/p/android-rome-feed-reader/">Android Rome Feed Reader</a>. This version of ROME is not available in the Maven Central repository, so in order to use it you have to include the repository information in your POM. The Spring Android Showcase client does not contain any ROME samples, as these are included in a separate sample project. Normally, this would mean that you do not have to include the repository reference for that library. With the previous version of the Maven Android Plugin, the project built correctly without having to include the repository reference. However, it seems that the 3.0.0-alpha-13 release of the Android Maven Plugin tries to download all dependencies, even optional ones. If you do not include the ROME repository, then the build fails with the following error.</p>
+<pre><code class="prettyprint sourcecode">[WARNING] The POM for com.google.code.android-rome-feed-reader:android-rome-feed-reader:jar:1.0.0-r2 is missing, no dependency information available
+Downloading: http://maven.springframework.org/milestone/com/google/code/android-rome-feed-reader/android-rome-feed-reader/1.0.0-r2/android-rome-feed-reader-1.0.0-r2.jar
+Downloading: http://repo1.maven.org/maven2/com/google/code/android-rome-feed-reader/android-rome-feed-reader/1.0.0-r2/android-rome-feed-reader-1.0.0-r2.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 21.486s
+[INFO] Finished at: Mon Nov 07 16:04:24 EST 2011
+[INFO] Final Memory: 13M/81M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal com.jayway.maven.plugins.android.generation2:android-maven-plugin:3.0.0-alpha-13:apk (default-apk) on project spring-android-showcase-client: Error while processing transient dependencies: Could not find artifact com.google.code.android-rome-feed-reader:android-rome-feed-reader:jar:1.0.0-r2 in org.springframework.maven.milestone (http://maven.springframework.org/milestone)
+</code></pre>
+<p>In order for the build to succeed with the current maven plugin, you need to include the Android ROME repository with your Spring Android projects.</p>
+<pre><code class="prettyprint xml"><br />&lt;repository&gt;
+    &lt;id&gt;android-rome-feed-reader-repository&lt;/id&gt;
+    &lt;name&gt;Android ROME Feed Reader Repository&lt;/name&gt;
+    &lt;url&gt;https://android-rome-feed-reader.googlecode.com/svn/maven2/releases&lt;/url&gt;
+&lt;/repository&gt;
+</code></pre>
+<h3>Android Configurator for M2E</h3>
+<p>The Android Configurator for M2E has also undergone a name change since I last <a href="http://blog.springsource.com/2011/02/09/spring-android-and-maven-part-2/">blogged about the Maven Android plugins</a>. Previously, it was called Maven Integration for Android Development Tools. The latest version of the Android Configurator now supports Android SDK r14.</p>
+<h4>Install the Plugin</h4>
+<p>You can install the configurator from the Eclipse Marketplace. If you are using SpringSource Tool Suite (STS), then you can install the Eclipse Marketplace from the Extensions tab on the Dashboard. It is located under the Utilities section. Otherwise, if you are using a different version of Eclipse 3.7, the Eclipse Marketplace is available from the Indigo download site.</p>
+<ol>
+<li>Install the Eclipse Marketplace client.</li>
+<li>From the Eclipse Marketplace, search for Android Configurator.</li>
+<li>Click the Install button to install the Android Configurator.</li>
+<li>The configuration will install the Android ADT if you do not already have it installed.</li>
+</ol>
+<h4>m2e - Maven Integration for Eclipse</h4><p>One thing to note, is that the m2e - Maven Integration for Eclipse plugin is not automatically installed with the configurator. If you are using <a href="http://www.springsource.com/developer/sts">STS 2.8.0</a>, then the m2e plugin is already installed. If not, then you can follow the previous steps above to also install the <a href="https://marketplace.eclipse.org/content/maven-integration-eclipse">m2e plugin from the Eclipse Marketplace</a> before importing your Android projects.</p>
+<h4>Import Your Project into Eclipse</h4>
+<p>Once the required Eclipse plugins are installed, you can import your Android project. If you have an existing POM file, then simply import the project as an Existing Maven Project and point to your POM. If you had previously been working on your project with the older versions of the Maven plugins, then you will need to update your project.</p>
+<ol>
+<li>Right-click on your project from within the Eclipse Package Explorer.</li>
+<li>Select the Maven context menu and Update Project Configuration...</li>
+<li>Verify your project is selected in the Available Maven Codebases, and click OK.</li>
+</ol>
+<h3>Conclusion</h3>
+<p>The Maven plugins are powerful tools for use in building your Android projects, and these plugins will continue to evolve and mature with the help of the community. The <a href="https://github.com/SpringSource/spring-android-samples">Spring Android Samples</a> have been updated to work with these latest plugins, so please pull the latest versions and review the changes. Additionally, the <a href="https://github.com/jayway/maven-android-plugin">Android Maven Plugin</a> and <a href="https://github.com/rgladwell/m2e-android">Android Configurator for m2e</a> are on GitHub, and they welcome your feedback and pull requests!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 449;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

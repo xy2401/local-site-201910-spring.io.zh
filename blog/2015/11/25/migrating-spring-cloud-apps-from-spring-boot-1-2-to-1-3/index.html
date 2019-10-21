@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Migrating Spring Cloud Apps from Spring Boot 1.2 to 1.3</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Migrating Spring Cloud Apps from Spring Boot 1.2 to 1.3" />
+<meta name="twitter:description" content="&lt;p&gt;There are some interesting new features in &lt;a href=&quot;http://projects.spring.io/spring-boot/&quot;&gt;Spring Boot&lt;/a&gt; 1.3 that are now available in Spring Cloud in the Brixton release train. The Angel release train of &lt;a href=&quot;http://projects.spring.io/spring-cloud/&quot;&gt;Spring Cloud&lt;/a&gt; is partly incompatible with Spring Boot 1.3, so when you upgrade there are some important things to be aware of. This article helps you navigate the changes and update any existing apps to use the new features. It should also be helpful generally when trying to adopt new versions of Spring projects into existing codebases.&lt;/p&gt;
+&lt;blockquote&gt; 
+ &lt;p&gt;TIP: You can use &lt;code&gt;mvn dependency:tree&lt;/code&gt; or &lt;code&gt;gradle dependencies&lt;/code&gt; to list the dependencies in your project and check the versions.&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta name="twitter:creator" content="@david_syer" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+
+<meta property="og:title" content="Migrating Spring Cloud Apps from Spring Boot 1.2 to 1.3" />
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta property="og:description" content="&lt;p&gt;There are some interesting new features in &lt;a href=&quot;http://projects.spring.io/spring-boot/&quot;&gt;Spring Boot&lt;/a&gt; 1.3 that are now available in Spring Cloud in the Brixton release train. The Angel release train of &lt;a href=&quot;http://projects.spring.io/spring-cloud/&quot;&gt;Spring Cloud&lt;/a&gt; is partly incompatible with Spring Boot 1.3, so when you upgrade there are some important things to be aware of. This article helps you navigate the changes and update any existing apps to use the new features. It should also be helpful generally when trying to adopt new versions of Spring projects into existing codebases.&lt;/p&gt;
+&lt;blockquote&gt; 
+ &lt;p&gt;TIP: You can use &lt;code&gt;mvn dependency:tree&lt;/code&gt; or &lt;code&gt;gradle dependencies&lt;/code&gt; to list the dependencies in your project and check the versions.&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-11-25 12:18:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Migrating Spring Cloud Apps from Spring Boot 1.2 to 1.3</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-11-25 12:18:00.0">November 25, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2307" href="/blog/2015/11/25/migrating-spring-cloud-apps-from-spring-boot-1-2-to-1-3#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>There are some interesting new features in <a href="https://projects.spring.io/spring-boot/">Spring Boot</a> 1.3 that are now available in Spring Cloud in the Brixton release train. The Angel release train of <a href="https://projects.spring.io/spring-cloud/">Spring Cloud</a> is partly incompatible with Spring Boot 1.3, so when you upgrade there are some important things to be aware of. This article helps you navigate the changes and update any existing apps to use the new features. It should also be helpful generally when trying to adopt new versions of Spring projects into existing codebases.</p>
+<blockquote>
+<p>TIP: You can use <code>mvn dependency:tree</code> or <code>gradle dependencies</code> to list the dependencies in your project and check the versions.</p>
+</blockquote><h2><a href="#dependency-management" class="anchor" name="dependency-management"></a>Dependency Management</h2>
+<p>If you are using the older versions of Spring Boot, you probably have something like this in your Maven POM:</p>
+<pre><code class="prettyprint xml">&lt;parent&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+  &lt;version&gt;1.2.7.RELEASE&lt;/version&gt;
+  &lt;relativePath /&gt; &lt;!-- lookup parent from repository --&gt;
+&lt;/parent&gt;
+</code></pre>
+<p>or</p>
+<pre><code class="prettyprint xml">&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+      &lt;version&gt;1.2.7.RELEASE&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+<p>or, if you are using Gradle,</p>
+<pre><code class="prettyprint groovy">buildscript {
+	ext {
+		springBootVersion = &#39;1.2.7.RELEASE&#39;
+	}
+	dependencies {
+		classpath(&quot;org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}&quot;)
+	}
+}
+
+</code></pre>
+<p>To upgrade to Spring Boot 1.3.0 you would change the &lsquo;1.2.7&rsquo; above to &lsquo;1.3.0&rsquo;. So far so simple.</p>
+<blockquote>
+<p>TIP: to see a &ldquo;typical&rdquo; Maven POM with the most recent version of Spring Boot you can <code>curl start.spring.io/pom.xml</code>. To add Spring Cloud you can append <code>-d style=cloud-config-client</code>. The Spring Boot version can be changed by adding <code>-d bootVersion=1.3.1.BUILD-SNAPSHOT</code> (for instance). To do the same for Gradle use <code>build.gradle</code> instead of <code>pom.xml</code>.</p>
+</blockquote><h2><a href="#using-spring-cloud-with-spring-boot" class="anchor" name="using-spring-cloud-with-spring-boot"></a>Using Spring Cloud with Spring Boot</h2>
+<p>Since Spring Cloud builds on top of Spring Boot it can be confusing and difficult to find a combination that works together. In what follows we describe a few scenerios of upgrades and show what you can expect to be able to achieve with dependency management. </p><h3><a href="#the-big-upgrade" class="anchor" name="the-big-upgrade"></a>The Big Upgrade</h3>
+<p>In general the biggest change will be when you upgrade (Spring Boot 1.2 to 1.3, or Spring Cloud Angel to Brixton). If you downloaded a project from the <a href="https://start.spring.io">Spring Initializr</a> then it will be using the Spring Boot parent POM:</p>
+<pre><code class="prettyprint xml">&lt;parent&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+  &lt;version&gt;1.2.7.RELEASE&lt;/version&gt;
+  &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+&lt;/parent&gt;
+</code></pre>
+<p>and a Spring Cloud BOM in the <code>&lt;dependencyManagement&gt;</code> section:</p>
+<pre><code class="prettyprint xml">&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-parent&lt;/artifactId&gt;
+      &lt;version&gt;Angel.SR4&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+<p>In Gradle you would see something like this:</p>
+<pre><code class="prettyprint groovy">buildscript {
+    ext {
+        springBootVersion = &#39;1.2.7.RELEASE&#39;
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath(&quot;org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}&quot;) 
+    }
+}
+dependencyManagement {
+  imports { 
+    mavenBom &quot;org.springframework.cloud:spring-cloud-starter-parent:Angel.SR4&quot; 
+  }
+}
+</code></pre>
+<p>Simply updating the Spring Boot version in either case isn&rsquo;t going to work because the Spring Cloud Angel BOM has old versions of Spring Boot and Spring (amongst other things). Thus we really need to upgrade both Spring Boot and Spring Cloud. For example in Maven:</p>
+<pre><code class="prettyprint xml">&lt;parent&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+  &lt;version&gt;1.3.0.RELEASE&lt;/version&gt;
+  &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+&lt;/parent&gt;
+&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-parent&lt;/artifactId&gt;
+      &lt;version&gt;Brixton.M3&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+<p>and in Gradle:</p>
+<pre><code class="prettyprint groovy">buildscript {
+    ext {
+        springBootVersion = &#39;1.3.0.RELEASE&#39;
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath(&quot;org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}&quot;) 
+    }
+}
+dependencyManagement {
+  imports { 
+    mavenBom &quot;org.springframework.cloud:spring-cloud-starter-parent:Brixton.M3&quot; 
+  }
+}
+</code></pre>
+<p>NOTE: Brixton.M2 and all earlier releases of Spring Cloud are <em>not</em> compatible with Spring Boot 1.3.0.RELEASE. You need at least Brixton.M3.</p><h2><a href="#upgrading-spring-boot-beyond-1-3-0" class="anchor" name="upgrading-spring-boot-beyond-1-3-0"></a>Upgrading Spring Boot Beyond 1.3.0</h2>
+<p>Suppose you want to use Spring Boot snapshots, or upgrade to 1.3.1 when it is released, but Spring Cloud doesn&rsquo;t have a version that explicitly depends on the version of Boot you want.</p>
+<p>In Maven, remember that if you use one of the off the shelf parent POMs they contain <code>&lt;dependencyManagement&gt;</code> and will take precedence. With that in mind, if you use those parent POMs, be sure to use the parent with the closest dependency set to what you need (the Boot one in this scenario).</p>
+<pre><code class="prettyprint xml">&lt;parent&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+  &lt;version&gt;1.3.1.BUILD-SNAPSHOT&lt;/version&gt;
+  &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+&lt;/parent&gt;
+&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-parent&lt;/artifactId&gt;
+      &lt;version&gt;Brixton.M3&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+<p>In Gradle things are in principle simpler because there is no concept of a &ldquo;parent&rdquo;. In practice the Spring Boot plugin cannot be applied with a different version than the dependency management unless you also manually apply the dependency management plugin as well. So you have to do a little dance in the <code>build.gradle</code>:</p>
+<pre><code class="prettyprint groovy">buildscript {
+    ext {
+        springBootVersion = &#39;1.3.0.RELEASE&#39;
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath &quot;io.spring.gradle:dependency-management-plugin:0.5.3.RELEASE&quot;
+        classpath(&quot;org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}&quot;) 
+    }
+}
+
+apply plugin: &quot;io.spring.dependency-management&quot;
+...
+
+dependencyManagement {
+  imports { 
+    mavenBom &quot;org.springframework.cloud:spring-cloud-starter-parent:Brixton.M3&quot; 
+    mavenBom &quot;org.springframework.bootspring-boot-starter-parent:1.3.1.BUILD-SNAPSHOT&quot; 
+  }
+}
+
+apply plugin: &#39;spring-boot&#39; 
+
+</code></pre>
+<p>The rule is you have to a) import the dependency management plugin manually and <em>before</em> the Spring Boot one, b) declare the <code>dependencyManagement</code> <em>before</em> applying the Spring Boot plugin. Once you do that you can list dependencies in the <code>dependencyManagement</code> declaration and the <em>last</em> one wins (the opposite to Maven).</p>
+<blockquote>
+<p>NOTE: This sensitivity to the order of the declarations is a &ldquo;feature&rdquo; of the current version of the tooling. It might be different in future versions. See <a href="https://github.com/spring-gradle-plugins/dependency-management-plugin/issues/66">this issue in the Gradle tooling</a> for more details.</p>
+</blockquote><h2><a href="#using-maven-with-a-custom-parent" class="anchor" name="using-maven-with-a-custom-parent"></a>Using Maven with a Custom Parent</h2>
+<p>If you don&rsquo;t use the off the shelf parent POMs you have the freedom to use one that does <em>not</em> contain <code>&lt;dependencyManagement&gt;</code>, and this makes things easier to control. In this case you need to put both Spring Boot and Spring Cloud in the <code>&lt;dependencyManagement&gt;</code> and the order is significant: the first one wins (last one for Gradle). For example, to use Spring Boot 1.3.1.BUILD-SNAPSHOT and Spring Cloud Brixton.M3 in Maven:</p>
+<pre><code class="prettyprint xml">&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+      &lt;version&gt;1.3.1.BUILD-SNAPSHOT&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-parent&lt;/artifactId&gt;
+      &lt;version&gt;Brixton.M3&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre><h2><a href="#order-of-the-boms" class="anchor" name="order-of-the-boms"></a>Order of the BOMs</h2>
+<p>Note that in both Maven and Gradle the order of the BOMs is significant: the one that is declared first generally wins in Maven (last one in Gradle) if there is a conflict at the top level (explicitly declared dependencies). A big difference with Maven is that the parent is special: if it contains <code>&lt;dependencyManagement&gt;</code> it always wins.</p>
+<p>To understand if a particular dependency version will resolve in the way you need is complicated. It depends on the order of the BOMs, <em>and</em> the depth in the transitive dependency tree that your dependency is declared. For instance, the Spring Boot BOM declares an explicit (level 1) dependency management for <code>spring-core</code> but not on any other Spring Framework jars (those are brought in via a reference to the Spring Framework BOM). The rule is that the first time it is declared wins, but the whole tree is included (including all BOMs), searching from the top, level by level.</p>
+<p>NOTE: Gradle does not have this &ldquo;last one wins&rdquo; rule without the Spring Boot (or Spring Dependency Management) Plugin. To do the same thing with a &ldquo;native&rdquo; Gradle build often requires careful and tedious work manually fixing transitive dependency versions.</p><h2><a href="#further-manipulating-dependency-versions" class="anchor" name="further-manipulating-dependency-versions"></a>Further Manipulating Dependency Versions</h2>
+<p>If you want to bump the version of a dependency beyond what is specified in the Spring Boot and Spring Cloud BOMs, things can get complicated. Broadly speaking there are 2 options: properties and additional BOMs. The first (properties) works with the off the shelf parent POMs, and the other doesn&rsquo;t. The second (more BOMs) only works if there <em>is</em> a BOM available for the dependency you are interested in, and only if the transitive dependencies don&rsquo;t conflict with your requirements. All of the Spring Cloud projects have their own BOM, for instance, as does Spring Framework, so that&rsquo;s a start. </p><h3><a href="#properties" class="anchor" name="properties"></a>Properties</h3>
+<p>The Spring Boot parent POM (and the Spring Cloud one if you use that since it inherits from the Boot one) has all of its dependency versions extracted into <code>&lt;properties/&gt;</code>. So you can often just change the property value. Example in Maven:</p>
+<pre><code class="prettyprint xml">&lt;parent&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+  &lt;version&gt;1.3.0.RELEASE&lt;/version&gt;
+  &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+&lt;/parent&gt;
+&lt;properties&gt;
+  &lt;spring.version&gt;4.2.4.BUILD-SNAPSHOT&lt;/spring.version&gt;
+&lt;/properties&gt;
+</code></pre>
+<p>There corresponding feature in Gradle is an <code>ext</code> property, e.g.</p>
+<pre><code class="prettyprint groovy">ext[&#39;spring.version&#39;] = &#39;4.2.4.BUILD-SNAPSHOT&#39;
+</code></pre><h3><a href="#additional-boms" class="anchor" name="additional-boms"></a>Additional BOMs</h3>
+<p>The Spring Framework has its own BOM, so we can use that to manage the Spring versions instead. In Maven with a custom parent (containing no <code>&lt;dependencyManagement&gt;</code>):</p>
+<pre><code class="prettyprint xml">&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-framework-bom&lt;/artifactId&gt;
+      &lt;version&gt;4.2.4.BUILD-SNAPSHOT&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+<blockquote>
+<p>NOTE: this example actually will <em>not</em> work with the Spring Boot parent POM (unless it happens to have the same <code>&lt;spring.version/&gt;</code>) because the Spring Framework version is fixed already by the parent. To use the Spring Boot parent with a Spring Framwork snapshot it is better to use the properties approach (above).</p>
+</blockquote>
+<p>In Gradle it is simpler (because there is no parent to set conflicting versions):</p>
+<pre><code class="prettyprint groovy">dependencyManagement {
+	imports { 
+      mavenBom &quot;org.springframework:spring-framework-bom:4.2.4.BUILD-SNAPSHOT&quot; 
+      mavenBom &quot;org.springframework.boot:spring-boot-starter-parent:1.3.0.RELEASE&quot; 
+	}
+}
+</code></pre><h2><a href="#conclusion" class="anchor" name="conclusion"></a>Conclusion</h2>
+<p>Dependency management is hard, but hopefully we have softened the blow by outlining a few common scenarios when upgrading bits of Spring Boot and Spring Cloud. There are some slightly different behaviours depending on whether you choose Maven or Gradle, but at least if you choose Gradle and use the Spring Boot plugin the differences are minimized. At the end of the day, Spring projects have different release schedules, so there can always be conflicts, but they will generally always be moving towards convergence, so if you wait long enough things will equalize. Umbrella projects like Spring Cloud, Spring Boot and the Spring IO Platform also help to smooth out the bumps: if you can use one of those to manage all your dependencies things get a lot simpler.</p>
+<p>The sample apps in the Spring Guides have all been updated to Spring Boot 1.3 now, even if that means they depend on a milestone of Spring Cloud (this only applies to the Zuul proxy sample). Many do not need Spring Cloud any more. If you need a GA version of Spring Cloud you need to stay with Spring Boot 1.2 right now. The samples for that combination can be lifted from git history.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2307;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

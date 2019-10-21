@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>What&#39;s new in Spring Data Moore?</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="What&#39;s new in Spring Data Moore?" />
+<meta name="twitter:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Spring Data Moore ships with 16 modules and over 700 tickets completed. It includes tons of improvements and new features across the portfolio and has a strong focus on three major topics: Reactive, Kotlin, and Performance. The release adds features such as declarative reactive transactions and Coroutines/Flow support and comes with up to &lt;a href=&quot;#performance&quot;&gt;60%&lt;sup&gt;*&lt;/sup&gt;&lt;/a&gt; faster finder methods.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Let’s start with a look at some of the Reactive features of Moore.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;declarative-reactive-transactions&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#declarative-reactive-transactions&quot;&gt;&lt;/a&gt;Declarative, reactive transactions&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The &lt;a href=&quot;https://spring.io/blog/2018/09/27/what-s-new-in-spring-data-lovelace&quot;&gt;Lovelace Release&lt;/a&gt; introduced early support for reactive transactions in a closure-fashioned style that left some room for improvements. The following listing shows that style:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;title&quot;&gt;
+    Reactive Transactions in Lovelace (with MongoDB)
+   &lt;/div&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;public Mono&amp;lt;Process&amp;gt; doSomething(Long id) {
+
+  return template.inTransaction().execute(txTemplate -&amp;gt; {
+
+    return txTemplate.findById(id)
+      .flatMap(it -&amp;gt; start(txTemplate, it))
+      .flatMap(it -&amp;gt; verify(it))
+      .flatMap(it -&amp;gt; finish(txTemplate, it));
+
+  }).next();
+}&lt;/code&gt;&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In the preceding snippet, the transaction has to be initiated by explicitly calling &lt;code&gt;inTransaction()&lt;/code&gt; with a transaction-aware template within the closure, calling &lt;code&gt;next()&lt;/code&gt; at the end to turn the returned &lt;code&gt;Flux&lt;/code&gt; into a &lt;code&gt;Mono&lt;/code&gt; to satisfy the method signature, even though &lt;code&gt;findById(…)&lt;/code&gt; already emits only a single element.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Obviously, this is not the most intuitive way of doing reactive transactions. So let’s have a look at the same flow using declarative reactive transaction support. As with Spring’s &lt;a href=&quot;https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction&quot;&gt;transaction support&lt;/a&gt;, you need a component to handle the transaction for you. For reactive transactions, a &lt;code&gt;ReactiveTransactionManager&lt;/code&gt; is currently provided by the MongoDB and R2DBC modules. The following listing shows such a component:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@EnableTransactionManagement
+class Config extends AbstractReactiveMongoConfiguration {
+
+  // …
+
+  @Bean
+  ReactiveTransactionManager mgr(ReactiveMongoDatabaseFactory f) {
+    return new ReactiveMongoTransactionManager(f);
+  }
+}&lt;/code&gt;&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;From there, you can annotate methods with &lt;code&gt;@Transactional&lt;/code&gt; and rely on the infrastructure to start, commit, and roll back transactional flows to handle the lifecycle via the &lt;a href=&quot;https://projectreactor.io/docs/core/release/reference/#context&quot;&gt;Reactor Context&lt;/a&gt;. This lets you turn the code from Lovelace into the following listing, removing the need for the closure with its scoped template and the superfluous &lt;code&gt;Flux&lt;/code&gt; to &lt;code&gt;Mono&lt;/code&gt; transformation:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;title&quot;&gt;
+    Declarative Reactive Transactions in Moore (with MongoDB)
+   &lt;/div&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@Transactional
+public Mono&amp;lt;Process&amp;gt; doSomething(Long id) {
+
+  return template.findById(id)
+    .flatMap(it -&amp;gt; start(template, it))
+    .flatMap(it -&amp;gt; verify(it))
+    .flatMap(it -&amp;gt; finish(template, it));
+}&lt;/code&gt;&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@stroblchristoph" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/eeacd6c45e867cb36eb05c9daa5cc2de?s=200" />
+
+<meta property="og:title" content="What&#39;s new in Spring Data Moore?" />
+<meta property="og:image" content="https://gravatar.com/avatar/eeacd6c45e867cb36eb05c9daa5cc2de?s=200" />
+<meta property="og:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Spring Data Moore ships with 16 modules and over 700 tickets completed. It includes tons of improvements and new features across the portfolio and has a strong focus on three major topics: Reactive, Kotlin, and Performance. The release adds features such as declarative reactive transactions and Coroutines/Flow support and comes with up to &lt;a href=&quot;#performance&quot;&gt;60%&lt;sup&gt;*&lt;/sup&gt;&lt;/a&gt; faster finder methods.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Let’s start with a look at some of the Reactive features of Moore.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;declarative-reactive-transactions&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#declarative-reactive-transactions&quot;&gt;&lt;/a&gt;Declarative, reactive transactions&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The &lt;a href=&quot;https://spring.io/blog/2018/09/27/what-s-new-in-spring-data-lovelace&quot;&gt;Lovelace Release&lt;/a&gt; introduced early support for reactive transactions in a closure-fashioned style that left some room for improvements. The following listing shows that style:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;title&quot;&gt;
+    Reactive Transactions in Lovelace (with MongoDB)
+   &lt;/div&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;public Mono&amp;lt;Process&amp;gt; doSomething(Long id) {
+
+  return template.inTransaction().execute(txTemplate -&amp;gt; {
+
+    return txTemplate.findById(id)
+      .flatMap(it -&amp;gt; start(txTemplate, it))
+      .flatMap(it -&amp;gt; verify(it))
+      .flatMap(it -&amp;gt; finish(txTemplate, it));
+
+  }).next();
+}&lt;/code&gt;&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In the preceding snippet, the transaction has to be initiated by explicitly calling &lt;code&gt;inTransaction()&lt;/code&gt; with a transaction-aware template within the closure, calling &lt;code&gt;next()&lt;/code&gt; at the end to turn the returned &lt;code&gt;Flux&lt;/code&gt; into a &lt;code&gt;Mono&lt;/code&gt; to satisfy the method signature, even though &lt;code&gt;findById(…)&lt;/code&gt; already emits only a single element.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Obviously, this is not the most intuitive way of doing reactive transactions. So let’s have a look at the same flow using declarative reactive transaction support. As with Spring’s &lt;a href=&quot;https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction&quot;&gt;transaction support&lt;/a&gt;, you need a component to handle the transaction for you. For reactive transactions, a &lt;code&gt;ReactiveTransactionManager&lt;/code&gt; is currently provided by the MongoDB and R2DBC modules. The following listing shows such a component:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@EnableTransactionManagement
+class Config extends AbstractReactiveMongoConfiguration {
+
+  // …
+
+  @Bean
+  ReactiveTransactionManager mgr(ReactiveMongoDatabaseFactory f) {
+    return new ReactiveMongoTransactionManager(f);
+  }
+}&lt;/code&gt;&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;From there, you can annotate methods with &lt;code&gt;@Transactional&lt;/code&gt; and rely on the infrastructure to start, commit, and roll back transactional flows to handle the lifecycle via the &lt;a href=&quot;https://projectreactor.io/docs/core/release/reference/#context&quot;&gt;Reactor Context&lt;/a&gt;. This lets you turn the code from Lovelace into the following listing, removing the need for the closure with its scoped template and the superfluous &lt;code&gt;Flux&lt;/code&gt; to &lt;code&gt;Mono&lt;/code&gt; transformation:&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;title&quot;&gt;
+    Declarative Reactive Transactions in Moore (with MongoDB)
+   &lt;/div&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@Transactional
+public Mono&amp;lt;Process&amp;gt; doSomething(Long id) {
+
+  return template.findById(id)
+    .flatMap(it -&amp;gt; start(template, it))
+    .flatMap(it -&amp;gt; verify(it))
+    .flatMap(it -&amp;gt; finish(template, it));
+}&lt;/code&gt;&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-10-08 20:58:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">What&#39;s new in Spring Data Moore?</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/eeacd6c45e867cb36eb05c9daa5cc2de?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/christophstrobl">Christoph Strobl</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-10-08 20:58:00.0">October 08, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3802" href="/blog/2019/10/08/what-s-new-in-spring-data-moore#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div class="paragraph">
+<p>Spring Data Moore ships with 16 modules and over 700 tickets completed.
+It includes tons of improvements and new features across the portfolio and has a strong focus on three major topics: Reactive, Kotlin, and Performance.
+The release adds features such as declarative reactive transactions and Coroutines/Flow support and comes with up to <a href="#performance">60%<sup>*</sup></a> faster finder methods.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s start with a look at some of the Reactive features of Moore.</p>
+</div>
+<div class="sect1">
+<h2 id="declarative-reactive-transactions"><a class="anchor" href="#declarative-reactive-transactions"></a>Declarative, reactive transactions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://spring.io/blog/2018/09/27/what-s-new-in-spring-data-lovelace">Lovelace Release</a> introduced early support for reactive transactions in a closure-fashioned style that left some room for improvements.
+The following listing shows that style:</p>
+</div>
+<div class="listingblock">
+<div class="title">Reactive Transactions in Lovelace (with MongoDB)</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public Mono&lt;Process&gt; doSomething(Long id) {
+
+  return template.inTransaction().execute(txTemplate -&gt; {
+
+    return txTemplate.findById(id)
+      .flatMap(it -&gt; start(txTemplate, it))
+      .flatMap(it -&gt; verify(it))
+      .flatMap(it -&gt; finish(txTemplate, it));
+
+  }).next();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the preceding snippet, the transaction has to be initiated by explicitly calling <code>inTransaction()</code> with a transaction-aware template within the closure, calling <code>next()</code> at the end to turn the returned <code>Flux</code> into a <code>Mono</code> to satisfy the method signature, even though <code>findById(…)</code> already emits only a single element.</p>
+</div>
+<div class="paragraph">
+<p>Obviously, this is not the most intuitive way of doing reactive transactions.
+So let&#8217;s have a look at the same flow using declarative reactive transaction support.
+As with Spring&#8217;s <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction">transaction support</a>, you need a component to handle the transaction for you.
+For reactive transactions, a <code>ReactiveTransactionManager</code> is currently provided by the MongoDB and R2DBC modules.
+The following listing shows such a component:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@EnableTransactionManagement
+class Config extends AbstractReactiveMongoConfiguration {
+
+  // …
+
+  @Bean
+  ReactiveTransactionManager mgr(ReactiveMongoDatabaseFactory f) {
+    return new ReactiveMongoTransactionManager(f);
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From there, you can annotate methods with <code>@Transactional</code> and rely on the infrastructure to start, commit, and roll back transactional flows to handle the lifecycle via the <a href="https://projectreactor.io/docs/core/release/reference/#context">Reactor Context</a>.
+This lets you turn the code from Lovelace into the following listing, removing the need for the closure with its scoped template and the superfluous <code>Flux</code> to <code>Mono</code> transformation:</p>
+</div>
+<div class="listingblock">
+<div class="title">Declarative Reactive Transactions in Moore (with MongoDB)</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Transactional
+public Mono&lt;Process&gt; doSomething(Long id) {
+
+  return template.findById(id)
+    .flatMap(it -&gt; start(template, it))
+    .flatMap(it -&gt; verify(it))
+    .flatMap(it -&gt; finish(template, it));
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-elasticsearch"><a class="anchor" href="#reactive-elasticsearch"></a>Reactive Elasticsearch repositories</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Another notable addition to the reactive family can be found in one of the community modules, with Spring Data Elasticsearch now offering reactive template and repository support built upon a fully reactive Elasticsearch REST client that in turn is based on Spring&#8217;s <code>WebClient</code>.</p>
+</div>
+<div class="paragraph">
+<p>The client offers first class support for everyday search operations by exposing a familiar API close to the <em>Java High-Level REST Client</em>, making necessary cuts where needed.
+The combination of the template and repository API lets you, if needed, seamlessly transition to reactive without getting lost.
+The following listing shows how to configure Elasticsearch to use a reactive client:</p>
+</div>
+<div class="listingblock">
+<div class="title">Reactive Elasticsearch</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class Config extends AbstractReactiveElasticsearchConfiguration {
+
+  // …
+
+  @Bean
+  public ReactiveElasticsearchClient reactiveClient() {
+    return ReactiveRestClients.create(localhost());
+  }
+}
+
+@Autowired
+ReactiveElasticsearchTemplate template;
+
+//…
+
+Criteria criteria = new Criteria("topics").contains("spring")
+    .and("date").greaterThanEqual(today())
+
+Flux&lt;Conference&gt; result = template.find(new CriteriaQuery(criteria), Conference.class);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reactive-querydsl"><a class="anchor" href="#reactive-querydsl"></a>Reactive Querydsl</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Speaking of getting lost in transition: <a href="http://www.querydsl.com/">Querydsl</a> (&#8592; plain HTTP / NO HTTPS) offers a remarkable way of defining type safe queries for several data stores and has been supported for non-reactive data access for quite a while already.
+To support it in reactive scenarios, we added a reactive execution layer that lets you run <code>Predicate</code> backed queries.
+The <code>ReactiveQuerydslPredicateExecutor</code>, when added to the repository interface, provides all entry points, as the following example shows:</p>
+</div>
+<div class="listingblock">
+<div class="title">Reactive Querydsl</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">interface SampleRepository extends …, ReactiveQuerydslPredicateExecutor&lt;…&gt; {
+  // …
+}
+
+@Autowired
+SampleRepository repository;
+
+// …
+Predicate predicate = QCustomer.customer.lastname.eq("Matthews");
+Flux&lt;Customer&gt; result = repository.findAll(predicate);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kotlin-coroutines"><a class="anchor" href="#kotlin-coroutines"></a>Support for Kotlin coroutines and MongoDB criteria API DSL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Along the lines of the enhanced reactive support in Moore, we continued the Kotlin story that we already started with the Lovelace Release.
+In particular, we provide several extensions for <a href="https://kotlinlang.org/docs/reference/coroutines-overview.html">Kotlin Coroutines</a> and Flows by such offering methods as <code>awaitSingle()</code> and <code>asFlow()</code>.
+The following method uses the <code>awaitSingle()</code> method:</p>
+</div>
+<div class="listingblock">
+<div class="title">Kotlin Coroutine Support</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-kotlin" data-lang="kotlin">val result = runBlocking {
+  operations.query&lt;Person&gt;()
+   .matching(query(where("lastname").isEqualTo("Matthews")))
+   .awaitSingle()
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another great enhancement that uses Kotlin language features was contributed by the community, adding a type safe query DSL for the Spring Data MongoDB criteria API.
+This lets you transform code such as <code>query(where("lastname").isEqualTo("Matthews"))</code> to the following notation:</p>
+</div>
+<div class="listingblock">
+<div class="title">Kotlin type safe queries</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-kotlin" data-lang="kotlin">val people = operations.query&lt;Person&gt;()
+  .matching(query(Person::lastname isEqualTo "Matthews"))
+  .all()</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="performance"><a class="anchor" href="#performance"></a>Performance improvements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Along with crafting all these new features, we also took some time to investigate potential bottlenecks of the current implementations and found some areas for improvement.
+This included getting rid of <code>Optional</code>, capturing lambdas and stream execution in a lot of places, adding caches, and avoiding unnecessary lookup operations. In the end, the benchmarks showed an almost 60% increase of throughput for JPA single attribute finder methods, such as <code>findByTitle(…)</code>.</p>
+</div>
+<div class="paragraph">
+<p><img src='data:image/png;base64,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'></img></p>
+</div>
+<div class="paragraph">
+<p>This is great and was worth the time it took! However, and I want to be clear about this, all benchmarks use clean-room scenarios that avoid any kind of overhead whatsoever. If you move them to a more real-world scenario (for example, by replacing an in-memory H2 database with an actual production-ready database), results look way different, as performance throttles shift to the network interaction, query execution and result transmission. The improvements are still visible but are usually down to single-digit percentages.
+The benchmarks can be found in this <a href="https://github.com/spring-projects/spring-data-dev-tools/tree/master/benchmark">GitHub repository</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="entity-callback-api"><a class="anchor" href="#entity-callback-api"></a>New entity callback API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We also refined our existing hooks to intercept an entity&#8217;s lifecycle during persistence operations by moving away from the current <code>ApplicationEvent</code>-based approach to a more direct interaction model.
+The <code>EntityCallback</code> API introduces better support for immutable types, provides runtime guarantees, and also seamlessly integrates into a reactive flow.
+Of course, we still support and publish <code>ApplicationEvents</code>, but we highly recommend switching to <code>EntityCallbacks</code> when changes to the processed entity should be made.</p>
+</div>
+<div class="paragraph">
+<p>In the following sample, the <code>BeforeConvertCallback</code> modifies a given immutable entity by using a <code>wither</code> method that assigns an <code>id</code> to a copy of the entity, which is then returned and, in the next step, converted into the store specific representation:</p>
+</div>
+<div class="listingblock">
+<div class="title">EntityCallback API</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Bean
+BeforeConvertCallback&lt;Person&gt; beforeConvert() {
+
+  return (entity, collection) -&gt; {
+    return entity.withId(…);
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Other than with <code>ApplicationEvents</code> (which could be configured with an <code>AsyncTaskExecutor</code>, leaving it pretty much open when the action is executed), the <code>EntityCallback</code> API guarantees to be invoked right before the actual event is triggered. Even in a reactive stream. The following listing shows how it works:</p>
+</div>
+<div class="listingblock">
+<div class="title">Reactive EntityCallback API</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Bean
+ReactiveBeforeConvertCallback&lt;Person&gt; beforeConvert() {
+
+  return (entity, collection) -&gt; {
+    return Mono.just(entity.withId(…));
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redis-streams"><a class="anchor" href="#redis-streams"></a>Support for Redis Streams</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Speaking of streams, Spring Data Redis now has support for Redis Streams, which have almost nothing to do with reactive streams but are a new Redis append-only data structure that models a log where each entry consists of an id (typically a timestamp plus a sequence number) and multiple key/value pairs.
+Along with the usual suspects, such as adding to the log and reading from it, Spring Data Redis provides containers that allow infinite listening and processing of entries added to the log.
+It works like <code>tail -f</code> but for a Redis Stream.
+The following example shows a Redis stream listener:</p>
+</div>
+<div class="listingblock">
+<div class="title">Redis Streams listener</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Autowired
+RedisConnectionFactory factory;
+
+StreamListener&lt;String, MapRecord&lt;…&gt;&gt; listener =
+  (msg) -&gt; {
+
+    // … msg.getId()
+    // … msg.getStream()
+    // … msg.getValue()
+  };
+
+StreamMessageListenerContainer container = StreamMessageListenerContainer.create(factory));
+
+container.receive(StreamOffset.fromStart("my-stream"), listener);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>StreamMessageListenerContainer</code> in the preceding sample reads all existing entries of <code>my-stream</code> and gets notified about newly added ones.
+For each message received, the <code>StreamListener</code> is invoked.
+A single container can receive messages from multiple streams.</p>
+</div>
+<div class="paragraph">
+<p>Of course, stream-like structures are best consumed by a reactive infrastructure, as the following example shows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">StreamReceiver receiver = // …
+
+receiver.receive(StreamOffset.fromStart("my-stream"))
+  .doOnNext(msg -&gt; {
+      // …
+  })
+  .subscribe();</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="multiple-out-parameters-jpa"><a class="anchor" href="#multiple-out-parameters-jpa"></a>Multiple out parameters for JPA stored procedures</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>On the JPA side of things, a tiny improvement now lets you have multiple <code>OUT</code> parameters for stored procedures, which are returned within a <code>Map</code>.
+The following example shows how to do so:</p>
+</div>
+<div class="listingblock">
+<div class="title">Out parameters with JPA Stored Procedures</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@NamedStoredProcedureQuery(name = "User.s1p", procedureName = "s1p",
+  parameters = {
+    @StoredProcedureParameter(mode = IN, name = "in_1", type = …),
+    @StoredProcedureParameter(mode = OUT, name = "out_1", type = …),
+    @StoredProcedureParameter(mode = OUT, name = "out_2", type = …)})
+@Table(name = "SD_User")
+class User { … }
+
+interface UserRepository extends JpaRepository&lt;…&gt; {
+
+  @Procedure(name = "User.s1p")
+  Map&lt;String, Integer&gt; callS1P(@Param("in_1") Integer arg);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All of the out parameters declared in JPA&#8217;s <code>@StoredProcedureParameter</code> annotations will eventually be available in the <code>Map</code> returned by the repository query method.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="declarative-mongodb-aggregations"><a class="anchor" href="#declarative-mongodb-aggregations"></a>Declarative MongoDB aggregations on repository methods</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With MongoDB, complex data processing is done with <a href="https://docs.mongodb.com/manual/reference/operator/aggregation/">Aggregations</a> for which Spring Data offers a specific (fluent) API with abstractions for the operations and expressions. However, Stackoverflow taught us that people tend to craft their aggregations on the command line and translate those into Java code later on. That translation turned out to be one major pain point.<br>
+So we took the opportunity to introduce <code>@Aggregation</code> as a direct way to run aggregations in a repository method. The following example shows how to do so:</p>
+</div>
+<div class="listingblock">
+<div class="title">Declarative MongoDB Aggregations</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">interface OrderRepository extends CrudRepository&lt;Order, Long&gt; {
+
+  @Aggregation("{ $group : { _id : '$cust_id', total : { $sum : '$amount' }}}")
+  List&lt;TotalByCustomer&gt; totalByCustomer(Sort sort);
+
+  @Aggregation(pipeline = {
+    "{ $match : { customerId : ?0 }}",
+    "{ $count : total }"
+  })
+  Long totalOrdersForCustomer(String customerId);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Like its relative, the <code>@Query</code> annotation, <code>@Aggregation</code> supports parameter replacement and adds sorting to the aggregation if provided by a query method argument, as shown in the preceding example.
+We even took it one step further, extracting single-attribute document values for methods that return simple types, such as the <em>totalOrdersForCustomer</em> method in the preceding example. The <code>$count</code> stage in this case returns a document like <code>{"total" : 101 }</code> that normally requires mapping to either plain <code>org.bson.Document</code> or a corresponding domain type. However, since the method declares <code>Long</code> as its return type, we inspect the result document and extract / convert the value from there, removing the need of the dedicated type.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="more"><a class="anchor" href="#more"></a>There&#8217;s much more for you to explore</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To round things off for now, I want to mention some additional features across other modules. If you&#8217;re interested in all of them, please have a look at our <a href="https://github.com/spring-projects/spring-data-commons/wiki/Release-Train-Moore">release wiki</a> or refer to the "What&#8217;s New" section in the reference documentation of the individual modules. So, without further ado, here are yet more improvements provided by this release:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Gemfire/Apache Geode: Improved SSL support &amp; dynamic port configuration</p>
+</li>
+<li>
+<p>JDBC: Read only properties, SQL generation &amp; embeddable load options</p>
+</li>
+<li>
+<p>REST: making use of HATEOAS 1.0 and all the cool stuff in there!</p>
+</li>
+<li>
+<p>MongoDB: Reactive GridFS, declarative collation support &amp; JSON Schema generator</p>
+</li>
+<li>
+<p>neo4j: Spatial types &amp; exists projections</p>
+</li>
+<li>
+<p>Apache Cassandra: Range queries, Optimistic locking and auditing support</p>
+</li>
+<li>
+<p>Redis: Cluster caching and non blocking connect methods</p>
+</li>
+<li>
+<p>Elasticsearch: High Level REST Client support &amp; non Jackson based entity mapping</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you&#8217;d like to know more, <a href="https://www.youtube.com/watch?v=jwdhZcCOock">here</a>'s a 30-minute presentation recorded at SpringOne 2019 in Austin, TX.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3802;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Integration in 10 minutes</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Integration in 10 minutes" />
+<meta name="twitter:description" content="&lt;p&gt;The Spring Integration 1.0 GA release was &lt;a href=&quot;http://www.springsource.org/node/843&quot; target=&quot;_blank&quot;&gt;announced&lt;/a&gt; 2 months ago at SpringOne Americas, and ever since I’ve been meaning to write a new, up-to-date “getting started” blog post. Well, the beginning of the year is always a busy time, so my goal is to provide a hands-on example with 10 steps. Each step should take roughly one minute… unless you stop to think ;). So, without further ado, here we go!&lt;/p&gt;
+&lt;h2&gt;Step 1: Download the Spring Integration distribution&lt;/h2&gt;
+&lt;p&gt;You can grab the latest version (1.0.1 at the time I’m writing this) here:&lt;br&gt;&lt;a href=&quot;http://www.springsource.com/download/community?project=Spring%20Integration&quot; target=&quot;_blank&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.springsource.com/download/community?project=Spring%20Integration&quot;&gt;http://www.springsource.com/download/community?project=Spring%20Integration&lt;/a&gt;&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@m_f_" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+
+<meta property="og:title" content="Spring Integration in 10 minutes" />
+<meta property="og:image" content="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=200" />
+<meta property="og:description" content="&lt;p&gt;The Spring Integration 1.0 GA release was &lt;a href=&quot;http://www.springsource.org/node/843&quot; target=&quot;_blank&quot;&gt;announced&lt;/a&gt; 2 months ago at SpringOne Americas, and ever since I’ve been meaning to write a new, up-to-date “getting started” blog post. Well, the beginning of the year is always a busy time, so my goal is to provide a hands-on example with 10 steps. Each step should take roughly one minute… unless you stop to think ;). So, without further ado, here we go!&lt;/p&gt;
+&lt;h2&gt;Step 1: Download the Spring Integration distribution&lt;/h2&gt;
+&lt;p&gt;You can grab the latest version (1.0.1 at the time I’m writing this) here:&lt;br&gt;&lt;a href=&quot;http://www.springsource.com/download/community?project=Spring%20Integration&quot; target=&quot;_blank&quot;&gt;&lt;/a&gt;&lt;a href=&quot;http://www.springsource.com/download/community?project=Spring%20Integration&quot;&gt;http://www.springsource.com/download/community?project=Spring%20Integration&lt;/a&gt;&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2009-02-13 16:15:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Integration in 10 minutes</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/443e6ec0242c3f54001dae34374780e2?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mfisher">Mark Fisher</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2009-02-13 16:15:00.0">February 13, 2009</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="201" href="/blog/2009/02/13/spring-integration-in-10-minutes#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>The Spring Integration 1.0 GA release was <a href="http://www.springsource.org/node/843" target="_blank">announced</a> 2 months ago at SpringOne Americas, and ever since I&rsquo;ve been meaning to write a new, up-to-date &ldquo;getting started&rdquo; blog post. Well, the beginning of the year is always a busy time, so my goal is to provide a hands-on example with 10 steps. Each step should take roughly one minute&hellip; unless you stop to think ;). So, without further ado, here we go!</p>
+<h2>Step 1: Download the Spring Integration distribution</h2><p>You can grab the latest version (1.0.1 at the time I&rsquo;m writing this) here:<br /><a href="http://www.springsource.com/download/community?project=Spring%20Integration" target="_blank"><a href="http://www.springsource.com/download/community?project=Spring%20Integration">http://www.springsource.com/download/community?project=Spring%20Integration</a></a></p><p>Once the download completes, unzip the file. You will see a &lsquo;dist&rsquo; directory containing the JARs that comprise the Spring Integration project. You will also see a &lsquo;lib&rsquo; directory that contains dependencies.</p>
+<h2>Step 2: Create a project</h2><p>I&rsquo;ll be using Eclipse for the example, but of course you could do this in another IDE. You can also use Maven or Ivy, but the example here is so simple, it&rsquo;s sufficient to just create a directory and add the JARs.</p><p>Create a new &lsquo;Java Project&rsquo; (In the &lsquo;Package Explorer&rsquo; view, right-click, then &lsquo;New -&gt; Java Project&rsquo;), and create a &lsquo;lib&rsquo; directory within that. Then, copy the following JARs from the Spring Integration &lsquo;dist&rsquo; and &lsquo;lib&rsquo; directory into the project&rsquo;s &lsquo;lib&rsquo;.<br /><strong>from dist:</strong><br /><ul><br /> <li>org.springframework.integration-1.0.1.RELEASE.jar</li><br /> <li>org.springframework.integration-file-1.0.1.RELEASE.jar</li><br /></ul><br /><strong>from lib:</strong><br /><ul><br /> <li>com.springsource.org.aopalliance-1.0.0.jar</li><br /> <li>com.springsource.org.apache.commons.logging-1.1.1.jar</li><br /> <li>org.springframework.aop-2.5.6.A.jar</li><br /> <li>org.springframework.beans-2.5.6.A.jar</li><br /> <li>org.springframework.context-2.5.6.A.jar</li><br /> <li>org.springframework.core-2.5.6.A.jar</li><br /> <li>org.springframework.transaction-2.5.6.A.jar</li><br /></ul></p><p>Refresh the &lsquo;lib&rsquo; directory in Eclipse (hit F5) and add those JARs to the build-path (select the JARs, right-click, and choose &ldquo;Build Path -&gt; Add to Build Path&rdquo;). Finally, create a &lsquo;blog&rsquo; package in the &lsquo;src&rsquo; directory.</p>
+<h2>Step 3: Begin the Spring configuration</h2><p>If you&rsquo;re using <a href="http://springide.org/blog/" target="_blank">Spring IDE</a> or the <a href="http://www.springsource.com/products/suite/sts" target="_blank">SpringSource Tool Suite</a>, you can add Spring project nature and just right-click the &lsquo;blog&rsquo; package to create a new bean definition file. Otherwise, just create the following and name it &lsquo;config.xml&rsquo;:</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:si=&quot;http://www.springframework.org/schema/integration&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/integration
+           http://www.springframework.org/schema/integration/spring-integration-1.0.xsd&quot;&gt;
+
+&lt;/beans&gt;
+</code></pre><p>We will add a single element for now. This defines a Message Channel that is backed by a Java in-memory queue and will hold up to 10 Messages at a time:</p>
+<pre><code class="prettyprint xml"><br />&lt;si:channel id=&quot;channel&quot;&gt;
+    &lt;si:queue capacity=&quot;10&quot;/&gt;
+&lt;/si:channel&gt;
+</code></pre>
+<h2>Step 4: Define a Bootstrap Java class</h2><p>Spring Integration components are simply embedded within any Spring ApplicationContext. Therefore, all we need to do is create one based on this configuration file. If running within a web-app, you could bootstrap with Spring&rsquo;s ContextLoaderListener, or if you run within <a href="http://www.springsource.com/products/suite/dmserver" target="_blank">dm Server</a>, it will also handle this for you. For this simple example, we&rsquo;ll just create a <em>main()</em> method in a class called Bootstrap (in the &lsquo;blog&rsquo; package):</p>
+<pre><code class="prettyprint java"><br />public class Bootstrap {
+
+    public static void main(String[] args) {
+        new ClassPathXmlApplicationContext(&quot;blog/config.xml&quot;);
+    }
+
+}
+</code></pre><p>(At any point, to quickly resolve imports in Eclipse you can &ldquo;organize imports&rdquo; with Ctrl+Shift+O&hellip; or Command+Shift+O on a Mac).</p>
+<h2>Step 5: Send and receive a Spring Integration Message</h2><p>Now, we can access the channel from the context and send a Message. Because we don&rsquo;t have any subscribers yet (coming in the next couple steps), we will also receive from the same channel. This will prove that everything is configured properly. Modify the <em>main()</em> method so it looks like this:</p>
+<pre><code class="prettyprint java"><br />public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;blog/config.xml&quot;);
+    PollableChannel channel = (PollableChannel) context.getBean(&quot;channel&quot;);
+    channel.send(new StringMessage(&quot;Spring Integration rocks&quot;));
+    Message&lt;?&gt; reply = channel.receive();
+    System.out.println(&quot;received: &quot; + reply);
+}
+</code></pre><p>When you run that, you should see the result of the Message&rsquo;s <em>toString()</em> method printed to the console.</p>
+<h2>Step 6: Create a Service</h2><p>Spring Integration aims to be non-invasive. That means we will now gradually modify the sample so that you have <strong>no</strong> code directly tied to the framework. The first thing we&rsquo;ll do, however, is add a POJO Service that will become a subscriber for our messages. This example is going to simply convert the String to uppercase and add some exclamation points:</p>
+<pre><code class="prettyprint java"><br />public class Shouter {
+
+    public String shout(String s) {
+        return s.toUpperCase().concat(&quot;!!!&quot;);
+    }
+
+}
+</code></pre>
+<h2>Step 7: Add the Service to the Spring configuration</h2><p>The Service can be added as just a regular bean:</p>
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;shouter&quot; class=&quot;blog.Shouter&quot;/&gt;
+</code></pre><p>Next, we&rsquo;ll add a &ldquo;Service Activator&rdquo; to connect the Service bean to input and output channels. We need to rename the existing &ldquo;channel&rdquo; to &ldquo;output&rdquo;, and then add a simple non-buffering channel for input. The entire configuration should look like this:</p>
+<pre><code class="prettyprint xml"><br />&lt;si:channel id=&quot;input&quot;/&gt;
+
+&lt;si:channel id=&quot;output&quot;&gt;
+    &lt;si:queue capacity=&quot;10&quot;/&gt;
+&lt;/si:channel&gt;
+
+&lt;si:service-activator input-channel=&quot;input&quot;
+                      output-channel=&quot;output&quot;
+                      ref=&quot;shouter&quot;
+                      method=&quot;shout&quot;/&gt;
+
+&lt;bean id=&quot;shouter&quot; class=&quot;blog.Shouter&quot;/&gt;
+</code></pre>
+<h2>Step 8: Invoke the Service by sending a Message</h2><p>Modify the <em>main()</em> method to send a Message to the input channel and to receive from the output channel. Notice that we&rsquo;re also modifying the dependency lookups and that the channels are cast to different types (the &lsquo;input&rsquo; channel is non-buffering, hence it is not a <em>PollableChannel</em> like the output is):</p>
+<pre><code class="prettyprint java"><br />public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;blog/config.xml&quot;);
+    MessageChannel input = (MessageChannel) context.getBean(&quot;input&quot;);
+    PollableChannel output = (PollableChannel) context.getBean(&quot;output&quot;);
+    input.send(new StringMessage(&quot;Spring Integration rocks&quot;));
+    Message&lt;?&gt; reply = output.receive();
+    System.out.println(&quot;received: &quot; + reply);
+}
+</code></pre>
+<h2>Step 9: Send the output to a File</h2><p>Rather than polling for output in the <em>main()</em> method, we can send the result directly to a File by adding a Channel Adapter. First, you can remove the queue sub-element from the output channel, since polling will not be necessary:</p>
+<pre><code class="prettyprint xml"><br />&lt;si:channel id=&quot;output&quot;/&gt;
+</code></pre><p>Add the Channel Adapter. You can specify any existing directory, and on Windows you should include the drive letter (e.g. &ldquo;C:/tmp&rdquo;):</p>
+<pre><code class="prettyprint xml"><br />&lt;file:outbound-channel-adapter channel=&quot;output&quot; directory=&quot;/tmp&quot;/&gt;
+</code></pre><p>Next, you can update the Bootstrap&rsquo;s <em>main()</em> method to only send:</p>
+<pre><code class="prettyprint java"><br />public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;blog/config.xml&quot;);
+    MessageChannel input = (MessageChannel) context.getBean(&quot;input&quot;);
+    input.send(new StringMessage(&quot;Spring Integration rocks&quot;));
+}
+</code></pre><p>You also need to add the &lsquo;file&rsquo; namespace to the XSD configuration. The top-level &lsquo;beans&rsquo; element should look like this:</p>
+<pre><code class="prettyprint xml"><br />&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:si=&quot;http://www.springframework.org/schema/integration&quot;
+       xmlns:file=&quot;http://www.springframework.org/schema/integration/file&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/integration
+            http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
+            http://www.springframework.org/schema/integration/file
+            http://www.springframework.org/schema/integration/file/spring-integration-file-1.0.xsd&quot;&gt;
+</code></pre><p>Run the example, and you should see the output in a file with a &ldquo;.msg&rdquo; extension (you can add a filename-generator strategy, but that is beyond the scope of this post).</p>
+<h2>Step 10: Create a Gateway interface</h2><p>The final step will achieve the goal of complete non-invasiveness. Rather than sending the Message to a Message Channel, it would be much cleaner to send a String as a parameter to a simple interface. Create the following interface within the &lsquo;blog&rsquo; package:</p>
+<pre><code class="prettyprint java"><br />public interface Gateway {
+
+    void send(String s);
+
+}
+</code></pre><p>Then, add the following element to your configuration:</p>
+<pre><code class="prettyprint xml"><br />&lt;si:gateway id=&quot;gateway&quot; service-interface=&quot;blog.Gateway&quot; default-request-channel=&quot;input&quot;/&gt;
+</code></pre><p>Finally, use the Gateway in the main method instead of the channel. Now, you can simply pass a String:</p>
+<pre><code class="prettyprint java"><br />public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;blog/config.xml&quot;);
+    Gateway gateway = (Gateway) context.getBean(&quot;gateway&quot;);
+    gateway.send(&quot;Spring Integration rocks&quot;);
+}
+</code></pre>
+<h2>Conclusion</h2><p>Hopefully that provides a decent introduction to Spring Integration. The main point to take away is that you can easily create a dedicated integration layer that uses the non-invasive Spring programming model. The real value is apparent when you start adding multiple endpoints. Then, you may need to add filters, transformers, and routers.</p><p>Spring Integration provides much more than what this sample demonstrates. To learn more, check out the various projects within the &lsquo;org.springframework.integration.samples&rsquo; module (sources are available in the &lsquo;src&rsquo; directory of the distribution) and read through the <a href="http://static.springframework.org/spring-integration/reference/htmlsingle/spring-integration-reference.html" target="_blank">Reference Documentation</a>. Of course, you can find much more information on the Spring Integration <a href="http://www.springsource.org/spring-integration" target="_blank">Home Page</a>.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 201;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

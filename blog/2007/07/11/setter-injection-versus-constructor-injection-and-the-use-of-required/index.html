@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Setter injection versus constructor injection and the use of @Required</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Setter injection versus constructor injection and the use of @Required" />
+<meta name="twitter:description" content="&lt;p&gt;A couple of month ago, we start publishing polls on &lt;a href=&quot;http://www.springframework.org&quot;&gt;www.springframework.org&lt;/a&gt; asking people to provide their feedback about Spring, some of its features and how they are using those features. The first question I posted was whether or not people were checking required dependencies and if so, what mechanisms they used. I quickly followed up on this question asking the community what transaction management strategy it used.&lt;/p&gt;
+&lt;p&gt;To my delight when I first checked the results, back in March, a lot of people told us by voting in the first poll that they were using the @Required annotation. The second poll–on transaction management, quickly showed that a lot of people were using the @Transactional annotation. Below you can find some of the results of the poll about checking required dependencies. Together with the poll on transaction management (about 30% of all respondents are using the @Transactional annotation to demarcate transaction boundaries) they consistently show that people are using Spring 2.0 a lot, which was very good news for us. Because upgrading an application that uses Spring 1.x to use Spring 2.0 shouldn’t be any issue, we really hoped people would not stick to Spring 1.x and in fact, people massively upgraded.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Setter injection versus constructor injection and the use of @Required" />
+<meta property="og:description" content="&lt;p&gt;A couple of month ago, we start publishing polls on &lt;a href=&quot;http://www.springframework.org&quot;&gt;www.springframework.org&lt;/a&gt; asking people to provide their feedback about Spring, some of its features and how they are using those features. The first question I posted was whether or not people were checking required dependencies and if so, what mechanisms they used. I quickly followed up on this question asking the community what transaction management strategy it used.&lt;/p&gt;
+&lt;p&gt;To my delight when I first checked the results, back in March, a lot of people told us by voting in the first poll that they were using the @Required annotation. The second poll–on transaction management, quickly showed that a lot of people were using the @Transactional annotation. Below you can find some of the results of the poll about checking required dependencies. Together with the poll on transaction management (about 30% of all respondents are using the @Transactional annotation to demarcate transaction boundaries) they consistently show that people are using Spring 2.0 a lot, which was very good news for us. Because upgrading an application that uses Spring 1.x to use Spring 2.0 shouldn’t be any issue, we really hoped people would not stick to Spring 1.x and in fact, people massively upgraded.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2007-07-11 08:04:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Setter injection versus constructor injection and the use of @Required</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Alef Arendsen</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2007-07-11 08:04:00.0">July 11, 2007</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="97" href="/blog/2007/07/11/setter-injection-versus-constructor-injection-and-the-use-of-required#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>A couple of month ago, we start publishing polls on <a href="http://www.springframework.org">www.springframework.org</a> asking people to provide their feedback about Spring, some of its features and how they are using those features. The first question I posted was whether or not people were checking required dependencies and if so, what mechanisms they used. I quickly followed up on this question asking the community what transaction management strategy it used.</p><p>To my delight when I first checked the results, back in March, a lot of people told us by voting in the first poll that they were using the @Required annotation. The second poll&ndash;on transaction management, quickly showed that a lot of people were using the @Transactional annotation. Below you can find some of the results of the poll about checking required dependencies. Together with the poll on transaction management (about 30% of all respondents are using the @Transactional annotation to demarcate transaction boundaries) they consistently show that people are using Spring 2.0 a lot, which was very good news for us. Because upgrading an application that uses Spring 1.x to use Spring 2.0 shouldn&rsquo;t be any issue, we really hoped people would not stick to Spring 1.x and in fact, people massively upgraded.</p>
+<h3>How are you checking required dependencies</h3>
+<table>
+<tr>
+<td>8%</td>
+<td>I check them in my business methods</td>
+</tr>
+<tr>
+<td>9%</td>
+<td>Using init-method and an assert mechanism (c.f. Assert)</td>
+</tr>
+<tr>
+<td>9%</td>
+<td>Using the dependency-check attribute in XML</td>
+</tr>
+<tr>
+<td>13%</td>
+<td>I don't have to, I use constructor injection</td>
+</tr>
+<tr>
+<td>15%</td>
+<td>Using InitializingBean and an assert mechanism</td>
+</tr>
+<tr>
+<td><b>17%</b></td>
+<td><b>Using the Spring 2.0 @Required annotation</b></td>
+</tr>
+<tr>
+<td>29%</td>
+<td>I do not check required dependencies</td>
+</tr>
+</table><p>What&rsquo;s interesting however is that 29 percent of all people do not check required dependencies. In the forum thread that accompanied the discussion, interesting suggestions came up as to why some people weren&rsquo;t doing this and how people solved it otherwise. Let&rsquo;s review some of those.</p>
+<h2>Constructor injection</h2><p>I&rsquo;d like to begin with reviewing constructor injection. Any object that has a constructor that takes arguments, can (obviously) not be constructed without passing in arguments. In Java, we have a default or implicit constructor added to our class as long as we do not add one ourselves. This default or implicit constructor does not take arguments, so as long as you do not add a constructor with arguments at all, or specifically add one without any arguments, it will be possible for Spring (or any other user of your class for that matter) to instantiate your class without passing it anything.</p><p>In other words, we can <b>force</b> a user of our class (again, this might be Spring but it could also be a unit test that instantiates your class directly) to instantiate it while passing in arguments.</p>
+<pre><code class="prettyprint java"><br />public class Service {
+
+  public Collaborator collaborator;
+
+  // constructor with arguments, you *have* to
+  // satisfy the argument to instantiate this class
+  public Service(Collaborator collaborator) {
+    this.collaborator = collaborator;
+  }
+}
+</code></pre><p>We can use this to our advantage when in need to check required dependencies. If we modify the above code example to include assertions, we are 100% sure the class will never be instantiated without its collaborators injected:</p>
+<pre><code class="prettyprint java"><br />public Service(Collaborator collaborator) {
+  if (collaborator == null) {
+    throw new IllegalArgumentException(&quot;Collaborator cannot be null&quot;);
+  }
+  this.collaborator = collaborator;
+}
+</code></pre><p>In other words, we do not need a dependency checking mechanism if we&rsquo;re using constructor injection in combination with an assertion mechanism like I&rsquo;ve showed above.</p>
+<h3>Why do people not use constructor injection mostly</h3><p>The question of course now is, why so few people are using constructor injection to enforce required dependencies, if it is the simplest way to get the job done! There are two reasons for this&ndash;one is a bit more historical, the other being the nature of the Spring Framework itself.</p>
+<h3>Historical reasons</h3><p>Early 2003, when Spring was first published as an open source project, it primarily focused on setter injection. Other frameworks also pioneered ways of doing dependency injection and one of those was PicoContainer, which strongly focused on constructor injection. Spring maintained its focus on setter injection because at the time, we believed that the lack of default arguments and argument names for constructor arguments resulted in less clarity for developers. We however also implemented constructor injection, to be able to offer that feature to developers that wanted to instantiate and manage objects they didn&rsquo;t control.</p><p>This is one of the reasons why you&rsquo;re seeing a lot of setter injection throughout the Spring Framework itself. The fact that setter injection was used in Spring itself, as well as us advocating it mostly also caused many pieces of third-party software to start using setter injection as well as blog and articles to start mentioning setter injection.</p><p>(By the way, do people still remember type 1, 2 and M inversion of control ;-) )</p>
+<h3>Frameworks need to be a lot more configurable</h3><p>The second reason why setter injection is used a lot more often than you would expect, is the fact that frameworks like Spring in general, are much more suited to be configured by setter injection than by constructor injection. This is mostly because frameworks that need to be configured often contain lots of optional values. Making optional values configurable using constructor injection would lead to needless clutter and proliferating constructors, especially when used in combination with class inheritance.</p><p>For those exact two reasons, I think constructor injection is much more usable for application code than it is for framework code. In application code, you inherently have a lesser need for optional values that you need to configure (you&rsquo;re application code is less likely to be used in many situations, which would require configurable properties). Second of all, application code uses class inheritance a lot less often than framework code does. Specialization in an application does not occur as often in application code as it does in framework code for example&ndash;again the number of use cases in which application code is far less.</p>
+<h3>So what should you use?</h3><p>We usually advise people to use constructor injection for all mandatory collaborators and setter injection for all other properties. Again, constructor injection ensures all mandatory properties have been satisfied, and it is simply not possible to instantiate an object in an invalid state (not having passed its collaborators). In other words, when using constructor injection you do not have to use a dedicated mechanism to ensure required properties are set (other than normal Java mechanisms).</p><p>One of the other arguments for not using constructor injection is the lack of argument names in constructors and the fact that these do not appear in the XML. I would argue that in <b>most</b> applications, this does not matter that much. First consider the variant that uses setter injection:</p>
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;authenticator&quot; class=&quot;com.mycompany.service.AuthenticatorImpl&quot;/&gt;
+
+&lt;bean id=&quot;accountService&quot; class=&quot;com.mycompany.service.AccountService&quot;&gt;
+  &lt;property name=&quot;authenticator&quot; ref=&quot;authenticator&quot;/&gt;
+&lt;/bean&gt;
+</code></pre><p>This version mentions the authenticator as a property name as well as a bean name. This is the pattern that I frequently encounter. I would argue that while using constructor injection, the lack of constructor argument names (and those not appearing in XML), doesn&rsquo;t really confuse us a lot.</p>
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;authenticator&quot; class=&quot;com.mycompany.service.AuthenticatorImpl&quot;/&gt;
+
+&lt;bean id=&quot;accountService&quot; class=&quot;com.mycompany.service.AccountService&quot;&gt;
+  &lt;constructor-arg ref=&quot;authenticator&quot;/&gt;
+&lt;/bean&gt;
+</code></pre>
+<h2>Using the alternative mechanisms</h2><p>That brings us back to the topic of this blog entry, which also included a mention of @Required. This the new Spring 2.0 annotation we introduced back in 2006. @Required allows you to instruct Spring to check required dependencies for you. In case you are not in the position to use constructor injection, or for whatever other reasons, you prefer setter injection, @Required is the way to go. Annotation a property&rsquo;s setter an registering the RequiredAnnotationBeanFactoryPostProcessor as a bean in your application context is all you need to do:</p>
+<pre><code class="prettyprint java"><br />public class Service {
+
+  private Collaborator collaborator;
+
+  @Required
+  public void setCollaborator(Collaborator c) {
+    this.collaborator = c;
+  }
+}
+</code></pre>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.sfw.beans.factory.annotation.RequiredAnnotationBeanFactoryPostProcessor&quot;/&gt;
+</code></pre>
+<h3>Other mechanisms to check required dependencies</h3><p>There are a few other mechanisms to enforce the checking of required dependencies. Most of those rely on Spring&rsquo;s ability to allow you to get callbacks at certain points in the construction an initialization of an object, such as the Spring InitializingBean interface or Spring&rsquo;s an arbitrary init method you can configure in the XML (using the init-method attribute). Those all resemble the use of constructor injection a lot, with the difference that you are relying on Spring to call the method in which the assertions take place for you.</p>
+<pre><code class="prettyprint java"><br />public class Service implements InitializingBean {
+
+  private Collaborator collaborator;
+
+  public void setCollaborator(Collaborator c) {
+    this.collaborator = c;
+  }
+
+  // from the InitializingBean interface
+  public void afterPropertiesSet() {
+    if (collaborator == null) {
+      throw new IllegalStateException(&quot;Collaborator must be set in order for service to work&quot;);
+    }
+  }
+}
+</code></pre><p>Another mechanism, similar to @Required in Java is the dependency-check attribute in XML, which strangely enough is not used all that much. Enabling the dependency check by tweaking this attribute (it&rsquo;s turned off by default) will tell Spring to start checking certain dependencies on beans. Refer to the reference for more information about this features.</p>
+<h2>So why <b>NOT</b> check required dependencies</h2><p>There are a lof of people that actually do not check if dependencies have been accurately set. The biggest reason people gave for not doing so is because they would find out quickly enough is they fired up the ApplicationContext and somehow used the classes that had dependencies. This is of course very true. If you&rsquo;re using Spring&rsquo;s integration testing support for example, you can have Spring load up an application context for you. If you&rsquo;re also making sure some of the actual code gets tested in your integration test, you can probably pretty much guarantee all the dependencies the classes need to work are set. It is an approach that bugs me a little bit though. You have to be confident in your test cases covering your code enough though, because if your tests do not test the code that depends on the collaborators being set, you&rsquo;re screwed, as you might not detect things! Of course a smoke test when you are deploying your application would probably do the trick right then and there, but I wouldn&rsquo;t want to be the one that only finds out about missing dependencies at runtime!</p>
+<h2>Conclusion</h2><p>There is a lot to be said about constructor injection versus setter injection and I know a lot of people still prefer setter injection. I think though (and with me a lot of people) that constructor injection in combination with checking dependencies in your constructor is the better way (for code that does not have a lot of optional and configurable values or collaborators) to enforce checking of required dependencies. Combining this with final fields immediately gives you the other benefit of increased safety in a multi-threaded environment and because usually that does not prove to be a big deal anyway, I&rsquo;m not going to touch on that in this blog entry.</p><p>There are situations in which I would not use constructor injection. One of those for example is a class with <b>a lot</b> of dependencies or other configurable values. I personally do not consider a constructor with 20 arguments as a good example of nice code. Of course, the question is, if a class with 20 dependencies does not have too many responsibilities&hellip;</p><p>One thing is for sure&ndash;enforcing required dependencies by checking them in your business methods is something I would certainly not do.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 97;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

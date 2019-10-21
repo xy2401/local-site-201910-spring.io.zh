@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Countdown to Grails 2.0: Unit testing</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Countdown to Grails 2.0: Unit testing" />
+<meta name="twitter:description" content="&lt;p&gt;The first milestone of Grails 1.4 &lt;ins datetime=&quot;2011-06-30T17:06:58+00:00&quot;&gt;(now 2.0)&lt;/ins&gt; has now been released and we are on the last stages of the journey towards &lt;del datetime=&quot;2011-06-30T17:06:58+00:00&quot;&gt;1.4&lt;/del&gt; 2.0 final. As we approach that point, I will be writing a series of blog posts that cover the various new features and changes that the &lt;del datetime=&quot;2011-06-30T17:06:58+00:00&quot;&gt;1.4&lt;/del&gt; 2.0 version brings. I’ll be starting with the new testing support.&lt;/p&gt;
+&lt;p&gt;Since the beginning, Grails has provided three levels of testing support for developers: unit, integration, and functional. Unit tests had and still have the benefit of running independently of Grails, but they typically required a fair bit of extra work in the form of mocking. The unit test framework introduced with Grails 1.1 helped with that mocking, but it still didn’t cover all use cases and so developers needed to resort to integration tests, which run inside a bootstrapped Grails instance, earlier than was desirable.&lt;/p&gt;
+" />
+
+<meta property="og:title" content="Countdown to Grails 2.0: Unit testing" />
+<meta property="og:description" content="&lt;p&gt;The first milestone of Grails 1.4 &lt;ins datetime=&quot;2011-06-30T17:06:58+00:00&quot;&gt;(now 2.0)&lt;/ins&gt; has now been released and we are on the last stages of the journey towards &lt;del datetime=&quot;2011-06-30T17:06:58+00:00&quot;&gt;1.4&lt;/del&gt; 2.0 final. As we approach that point, I will be writing a series of blog posts that cover the various new features and changes that the &lt;del datetime=&quot;2011-06-30T17:06:58+00:00&quot;&gt;1.4&lt;/del&gt; 2.0 version brings. I’ll be starting with the new testing support.&lt;/p&gt;
+&lt;p&gt;Since the beginning, Grails has provided three levels of testing support for developers: unit, integration, and functional. Unit tests had and still have the benefit of running independently of Grails, but they typically required a fair bit of extra work in the form of mocking. The unit test framework introduced with Grails 1.1 helped with that mocking, but it still didn’t cover all use cases and so developers needed to resort to integration tests, which run inside a bootstrapped Grails instance, earlier than was desirable.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-06-07 09:12:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Countdown to Grails 2.0: Unit testing</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
+<span class="author">Peter Ledbrook</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-06-07 09:12:00.0">June 07, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="418" href="/blog/2011/06/07/countdown-to-grails-2-0-unit-testing#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>The first milestone of Grails 1.4 <ins datetime="2011-06-30T17:06:58+00:00">(now 2.0)</ins> has now been released and we are on the last stages of the journey towards <del datetime="2011-06-30T17:06:58+00:00">1.4</del> 2.0 final. As we approach that point, I will be writing a series of blog posts that cover the various new features and changes that the <del datetime="2011-06-30T17:06:58+00:00">1.4</del> 2.0 version brings. I&rsquo;ll be starting with the new testing support.</p><p>Since the beginning, Grails has provided three levels of testing support for developers: unit, integration, and functional. Unit tests had and still have the benefit of running independently of Grails, but they typically required a fair bit of extra work in the form of mocking. The unit test framework introduced with Grails 1.1 helped with that mocking, but it still didn&rsquo;t cover all use cases and so developers needed to resort to integration tests, which run inside a bootstrapped Grails instance, earlier than was desirable.</p><p>Grails 2.0 introduces significant changes that improve the situation considerably:<br /><ul><br /><li>the unit test support can be integrated into any test framework (no more base classes);</li><br /><li>it has a full in-memory GORM implementation; and</li><br /><li>it better supports testing REST actions, file uploads, and more.</li><br /></ul></p><p>So what do these changes look like to you as a user?</p>
+<h2>The day inheritance died</h2><p>The original unit testing support was provided as a hierarchy of classes that your own test cases had to extend, the root of which was <tt>GrailsUnitTestCase</tt>. This is a time-honoured pattern from the early days of JUnit and it is well understood. It also worked well for Grails initially. The problems started when people switched to testing frameworks other than JUnit 3 such as Spock, which also requires you to inherit a base class: <tt>spock.lang.Specification</tt>.</p><p>As we all know, Java doesn&rsquo;t support multiple inheritance and so the result for Spock was a duplication of the <tt>GrailsUnitTestCase</tt> hierarchy based on the <tt>Specification</tt> class. Not exactly ideal!</p><p>Grails 2.0 solves this problem by providing all the features originally supplied by <tt>GrailsUnitTestCase</tt> and its family via annotations. So for a simple controller unit test, you now have code like this:</p>
+<pre><code class="prettyprint groovy">package org.example
+
+import grails.test.mixin.*
+
+@TestFor(PostController)
+class PostControllerTests {
+    void testIndex() {
+        controller.index()
+        assert &quot;/post/list&quot; == response.redirectedUrl
+    }
+    ...
+}
+</code></pre><p>As you can see, the addition of the <tt>TestFor</tt> annotation immediately makes <tt>controller</tt> and <tt>response</tt> variables (amongst others) available to your tests. And all without an <tt>extends</tt> in sight! Even better, with the latest Spock plugin you can also do:</p>
+<pre><code class="prettyprint groovy">package org.example
+
+import grails.test.mixin.*
+
+@TestFor(PostController)
+class PostControllerSpec extends spock.lang.Specification {
+    def &quot;Index action should redirect to list page&quot;() {
+        when: &quot;The index action is hit&quot;
+        controller.index()
+
+        then: &quot;The user should be redirected to the list action&quot;
+        response.redirectedUrl == &quot;/post/list&quot;
+    }
+    ...
+}
+</code></pre><p>In other words, you can take advantage of any improvements to the unit test support straight away no matter which test framework you are using. You can still use the old <tt>GrailsUnitTestCase</tt> hierarchy if you want, but it doesn&rsquo;t support any of the new features. For that reason, we strongly recommend you migrate your tests to the annotation-based mechanism as soon as you can.</p><p>What new features am I talking about? How about a proper GORM implementation.</p>
+<h2>In-memory GORM implementation</h2><p>Since the unit test framework was introduced, it has supported the mocking of domain classes. This saved you the effort of explicitly mocking the various dynamic methods yourself, such as <tt>save()</tt> and <tt>list()</tt>. But it has never been a full GORM implementation and users had to know the limitations in order to use it effectively. In particular, criteria queries had to be mocked manually and new GORM methods typically lagged behind in the mock implementation.</p><p>The introduction of a GORM API changed things: it was now possible to implement this API and check that implementation against a TCK. As long as the TCK tests passed, the implementation was GORM-compliant. And as a result of the noSQL work for GORM, we now have an in-memory GORM implementation that can be used for unit testing.</p><p>So how do you go about using this GORM implementation in your tests? Easy! Just declare the domain classes that you want to test within a new annotation: <tt>@Mock</tt>. You can then interact with instances of those domain classes as you would in normal Grails code. For example, consider the <tt>list</tt> action of the <tt>PostController</tt> we&rsquo;re testing. This action will perform a query on the <tt>Post</tt> domain class and we want to make sure it&rsquo;s returning the appropriate domain instances. Here&rsquo;s how we do that with the new unit testing support:</p>
+<pre><code class="prettyprint groovy">package org.example
+
+import grails.test.mixin.*
+
+@TestFor(PostController)
+@Mock(Post)
+class PostControllerTests {
+    void testList() {
+        new Post(message: &quot;Test&quot;).save(validate: false)
+        def model = controller.list()
+
+        assert model.postInstanceList.size() == 1
+        assert model.postInstanceList[0].message == &quot;Test&quot;
+        assert model.postInstanceTotal == 1
+    }
+}
+</code></pre><p>The two key lines are highlighted: the <tt>@Mock</tt> annotation and the <tt>Post.save()</tt> line. The former ensures that <tt>Post</tt> behaves like a normal domain class while the latter saves a new <tt>Post</tt> instance. That instance will then be picked up by the query executed by the <tt>index</tt> action. As you can see, no <tt>mockDomain()</tt> method is required, just straightforward, well-understood GORM code.</p><p>One question you may ask is why does the above example use the <tt>validate: false</tt> option when saving the new domain instance? You have to remember that you are working against a full GORM implementation and so validation takes effect by default. For a simple domain class this isn&rsquo;t a problem, but what if you have tens of properties and some required relationships too? Building a valid graph of domain instances can involve considerable effort and yet the method or action under test may only access one or two properties of the domain class. Disabling validation removes what would otherwise be an onerous requirement.</p><p>For example, imagine that the <tt>Post</tt> domain class had a required <tt>user</tt> property of type <tt>User</tt>. Now, the <tt>list</tt> action doesn&rsquo;t care about the user at all - it&rsquo;s just returning a list of posts. But with validation enabled, you would have to create a dummy <tt>User</tt> instance and attach it to the <tt>Post</tt> instance. Scale that up to a complex domain model and you can see that validation is not your friend in this particular case.</p><p>This &ldquo;mock&rdquo; GORM implementation even extends to criteria queries, so you can now readily test those from within your unit test cases. And because we have the GORM TCK, any changes to GORM will be reflected in the mock implementation straight away. Unit testing with domain classes in Grails has never been easier!</p><p>Before I move on, there is one more thing to be aware of. The GORM implementation does not fully support transactions yet, so if you have any <tt>withTransaction</tt> blocks that you want to test, you will still have to rely on integration or functional tests. That doesn&rsquo;t mean you can&rsquo;t unit test code that uses <tt>withTransaction</tt> - you can - but you won&rsquo;t be able to reliably test the transactional semantics. For most people, particularly those that use transactional services instead, this won&rsquo;t be an issue at all.</p><p>GORM mocking is only one improvement to the unit testing support. Several other scenarios that used to be difficult have now been simplified.</p>
+<h2>The rest</h2><p>Did you ever try unit testing JSON responses? Grails filters? Tag libraries? Although each of these was possible, it wasn&rsquo;t particularly easy and often required a fair bit of mocking. Grails 2.0 brings in a host of changes that make such testing (and more) significantly easier. All the possibilities are documented in the <a href="http://grails.org/doc/1.4.0.M1/guide/9.%20Testing.html#9.1%20Unit%20Testing">user guide</a>, so I&rsquo;ll just focus on a few scenarios here to whet your appetite.</p>
+<h3>Testing XML/JSON responses</h3><p>With REST seemingly so widespread, more and more Grails applications will probably be using the &ldquo;render as XML/JSON&rdquo; options. But how do you unit test these? Let&rsquo;s say the <tt>list</tt> action of <tt>PostController</tt> looks like this:</p>
+<pre><code class="prettyprint groovy">    def list = {
+        params.max = Math.min(params.max ? params.int(&#39;max&#39;) : 10, 100)
+
+        def postList = Post.list(params)
+        withFormat {
+            html {
+                [postInstanceList: postList, postInstanceTotal: Post.count()]
+            }
+            xml {
+                render(contentType: &quot;application/xml&quot;) {
+                    for (p in postList) {
+                        post(author: p.author, p.message)
+                    }
+                }
+            }
+            json {
+                render(contentType: &quot;application/json&quot;) {
+                    posts = postList.collect { p -&gt;
+                        return { message = p.message; author = p.author }
+                    }
+                }
+            }
+        }
+    }
+</code></pre><p>First, you need to set the format you want to test so that <tt>withFormat</tt> picks the appropriate block of code. Then you have to somehow check that the correct JSON string is generated. Both of these can easily be achieved through the <tt>response</tt> property that is automatically injected into controller unit test cases:</p>
+<pre><code class="prettyprint groovy">    void testListWithJson() {
+        new Post(message: &quot;Test&quot;, author: &quot;Peter&quot;).save()
+        response.format = &quot;json&quot;
+        controller.list()
+
+        assert response.text == &#39;{&quot;posts&quot;:[{&quot;message&quot;:&quot;Test&quot;,&quot;author&quot;:&quot;Peter&quot;}]}&#39;
+    }
+</code></pre><p>Of course, comparing strings is typically quite brittle. It&rsquo;s fine for small JSON responses like the one above, but what if the controller suddenly includes the <tt>dateCreated</tt> property in the JSON response? The above test will immediately fail. That may be what you want, but perhaps you&rsquo;re not interested in whether <tt>dateCreated</tt> is included or not?</p><p>Fortunately, you can also interrogate the JSON response as if it were a hierarchy of objects rather than a straight string. The <tt>response</tt> object has both <tt>json</tt> and <tt>xml</tt> properties that are object representations of the underlying JSON or XML:</p>
+<pre><code class="prettyprint groovy">    void testListWithJson() {
+        ...
+        assert response.json.posts.size() == 1
+        assert response.json.posts[0].message == &quot;Test&quot;
+    }
+</code></pre><p>This can make your unit tests much more maintainable and robust and certainly makes it possible to test large responses by looking at only parts of the JSON or XML document.</p>
+<h3>Tag libraries</h3><p>When it comes to custom tags, life has definitely just got easier. You could test them before, but any call to another tag had to be manually mocked, for example via <tt>mockFor()</tt>. This was fine for simple tags, but it could quickly become a burden for more complex tags.</p><p>So what&rsquo;s changed? First of all, unit tests now look more like integration tests in that you use an <tt>applyTemplate()</tt> method with the markup form of the tag you&rsquo;re testing. Second, you don&rsquo;t have to mock calls to other custom tags. The standard Grails tags will just work and you can enable other tags by simply calling <tt>mockTagLib()</tt> with the relevant <tt>TagLib</tt> class.</p><p>As an example, consider these very simple tags:</p>
+<pre><code class="prettyprint groovy">package org.example
+
+class FirstTagLib {
+    static namespace = &quot;f&quot;
+
+    def styledLink = { attrs, body -&gt;
+        out &lt;&lt; &#39;&lt;span class=&quot;mylink&quot;&gt;&#39; &lt;&lt; s.postLink(attrs, body) &lt;&lt; &#39;&lt;/span&gt;&#39;
+    }
+}
+
+class SecondTagLib {
+    static namespace = &quot;s&quot;
+
+    def postLink = { attrs, body -&gt;
+        out &lt;&lt; g.link(controller: &quot;post&quot;, action: &quot;list&quot;, body)
+    }
+}
+</code></pre><p>The <tt>&lt;f:styledLink&gt;</tt> tag calls the <tt>&lt;s:postLink&gt;</tt> one, which in turns calls the standard <tt>&lt;g:link&gt;</tt> tag. So if we want to test the <tt>&lt;f:styledLink&gt;</tt> tag, we mock <tt>SecondTagLib</tt> to ensure that <tt>&lt;s:postLink&gt;</tt> is operational and then execute <tt>applyTemplate()</tt> like so:</p>
+<pre><code class="prettyprint groovy">package org.example
+
+import grails.test.mixin.*
+
+@TestFor(FirstTagLib)
+class FirstTagLibTests {
+    void testStyledLink() {
+        mockTagLib(SecondTagLib)
+        assert applyTemplate(&#39;&lt;f:styledLink&gt;Test&lt;/f:styledLink&gt;&#39;) == &#39;&lt;span class=&quot;mylink&quot;&gt;&lt;a href=&quot;/post/list&quot;&gt;Test&lt;/a&gt;&lt;/span&gt;&#39;
+    }
+}
+</code></pre><p>As you can see, Grails does a lot of heavy lifting for you, ensuring that chains of tag calls will work as they would in the application. One thing you do need to bear in mind is that tags like <tt>&lt;g:link&gt;</tt> will assume a servlet context of &quot;&ldquo;, hence why the above example checks for an <tt>href</tt> value of &rdquo;/post/list&ldquo; rather than &rdquo;/my-app/post/list&quot;.</p><p>These are just two examples of the improved unit testing support. Others include:<br /><ul><br /><li>Grails Filters</li><br /><li>File uploads</li><br /><li>Command objects</li><br /><li>View and template rendering</li><br /></ul><br />As you can see, there are few areas of Grails code that can&rsquo;t now be unit tested.</p>
+<h2>Conclusion</h2><p>Testing has always been an important part of application development and the ease of testing has a direct impact on test coverage: the easier it is to write tests, the more likely developers are to write them. That&rsquo;s why the unit testing changes that come with the 2.0 release of Grails are so significant. They make it much easier to write unit tests for scenarios that used to be relatively tricky. With that, the test coverage of the average Grails application is likely to go up and developers will end up with more robust applications.</p><p>All of this makes the unit testing improvements one of the most significant features of Grails 2.0 and a compelling argument for upgrading. So download the latest 2.0 release and give it a whirl!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 418;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

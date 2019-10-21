@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring 3.1 M1: Introducing FeatureSpecification support</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring 3.1 M1: Introducing FeatureSpecification support" />
+<meta name="twitter:description" content="&lt;p&gt;&lt;em&gt;UPDATE: The &lt;code&gt;FeatureSpecification&lt;/code&gt; functionality described in this blog post was removed in Spring Framework 3.1 M2 in favor of &lt;code&gt;@Enable*&lt;/code&gt; annotations. See the &lt;a href=&quot;http://blog.springsource.org/2011/06/10/spring-3-1-m2-configuration-enhancements&quot;&gt;3.1 M2 announcement&lt;/a&gt; for more information.&lt;/em&gt;&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;Earlier &lt;a href=&quot;http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released/&quot;&gt;in&lt;/a&gt; &lt;a href=&quot;http://blog.springsource.com/2011/02/14/spring-3-1-m1-introducing-profile/&quot;&gt;this&lt;/a&gt; &lt;a href=&quot;http://blog.springsource.com/2011/02/15/spring-3-1-m1-unified-property-management/&quot;&gt;series&lt;/a&gt; I touched on how the new &lt;code&gt;@Profile&lt;/code&gt; annotation can be used in conjunction with &lt;code&gt;@Configuration&lt;/code&gt; classes to take advantage of Spring’s &lt;em&gt;bean definition profiles&lt;/em&gt;. Today, we’ll look at an entirely new addition to the code-based configuration landscape in Spring 3.1: &lt;em&gt;&lt;code&gt;FeatureSpecification&lt;/code&gt; classes&lt;/em&gt; and their related support.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@cbeams" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+
+<meta property="og:title" content="Spring 3.1 M1: Introducing FeatureSpecification support" />
+<meta property="og:image" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200" />
+<meta property="og:description" content="&lt;p&gt;&lt;em&gt;UPDATE: The &lt;code&gt;FeatureSpecification&lt;/code&gt; functionality described in this blog post was removed in Spring Framework 3.1 M2 in favor of &lt;code&gt;@Enable*&lt;/code&gt; annotations. See the &lt;a href=&quot;http://blog.springsource.org/2011/06/10/spring-3-1-m2-configuration-enhancements&quot;&gt;3.1 M2 announcement&lt;/a&gt; for more information.&lt;/em&gt;&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;Earlier &lt;a href=&quot;http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released/&quot;&gt;in&lt;/a&gt; &lt;a href=&quot;http://blog.springsource.com/2011/02/14/spring-3-1-m1-introducing-profile/&quot;&gt;this&lt;/a&gt; &lt;a href=&quot;http://blog.springsource.com/2011/02/15/spring-3-1-m1-unified-property-management/&quot;&gt;series&lt;/a&gt; I touched on how the new &lt;code&gt;@Profile&lt;/code&gt; annotation can be used in conjunction with &lt;code&gt;@Configuration&lt;/code&gt; classes to take advantage of Spring’s &lt;em&gt;bean definition profiles&lt;/em&gt;. Today, we’ll look at an entirely new addition to the code-based configuration landscape in Spring 3.1: &lt;em&gt;&lt;code&gt;FeatureSpecification&lt;/code&gt; classes&lt;/em&gt; and their related support.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-02-17 00:58:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring 3.1 M1: Introducing FeatureSpecification support</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=20&amp;d=mm" />
+<span class="author">Chris Beams</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-02-17 00:58:00.0">February 17, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="397" href="/blog/2011/02/17/spring-3-1-m1-introducing-featurespecification-support#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p><em>UPDATE: The <code>FeatureSpecification</code> functionality described in this blog post was removed in Spring Framework 3.1 M2 in favor of <code>@Enable*</code> annotations. See the <a href="http://blog.springsource.org/2011/06/10/spring-3-1-m2-configuration-enhancements">3.1 M2 announcement</a> for more information.</em></p>
+<h3>Introduction</h3><p>Earlier <a href="http://blog.springsource.com/2011/02/11/spring-framework-3-1-m1-released/">in</a> <a href="http://blog.springsource.com/2011/02/14/spring-3-1-m1-introducing-profile/">this</a> <a href="http://blog.springsource.com/2011/02/15/spring-3-1-m1-unified-property-management/">series</a> I touched on how the new <code>@Profile</code> annotation can be used in conjunction with <code>@Configuration</code> classes to take advantage of Spring&rsquo;s <em>bean definition profiles</em>. Today, we&rsquo;ll look at an entirely new addition to the code-based configuration landscape in Spring 3.1: <em><code>FeatureSpecification</code> classes</em> and their related support.</p><p>I&rsquo;ve put together a sample project to accompany this post. Find it at <a href="https://bit.ly/gm8z9o"><a href="https://github.com/cbeams/spring-3.1-featurespec">https://github.com/cbeams/spring-3.1-featurespec</a></a> and follow the instructions in the <a href="https://github.com/cbeams/spring-3.1-featurespec/blob/master/README">README</a>.</p>
+<h3>From <code><bean /></code> to <code>@Bean</code></h3><p>The support for <code>@Configuration</code> classes added in Spring 3.0 essentially provides a mechanism for writing bean definitions in Java instead of XML. For example:</p><p><code>/src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
+	&lt;bean id=&quot;accountRepository&quot; class=&quot;com.bank.repository.internal.JdbcAccountRepository&quot;&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
+
+	&lt;!-- &#39;dataSource&#39; and other bean definitions --&gt;
+&lt;/beans&gt;
+</code></pre><p>can be translated into the following <code>@Configuration</code> class:</p><p><code>/src/main/com/bank/config/xml/TransferServiceConfig.java</code></p>
+<pre><code class="prettyprint java"><br />@Configuration
+public class TransferServiceConfig {
+
+	@Bean
+	public AccountRepository accountRepository() {
+		return new JdbcAccountRepository(dataSource());
+	}
+
+	@Bean
+	public DataSource dataSource() {
+		// create, configure and return the DataSource ...
+	}
+}
+</code></pre><p>And where the XML configuration would be bootstrapped as follows:</p>
+<pre><code class="prettyprint java"><br />new GenericXmlApplicationContext(&quot;com/bank/config/xml/transfer-service-config.xml&quot;);
+</code></pre><p>the <code>@Configuration</code> would be bootstrapped similarly, but taking the class as input:</p>
+<pre><code class="prettyprint java"><br />new AnnotationConfigApplicationContext(TransferServiceConfig.class);
+</code></pre><p>This approach works well, but it is limited to expressing individual bean definitions &ndash; to date there has been no support equivalent to Spring&rsquo;s XML namespaces in the <code>@Configuration</code> world. Spring&rsquo;s XML namespaces, such as <code>&lt;context:*/&gt;</code> and <code>&lt;tx:*/&gt;</code> allow for a tremendous amount of configuration to happen in a very concise fashion. For example, and as many users will know, enabling Spring&rsquo;s annotation-driven transaction management is a one-liner in XML:</p><p><code>/src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
+<pre><code class="prettyprint xml"><br />&lt;tx:annotation-driven transaction-manager=&quot;txManager&quot;/&gt;
+</code></pre><p>Under the covers, when the <code>tx:annotation-driven</code> element is processed, a number of supporting infrastructure-level bean definitions are created on your behalf, none of which you need directly care about, and that&rsquo;s a good thing &ndash; it <em>just works</em>, ensuring that any of your Spring beans marked with <code>@Transactional</code> are proxied with a <code>TransactionInterceptor</code>. Prior to Spring 3.1 M1, in order to emulate this functionality in a <code>@Configuration</code> class, you would have had to declare each of these infrastructure beans yourself as individual <code>@Bean</code> methods. This is a path some have actually gone down, and I think it&rsquo;s safe to say it is not a preferred approach. To help avoid this extra effort, Spring 3.0 provided the <code>@ImportResource</code> annotation to allow <code>@Configuration</code> classes to &ldquo;pull in&rdquo; XML configuration selectively when namespaces are needed:</p><p><code>/src/main/com/bank/config/code/TransferServiceConfig.java</code></p>
+<pre><code class="prettyprint java"><br />@Configuration
+@ImportResource(&quot;com/bank/config/xml/tx-config.xml&quot;)
+public class TransferServiceConfig {
+	// ...
+}
+</code></pre><p>In the example above, <code>tx-config.xml</code> would contain the <code>&lt;tx:annotation-driven/&gt;</code> declaration. It&rsquo;s nice that this hybrid model works, but again, it&rsquo;s not exactly ideal having to split configuration between XML and code. What&rsquo;s needed is an approach that allows <em>all</em> application configuration to be specified in code.</p>
+<h3>From <code><tx:annotation-driven /></code> to <code>TxAnnotationDriven</code></h3><p>To understand <code>FeatureSpecification</code> classes, it&rsquo;s best to think first about the nature of many of Spring&rsquo;s XML namespaces. Consider the following:</p>
+<ul>
+<li><code><context:component-scan /></code></li>
+<li><code><context:mbean-export /></code></li>
+<li><code><tx:annotation-driven /></code></li>
+<li><code><aop:aspectj-autoproxy /></code></li>
+</ul><p>Each of these elements <em>specifies</em> the configuration of a <em>feature</em> of the Spring container: the component-scanning feature, the annotation-driven transaction management feature, etc. <em><code>FeatureSpecification</em></code> classes allow users to configure these same features of the Spring container entirely in code.</p><p>Let&rsquo;s see a <code>FeatureSpecification</code> in action, with the transition from <code>&lt;tx:annotation-driven/&gt;</code> to <code>TxAnnotationDriven</code> as an example:</p>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
+    &lt;tx:annotation-driven transaction-manager=&quot;txManager&quot;/&gt;
+&lt;/beans&gt;
+</code></pre><p>becomes:</p><p><code>/src/main/com/bank/config/code/TxFeature.java</code></p>
+<pre><code class="prettyprint java"><br />@FeatureConfiguration
+class TxFeature {
+
+	@Feature
+	public TxAnnotationDriven txAnnotationDriven(PlatformTransactionManager txManager) {
+		return new TxAnnotationDriven(txManager);
+	}
+
+}
+</code></pre><p><code>@FeatureConfiguration</code> classes are processed by the Spring container in expectation of <code>@Feature</code> methods that return <code>FeatureSpecifation</code> types such as <code>TxAnnotationDriven</code>.</p><p><code>@FeatureConfiguration</code> classes are designed as a companion to <code>@Configuration</code> classes. The two may be used interchangably when bootstrapping the container:</p>
+<pre><code class="prettyprint java"><br />ApplicationContext ctx =
+	new AnnotationConfigApplicationContext(TransferServiceConfig.class, TxFeatures.class);
+TransferService transferService = ctx.getBean(TransferService.class);
+// ...
+</code></pre><p>and one may <code>@Import</code> the other:</p>
+<pre><code class="prettyprint java"><br />@Configuration
+@Import(TxFeature.class)
+public class TransferServiceConfig { ... }
+</code></pre><p>or:</p>
+<pre><code class="prettyprint java"><br />@FeatureConfiguration
+@Import(TransferServiceConfig.class)
+public class TxFeature { ... }
+</code></pre><p><code>@FeatureConfiguration</code> classes may contain one or more <code>@Feature</code> methods. For example, we could configure both component scanning and annotation-driven transaction management within the same class:</p>
+<pre><code class="prettyprint java"><br />@FeatureConfiguration
+class MyFeatures {
+
+	@Feature
+	public TxAnnotationDriven tx(PlatformTransactionManager txManager) {
+		return new TxAnnotationDriven(txManager);
+	}
+
+	@Feature
+	public ComponentScanSpec scan() {
+		return new ComponentScanSpec(&quot;com.bank.service&quot;);
+	}
+
+}
+</code></pre><p><code>@Feature</code> methods are called by the container at bootstrap time and the <code>FeatureSpecification</code> objects returned are processed in order to configure the actual internals of the feature in question. In the case of <code>TxAnnotationDriven</code>, proxy creation is configured, a transaction interceptor bean is registered, and so on; in the case of <code>ComponentScanSpec</code>, a <code>ClassPathBeanDefinitionScanner</code> is configured with the values specified and then run in order to detect and register your classes marked with <code>@Component</code> or other Spring stereotype annotations.</p><p><code>@Feature</code> methods may accept parameters in order to get references to Spring beans:</p>
+<pre><code class="prettyprint java"><br />	@Feature
+	public TxAnnotationDriven tx(PlatformTransactionManager txManager) {
+		return new TxAnnotationDriven(txManager);
+	}
+</code></pre><p>In order for the parameter to be supplied by the container, there must be a Spring bean of type <code>PlatformTransactionManager</code> declared elsewhere, probably within a <code>@Configuration</code> class. This notion of &lsquo;parameter autowiring&rsquo; is not new to the framework; for example, this is similar to the way <code>@InitBinder</code> and <code>@RequestMapping</code> methods work in Spring MVC. The ability to refer to actual spring bean instances keeps things type-safe by avoiding the use of string-based bean names.</p><p>The <code>FeatureSpecification</code> implementations shipped out of the box with the framework are designed for maximum ease of use when writing <code>@Feature</code> methods. As you can see in the screenshot below, <code>ComponentScanSpec</code> methods are <em>chainable</em>, and the public API of the class has been carefully designed to optimize the content-assist experience when working in your IDE:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/02/spec-content-assist.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/02/spec-content-assist.png" alt="Content-assist for ComponentScanSpec" title="spec-content-assist" width="642" height="400" class="alignnone size-full wp-image-7951" /></a></p>
+<h3>Status of efforts</h3><p>The following FeatureSpecification implementations are already available with the first milestone release:</p>
+<ul>
+<li><code>ComponentScanSpec</code></li>
+<li><code>TxAnnotationDriven</code></li>
+<li><code>MvcAnnotationDriven</code></li>
+<li><code>MvcResources</code></li>
+<li><code>MvcViewControllers</code></li>
+<li><code>MvcDefaultServletHandler</code></li>
+</ul><p>You&rsquo;ll see many of the <code>Mvc*</code> types put to use in Rossen&rsquo;s upcoming post in this series covering enhancements to Spring MVC in Spring 3.1 M1.</p><p>With the second milestone we&rsquo;ll add specification implementations for more of the most commonly used namespace elements such as <code>&lt;context:mbean-export/&gt;</code>, <code>&lt;aop:aspectj-autoproxy/&gt;</code> and so on.</p><p>Note that not all Spring XML namespace elements are alike. Some like those mentioned already are used to configure container features, while others like <code>&lt;jee:jndi-lookup/&gt;</code> and everything in the <code>&lt;util:*/&gt;</code> namespace are simply convenient utilities for doing in XML what can otherwise easily be done in code without any special support. For this reason, don&rsquo;t expect a one-to-one mapping between Spring XML elements and <code>FeatureSpecification</code> types. Only those elements that make sense will be translated into code.</p>
+<h3>An open model</h3><p>Just as users may define their own Spring XML namespaces and register their own <code>NamespaceHandler</code> and <code>BeanDefinitionParser</code> implementations, naturally the entire <code>Feature*</code> model is just as open. I&rsquo;ll defer to the <a href="http://static.springsource.org/spring/docs/3.1.0.M1/javadoc-api/org/springframework/context/config/FeatureSpecification.html">Javadoc</a> for full details, but suffice it to say that you can author your own <code>FeatureSpecification</code> types and use them with ease in <code>@Feature</code> methods.</p><p>And for those that have already implemented custom namespaces and <code>BeanDefinitionParsers</code>, you&rsquo;ll be interested to know that within the framework, we&rsquo;ve refactored existing <code>BeanDefinitionParsers</code> to delegate to <code>FeatureSpecifications</code> internally. This greatly simplifies the implementation of a parser, and also ensures reuse of critical bean registration logic across the XML and <code>@Configuration</code> styles. We encourage you to consider this same refactoring wherever appropriate.</p>
+<h3>A note to the happy XML user</h3><p>While Spring continues to move forward with code-based configuration, it must be noted again and again that we are in no way eliminating, deprecating or otherwise encouraging users to phase out the use of XML to configure the container. Spring XML remains popular and many users are satisfied with it, especially considering the advanced tooling options that the SpringSource Tool Suite provides for authoring bean configuration files. <code>@Configuration</code> &ndash; and now <code>@FeatureConfiguration</code> &ndash; classes provide another first-class configuration approach for those that prefer to work in Java as much as possible. So rest assured that Spring XML isn&rsquo;t going anywhere &ndash; indeed, with Spring 3.1 M1 we&rsquo;ve given plenty of attention to XML with the addition of nested <code><beans></code> elements, the <code>c:</code> namespace for more convenient constructor injection, and the <code>cache:</code> nampespace to configure Spring&rsquo;s new caching feature.</p>
+<h3>Summary</h3><p>We hope you&rsquo;ll find <code>FeatureSpecification</code> classes to be a natural, powerful extension of the existing <code>@Configuration</code> class model. Take a look at the <a href="https://bit.ly/gm8z9o">sample application</a> accompanying this post, and please do provide feedback!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 397;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

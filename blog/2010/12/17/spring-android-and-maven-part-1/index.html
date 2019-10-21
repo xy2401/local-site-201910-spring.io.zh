@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Android and Maven (Part 1)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Android and Maven (Part 1)" />
+<meta name="twitter:description" content="&lt;p&gt;We recently announced the &lt;a href=&quot;http://www.springsource.org/spring-android/news/1.0.0.m1-released&quot;&gt;M1 release&lt;/a&gt; of &lt;a href=&quot;http://www.springsource.org/spring-android&quot;&gt;Spring Android&lt;/a&gt;, and with that release some questions have arisen around how to build an Android application utilizing the Spring Android Rest Template and Spring Android Commons Logging libraries. Google provides several methods for compiling an Android application, including SDK command line tools, and the ADT (Android Development Tools) Plugin for Eclipse. Unfortunately, neither of these methods includes integrated dependency management support.&lt;/p&gt;
+&lt;h3&gt;Overview&lt;/h3&gt;
+&lt;p&gt;As Java developers we have come to appreciate tools such as &lt;a href=&quot;http://maven.apache.org/&quot;&gt;Maven&lt;/a&gt; and &lt;a href=&quot;http://www.gradle.org/&quot;&gt;Gradle&lt;/a&gt; for managing external dependencies. While traditional Java applications run in a JVM, Android applications run on the Dalvik virtual machine.&amp;nbsp; The Dalvik VM executes files in the Dalvik Executable (.dex) format.&amp;nbsp; It runs classes compiled by a Java language compiler that have been transformed into the .dex format.&amp;nbsp; A build tool will need to support this process if it is going to be able to compile a compatible Android application with dependencies.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@royclarkson" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=200" />
+
+<meta property="og:title" content="Spring Android and Maven (Part 1)" />
+<meta property="og:image" content="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=200" />
+<meta property="og:description" content="&lt;p&gt;We recently announced the &lt;a href=&quot;http://www.springsource.org/spring-android/news/1.0.0.m1-released&quot;&gt;M1 release&lt;/a&gt; of &lt;a href=&quot;http://www.springsource.org/spring-android&quot;&gt;Spring Android&lt;/a&gt;, and with that release some questions have arisen around how to build an Android application utilizing the Spring Android Rest Template and Spring Android Commons Logging libraries. Google provides several methods for compiling an Android application, including SDK command line tools, and the ADT (Android Development Tools) Plugin for Eclipse. Unfortunately, neither of these methods includes integrated dependency management support.&lt;/p&gt;
+&lt;h3&gt;Overview&lt;/h3&gt;
+&lt;p&gt;As Java developers we have come to appreciate tools such as &lt;a href=&quot;http://maven.apache.org/&quot;&gt;Maven&lt;/a&gt; and &lt;a href=&quot;http://www.gradle.org/&quot;&gt;Gradle&lt;/a&gt; for managing external dependencies. While traditional Java applications run in a JVM, Android applications run on the Dalvik virtual machine.&amp;nbsp; The Dalvik VM executes files in the Dalvik Executable (.dex) format.&amp;nbsp; It runs classes compiled by a Java language compiler that have been transformed into the .dex format.&amp;nbsp; A build tool will need to support this process if it is going to be able to compile a compatible Android application with dependencies.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2010-12-17 20:59:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Android and Maven (Part 1)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/rclarkson">Roy Clarkson</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2010-12-17 20:59:00.0">December 17, 2010</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="382" href="/blog/2010/12/17/spring-android-and-maven-part-1#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>We recently announced the <a href="http://www.springsource.org/spring-android/news/1.0.0.m1-released">M1 release</a> of <a href="http://www.springsource.org/spring-android">Spring Android</a>, and with that release some questions have arisen around how to build an Android application utilizing the Spring Android Rest Template and Spring Android Commons Logging libraries. Google provides several methods for compiling an Android application, including SDK command line tools, and the ADT (Android Development Tools) Plugin for Eclipse. Unfortunately, neither of these methods includes integrated dependency management support.</p>
+<h3>Overview</h3>
+<p>As Java developers we have come to appreciate tools such as <a href="https://maven.apache.org/">Maven</a> and <a href="http://www.gradle.org/">Gradle</a> for managing external dependencies. While traditional Java applications run in a JVM, Android applications run on the Dalvik virtual machine.  The Dalvik VM executes files in the Dalvik Executable (.dex) format.  It runs classes compiled by a Java language compiler that have been transformed into the .dex format.  A build tool will need to support this process if it is going to be able to compile a compatible Android application with dependencies.</p>
+<p>There are basically two options for including external libraries in your Android application. The first is to manually copy the jars into the libs directory within your project and update the classpath within Eclipse. This is the simplest solution, and the one most supported by the ADT plugin. The disadvantage is that you have to manage the dependencies manually. Alternatively, a third party plugin such as the <a href="https://code.google.com/p/maven-android-plugin/">Maven Android Plugin</a> can be utilized to automatically include the dependencies from a Maven repository.</p>
+<p>In this post I will walk through the process of using the Android command line tools, Maven, the Maven Android Plugin, and <a href="http://www.simpligility.com/2010/06/android-artifacts-hit-maven-central/">Android Maven artifacts</a> to compile a sample application that utilizes the Spring Android libraries, and deploy it to the Android emulator. After you have configured Maven, it is easy to create a build, deploy it to the emulator, run tests, and package the app for deployment to the Android Market. Before running the sample code, we will first highlight the configuration settings necessary in the pom.xml. The components used in this example are listed below.</p>
+<ul>
+<li><a href="http://www.springsource.com/developer/sts">SpringSource Tool Suite 2.5.2 (Eclipse 3.6.1)</a></li>
+<li><a href="https://developer.android.com/sdk/index.html">Android SDK Revision 9</a></li>
+<li><a href="https://code.google.com/p/maven-android-plugin/">Maven Android Plugin 2.8.4</a></li>
+</ul>
+<h3>Maven Configuration</h3>
+<p>This section covers the parts of a pom.xml that are required for developing with Spring Android and the Maven Android Plugin.</p>
+<h4>Maven Android Plugin</h4>
+<p>In order to use Maven to build an Android application, you will need to configure the Maven Android Plugin within your pom.xml file. Android applications are deployed to the device as an apk file, not a jar. You must specify this in the the packaging configuration.</p>
+<pre><code class="prettyprint xml"><br />&lt;packaging&gt;apk&lt;/packaging&gt;
+</code></pre><p>To configure the Maven Android and Maven Compiler Plugins in the build task, set the sdk platform to the desired level. In this example it is set to 9, which corresponds to Android version 2.3.1. The emulator avd value is the name of the AVD (Android Virtual Device) you defined in the AVD Manager. In this case, an AVD with the name &ldquo;9&rdquo;, but the AVD can be named whatever you like, as long as it matches the name you specified when creating the AVD. This is a basic configuration for the plugin that is needed to build and run an Android application. There are additional parameters that can be included for more functionality.</p>
+<pre><code class="prettyprint xml"><br />&lt;build&gt;
+	&lt;sourceDirectory&gt;src&lt;/sourceDirectory&gt;
+	&lt;finalName&gt;${project.artifactId}&lt;/finalName&gt;
+	&lt;plugins&gt;
+		&lt;plugin&gt;
+			&lt;groupId&gt;com.jayway.maven.plugins.android.generation2&lt;/groupId&gt;
+			&lt;artifactId&gt;maven-android-plugin&lt;/artifactId&gt;
+			&lt;version&gt;2.8.4&lt;/version&gt;
+			&lt;configuration&gt;
+				&lt;sdk&gt;
+					&lt;platform&gt;9&lt;/platform&gt;
+				&lt;/sdk&gt;
+				&lt;emulator&gt;
+					&lt;avd&gt;9&lt;/avd&gt;
+				&lt;/emulator&gt;
+				&lt;deleteConflictingFiles&gt;true&lt;/deleteConflictingFiles&gt;
+				&lt;undeployBeforeDeploy&gt;true&lt;/undeployBeforeDeploy&gt;
+			&lt;/configuration&gt;
+			&lt;extensions&gt;true&lt;/extensions&gt;
+		&lt;/plugin&gt;
+		&lt;plugin&gt;
+			&lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+			&lt;version&gt;2.3.2&lt;/version&gt;
+		&lt;/plugin&gt;
+	&lt;/plugins&gt;
+&lt;/build&gt;
+</code></pre>
+<h4>Dependencies</h4>
+<p>The Android artifacts have been built and published to the Maven repository through the efforts of the <a href="https://sourceforge.net/projects/android4maven/">Android for Maven project</a>. Google prevented the official Android jars from being uploaded to Maven, so the, third party, Android for Maven project was started to provide an API compatible Android artifact that could be uploaded to the Maven repository. There are now artifacts for each major Android version available in the Maven repository. These are not functional, however, and only provide stubbed implementations of the API. All methods in all classes throw a runtime exception. Because an Android app runs on a device, it will never use these libraries for execution, but the API compatibility allows an app to be compiled as if it were the real library. More information can be found <a href="http://www.simpligility.com/2010/06/android-artifacts-hit-maven-central/">here</a>.</p>
+<p>To compile an Android application with dependencies you need to include the Android version you are targeting for your app. As stated previously, we are using level 9, which corresponds to version 2.3.1. Check the <a href="http://repo2.maven.org/maven2/com/google/android/android/">Maven Repository</a> for the available versions. You must set the android dependency scope to <strong>provided</strong>, otherwise Maven will try to include the Android jar library into your apk.</p>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+	&lt;groupId&gt;com.google.android&lt;/groupId&gt;
+	&lt;artifactId&gt;android&lt;/artifactId&gt;
+	&lt;version&gt;2.3.1&lt;/version&gt;
+	&lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>Compile against the latest milestone release of Spring Android Rest Template by adding the following dependency.</p>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+	&lt;groupId&gt;org.springframework.android&lt;/groupId&gt;
+	&lt;artifactId&gt;spring-android-rest-template&lt;/artifactId&gt;
+	&lt;version&gt;1.0.0.M2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>Include the repositories for the snapshot and milestone builds to use the latest build or milestone release of either of the Spring Android libraries in your app.</p>
+<pre><code class="prettyprint xml"><br />&lt;repositories&gt;
+	&lt;!-- For testing against latest Spring snapshots --&gt;
+	&lt;repository&gt;
+		&lt;id&gt;org.springframework.maven.snapshot&lt;/id&gt;
+		&lt;name&gt;Spring Maven Snapshot Repository&lt;/name&gt;
+		&lt;url&gt;http://maven.springframework.org/snapshot&lt;/url&gt;
+		&lt;releases&gt;&lt;enabled&gt;false&lt;/enabled&gt;&lt;/releases&gt;
+		&lt;snapshots&gt;&lt;enabled&gt;true&lt;/enabled&gt;&lt;/snapshots&gt;
+	&lt;/repository&gt;
+	&lt;!-- For developing against latest Spring milestones --&gt;
+	&lt;repository&gt;
+		&lt;id&gt;org.springframework.maven.milestone&lt;/id&gt;
+		&lt;name&gt;Spring Maven Milestone Repository&lt;/name&gt;
+		&lt;url&gt;http://maven.springframework.org/milestone&lt;/url&gt;
+		&lt;snapshots&gt;&lt;enabled&gt;false&lt;/enabled&gt;&lt;/snapshots&gt;
+	&lt;/repository&gt;
+&lt;/repositories&gt;
+</code></pre>
+<h3>Development Environment</h3>
+<p>The Android SDK is required for developing Android applications. As mentioned earlier, Google provides command line tools, and an Eclipse plugin for building Android applications, however you are not restricted to only those options. Other IDE's also provide support for building Android apps. The Maven Android Plugin makes use of the Android SDK command line tools to compile and deploy the app to the emulator, so there is no need for a separate IDE setup or configuration.</p>
+<p>The instructions for <a href="https://developer.android.com/sdk/index.html">downloading and installing the Android SDK</a> can be found on the Android web site. Please note that the <a href="https://developer.android.com/sdk/tools-notes.html">Android SDK Revision 8 release</a> changed the location of some of the tools. In addition to the <strong>tools</strong> directory, you must also add the <strong>platform-tools</strong> directory to your path.</p>
+<p>For example, a .bash_profile on a Mac may look like the following.</p>
+<pre><code class="prettyprint sourcecode">export ANDROID_HOME=~/android-sdk-mac_x86
+export PATH=${PATH}:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+</code></pre>
+<h3>Configure an Android Virtual Device</h3>
+<p>To run an Android app, you must have an <a href="https://developer.android.com/guide/developing/tools/avd.html">Android Virtual Device</a> (AVD) configured. An AVD is a configuration of emulator options. In other words, you are defining the settings to use when running the emulator. You can save a configuration with a name and use it later. You can also define multiple AVD's for testing against different Android versions or hardware configurations.</p>
+<p>The pom.xml file included with the sample Android client app specifies an AVD with the name "9". In order for Maven to be able to deploy the Android app, you must have an AVD configured with that same name. This is of particular interest, as all developer machines will need to have the same AVD configured, since the pom.xml is typically committed to source control.</p>
+<ol>
+<li>From the command line, type <strong>android</strong> and hit return. This opens the <strong>Android SDK and AVD Manager</strong> window.</li>
+<li>Select <strong>Virtual devices</strong> in the left hand column and click the <strong>New...</strong> button</li>
+<li>Enter <strong>9</strong> in the <strong>Name</strong> field</li>
+<li>Select <strong>Android 2.3.1- API Level 9</strong> in the <strong>Target</strong> selector</li>
+<li>Click <strong>Create AVD</strong> to finish</li>
+</ol><p><a href="http://blog.springsource.com/wp-content/uploads/2010/12/android-virtual-devices.png"><img src="http://blog.springsource.com/wp-content/uploads/2010/12/android-virtual-devices.png" alt="" title="android-virtual-devices" width="649" height="322" class="alignnone size-full wp-image-7798" /></a></p>
+<h3>Sample Application</h3>
+<p>We've set up a samples repository for the Spring Mobile projects. From the command prompt, clone the repository to your local machine with the following command.</p>
+<pre><code class="prettyprint sourcecode">$ git clone git://git.springsource.org/spring-mobile/samples.git spring-mobile-samples
+</code></pre>
+<h4>Start the Server</h4>
+<p>If you would like to run the server component of the sample application, to see the interaction between the Android client and a Spring MVC website, the easiest way to do so is from within the STS IDE. Navigate to the <strong>spring-android-showcase</strong> directory. There are two directories, "client" for a client Android application, and "server" for a Spring MVC server application. The client app makes network requests to the server to illustrate RestTemplate functionality, so the server must be running for the client to function.</p>
+<ol>
+<li>From STS, select <strong>File -> Import...</strong></li>
+<li>In the <strong>General</strong> folder, select <strong>Existing Projects into Workspace</strong> and click <strong>Next</strong></li>
+<li>Click <strong>Browse</strong> and navigate to the <strong>Server</strong> directory of the <strong>spring-android-showcase</strong> directory</li>
+<li>Click <strong>Open</strong> to add the project to your workspace</li>
+<li>Highlight the <strong>spring-android-showcase-server</strong> project in the <strong>Package Explorer</strong> view and drag it to <strong>SpringSource tc Server Developer Edition</strong> in the <strong>Servers</strong> view to deploy the web app</li>
+<li>Finally, click the <strong>Run</strong> button to start the server</li>
+</ol>
+<h4>Run the Android Client</h4>
+<p>To build the client app enter the following command from the command line</p>
+<pre><code class="prettyprint sourcecode">$ mvn clean install
+</code></pre>
+<p>Enter the following command to start the Android emulator. Maven tries to start the AVD with the name configured in the pom.xml, which is why the name needs to match with the name of the actual AVD you created.</p>
+<pre><code class="prettyprint sourcecode">$ mvn android:emulator-start
+</code></pre>
+<p>Finally, deploy the application to the emulator with the following command.</p>
+<pre><code class="prettyprint sourcecode">$ mvn android:deploy
+</code></pre>
+<p>The app is deployed to the emulator as S2Android Showcase. Before running the app, start up the Android log viewer to see the activity of the application. You will spend a lot of time with the Android logs when doing development. To view the logs, execute the following command at the command prompt.</p>
+<pre><code class="prettyprint sourcecode">$ adb logcat
+</code></pre>
+<p>Congratulations! You have now built and deployed an Android app with Maven managed dependencies.</p>
+<h3>Conclusion</h3>
+<p>Adding Maven to your Android development process adds extra complexity, but it provides the ability to compile an Android app that includes external dependencies from a Maven repository. Without it, you would manually have to download the dependencies needed to compile and run your application. We've shown the benefit of using it for dependency management to build with the Spring Android libraries. In the <a href="http://blog.springsource.com/2011/02/09/spring-android-and-maven-part-2/">Part 2</a> post I will cover Android development in Eclipse with the <a href="https://code.google.com/a/eclipselabs.org/p/m2eclipse-android-integration/">Maven Integration for Android Development Tools</a> plugin, and the <a href="https://developer.android.com/sdk/eclipse-adt.html">ADT (Android Developer Tools) Plugin for Eclipse</a>. Neither the m2eclipse nor ADT plugins support building Android applications with Maven dependencies. The Maven Integration for Android Development Tools plugin provides a bridge to the Maven Android Plugin, enabling Maven dependency management within Eclipse for Android projects. If you prefer using Eclipse for development, I'll discuss how to use these plugins in the <a href="http://blog.springsource.com/2011/02/09/spring-android-and-maven-part-2/">next post</a>.</p>
+<h3>Additional Resources</h3>
+<p>The <a href="http://www.sonatype.com/books/mvnref-book/reference/android-dev.html">Android Chapter of Maven: The Complete Reference</a> contains a lot of good information about the Android Maven Plugin.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 382;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

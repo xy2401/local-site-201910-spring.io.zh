@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>React.js and Spring Data REST: Part 2 - Hypermedia</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="React.js and Spring Data REST: Part 2 - Hypermedia" />
+<meta name="twitter:description" content="&lt;div id=&quot;preamble&quot;&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;admonitionblock note&quot;&gt; 
+   &lt;table&gt; 
+    &lt;tbody&gt; 
+     &lt;tr&gt; 
+      &lt;td class=&quot;icon&quot;&gt; &lt;i class=&quot;fa icon-note&quot; title=&quot;Note&quot;&gt;&lt;/i&gt; &lt;/td&gt; 
+      &lt;td class=&quot;content&quot;&gt;To see updates to this code, visit our &lt;a href=&quot;https://spring.io/guides/tutorials/react-and-spring-data-rest/&quot;&gt;React.js and Spring Data REST tutorial&lt;/a&gt;.&lt;/td&gt; 
+     &lt;/tr&gt; 
+    &lt;/tbody&gt; 
+   &lt;/table&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In the &lt;a href=&quot;https://spring.io/blog/2015/09/01/react-js-and-spring-data-rest-part-1-basic-features&quot;&gt;previous session&lt;/a&gt;, you found out how to stand up a backend payroll service to store employee data using Spring Data REST. A key feature it lacked was using the hypermedia controls and navigation by links. Instead, it hard coded the path to find data.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Feel free to &lt;a href=&quot;https://github.com/gregturn/react-and-spring-data-rest/tree/master/hypermedia&quot;&gt;grab the code&lt;/a&gt; from this repository and follow along. This session is based on the previous session’s app with extra things added.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;_in_the_beginning_there_was_data_and_then_there_was_rest&quot;&gt;In the beginning there was data…​and then there was REST&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;quoteblock&quot;&gt; 
+   &lt;blockquote&gt;
+     I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC…​.What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed? 
+   &lt;/blockquote&gt; 
+   &lt;div class=&quot;attribution&quot;&gt;
+     — 
+    &lt;a href=&quot;http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven&quot;&gt;Roy T. Fielding&lt;/a&gt;
+    &lt;br&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;So, what exactly ARE hypermedia controls, i.e. hypertext, and how can you use them? To find out, let’s take a step back and look at the core mission of REST.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The concept of REST was to borrow ideas that made the web so successful and apply them to APIs. Despite the web’s vast size, dynamic nature, and low rate that clients, i.e. browsers, are updated, the web is an amazing success. Roy Fielding sought to use some of its constraints and features and see if that would afford similar expansion of API production and consumption.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;One of the constraints is to limit the number of verbs. For REST, the primary ones are GET, POST, PUT, DELETE, and PATCH. There are others, but we won’t get into them here.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;ulist&quot;&gt; 
+   &lt;ul&gt; 
+    &lt;li&gt; GET - fetch the state of a resource without altering the system &lt;/li&gt; 
+    &lt;li&gt; POST - create a new resource without saying where &lt;/li&gt; 
+    &lt;li&gt; PUT - replace an existing resource, overwriting whatever else is already there (if anything) &lt;/li&gt; 
+    &lt;li&gt; DELETE - remove an existing resource &lt;/li&gt; 
+    &lt;li&gt; PATCH - alter an existing resource partially &lt;/li&gt; 
+   &lt;/ul&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;These are standardized HTTP verbs with well written specs. By picking up and using already coined HTTP operations, we don’t have to invent a new language and educate the industry.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Another constraint of REST is to use media types to define the format of data. Instead of everyone writing their own dialect for the exchange of information, it would be prudent to develop some media types. One of the most popular ones to be accepted is HAL, media type application/hal+json. It is Spring Data REST’s default media type. A keen value is that there is no centralized, single media type for REST. Instead, people can develop media types and plug them in. Try them out. As different needs become available, the industry can flexibly move.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;A key feature of REST is to include links to relevant resources. For example, if you were looking at an order, a RESTful API would include a link to the related customer, links to the catalog of items, and perhaps a link to the store from which the order was placed. In this session, you will introduce paging, and see how to also use navigational paging links.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:creator" content="@gregturn" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200" />
+
+<meta property="og:title" content="React.js and Spring Data REST: Part 2 - Hypermedia" />
+<meta property="og:image" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200" />
+<meta property="og:description" content="&lt;div id=&quot;preamble&quot;&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;admonitionblock note&quot;&gt; 
+   &lt;table&gt; 
+    &lt;tbody&gt; 
+     &lt;tr&gt; 
+      &lt;td class=&quot;icon&quot;&gt; &lt;i class=&quot;fa icon-note&quot; title=&quot;Note&quot;&gt;&lt;/i&gt; &lt;/td&gt; 
+      &lt;td class=&quot;content&quot;&gt;To see updates to this code, visit our &lt;a href=&quot;https://spring.io/guides/tutorials/react-and-spring-data-rest/&quot;&gt;React.js and Spring Data REST tutorial&lt;/a&gt;.&lt;/td&gt; 
+     &lt;/tr&gt; 
+    &lt;/tbody&gt; 
+   &lt;/table&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;In the &lt;a href=&quot;https://spring.io/blog/2015/09/01/react-js-and-spring-data-rest-part-1-basic-features&quot;&gt;previous session&lt;/a&gt;, you found out how to stand up a backend payroll service to store employee data using Spring Data REST. A key feature it lacked was using the hypermedia controls and navigation by links. Instead, it hard coded the path to find data.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Feel free to &lt;a href=&quot;https://github.com/gregturn/react-and-spring-data-rest/tree/master/hypermedia&quot;&gt;grab the code&lt;/a&gt; from this repository and follow along. This session is based on the previous session’s app with extra things added.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;_in_the_beginning_there_was_data_and_then_there_was_rest&quot;&gt;In the beginning there was data…​and then there was REST&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;quoteblock&quot;&gt; 
+   &lt;blockquote&gt;
+     I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC…​.What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed? 
+   &lt;/blockquote&gt; 
+   &lt;div class=&quot;attribution&quot;&gt;
+     — 
+    &lt;a href=&quot;http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven&quot;&gt;Roy T. Fielding&lt;/a&gt;
+    &lt;br&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;So, what exactly ARE hypermedia controls, i.e. hypertext, and how can you use them? To find out, let’s take a step back and look at the core mission of REST.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The concept of REST was to borrow ideas that made the web so successful and apply them to APIs. Despite the web’s vast size, dynamic nature, and low rate that clients, i.e. browsers, are updated, the web is an amazing success. Roy Fielding sought to use some of its constraints and features and see if that would afford similar expansion of API production and consumption.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;One of the constraints is to limit the number of verbs. For REST, the primary ones are GET, POST, PUT, DELETE, and PATCH. There are others, but we won’t get into them here.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;ulist&quot;&gt; 
+   &lt;ul&gt; 
+    &lt;li&gt; GET - fetch the state of a resource without altering the system &lt;/li&gt; 
+    &lt;li&gt; POST - create a new resource without saying where &lt;/li&gt; 
+    &lt;li&gt; PUT - replace an existing resource, overwriting whatever else is already there (if anything) &lt;/li&gt; 
+    &lt;li&gt; DELETE - remove an existing resource &lt;/li&gt; 
+    &lt;li&gt; PATCH - alter an existing resource partially &lt;/li&gt; 
+   &lt;/ul&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;These are standardized HTTP verbs with well written specs. By picking up and using already coined HTTP operations, we don’t have to invent a new language and educate the industry.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;Another constraint of REST is to use media types to define the format of data. Instead of everyone writing their own dialect for the exchange of information, it would be prudent to develop some media types. One of the most popular ones to be accepted is HAL, media type application/hal+json. It is Spring Data REST’s default media type. A keen value is that there is no centralized, single media type for REST. Instead, people can develop media types and plug them in. Try them out. As different needs become available, the industry can flexibly move.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;A key feature of REST is to include links to relevant resources. For example, if you were looking at an order, a RESTful API would include a link to the related customer, links to the catalog of items, and perhaps a link to the store from which the order was placed. In this session, you will introduce paging, and see how to also use navigational paging links.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-09-15 13:34:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">React.js and Spring Data REST: Part 2 - Hypermedia</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/gturnquist">Greg Turnquist</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-09-15 13:34:00.0">September 15, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2236" href="/blog/2015/09/15/react-js-and-spring-data-rest-part-2-hypermedia#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tbody>
+<tr>
+<td class="icon"> <i class="fa icon-note" title="Note"></i> </td>
+<td class="content">To see updates to this code, visit our <a href="https://spring.io/guides/tutorials/react-and-spring-data-rest/">React.js and Spring Data REST tutorial</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph">
+<p>In the <a href="https://spring.io/blog/2015/09/01/react-js-and-spring-data-rest-part-1-basic-features">previous session</a>, you found out how to stand up a backend payroll service to store employee data using Spring Data REST. A key feature it lacked was using the hypermedia controls and navigation by links. Instead, it hard coded the path to find data.</p>
+</div>
+<div class="paragraph">
+<p>Feel free to <a href="https://github.com/gregturn/react-and-spring-data-rest/tree/master/hypermedia">grab the code</a> from this repository and follow along. This session is based on the previous session&#8217;s app with extra things added.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_in_the_beginning_there_was_data_and_then_there_was_rest">In the beginning there was data&#8230;&#8203;and then there was REST</h2>
+<div class="sectionbody">
+<div class="quoteblock">
+<blockquote>
+I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC&#8230;&#8203;.What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?
+</blockquote>
+<div class="attribution">
+&#8212; <a href="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">Roy T. Fielding</a><br>
+</div>
+</div>
+<div class="paragraph">
+<p>So, what exactly ARE hypermedia controls, i.e. hypertext, and how can you use them? To find out, let&#8217;s take a step back and look at the core mission of REST.</p>
+</div>
+<div class="paragraph">
+<p>The concept of REST was to borrow ideas that made the web so successful and apply them to APIs. Despite the web&#8217;s vast size, dynamic nature, and low rate that clients, i.e. browsers, are updated, the web is an amazing success. Roy Fielding sought to use some of its constraints and features and see if that would afford similar expansion of API production and consumption.</p>
+</div>
+<div class="paragraph">
+<p>One of the constraints is to limit the number of verbs. For REST, the primary ones are GET, POST, PUT, DELETE, and PATCH. There are others, but we won&#8217;t get into them here.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+GET - fetch the state of a resource without altering the system
+</li>
+<li>
+POST - create a new resource without saying where
+</li>
+<li>
+PUT - replace an existing resource, overwriting whatever else is already there (if anything)
+</li>
+<li>
+DELETE - remove an existing resource
+</li>
+<li>
+PATCH - alter an existing resource partially
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These are standardized HTTP verbs with well written specs. By picking up and using already coined HTTP operations, we don&#8217;t have to invent a new language and educate the industry.</p>
+</div>
+<div class="paragraph">
+<p>Another constraint of REST is to use media types to define the format of data. Instead of everyone writing their own dialect for the exchange of information, it would be prudent to develop some media types. One of the most popular ones to be accepted is HAL, media type application/hal+json. It is Spring Data REST&#8217;s default media type. A keen value is that there is no centralized, single media type for REST. Instead, people can develop media types and plug them in. Try them out. As different needs become available, the industry can flexibly move.</p>
+</div>
+<div class="paragraph">
+<p>A key feature of REST is to include links to relevant resources. For example, if you were looking at an order, a RESTful API would include a link to the related customer, links to the catalog of items, and perhaps a link to the store from which the order was placed. In this session, you will introduce paging, and see how to also use navigational paging links.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_turning_on_paging_from_the_backend">Turning on paging from the backend</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To get underway with using frontend hypermedia controls, you need to turn on some extra controls. Spring Data REST provides paging support. To use it, just tweak the repository definition:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/com/greglturnquist/payroll/EmployeeRepository.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public interface EmployeeRepository extends PagingAndSortingRepository&lt;Employee, Long&gt; {
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Your interface now extends <code>PagingAndSortingRepository</code> which adds extra options to set page size, and also adds navigational links to hop from page to page. The rest of the backend is the same (exception for some <a href="https://github.com/gregturn/react-and-spring-data-rest/blob/master/hypermedia/src/main/java/com/greglturnquist/payroll/DatabaseLoader.java">extra pre-loaded data</a> to make things interesting).</p>
+</div>
+<div class="paragraph">
+<p>Restart the application (<code>./mvnw spring-boot:run</code>) and see how it works.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl localhost:8080/api/employees?size=2
+{
+  "_links" : {
+    "first" : {
+      "href" : "http://localhost:8080/api/employees?page=0&amp;size=2"
+    },
+    "self" : {
+      "href" : "http://localhost:8080/api/employees"
+    },
+    "next" : {
+      "href" : "http://localhost:8080/api/employees?page=1&amp;size=2"
+    },
+    "last" : {
+      "href" : "http://localhost:8080/api/employees?page=2&amp;size=2"
+    }
+  },
+  "_embedded" : {
+    "employees" : [ {
+      "firstName" : "Frodo",
+      "lastName" : "Baggins",
+      "description" : "ring bearer",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/employees/1"
+        }
+      }
+    }, {
+      "firstName" : "Bilbo",
+      "lastName" : "Baggins",
+      "description" : "burglar",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/api/employees/2"
+        }
+      }
+    } ]
+  },
+  "page" : {
+    "size" : 2,
+    "totalElements" : 6,
+    "totalPages" : 3,
+    "number" : 0
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The default page size is 20, so to see it in action, <code>?size=2</code> applied. As expected, only two employees are listed. In addition, there is also a <strong>first</strong>, <strong>next</strong>, and <strong>last</strong> link. There is also the <strong>self</strong> link, free of context <em>including page parameters</em>.</p>
+</div>
+<div class="paragraph">
+<p>If you navigate to the <strong>next</strong> link, you&#8217;ll then see a <strong>prev</strong> link as well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl "http://localhost:8080/api/employees?page=1&amp;size=2"
+{
+  "_links" : {
+    "first" : {
+      "href" : "http://localhost:8080/api/employees?page=0&amp;size=2"
+    },
+    "prev" : {
+      "href" : "http://localhost:8080/api/employees?page=0&amp;size=2"
+    },
+    "self" : {
+      "href" : "http://localhost:8080/api/employees"
+    },
+    "next" : {
+      "href" : "http://localhost:8080/api/employees?page=2&amp;size=2"
+    },
+    "last" : {
+      "href" : "http://localhost:8080/api/employees?page=2&amp;size=2"
+    }
+  },
+...</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+When using "&amp;" in URL query parameters, the command line thinks it&#8217;s a line break. Wrap the whole URL with quotation marks to bypass that.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>That looks neat, but it will be even better when you update the frontend to take advantage of that.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_navigating_by_relationship">Navigating by relationship</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>That&#8217;s it! No more changes are needed on the backend to start using the hypermedia controls Spring Data REST provides out of the box. You can switch to working on the frontend. (That&#8217;s part of the beauty of Spring Data REST. No messy controller updates!)</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+It&#8217;s important to point out, this application isn&#8217;t "Spring Data REST-specific." Instead, it uses <a href="http://stateless.co/hal_specification.html">HAL</a>, <a href="https://tools.ietf.org/html/rfc6570">URI Templates</a>, and other standards. That&#8217;s how using rest.js is a snap: that library comes with HAL support.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In the previous session, you hardcoded the path to <code>/api/employees</code>. Instead, the ONLY path you should hardcode is the root.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">...
+var root = '/api';
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With a handy little <a href="https://github.com/gregturn/react-and-spring-data-rest/blob/master/hypermedia/src/main/resources/static/follow.js"><code>follow()</code> function</a>, you can now start from the root and navigate to where you need!</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">componentDidMount: function () {
+    this.loadFromServer(this.state.pageSize);
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the previous session, the loading was done directly inside <code>componentDidMount()</code>. In this session, we are making it possible to reload the entire list of employees when the page size is updated. To do so, we have moved things into <code>loadFromServer()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">loadFromServer: function (pageSize) {
+    follow(client, root, [
+        {rel: 'employees', params: {size: pageSize}}]
+    ).then(employeeCollection =&gt; {
+        return client({
+            method: 'GET',
+            path: employeeCollection.entity._links.profile.href,
+            headers: {'Accept': 'application/schema+json'}
+        }).then(schema =&gt; {
+            this.schema = schema.entity;
+            return employeeCollection;
+        });
+    }).done(employeeCollection =&gt; {
+        this.setState({
+            employees: employeeCollection.entity._embedded.employees,
+            attributes: Object.keys(this.schema.properties),
+            pageSize: pageSize,
+            links: employeeCollection.entity._links});
+    });
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>loadFromServer</code> is very similar the previous session, but instead if uses <code>follow()</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+The first argument to the follow() function is the <code>client</code> object used to make REST calls.
+</li>
+<li>
+The second argument is the root URI to start from.
+</li>
+<li>
+The third argument is an array of relationships to navigate along. Each one can be a string or an object.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The array of relationships can be as simple as <code>["employees"]</code>, meaning when the first call is made, look in <strong>_links</strong> for the relationship (or <strong>rel</strong>) named <strong>employees</strong>. Find its <strong>href</strong> and navigate to it. If there is another relationship in the array, rinse and repeat.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes, a rel by itself isn&#8217;t enough. In this fragment of code, it also plugs in a query parameter of <strong>?size=&lt;pageSize&gt;</strong>. There are other options that can be supplied, as you&#8217;ll see further along.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_grabbing_json_schema_metadata">Grabbing JSON Schema metadata</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After navigating to <strong>employees</strong> with the size-based query, the <strong>employeeCollection</strong> is at your fingertips. In the previous session, we called it day and displayed that data inside <code>&lt;EmployeeList /&gt;</code>. Today, you are performing another call to grab some <a href="https://json-schema.org/">JSON Schema metadata</a> found a <code>/api/profile/employees</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can see the data yourself:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ curl http://localhost:8080/api/profile/employees -H 'Accept:application/schema+json'
+{
+  "title" : "Employee",
+  "properties" : {
+    "firstName" : {
+      "title" : "First name",
+      "readOnly" : false,
+      "type" : "string"
+    },
+    "lastName" : {
+      "title" : "Last name",
+      "readOnly" : false,
+      "type" : "string"
+    },
+    "description" : {
+      "title" : "Description",
+      "readOnly" : false,
+      "type" : "string"
+    }
+  },
+  "definitions" : { },
+  "type" : "object",
+  "$schema" : "http://json-schema.org/draft-04/schema#"
+}</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The default form of metadata at /profile/employees is ALPS. In this case, though, you are using content negotation to fetch JSON Schema.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>By capturing this information in the`&lt;App /&gt;` component&#8217;s state, you can make good use of it later on when building input forms.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="creating-new-records">Creating new records</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Equipped with this metadata, you can now add some extra controls to the UI. Create a new React component, <code>&lt;CreateDialog /&gt;</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var CreateDialog = React.createClass({
+
+    handleSubmit: function (e) {
+        e.preventDefault();
+        var newEmployee = {};
+        this.props.attributes.forEach(attribute =&gt; {
+            newEmployee[attribute] = React.findDOMNode(this.refs[attribute]).value.trim();
+        });
+        this.props.onCreate(newEmployee);
+
+        // clear out the dialog's inputs
+        this.props.attributes.forEach(attribute =&gt; {
+            React.findDOMNode(this.refs[attribute]).value = '';
+        });
+
+        // Navigate away from the dialog to hide it.
+        window.location = "#";
+    },
+
+    render: function () {
+        var inputs = this.props.attributes.map(attribute =&gt;
+            &lt;p key={attribute}&gt;
+                &lt;input type="text" placeholder={attribute} ref={attribute} className="field" /&gt;
+            &lt;/p&gt;
+        );
+
+        return (
+            &lt;div&gt;
+                &lt;a href="#createEmployee"&gt;Create&lt;/a&gt;
+
+                &lt;div id="createEmployee" className="modalDialog"&gt;
+                    &lt;div&gt;
+                        &lt;a href="#" title="Close" className="close"&gt;X&lt;/a&gt;
+
+                        &lt;h2&gt;Create new employee&lt;/h2&gt;
+
+                        &lt;form&gt;
+                            {inputs}
+                            &lt;button onClick={this.handleSubmit}&gt;Create&lt;/button&gt;
+                        &lt;/form&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        )
+    }
+
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This new component has both a <code>handleSubmit()</code> function as well as the expected <code>render()</code> function.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s dig into these functions in reverse order, and first look at the <code>render()</code> function.</p>
+</div>
+<div class="sect2">
+<h3 id="hypermedia-rendering">Rendering</h3>
+<div class="paragraph">
+<p>Your code maps over the JSON Schema data found in the <strong>attributes</strong> property and converts it into an array of <code>&lt;p&gt;&lt;input&gt;&lt;/p&gt;</code> elements.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<strong>key</strong> is again needed by React to distinguish between multiple child nodes.
+</li>
+<li>
+It&#8217;s a simple text-based entry field.
+</li>
+<li>
+<strong>placeholder</strong> is where we can show the user with field is which.
+</li>
+<li>
+You may used to having a <strong>name</strong> attribute, but it&#8217;s not necessary. With React, <strong>ref</strong> is the mechanism to grab a particular DOM node (as you&#8217;ll soon see).
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This represents the dynamic nature of the component, driven by loading data from the server.</p>
+</div>
+<div class="paragraph">
+<p>Inside this component&#8217;s top-level <code>&lt;div&gt;</code> is an anchor tag and another <code>&lt;div&gt;</code>. The anchor tag is the button to open the dialog. And the nested <code>&lt;div&gt;</code> is the hidden dialog itself. In this example, you are use pure HTML5 and CSS3. No JavaScript at all! You can <a href="https://github.com/gregturn/react-and-spring-data-rest/blob/master/hypermedia/src/main/resources/static/main.css">see the CSS code</a> used to show/hide the dialog. We won&#8217;t dive into that here.</p>
+</div>
+<div class="paragraph">
+<p>Nestled inside <code>&lt;div id="createEmployee"&gt;</code> is a form where your dynamic list of input fields are injected followed by the <strong>Create</strong> button. That button has an <code>onClick={this.handleSubmit}</code> event handler. This is the React way of registering an event handler.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+React doesn&#8217;t create a fistful of event handlers on every DOM element. Instead, it has a <a href="https://facebook.github.io/react/docs/interactivity-and-dynamic-uis.html#under-the-hood-autobinding-and-event-delegation">much more performant and sophisticated</a> solution. The point being you don&#8217;t have to manage that infrastructure and can instead focus on writing functional code.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_handling_user_input">Handling user input</h3>
+<div class="paragraph">
+<p>The <code>handleSubmit()</code> function first stops the event from bubbling further up the hierarchy. It then uses the same JSON Schema attribute property to find each <code>&lt;input&gt;</code> using <code>React.findDOMNode(this.refs[attribute])</code>.</p>
+</div>
+<div class="paragraph">
+<p><code>this.refs</code> is a way to reach out and grab a particular React component by name. In that sense, you are ONLY getting the virtual DOM component. To grab the actual DOM element you need to use <code>React.findDOMNode()</code>.</p>
+</div>
+<div class="paragraph">
+<p>After iterating over every input and building up the <code>newEmployee</code> object, we invoke a callback to <code>onCreate()</code> the new employee. This function is up top inside <code>App.onCreate</code> and was provided to this React component as another property. Look at how that top-level function operates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">onCreate: function (newEmployee) {
+    follow(client, root, ['employees']).then(employeeCollection =&gt; {
+        return client({
+            method: 'POST',
+            path: employeeCollection.entity._links.self.href,
+            entity: newEmployee,
+            headers: {'Content-Type': 'application/json'}
+        })
+    }).then(response =&gt; {
+        return follow(client, root, [
+            {rel: 'employees', params: {'size': this.state.pageSize}}]);
+    }).done(response =&gt; {
+        this.onNavigate(response.entity._links.last.href);
+    });
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Once again, use the <code>follow()</code> function to navigate to the <strong>employees</strong> resource where POST operations are performed. In this case, there was no need to apply any parameters, so the string-based array of rels is fine. In this situation, the POST call is returned. This allows the next <code>then()</code> clause to handle processing the outcome of the POST.</p>
+</div>
+<div class="paragraph">
+<p>New records are typically added to the end of the dataset. Since you are looking at a certain page, it&#8217;s logical to expect the new employee record to not be on the current page. To handle this, you need to fetch a new batch of data with the same page size applied. That promise is returned for the final clause inside <code>done()</code>.</p>
+</div>
+<div class="paragraph">
+<p>Since the user probably wants to see the newly created employee, you can then use the hypermedia controls and navigate to the <strong>last</strong> entry.</p>
+</div>
+<div class="paragraph">
+<p>This introduces the concept of paging in our UI. Let&#8217;s tackle that next!</p>
+</div>
+<div id="NOTE" class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>First time using a promise-based API? <a href="https://promisesaplus.com/">Promises</a> are a way to kick of asynchronous operations and then register a function to respond when the task is done. Promises are designed to be chained together to avoid "callback hell". Look at the following flow:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">when.promise(async_func_call())
+	.then(function(results) {
+		/* process the outcome of async_func_call */
+	})
+	.then(function(more_results) {
+		/* process the previous then() return value */
+	})
+	.done(function(yet_more) {
+		/* process the previous then() and wrap things up */
+	});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more details, check out <a href="http://know.cujojs.com/tutorials/promises/consuming-promises">this tutorial on promises</a>.</p>
+</div>
+<div class="paragraph">
+<p>The secret thing to remember with promises is that <code>then()</code> functions <em>need</em> to return something, whether it&#8217;s a value or another promise. <code>done()</code> functions do NOT return anything, and you don&#8217;t chain anything after it. In case you haven&#8217;t noticed yet, <code>client</code> (which is an instance of <code>rest</code> from rest.js) as well as the <code>follow</code> function return promises.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_paging_through_data">Paging through data</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You set up paging on the backend and have already starting taking advantage of it when creating new employees.</p>
+</div>
+<div class="paragraph">
+<p>In <a href="#creating-new-records">the previous section</a>, you used the page controls to jump to the <strong>last</strong> page. It would be really handy to dynamically apply it to the UI and let the user navigate as desired. Adjusting the controls dynamically based on available navigation links would be great.</p>
+</div>
+<div class="paragraph">
+<p>First, let&#8217;s check out the <code>onNavigate()</code> function you used.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">onNavigate: function(navUri) {
+    client({method: 'GET', path: navUri}).done(employeeCollection =&gt; {
+        this.setState({
+            employees: employeeCollection.entity._embedded.employees,
+            attributes: this.state.attributes,
+            pageSize: this.state.pageSize,
+            links: employeeCollection.entity._links
+        });
+    });
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is defined at the top, inside <code>App.onNavigate</code>. Again, this is to allow managing the state of the UI in the top component. After passing <code>onNavigate()</code> down to the <code>&lt;EmployeeList /&gt;</code> React component, the following handlers are coded up to handle clicking on some buttons:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">handleNavFirst: function(e){
+    e.preventDefault();
+    this.props.onNavigate(this.props.links.first.href);
+},
+handleNavPrev: function(e) {
+    e.preventDefault();
+    this.props.onNavigate(this.props.links.prev.href);
+},
+handleNavNext: function(e) {
+    e.preventDefault();
+    this.props.onNavigate(this.props.links.next.href);
+},
+handleNavLast: function(e) {
+    e.preventDefault();
+    this.props.onNavigate(this.props.links.last.href);
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Each of these functions intercepts the default event and stops it from bubbling up. Then it invokes the <code>onNavigate()</code> function with the proper hypermedia link.</p>
+</div>
+<div class="paragraph">
+<p>Now conditionally display the controls based on which links appear in the hypermedia links in <code>EmployeeList.render</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">render: function () {
+    var employees = this.props.employees.map(employee =&gt;
+        &lt;Employee key={employee._links.self.href} employee={employee} onDelete={this.props.onDelete}/&gt;
+    );
+
+    var navLinks = [];
+    if ("first" in this.props.links) {
+        navLinks.push(&lt;button key="first" onClick={this.handleNavFirst}&gt;&amp;lt;&amp;lt;&lt;/button&gt;);
+    }
+    if ("prev" in this.props.links) {
+        navLinks.push(&lt;button key="prev" onClick={this.handleNavPrev}&gt;&amp;lt;&lt;/button&gt;);
+    }
+    if ("next" in this.props.links) {
+        navLinks.push(&lt;button key="next" onClick={this.handleNavNext}&gt;&amp;gt;&lt;/button&gt;);
+    }
+    if ("last" in this.props.links) {
+        navLinks.push(&lt;button key="last" onClick={this.handleNavLast}&gt;&amp;gt;&amp;gt;&lt;/button&gt;);
+    }
+
+    return (
+        &lt;div&gt;
+            &lt;input ref="pageSize" defaultValue={this.props.pageSize} onInput={this.handleInput}/&gt;
+            &lt;table&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;First Name&lt;/th&gt;
+                    &lt;th&gt;Last Name&lt;/th&gt;
+                    &lt;th&gt;Description&lt;/th&gt;
+                    &lt;th&gt;&lt;/th&gt;
+                &lt;/tr&gt;
+                {employees}
+            &lt;/table&gt;
+            &lt;div&gt;
+                {navLinks}
+            &lt;/div&gt;
+        &lt;/div&gt;
+    )
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As in the previous session, it still transforms <code>this.props.employees</code> into an array of <code>&lt;Element /&gt;</code> components. Then it builds up an array of <code>navLinks</code>, an array of HTML buttons.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Because React is based on XML, you can&#8217;t put "&lt;" inside the <code>&lt;button&gt;</code> element. You must instead use the encoded version.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Then you can see <code>{navLinks}</code> inserted towards the bottom of the returned HTML.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_deleting_existing_records">Deleting existing records</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Deleting entries is much easier. Get a hold of its HAL-based record and apply <strong>DELETE</strong> to its <strong>self</strong> link.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var Employee = React.createClass({
+    handleDelete: function () {
+        this.props.onDelete(this.props.employee);
+    },
+    render: function () {
+        return (
+            &lt;tr&gt;
+                &lt;td&gt;{this.props.employee.firstName}&lt;/td&gt;
+                &lt;td&gt;{this.props.employee.lastName}&lt;/td&gt;
+                &lt;td&gt;{this.props.employee.description}&lt;/td&gt;
+                &lt;td&gt;
+                    &lt;button onClick={this.handleDelete}&gt;Delete&lt;/button&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        )
+    }
+})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This updated version of the Employee component shows an extra entry at the end of the row, a delete button. It is registered to invoke <code>this.handleDelete</code> when clicked upon. The <code>handleDelete()</code> function can then invoke the callback passed down while supplying the contextually important <code>this.props.employee</code> record.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+This shows again that it is easiest to manage state in the top component, in one place. This might not <em>always</em> be the case, but oftentimes, managing state in one place makes it easier to keep straight and simpler. By invoking the callback with component-specific details (<code>this.props.onDelete(this.props.employee)</code>), it is very easy to orchestrate behavior between components.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Tracing the <code>onDelete()</code> function back to the top at <code>App.onDelete</code>, you can see how it operates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">onDelete: function (employee) {
+    client({method: 'DELETE', path: employee._links.self.href}).done(response =&gt; {
+        this.loadFromServer(this.state.pageSize);
+    });
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The behavior to apply after deleting a record with a page-based UI is a bit tricky. In this case, it reloads the whole data from the server, applying the same page size. Then it shows the first page.</p>
+</div>
+<div class="paragraph">
+<p>If you are deleting the last record on the last page, it will jump to the first page.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adjusting_the_page_size">Adjusting the page size</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One way to see how hypermedia really shines is to update the page size. Spring Data REST fluidly updates the navigational links based on the page size.</p>
+</div>
+<div class="paragraph">
+<p>There is an HTML element at the top of <code>ElementList.render</code>: <code>&lt;input ref="pageSize" defaultValue={this.props.pageSize} onInput={this.handleInput}/&gt;</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<code>ref="pageSize"</code> makes it easy to grab that element via this.refs.pageSize.
+</li>
+<li>
+<code>defaultValue</code> initializes it with the state&#8217;s <strong>pageSize</strong>.
+</li>
+<li>
+<code>onInput</code> registers a handler as shown below.
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">handleInput: function (e) {
+    e.preventDefault();
+    var pageSize = React.findDOMNode(this.refs.pageSize).value;
+    if (/^[0-9]+$/.test(pageSize)) {
+        this.props.updatePageSize(pageSize);
+    } else {
+        React.findDOMNode(this.refs.pageSize).value =
+            pageSize.substring(0, pageSize.length - 1);
+    }
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It stops the event from bubbling up. Then it uses the <strong>ref</strong> attribute of the <code>&lt;input&gt;</code> to find the DOM node and extract its value, all through React&#8217;s <code>findDOMNode()</code> helper function. It tests if the input is really a number by checking if it&#8217;s a string of digits. If so, it invokes the callback, sending the new page size to the <code>App</code> React component. If not, the character just entered is stripped off the input.</p>
+</div>
+<div class="paragraph">
+<p>What does <code>App</code> do when it gets a <code>updatePageSize()</code>? Check it out:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">updatePageSize: function (pageSize) {
+    if (pageSize !== this.state.pageSize) {
+        this.loadFromServer(pageSize);
+    }
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Because a new page size causes changes to all the navigation links, it&#8217;s best to refetch the data and start from the beginning.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_putting_it_all_together">Putting it all together</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>With all these nice additions, you now have a really vamped up UI.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://github.com/gregturn/react-and-spring-data-rest/raw/master/hypermedia/images/hypermedia-1.png" alt="hypermedia 1">
+</div>
+</div>
+<div class="paragraph">
+<p>You can see the page size setting at the top, the delete buttons on each row, and the navigational buttons at the bottom. The navigational buttons illustrate a powerful feature of hypermedia controls.</p>
+</div>
+<div class="paragraph">
+<p>Down below, you can see the <code>CreateDialog</code> with the metadata plugged into the HTML input placeholders.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://github.com/gregturn/react-and-spring-data-rest/raw/master/hypermedia/images/hypermedia-2.png" alt="hypermedia 2">
+</div>
+</div>
+<div class="paragraph">
+<p>This really shows the power of using hypermedia coupled with domain-driven metadata (JSON Schema). The web page doesn&#8217;t have to know which field is which. Instead, the user can <em>see</em> it and know how to use it. If you added another field to the <code>Employee</code> domain object, this pop-up would automatically display it.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_review">Review</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this session:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+You turned on Spring Data REST&#8217;s paging feature.
+</li>
+<li>
+You threw out hardcoded URI paths and started using the root URI combined with relationship names or "rels".
+</li>
+<li>
+You updated the UI to dynamically use page-based hypermedia controls.
+</li>
+<li>
+You added the ability to create &amp; delete employees and update the UI as needed.
+</li>
+<li>
+You made it possible to change the page size and have the UI flexibly respond.
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Issues?</p>
+</div>
+<div class="paragraph">
+<p>You made the webpage dynamic. But open another browser tab and point it at the same app. Changes in one tab won&#8217;t update anything in the other.</p>
+</div>
+<div class="paragraph">
+<p>That is something we can address in the next session. Until then, happy coding!</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2236;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

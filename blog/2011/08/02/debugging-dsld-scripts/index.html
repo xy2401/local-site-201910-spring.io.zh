@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Debugging DSLD Scripts</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Debugging DSLD Scripts" />
+<meta name="twitter:description" content="&lt;p&gt;Not too long ago, I introduced &lt;a href=&quot;http://blog.springsource.com/2011/05/08/better-dsl-support-in-groovy-eclipse/&quot;&gt;DSL descriptors&lt;/a&gt; (DSLDs) for &lt;a href=&quot;http://groovy.codehaus.org/Eclipse+Plugin&quot;&gt;Groovy-Eclipse&lt;/a&gt;. DSLDs are Groovy scripts that provide rich editing support (content assist, navigation, etc.) for Groovy projects in your Eclipse workspace. Since DSLDs can only be executed inside a running Eclipse process, debugging is not as simple as firing up the Eclipse debugger and stepping through a Groovy script. In this post, I’ll describe some simple and some more complex techniques that you can use for debugging your DSLDs.&lt;/p&gt;
+&lt;p&gt;To get all of this working, you will need the latest development builds:&lt;br&gt;&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@werdnagreb" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=200" />
+
+<meta property="og:title" content="Debugging DSLD Scripts" />
+<meta property="og:image" content="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=200" />
+<meta property="og:description" content="&lt;p&gt;Not too long ago, I introduced &lt;a href=&quot;http://blog.springsource.com/2011/05/08/better-dsl-support-in-groovy-eclipse/&quot;&gt;DSL descriptors&lt;/a&gt; (DSLDs) for &lt;a href=&quot;http://groovy.codehaus.org/Eclipse+Plugin&quot;&gt;Groovy-Eclipse&lt;/a&gt;. DSLDs are Groovy scripts that provide rich editing support (content assist, navigation, etc.) for Groovy projects in your Eclipse workspace. Since DSLDs can only be executed inside a running Eclipse process, debugging is not as simple as firing up the Eclipse debugger and stepping through a Groovy script. In this post, I’ll describe some simple and some more complex techniques that you can use for debugging your DSLDs.&lt;/p&gt;
+&lt;p&gt;To get all of this working, you will need the latest development builds:&lt;br&gt;&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2011-08-02 21:30:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Debugging DSLD Scripts</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=20&amp;d=mm" />
+<span class="author">Andrew Eisenberg</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2011-08-02 21:30:00.0">August 02, 2011</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="428" href="/blog/2011/08/02/debugging-dsld-scripts#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Not too long ago, I introduced <a href="http://blog.springsource.com/2011/05/08/better-dsl-support-in-groovy-eclipse/">DSL descriptors</a> (DSLDs) for <a href="http://groovy.codehaus.org/Eclipse+Plugin">Groovy-Eclipse</a>. DSLDs are Groovy scripts that provide rich editing support (content assist, navigation, etc.) for Groovy projects in your Eclipse workspace. Since DSLDs can only be executed inside a running Eclipse process, debugging is not as simple as firing up the Eclipse debugger and stepping through a Groovy script. In this post, I&rsquo;ll describe some simple and some more complex techniques that you can use for debugging your DSLDs.</p><p>To get all of this working, you will need the latest development builds:<br /><ul><br /> <li>Groovy-Eclipse: <a href="http://dist.codehaus.org/groovy/distributions/greclipse/snapshot/e3.7/"><a href="http://dist.codehaus.org/groovy/distributions/greclipse/snapshot/e3.7/">http://dist.codehaus.org/groovy/distributions/greclipse/snapshot/e3.7/</a></a></li><br /> <li>STS Grails Tooling (optional, for debug evaluations): <a href="http://dist.springsource.com/snapshot/TOOLS/nightly/e3.7"><a href="http://dist.springsource.com/snapshot/TOOLS/nightly/e3.7">http://dist.springsource.com/snapshot/TOOLS/nightly/e3.7</a></a></li><br /> <li>AJDT (optional, for debug evaluations): <a href="http://download.eclipse.org/tools/ajdt/37/update"><a href="http://download.eclipse.org/tools/ajdt/37/update">http://download.eclipse.org/tools/ajdt/37/update</a></a></li><br /></ul></p>
+<h3>Simple and crude</h3><p>The simplest and crudest way to debug your DSLDs is by using <code>println</code>. This will print expressions to the standard out of the running Eclipse process, which can be seen if you launched your Eclipse from the command line. However, I recommend using a <code>log</code> statement instead. This will print logging information to the <a href="http://docs.codehaus.org/display/GROOVY/Groovy-Eclipse+2.1.1+New+and+Noteworthy#Groovy-Eclipse2.1.1NewandNoteworthy-GroovyEventConsole">Groovy event console</a>.</p><p>As you can see in the example below, every time the pointcut in <code>MethodParams.dsld</code> matches, the current value of <code>vals</code> will be printed to the Groovy event console.</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/07/log.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/log.png" alt="" title="log" width="600" class="aligncenter size-full wp-image-9180" /></a></p><p>The <code>log</code> method may be used anywhere in a DSLD script. All log entries in the event console are prefixed with &ldquo;======&rdquo;. The Groovy event console will also display your script&rsquo;s compilation errors and exceptions thrown, so it is quite useful even if the DSLD script does not contain any <code>log</code> statements.</p><p>When not using the event console, it is better to keep it closed, since the trace can get large quickly and wind up consuming significant memory and processing power.</p>
+<h3>Fancy</h3><p>Print and log statements only have limited use. It is possible to get proper debug support for your DSLDs with the ability to set breakpoints, step through code, and perform debug evaluations. Even though the set-up is a bit involved, this may be worthwhile when debugging complex scripts. Essentially, you need to launch a new instance of Eclipse (a runtime workbench) in your Eclipse debugger and debug your script through there. <a href="https://www.eclipse.org/articles/Article-PDE-does-plugins/PDE-intro.html">There</a> <a href="https://cvalcarcel.wordpress.com/2009/10/11/writing-an-eclipse-plug-in-part-5-adding-icons-and-a-new-project-structure/">is</a> <a href="http://learning.infocollections.com/ebook%202/Computer/Programming/Java/Eclipse.Modeling.Framework/0131425420_ch04lev1sec4.html">a</a> <a href="http://www.tutorial-omondo.com/omondoProfile/runtheworkbench/index.html">lot</a> <a href="https://help.eclipse.org/helios/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/firstplugin_run.htm">of</a> <a href="http://onjava.com/pub/a/onjava/2005/02/09/eclipse.html?page=2">information</a> <a href="https://tinyurl.com/3bkksy2">available</a> about creating and using Eclipse runtime workbenches, but most of that is not necessary for DSLD debugging. </p><p>Here are the required steps:</p>
+<ol>
+<li>Install Groovy-Eclipse source code (optional, but useful for digging deeper into how DSLDs are executed). You can do this from your Eclipse's install manager. Choose the Groovy-Eclipse SDK. See <a href="http://docs.codehaus.org/display/GROOVY/Install+Groovy-Eclipse+Plugin">here for more details</a>.
+<li>Create and launch a new and empty Eclipse workspace, You can do this by launching Eclipse from the command line and specify a -data parameter of the location of the new workspace. This workspace is the host that will launch the second workspace where your DSLD actually lives.</li>
+<li>Create new groovy project in your new workspace, initially empty</li>
+<li>Launch the runtime workbench. First open the launch configuration dialog:
+<a href="http://blog.springsource.com/wp-content/uploads/2011/07/open_launch_config_dialog.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/open_launch_config_dialog.png" alt="" title="open_launch_config_dialog" width="150" class="aligncenter size-full wp-image-9182" /></a>
+Then create a new launch configuration by double-clicking on <i>Eclipse application</i>. In the <em>Workspace Location</em> section, choose the filesystem directory of the workspace containing your DSLD:
+<a href="http://blog.springsource.com/wp-content/uploads/2011/07/launch_workspace1.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/launch_workspace1.png" alt="" title="launch_workspace" width="550" class="aligncenter size-full wp-image-9183" /></a></li>
+<li>After the runtime workbench starts, drag and drop the DSLD to debug from the runtime workspace into the newly created project in the host workspace. When you do that, you will see a dialog like this:
+<a href="http://blog.springsource.com/wp-content/uploads/2011/07/copy_link.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/copy_link.png" alt="" title="copy_link" width="300" class="aligncenter size-full wp-image-9184" /></a>
+Make sure to choose <em>link</em>. A linked file will ensure that changes made in one workspace will be reflected in the other. I recommend dragging and dropping (instead of other ways of importing the file into your workspace) because it is the easiest way to ensure that your file is linked instead of copied.</li>
+<li>Set a breakpoint somewhere in the DSLD in the host workspace.</li>
+<li>Do something that exercises your script in the runtime workbench. Perhaps hover over an interesting identifier in a Groovy file that the DSLD is applied to.</li>
+<li>Eclipse will stop at the breakpoint</li>
+<li>The first time that Eclipse stops at the breakpoint, the source code will not appear:<br />
+<a href="http://blog.springsource.com/wp-content/uploads/2011/07/no_source_code.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/no_source_code.png" alt="" title="no_source_code" width="150" class="aligncenter size-full wp-image-9185" /></a>
+You must explicitly add the newly created Groovy project to the source lookup path of the Eclipse runtime launch configuration. And once you do, the source code will be available.</li>
+<li>Rejoice! You should now be able to use the debugger for your DSLDs.</li>
+</ol><p>The variables view will work:<br /><a href="http://blog.springsource.com/wp-content/uploads/2011/07/variables_view.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/variables_view.png" alt="" title="variables_view" width="634" height="215" class="aligncenter size-full wp-image-9188" /></a></p><p>And if you have <a href="http://www.springsource.com/landing/best-development-tool-enterprise-java">STS</a>, you can perform evaluations in the expressions view:<br /><a href="http://blog.springsource.com/wp-content/uploads/2011/07/expressions_view.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/expressions_view.png" alt="" title="expressions_view" width="430" height="135" class="aligncenter size-full wp-image-9189" /></a></p><p>in the display view:<br /><a href="http://blog.springsource.com/wp-content/uploads/2011/07/display_view.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/display_view.png" alt="" title="display_view" width="617" height="128" class="aligncenter size-full wp-image-9190" /></a></p><p>And in the editor, select an expression and do CTRL-Shift-I, or CMD-Shift-I (in this case <code>names</code>):</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/07/eval_in_editor.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/eval_in_editor.png" alt="" title="eval_in_editor" width="376" height="170" class="aligncenter size-full wp-image-9191" /></a></p><p>Note that closures are not allowed in evaluations and Groovy debug evaluations must be explicitly enabled in the Groovy -&gt; Debugger -&gt; Extended Debugging Support page:</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/07/debug_preferences.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/07/debug_preferences.png" alt="" title="debug_preferences" width="541" height="201" class="aligncenter size-full wp-image-9192" /></a></p><p>Using this method to debug your DSLD scripts will help you create larger scripts to support more sophisticated Groovy DSLs.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 428;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+ </article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

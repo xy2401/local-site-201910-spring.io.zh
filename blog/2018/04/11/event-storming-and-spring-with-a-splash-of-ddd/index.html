@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Event Storming and Spring with a Splash of DDD</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Event Storming and Spring with a Splash of DDD" />
+<meta name="twitter:description" content="&lt;p&gt;It is my pleasure to announce that I have just joined the developer advocacy team at Pivotal, focusing on Spring. I feel privileged to have the opportunity to learn and collaborate with great and passionate engineers from all over the world. Hence, I must say I am really excited for the upcoming journey.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;If you would like to follow me, I tweet under&lt;/em&gt; &lt;a href=&quot;https://twitter.com/JakubPilimon&quot;&gt;&lt;em&gt;@JakubPilimon&lt;/em&gt;&lt;/a&gt; &lt;em&gt;and blog&lt;/em&gt; &lt;a href=&quot;http://pillopl.github.io&quot;&gt;&lt;em&gt;here&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Before joining Pivotal, I have had the pleasure of consulting with and learning from software development teams across a variety of domains. Whether the domain is e-commerce, pharma, fintech, or insurance—common to all domains in software are &lt;em&gt;the expectations of users&lt;/em&gt;. In this post I&#39;m going to introduce some of my principles for building Spring applications with DDD.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@JakubPilimon" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/55bc8e570d4038efca3c01daa2bb376c?s=200" />
+
+<meta property="og:title" content="Event Storming and Spring with a Splash of DDD" />
+<meta property="og:image" content="https://gravatar.com/avatar/55bc8e570d4038efca3c01daa2bb376c?s=200" />
+<meta property="og:description" content="&lt;p&gt;It is my pleasure to announce that I have just joined the developer advocacy team at Pivotal, focusing on Spring. I feel privileged to have the opportunity to learn and collaborate with great and passionate engineers from all over the world. Hence, I must say I am really excited for the upcoming journey.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;If you would like to follow me, I tweet under&lt;/em&gt; &lt;a href=&quot;https://twitter.com/JakubPilimon&quot;&gt;&lt;em&gt;@JakubPilimon&lt;/em&gt;&lt;/a&gt; &lt;em&gt;and blog&lt;/em&gt; &lt;a href=&quot;http://pillopl.github.io&quot;&gt;&lt;em&gt;here&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Before joining Pivotal, I have had the pleasure of consulting with and learning from software development teams across a variety of domains. Whether the domain is e-commerce, pharma, fintech, or insurance—common to all domains in software are &lt;em&gt;the expectations of users&lt;/em&gt;. In this post I&#39;m going to introduce some of my principles for building Spring applications with DDD.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2018-04-11 21:01:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Event Storming and Spring with a Splash of DDD</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/55bc8e570d4038efca3c01daa2bb376c?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/pilloPl">Jakub Pilimon</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2018-04-11 21:01:00.0">April 11, 2018</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3247" href="/blog/2018/04/11/event-storming-and-spring-with-a-splash-of-ddd#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>It is my pleasure to announce that I have just joined the developer advocacy team at Pivotal, focusing on Spring. I feel privileged to have the opportunity to learn and collaborate with great and passionate engineers from all over the world. Hence, I must say I am really excited for the upcoming journey.</p>
+<p><em>If you would like to follow me, I tweet under</em> <a href="https://twitter.com/JakubPilimon"><em>@JakubPilimon</em></a> <em>and blog</em> <a href="https://pillopl.github.io"><em>here</em></a>.</p>
+<p>Before joining Pivotal, I have had the pleasure of consulting with and learning from software development teams across a variety of domains. Whether the domain is e-commerce, pharma, fintech, or insurance—common to all domains in software are <em>the expectations of users</em>. In this post I&#39;m going to introduce some of my principles for building Spring applications with DDD.</p>
+<p><em>Principles for delivering software faster while increasing reliability</em>:</p>
+<ul>
+<li><strong>UNDERSTAND</strong> - Help teams understand and fix the gap between complex business problems (the so-called &quot;domain&quot;) and the model in code representing it. The most common problem I run into is that the domain models that find their way to production are often far and away from what the domain experts had in mind.</li>
+<li><strong>DIVIDE</strong> - Decompose software functionally into modules. By module, I mean any independent piece of our enterprise that could be one or many deployment units. It is crucial that each module be shipped as independent products so that we can apply different architectural styles.</li>
+<li><strong>IMPLEMENT</strong> - Refactor towards microservices by shifting the mindset from monoliths to distributed systems—or <em>discouraging</em> going down that path when it is not necessary!</li>
+<li><strong>DEPLOY</strong> - Improve the process of delivery by enlarging the awareness of habits like <em>Test Driven Development</em>, <em>Continuous Integration</em> and <em>Continuous Delivery</em></li>
+<li><strong>BUILD VALUE</strong> - Use Spring Boot and Spring Cloud to shorten the time needed to deliver business value. Allow developers to spend as much time as needed on understanding the business domain itself.</li>
+</ul>
+<p><strong>Domain Modeling</strong></p>
+<p>When it comes to understanding the business that you&#39;re building software for, there is no programming framework that can magically help us understand and model a complex domain. I don&#39;t expect such a tool to ever materialize, since it is generally impossible to predict how such a domain will evolve and change in the future. There are, however, some common abstract business domains that most should be familiar with—like <em>sales</em>, <em>inventory,</em> or a <em>product catalogue</em>. When it comes to domain modeling from scratch, there&#39;s no need to reinvent the wheel. Here is a great resource I recommend for complex domain modeling: <a href="https://www.amazon.com/Enterprise-Patterns-MDA-Building-Archetype/dp/032111230X">Enterprise Patterns and MDA: Building Better Software with Archetype Patterns and UML</a>.</p>
+<p><strong>Understand, Divide, and Continuously Conquer</strong></p>
+<p>When rapidly delivering software, we must not sacrifice how code will be understood by others later. Thankfully, we have a set of principles and practices to help us—in the form of <em>Domain-Driven Design</em>. Personally, I like to think about DDD as a process of iterative learning of the unknown. The side-effect of applying DDD is that we are able to make our code more understandable, extendable, and coherent for both developers and the business. With DDD, it becomes possible to make our source code the single source of truth for how a domain should function. Software functionality is meant to be changed. But when a developer is unable to articulate source code to the business in the terms that they understand, that functionality becomes ornamental and difficult to change or replace.</p>
+<p>Even the most complex domains can be divided into…</p>
+<ul>
+<li>Smaller but still quite complex subdomains (so-called core domains) - this is probably the largest competitive advantage of our enterprise hence, we invest much effort there.</li>
+<li>Simple and understandable subdomains that might not be unique to our enterprise (so-called generic subdomains) - we need them for our enterprise to operate but it does not give our customers competitive advantage. Think about <em>inventory</em> or <em>invoicing.</em> Our users will not come back attracted by even the prettiest invoices.</li>
+</ul>
+<p>Identifying those smaller products gives us a first draft of how to organize our code into modules. Each subdomain equals separate module. Understanding distinction between core and generic domains helps us see that they probably need different architectural style.</p>
+<p>Fortunately, there are a lot of <a href="https://start.spring.io">ingredients we can pick and choose</a> from!</p>
+<p><strong>The example</strong></p>
+<p>From this place I am happy to announce that together with my friend <a href="https://twitter.com/michal_michaluk">Michał Michaluk</a>, we&#39;ve created an initiative called #dddbyexamples. The purpose of the initiative is to bridge the many different parts of the Spring ecosystem with the interests of DDD enthusiasts. You can check our samples <a href="https://github.com/ddd-by-examples">here</a>. So far, there are two samples. One sample focuses on Event Sourcing and Command Query Responsibility Segregation, while the other focuses on an end-to-end DDD example. Both are implemented with Spring Boot.</p>
+<p>Let&#39;s dive into the end-to-end example. We are going to implement a simplified credit card management system. We will segment the work to Understand, Divide, Implement and Deploy. The requirements are not clear yet and so far we know that the system should be able to:</p>
+<ul>
+<li>Assign initial limit to a card</li>
+<li>Withdraw money</li>
+<li>Create a statement with amount of money to be repaid (at the end of a billing cycle)</li>
+<li>Repay money</li>
+<li>Order or change personalized plastic card</li>
+</ul>
+<p><strong>Understand</strong></p>
+<p>To understand what is <strong>really</strong> going on in our business problem we can take advantage of a lightweight technique called <a href="https://en.wikipedia.org/wiki/Event_storming">Event Storming</a>. All we need is unlimited space on a wide wall, sticky notes and both business and technical people gathered in one room. The first step is to write down <strong>what can happen</strong> in our domain on orange notes. These are the <strong>domain events.</strong> Note the past tense and no particular order.</p>
+<p><img src="https://github.com/pilloPl/eventstorming-with-spring/blob/master/just-events.png?raw=true" alt="events" /></p>
+<p>Then we must identify the cause of each event. Domain experts know the cause and most probably it can be categorized to:</p>
+<ul>
+<li>A direct <strong>command</strong> to a system - blue note next to the event</li>
+<li>Another event - in that case we put those events next to each other</li>
+<li>Some period of time that has passed - small note saying <em>time</em></li>
+</ul>
+<p><img src="https://github.com/pilloPl/eventstorming-with-spring/blob/master/events-and-causes.png?raw=true" alt="events-and-commands" /></p>
+<p>There is also a green note: <em>plastic card personalization view</em>. It is a direct message to the system that causes <em>plastic card personalization displayed</em> event. But it is a <strong>query</strong> , not a command. For views and read models we are going to use green notes.</p>
+<p>Next step is crucial. We need to know if the cause alone is sufficient for the domain event to occur. Maybe there is another condition that have to be met. Maybe more than one. Those conditions are called <strong>invariants.</strong> If so, we write them down on yellow notes and place in between events and causes.</p>
+<p><img src="https://github.com/pilloPl/eventstorming-with-spring/blob/master/invariants.png?raw=true" alt="invariants" /></p>
+<p>If we applied chronology to our events we would get a very good overview of what our domain is about. Moreover, we will learn about basic business processes. The technique is lightweight, quick, fun and more descriptive comparing to tones of text documents or UI mockups. But it did not deliver a single line of code yet, did it?</p>
+<p><strong>Divide</strong></p>
+<p>To find boundaries between business modules we can apply the rule of cohesion: things that change together and are used together should be kept together. For instance, in one module. How can we talk about cohesion having just a set of colorful notes? Let&#39;s see.</p>
+<p>In order to check invariants (yellow notes) system must ask some questions. For instance, in order to withdraw there must be already an assigned limit. System must run a query: <em>&ldquo;Hi, does it have assigned limit?&rdquo;</em>. On the other hand, there are commands and events that might <strong>change</strong> answer to that question. For instance, the first command to assign limit changes that answer from <em>no</em> to <em>yes</em> forever. This a clear indicator of <strong>highly cohesive</strong> behaviors that might go together into one module or class.</p>
+<p>Let&#39;s apply this heuristic in all places. On green notes we will write down the name of a query/view that the system needs to check during processing each invariant. Also, let&#39;s highlight when the answer to that query/view might change as a consequence of an event. That way the green notes can be spotted either next to an invariant or next to an event.</p>
+<p><img src="https://i.imgur.com/G9XVk63.png" alt="invariants-view-events-view-changes" /></p>
+<p>Let&#39;s search for the following pattern:</p>
+<ul>
+<li>Command <code>CmdA</code> is fired and it causes <code>EventA</code></li>
+<li><code>EventA</code> affects view <code>SomeView</code>.</li>
+<li><code>SomeView</code> is also needed while processing an invariant that protects <code>CmdB</code></li>
+<li>That means that <code>CmdA</code> and <code>CmdB</code> might be good candidates to land in the same module!</li>
+<li>Let&#39;s put those commands (together with invariants and events) next to each other.</li>
+</ul>
+<p>Doing so might segment our domain into very cohesive spots. Below we can find a proposed modularization. Remember that this is just a heuristic, you might end up with different setup. Proposed technique gives us a good chance to identify modules which are loosely coupled. This method is just a heuristic (not a strong rule) that can help us at finding independent modules. Also, if you think about it, proposed modules have linguistic boundaries. Credit card means something different for accounting and marketing, even though it&rsquo;s the same word. In DDD terminology those are called <em>Bounded Contexts</em>. Those will be our deployment units. Also, this generalization must take into account if the effect should be immediate or eventual. If it can be eventually consistent, this heuristic is not that strong, even though there is a relationship.</p>
+<p><img src="https://i.imgur.com/YJBU0WO.png" alt="modules" /></p>
+<p>The last step in DIVIDE part is to identify how modules communicate with each other. This is so-called context mapping. Here is a list of some integration strategies:</p>
+<ul>
+<li>A module sends a query to another module - Statement module needs to ask Card Operations if there are any withdrawals. Because if not, it does not issue any statement.</li>
+<li>A module listens to events sent by another module - The direct consequence of <em>Money Repaid</em> event is <em>Statement Closed</em> event. That means that Statements shall subscribe to events thrown by Card Operations. That was missed at the beginning of Event Storming session. Context Mapping is actually a moment when we discover a lot of new information</li>
+<li>A module fires a command to another module - no such example in our system.</li>
+</ul>
+<p><img src="https://i.imgur.com/vBhouxJ.png" alt="contextmap" /></p>
+<p><strong>Implement</strong></p>
+<p>Having functionally decomposed software tremendously helps during its maintenance. Modular monolith is a good start, but the fact that it is a single deployment unit might cause problems. All of the modules must be deployed together. In some enterprises going with microservices may be a better option. Please refer to <a href="https://content.pivotal.io/blog/should-that-be-a-microservice-keep-these-six-factors-in-mind?utm_campaign=content-social&utm_medium=social-sprout&utm_source=twitter&utm_content=1516394228">this article</a> by <a href="https://twitter.com/ntschutta">Nate Shutta</a> in order to learn more about when this decision is right. </p>
+<p>Let&rsquo;s assume that our example fits microservice architecture. Each module can be a separate Spring Boot application. We know the boundaries of the modules. Different architectural styles can be applied in each of them. The places which contain the most business logic should be implemented with careful attention. On the other hand, there are some modules which are clear and simple. How to find both?</p>
+<ul>
+<li>Look for spots with a lot of yellow notes (invariants). This is where we have much logic in between a command and eventual event. System needs to process complex commands here. This is where we expect sudden changes and where we probably build competitive advantage. We want to apply special care here, thus for example apply the Domain-Driven Design techniques or hexagonal architecture.</li>
+<li>Look for spots that contain a few or zero yellow notes. Those are clear and easy to implement. There is almost nothing in between a command and an event, the system does not need to do anything complex here. The only job here is to interact with the database so we should be careful and try to avoid accidental complexity there.</li>
+</ul>
+<p>That knowledge is a very important architectural driver that can make us decide to decouple <em>commands exposure</em> (e.g. REST resources) from <em>commands processing</em> (domain model with invariants). This architectural driver applied to Card Operations leads us to the following technology stack:</p>
+<p><img src="https://i.imgur.com/LBOtKc5.png" alt="cardoperations" /></p>
+<p>Take a look at the commands and related invariants (blue and yellow notes). On the wall we have a complete suite of test scenarios! The only thing left is to write them down:</p>
+<pre><code class="prettyprint java">class CreditCardTest {
+
+    @Test
+    public void cannot_withdraw_when_limit_not_assigned() {
+
+    }
+
+    @Test
+    public void cannot_withdraw_when_not_enough_money() {
+
+    }
+
+    @Test
+    public void cannot_withdraw_when_there_was_withdrawal_within_lastH() {
+
+    }
+
+    @Test
+    public void can_withdraw() {
+
+    }
+
+    @Test
+    public void cannot_assign_limit_when_it_was_already_assigned() {
+
+    }
+
+    @Test
+    public void can_assign_limit() {
+
+    }
+
+    @Test
+    public void can_repay() {
+
+    }
+
+}
+</code></pre>
+<p>And following TDD principles we can design our code to meet these scenarios. Next is an initial design that we can construct from the blue and yellow sticky notes.</p>
+<pre><code class="prettyprint java">@Entity
+class CreditCard {
+
+    //..fields will pop-up during TDD!
+
+    void assignLimit(BigDecimal money) {
+        if(limitAlreadyAssigned()) {
+            // throw
+        }
+        //...
+    }
+
+    void withdraw(BigDecimal money) {
+        if(limitNotAssigned()) {
+            // throw
+        }
+        if(notEnoughMoney()) {
+            // throw
+        }
+        if(withdrawalWithinLastHour()) {
+            // throw
+        }
+
+        //...
+    }
+
+    void repay(BigDecimal money) {
+
+    }
+
+}
+</code></pre>
+<p>Because we used the sticky notes, we did our thinking in the design phase. We just copied what was on the sticky notes and pasted it to the code. The same language is present on the notes and in the code, which is part of what makes event storming powerful. As a developer, this process allows us to focus on what we do best, which is writing robust code. The language and the models are just a part of the process of working together with a business&rsquo;s domain experts.</p>
+<p>Now let&#39;s implement the integration layer. To implement the answer to the view <em>list of withdrawals</em> requested by <code>Statements</code> module we will create REST withdrawals resource. Also, this will be a natural candidate for exposing the <code>withdraw</code> command. As always, let&#39;s start with a test:</p>
+<pre><code class="prettyprint java">@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+class WithdrawalControllerTest {
+
+	private static final String ANY_CARD_NO = &quot;no&quot;;
+
+	@Autowired
+	TestRestTemplate testRestTemplate;
+
+	@Test
+	public void should_show_correct_number_of_withdrawals() {
+	    // when
+	    testRestTemplate.postForEntity(&quot;/withdrawals/&quot; + ANY_CARD_NO, 
+                                        new WithdrawRequest(TEN), 
+                                        WithdrawRequest.class);
+
+	    // then
+            ResponseEntity res = testRestTemplate.getForEntity(
+                                         &quot;/withdrawals/&quot; + ANY_CARD_NO, 
+                                         WithdrawRequest.class);
+            assertThat(res.getStatusCode().is2xxSuccessful()).isTrue();
+            assertThat(res.getBody()).hasSize(1);
+	}
+
+}
+</code></pre>
+<p>And the implementation:</p>
+<pre><code class="prettyprint java">@RestController(&quot;/withdrawals&quot;)
+class WithdrawalController {
+
+    @GetMapping(&quot;/{cardNo}&quot;)
+    ResponseEntity withdrawalsForCard(@PathVariable String cardNo) {
+        //.. stack for query
+        // - direct call to DB to Withdrawals
+    }
+
+    @PostMapping(&quot;/{cardNo}&quot;)
+    ResponseEntity withdraw(@PathVariable String cardNo, @RequestBody WithdrawRequest r) {
+        //.. stack for commands
+        // - call to CreditCard.withdraw(r.amount)
+        // - insert new Withdrawal to DB
+    }
+
+}
+</code></pre>
+<p>According to the context map the <code>Repay</code> command emits <code>MoneyRepaid</code> event. A message broker will be a natural candidate for asynchronously transporting the domain events. To implement messaging, we&rsquo;ll save ourselves some time by using <a href="https://cloud.spring.io/spring-cloud-stream/">Spring Cloud Stream</a>. Let&#39;s create an end-to-end test:</p>
+<pre><code class="prettyprint java">@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+class RepaymentsTest {
+
+	private static final String ANY_CARD_NO = &quot;no&quot;;
+
+	@Autowired
+        TestRestTemplate testRestTemplate;
+
+	@Autowired
+	MessageCollector messageCollector;
+
+	@Autowired
+	Source source;
+
+	BlockingQueue&lt;Message&lt;?&gt;&gt; outputEvents;
+
+	@BeforeClass
+	public void setup() {
+		outputEvents = messageCollector.forChannel(source.output());
+	}
+
+	@Test
+	public void should_show_correct_number_of_withdrawals_after_1st_withdrawal() {
+	    // given
+	    testRestTemplate.postForEntity(&quot;/withdrawals/&quot; + ANY_CARD_NR, 
+                                new WithdrawRequest(TEN), 
+                                WithdrawRequest.class);
+
+	    // when
+	    testRestTemplate.postForEntity(&quot;/repayments/&quot; + ANY_CARD_NR, 
+                                new RepaymentRequest(TEN), 
+                                RepaymentRequest.class);
+
+	    // then
+	    assertThat(
+                   outputEvents.poll()
+                        .getPayload() instanceof MoneyRepaid)
+                             .isTrue();
+	}
+
+}
+</code></pre>
+<p>And the implementation:</p>
+<pre><code class="prettyprint">@RestController(&quot;/repayments&quot;)
+class RepaymentController {
+
+    private final Source source;
+
+    RepaymentController(Source source) {
+        this.source = source;
+    }
+
+    @PostMapping(&quot;/{cardNr}&quot;)
+    ResponseEntity repay(@PathVariable String cardNo, @RequestBody RepaymentRequest r) {
+        //.. stack for commands
+        // - call to CreditCard.repay(r)
+        // - source.output().send(... new MoneyRepaid(...));
+    }
+
+}
+
+class RepaymentRequest {
+
+    final BigDecimal amount;
+
+    RepaymentRequest(BigDecimal amount) {
+        this.amount = amount;
+    }
+}
+</code></pre>
+<p>The <code>PlasticCards</code> module is very simple. There are no <a href="http://www.informit.com/articles/article.aspx?p=2020371&seqNum=2">invariants</a> and the only responsibility is to talk with the database and/or the message broker. Let&#39;s not over-complicate the matter and first notice the fact that it has four primary functions: <em>create, update, read and delete</em>. <a href="https://projects.spring.io/spring-data-rest/">Spring Data REST</a> is a fantastic project to easily create a basic CRUD repository without any heavy lifting or worrying too much about the plumbing.</p>
+<p><img src="https://i.imgur.com/FUTqyMX.png" alt="plasticcards" /></p>
+<p>Spring Data allows us to implement a repository from the above design in just a few lines of code. One can argue that a simple test to check if the contexts and entity mappings are fine, which seems like a good idea. For brevity, let&#39;s skip that and jump directly to the implementation:</p>
+<pre><code class="prettyprint java">@RepositoryRestResource(path = &quot;plastic-cards&quot;,
+        collectionResourceRel = &quot;plastic-cards&quot;,
+        itemResourceRel = &quot;plastic-cards&quot;)
+interface PlasticCardController extends CrudRepository&lt;PlasticCard, Long&gt; {
+
+}
+
+@Entity
+class PlasticCard {
+
+    //..
+}
+</code></pre>
+<p>Although the <code>Statements</code> module contains one invariant, the module is also very close to a simple CRUD interface. Although, <code>Statements</code> has one invariant. In order to process the invariant, the module interacts with the <code>CardOperations</code> module. To test that behaviour in isolation (without the real instance of <code>CardOperations</code> in our Spring Boot application) we should take a look at <a href="https://cloud.spring.io/spring-cloud-contract/">Spring Cloud Contract</a> and start to introduce it into our proposed stack. <code>Statements</code> are simple documents by their nature, and <em>Spring Data MongoDB</em>, provides that functionality out of the box with document collections. The <code>Statements</code> module exposes no endpoints for commands, but it subscribes to the <code>MoneyRepaid</code> command and leverages Spring Cloud Stream&rsquo;s messaging capabilities.</p>
+<p><img src="https://i.imgur.com/HhawAb9.png" alt="statements" /></p>
+<p>There is an interesting scenario: closing a statement as a consequence of received <code>MoneyRepaid</code> event. The test might trigger the fake event with Spring Cloud Stream test tools:</p>
+<pre><code class="prettyprint">@RunWith(SpringRunner.class)
+@SpringBootTest
+class MoneyRepaidListenerTest {
+
+	private static final String ANY_CARD_NR = &quot;nr&quot;;
+
+	@Autowired Sink sink;
+	@Autowired StatementRepository statementRepository;
+
+	@Test
+	public void should_close_the_statement_when_money_repaid_event_happens() {
+	    // when
+	    sink.input()
+                .send(new GenericMessage&lt;&gt;(new MoneyRepaid(ANY_CARD_NR, TEN)));
+
+	    // then
+	    assertThat(statementRepository
+                .findLastByCardNr(ANY_CARD_NR).isClosed()).isTrue();
+	}
+
+}
+</code></pre>
+<p>And the implementation:</p>
+<pre><code class="prettyprint java">@Component
+class MoneyRepaidListener {
+
+    @StreamListener(&quot;card-operations&quot;)
+    public void handle(MoneyRepaid moneyRepaid) {
+        //..close statement
+    }
+}
+
+class MoneyRepaid {
+
+    final String cardNo;
+    final BigDecimal amount;
+
+    MoneyRepaid(String cardNo, BigDecimal amount) {
+        this.cardNo = cardNo;
+        this.amount = amount;
+    }
+}
+</code></pre>
+<p>On the other hand, the process of generating statements requires a query to <code>CardOperations</code> module in order to check for present withdrawals. As already mentioned, this should be tested in isolation. To do so a contract with the team responsible for <code>CardOperations</code> module can be proposed. Hence the stubbed version of that module can be fired for testing purposes. The <a href="http://wiremock.org/">WireMock</a> stub generated from the contract might look as follows&hellip;</p>
+<pre><code class="prettyprint json">{
+  &quot;request&quot; : {
+    &quot;url&quot; : &quot;/withdrawals/123&quot;,
+    &quot;method&quot; : &quot;GET&quot;
+  },
+  &quot;response&quot; : {
+    &quot;status&quot; : 200,
+    &quot;body&quot; : &quot;{\&quot;withdrawals\&quot;:\&quot;[&quot;first&quot;, &quot;second&quot;, &quot;third&quot;]\&quot;}&quot;
+  }
+}
+
+{
+  &quot;request&quot; : {
+    &quot;url&quot; : &quot;/withdrawals/456&quot;,
+    &quot;method&quot; : &quot;GET&quot;
+  },
+  &quot;response&quot; : {
+    &quot;status&quot; : 204,
+    &quot;body&quot; : &quot;{}&quot;
+  }
+}
+</code></pre>
+<p>And here are tests that, <em>thanks to the contract</em>, will work without any real instance of <code>CardOperations</code>:</p>
+<pre><code class="prettyprint java">@RunWith(SpringRunner.class)
+class StatementGeneratorTest {
+
+	private static final String USED_CARD = &quot;123&quot;;
+	private static final String NOT_USED_CARD = &quot;456&quot;;
+
+	@Autowired StatementGenerator statementGenerator;
+	@Autowired StatementRepository statementRepository;
+
+	@Test
+	public void should_create_statement_only_if_there_are_withdrawals() {
+	    // when
+	    statementGenerator.generateStatements();
+
+	    // then
+	    assertThat(statementRepository
+                             .findOpenByCardNr(USED_CARD)).hasSize(1);
+	    assertThat(statementRepository
+                             .findOpenByCardNr(NOT_USED_CARD)).hasSize(0);
+
+	}
+
+}
+</code></pre>
+<p>The last thing is the implementation:</p>
+<pre><code class="prettyprint java">@Component
+class StatementGenerator {
+
+    @Scheduled
+    public void generateStatements() {
+        allCardNumbers()
+                .forEach(this::generateIfNeeded);
+    }
+
+    private void generateIfNeeded(CardNr cardNo) {
+        //query to card-operations
+        //if 200 OK - generate and statement
+    }
+
+    private List&lt;CardNr&gt; allCardNumbers() {
+         return callToCardRepository();
+    }
+}
+</code></pre>
+<p>Using <a href="https://cloud.spring.io/spring-cloud-pipelines/">Spring Cloud Pipelines</a> we can easily introduce CI/CD and be done with the deploy part.</p>
+<blockquote>
+<p>If you are interested, don&rsquo;t miss <a href="https://content.pivotal.io/springone-platform-2017/continuous-deployment-to-the-cloud-marcin-grzejszczak-cora-iberkleid">this talk by Cora Iberkleid and Marcin Grzejszczak</a> about Spring Cloud Pipelines.</p>
+</blockquote>
+<p><strong>Conclusions</strong></p>
+<p>Event Storming helps us quickly understand what our domain is all about. Following DDD principles, we can divide the enterprise into smaller cohesive and loosely coupled problems. Knowing the complexity of each module and how they need to communicate with each other, we can pick from a broad set of tools in the Spring ecosystem in order to implement and deploy very quickly.</p>
+<p><strong>Special Thanks</strong></p>
+<p>I want to thank <a href="https://twitter.com/kennybastani">Kenny Bastani</a> for many useful remarks about early draft of this post. But first of all I would like to thank him for having so many great ideas when we were creating and rehearsing our <a href="https://content.pivotal.io/springone-platform-2017/state-or-events-which-shall-i-keep-jakub-pilimon-kenny-bastani-2">talk</a> at SpringOne. </p>
+<p>Also, I would like to thank <a href="https://twitter.com/MGrzejszczak">Marcin Grzejszczak</a> for endless discussions about microservices and testing. I can say that you rarely see so much passion and enthusiasm in one person.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3247;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+ </ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Integration Java DSL: Line by line tutorial</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Integration Java DSL: Line by line tutorial" />
+<meta name="twitter:description" content="&lt;p&gt;Dear Spring Community!&lt;/p&gt;
+&lt;p&gt;Just after the &lt;a href=&quot;https://spring.io/blog/2014/11/24/spring-integration-java-dsl-1-0-ga-released&quot;&gt;Spring Integration Java DSL 1.0 GA&lt;/a&gt; release announcement I want to introduce the Spring Integration Java DSL to you as a line by line tutorial based on the classic&lt;br&gt;&lt;a href=&quot;https://github.com/spring-projects/spring-integration-samples/tree/master/dsl/cafe-dsl&quot;&gt;Cafe Demo&lt;/a&gt; integration sample.&lt;br&gt;We describe here &lt;a href=&quot;http://projects.spring.io/spring-boot/&quot;&gt;Spring Boot&lt;/a&gt; support, Spring Framework &lt;a href=&quot;http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#beans-java&quot;&gt;Java and Annotation&lt;/a&gt; configuration, the &lt;a href=&quot;https://github.com/spring-projects/spring-integration-java-dsl/blob/master/src/main/java/org/springframework/integration/dsl/IntegrationFlow.java&quot;&gt;&lt;code&gt;IntegrationFlow&lt;/code&gt;&lt;/a&gt; feature and pay tribute to Java 8 &lt;a href=&quot;https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html&quot;&gt;Lambda&lt;/a&gt; support which was an inspiration for the DSL style. Of course, it is all backed by the &lt;a href=&quot;http://projects.spring.io/spring-integration/&quot;&gt;Spring Integration Core&lt;/a&gt; project.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@artem_bilan" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/2158ce6e7c048277890eb64458864c1c?s=200" />
+
+<meta property="og:title" content="Spring Integration Java DSL: Line by line tutorial" />
+<meta property="og:image" content="https://gravatar.com/avatar/2158ce6e7c048277890eb64458864c1c?s=200" />
+<meta property="og:description" content="&lt;p&gt;Dear Spring Community!&lt;/p&gt;
+&lt;p&gt;Just after the &lt;a href=&quot;https://spring.io/blog/2014/11/24/spring-integration-java-dsl-1-0-ga-released&quot;&gt;Spring Integration Java DSL 1.0 GA&lt;/a&gt; release announcement I want to introduce the Spring Integration Java DSL to you as a line by line tutorial based on the classic&lt;br&gt;&lt;a href=&quot;https://github.com/spring-projects/spring-integration-samples/tree/master/dsl/cafe-dsl&quot;&gt;Cafe Demo&lt;/a&gt; integration sample.&lt;br&gt;We describe here &lt;a href=&quot;http://projects.spring.io/spring-boot/&quot;&gt;Spring Boot&lt;/a&gt; support, Spring Framework &lt;a href=&quot;http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#beans-java&quot;&gt;Java and Annotation&lt;/a&gt; configuration, the &lt;a href=&quot;https://github.com/spring-projects/spring-integration-java-dsl/blob/master/src/main/java/org/springframework/integration/dsl/IntegrationFlow.java&quot;&gt;&lt;code&gt;IntegrationFlow&lt;/code&gt;&lt;/a&gt; feature and pay tribute to Java 8 &lt;a href=&quot;https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html&quot;&gt;Lambda&lt;/a&gt; support which was an inspiration for the DSL style. Of course, it is all backed by the &lt;a href=&quot;http://projects.spring.io/spring-integration/&quot;&gt;Spring Integration Core&lt;/a&gt; project.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2014-11-25 13:10:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Integration Java DSL: Line by line tutorial</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/2158ce6e7c048277890eb64458864c1c?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/artembilan">Artem Bilan</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2014-11-25 13:10:00.0">November 25, 2014</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="1862" href="/blog/2014/11/25/spring-integration-java-dsl-line-by-line-tutorial#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Dear Spring Community!</p><p>Just after the <a href="https://spring.io/blog/2014/11/24/spring-integration-java-dsl-1-0-ga-released">Spring Integration Java DSL 1.0 GA</a> release announcement I want to introduce the Spring Integration Java DSL to you as a line by line tutorial based on the classic<br /><a href="https://github.com/spring-projects/spring-integration-samples/tree/master/dsl/cafe-dsl">Cafe Demo</a> integration sample.<br />We describe here <a href="https://projects.spring.io/spring-boot/">Spring Boot</a> support, Spring Framework <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#beans-java">Java and Annotation</a> configuration, the <a href="https://github.com/spring-projects/spring-integration-java-dsl/blob/master/src/main/java/org/springframework/integration/dsl/IntegrationFlow.java"><code>IntegrationFlow</code></a> feature and pay tribute to Java 8 <a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">Lambda</a> support which was an inspiration for the DSL style. Of course, it is all backed by the <a href="https://projects.spring.io/spring-integration/">Spring Integration Core</a> project.</p><p>For those, who are not interested in Java 8 yet, we provide similar tutorial without Lambdas: <a href="https://spring.io/blog/2014/12/01/spring-integration-java-dsl-pre-java-8-line-by-line-tutorial">Spring Integration Java DSL (pre Java 8): Line by line tutorial</a>.</p><p>But, before we launch into the description of the Cafe demonstration app here&rsquo;s a shorter example just to get started&hellip;</p>
+<pre><code class="prettyprint java">@Configuration
+@EnableAutoConfiguration
+@IntegrationComponentScan
+public class Start {
+
+	public static void main(String[] args) throws InterruptedException {
+		ConfigurableApplicationContext ctx = 
+                                 SpringApplication.run(Start.class, args);
+
+		List&lt;String&gt; strings = Arrays.asList(&quot;foo&quot;, &quot;bar&quot;);
+		System.out.println(ctx.getBean(Upcase.class).upcase(strings));
+
+		ctx.close();
+	}
+
+	@MessagingGateway
+	public interface Upcase {
+
+		@Gateway(requestChannel = &quot;upcase.input&quot;)
+		Collection&lt;String&gt; upcase(Collection&lt;String&gt; strings);
+
+	}
+
+	@Bean
+	public IntegrationFlow upcase() {
+	     return f -&gt; f
+		 	.split()                                         // 1
+			.&lt;String, String&gt;transform(String::toUpperCase)  // 2
+			.aggregate();                                    // 3
+	}
+
+}
+</code></pre><p>We will leave the description of the infrastructure (annotations etc) to the main cafe flow description. Here, we want you to concentrate on the last <code>@Bean</code>, the <code>IntegrationFlow</code> as well as the gateway method which sends messages to that flow.</p><p>In the <code>main</code> method we send a collection of strings to the gateway and print the results to STDOUT. The flow first splits the collection into individual <code>String</code>s (1); each string is then transformed to upper case (2) and finally we re-aggregate them back into a collection (3)<br />Since that&rsquo;s the end of the flow, the framework returns the result of the aggregation back to the gateway and the new payload becomes the return value from the gateway method.</p><p>The equivalent XML configuration might be&hellip;</p>
+<pre><code class="prettyprint xml">&lt;int:gateway service interface=&quot;foo.Upcase&quot; 
+                 default-request-channel=&quot;upcase.input&quot;&gt;
+
+&lt;int:splitter input-channel=&quot;upcase.input&quot; output-channel=&quot;transform&quot;/&gt;
+
+&lt;int:transformer expression=&quot;payload.toUpperCase()&quot;
+    input-channel=&quot;transform&quot;
+    output-channel=&quot;aggregate&quot; /&gt;
+
+&lt;int:aggregator input-channle=&quot;aggregate&quot; /&gt;
+</code></pre><p>or&hellip;</p>
+<pre><code class="prettyprint xml">&lt;int:gateway service interface=&quot;foo.Upcase&quot; 
+                default-request-channel=&quot;upcase.input&quot;&gt;
+
+&lt;int:chain input-channel=&quot;upcase.input&quot;&gt;
+    &lt;int:splitter /&gt;
+    &lt;int:transformer expression=&quot;payload.toUpperCase()&quot; /&gt;
+    &lt;int:aggregator /&gt;
+&lt;/int:chain&gt;
+</code></pre><h2><a href="#cafe-demo" class="anchor" name="cafe-demo"></a>Cafe Demo</h2><p>The purpose of the <code>Cafe Demo</code> application is to demonstrate how Enterprise Integration Patterns (EIP) can be used to reflect the <code>order-delivery</code> scenario in a real life cafe. With this application, we handle several drink orders - hot and iced. After running the application we can see in the standard output (<code>System.out.println</code>) how cold drinks are prepared quicker<br />than hot. However the delivery for the whole order is postponed until the hot drink is ready.</p><p>To reflect the domain model we have several classes: <code>Order</code>, <code>OrderItem</code>, <code>Drink</code> and <code>Delivery</code>. They all are mentioned in the integration scenario, but we won&rsquo;t analyze them here, because they are simple enough.</p><p>The source code for our application is placed only in a single class; significant lines are annotated with a number corresponding to the comments, which follow:</p>
+<pre><code class="prettyprint java">@SpringBootApplication               // 1
+@IntegrationComponentScan            // 2
+public class Application {
+
+  public static void main(String[] args) throws Exception {
+  	ConfigurableApplicationContext ctx =
+  	              SpringApplication.run(Application.class, args);// 3
+
+  	Cafe cafe = ctx.getBean(Cafe.class);                         // 4
+  	for (int i = 1; i &lt;= 100; i++) {                             // 5
+       Order order = new Order(i);
+       order.addItem(DrinkType.LATTE, 2, false); //hot
+       order.addItem(DrinkType.MOCHA, 3, true);  //iced
+       cafe.placeOrder(order);
+  	}
+
+  	System.out.println(&quot;Hit &#39;Enter&#39; to terminate&quot;);              // 6
+  	System.in.read();
+  	ctx.close();
+  }
+
+  @MessagingGateway                                              // 7
+  public interface Cafe {
+
+  	@Gateway(requestChannel = &quot;orders.input&quot;)                    // 8
+  	void placeOrder(Order order);                                // 9
+
+  }
+
+  private AtomicInteger hotDrinkCounter = new AtomicInteger();
+
+  private AtomicInteger coldDrinkCounter = new AtomicInteger();  // 10
+
+  @Bean(name = PollerMetadata.DEFAULT_POLLER)
+  public PollerMetadata poller() {                               // 11
+  	return Pollers.fixedDelay(1000).get();
+  }
+
+  @Bean
+  public IntegrationFlow orders() {                             // 12
+  	return f -&gt; f                                               // 13
+  	  .split(Order.class, Order::getItems)                      // 14
+  	  .channel(c -&gt; c.executor(Executors.newCachedThreadPool()))// 15
+  	  .&lt;OrderItem, Boolean&gt;route(OrderItem::isIced, mapping -&gt; mapping // 16
+  	    .subFlowMapping(&quot;true&quot;, sf -&gt; sf                        // 17
+  	      .channel(c -&gt; c.queue(10))                            // 18
+  	      .publishSubscribeChannel(c -&gt; c                       // 19
+  	        .subscribe(s -&gt;                                     // 20
+  	          s.handle(m -&gt; sleepUninterruptibly(1, TimeUnit.SECONDS)))// 21
+  	        .subscribe(sub -&gt; sub                               // 22
+  	          .&lt;OrderItem, String&gt;transform(item -&gt;
+  	            Thread.currentThread().getName()
+  	              + &quot; prepared cold drink #&quot;
+  	              + this.coldDrinkCounter.incrementAndGet()
+  	              + &quot; for order #&quot; + item.getOrderNumber()
+  	              + &quot;: &quot; + item)                                 // 23
+  	          .handle(m -&gt; System.out.println(m.getPayload())))))// 24
+  	    .subFlowMapping(&quot;false&quot;, sf -&gt; sf                        // 25
+  	      .channel(c -&gt; c.queue(10))
+  	      .publishSubscribeChannel(c -&gt; c
+  	        .subscribe(s -&gt;
+  	          s.handle(m -&gt; sleepUninterruptibly(5, TimeUnit.SECONDS)))// 26
+  	        .subscribe(sub -&gt; sub
+  	          .&lt;OrderItem, String&gt;transform(item -&gt;
+  	            Thread.currentThread().getName()
+  	              + &quot; prepared hot drink #&quot;
+  	              + this.hotDrinkCounter.incrementAndGet()
+  	              + &quot; for order #&quot; + item.getOrderNumber()
+  	              + &quot;: &quot; + item)
+  	          .handle(m -&gt; System.out.println(m.getPayload()))))))
+  	  .&lt;OrderItem, Drink&gt;transform(orderItem -&gt;
+  	    new Drink(orderItem.getOrderNumber(),
+  	      orderItem.getDrinkType(),
+  	      orderItem.isIced(),
+  	      orderItem.getShots()))                                // 27
+  	  .aggregate(aggregator -&gt; aggregator                       // 28
+  	    .outputProcessor(group -&gt;                               // 29
+  	      new Delivery(group.getMessages()
+  	        .stream()
+  	        .map(message -&gt; (Drink) message.getPayload())
+  	        .collect(Collectors.toList())))                     // 30
+  	    .correlationStrategy(m -&gt;
+  	      ((Drink) m.getPayload()).getOrderNumber()), null)     // 31
+  	  .handle(CharacterStreamWritingMessageHandler.stdout());   // 32
+  }
+
+}
+</code></pre><p>Examining the code line by line&hellip;</p><p>1</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+</code></pre><p>This new meta-annotation from Spring Boot 1.2. Includes <code>@Configuration</code> and <code>@EnableAutoConfiguration</code>. Since we are in a Spring Integration application and Spring Boot has auto-configuration for it, the <code>@EnableIntegration</code> is automatically applied, to initialize the Spring Integration infrastructure including an environment for the Java DSL - <code>DslIntegrationConfigurationInitializer</code>, which is picked up by the <code>IntegrationConfigurationBeanFactoryPostProcessor</code> from <code>/META-INF/spring.factories</code>.</p><p>2</p>
+<pre><code class="prettyprint java">@IntegrationComponentScan
+</code></pre><p>The Spring Integration analogue of <code>@ComponentScan</code> to scan components based on<br />interfaces, (the Spring Framework&rsquo;s <code>@ComponentScan</code> only looks at classes). Spring Integration supports the discovery of interfaces annotated with <code>@MessagingGateway</code> (see #7 below).</p><p>3</p>
+<pre><code class="prettyprint java">ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
+</code></pre><p>The <code>main</code> method of our class is designed to start the Spring Boot application using the<br />configuration from this class and starts an <code>ApplicationContext</code> via Spring Boot. In addition, it delegates command line arguments to the Spring Boot. For example you can specify <code>--debug</code> to see logs for the boot auto-configuration report.</p><p>4</p>
+<pre><code class="prettyprint java">Cafe cafe = ctx.getBean(Cafe.class);
+</code></pre><p>Since we already have an <code>ApplicationContext</code> we can start to interact with application. And <code>Cafe</code> is that entry point - in EIP terms a <code>gateway</code>. Gateways are simply interfaces and the application does not interact with the Messaging API; it simply deals with the domain (see #7 below).</p><p>5</p>
+<pre><code class="prettyprint java">for (int i = 1; i &lt;= 100; i++) {
+</code></pre><p>To demonstrate the cafe &ldquo;work&rdquo; we intiate 100 orders with two drinks - one hot and one iced. And send the <code>Order</code> to the <code>Cafe</code> gateway.</p><p>6</p>
+<pre><code class="prettyprint java">System.out.println(&quot;Hit &#39;Enter&#39; to terminate&quot;);
+</code></pre><p>Typically Spring Integration application are asynchronous, hence to avoid early exit from the <code>main</code> Thread we block the <code>main</code> method until some end-user interaction through the command line. Non daemon threads will keep the application open but <code>System.read()</code> provides us with a mechanism to close the application cleanly.</p><p>7 </p>
+<pre><code class="prettyprint java">@MessagingGateway
+</code></pre><p>The annotation to mark a business interface to indicate it is a <code>gateway</code> between the<br />end-application and integration layer. It is an analogue of <code>&lt;gateway /&gt;</code> component from Spring Integration XML configuration. Spring Integration creates a <code>Proxy</code> for this interface and populates it as a bean in the application context. The purpose of this <code>Proxy</code> is to wrap parameters in a <code>Message&lt;?&gt;</code> object and send it to the <code>MessageChannel</code> according to the provided options.</p><p>8 </p>
+<pre><code class="prettyprint java">@Gateway(requestChannel = &quot;orders.input&quot;)
+</code></pre><p>The method level annotation to distinct business logic by methods as well as by the target<br />integration flows. In this sample we use a <code>requestChannel</code> reference of <code>orders.input</code>, which is a <code>MessageChannel</code> bean name of our <code>IntegrationFlow</code> input channel (see below #13).</p><p>9 </p>
+<pre><code class="prettyprint java">void placeOrder(Order order);
+</code></pre><p>The interface method is a central point to interact from end-application with the integration layer. This method has a <code>void</code> return type. It means that our integration flow is <code>one-way</code> and we just send messages to the integration flow, but don&rsquo;t wait for a reply.</p><p>10</p>
+<pre><code class="prettyprint java">private AtomicInteger hotDrinkCounter = new AtomicInteger();
+private AtomicInteger coldDrinkCounter = new AtomicInteger();
+</code></pre><p>Two counters to gather the information how our cafe works with drinks.</p><p>11</p>
+<pre><code class="prettyprint java">@Bean(name = PollerMetadata.DEFAULT_POLLER)
+public PollerMetadata poller() {
+</code></pre><p>The <code>default</code> <code>poller</code> bean. It is a analogue of <code>&lt;poller default=&quot;true&quot;&gt;</code> component from Spring Integration XML configuration. Required for endpoints where the <code>inputChannel</code> is a <code>PollableChannel</code>. In this case, it is necessary for the two Cafe <code>queues</code> - hot and iced (see below #18). Here we use the <code>Pollers</code> factory from the DSL project and use its method-chain fluent API to build the poller metadata. Note that <code>Pollers</code> can be used directly from an <code>IntegrationFlow</code> definition, if a specific <code>poller</code> (rather than the default poller) is needed for an endpoint.</p><p>12 </p>
+<pre><code class="prettyprint java">@Bean
+public IntegrationFlow orders() {
+</code></pre><p>The <code>IntegrationFlow</code> bean definition. It is the central component of the Spring Integration Java DSL, although it does not play any role at runtime, just during the bean registration phase. All other code below registers Spring Integration components (<code>MessageChannel</code>, <code>MessageHandler</code>, <code>EventDrivenConsumer</code>, <code>MessageProducer</code>, <code>MessageSource</code> etc.) in the <code>IntegrationFlow</code> object, which is parsed by the <code>IntegrationFlowBeanPostProcessor</code> to<br /> process those components and register them as beans in the application context as necessary (some elements, such as channels may already exist).</p><p>13 </p>
+<pre><code class="prettyprint java">return f -&gt; f
+</code></pre><p>The <code>IntegrationFlow</code> is a <code>Consumer</code> functional interface, so we can minimize our code and concentrate just only on the integration scenario requirements. Its <code>Lambda</code> accepts <code>IntegrationFlowDefinition</code> as an argument. This class offers a comprehensive set of methods which can be composed to the <code>chain</code>. We call these <code>EIP-methods</code>, because they provide implementations for EI patterns and populate components from Spring Integration Core. During the bean registration phase, the <code>IntegrationFlowBeanPostProcessor</code> converts this inline (Lambda) <code>IntegrationFlow</code> to a <code>StandardIntegrationFlow</code> and processes its components. The same we can achieve using <code>IntegrationFlows</code> factory (e.g. <code>IntegrationFlow.from(&quot;channelX&quot;). ... .get()</code>), but we find the Lambda definition more elegant. An <code>IntegrationFlow</code> definition using a Lambda populates <code>DirectChannel</code> as an <code>inputChannel</code> of the flow and it is registered in the application context as a bean with the name <code>orders.input</code> in this our sample (<code>flow bean name + &quot;.input&quot;</code>). That&rsquo;s why we use that name for the <code>Cafe</code> gateway.</p><p>14</p>
+<pre><code class="prettyprint java">.split(Order.class, Order::getItems)
+</code></pre><p>Since our integration flow accepts message through the <code>orders.input</code> channel, we are ready to consume and process them. The first EIP-method in our scenario is <code>.split()</code>. We know that the message <code>payload</code> from <code>orders.input</code> channel is an <code>Order</code> domain object, so we can simply use its type here and use the Java 8 <code>method-reference</code> feature. The first parameter is a type of message <code>payload</code> we expect, and the second is a method reference to the<br /> <code>getItems()</code> method, which returns <code>Collection&lt;OrderItem&gt;</code>. So, this performs the <code>split</code> EI pattern, when we send each collection entry as a separate message to the next channel. In the background, the <code>.split()</code> method registers a <code>MethodInvokingSplitter</code> <code>MessageHandler</code> implementation and the <code>EventDrivenConsumer</code> for that <code>MessageHandler</code>, and wiring in the <code>orders.input</code> channel as the <code>inputChannel</code>.</p><p>15 </p>
+<pre><code class="prettyprint java">.channel(c -&gt; c.executor(Executors.newCachedThreadPool()))
+</code></pre><p>The <code>.channel()</code> EIP-method allows the specification of concrete <code>MessageChannel</code>s between endpoints, as it is done via <code>output-channel</code>/<code>input-channel</code> attributes pair with Spring Integration XML configuration. By default, endpoints in the DSL integration flow definition are wired with <code>DirectChannel</code>s, which get the bean names based on the <code>IntegrationFlow</code> bean name and <code>index</code> in the flow chain. In this case we use another <code>Lambda</code> expression, which selects a specific <code>MessageChannel</code> implementation from its <code>Channels</code> factory and configures it with the fluent API. The current channel here is an <code>ExecutorChannel</code>, to allow to distribute messages from the <code>splitter</code> to separate <code>Thread</code>s, to process them in parallel in the downstream flow.</p><p>16 </p>
+<pre><code class="prettyprint java">.&lt;OrderItem, Boolean&gt;route(OrderItem::isIced, mapping -&gt; mapping
+</code></pre><p>The next EIP-method in our scenario is <code>.route()</code>, to send <code>hot/iced</code> order items to different Cafe kitchens. We again use here a method reference (<code>isIced()</code>) to get the <code>routingKey</code> from the incoming message. The second Lambda parameter represents a <code>router mapping</code> - something similar to <code>&lt;mapping&gt;</code> sub-element for the <code>&lt;router&gt;</code> component from Spring Integration XML configuration. However since we are using Java we can go a bit further with its Lambda support! The Spring Integration Java DSL introduced the <code>subflow</code> definition for <code>router</code>s in addition to traditional <code>channel mapping</code>. Each subflow is executed depending on the routing and, if the subflow produces a result, it is passed to the next element in the flow definition after the router.</p><p>17 </p>
+<pre><code class="prettyprint java">.subFlowMapping(&quot;true&quot;, sf -&gt; sf 
+</code></pre><p>Specifies the integration flow for the current router&rsquo;s <code>mappingKey</code>. We have in this samples two subflows - <code>hot</code> and <code>iced</code>. The subflow is the same <code>IntegrationFlow</code> functional interface, therefore we can use its Lambda exactly the same as we do on the top level <code>IntegrationFlow</code> definition. The subflows don&rsquo;t have any runtime dependency with its parent, it&rsquo;s just a logical relationship.</p><p>18 </p>
+<pre><code class="prettyprint java">.channel(c -&gt; c.queue(10))
+</code></pre><p>We already know that a Lambda definition for the <code>IntegrationFlow</code> starts from <code>[FLOW_BEAN_NAME].input</code> <code>DirectChannel</code>, so it may be a question &ldquo;how does it work here if we specify <code>.channel()</code> again?&rdquo;. The DSL takes care of such a case and wires those two channels with a <code>BridgeHandler</code> and endpoint. In our sample, we use here a restricted<br /><code>QueueChannel</code> to reflect the Cafe kitchen busy state from real life. And here is a place where we need that <code>global poller</code> for the next endpoint which is listening on this channel.</p><p>19 </p>
+<pre><code class="prettyprint java">.publishSubscribeChannel(c -&gt; c
+</code></pre><p>The <code>.publishSubscribeChannel()</code> EIP-method is a variant of the <code>.channel()</code> for a<br /><code>MessageChannels.publishSubscribe()</code>, but with the <code>.subscribe()</code> option when we can specify subflow as a subscriber to the channel. Right, subflow one more time! So, subflows can be specified to any depth. Independently of the presence <code>.subscribe()</code> subflows, the next endpoint in the parent flow is also a subscriber to this <code>.publishSubscribeChannel()</code>.<br />Since we are in the <code>.route()</code> subflow already, the last subscriber is an implicit <code>BridgeHandler</code> which just pops the message to the top level - to a similar implicit <code>BridgeHandler</code> to pop message to the next <code>.transform()</code> endpoint in the main flow. And one more note about this current position of our flow: the previous EIP-method is <code>.channel(c -&gt; c.queue(10))</code> and this one is for <code>MessageChannel</code> too. So, they are again tied with an implicit <code>BridgeHandler</code> as well. In a real application we could avoid this <code>.publishSubscribeChannel()</code> just with the single <code>.handle()</code> for the Cafe kitchen, but our goal here to cover DSL features as much as possible. That&rsquo;s why we distribute the kitchen work to several subflows for the same <code>PublishSubscribeChannel</code>.</p><p>20 </p>
+<pre><code class="prettyprint java">.subscribe(s -&gt;
+</code></pre><p>The <code>.subscribe()</code> method accepts an <code>IntegrationFlow</code> as parameter, which can be specified as Lambda to configure subscriber as <code>subflow</code>. We use here several subflow subscribers to avoid multi-line Lambdas and cover some DSL as we as Spring Integration capabilities.</p><p>21 </p>
+<pre><code class="prettyprint java">s.handle(m -&gt; sleepUninterruptibly(1, TimeUnit.SECONDS)))
+</code></pre><p>Here we use a simple <code>.handle()</code> EIP-method just to block the current Thread for some timeout to demonstrate how quickly the Cafe kitchen prepares a drink. Here we use Google Guava <code>Uninterruptibles.sleepUninterruptibly</code>, to avoid using a <code>try...catch</code> block within the Lambda expression, although you can do that and your Lambda will be multi-line. Or you can move that code to a separate method and use it here as <code>method reference</code>.</p><p>Since we don&rsquo;t use any <code>Executor</code> on the <code>.publishSubscribeChannel()</code> all subscribers will beperformed sequentially on the same Thread; in our case it is one of <code>TaskScheduler</code>&rsquo;s Threads from <code>poller</code> on the previous <code>QueueChannel</code>. That&rsquo;s why this <code>sleep</code> blocks all downstream process and allows to demonstrate the <code>busy state</code> for that restricted to 10<br /><code>QueueChannel</code>.</p><p>22 </p>
+<pre><code class="prettyprint java">.subscribe(sub -&gt; sub
+</code></pre><p>The next subflow subscriber which will be performed only after that <code>sleep</code> with 1 second for <code>iced</code> drink. We use here one more subflow because <code>.handle()</code> of previous one is <code>one-way</code> with the nature of the Lambda for <code>MessageHandler</code>. That&rsquo;s why, to go ahead with process of our whole flow, we have several subscribers: some of subflows finish after their work and don&rsquo;t return anything to the parent flow.</p><p>23 </p>
+<pre><code class="prettyprint java"> .&lt;OrderItem, String&gt;transform(item -&gt;
+  	            Thread.currentThread().getName()
+  	              + &quot; prepared cold drink #&quot;
+  	              + this.coldDrinkCounter.incrementAndGet()
+  	              + &quot; for order #&quot; + item.getOrderNumber()
+  	              + &quot;: &quot; + item)         
+</code></pre><p>The <code>transformer</code> in the current subscriber subflow is to convert the <code>OrderItem</code> to the friendly STDOUT message for the next <code>.handle</code>. Here we see the use of generics with the Lambda expression. This is implemented using the <code>GenericTransformer</code> functional interface.</p><p>24 </p>
+<pre><code class="prettyprint java">.handle(m -&gt; System.out.println(m.getPayload())))))
+</code></pre><p>The <code>.handle()</code> here just to demonstrate how to use Lambda expression to print the <code>payload</code> to STDOUT. It is a signal that our drink is ready. After that the final (implicit) subscriber to the <code>PublishSubscribeChannel</code> just sends the message with the <code>OrderItem</code> to the <code>.transform()</code> in the main flow.</p><p>25 </p>
+<pre><code class="prettyprint java">.subFlowMapping(&quot;false&quot;, sf -&gt; sf
+</code></pre><p>The <code>.subFlowMapping()</code> for the <code>hot</code> drinks. Actually it is similar to the previous <code>iced</code> drinks subflow, but with specific <code>hot</code> business logic.</p><p>26 </p>
+<pre><code class="prettyprint java">s.handle(m -&gt; sleepUninterruptibly(5, TimeUnit.SECONDS)))
+</code></pre><p>The <code>sleepUninterruptibly</code> for <code>hot</code> drinks. Right, we need more time to boil the water!</p><p>27 </p>
+<pre><code class="prettyprint java"> .&lt;OrderItem, Drink&gt;transform(orderItem -&gt;
+  	    new Drink(orderItem.getOrderNumber(),
+  	      orderItem.getDrinkType(),
+  	      orderItem.isIced(),
+  	      orderItem.getShots()))      
+</code></pre><p>The main <code>OrderItem</code> to <code>Drink</code> <code>transformer</code>, which is performed when the <code>.route()</code> subflow returns its result after the Cafe kitchen subscribers have finished preparing the drink.</p><p>28 </p>
+<pre><code class="prettyprint java">.aggregate(aggregator -&gt; aggregator
+</code></pre><p>The <code>.aggregate()</code> EIP-method provides similar options to configure an <code>AggregatingMessageHandler</code> and its endpoint, like we can do with the <code>&lt;aggregator&gt;</code> component when using Spring Integration XML configuration. Of course, with the Java DSL<br />we have more power to configure the aggregator just in place, without any other extra beans. And Lambdas come to the rescue again! From the Cafe business logic perspective we compose the <code>Delivery</code> for the initial <code>Order</code>, since we <code>.split()</code> the original order to the <code>OrderItem</code>s near the beginning.</p><p>29 </p>
+<pre><code class="prettyprint java">.outputProcessor(group -&gt; 
+</code></pre><p>The <code>.outputProcessor()</code> of the <code>AggregatorSpec</code> allows us to emit a custom result after aggregator completes the group. It&rsquo;s an analogue of <code>ref</code>/<code>method</code> from the <code>&lt;aggregator&gt;</code> component or the <code>@Aggregator</code> annotation on a POJO method. Our goal here to compose a <code>Delivery</code> for all <code>Drink</code>s.</p><p>30 </p>
+<pre><code class="prettyprint java">new Delivery(group.getMessages()
+  	        .stream()
+  	        .map(message -&gt; (Drink) message.getPayload())
+  	        .collect(Collectors.toList())))    
+</code></pre><p>As you see we use here the Java 8 <code>Stream</code> feature for <code>Collection</code>. We iterate over messages from the released <code>MessageGroup</code> and convert (<code>map</code>) each of them to its <code>Drink</code> <code>payload</code>. The result of the <code>Stream</code> (<code>.collect()</code>) (a list of <code>Drink</code>s) is passed to the<br /><code>Delivery</code> constructor. The <code>Message</code> with this new <code>Delivery</code> payload is sent to the next endpoint in our Cafe scenario.</p><p>31</p>
+<pre><code class="prettyprint java">.correlationStrategy(m -&gt;
+  	      ((Drink) m.getPayload()).getOrderNumber()), null)
+</code></pre><p>The <code>.correlationStrategy()</code> Lambda demonstrates how we can customize an aggregator behaviour. Of course, we can rely here just only on a built-in <code>SequenceDetails</code> from Spring Integration, which is populated by default from <code>.split()</code> in the beginning of our flow to each split message, but the Lambda sample for the <code>CorrelationStrategy</code> is included for illustration. (With XML, we could have used a <code>correlation-expression</code> or a custom<br /><code>CorrelationStrategy</code>). The second argument in this line for the <code>.aggregate()</code> EIP-method is for the <code>endpointConfigurer</code> to customize options like <code>autoStartup</code>, <code>requiresReply</code>, <code>adviceChain</code> etc. We use here <code>null</code> to show that we rely on the default options for the endpoint. Many of EIP-methods provide overloaded versions with and without <code>endpointConfigurer</code>, but <code>.aggregate()</code> requires an endpoint argument, to avoid an explicit cast for the <code>AggregatorSpec</code> Lambda argument.</p><p>32 </p>
+<pre><code class="prettyprint java">.handle(CharacterStreamWritingMessageHandler.stdout());
+</code></pre><p>It is the end of our flow - the <code>Delivery</code> is delivered to the client! We just print here the message <code>payload</code> to STDOUT using out-of-the-box <code>CharacterStreamWritingMessageHandler</code> from Spring Integration Core. This is a<br />case to show how existing components from Spring Integration Core (and its modules) can be used from the Java DSL.</p><p>Well, we have finished describing the Cafe Demo sample based on the Spring Integration Java DSL. Compare it with <a href="https://github.com/spring-projects/spring-integration-samples/tree/master/applications/cafe/cafe-si">XML sample</a> to get more information regarding Spring Integration.</p><p>This is not an overall tutorial to the DSL stuff. We don&rsquo;t review here the <code>endpointConfigurer</code> options, <code>Transformers</code> factory, the <code>IntegrationComponentSpec</code> hierarchy, the <code>NamespaceFactories</code>, how we can specify several <code>IntegrationFlow</code> beans and wire them to a single application etc., see the <a href="https://github.com/spring-projects/spring-integration-java-dsl/wiki/Spring-Integration-Java-DSL-Reference">Reference Manual</a> for more information.</p><p>At least this line-by-line tutorial should show you Spring Integration Java DSL basics and its seamless fusion between Spring Framework Java &amp; Annotation configuration, Spring Integration foundation and Java 8 Lambda support!</p><p>Also see the <a href="https://github.com/spring-projects/spring-integration-samples/tree/master/dsl/si4demo">si4demo</a> to see the evolution of Spring Integration including the Java DSL, as shown at the 2014 SpringOne/2GX Conference. (Video should be available soon).</p><p>As always, we look forward to your comments and feedback (<a href="https://stackoverflow.com">StackOverflow</a> (<code>spring-integration</code> tag), <a href="https://jira.spring.io/browse/INTEXT">Spring JIRA</a>, <a href="https://github.com/spring-projects/spring-integration-java-dsl/issues">GitHub</a>) and we very much welcome <a href="https://github.com/spring-projects/spring-integration/blob/master/CONTRIBUTING.md">contributions</a>!</p><p>P.S. Even if this tutorial is fully based on the Java 8 Lambda support, we don&rsquo;t want to miss pre Java 8 users, we are going to provide similar non-Lambda blog post. Stay tuned!</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1862;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

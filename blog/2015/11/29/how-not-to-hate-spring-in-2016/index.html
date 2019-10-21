@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>How not to hate Spring in 2016</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="How not to hate Spring in 2016" />
+<meta name="twitter:description" content="&lt;p&gt;Over the Thanksgiving weekend a 2014 article called &lt;a href=&quot;http://samatkinson.com/why-i-hate-spring/&quot;&gt;“Why I hate Spring” by Sam Atkinson&lt;/a&gt; started doing the rounds on Twitter. It’s always interesting to listen to criticisms to see what we can do to improve Spring, much of &lt;a href=&quot;https://spring.io/projects/spring-boot&quot;&gt;Spring Boot&lt;/a&gt; was born out of listening to &lt;a href=&quot;https://jira.spring.io/browse/SPR-9888&quot;&gt;people talk about the problems&lt;/a&gt; that they faced with the framework. &lt;/p&gt;
+&lt;p&gt;In this blog post, I’ll try to address some of the concerns discussed in Sam’s article, and describe my personal Spring “best practices”. Before we get too much into the details though, it’s worth considering why less than optimal ways of doing things still exist in the framework.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@phillip_webb" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/abbd9da647d544664816f5212717aba2?s=200" />
+
+<meta property="og:title" content="How not to hate Spring in 2016" />
+<meta property="og:image" content="https://gravatar.com/avatar/abbd9da647d544664816f5212717aba2?s=200" />
+<meta property="og:description" content="&lt;p&gt;Over the Thanksgiving weekend a 2014 article called &lt;a href=&quot;http://samatkinson.com/why-i-hate-spring/&quot;&gt;“Why I hate Spring” by Sam Atkinson&lt;/a&gt; started doing the rounds on Twitter. It’s always interesting to listen to criticisms to see what we can do to improve Spring, much of &lt;a href=&quot;https://spring.io/projects/spring-boot&quot;&gt;Spring Boot&lt;/a&gt; was born out of listening to &lt;a href=&quot;https://jira.spring.io/browse/SPR-9888&quot;&gt;people talk about the problems&lt;/a&gt; that they faced with the framework. &lt;/p&gt;
+&lt;p&gt;In this blog post, I’ll try to address some of the concerns discussed in Sam’s article, and describe my personal Spring “best practices”. Before we get too much into the details though, it’s worth considering why less than optimal ways of doing things still exist in the framework.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2015-11-29 17:31:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">How not to hate Spring in 2016</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/abbd9da647d544664816f5212717aba2?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/pwebb">Phil Webb</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2015-11-29 17:31:00.0">November 29, 2015</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="2311" href="/blog/2015/11/29/how-not-to-hate-spring-in-2016#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>Over the Thanksgiving weekend a 2014 article called <a href="http://samatkinson.com/why-i-hate-spring/">&ldquo;Why I hate Spring&rdquo; by Sam Atkinson</a> started doing the rounds on Twitter. It&rsquo;s always interesting to listen to criticisms to see what we can do to improve Spring, much of <a href="https://spring.io/projects/spring-boot">Spring Boot</a> was born out of listening to <a href="https://jira.spring.io/browse/SPR-9888">people talk about the problems</a> that they faced with the framework. </p>
+<p>In this blog post, I&rsquo;ll try to address some of the concerns discussed in Sam&rsquo;s article, and describe my personal Spring &ldquo;best practices&rdquo;. Before we get too much into the details though, it&rsquo;s worth considering why less than optimal ways of doing things still exist in the framework.</p><h2><a href="#the-curse-of-backwards-compatibility" class="anchor" name="the-curse-of-backwards-compatibility"></a>The curse of backwards-compatibility</h2>
+<p>One of the more stressful aspects of working on Spring, other than people writing about how much they hate it, is that features tend to have a very long tail. Spring has a strong commitment to back-compatibility, which means once a feature gets added, it&rsquo;s quite hard to fundamentally change it. Developing a framework presents unique challenges that application developers don&rsquo;t generally have. Agile techniques such as YAGNI <em>(You ain&rsquo;t gonna need it)</em> and, refactor aggressively are much harder to apply. We have SMNI <em>(Someone might need it)</em> and, refactor cautiously. Features that made sense before lambdas, generics and even annotations existed in Java are still supported. It&rsquo;s easy to argue that XML isn&rsquo;t such a good way to wire up beans these days, but it&rsquo;s much harder to argue that it should be removed altogether. I personally value the fact that I can easily upgrade older Spring applications and gradually migrate to newer techniques.</p>
+<p>Remember as well that, just like commercial software, open source has limited resource and pressures of time. Sometimes we just make mistakes as developers and end up needing to live with them for a while.</p><h2><a href="#too-big-too-fail" class="anchor" name="too-big-too-fail"></a>Too Big, Too Fail?</h2>
+<p>At its heart, Spring is an integration framework. It provides a consistent programming model over lots of different technologies. It&rsquo;s fair to say that Spring can be on the large side, but it&rsquo;s simply not possible to provide integration with lots of technologies without&hellip; integrating with lots of technologies. Although it can seem overwhelming, once you understand the core concepts, it&rsquo;s pretty easy to pick only the parts of the Spring that you need. The <a href="https://spring.io/guides">guides on spring.io</a> can be useful starting point if you have some specific goal that you need to achieve. The <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter-poms">list of Spring Boot starters</a> or using <a href="https://start.spring.io">start.spring.io</a> can also be a good way of limiting Spring to a specific area.</p><h2><a href="#dependencies" class="anchor" name="dependencies"></a>Dependencies</h2>
+<p>A typical Spring-based application will have dependencies on any number of third-party libraries. Historically, it&rsquo;s been hard to know exactly which versions of various libraries will work well together. If you&rsquo;re starting a new project today, I highly recommend using <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-dependency-management">Spring Boot&rsquo;s parent POM</a> or the <a href="https://spring.io/platform">Spring Platform</a>. Both provide a curated set of dependencies that are known to work well together.</p>
+<p>We&rsquo;ve even developed a <a href="https://github.com/spring-gradle-plugins/dependency-management-plugin">Gradle plugin that allows you to use the managed dependencies</a> section of POM when you don&rsquo;t have the benefit of Maven&rsquo;s parent dependency feature.</p>
+<p>If you can&rsquo;t use managed dependencies for some reason, you can still refer to the Spring Boot documentation for a <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#appendix-dependency-versions">list of compatible versions</a> that are known to play well together.</p><h2><a href="#injection" class="anchor" name="injection"></a>Injection</h2>
+<p>Always use <a href="https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans-constructor-injection">constructor based dependency injection</a> in your beans. Always use <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/util/Assert.html">assertions</a> for mandatory dependencies. For more background on why field based injection is evil, you can read <a href="http://olivergierke.de/2013/11/why-field-injection-is-evil/">this article by Oliver Gierke</a>.</p>
+<p>As always there is one exception to the rule, it&rsquo;s fine to use field based injection in tests when you&rsquo;re <a href="https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/htmlsingle/#integration-testing">using the <code>SpringJUnit4ClassRunner</code></a>.</p><h2><a href="#leaky-spring" class="anchor" name="leaky-spring"></a>Leaky Spring</h2>
+<p>I&rsquo;ve seen a few people argue that application code should <em>never</em> have any dependencies on frameworks. I.e. an <code>org.springframework</code> import anywhere (other than configuration code) is bad. Whilst you can absolutely can do this (there is wide support for standard annotations such as <code>@Inject</code>), I tend not to be so prescriptive. I prefer to apply the 80/20 rule here. I think it&rsquo;s fine to have dependencies on framework classes and annotations, but I don&rsquo;t want to rewrite more than 20% of the class if I were to move off Spring.</p>
+<p>What I do want is application code that is easy to test. It should be possible for me to manually create an instance of my business service and test it without needing a full <code>ApplicationContext</code>.</p><h2><a href="#configuration" class="anchor" name="configuration"></a>Configuration</h2>
+<p>I personally like to keep my Spring configuration fairly light. I like to use component-scanning to find application beans and I like to keep my <code>@Configuration</code> for framework specific configuration that deviates from Spring Boot&rsquo;s default auto-configuration. I don&rsquo;t tend to use XML-configuration at all these days.</p>
+<p>Some people argue that it&rsquo;s better to have explicit configuration for all defined beans but in practice I tend to find this a hindrance. Applications that follow this approach tend to have a single <code>@Configuration</code> class that ends up knowing about everything in the system, and contains a whole bunch of small <code>@Bean</code> methods. I also find the self-documentation nature of annotations really useful. I can easily search for <code>@Service</code> and find all my service beans.</p>
+<p>Sam&rsquo;s article states <em>&ldquo;&hellip;annotations are still magic. Until you run your app you’ve no idea if it’s wired up correctly&rdquo;</em> but I don&rsquo;t really see how this is much different to having a class that <a href="https://sites.google.com/site/unclebobconsultingllc/blogs-by-robert-martin/dependency-injection-inversion">manually wires everything up</a>. You still need to run the entire app at some point to be sure that it works.</p><h2><a href="#layering" class="anchor" name="layering"></a>Layering</h2>
+<p>Any system of significant size needs to think about architectural layers. Almost all my Spring applications end up with a &ldquo;domain&rdquo; layer at the bottom and a &ldquo;web&rdquo; layer at the top. I find it best to enforce strict separation between layers and keep dependencies in a single direction. It&rsquo;s pretty easy to annotate domain service exceptions with <code>@ResponseStatus</code> but I&rsquo;ve rarely found this to be a good idea in practice. Likewise, it&rsquo;s easy to throw some Jackson annotations on an <code>@Entity</code> so that it can be marshalled as JSON but this often causes problems in the long run.</p>
+<p>I recommend tools such as <a href="https://structure101.com/">Structure 101</a> and <a href="https://www.sonarqube.org/">SonarQube</a> which can check your code for package tangles and design problems.</p><h2><a href="#spring-mvc" class="anchor" name="spring-mvc"></a>Spring MVC</h2>
+<p>I generally find it best to keep business logic outside of Spring MVC <code>@Controller</code> beans. I like to think of Spring MVC as a little adapter layer. It&rsquo;s responsible for taking HTTP input, validating it, passing it to a service then returning a response. I&rsquo;ll often add mediator <code>@Service</code> beans at the web layer to take care coordinating calls to business services. This generally makes it much easier to test things, especially when using the <a href="https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/htmlsingle/#spring-mvc-test-framework">MVC Test framework</a>.</p><h2><a href="#logging" class="anchor" name="logging"></a>Logging</h2>
+<p>Logging in Java really shouldn&rsquo;t be as difficult as it is. There are so many logging libraries to choose from, and so many different combinations that it&rsquo;s easy to get bogged down. Luckily, for a typical Spring Boot application you don&rsquo;t really need to worry too much. My advice is always:</p>
+<ul>
+<li>Use <a href="http://www.slf4j.org/">SLF4J</a> in your code to log things.</li>
+<li>Stick with Spring Boot&rsquo;s default choice of <a href="http://logback.qos.ch/">logback</a> if possible.</li>
+<li>Log to the console only and use a tool such as <a href="http://www.splunk.com">Splunk</a> to capture and store.</li>
+</ul><h2><a href="#testing" class="anchor" name="testing"></a>Testing</h2>
+<p>The golden rule for unit testing in Spring is keep Spring out of your unit testing! It should be possible to unit test the majority of your beans without needing to spin up an application context. There&rsquo;s a lot of debate in the testing world about mocks, but I generally find judicious use of <a href="http://mockito.org/">Mockito</a> (I like <a href="https://mockito.github.io/mockito/docs/current/org/mockito/BDDMockito.html">BDD Mockito</a>) pretty helpful.</p>
+<p>You will often need to involve Spring when it comes to integration testing. I tend to find my integration tests often configure a &ldquo;layer&rdquo; of the application. For example, domain tests might startup Hibernate + Spring Data + In-memory Database. For Spring MVC tests, I tend to leave the database alone and inject mock services. The layered architecture discussed above really starts to pay dividends here since it&rsquo;s easy to mock or stub the things that your &ldquo;web layer&rdquo; needs.</p><h2><a href="#startup-times" class="anchor" name="startup-times"></a>Startup times</h2>
+<p>A typical Spring Boot REST application starts in about 2.5 seconds and things get slower once you start to throw technologies such as Hibernate in the mix. Spring is designed to &ldquo;fail fast &amp; fail early&rdquo; and unfortunately that does have an impact on startup time. On the plus side, once an application has started, it&rsquo;s likely that it&rsquo;s in a functioning state.</p>
+<p>If you do have issues with slow startup, consider looking at <a href="https://spring.io/blog/2015/06/17/devtools-in-spring-boot-1-3">Spring Boot Devtools</a> which should make re-starts much quicker. You should also look at using <code>@Lazy</code> initialization if you have any of your own beans that are slow to create.</p><h2><a href="#spring-boot" class="anchor" name="spring-boot"></a>Spring Boot</h2>
+<p>Spring Boot was launched at the end of 2013 to specifically address some of the common problems faced by users of Spring. Unfortunately I&rsquo;ve seen the <em>&ldquo;Spring is now so complex that it has its own framework.&rdquo;</em> quote paraphrased quite often. Spring Boot is intentionally distinct from the Spring Framework, it has different goals, different dependencies and a different release schedule. I prefer to think of Spring Framework as the raw ingredients, and Spring Boot as fully baked cake. You&rsquo;re free to mix the ingredients in anyway you see fit, but who doesn&rsquo;t like cake?</p>
+<p><img src="https://raw.githubusercontent.com/philwebb/media/master/hownottohate/spring-ingredients.jpg" alt="Ingredients" /> <img src="https://raw.githubusercontent.com/philwebb/media/master/hownottohate/boot-cake.jpg" alt="Cake" /></p><h2><a href="#choice-amp-open-source" class="anchor" name="choice-amp-open-source"></a>Choice &amp; Open Source</h2>
+<p>One of the greatest things about Open Source is that it gives you tremendous freedom. If you want Dependency Injection, but you&rsquo;re not a fan of Spring, take a look at <a href="https://github.com/google/guice">Guice</a>. If you want to build a REST service, but you don&rsquo;t like Spring MVC, try <a href="http://ratpack.io/">Ratpack</a>. If you want a well integrated, well tested, documented framework with a proven track record, try <a href="https://start.spring.io">Spring</a> with <a href="https://start.spring.io">Spring Boot</a>.</p>
+<p>If you want to change the way that your Open Source works, try <a href="https://spring.io/blog/2013/09/20/contributing-to-spring-boot-with-a-pull-request">contributing</a>!</p>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2311;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

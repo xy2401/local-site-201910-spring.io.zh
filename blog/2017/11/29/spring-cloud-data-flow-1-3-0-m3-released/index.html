@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Spring Cloud Data Flow 1.3.0.M3 released</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Spring Cloud Data Flow 1.3.0.M3 released" />
+<meta name="twitter:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;We are pleased to announce the 1.3.0.M3 release of the Spring Cloud Data Flow and its associated ecosystem of projects.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Local Server: &lt;a href=&quot;https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#getting-started&quot;&gt;Getting Started Guide&lt;/a&gt;&lt;/p&gt; 
+&lt;/div&gt;
+&lt;h1 id=&quot;release-highlights&quot; class=&quot;sect0&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#release-highlights&quot;&gt;&lt;/a&gt;Release Highlights&lt;/h1&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;stream-updates-and-rollback&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#stream-updates-and-rollback&quot;&gt;&lt;/a&gt;Stream updates and rollback&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;A streaming data pipeline orchestrated as a series of microservice applications has always been the core value of Spring Cloud Data Flow’s design. In 1.3.0.M3 we have provided the ability to update sources, processors, and sinks independently without having to undeploy and redeploy the entire stream.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The stream update feature is implemented by delegating the deployment process to a new Spring Cloud project called Skipper. Introduced in &lt;a href=&quot;https://spring.io/blog/2017/10/30/spring-cloud-skipper-1-0-m1-released&quot;&gt;this blog&lt;/a&gt;, Spring Cloud Skipper is a standalone server that deploys Spring Boot applications to multiple cloud platforms. It also keeps track of the application version, application properties, and deployment properties of the deployed application or applications so that the changes to any of these properties can be calculated upon an update request.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;When a request is made to update applications in a Stream, only the application or applications that need to be changed are updated. A simple red/black update is performed and the design relies on Spring Boot’s health endpoint associated with the new application(s). By keeping track of the deployments, Skipper can also rollback to previous versions of the stream.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The following new Data Flow commands show the basic lifecycle of updating the log sink from version 1.1.0 to version 1.2.0 and then rolling back to 1.1.0. This assumes that both version 1.1.0 and 1.2.0 of the log sink were deployed as maven artifacts. Note that the HTTP source application remains deployed throughout the changes to the log sink.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre&gt;dataflow:&amp;gt; app register --name http --type source --uri maven://org.springframework.cloud.stream.app:http-source-rabbit:1.2.0.RELEASE
+
+dataflow:&amp;gt; app register --name log --type sink --uri maven://org.springframework.cloud.stream.app:log-sink-rabbit:1.1.0.RELEASE
+
+dataflow:&amp;gt; stream create --name httptest --definition &quot;http --server.port=9000 | log&quot;
+
+dataflow:&amp;gt; stream skipper deploy --name httptest
+
+dataflow:&amp;gt; stream skipper update --name httptest --properties version.log=1.2.0.RELEASE
+
+dataflow:&amp;gt; stream skipper rollback --name httptest&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The &lt;a href=&quot;https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#getting-started&quot;&gt;Getting Started&lt;/a&gt; and &lt;a href=&quot;https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#spring-cloud-dataflow-streams-skipper&quot;&gt;Streams with Skipper&lt;/a&gt; sections of the documentation walk through the process in much greater detail.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/5cffed9a3aad16d33d07f6e7ef2ebbb7?s=200" />
+
+<meta property="og:title" content="Spring Cloud Data Flow 1.3.0.M3 released" />
+<meta property="og:image" content="https://gravatar.com/avatar/5cffed9a3aad16d33d07f6e7ef2ebbb7?s=200" />
+<meta property="og:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;We are pleased to announce the 1.3.0.M3 release of the Spring Cloud Data Flow and its associated ecosystem of projects.&lt;/p&gt; 
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt; 
+ &lt;p&gt;Local Server: &lt;a href=&quot;https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#getting-started&quot;&gt;Getting Started Guide&lt;/a&gt;&lt;/p&gt; 
+&lt;/div&gt;
+&lt;h1 id=&quot;release-highlights&quot; class=&quot;sect0&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#release-highlights&quot;&gt;&lt;/a&gt;Release Highlights&lt;/h1&gt;
+&lt;div class=&quot;sect1&quot;&gt; 
+ &lt;h2 id=&quot;stream-updates-and-rollback&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#stream-updates-and-rollback&quot;&gt;&lt;/a&gt;Stream updates and rollback&lt;/h2&gt; 
+ &lt;div class=&quot;sectionbody&quot;&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;A streaming data pipeline orchestrated as a series of microservice applications has always been the core value of Spring Cloud Data Flow’s design. In 1.3.0.M3 we have provided the ability to update sources, processors, and sinks independently without having to undeploy and redeploy the entire stream.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The stream update feature is implemented by delegating the deployment process to a new Spring Cloud project called Skipper. Introduced in &lt;a href=&quot;https://spring.io/blog/2017/10/30/spring-cloud-skipper-1-0-m1-released&quot;&gt;this blog&lt;/a&gt;, Spring Cloud Skipper is a standalone server that deploys Spring Boot applications to multiple cloud platforms. It also keeps track of the application version, application properties, and deployment properties of the deployed application or applications so that the changes to any of these properties can be calculated upon an update request.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;When a request is made to update applications in a Stream, only the application or applications that need to be changed are updated. A simple red/black update is performed and the design relies on Spring Boot’s health endpoint associated with the new application(s). By keeping track of the deployments, Skipper can also rollback to previous versions of the stream.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The following new Data Flow commands show the basic lifecycle of updating the log sink from version 1.1.0 to version 1.2.0 and then rolling back to 1.1.0. This assumes that both version 1.1.0 and 1.2.0 of the log sink were deployed as maven artifacts. Note that the HTTP source application remains deployed throughout the changes to the log sink.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;listingblock&quot;&gt; 
+   &lt;div class=&quot;content&quot;&gt; 
+    &lt;pre&gt;dataflow:&amp;gt; app register --name http --type source --uri maven://org.springframework.cloud.stream.app:http-source-rabbit:1.2.0.RELEASE
+
+dataflow:&amp;gt; app register --name log --type sink --uri maven://org.springframework.cloud.stream.app:log-sink-rabbit:1.1.0.RELEASE
+
+dataflow:&amp;gt; stream create --name httptest --definition &quot;http --server.port=9000 | log&quot;
+
+dataflow:&amp;gt; stream skipper deploy --name httptest
+
+dataflow:&amp;gt; stream skipper update --name httptest --properties version.log=1.2.0.RELEASE
+
+dataflow:&amp;gt; stream skipper rollback --name httptest&lt;/pre&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div class=&quot;paragraph&quot;&gt; 
+   &lt;p&gt;The &lt;a href=&quot;https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#getting-started&quot;&gt;Getting Started&lt;/a&gt; and &lt;a href=&quot;https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#spring-cloud-dataflow-streams-skipper&quot;&gt;Streams with Skipper&lt;/a&gt; sections of the documentation walk through the process in much greater detail.&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+&lt;/div&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2017-11-29 16:10:33.075" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category active content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Cloud Data Flow 1.3.0.M3 released</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon releases"></div>
+<a class="category">Releases</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/5cffed9a3aad16d33d07f6e7ef2ebbb7?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/mpollack">Mark Pollack</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2017-11-29 16:10:33.075">November 29, 2017</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3115" href="/blog/2017/11/29/spring-cloud-data-flow-1-3-0-m3-released#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><div class="paragraph">
+<p>We are pleased to announce the 1.3.0.M3 release of the Spring Cloud Data Flow and its associated ecosystem of projects.</p>
+</div>
+<div class="paragraph">
+<p>Local Server: <a href="https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#getting-started">Getting Started Guide</a></p>
+</div>
+<h1 id="release-highlights" class="sect0"><a class="anchor" href="#release-highlights"></a>Release Highlights</h1>
+<div class="sect1">
+<h2 id="stream-updates-and-rollback"><a class="anchor" href="#stream-updates-and-rollback"></a>Stream updates and rollback</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A streaming data pipeline orchestrated as a series of microservice applications has always been the core value of Spring Cloud Data Flow&#8217;s design. In 1.3.0.M3 we have provided the ability to update sources, processors, and sinks independently without having to undeploy and redeploy the entire stream.</p>
+</div>
+<div class="paragraph">
+<p>The stream update feature is implemented by delegating the deployment process to a new Spring Cloud project called Skipper. Introduced in <a href="https://spring.io/blog/2017/10/30/spring-cloud-skipper-1-0-m1-released">this blog</a>, Spring Cloud Skipper is a standalone server that deploys Spring Boot applications to multiple cloud platforms. It also keeps track of the application version, application properties, and deployment properties of the deployed application or applications so that the changes to any of these properties can be calculated upon an update request.</p>
+</div>
+<div class="paragraph">
+<p>When a request is made to update applications in a Stream, only the application or applications that need to be changed are updated. A simple red/black update is performed and the design relies on Spring Boot’s health endpoint associated with the new application(s). By keeping track of the deployments, Skipper can also rollback to previous versions of the stream.</p>
+</div>
+<div class="paragraph">
+<p>The following new Data Flow commands show the basic lifecycle of updating the log sink from version 1.1.0 to version 1.2.0 and then rolling back to 1.1.0. This assumes that both version 1.1.0 and 1.2.0 of the log sink were deployed as maven artifacts. Note that the HTTP source application remains deployed throughout the changes to the log sink.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dataflow:&gt; app register --name http --type source --uri maven://org.springframework.cloud.stream.app:http-source-rabbit:1.2.0.RELEASE
+
+dataflow:&gt; app register --name log --type sink --uri maven://org.springframework.cloud.stream.app:log-sink-rabbit:1.1.0.RELEASE
+
+dataflow:&gt; stream create --name httptest --definition "http --server.port=9000 | log"
+
+dataflow:&gt; stream skipper deploy --name httptest
+
+dataflow:&gt; stream skipper update --name httptest --properties version.log=1.2.0.RELEASE
+
+dataflow:&gt; stream skipper rollback --name httptest</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <a href="https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#getting-started">Getting Started</a> and <a href="https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.M3/reference/htmlsingle/#spring-cloud-dataflow-streams-skipper">Streams with Skipper</a> sections of the documentation walk through the process in much greater detail.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="javadsl"><a class="anchor" href="#javadsl"></a>JavaDSL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>An an alternative to using the Shell, the newly added JavaDSL provides a programmatic way to create, deploy, or launch streams using a fluent API. Instead of having to deploy streams into production by passing a script file to the shell, you can now write an application and manage it under version control along with other code artifacts.</p>
+</div>
+<div class="paragraph">
+<p>The JavaDSL offers two styles to create StreamDefinitions.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The “definition” style keeps the feel of using the pipes and filters textual DSL in the shell. This style is selected by using the definition method after setting the stream name, e.g.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">StreamDefinition streamDefinition = Stream.builder(dataFlowOperations)
+                                      .name("ticktock")
+                                      .definition("time | log")
+                                      .create()</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The “fluent” style lets you chain together sources, processors and sinks by passing in an instance of a StreamApplication, e.g.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">StreamApplication timeSource = new StreamApplication("time");
+StreamApplication logSink = new StreamApplication("log");
+StreamDefinition streamDefinition = Stream.builder(dataFlowOperations)
+                                     	 .name("ticktock")
+					 .source("timeSource")
+					 .sink("logSink");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>While this approach might not seem at first glance significantly different from the definition style, it allows you reuse StreamApplication instances across multiple streams by declaring them as Spring Beans in an application context.</p>
+</div>
+<div class="paragraph">
+<p>With the StreamDefinition instance, you can then deploy the stream.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Stream stream = streamDefinition.deploy();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With a Stream instance you can ask for the stream’s status, undeploy, or destroy the stream.</p>
+</div>
+<div class="paragraph">
+<p>The <a href="https://docs.spring.io/spring-cloud-dataflow/docs/1.3.0.BUILD-SNAPSHOT/reference/htmlsingle/#spring-cloud-dataflow-stream-java-dsl">Java DSL section</a> of the reference guide provides a more complete introduction to the DSL and Spring Data Flow Samples repository provides a <a href="https://github.com/spring-cloud/spring-cloud-dataflow-samples/tree/master/javadsl">working example</a> for you to get started using in your own projects.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="app-resolution-of-http-based-resources"><a class="anchor" href="#app-resolution-of-http-based-resources"></a>App Resolution of HTTP based resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previously any application registered as HTTP resources were downloaded once and then cached by the Data Flow server. While in theory, this optimized the deployment time, since an existing application would not be downloaded multiple times, in practice HTTP resources were commonly used in the early stages of developing custom stream applications. In this mode of operation, the file name of the artifact, which contains the version number, would not change even though application code would change. Seeing the new code run would then require you to increment the version number, which was not intuitive in these early stages of development.</p>
+</div>
+<div class="paragraph">
+<p>To accommodate this use-case, the Data Flow server now always downloads an HTTP based resource. To ensure that disk space does not grow unchecked, a LRU cache is used to delete downloaded resources. This feature also lets you download SNAPSHOT named artifacts from a maven repository via an HTTP resource reference and always get the latest code. In conclusion, this further simplifies the development experience; especially, when the business-logic is actively being iterated over.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dashboard-flo"><a class="anchor" href="#dashboard-flo"></a>Dashboard / Flo</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are excited to announce that this release brings feature-parity on the SCDF&#8217;s Dashboard. All the feature capabilities that were supported in the older UI-stack are ported and upgraded to the Angular 4.0 stack. The stream, task, job, analytics, runtime, and apps tabs are fully featured. The Spring Flo designer for streams and composed-task is operational and functionally complete. For the curious, we have also published the Spring Flo’s <a href="https://github.com/spring-projects/spring-flo">core library</a> as an <a href="https://www.npmjs.com/package/spring-flo">NPM package</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="version-compatibility"><a class="anchor" href="#version-compatibility"></a>Version Compatibility</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This release brings the Spring Boot 1.5.8 compatibility and the underlying Spring Cloud infrastructure is updated to Edgware.RELEASE. For more details, please review the <a href="https://github.com/spring-cloud/spring-cloud-dataflow/releases">1.3.0.M3</a> release notes.</p>
+</div>
+<div class="paragraph">
+<p>Looking ahead, we are aiming for 1.3.0 RC1 in a few weeks followed by the general availability release by end of January 2018.</p>
+</div>
+<div class="paragraph">
+<p>As always, we welcome feedback and contributions, so please reach out to us on <a href="https://stackoverflow.com/questions/tagged/spring-cloud-dataflow">Stackoverflow</a> or <a href="https://github.com/spring-cloud/spring-cloud-dataflow/issues">GitHub</a> or via <a href="https://gitter.im/spring-cloud/spring-cloud-stream">Gitter</a>.</p>
+</div>
+<div class="paragraph">
+<p>Please try it out, share your feedback, and consider contributing to the project!</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3115;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

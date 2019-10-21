@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Simple templates for the Scripted Editor</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Simple templates for the Scripted Editor" />
+<meta name="twitter:description" content="&lt;p&gt;We &lt;a href=&quot;http://blog.springsource.org/2013/01/08/scripted-editor-0-3-release-available/&quot;&gt;recently released 0.3&lt;/a&gt; of the &lt;a href=&quot;https://github.com/scripted-editor/scripted&quot;&gt;Scripted Editor&lt;/a&gt;, and we are making fast progress towards our next release. One of the major goals of &lt;a href=&quot;https://github.com/scripted-editor/scripted/&quot;&gt;Scripted Editor&lt;/a&gt; 0.4 is extensibility and part of the extensibility story is a simple, extensible templating mechanism (the other part is a powerful plugin model, which will be described in a future blog post). In this post, I will introduce custom code completions and templates for the Scripted editor.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.sublimetext.com/&quot;&gt;Sublime Text&lt;/a&gt; is an excellent, general purpose editor. It is highly configurable and many users of Scripted also use Sublime. Because of this, we want to make extensions to Sublime compatible with Scripted where it makes sense. One of these areas is &lt;a href=&quot;http://www.sublimetext.info/docs/en/extensibility/completions.html&quot;&gt;sublime-completions files&lt;/a&gt;. These files specify lists of completions for a given content type (typically mapped to file extensions). Scripted allows you to use these completions files as-is and also provides a bit of extra functionality.&lt;/p&gt;
+" />
+<meta name="twitter:creator" content="@werdnagreb" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=200" />
+
+<meta property="og:title" content="Simple templates for the Scripted Editor" />
+<meta property="og:image" content="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=200" />
+<meta property="og:description" content="&lt;p&gt;We &lt;a href=&quot;http://blog.springsource.org/2013/01/08/scripted-editor-0-3-release-available/&quot;&gt;recently released 0.3&lt;/a&gt; of the &lt;a href=&quot;https://github.com/scripted-editor/scripted&quot;&gt;Scripted Editor&lt;/a&gt;, and we are making fast progress towards our next release. One of the major goals of &lt;a href=&quot;https://github.com/scripted-editor/scripted/&quot;&gt;Scripted Editor&lt;/a&gt; 0.4 is extensibility and part of the extensibility story is a simple, extensible templating mechanism (the other part is a powerful plugin model, which will be described in a future blog post). In this post, I will introduce custom code completions and templates for the Scripted editor.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.sublimetext.com/&quot;&gt;Sublime Text&lt;/a&gt; is an excellent, general purpose editor. It is highly configurable and many users of Scripted also use Sublime. Because of this, we want to make extensions to Sublime compatible with Scripted where it makes sense. One of these areas is &lt;a href=&quot;http://www.sublimetext.info/docs/en/extensibility/completions.html&quot;&gt;sublime-completions files&lt;/a&gt;. These files specify lists of completions for a given content type (typically mapped to file extensions). Scripted allows you to use these completions files as-is and also provides a bit of extra functionality.&lt;/p&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2013-01-23 00:42:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Simple templates for the Scripted Editor</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/0a618b43738457becc18ec0348cea9f7?s=20&amp;d=mm" />
+<span class="author">Andrew Eisenberg</span>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2013-01-23 00:42:00.0">January 23, 2013</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="505" href="/blog/2013/01/23/simple-templates-for-the-scripted-editor#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>We <a href="http://blog.springsource.org/2013/01/08/scripted-editor-0-3-release-available/">recently released 0.3</a> of the <a href="https://github.com/scripted-editor/scripted">Scripted Editor</a>, and we are making fast progress towards our next release. One of the major goals of <a href="https://github.com/scripted-editor/scripted/">Scripted Editor</a> 0.4 is extensibility and part of the extensibility story is a simple, extensible templating mechanism (the other part is a powerful plugin model, which will be described in a future blog post). In this post, I will introduce custom code completions and templates for the Scripted editor.</p><p><a href="https://www.sublimetext.com/">Sublime Text</a> is an excellent, general purpose editor. It is highly configurable and many users of Scripted also use Sublime. Because of this, we want to make extensions to Sublime compatible with Scripted where it makes sense. One of these areas is <a href="http://www.sublimetext.info/docs/en/extensibility/completions.html">sublime-completions files</a>. These files specify lists of completions for a given content type (typically mapped to file extensions). Scripted allows you to use these completions files as-is and also provides a bit of extra functionality.</p><p>First, I will explain how to use existing sublime-completions files, then I will show how to create new ones, and finally I will show some of the extra functionality that we have added on top of what Sublime Text supports and how this all manifests in the editor.<br /><h3>Using existing completions files</h3><br />Simply rename your <code>*.sublime-completions</code> files to <code>*.scripted-completions</code> and place them in your <code>${user.home}/.scriptedrc</code> directory. Completions files also exist in the <code>scripted/completions</code> directory, but these completions are provided by scripted itself and will be overwritten on every upgrade.</p><p>As an example:<br /><ol><br /> <li>Place the <code>PHP.sublime-completions</code> file in your Sublime Text distribution in your <code>.scriptedrc</code> directory. On macs, this file can be found here <code>${HOME}/Library/Application Support/Sublime Text 2/Packages/PHP/PHP.sublime-completions</code></li><br /> <li>Rename it to <code>PHP.scripted-completions</code>.</li><br /> <li>Restart the Scripted server (run <code>scr -r</code> on the command line) to pick up the new file (remember&hellip;Scripted is a node app)</li><br /> <li>Refresh editor page and open a php file.</li><br /> <li>Content assist will now show the new PHP completions in your editor</li><br /></ol><br />You will see something like this:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/01/first-php.png"><img class="centered size-full wp-image-12563" title="first-php" src="http://blog.springsource.org/wp-content/uploads/2013/01/first-php.png" alt="" width="393" height="201" /></a></p><p>And selecting a proposal will show this:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/01/first-php-result.png"><img class="centered size-full wp-image-12564" title="first-php-result" src="http://blog.springsource.org/wp-content/uploads/2013/01/first-php-result.png" alt="" width="388" height="63" /></a></p><p>Simple as that.</p>
+<h3>Creating your own completions files</h3><p>Let&rsquo;s use a simplified portion of the PHP completions as an example:</p>
+<script src="https://gist.github.com/4599386.js"></script><p>The first line is the <code>scope</code> and is used by Sublime and Scripted to determine the context in which the completions are active. Scripted just recognizes the file extension of the first word of the scope (e.g., <code>php</code>) to determine in which kinds of files these completions are active. Sublime has a more complex notion of scopes, which are not (yet) implemented in Scripted. Next comes the array of completions. A single string element (e.g., <code>php</code>) will add that entry to the list of content assist proposals if the prefix matches. Slightly more complex are the entries with <code>trigger</code> and <code>contents</code>. The <code>trigger</code> refers to the text that will trigger the completion to appear in the list of proposals. The content section is the text that will replace the trigger. <code>$1</code>, <code>$2</code>, etc refer to tab stops while editing. The tab stops can be named like this <code>${1:text}</code>. <code>$0</code> is the escape position, which is the location that the caret will jump to after pressing enter. If not specified, the escape position defaults to being after the last character of the completion. There are a few differences between sublime-completions and scripted-completions to be aware of:</p>
+<ol>
+<li>Scripted does not recognize partitions in the scope. All that Scripted recognizes is the file extension.</li>
+<li>We use <a href="https://github.com/aseemk/json5">json5</a> to parse scripted-completions files, so you can include comments and unquoted keys in your JSON text.</li>
+</ol><p>Any errors in the file will be logged in the <code>${TEMP}/scripted.log</code> file. And a complete reference for the sublime-completions file format is <a href="http://www.sublimetext.info/docs/en/extensibility/completions.html">available here</a>.</p>
+<h3>Other capabilities</h3><p>Scripted provides some extra features that are not available in Sublime.</p>
+<h5>Variables</h5><p>You can include variables to be expanded in the content assist proposal. For example:</p>
+<script src="https://gist.github.com/4599419.js"></script><p>And content assist will look something like this:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/01/var-php.png"><img class="centered size-full wp-image-12567" title="var-php" src="http://blog.springsource.org/wp-content/uploads/2013/01/var-php.png" alt="" width="386" height="81" /></a></p><p>Pressing enter will produce this:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/01/var-php-result.png"><img class="centered size-full wp-image-12568" title="var-php-result" src="http://blog.springsource.org/wp-content/uploads/2013/01/var-php-result.png" alt="" width="388" height="59" /></a></p><p>The currently supported variables are:<br /><ul><br /> <li><code>${year}</code> the current year</li><br /> <li><code>${file}</code> full path to current file in editor</li><br /> <li><code>${dir}</code> directory name of current file</li><br /> <li><code>${projectDir}</code> directory of the current scripted project</li><br /> <li><code>${selection}</code> currently selected text in the editor</li><br /> <li><code>${lineStart}</code> opening whitespace of the current line</li><br /> <li><code>${indent}</code> defaults to &lsquo;\t&rsquo; and <a href="https://github.com/scripted-editor/scripted/wiki/Configuration">can be configured</a></li><br /></ul><br />The <code>${lineStart}</code> and <code>${indent}</code> variables do not need to be explicitly used. Every &lsquo;\n&rsquo; in your completion will be replaced with <code>${lineStart}</code> and every &lsquo;\t&rsquo; will be replaced with <code>${indent}</code>.<br /><h5>Templates</h5><br />Templates are a special kind of completion. When content assist is invoked with a non-empty selection, all templates (and only the templates) will be shown regardless of prefixes. Templates can be used to surround your code in blocks. To mark a completion as a template, add isTemplate: true to the completion. For example, given this completion:</p>
+<script src="https://gist.github.com/4599778.js"></script><p>You can use it in the editor, like this:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/01/template-php.png"><img class="centered size-full wp-image-12569" title="template-php" src="http://blog.springsource.org/wp-content/uploads/2013/01/template-php.png" alt="" width="331" height="103" /></a></p><p>Press enter or click and the template is applied:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/01/template-php-result.png"><img class="centered size-full wp-image-12578" title="template-php-result" src="http://blog.springsource.org/wp-content/uploads/2013/01/template-php-result.png" alt="" width="163" height="142" /></a></p><p>Notice that formatting is applied correctly, using the existing whitespace to indent the code.</p>
+<h3>Current status</h3><p>An early form of scripted-completions are available in 0.3, but to use all of the features described in this blog post, you should work from master of the <a href="https://github.com/scripted-editor/scripted">Scripted repository on github</a>.</p><p>At the time of this writing, Scripted provides completions for html and JavaScript and we plan on providing proposals for more languages. Of course. you can add your own. And if you want to be a good open source citizen, please consider submitting pull requests for any new completion files that you create.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 505;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

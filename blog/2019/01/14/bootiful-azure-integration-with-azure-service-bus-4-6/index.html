@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html data-code-prettify="" data-mobile-support="" data-search="">
+<head>
+<title>Bootiful Azure: Integration with Azure Service Bus (4/6)</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
+<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
+<script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
+<script>
+      System.import('app/main.js')
+  </script>
+<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
+
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+
+<meta content="summary" name="twitter:card" />
+<meta content="@springcentral" name="twitter:site" />
+<meta name="twitter:title" content="Bootiful Azure: Integration with Azure Service Bus (4/6)" />
+<meta name="twitter:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;This is part 4 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series &lt;a href=&quot;https://github.com/joshlong/bootiful-azure-article&quot;&gt;on Github&lt;/a&gt;. Hit me up on &lt;a href=&quot;http://twitter.com/Starbuxman&quot;&gt;Twitter (@starbuxman)&lt;/a&gt; as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my &lt;a href=&quot;http://twitter.com/SpringTipsLive&quot;&gt;Spring Tips (@SpringTipsLive)&lt;/a&gt; installment, &lt;a href=&quot;https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure&quot;&gt;&lt;em&gt;Bootiful Azure&lt;/em&gt;&lt;/a&gt;&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta name="twitter:creator" content="@starbuxman" />
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+
+<meta property="og:title" content="Bootiful Azure: Integration with Azure Service Bus (4/6)" />
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta property="og:description" content="&lt;blockquote&gt; 
+ &lt;p&gt;This is part 4 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series &lt;a href=&quot;https://github.com/joshlong/bootiful-azure-article&quot;&gt;on Github&lt;/a&gt;. Hit me up on &lt;a href=&quot;http://twitter.com/Starbuxman&quot;&gt;Twitter (@starbuxman)&lt;/a&gt; as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my &lt;a href=&quot;http://twitter.com/SpringTipsLive&quot;&gt;Spring Tips (@SpringTipsLive)&lt;/a&gt; installment, &lt;a href=&quot;https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure&quot;&gt;&lt;em&gt;Bootiful Azure&lt;/em&gt;&lt;/a&gt;&lt;/p&gt; 
+&lt;/blockquote&gt;
+" />
+<meta content="article" property="og:type" />
+<meta property="og:article:published_time" content="2019-01-14 00:00:00.0" />
+</head>
+<body>
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }
+  </script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
+<div class="container-fluid">
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">Projects</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">Guides</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">Blog</a>
+</li>
+<li class="navbar-link">
+<a href="/services">Training & Certification</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form action="/search" class="form-inline form-search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+</form>
+</div>
+</div>
+</div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form action="/search" class="form-inline form-search" method="get">
+<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+</form>
+</div>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">
+Home
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">
+Projects
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">
+Guides
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">
+Blog
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">
+Training & Certification
+<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>Engineering</div>
+</div>
+<div class="blog-category content--title">
+<div>Releases</div>
+</div>
+<div class="blog-category content--title">
+<div>News and Events</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Bootiful Azure: Integration with Azure Service Bus (4/6)</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">Engineering</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
+<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2019-01-14 00:00:00.0">January 14, 2019</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" data-disqus-identifier="3518" href="/blog/2019/01/14/bootiful-azure-integration-with-azure-service-bus-4-6#disqus_thread">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><blockquote>
+<p>This is part 4 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn&rsquo;t have put this together without input from Microsoft&rsquo;s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series <a href="https://github.com/joshlong/bootiful-azure-article">on Github</a>. Hit me up on <a href="https://twitter.com/Starbuxman">Twitter (@starbuxman)</a> as you&rsquo;re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my <a href="https://twitter.com/SpringTipsLive">Spring Tips (@SpringTipsLive)</a> installment, <a href="https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure"><em>Bootiful Azure</em></a></p>
+</blockquote>
+<p>Here are all the installments: </p>
+<ul>
+<li><a href="https://spring.io/blog/2019/01/03/bootiful-azure-taking-your-first-steps-with-microsoft-azure-1-6">Bootiful Azure: Taking Your First Steps with Microsoft Azure</a></li>
+<li><a href="https://spring.io/blog/2019/01/07/bootiful-azure-sql-based-data-access-with-microsoft-sql-server-2-6">Bootiful Azure: SQL-based data access with Microsoft SQL Server</a></li>
+<li><a href="https://spring.io/blog/2019/01/10/bootiful-azure-global-scale-data-access-with-cosmosdb-3-6">Bootiful Azure: Global Scale Data Access with CosmosDB</a></li>
+<li><a href="https://spring.io/blog/2019/01/14/bootiful-azure-integration-with-azure-service-bus-4-6">Bootiful Azure: Integration with Azure Service Bus</a></li>
+<li><a href="https://spring.io/blog/2019/01/17/bootiful-azure-object-storage-service-5-6">Bootiful Azure: Object Storage Service</a></li>
+<li><a href="https://spring.io/blog/2019/01/21/bootiful-azure-to-production-6-6">Bootiful Azure: To Production!</a></li>
+</ul>
+<p>Azure Service Bus is a cloud messaging as a service and integration technology. It is, just like CosmosDB, as flexible as possible. It <a href="https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-jms-api-amqp">supports the AMQP 1.0 protocol</a>, like RabbitMQ. AMQP is a flexible wire protocol. The protocol itself includes instructions for administering the broker, beyond just interacting with it. AMQP brokers are ideal for integration because they are language- and platform-agnostic. In an AMQP broker producers send messages to <em>exchanges</em> which then route the messages to <em>queues</em>, from which consumers then read the messages. The exchange is responsible for deciding to which queue the message should be sent. It does this in any of a number of ways but it usually involves looking at a key in the message headers called the <em>routing key</em>.</p>
+<p>This indirection between the exhcange and the queues makes AMQP a bit more flexible than JMS-based brokers where producers send messages directly to <code>Destination</code> objects that consumers then read from. This means that producers and consumers are coupled by their choice of <code>Destination</code>. Additionally, JMS is an API for the JVM, it is not a wire protocol. As such, producers and consumers are dependent on the version of the library they&rsquo;re using being correct. That said, <a href="https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-jms-api-amqp">you can also use Azure Service Bus through the JMS API</a>.</p>
+<p>Like I said, Azure Service Bus is nothing if not flexible!</p>
+<p>The AMQP model is illustrative because, basically, the native model for Azure Service Bus looks like AMQP. In Azure Service Bus you have topics or queues to which you send messages. Messages are then connected to subscriptions, from which consumers read. Let&rsquo;s build a simple example that sends and then consumes messages. We won&rsquo;t use AMQP or JMS, just the regular Microsoft Azure ServiceBus API.</p><h2><a href="#configuring-azure-service-bus-on-microsoft-azure" class="anchor" name="configuring-azure-service-bus-on-microsoft-azure"></a>Configuring Azure Service Bus on Microsoft Azure</h2>
+<p>You&rsquo;ll need to provision a servicebus namespace, a topic (top which we send messages and from which multiple consumers may listen) and a subscription (a consumer to either a topic or a queue) to connect to the topic. Here&rsquo;s an example script that does just that.</p>
+<pre><code class="prettyprint shell">#!/usr/bin/env bash
+
+destination=messages
+topic=${destination}-topic
+subscription=${destination}-subscription
+namespace=bootiful
+rg=$1
+
+az servicebus namespace create --resource-group $rg \
+    --name ${namespace}
+
+az servicebus topic create --resource-group $rg \
+    --namespace-name ${namespace} \
+    --name ${topic}
+
+az servicebus topic subscription create --resource-group $rg  \
+    --namespace-name ${namespace} --topic-name ${topic} \
+    --name ${subscription}
+</code></pre>
+<p>You&rsquo;ll need a connection string in order to connect your Spring application to the servicebus. Run this command and note the <code>primaryConnectionString</code> attribute value for later.</p>
+<pre><code class="prettyprint shell">az servicebus namespace authorization-rule keys list --resource-group bootiful --namespace-name bootiful --name RootManageSharedAccessKey
+</code></pre><h2><a href="#introducing-azure-service-bus-into-your-spring-application" class="anchor" name="introducing-azure-service-bus-into-your-spring-application"></a>Introducing Azure Service Bus into your Spring Application</h2>
+<p>Add the following dependency to your build: <code>com.microsoft.azure</code> : <code>azure-servicebus-spring-boot-starter</code>.</p>
+<p>We&rsquo;ll write two components: one a producer and the other a consumer. In a <em>real</em> application these things would naturally live in separate applications and separate processes. Messaging serves to support the integration of disparate applications, after all. We&rsquo;ll look at the consumer first. The consumer needs to register a subscriber <em>before</em> something else has produced the message, so we&rsquo;ll make these beans <em>ordered</em> - the Spring container will order their initialization one before the other based on the <code>Ordered</code> value we give it.</p>
+<pre><code class="prettyprint java">package com.example.bootifulazure;
+
+import com.microsoft.azure.servicebus.ExceptionPhase;
+import com.microsoft.azure.servicebus.IMessage;
+import com.microsoft.azure.servicebus.IMessageHandler;
+import com.microsoft.azure.servicebus.ISubscriptionClient;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.CompletableFuture;
+
+@Log4j2
+@Component
+class ServiceBusConsumer implements Ordered {
+
+    private final ISubscriptionClient iSubscriptionClient;
+
+    ServiceBusConsumer(ISubscriptionClient isc) {
+        this.iSubscriptionClient = isc;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void consume() throws Exception {
+
+        this.iSubscriptionClient.registerMessageHandler(new IMessageHandler() {
+
+            @Override
+            public CompletableFuture&lt;Void&gt; onMessageAsync(IMessage message) {
+                log.info(&quot;received message &quot; + new String(message.getBody()) + &quot; with body ID &quot; + message.getMessageId());
+                return CompletableFuture.completedFuture(null);
+            }
+
+            @Override
+            public void notifyException(Throwable exception, ExceptionPhase phase) {
+                log.error(&quot;eeks!&quot;, exception);
+            }
+        });
+
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
+}
+</code></pre>
+<p>When a message arrives, we log its <code>body</code> and <code>messageId</code> .</p>
+<p>Now, let&rsquo;s look at the producer.</p>
+<pre><code class="prettyprint java">package com.example.bootifulazure;
+
+import com.microsoft.azure.servicebus.ITopicClient;
+import com.microsoft.azure.servicebus.Message;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+
+@Log4j2
+@Component
+class ServiceBusProducer implements Ordered {
+
+    private final ITopicClient iTopicClient;
+
+    ServiceBusProducer(ITopicClient iTopicClient) {
+        this.iTopicClient = iTopicClient;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void produce() throws Exception {
+        this.iTopicClient.send(new Message(&quot;Hello @ &quot; + Instant.now().toString()));
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
+    }
+}
+</code></pre>
+<p>Pretty straightforward right? The meat of the classes are in the <code>consume()</code> and <code>produce()</code> methods. The consumer runs first, then the producer. If you&rsquo;ve ever done any work with messaging technoogies you might find the lack of a mention of any sort of <em>destination</em> - the topic or queue - a bit puzzling. That configuration all lives in the properties (such as those in your <code>application.properties</code> file) and are used when auto-configuring the <code>ITopicClient</code> and <code>ISubscriptionClient</code>. If you want to send messages or consume messages from multiple destinations, simply define the relevant beans yourself and make sure to <em>not</em> specify <code>azure.service-bus.connection-string</code> in your application&rsquo;s properties, otherwise the default Spring Boot auto-configuration will kick in and try to create these beans for you.</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3518;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>
+Back
+</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">All Posts</a>
+<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">Engineering</a>
+<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">Releases</a>
+<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">News and Events</a>
+<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>Get updates from The Spring Team delivered to your inbox</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">Team</a></li>
+<li><a href="/tools">Tools</a></li>
+<li><a href="https://store.pivotal.io/">Store</a></li>
+<li><a href="/blog">Newsletter</a></li>
+</ul>
+</div>
+</div>
+&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
+<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
+<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
+<a href="/trademarks">Trademark Guidelines</a>
+<div id="teconsent" style="display:inline-block;"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>
