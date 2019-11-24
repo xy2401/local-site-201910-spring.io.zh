@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Dependency analysis in Scripted</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>脚本化的依赖性分析</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,58 +16,56 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Dependency analysis in Scripted" />
-<meta name="twitter:description" content="&lt;p&gt;Scripted, a JavaScript editor from VMWare was &lt;a href=&quot;http://blog.springsource.org/2012/10/11/scripted-a-javascript-editor-from-vmware/&quot;&gt;announced on this blog&lt;/a&gt; last month. In this article we’ll take a look under the hood at Scripted’s &lt;em&gt;Dependency Analysis Engine&lt;/em&gt;. But before diving into the details, lets motivate why we need it.&lt;br&gt;&lt;/p&gt;
-&lt;h2&gt;Main Motivation: Cross-file Content Assist&lt;/h2&gt;
-&lt;br&gt;
-&lt;em&gt;accurate&lt;/em&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;[caption id=“attachment_12178” align=“aligncenter” width=“533” caption=“Cross-file Content Assist”]&lt;a href=&quot;http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png&quot;&gt;&lt;img class=&quot;size-full wp-image-12178 &quot; title=&quot;xfile-content-assist&quot; src=&quot;http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png&quot; alt=&quot;&quot; width=&quot;533&quot; height=&quot;491&quot;&gt;&lt;/a&gt;[/caption]&lt;/p&gt;
-&lt;p&gt;Two components work together to achieve this goal:&lt;br&gt;&lt;/p&gt;
-&lt;ul&gt;
- &lt;br&gt; 
- &lt;li&gt;a fine-grained type inference analysis engine&lt;/li&gt;
- &lt;br&gt; 
- &lt;li&gt;a coarse-grained dependency analysis engine&lt;/li&gt;
- &lt;br&gt;
-&lt;/ul&gt;
-" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/4aa2e47ff7cc610ddc3ebed3a2291a1a?s=200" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Dependency analysis in Scripted">
+<meta name="twitter:description" content="<p>Scripted, a JavaScript editor from VMWare was <a href=" http: ="" blog.springsource.org 2012="" 10="" 11 scripted-a-javascript-editor-from-vmware="" ="="></meta>announced on this blog last month. In this article we’ll take a look under the hood at Scripted’s <em>Dependency Analysis Engine</em>. But before diving into the details, lets motivate why we need it.<br>
+<h2>Main Motivation: Cross-file Content Assist</h2>
+<br>
+<em>accurate</em>
+<p></p>
+<p>[caption id=“attachment_12178” align=“aligncenter” width=“533” caption=“Cross-file Content Assist”]<a href=" wp-content uploads 2015 xfile-content-assist1.png"></head><body dir="ltr"><img class="size-full wp-image-12178 " title="xfile-content-assist" src="http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png" alt="" width="533" height="491">[/caption]<p></p>
+<p>Two components work together to achieve this goal:<br></p>
+<ul>
+ <br> 
+ <li>a fine-grained type inference analysis engine</li>
+ <br> 
+ <li>a coarse-grained dependency analysis engine</li>
+ <br>
+</ul>
+">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/4aa2e47ff7cc610ddc3ebed3a2291a1a?s=200">
 
-<meta property="og:title" content="Dependency analysis in Scripted" />
-<meta property="og:image" content="https://gravatar.com/avatar/4aa2e47ff7cc610ddc3ebed3a2291a1a?s=200" />
-<meta property="og:description" content="&lt;p&gt;Scripted, a JavaScript editor from VMWare was &lt;a href=&quot;http://blog.springsource.org/2012/10/11/scripted-a-javascript-editor-from-vmware/&quot;&gt;announced on this blog&lt;/a&gt; last month. In this article we’ll take a look under the hood at Scripted’s &lt;em&gt;Dependency Analysis Engine&lt;/em&gt;. But before diving into the details, lets motivate why we need it.&lt;br&gt;&lt;/p&gt;
-&lt;h2&gt;Main Motivation: Cross-file Content Assist&lt;/h2&gt;
-&lt;br&gt;
-&lt;em&gt;accurate&lt;/em&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;p&gt;[caption id=“attachment_12178” align=“aligncenter” width=“533” caption=“Cross-file Content Assist”]&lt;a href=&quot;http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png&quot;&gt;&lt;img class=&quot;size-full wp-image-12178 &quot; title=&quot;xfile-content-assist&quot; src=&quot;http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png&quot; alt=&quot;&quot; width=&quot;533&quot; height=&quot;491&quot;&gt;&lt;/a&gt;[/caption]&lt;/p&gt;
-&lt;p&gt;Two components work together to achieve this goal:&lt;br&gt;&lt;/p&gt;
-&lt;ul&gt;
- &lt;br&gt; 
- &lt;li&gt;a fine-grained type inference analysis engine&lt;/li&gt;
- &lt;br&gt; 
- &lt;li&gt;a coarse-grained dependency analysis engine&lt;/li&gt;
- &lt;br&gt;
-&lt;/ul&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2012-11-20 07:01:00.0" />
-</head>
-<body>
+<meta property="og:title" content="Dependency analysis in Scripted">
+<meta property="og:image" content="https://gravatar.com/avatar/4aa2e47ff7cc610ddc3ebed3a2291a1a?s=200">
+<meta property="og:description" content="<p>Scripted, a JavaScript editor from VMWare was <a href=" http: ="" blog.springsource.org 2012="" 10="" 11 scripted-a-javascript-editor-from-vmware="" ="="></meta>announced on this blog last month. In this article we’ll take a look under the hood at Scripted’s <em>Dependency Analysis Engine</em>. But before diving into the details, lets motivate why we need it.<br>
+<h2>Main Motivation: Cross-file Content Assist</h2>
+<br>
+<em>accurate</em>
+<p></p>
+<p>[caption id=“attachment_12178” align=“aligncenter” width=“533” caption=“Cross-file Content Assist”]<a href=" wp-content uploads 2015 xfile-content-assist1.png"><img class="size-full wp-image-12178 " title="xfile-content-assist" src="http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png" alt="" width="533" height="491">[/caption]<p></p>
+<p>Two components work together to achieve this goal:<br></p>
+<ul>
+ <br> 
+ <li>a fine-grained type inference analysis engine</li>
+ <br> 
+ <li>a coarse-grained dependency analysis engine</li>
+ <br>
+</ul>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2012-11-20 07:01:00.0">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -83,16 +75,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -108,9 +100,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -120,40 +112,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -179,42 +161,40 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Dependency analysis in Scripted</h1>
+<h1 class="blog--title">脚本化的依赖性分析</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/4aa2e47ff7cc610ddc3ebed3a2291a1a?s=20&amp;d=mm" />
-<a class="author" rel="author" href="/team/kdvolder">Kris De Volder</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/4aa2e47ff7cc610ddc3ebed3a2291a1a?s=20&d=mm"> <a class="author" rel="author" href="/team/kdvolder">克里斯·德·沃尔德</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2012-11-20 07:01:00.0">November 20, 2012</time>
+<time class="date" pubdate="" datetime="2012-11-20 07:01:00.0">2012年11月20日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="496" href="/blog/2012/11/20/dependency-analysis-in-scripted#disqus_thread">
+<a class="comments" href="/blog/2012/11/20/dependency-analysis-in-scripted#disqus_thread" data-disqus-identifier="496">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Scripted, a JavaScript editor from VMWare was <a href="http://blog.springsource.org/2012/10/11/scripted-a-javascript-editor-from-vmware/">announced on this blog</a> last month. In this article we&rsquo;ll take a look under the hood at Scripted&rsquo;s <em>Dependency Analysis Engine</em>. But before diving into the details, lets motivate why we need it.<br /><h2>Main Motivation: Cross-file Content Assist</h2><br />To provide a great JavaScript editing experience, Scripted needs to provide <em>accurate</em> suggestions about the functions, methods or identifiers you can use in your current editor context.</p><p>[caption id=&ldquo;attachment_12178&rdquo; align=&ldquo;aligncenter&rdquo; width=&ldquo;533&rdquo; caption=&ldquo;Cross-file Content Assist&rdquo;]<a href="http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png"><img class="size-full wp-image-12178 " title="xfile-content-assist" src="http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png" alt="" width="533" height="491" /></a>[/caption]</p><p>Two components work together to achieve this goal:<br /><ul><br /> <li>a fine-grained type inference analysis engine</li><br /> <li>a coarse-grained dependency analysis engine</li><br /></ul><br />The inference engine parses your code and walks every declaration, statement and expression. This allows it to determine what identifiers are valid in a given context, and make good guesses about the kinds of things that may be stored in these variables. This information is then used to make content assist suggestions.</p><p>If you wanted to simply put all your code into one big file, then a good quality inferencer alone would be sufficient to provide some pretty good content assist. In reality, projects will be divided into modules. In the example above, the &lsquo;main&rsquo; module imports a &lsquo;utils&rsquo; module. While you edit the main module, Scripted proposes functions from &lsquo;utils&rsquo; as appropriate. The dependency analysis engine is what makes this possible.<br /><h2>Other Uses of Dependency Analysis</h2><br />Scripted also uses dependency analysis to flag unresolved dependencies as errors. For example, if we try to import a &lsquo;bogus&rsquo; module Scripted will show an <strong>error marker</strong>.</p><p>[caption id=&ldquo;attachment_12180&rdquo; align=&ldquo;aligncenter&rdquo; width=&ldquo;518&rdquo; caption=&ldquo;Error Marker for an Unresolved Module&rdquo;]<a href="http://blog.springsource.org/wp-content/uploads/2015/11/unresolved-error1.png"><img class="size-full wp-image-12180" title="unresolved-error" src="http://blog.springsource.org/wp-content/uploads/2015/11/unresolved-error1.png" alt="" width="518" height="329" /></a>[/caption]</p><p>Scripted also uses dependency analysis to support easy navigation. A shift or ctrl click on a resolved dependency name will take you to the corresponding file.</p><p>In the future, dependency analysis might also allow us to implement refactoring tools. For example, if you drag-and-drop a .js file to a different directory, Scripted could automatically update relative path references as needed.<br /><h2>What does it do?</h2><br />The dependency analysis engine provides just a single <em>getDGraph</em> function to its client, the type inference engine:<br /><pre>getDGraph :: &lt;path-to-js-file&gt; -&gt; &lt;dependency-graph&gt;</pre><br />This function computes a JSON representation of the dependency graph. This graph contains a node for all files that the target file directly or transitively depends on. If we pass it our &lsquo;main&rsquo; module, it will return something like the following:<br /><pre>getDGraph(&lsquo;/sample/main.js&rsquo;) ==&gt;<br />{<br /> &hellip;<br /> &ldquo;/NODE-NATIVES/stream.js&rdquo;: {<br /> &ldquo;kind&rdquo;: &ldquo;commonjs&rdquo;,<br /> &ldquo;refs&rdquo;: { &hellip; }<br /> },<br /> &ldquo;/NODE-NATIVES/fs.js&rdquo;: {<br /> &ldquo;kind&rdquo;: &ldquo;commonjs&rdquo;,<br /> &ldquo;refs&rdquo;: {<br /> &ldquo;stream&rdquo;: {<br /> &ldquo;kind&rdquo;: &ldquo;commonjs&rdquo;,<br /> &ldquo;name&rdquo;: &ldquo;stream&rdquo;,<br /> &ldquo;path&rdquo;: &ldquo;/NODE-NATIVES/stream.js&rdquo;<br /> },<br /> &hellip;<br /> }<br /> },<br /> &ldquo;/sample/utils.js&rdquo;: {<br /> &ldquo;kind&rdquo;: &ldquo;commonjs&rdquo;,<br /> &ldquo;refs&rdquo;: {}<br /> },<br /> &ldquo;/sample/main.js&rdquo;: {<br /> &ldquo;kind&rdquo;: &ldquo;commonjs&rdquo;,<br /> &ldquo;refs&rdquo;: {<br /> &ldquo;fs&rdquo;: {<br /> &ldquo;kind&rdquo;: &ldquo;commonjs&rdquo;,<br /> &ldquo;name&rdquo;: &ldquo;fs&rdquo;,<br /> &ldquo;path&rdquo;: &ldquo;/NODE-NATIVES/fs.js&rdquo;<br /> },<br /> &ldquo;./utils&rdquo;: {<br /> &ldquo;kind&rdquo;: &ldquo;commonjs&rdquo;,<br /> &ldquo;name&rdquo;: &ldquo;./utils&rdquo;,<br /> &ldquo;path&rdquo;: &ldquo;/sample/utils.js&rdquo;<br /> }<br /> }<br /> }<br />}</pre><br />Each property in this JSON object represents a node in the graph. The &lsquo;refs&rsquo; property contains the edges. Each edge corresponds to a module import.</p><p>An interesting detail is that the dependency analyzer returns special <em>path</em> strings for native node modules. When the inference engine request the source code for such a path, the Scripted server, which is written in JavaScript and running on Node.js, extracts the source code from its very own Node.js process. The inference engine analyzes it just like an ordinary JavaScript file. The result is nice content assist for built-in node modules:</p><p>[caption id=&ldquo;attachment_12184&rdquo; align=&ldquo;aligncenter&rdquo; width=&ldquo;587&rdquo; caption=&ldquo;Inferred Suggestions for Built-in Node Modules&rdquo;]<a href="http://blog.springsource.org/wp-content/uploads/2015/11/node_modules_suggestions1.png"><img class="size-full wp-image-12184" title="node_modules_suggestions" src="http://blog.springsource.org/wp-content/uploads/2015/11/node_modules_suggestions1.png" alt="" width="587" height="384" /></a>[/caption]<br /><h2>What module systems are supported?</h2><br />For now we only provide support for AMD and CommonJS. For CommonJS we use the <a href="https://github.com/webpack/enhanced-resolve">enhanced-resolve</a> library to resolve references to paths. For AMD we currently use a custom-made resolver. We may replace this with an existing library if we find one that meets our needs.<br /><h2>How does it work?</h2><br />The process starts with the <em>target file</em> (i.e. the argument passed to the <em>getDGraph</em> function). It proceeds roughly in the following steps:<br /><ol><br /> <li>Detect the module type (CommonJS versus AMD).</li><br /> <li>Find references in the target module.</li><br /> <li>Resolve the references (i.e. determine the path of the actual file that will get loaded for a reference).</li><br /> <li>Repeat the process from step 1 for each of the resolved references.</li><br /></ol><br />Step 1 is based on detecting some typical code patterns. E.g. &ldquo;a call to &lsquo;require&rsquo; not nested inside of a &lsquo;define&rsquo; call&rdquo; is  a sign that we are dealing with a CommonJS module.</p><p>Steps 2 and 3 are dispatched to different support modules depending on the module type from step 1. It should be relatively easy to add support for additional module types (provided the step 1 detector can be made to recognize the new module type).<br /><h2>Automatic Resolver Configuration</h2><br />The dependency analyzer tries to discover what it needs to know rather than requiring manual configuration. This is a general philosophy in Scripted and the dependency analyzer is no exception. In fact, there is no way to manually configure the dependency analyzer or any of its components, though it is likely we will make this possible in the future.</p><p>For Node/CommonJS this works very well, mainly because there really is not much that needs to be configured. I.e. if we assume the standard Node.js loader algorithm is used, that is really all the information we need.</p><p>For AMD the situation is unfortunately more complicated. The typical AMD loader (e.g. <em>requirejs</em>) is highly configurable. Moreover the way this configuration is expressed in the project&rsquo;s source code tends to vary from project to project. This makes it a challenge to determine where to find the required information in a random project.</p><p>The approach we have taken is to look at some example projects and the &lsquo;typical&rsquo; patterns they use. Discovery works by recognizing these patterns. The hope is that if we support enough common patterns, eventually discovery will work for most projects. We may also add some manual configuration options as a last resort, for those cases where it fails.</p><p>To give an idea how AMD discovery works, here&rsquo;s an example of one of the patterns we currently detect:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/11/editor-html.png"><img class="alignnone size-full wp-image-12125" title="editor-html" src="http://blog.springsource.org/wp-content/uploads/2012/11/editor-html.png" alt="" width="658" height="145" /></a></p><p>The pattern here is a <em>script</em> tag with a <em>data-main</em> attribute&hellip; If Scripted finds this, it will go looking for a <em>requirejs</em> style configuration block in the <em>data-main</em> file:</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/11/setup-js1.png"><img class="alignnone size-full wp-image-12127" title="setup-js" src="http://blog.springsource.org/wp-content/uploads/2012/11/setup-js1.png" alt="" width="667" height="304" /></a></p><p>AMD configuration discovery is a work in progress. As we are presented with more examples of how people setup their AMD loaders we try to add detectors for them. If Scripted incorrectly flags many dependencies as errors, it probably failed to discover your AMD configuration. You can help us by <a href="https://github.com/scripted-editor/scripted/issues?state=open">raising a bug request</a>. If you attach a code sample illustrating your &lsquo;typical pattern&rsquo;. This will help us extend our &lsquo;pattern catalog&rsquo;.<br /><h2>Conclusion</h2><br />We took a look under the covers of Scripted. We presented the Scripted dependency-analysis engine. It currently understands both AMD and CommonJS module systems. Dependency analysis provides the type inference engine with a dependency graph. Cross-file analysis based on this graph allows us to make accurate content assist suggestions for functionality defined in other modules. The dependency information is also used to create error markers for unresolvable module references, and allow navigation quick navigation to resolved dependencies. In the future, dependency analysis may also enable the implementation of accurate refactoring tools to move or rename modules.</p><p>Want to try out Scripted? Grab it from <a href="https://github.com/scripted-editor/scripted/">GitHub</a>. It is easy to install. Download and installation instructions are in the <a href="https://github.com/scripted-editor/scripted/blob/master/README.md">readme</a> file.<br /><h2>Links</h2><br /><ul><br /> <li>Scripted<br /><ul><br /> <li>GitHub (issue tracker, wiki etc.): <a href="https://github.com/scripted-editor/scripted/"><a href="https://github.com/scripted-editor/scripted/">https://github.com/scripted-editor/scripted/</a></a></li><br /> <li>Google Group: <a href="https://groups.google.com/forum/#!forum/scripted-dev"><a href="https://groups.google.com/forum/#!forum/scripted-dev">https://groups.google.com/forum/#!forum/scripted-dev</a></a></li><br /></ul><br /></li><br /> <li>Information on JavaScript Module Systems and loaders:<br /><ul><br /> <li>RequireJS the &lsquo;typical&rsquo; AMD module loader: <a href="http://requirejs.org/"><a href="http://requirejs.org/">http://requirejs.org/</a></a></li><br /> <li>Information on the Node.js module loader <a href="https://nodejs.org/docs/latest/api/modules.html"><a href="https://nodejs.org/docs/latest/api/modules.html">http://nodejs.org/docs/latest/api/modules.html</a></a></li><br /> <li>AMD or &lsquo;Asycnhronous Module Definition&rsquo;: <a href="https://github.com/amdjs/amdjs-api/wiki/AMD"><a href="https://github.com/amdjs/amdjs-api/wiki/AMD">https://github.com/amdjs/amdjs-api/wiki/AMD</a></a></li><br /> <li>CommonJS: <a href="http://www.commonjs.org/"><a href="http://www.commonjs.org/">http://www.commonjs.org/</a></a></li><br /></ul><br /></li><br /></ul></p></div>
+<div class="blog--post"><p>上个月， <a href="http://blog.springsource.org/2012/10/11/scripted-a-javascript-editor-from-vmware/">在此博客</a>上<a href="http://blog.springsource.org/2012/10/11/scripted-a-javascript-editor-from-vmware/">宣布了</a>脚本脚本，来自VMWare的JavaScript编辑器。在本文中，我们将深入研究Scripted的<em>Dependency Analysis Engine</em> 。但是，在深入细节之前，先激励我们为什么需要它。<br></p><h2>主要动机：跨文件内容辅助</h2><br>为了提供出色的JavaScript编辑体验，Scripted需要提供有关可在当前编辑器上下文中使用的功能，方法或标识符的<em>准确</em>建议。<p></p><p>[标题ID =“ attachment_12178” align =“ aligncenter” width =“ 533”标题=“跨文件内容辅助”] <a href="http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png"><img class="size-full wp-image-12178 " title="xfile-content-assist" src="http://blog.springsource.org/wp-content/uploads/2015/11/xfile-content-assist1.png" alt="" width="533" height="491"></a> [/字幕]</p><p>两个组件协同工作以实现此目标：<br></p><ul><br> <li>细粒度类型推断分析引擎</li><br> <li>粗粒度依赖性分析引擎</li><br></ul><br>推理引擎解析您的代码，并遍历每个声明，语句和表达式。这使它可以确定在给定上下文中哪些标识符有效，并对可以存储在这些变量中的事物进行很好的猜测。然后，此信息用于提出内容辅助建议。<p></p><p>如果您只想将所有代码放入一个大文件中，那么仅凭一个高质量的推断器就足以提供一些很好的内容帮助。实际上，项目将分为模块。在上面的示例中，“ main”模块导入了“ utils”模块。在编辑主模块时，“脚本化”会根据需要从“ utils”中提出功能。依赖性分析引擎使之成为可能。<br></p><h2>依赖性分析的其他用途</h2><br>脚本化脚本还使用依赖性分析将未解决的依赖性标记为错误。例如，如果我们尝试导入“假”模块，则Scripted将显示<strong>错误标记</strong> 。<p></p><p>[caption id =” attachment_12180” align =” aligncenter” width =“ 518” caption =”未解决模块的错误标记”] <a href="http://blog.springsource.org/wp-content/uploads/2015/11/unresolved-error1.png"><img class="size-full wp-image-12180" title="未解决的错误" src="http://blog.springsource.org/wp-content/uploads/2015/11/unresolved-error1.png" alt="" width="518" height="329"></a> [/字幕]</p><p>脚本化脚本还使用依赖关系分析来支持轻松导航。按住Shift键或按Ctrl键单击已解析的依赖项名称，将带您到相应的文件。</p><p>将来，依赖关系分析还可能使我们能够实施重构工具。例如，如果将.js文件拖放到其他目录，则Scripted可以根据需要自动更新相对路径引用。<br></p><h2>它有什么作用？</h2><br>依赖性分析引擎仅向其客户端提供一个<em>getDGraph</em>函数，即类型推断引擎：<br><pre>getDGraph :: <path-to-js-file> -> <dependency-graph></pre><br>此函数计算依赖关系图的JSON表示形式。此图包含目标文件直接或传递依赖的所有文件的节点。如果将“ main”模块传递给它，它将返回类似以下内容的内容：<br><pre>getDGraph(‘/sample/main.js’) ==><br>{<br> …<br> “/NODE-NATIVES/stream.js”: {<br> “kind”: “commonjs”,<br> “refs”: { … }<br> },<br> “/NODE-NATIVES/fs.js”: {<br> “kind”: “commonjs”,<br> “refs”: {<br> “stream”: {<br> “kind”: “commonjs”,<br> “name”: “stream”,<br> “path”: “/NODE-NATIVES/stream.js”<br> },<br> …<br> }<br> },<br> “/sample/utils.js”: {<br> “kind”: “commonjs”,<br> “refs”: {}<br> },<br> “/sample/main.js”: {<br> “kind”: “commonjs”,<br> “refs”: {<br> “fs”: {<br> “kind”: “commonjs”,<br> “name”: “fs”,<br> “path”: “/NODE-NATIVES/fs.js”<br> },<br> “./utils”: {<br> “kind”: “commonjs”,<br> “name”: “./utils”,<br> “path”: “/sample/utils.js”<br> }<br> }<br> }<br>}</pre><br>此JSON对象中的每个属性代表图中的一个节点。'refs'属性包含边缘。每个边都对应一个模块导入。<p></p><p>一个有趣的细节是，依赖关系分析器为本机节点模块返回特殊的<em>路径</em>字符串。当推理引擎请求此类路径的源代码时，用JavaScript编写并在Node.js上运行的脚本服务器从其自己的Node.js进程中提取源代码。推理引擎像普通的JavaScript文件一样对其进行分析。结果是为内置节点模块提供了很好的内容辅助：</p><p>[caption id =” attachment_12184” align =” aligncenter” width =” 587” caption =“内置节点模块的推断建议”] <a href="http://blog.springsource.org/wp-content/uploads/2015/11/node_modules_suggestions1.png"><img class="size-full wp-image-12184" title="node_modules_suggestions" src="http://blog.springsource.org/wp-content/uploads/2015/11/node_modules_suggestions1.png" alt="" width="587" height="384"></a> [/字幕]<br></p><h2>支持哪些模块系统？</h2><br>目前，我们仅提供对AMD和CommonJS的支持。对于CommonJS的，我们使用<a href="https://github.com/webpack/enhanced-resolve">增强的决心</a>库来解决引用路径。对于AMD，我们目前使用定制的解析器。如果找到满足我们需求的库，则可以用现有库替换。<br><h2>它是如何工作的？</h2><br>该过程从<em>目标文件</em> （即，传递给<em>getDGraph</em>函数的参数）开始。它大致按以下步骤进行：<br><ol><br> <li>检测模块类型（CommonJS与AMD）。</li><br> <li>在目标模块中查找引用。</li><br> <li>解析引用（即，确定将为引用加载的实际文件的路径）。</li><br> <li>对每个已解析的引用重复从步骤1开始的过程。</li><br></ol><br>步骤1基于检测一些典型的代码模式。例如，“未嵌套在'define'调用内的'require'调用”表示我们正在处理CommonJS模块。<p></p><p>根据步骤1中的模块类型，将步骤2和3分派到不同的支持模块。添加对其他模块类型的支持应该相对容易（前提是可以使第1步检测器识别新的模块类型）。<br></p><h2>自动解析器配置</h2><br>依赖性分析器尝试发现它需要知道的内容，而不需要手动配置。这是Scripted中的一般原理，依赖性分析器也不例外。实际上，没有办法手动配置依赖关系分析器或其任何组件，尽管我们很可能在将来使它成为可能。<p></p><p>对于Node / CommonJS来说，它工作得很好，主要是因为实际上并不需要太多配置。即，如果我们假设使用标准的Node.js加载程序算法，那实际上就是我们需要的所有信息。</p><p>不幸的是，对于AMD而言，情况更加复杂。典型的AMD加载器（例如<em>requirejs</em> ）是高度可配置的。此外，在项目的源代码中表达此配置的方式往往因项目而异。这给在随机项目中确定在哪里找到所需信息的挑战。</p><p>我们采用的方法是查看一些示例项目及其使用的“典型”模式。发现通过识别这些模式而起作用。希望是，如果我们支持足够的通用模式，最终发现将适用于大多数项目。对于失败的情况，我们可能还会添加一些手动配置选项作为最后的选择。</p><p>为了说明AMD发现的工作原理，以下是我们目前检测到的一种模式的示例：</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/11/editor-html.png"><img class="alignnone size-full wp-image-12125" title="编辑器-html" src="http://blog.springsource.org/wp-content/uploads/2012/11/editor-html.png" alt="" width="658" height="145"></a></p><p>这里的模式是一个带有<em>data-main</em>属性的<em>脚本</em>标签…如果Scripted找到了它，它将去在<em>data-main</em>文件中寻找一个<em>requirejs</em>样式的配置块：</p><p><a href="http://blog.springsource.org/wp-content/uploads/2012/11/setup-js1.png"><img class="alignnone size-full wp-image-12127" title="安装程序js" src="http://blog.springsource.org/wp-content/uploads/2012/11/setup-js1.png" alt="" width="667" height="304"></a></p><p>AMD配置发现正在进行中。当我们看到人们如何设置他们的AMD装载机的更多示例时，我们尝试为他们添加检测器。如果脚本错误地将许多依赖项标记为错误，则可能无法发现您的AMD配置。您可以通过<a href="https://github.com/scripted-editor/scripted/issues?state=open">提出错误请求</a>来帮助我们。如果您附上说明“典型模式”的代码示例。这将帮助我们扩展“样式目录”。<br></p><h2>结论</h2><br>我们看了一下Scripted的幕后故事。我们介绍了脚本化依赖关系分析引擎。它目前了解AMD和CommonJS模块系统。依赖性分析为类型推断引擎提供了依赖性图。基于此图的跨文件分析使我们可以针对其他模块中定义的功能提出准确的内容辅助建议。依赖项信息还用于为无法解析的模块引用创建错误标记，并允许快速导航到已解决的依赖项。将来，依存关系分析还可以实现准确的重构工具来移动或重命名模块。<p></p><p>想尝试脚本化吗？从<a href="https://github.com/scripted-editor/scripted/">GitHub上获取</a>它。易于安装。下载和安装说明位于<a href="https://github.com/scripted-editor/scripted/blob/master/README.md">自述</a>文件中。<br></p><h2>链接</h2><br><ul><br> <li>脚本化<br><ul><br> <li>GitHub（问题追踪器，Wiki等）： <a href="https://github.com/scripted-editor/scripted/"></a> <a href="https://github.com/scripted-editor/scripted/">https://github.com/scripted-editor/scripted/</a></li><br> <li>Google网上论坛： <a href="https://groups.google.com/forum/#!forum/scripted-dev"></a> <a href="https://groups.google.com/forum/#!forum/scripted-dev">https://groups.google.com/forum/#!forum/scripted-dev</a></li><br></ul><br></li><br> <li>有关JavaScript模块系统和加载程序的信息：<br><ul><br> <li>RequireJS是“典型” AMD模块加载器： <a href="http://requirejs.org/"></a> <a href="http://requirejs.org/">http://requirejs.org/</a></li><br> <li>有关Node.js模块加载器的信息<a href="https://nodejs.org/docs/latest/api/modules.html"></a> <a href="https://nodejs.org/docs/latest/api/modules.html">http://nodejs.org/docs/latest/api/modules.html</a></li><br> <li>AMD或“非同步模块定义”： <a href="https://github.com/amdjs/amdjs-api/wiki/AMD"></a> <a href="https://github.com/amdjs/amdjs-api/wiki/AMD">https://github.com/amdjs/amdjs-api/wiki/AMD</a></li><br> <li>CommonJS： <a href="http://www.commonjs.org/"></a> <a href="http://www.commonjs.org/">http://www.commonjs.org/</a></li><br></ul><br></li><br></ul><p></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 496;
 
       (function(disqus_shortname, document) {
@@ -228,15 +208,12 @@ Training & Certification
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -244,23 +221,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -270,17 +243,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -294,18 +265,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

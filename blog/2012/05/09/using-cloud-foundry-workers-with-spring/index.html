@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Using Cloud Foundry Workers with Spring</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>在Spring中使用Cloud Foundry Worker</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,51 +16,49 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Using Cloud Foundry Workers with Spring" />
-<meta name="twitter:description" content="&lt;p&gt;&lt;/p&gt;
-&lt;p&gt; You’ve no doubt read &lt;a href=&quot;http://blog.springsource.org/author/jhickey/&quot;&gt;Jennifer Hickey&lt;/a&gt;’s amazing blog posts &lt;a href=&quot;http://blog.cloudfoundry.com/post/13481011624/cloud-foundry-improves-support-for-background-processing&quot;&gt;introducing Cloud Foundry workers&lt;/a&gt;, their application in setting up &lt;a href=&quot;http://blog.cloudfoundry.com/post/13481011636/running-resque-workers-on-cloud-foundry&quot;&gt;Ruby Resque background jobs&lt;/a&gt;, and &lt;a href=&quot;http://blog.cloudfoundry.com/post/13481011979/running-workers-on-cloud-foundry-with-spring&quot;&gt;today’s post introducing the Spring support&lt;/a&gt;.&lt;br&gt;&lt;/p&gt;
-&lt;h2&gt; Key Takeaways for Spring Developers &lt;/h2&gt;
-&lt;ol&gt; 
- &lt;li&gt; You need to update your version of &lt;code&gt;vmc&lt;/code&gt; with &lt;code&gt;gem update vmc&lt;/code&gt;.&lt;/li&gt; 
- &lt;li&gt; Cloud Foundry workers let you run &lt;code&gt;public static void main&lt;/code&gt; jobs. That is, a Cloud Foundry worker is basically a process, lower level than a web application, which maps naturally to many so-called &lt;em&gt;back-office&lt;/em&gt; jobs.&lt;/li&gt; 
- &lt;li&gt; You need to provide the command that Cloud Foundry will run. You could provide the &lt;code&gt;java&lt;/code&gt; incantation you’d like it to use, but it’s far simpler to ship a shell script, and have Cloud Foundry run that shell script for you, instead. The command you provide should employ &lt;code&gt;$JAVA_OPTS&lt;/code&gt;, which Cloud Foundry has already provided to ensure consistent memory usage and JVM settings. &lt;/li&gt; 
- &lt;li&gt; There are various ways to automate the creation of a Cloud Foundry deployable application. If you’re using Maven, then the &lt;a href=&quot;http://mojo.codehaus.org/appassembler/&quot;&gt;&lt;code&gt;org.codehaus.mojo:appassembler-maven-plugin&lt;/code&gt;&lt;/a&gt; plugin will help you create a startup script and package your &lt;code&gt;.jars&lt;/code&gt; for easy deployment, as well as specifying an entry point class. &lt;/li&gt; 
- &lt;li&gt; Everything else is basically the same. When you do &lt;code&gt;vmc push&lt;/code&gt; on a Java &lt;code&gt;.jar&lt;/code&gt; project, Cloud Foundry will ask you whether the application is a standalone application. Confirm, and it’ll walk you through the setup from there. &lt;/li&gt; 
-&lt;/ol&gt;
-" />
-<meta name="twitter:creator" content="@starbuxman" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Using Cloud Foundry Workers with Spring">
+<meta name="twitter:description" content="<p></p>
+<p> You’ve no doubt read <a href=" http: ="" blog.springsource.org="" author="" jhickey="" ="="></meta>Jennifer Hickey’s amazing blog posts <a href=" blog.cloudfoundry.com post 13481011624 cloud-foundry-improves-support-for-background-processing"></head><body dir="ltr">introducing Cloud Foundry workers, their application in setting up <a href="http://blog.cloudfoundry.com/post/13481011636/running-resque-workers-on-cloud-foundry">Ruby Resque background jobs</a>, and <a href="http://blog.cloudfoundry.com/post/13481011979/running-workers-on-cloud-foundry-with-spring">today’s post introducing the Spring support</a>.<br>
+<h2> Key Takeaways for Spring Developers </h2>
+<ol> 
+ <li> You need to update your version of <code>vmc</code> with <code>gem update vmc</code>.</li> 
+ <li> Cloud Foundry workers let you run <code>public static void main</code> jobs. That is, a Cloud Foundry worker is basically a process, lower level than a web application, which maps naturally to many so-called <em>back-office</em> jobs.</li> 
+ <li> You need to provide the command that Cloud Foundry will run. You could provide the <code>java</code> incantation you’d like it to use, but it’s far simpler to ship a shell script, and have Cloud Foundry run that shell script for you, instead. The command you provide should employ <code>$JAVA_OPTS</code>, which Cloud Foundry has already provided to ensure consistent memory usage and JVM settings. </li> 
+ <li> There are various ways to automate the creation of a Cloud Foundry deployable application. If you’re using Maven, then the <a href="http://mojo.codehaus.org/appassembler/"><code>org.codehaus.mojo:appassembler-maven-plugin</code></a> plugin will help you create a startup script and package your <code>.jars</code> for easy deployment, as well as specifying an entry point class. </li> 
+ <li> Everything else is basically the same. When you do <code>vmc push</code> on a Java <code>.jar</code> project, Cloud Foundry will ask you whether the application is a standalone application. Confirm, and it’ll walk you through the setup from there. </li> 
+</ol>
+">
+<meta name="twitter:creator" content="@starbuxman">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200">
 
-<meta property="og:title" content="Using Cloud Foundry Workers with Spring" />
-<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
-<meta property="og:description" content="&lt;p&gt;&lt;/p&gt;
-&lt;p&gt; You’ve no doubt read &lt;a href=&quot;http://blog.springsource.org/author/jhickey/&quot;&gt;Jennifer Hickey&lt;/a&gt;’s amazing blog posts &lt;a href=&quot;http://blog.cloudfoundry.com/post/13481011624/cloud-foundry-improves-support-for-background-processing&quot;&gt;introducing Cloud Foundry workers&lt;/a&gt;, their application in setting up &lt;a href=&quot;http://blog.cloudfoundry.com/post/13481011636/running-resque-workers-on-cloud-foundry&quot;&gt;Ruby Resque background jobs&lt;/a&gt;, and &lt;a href=&quot;http://blog.cloudfoundry.com/post/13481011979/running-workers-on-cloud-foundry-with-spring&quot;&gt;today’s post introducing the Spring support&lt;/a&gt;.&lt;br&gt;&lt;/p&gt;
-&lt;h2&gt; Key Takeaways for Spring Developers &lt;/h2&gt;
-&lt;ol&gt; 
- &lt;li&gt; You need to update your version of &lt;code&gt;vmc&lt;/code&gt; with &lt;code&gt;gem update vmc&lt;/code&gt;.&lt;/li&gt; 
- &lt;li&gt; Cloud Foundry workers let you run &lt;code&gt;public static void main&lt;/code&gt; jobs. That is, a Cloud Foundry worker is basically a process, lower level than a web application, which maps naturally to many so-called &lt;em&gt;back-office&lt;/em&gt; jobs.&lt;/li&gt; 
- &lt;li&gt; You need to provide the command that Cloud Foundry will run. You could provide the &lt;code&gt;java&lt;/code&gt; incantation you’d like it to use, but it’s far simpler to ship a shell script, and have Cloud Foundry run that shell script for you, instead. The command you provide should employ &lt;code&gt;$JAVA_OPTS&lt;/code&gt;, which Cloud Foundry has already provided to ensure consistent memory usage and JVM settings. &lt;/li&gt; 
- &lt;li&gt; There are various ways to automate the creation of a Cloud Foundry deployable application. If you’re using Maven, then the &lt;a href=&quot;http://mojo.codehaus.org/appassembler/&quot;&gt;&lt;code&gt;org.codehaus.mojo:appassembler-maven-plugin&lt;/code&gt;&lt;/a&gt; plugin will help you create a startup script and package your &lt;code&gt;.jars&lt;/code&gt; for easy deployment, as well as specifying an entry point class. &lt;/li&gt; 
- &lt;li&gt; Everything else is basically the same. When you do &lt;code&gt;vmc push&lt;/code&gt; on a Java &lt;code&gt;.jar&lt;/code&gt; project, Cloud Foundry will ask you whether the application is a standalone application. Confirm, and it’ll walk you through the setup from there. &lt;/li&gt; 
-&lt;/ol&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2012-05-09 16:33:00.0" />
-</head>
-<body>
+<meta property="og:title" content="Using Cloud Foundry Workers with Spring">
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200">
+<meta property="og:description" content="<p></p>
+<p> You’ve no doubt read <a href=" http: ="" blog.springsource.org="" author="" jhickey="" ="="></meta>Jennifer Hickey’s amazing blog posts <a href=" blog.cloudfoundry.com post 13481011624 cloud-foundry-improves-support-for-background-processing">introducing Cloud Foundry workers, their application in setting up <a href="http://blog.cloudfoundry.com/post/13481011636/running-resque-workers-on-cloud-foundry">Ruby Resque background jobs</a>, and <a href="http://blog.cloudfoundry.com/post/13481011979/running-workers-on-cloud-foundry-with-spring">today’s post introducing the Spring support</a>.<br>
+<h2> Key Takeaways for Spring Developers </h2>
+<ol> 
+ <li> You need to update your version of <code>vmc</code> with <code>gem update vmc</code>.</li> 
+ <li> Cloud Foundry workers let you run <code>public static void main</code> jobs. That is, a Cloud Foundry worker is basically a process, lower level than a web application, which maps naturally to many so-called <em>back-office</em> jobs.</li> 
+ <li> You need to provide the command that Cloud Foundry will run. You could provide the <code>java</code> incantation you’d like it to use, but it’s far simpler to ship a shell script, and have Cloud Foundry run that shell script for you, instead. The command you provide should employ <code>$JAVA_OPTS</code>, which Cloud Foundry has already provided to ensure consistent memory usage and JVM settings. </li> 
+ <li> There are various ways to automate the creation of a Cloud Foundry deployable application. If you’re using Maven, then the <a href="http://mojo.codehaus.org/appassembler/"><code>org.codehaus.mojo:appassembler-maven-plugin</code></a> plugin will help you create a startup script and package your <code>.jars</code> for easy deployment, as well as specifying an entry point class. </li> 
+ <li> Everything else is basically the same. When you do <code>vmc push</code> on a Java <code>.jar</code> project, Cloud Foundry will ask you whether the application is a standalone application. Confirm, and it’ll walk you through the setup from there. </li> 
+</ol>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2012-05-09 16:33:00.0">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -76,16 +68,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -101,9 +93,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -113,40 +105,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -172,57 +154,56 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Using Cloud Foundry Workers with Spring</h1>
+<h1 class="blog--title">在Spring中使用Cloud Foundry Worker</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
-<a class="author" rel="author" href="/team/jlong">Josh Long</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&d=mm"> <a class="author" rel="author" href="/team/jlong">乔什·朗（Josh Long）</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2012-05-09 16:33:00.0">May 09, 2012</time>
+<time class="date" pubdate="" datetime="2012-05-09 16:33:00.0">2012年5月9日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="471" href="/blog/2012/05/09/using-cloud-foundry-workers-with-spring#disqus_thread">
+<a class="comments" href="/blog/2012/05/09/using-cloud-foundry-workers-with-spring#disqus_thread" data-disqus-identifier="471">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p><P> You&rsquo;ve no doubt read <a href="http://blog.springsource.org/author/jhickey/">Jennifer Hickey</A>&rsquo;s amazing blog posts <a href="http://blog.cloudfoundry.com/post/13481011624/cloud-foundry-improves-support-for-background-processing">introducing Cloud Foundry workers</A>, their application in setting up <a href="http://blog.cloudfoundry.com/post/13481011636/running-resque-workers-on-cloud-foundry">Ruby Resque background jobs</A>, and <a href="http://blog.cloudfoundry.com/post/13481011979/running-workers-on-cloud-foundry-with-spring">today&rsquo;s post introducing the Spring support</A>.<br /></P> <h2> Key Takeaways for Spring Developers </h2> <OL> <LI> You need to update your version of <CODE>vmc</CODE> with <CODE>gem update vmc</CODE>.</LI> <LI> Cloud Foundry workers let you run <code>public static void main</CODE> jobs. That is, a Cloud Foundry worker is basically a process, lower level than a web application, which maps naturally to many so-called <EM>back-office</EM> jobs.</LI> <LI> You need to provide the command that Cloud Foundry will run. You could provide the <CODE>java</CODE> incantation you&rsquo;d like it to use, but it&rsquo;s far simpler to ship a shell script, and have Cloud Foundry run that shell script for you, instead. The command you provide should employ <CODE>$JAVA_OPTS</CODE>, which Cloud Foundry has already provided to ensure consistent memory usage and JVM settings. </LI> <LI> There are various ways to automate the creation of a Cloud Foundry deployable application. If you&rsquo;re using Maven, then the <a href="http://mojo.codehaus.org/appassembler/"><CODE>org.codehaus.mojo:appassembler-maven-plugin</CODE></A> plugin will help you create a startup script and package your <CODE>.jars</CoDE> for easy deployment, as well as specifying an entry point class. </LI> <LI> Everything else is basically the same. When you do <CODE>vmc push</CODE> on a Java <CODE>.jar</CODE> project, Cloud Foundry will ask you whether the application is a standalone application. Confirm, and it&rsquo;ll walk you through the setup from there. </LI> </OL> <P> So, let&rsquo;s look at a few common architectures and arrangements that are easier and more natural with Cloud Foundry workers. We&rsquo;ll look at these patterns in terms of the Spring framework and two surrounding projects, <a href="http://www.springsource.org/spring-integration">Spring Integration</A> and <a href="http://www.springsource.org/spring-batch">Spring Batch</A>, both of which thrive in, and outside of, web applications. As we&rsquo;ll see, both of these frameworks support decoupling and improved composability. We&rsquo;ll disconnect <EM>what</EM> happens from <EM>when</EM> it happens, and we&rsquo;ll disconnect <EM>what</EM> happens from <EM>where</EM> it happens, both in the name of freeing up capacity on the front end.</P> <H2> I&rsquo;ve got a Schedule to Keep!</h2> <P> One common question I get is: <EM>How do I do job scheduling on Cloud Foundry?</EM> Cloud Foundry supports Spring applications, and Spring of course has always supported enterprise grade scheduling abstractions like <a href="http://quartz-scheduler.org/">Quartz</A> and Spring 3.0&rsquo;s <CODE><a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/scheduling/annotation/Scheduled.html">@Scheduled</A></CODE> annotation. <CODE>@Scheduled</CODE> is really nice because it is <EM>super</EM> easy to add into an existing application. In the simplest case, you add <CODE><a href="http://static.springsource.org/spring/docs/3.1.x/javadoc-api/org/springframework/scheduling/annotation/EnableScheduling.html">@EnableScheduling</A></CODE> to your Java configuration or <CODE><a href="http://blog.springsource.org/2010/01/05/task-scheduling-simplifications-in-spring-3-0/">&lt;task:annotation-driven/&gt;</A></CODE> to your XML, and then use the <CODE>@Scheduled</CODE> annotation in your code. This is a very natural thing to do in an enterprise application - perhaps you have an analytics or reporting process that needs to run? Some long running batch process? I&rsquo;ve put together an example that demonstrates using <CODE>@Scheduled</CODE> to run a <A href="http://www.springsource.org/spring-batch">Spring Batch</A> <CODE>Job</CODE>. The Spring Batch job itself is a worker thread that works with a web service whose poor SLA make it unfit for realtime use. It&rsquo;s safer, and cleaner, to handle the work in Spring Batch, where its recovery and retry capabilities pick up the slack of any network outages, network latency, etc. I&rsquo;ll refer you to <a href="https://github.com/cloudfoundry-samples/stock-workers/tree/master/cf-workers-batch">the code example for most of the details</A>, we&rsquo;ll just look at the the entry point and then look at deploying the application to Cloud Foundry. </P></p>
-<pre><code class="prettyprint java"><br />// set to every 10s for testing.
+<div class="blog--post"><p></p><p>您无疑已经阅读了<a href="http://blog.springsource.org/author/jhickey/">Jennifer Hickey</a>的精彩博客文章，其中<a href="http://blog.cloudfoundry.com/post/13481011624/cloud-foundry-improves-support-for-background-processing">介绍了Cloud Foundry工人</a> ，他们在设置<a href="http://blog.cloudfoundry.com/post/13481011636/running-resque-workers-on-cloud-foundry">Ruby Resque后台作业</a>中的应用以及<a href="http://blog.cloudfoundry.com/post/13481011979/running-workers-on-cloud-foundry-with-spring">今天的文章中介绍了Spring支持</a> 。<br></p> <h2>Spring开发人员要点</h2> <ol> <li>您需要使用<code>gem update vmc</code>更新您的<code>vmc</code>版本。</li> <li>Cloud Foundry工作者可让您运行<code>public static void main</code>作业。也就是说，Cloud Foundry工作者基本上是一个过程，其级别低于Web应用程序，它自然地映射到许多所谓的<em>后台</em>工作。</li> <li>您需要提供Cloud Foundry将运行的命令。您可以提供您希望使用的<code>java</code>指令，但要提供一个Shell脚本要简单得多，而让Cloud Foundry代您运行该Shell脚本。您提供的命令应该使用<code>$JAVA_OPTS</code> ，Cloud Foundry已经提供了<code>$JAVA_OPTS</code>以确保一致的内存使用和JVM设置。</li> <li>有多种方法可以自动创建Cloud Foundry可部署应用程序。如果您使用的是Maven，则<a href="http://mojo.codehaus.org/appassembler/"><code>org.codehaus.mojo:appassembler-maven-plugin</code></a>插件将帮助您创建启动脚本并打包<code>.jars</code>以便于部署，并指定入口点类。</li> <li>其他一切基本相同。当您在Java <code>.jar</code>项目上执行<code>vmc push</code>时，Cloud Foundry会询问您该应用程序是否为独立应用程序。确认，然后它将引导您完成设置。</li> </ol> <p>因此，让我们看一下Cloud Foundry工作者可以更轻松，更自然地使用的一些通用架构和安排。我们将通过Spring框架以及两个周围的项目<a href="http://www.springsource.org/spring-integration">Spring Integration</a>和<a href="http://www.springsource.org/spring-batch">Spring Batch</a>来研究这些模式，这两个项目在Web应用程序之内和之外都非常流行。正如我们将看到的，这两个框架都支持去耦和改进的可组合性。我们将断开它发生<em>的时候</em> <em>会</em>发生<em>什么</em> ，我们会断开它发生<em>在哪里</em>发生<em>了什么</em> ，无论是在前端释放产能的名称。</p> <h2>我有时间表要遵守！</h2> <p>我得到的一个常见问题是： <em>如何在Cloud Foundry上进行作业调度？</em> Cloud Foundry支持Spring应用程序，而Spring当然一直支持企业级调度抽象，例如<a href="http://quartz-scheduler.org/">Quartz</a>和Spring 3.0的<code><a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/scheduling/annotation/Scheduled.html">@Scheduled</a></code>annotation。<code>@Scheduled</code>是非常好的，因为它是<em>超级</em>方便地添加到现有的应用程序。在最简单的情况下，您可以将<code><a href="http://static.springsource.org/spring/docs/3.1.x/javadoc-api/org/springframework/scheduling/annotation/EnableScheduling.html">@EnableScheduling</a></code>添加到Java配置中，或者<code><a href="http://blog.springsource.org/2010/01/05/task-scheduling-simplifications-in-spring-3-0/"><task:annotation-driven/></a></code>到XML，然后在<code>@Scheduled</code>中使用<code>@Scheduled</code>annotation。在企业应用程序中这是很自然的事情-也许您有需要运行的分析或报告流程？一些长期运行的批处理过程？我整理了一个示例，演示了使用<code>@Scheduled</code>运行<a href="http://www.springsource.org/spring-batch">Spring Batch</a> <code>Job</code>的示例。Spring Batch作业本身是与Web服务一起使用的工作线程，该Web服务的SLA较差，因此不适合实时使用。在Spring Batch中处理工作是更安全，更干净的，它的恢复和重试功能弥补了网络中断，网络延迟等方面的不足。我将向您提供<a href="https://github.com/cloudfoundry-samples/stock-workers/tree/master/cf-workers-batch">示例代码，以供参考</a> 。将只看入口点，然后看将应用程序部署到Cloud Foundry。</p><p></p>
+<pre><code class="prettyprint java"><br>// set to every 10s for testing.
 @Scheduled(fixedRate = 10 * 1000)
 public void runNightlyStockPriceRecorder() throws Throwable {
 	JobParameters params = new JobParametersBuilder()
-		.addDate(&quot;date&quot;, new Date())
+		.addDate("date", new Date())
 		.toJobParameters();
 	JobExecution jobExecution = jobLauncher.run(job, params);
 	BatchStatus batchStatus = jobExecution.getStatus();
 	while (batchStatus.isRunning()) {
-		logger.info(&quot;Still running...&quot;);
+		logger.info("Still running...");
 		Thread.sleep(1000);
 	}
-	logger.info(String.format(&quot;Exit status: %s&quot;, jobExecution.getExitStatus().getExitCode()));
+	logger.info(String.format("Exit status: %s", jobExecution.getExitStatus().getExitCode()));
 	JobInstance jobInstance = jobExecution.getJobInstance();
-	logger.info(String.format(&quot;job instance Id: %d&quot;, jobInstance.getId()));
+	logger.info(String.format("job instance Id: %d", jobInstance.getId()));
 }
-</code></pre><p><P> This method will be invoked at a frequency prescribed by the <CODE>@Scheduled</CODE> annotation: every 10 seconds, in this case. After the <CODE>Job</CODE> has been launched using the <CODE>JobLauncher</CODE>, the application blocks (this can be avoided, but in this case, it&rsquo;s OK since we&rsquo;re expecting it to). Depending on the data, and on the type of the batch process, it may block for a few minutes, &hellip;or for a week! Spring Batch is a robust batch processing engine, and it was made to safely handle large data sets. A Batch process doesn&rsquo;t usually belong in the same pipeline as an HTTP request - it is determinant, and long running, so being able to use long running workers in Cloud Foundry is a real win here. </P><P> Let&rsquo;s deploy the application to Cloud Foundry. The example applications are Maven projects. To build them, go to the root of the code base, and run <CODE>mvn clean install</CODE> using the <a href="https://maven.apache.org/">Maven</A> build tool. </P><P> Deployment of the application is easy from here, assuming you&rsquo;ve already set up the <CODE>vmc</CODE> command line tool and updated to the latest revision <a href="http://blog.cloudfoundry.com/post/13481011624/cloud-foundry-improves-support-for-background-processing">as Jennifer explained in the first post</A>. The application comes with a <CODE>manifest.yml</CODE> at the root of the code. Cloud Foundry <CODE>manifest.yml</CODE> files fully describe everything the application expects to have provided for it by the Platform-as-a-Service, including which databases to use, how much RAM to appropriate, and more. Cloud Foundry reads this manifest and fulfills it when it deploys the application. So, by the sheer act of deploying this application, you will also be given the PostgreSQL database instance that this application needs to store the sample data, as well as the tables that Spring Batch maintains for its runtime state. </P></p>
-<pre><code class="prettyprint shell"><br />jlongmbp17:cf-workers-batch jlong$ vmc --path target/appassembler/ push 
-Pushing application &#39;batch&#39;...
+</code></pre><p></p><p>此方法将以<code>@Scheduled</code>annotation指定的频率调用：在这种情况下，每10秒调用一次。在使用<code>JobLauncher</code>启动<code>Job</code>之后，应用程序将阻塞（可以避免这种情况，但是在这种情况下，因为我们期望它可以，所以可以）。根据数据和批处理过程的类型，它可能会阻塞几分钟甚至一星期！Spring Batch是一个强大的批处理引擎，它可以安全地处理大型数据集。批处理进程通常与HTTP请求不在同一个管道中-它是决定性的，长期运行的，因此能够在Cloud Foundry中使用长期运行的工作程序是一个真正的胜利。</p><p>让我们将应用程序部署到Cloud Foundry。示例应用程序是Maven项目。要构建它们，请转到代码库的根目录，然后使用<a href="https://maven.apache.org/">Maven</a>构建工具运行<code>mvn clean install</code> 。</p><p>假设您已经设置了<code>vmc</code>命令行工具并已更新为最新版本（ <a href="http://blog.cloudfoundry.com/post/13481011624/cloud-foundry-improves-support-for-background-processing">如Jennifer在第一篇文章中所述）</a> ，那么从这里开始就可以轻松部署应用程序。该应用程序在代码的根目录中带有<code>manifest.yml</code> 。Cloud Foundry <code>manifest.yml</code>文件完整描述了应用程序希望通过平台即服务为其提供的所有内容，包括要使用的数据库，要使用的内存量等等。Cloud Foundry会读取此清单并在部署应用程序时执行它。因此，通过部署该应用程序的纯粹行为，您还将获得该应用程序需要存储示例数据以及Spring Batch为其运行时状态维护的表的PostgreSQL数据库实例。</p><p></p>
+<pre><code class="prettyprint shell"><br>jlongmbp17:cf-workers-batch jlong$ vmc --path target/appassembler/ push 
+Pushing application 'batch'...
 Creating Application: OK
 Creating Service [stock_batch]: OK
 Binding Service [stock_batch]: OK
@@ -232,8 +213,8 @@ Uploading Application:
   Packing application: OK
   Uploading (55K): OK   
 Push Status: OK
-Staging Application &#39;batch&#39;: OK                                                 
-Starting Application &#39;batch&#39;: OK      
+Staging Application 'batch': OK                                                 
+Starting Application 'batch': OK      
                                           
 jlongmbp17:cf-workers-batch jlong$ vmc apps
 +---------------------+----+---------+----------------------------------+----------------+
@@ -242,12 +223,12 @@ jlongmbp17:cf-workers-batch jlong$ vmc apps
 | batch               | 1  | RUNNING |                                  | stock_batch    |
 ...
 </code></pre>
-<p>The scheduled method runs every ten seconds, so wait ten seconds before following the next steps. Next, we'll login to the database to see what our little process has done. The Spring Batch job takes all the stock ticker symbols in the <CODE>STOCKS</CODE> table, and then looks up their current pricing information and inserts that snapshot data into the <CODE>STOCKS_DATA</CODE> table. The <CODE>vmc tunnel</CODE> command creates a tunnel directly into the database managed by the cloud. I use it to get into our PostgreSQL instance and run a query (<CODE>SELECT * FROM STOCKS_DATA</CODE>) on the <CODE>STOCKS_DATA</CODE> table. </p>
-<pre><code class="prettyprint shell"><br />jlongmbp17:cf-workers-batch jlong$ vmc tunnel stock_batch
+<p>计划的方法每十秒钟运行一次，因此请等待十秒钟，然后再执行下一步。接下来，我们将登录数据库以查看我们的小过程完成了什么。Spring Batch作业在<code>STOCKS</code>表中获取所有股票行情自动收录器符号，然后查找其当前定价信息，并将该快照数据插入<code>STOCKS_DATA</code>表中。<code>vmc tunnel</code>命令将直接在云管理的数据库中创建一条隧道。我用它进入我们的PostgreSQL实例并在<code>STOCKS_DATA</code>表上运行查询（ <code>SELECT * FROM STOCKS_DATA</code> ）。</p>
+<pre><code class="prettyprint shell"><br>jlongmbp17:cf-workers-batch jlong$ vmc tunnel stock_batch
 Binding Service [stock_batch]: OK
-Stopping Application &#39;caldecott&#39;: OK
-Staging Application &#39;caldecott&#39;: OK                                             
-Starting Application &#39;caldecott&#39;: OK                                            
+Stopping Application 'caldecott': OK
+Staging Application 'caldecott': OK                                             
+Starting Application 'caldecott': OK                                            
 Getting tunnel connection info: OK
 
 Service connection info: 
@@ -259,12 +240,12 @@ Starting tunnel to stock_batch on port 10002.
 1: none
 2: psql
 Which client would you like to start?: 2
-Launching &#39;psql -h localhost -p 10002 -d d5c5aefa6c1b04d2280838d7bcd79dc7e -U u59993cf15bc04817809ac861a1d2648f -w&#39;
+Launching 'psql -h localhost -p 10002 -d d5c5aefa6c1b04d2280838d7bcd79dc7e -U u59993cf15bc04817809ac861a1d2648f -w'
 
 psql (9.0.5, server 9.0.4)
-Type &quot;help&quot; for help.
+Type "help" for help.
 
-d5c5aefa6c1b04d2280838d7bcd79dc7e=&gt; select * from stocks_data;
+d5c5aefa6c1b04d2280838d7bcd79dc7e=> select * from stocks_data;
  id | date_analysed | high_price | low_price | closing_price | symbol 
 ----+---------------+------------+-----------+---------------+--------
   1 | 2012-05-08    |        613 |     602.3 |         602.3 | GOOG
@@ -274,40 +255,40 @@ d5c5aefa6c1b04d2280838d7bcd79dc7e=&gt; select * from stocks_data;
   5 | 2012-05-08    |     107.38 |       103 |           103 | VMW
 ...
 </code></pre>
-<p>It worked! Before we press on, now would be a <EM>great</EM> time to shut down the application. It will do you absolutely no good to look up those stocks every ten seconds, inserting new records each time! In a few hours that data set might very well become overwhelming. I suggest you change the frequency (see the comments for a <CODE>cron</CODE> expression that you can use in the <CODE>@Scheduled</CODE> annotation that runs every weekday at 11PM) and then do a <CODE>vmc --path target/appassembler/ update</CODE>, or just leave it stopped. </p>
+<p>有效！在我们继续之前，现在是关闭应用程序的<em>好</em>时机。每十秒钟查找一次这些库存，每次插入新记录，对您绝对没有好处！在几个小时内，该数据集可能会变得不堪重负。我建议您更改频率（可以在每个工作日的晚上11点运行的<code>@Scheduled</code>annotation中使用<code>cron</code>表达式，请参阅注释），然后执行<code>vmc --path target/appassembler/ update</code> ，或者只是使其停止。</p>
 <pre><code class="prettyprint shell">jlongmbp17:cf-workers-batch jlong$ vmc stop batch
-</code></pre><p><P> So, batch processing and job scheduling are two very common use cases that Spring and Spring Batch and Cloud Foundry handle with aplomb. Another (different, but equally common) use case is architecting for ease of scalability. After all, what does it really mean to scale when your next big application is <a href="https://en.wikipedia.org/w/index.php?title=Oprah_Effect&redirect=no"><EM>Oprah&rsquo;d</EM></A> or <a href="https://en.wikipedia.org/wiki/Slashdot_effect"><CODE>/.&rsquo;d</CODE></A>? Let&rsquo;s look at that, now&hellip; </P><br /><h2>Hey! Get to the Back of the Queue!</h2><br /><P> It&rsquo;s slightly counter intuitive, but a system with lots of small, singly focused components is easier to scale out than one monolithic application because individual workloads can be scaled and tuned independent of other parts of the application. Suppose you have a resource starved front-end web application that shouldn&rsquo;t be straddled with slower, perhaps I/O burdened, functionality. An easy way to decouple the main thread from the slower back office process is to introduce a message queue, <A href="http://www.rabbitmq.org">like RabbitMQ</A>. In messaging, we talk about the <EM>aggressive consumer</EM> pattern, where work is enqueued and workers dequeue this work as fast as they&rsquo;re able to complete it. If the workers aren&rsquo;t keeping pace with the availability of new work, it&rsquo;s easy enough to add new workers to pick up the slack: simply <CODE>vmc instances my-backend +10</CODE>! Each individual request may still take a fixed amount of time, but the over all throughput of the system is increased. </P><P> For our next example - which has little to do with our last example except that it&rsquo;s another way to use standalone worker processes on Cloud Foundry - we&rsquo;ll look at building a messaging-oriented service. We&rsquo;ll use <a href="http://rabbitmq.org">RabbitMQ</a>, a world-class message queue that&rsquo;s available on Cloud Foundry as a service. Messaging systems are just well known mailboxes. They accept messages and they distribute messages. By reducing your <EM>API</EM> to a messaging broker like RabbitMQ, which is itself based on a protocol - AMQP - you give your application as friendly as interface as possible. Messaging systems are also asynchronous by their very nature, so they don&rsquo;t impose notions of request/reply exchanges, though that is supported, too. If you want to take advantage of RabbitMQ to integrate with other workers, you can still expose a <EM>facade</EM>, or <EM>gateway</EM> to consumers of your service so that they don&rsquo;t need to know how the service is implemented, if you don&rsquo;t want them to. We&rsquo;ll use Spring Integration, which supports the <a href="http://www.eaipatterns.com/">Enterprise Integration patterns</A>, to build a <EM>messaging gateway</EM> from a Java interface type. </P><br /> <P><br />```java</p><p>public interface StockSymbolLookupClient {<br /> StockSymbolLookup lookupSymbol (String symbol) throws Throwable;<br />}<br />```<br /><P>With Spring Integration&rsquo;s help, calls to this method will result in a message being sent to RabbitMQ where, on the other side, our service will dequeue the message, process it, and then, eventually send a reply back to RabbitMQ, which the caller of this method will receive as the reply value. </P> <P> To configure the client, I used a little bit of Spring Integration to setup the gateway, which then forwards the request to the outbound AMQP gateway adapter.</P></p>
-<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-	&lt;beans:beans ...&gt;
+</code></pre><p></p><p>因此，批处理和作业调度是Spring和Spring Batch和Cloud Foundry认真处理的两个非常常见的用例。另一个（不同但同样普遍）的用例是架构设计，以简化可伸缩性。毕竟，当您的下一个大型应用程序是<a href="https://en.wikipedia.org/w/index.php?title=Oprah_Effect&redirect=no"><em>Oprah'd</em></a>或<a href="https://en.wikipedia.org/wiki/Slashdot_effect"><code>/.’d</code></a>时，扩展真正意味着什么？现在让我们来看一下...</p><br><h2>嘿!到达队列的后面！</h2><br><p>这有点与直观性相反，但是与单个整体应用程序相比，具有许多小型，单独关注组件的系统更易于扩展，因为可以独立于应用程序的其他部分扩展和调整单个工作负载。假设您有一个资源匮乏的前端Web应用程序，该应用程序不应被速度较慢，可能负担I / O的功能所困扰。使主线程与较慢的后台进程脱钩的一种简单方法是引入消息队列， <a href="http://www.rabbitmq.org">例如RabbitMQ</a> 。在消息传递中，我们谈论了<em>积极的消费者</em>模式，即工作入队，工作人员以他们能够完成的速度尽快将其出队。如果工作人员无法跟上新工作的进度，那么添加新工作人员就可以轻松解决问题：只需<code>vmc instances my-backend +10</code> ！每个单独的请求可能仍会花费固定的时间，但是会增加系统的整体吞吐量。</p><p>对于我们的下一个示例-与我们上一个示例几乎没有什么关系，只是它是在Cloud Foundry上使用独立工作进程的另一种方式-我们将研究构建面向消息传递的服务。我们将使用<a href="http://rabbitmq.org">RabbitMQ</a> ，这是世界一流的消息队列，可在Cloud Foundry上作为服务使用。邮件系统只是众所周知的邮箱。他们接受消息并分发消息。通过将您的<em>API</em>简化为RabbitMQ之类的消息传递代理，该代理本身是基于协议AMQP的，您可以为您的应用程序提供尽可能友好的界面。消息传递系统就其本质而言也是异步的，因此尽管也支持，但它们并不强加请求/答复交换的概念。如果您想利用RabbitMQ与其他工作人员集成，您仍然可以向服务的用户公开一个<em>Facade</em>或<em>网关</em> ，这样，如果您不想让他们不需要了解服务的实现方式，至。我们将使用支持<a href="http://www.eaipatterns.com/">企业集成模式的</a> Spring Integration从Java接口类型构建<em>消息传递网关</em> 。</p><br> <p><br>Java</p><p>公共接口StockSymbolLookupClient {<br>StockSymbolLookup lookupSymbol（字符串符号）抛出Throwable；<br>}<br>```<br></p><p>在Spring Integration的帮助下，对该方法的调用将导致一条消息发送到RabbitMQ，在另一方面，我们的服务将使该消息出队，进行处理，然后最终将答复发送回RabbitMQ，RabbitMQ的调用者此方法将作为回复值。</p> <p>为了配置客户端，我使用了一些Spring Integration来设置网关，然后将请求转发到出站AMQP网关适配器。</p><p></p>
+<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
+	<beans:beans ...>
 	    ...
-	    &lt;gateway
-	            service-interface=&quot;org.cloudfoundry.workers.stocks.integration.client.StockClientGateway&quot;
-	            default-request-channel=&quot;outboundSymbolsRequests&quot;
-	            default-reply-channel=&quot;outboundSymbolsReplies&quot;
-	    /&gt;
+	    <gateway
+	            service-interface="org.cloudfoundry.workers.stocks.integration.client.StockClientGateway"
+	            default-request-channel="outboundSymbolsRequests"
+	            default-reply-channel="outboundSymbolsReplies"
+	    />
 
-	    &lt;amqp:outbound-gateway
-	            request-channel=&quot;outboundSymbolsRequests&quot;
-	            reply-channel=&quot;outboundSymbolsReplies&quot;
-	            routing-key=&quot;tickers&quot;
-	            amqp-template=&quot;amqpTemplate&quot;
-	    /&gt;
-	&lt;/beans:beans&gt;
-</code></pre><p><p>I&rsquo;ve omitted the details of the RabbitMQ-specific connection machinery (which, of course, is all being done using the <CODE>cloudfoundry-runtime</CODE> API) - please refer to <a href="https://github.com/cloudfoundry-samples/stock-workers/tree/master/cf-workers-integration-client">the client example</A>. This snippet shows the important bit: Spring will synthesize an implementation at runtime based on the <CODE>StockClientGateway</CODE> <CODE>interface</CODE> which we can inject and then use from our client code to invoke the service. </P><P> On the service side, we need some code to dequeue messages from RabbitMQ, and then forward them to the workhorse, and then ferry the results back through RabbitMQ as the replies. The service side, of course, we can scale out independently of the client side. You might have one client per web application, but ten service implementations running, taking up the slack and absorbing the extra demand. Here&rsquo;s what our service implementation looks like, again omitting RabbitMQ-specific connection beans (<A href="https://github.com/cloudfoundry-samples/stock-workers/tree/master/cf-workers-integration-service">consult the example</a>): </P> </p>
-<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-	&lt;beans:beans ...&gt;
+	    <amqp:outbound-gateway
+	            request-channel="outboundSymbolsRequests"
+	            reply-channel="outboundSymbolsReplies"
+	            routing-key="tickers"
+	            amqp-template="amqpTemplate"
+	    />
+	</beans:beans>
+</code></pre><p></p><p>我已经省略了RabbitMQ专用连接机制的细节（当然，所有连接机制都是使用<code>cloudfoundry-runtime</code> API完成的）-请参阅<a href="https://github.com/cloudfoundry-samples/stock-workers/tree/master/cf-workers-integration-client">客户端示例</a> 。这个片段显示了重要的一点：Spring将在运行时基于<code>StockClientGateway</code> <code>interface</code>综合一个实现，我们可以注入该<code>interface</code> ，然后从客户端代码中使用该<code>interface</code>来调用服务。</p><p>在服务方面，我们需要一些代码来从RabbitMQ出队消息，然后将其转发给主力马，然后将结果作为答复通过RabbitMQ传递回去。服务端，当然，我们可以独立于客户端进行扩展。您可能每个Web应用程序只有一个客户端，但是正在运行十个服务实现，这占用了您的时间并吸收了额外的需求。这是我们的服务实现的样子，再次省略了RabbitMQ特定的连接bean（ <a href="https://github.com/cloudfoundry-samples/stock-workers/tree/master/cf-workers-integration-service">请参阅示例</a> ）：</p> <p></p>
+<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
+	<beans:beans ...>
 	    ...
-	    &lt;amqp:inbound-gateway request-channel=&quot;inboundSymbolsRequests&quot;
-		    queue-names=&quot;tickers&quot;
-		    message-converter=&quot;mc&quot;
-		    connection-factory=&quot;connectionFactory&quot;/&gt;
+	    <amqp:inbound-gateway request-channel="inboundSymbolsRequests"
+		    queue-names="tickers"
+		    message-converter="mc"
+		    connection-factory="connectionFactory"/>
 
-	    &lt;service-activator ref=&quot;client&quot; input-channel=&quot;inboundSymbolsRequests&quot; requires-reply=&quot;true&quot;/&gt;
+	    <service-activator ref="client" input-channel="inboundSymbolsRequests" requires-reply="true"/>
 
-	&lt;/beans:beans&gt;
-</code></pre><p><P> This approach is very powerful. In my example, I&rsquo;m simply deferring the admittedly trivial cost of a RESTful web service call. But you might imagine doing more lengthy things -image processing, batch jobs, large analytics, etc., in this manner. </P> <P> Deployment of this example is slightly more complicated, because there are two pieces. The gateway implementation is a simple bean that Spring Integration makes available as a sort of client-side proxy for the messaging system. We could use the gateway from another background job, or a web application, or anything else. In our case, our client - a Spring MVC application - uses the gateway to invoke the service. The service is what provides the interesting functionality, receiving requests from the provisioned RabbitMQ instance and invoking the stock ticker lookup bean and then returning the results back through RabbitMQ to the requester. We need to deploy the service first. As before, you need to build the whole code base by running <CODE>mvn clean install</CODE> at the root, if you haven&rsquo;t already. Then, from the root of the <CODE>cf-workers-integration-service</CODE> folder, run the following commands:</p>
-<pre><code class="prettyprint shell"><br />jlongmbp17:cf-workers-integration-service jlong$ vmc --path target/appassembler/ push 
-Pushing application &#39;integration-service&#39;...
+	</beans:beans>
+</code></pre><p></p><p>这种方法非常强大。在我的示例中，我只是推迟了RESTful Web服务调用的微不足道的费用。但是您可能会想像用这种方式做更长的事情-图像处理，批处理作业，大型分析等。</p> <p>此示例的部署稍微复杂一些，因为有两部分。网关实现是一个简单的bean，Spring Integration将其用作消息传递系统的一种客户端代理。我们可以使用来自其他后台作业，Web应用程序或其他任何东西的网关。在我们的例子中，我们的客户端-一个Spring MVC应用程序-使用网关来调用服务。该服务提供了有趣的功能，它从已调配的RabbitMQ实例接收请求，并调用股票报价器查找bean，然后将结果通过RabbitMQ返回给请求者。我们需要首先部署服务。和以前一样，您需要通过在根目录上运行<code>mvn clean install</code>来构建整个代码库（如果尚未安装）。然后，从<code>cf-workers-integration-service</code>文件夹的根目录中运行以下命令：</p>
+<pre><code class="prettyprint shell"><br>jlongmbp17:cf-workers-integration-service jlong$ vmc --path target/appassembler/ push 
+Pushing application 'integration-service'...
 Creating Application: OK
 Creating Service [stock_rabbitmq]: OK
 Binding Service [stock_rabbitmq]: OK
@@ -317,11 +298,11 @@ Uploading Application:
   Packing application: OK
   Uploading (44K): OK   
 Push Status: OK
-Staging Application &#39;integration-service&#39;: OK                                   
-Starting Application &#39;integration-service&#39;: OK                                  
-</code></pre><p><P> With the service in place, let&rsquo;s test it out by calling it once from our web client. Return the the <CODE>cf-workers-integration-webclient</CODE> directory. Then, run the same command as with the service. </p>
+Staging Application 'integration-service': OK                                   
+Starting Application 'integration-service': OK                                  
+</code></pre><p></p><p>有了该服务，让我们通过从Web客户端调用一次就可以对其进行测试。返回<code>cf-workers-integration-webclient</code>目录。然后，运行与该服务相同的命令。</p>
 <pre><code class="prettyprint shell">jlongmbp17:cf-workers-integration-webclient jlong$ vmc --path target/cf-workers-integration-webclient-1.0-SNAPSHOT push
-Pushing application &#39;integration-webclient&#39;...
+Pushing application 'integration-webclient'...
 Creating Application: OK
 Binding Service [stock_rabbitmq]: OK
 Uploading Application:
@@ -330,13 +311,12 @@ Uploading Application:
   Packing application: OK
   Uploading (3K): OK   
 Push Status: OK
-Staging Application &#39;integration-webclient&#39;: OK                                 
-Starting Application &#39;integration-webclient&#39;: OK                                                         
-</code></pre><p></P><P> Once the application&rsquo;s been deployed (you can confirm that both are running happily by running <CODE>vmc apps</CODE>). Now, let&rsquo;s open up the client and give our service a try: Open up the URL of the webclient application. In my case, the URL is <a href="http://integration-webclient.cloudfoundry.com/">integration-webclient.cloudfoundry.com</A>. It should give you a pedestrian looking form. Enter a stock symbol (I test with <CODE>VMW</CODE>&hellip;) and then hit <EM>Enter</EM>. You should see data manifest on the page. <div style="float : right; "> <img src="http://blog.springsource.org/wp-content/uploads/2012/05/stock-webclient1.png" width="600" /> </div><br /> If you then consult the logs of <CODE>integration-service</code>, you should see console output reflecting the very same information as you saw in the client. If so, congratulations! </P><br /><h2> Where to go From Here</h2><P> At this point, you&rsquo;ve got a lot of power at your fingertips. Cloud Foundry workers are ideal places to handle the work that doesn&rsquo;t naturally fit inside of an HTTP request processing pipeline. In my experience, this encompasses a good many things: batch processing, integration and messaging code, analytics, reporting, big data and compensatory transactions, and indeed systems exposed over other protocols besides HTTP. </P> </p></div>
+Staging Application 'integration-webclient': OK                                 
+Starting Application 'integration-webclient': OK                                                         
+</code></pre><p></p><p>部署完应用程序后（您可以通过运行<code>vmc apps</code>确认两者均运行良好）。现在，让我们打开客户端并尝试我们的服务：打开webclient应用程序的URL。在我的情况下，URL是<a href="http://integration-webclient.cloudfoundry.com/">Integration-webclient.cloudfoundry.com</a> 。它应该给您看起来像行人的形式。输入一个股票代码（我正在使用<code>VMW</code>测试...），然后<em>按Enter键</em> 。您应该在页面上看到数据清单。</p><div style="float:right"> <img src="http://blog.springsource.org/wp-content/uploads/2012/05/stock-webclient1.png" width="600"> </div><br>如果您随后查询<code>integration-service</code>的日志，则应该看到控制台输出反映的信息与您在客户端看到的信息完全相同。如果是这样，恭喜！<p></p><br><h2>从这往哪儿走</h2><p>在这一点上，您触手可及。Cloud Foundry工作者是处理HTTP请求处理管道中无法自然完成的工作的理想场所。以我的经验，这涉及很多方面：批处理，集成和消息传递代码，分析，报告，大数据和补偿性交易，以及除HTTP之外还通过其他协议公开的系统。</p> <p></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 471;
 
       (function(disqus_shortname, document) {
@@ -350,15 +330,12 @@ Starting Application &#39;integration-webclient&#39;: OK
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -366,23 +343,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -392,17 +365,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -416,18 +387,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

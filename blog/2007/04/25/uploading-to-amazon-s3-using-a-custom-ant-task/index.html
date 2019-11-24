@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Uploading to Amazon S3 using a custom ANT task</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>使用自定义ANT任务上传到Amazon S3</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,34 +16,32 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Uploading to Amazon S3 using a custom ANT task" />
-<meta name="twitter:description" content="&lt;p&gt;One of the interesting side effects of a solid CI structure is that when things are running reliably, new problems start to crop up. Shortly after Spring’s CI system started running smoothly, our occasional space and bandwidth issues on &lt;span style=&quot;font-family:courier&quot;&gt;static.springframework.org&lt;/span&gt; became more pronounced. Colin Sampaleanu had done research earlier on how to alleviate some of these problems and had settled on &lt;a href=&quot;http://aws.amazon.com/s3&quot;&gt;Amazon S3&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Amazon S3 is part of the &lt;a href=&quot;http://aws.amazon.com&quot;&gt;Amazon Web Services&lt;/a&gt; umbrella and provides an incredibly cheap online file storage service. What does ‘incredibly cheap’ mean? Well, from the website, it appears that 1 GB*month of storage costs US$0.15 and 1 GB of bandwidth costs US$0.20. Add to that, a high-bandwidth transparent mirroring service, and S3 becomes very appealing for storing our nightly snapshots. On a tangent, Amazon actually uses the exact same infrastructure internally, so you know that there is a team of admins guaranteeing their five 9’s promise.&lt;/p&gt;
-" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Uploading to Amazon S3 using a custom ANT task">
+<meta name="twitter:description" content="<p>One of the interesting side effects of a solid CI structure is that when things are running reliably, new problems start to crop up. Shortly after Spring’s CI system started running smoothly, our occasional space and bandwidth issues on <span style=" font-family:courie="="></head><body dir="ltr">static.springframework.org became more pronounced. Colin Sampaleanu had done research earlier on how to alleviate some of these problems and had settled on <a href="http://aws.amazon.com/s3">Amazon S3</a>.
+<p>Amazon S3 is part of the <a href="http://aws.amazon.com">Amazon Web Services</a> umbrella and provides an incredibly cheap online file storage service. What does ‘incredibly cheap’ mean? Well, from the website, it appears that 1 GB*month of storage costs US$0.15 and 1 GB of bandwidth costs US$0.20. Add to that, a high-bandwidth transparent mirroring service, and S3 becomes very appealing for storing our nightly snapshots. On a tangent, Amazon actually uses the exact same infrastructure internally, so you know that there is a team of admins guaranteeing their five 9’s promise.</p>
+">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200">
 
-<meta property="og:title" content="Uploading to Amazon S3 using a custom ANT task" />
-<meta property="og:image" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200" />
-<meta property="og:description" content="&lt;p&gt;One of the interesting side effects of a solid CI structure is that when things are running reliably, new problems start to crop up. Shortly after Spring’s CI system started running smoothly, our occasional space and bandwidth issues on &lt;span style=&quot;font-family:courier&quot;&gt;static.springframework.org&lt;/span&gt; became more pronounced. Colin Sampaleanu had done research earlier on how to alleviate some of these problems and had settled on &lt;a href=&quot;http://aws.amazon.com/s3&quot;&gt;Amazon S3&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Amazon S3 is part of the &lt;a href=&quot;http://aws.amazon.com&quot;&gt;Amazon Web Services&lt;/a&gt; umbrella and provides an incredibly cheap online file storage service. What does ‘incredibly cheap’ mean? Well, from the website, it appears that 1 GB*month of storage costs US$0.15 and 1 GB of bandwidth costs US$0.20. Add to that, a high-bandwidth transparent mirroring service, and S3 becomes very appealing for storing our nightly snapshots. On a tangent, Amazon actually uses the exact same infrastructure internally, so you know that there is a team of admins guaranteeing their five 9’s promise.&lt;/p&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2007-04-25 21:24:00.0" />
-</head>
-<body>
+<meta property="og:title" content="Uploading to Amazon S3 using a custom ANT task">
+<meta property="og:image" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200">
+<meta property="og:description" content="<p>One of the interesting side effects of a solid CI structure is that when things are running reliably, new problems start to crop up. Shortly after Spring’s CI system started running smoothly, our occasional space and bandwidth issues on <span style=" font-family:courie="=">static.springframework.org became more pronounced. Colin Sampaleanu had done research earlier on how to alleviate some of these problems and had settled on <a href="http://aws.amazon.com/s3">Amazon S3</a>.
+<p>Amazon S3 is part of the <a href="http://aws.amazon.com">Amazon Web Services</a> umbrella and provides an incredibly cheap online file storage service. What does ‘incredibly cheap’ mean? Well, from the website, it appears that 1 GB*month of storage costs US$0.15 and 1 GB of bandwidth costs US$0.20. Add to that, a high-bandwidth transparent mirroring service, and S3 becomes very appealing for storing our nightly snapshots. On a tangent, Amazon actually uses the exact same infrastructure internally, so you know that there is a team of admins guaranteeing their five 9’s promise.</p>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2007-04-25 21:24:00.0">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -59,16 +51,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -84,9 +76,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -96,40 +88,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -155,61 +137,60 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Uploading to Amazon S3 using a custom ANT task</h1>
+<h1 class="blog--title">使用自定义ANT任务上传到Amazon S3</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=20&amp;d=mm" />
-<a class="author" rel="author" href="/team/bhale">Ben Hale</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=20&d=mm"> <a class="author" rel="author" href="/team/bhale">本·黑尔</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2007-04-25 21:24:00.0">April 25, 2007</time>
+<time class="date" pubdate="" datetime="2007-04-25 21:24:00.0">2007年4月25日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="68" href="/blog/2007/04/25/uploading-to-amazon-s3-using-a-custom-ant-task#disqus_thread">
+<a class="comments" href="/blog/2007/04/25/uploading-to-amazon-s3-using-a-custom-ant-task#disqus_thread" data-disqus-identifier="68">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>One of the interesting side effects of a solid CI structure is that when things are running reliably, new problems start to crop up. Shortly after Spring&rsquo;s CI system started running smoothly, our occasional space and bandwidth issues on <span style="font-family:courier">static.springframework.org</span> became more pronounced. Colin Sampaleanu had done research earlier on how to alleviate some of these problems and had settled on <a href="https://aws.amazon.com/s3">Amazon S3</a>.</p><p>Amazon S3 is part of the <a href="https://aws.amazon.com">Amazon Web Services</a> umbrella and provides an incredibly cheap online file storage service. What does &lsquo;incredibly cheap&rsquo; mean? Well, from the website, it appears that 1 GB*month of storage costs US$0.15 and 1 GB of bandwidth costs US$0.20. Add to that, a high-bandwidth transparent mirroring service, and S3 becomes very appealing for storing our nightly snapshots. On a tangent, Amazon actually uses the exact same infrastructure internally, so you know that there is a team of admins guaranteeing their five 9&rsquo;s promise.</p><p>To use S3 for our nightly snapshots, we first had to replace the old snapshot upload procedure that used <span style="font-family:courier">scp</span>. Looking around I didn&rsquo;t see any ANT tasks that uploaded to S3, so I set out to create my own. My target configuration was very simple:</p>
-<pre><code class="prettyprint xml"><br />&lt;aws:s3 accessKey=&quot;${s3.accessKey}&quot; secretKey=&quot;${s3.secretKey}&quot;&gt;
-	&lt;upload bucketName=&quot;static.springframework.org&quot;
-		file=&quot;${target.release.dir}/${release-with-dependencies.zip}&quot;
-		toFile=&quot;SPR/spring-framework-${spring-version}-with-dependencies-${tstamp}-${build.number}.zip&quot;
-		publicRead=&quot;true&quot;/&gt;
-	&lt;upload bucketName=&quot;static.springframework.org&quot;
-		file=&quot;${target.release.dir}/${release.zip}&quot;
-		toFile=&quot;SPR/spring-framework-${spring-version}-${tstamp}-${build.number}.zip&quot;
-		publicRead=&quot;true&quot;/&gt;
-&lt;/aws:s3&gt;
-</code></pre><p>I wanted to be able to define a single S3 session governed by our access and secret keys (S3&rsquo;s cryptographic login) and execute multiple uploads in that definition. Each upload goes into a &lsquo;bucket&rsquo; which is the only level of granularity S3 provides.</p><p>S3 itself is typically used as a REST-ful service, so it&rsquo;s easy to interact with. For this effort, I used a library called <a href="https://jets3t.dev.java.net/">jets3t</a> (pronounced jet-set). For anyone using S3 with Java, this is the preferred way of using S3 (as far as I could tell, it&rsquo;s the only library endorsed by Amazon). Jets3t uses a similar paradigm to my XML definition (or maybe I used theirs?) in that you create a reference to the server and use that repeatedly to do multiple actions. In the ANT task, I create a set of credentials based on the access and secret keys and bind them into a reference to the service:</p>
-<pre><code class="prettyprint java"><br />AWSCredentials credentials = new AWSCredentials(accessKey, secretKey);
+<div class="blog--post"><p>可靠的CI结构的有趣的副作用之一是，当事情可靠地运行时，就会出现新的问题。在Spring的CI系统开始平稳运行之后不久，我们在<span style="font-family:courier">static.springframework.org</span>上偶尔出现的空间和带宽问题就变得更加明显。Colin Sampaleanu早些时候就如何缓解这些问题进行了研究，并选择了<a href="https://aws.amazon.com/s3">Amazon S3</a> 。</p><p>Amazon S3是<a href="https://aws.amazon.com">Amazon Web Services的</a>一部分，并提供了一种非常便宜的在线文件存储服务。“便宜得令人难以置信”是什么意思？从网站上看，似乎1 GB *月的存储成本为0.15美元，而1 GB带宽的成本为0.20美元。除此之外，高带宽透明镜像服务，S3对于存储我们的夜间快照变得非常有吸引力。从切线上看，亚马逊实际上在内部使用了完全相同的基础架构，因此您知道有一个管理员团队保证兑现其五个9的承诺。</p><p>要将S3用于夜间快照，我们首先必须替换使用<span style="font-family:courier">scp</span>的旧快照上传过程。环顾四周，我没有看到任何上载到S3的ANT任务，因此我着手创建自己的任务。我的目标配置非常简单：</p>
+<pre><code class="prettyprint xml"><br><aws:s3 accessKey="${s3.accessKey}" secretKey="${s3.secretKey}">
+	<upload bucketName="static.springframework.org"
+		file="${target.release.dir}/${release-with-dependencies.zip}"
+		toFile="SPR/spring-framework-${spring-version}-with-dependencies-${tstamp}-${build.number}.zip"
+		publicRead="true"/>
+	<upload bucketName="static.springframework.org"
+		file="${target.release.dir}/${release.zip}"
+		toFile="SPR/spring-framework-${spring-version}-${tstamp}-${build.number}.zip"
+		publicRead="true"/>
+</aws:s3>
+</code></pre><p>我希望能够定义一个由我们的访问和秘密密钥（S3的加密登录名）控制的S3会话，并在该定义中执行多个上载。每次上传都会进入一个“存储桶”，这是S3提供的唯一粒度级别。</p><p>S3本身通常用作REST-ful服务，因此易于交互。为此，我使用了一个名为<a href="https://jets3t.dev.java.net/">jets3t</a> （发音为jet-set）的库。对于将S3与Java结合使用的人，这是使用S3的首选方式（据我所知，这是Amazon认可的唯一库）。Jets3t使用与我的XML定义类似的范例（或者也许我使用了它们的范例？）您将创建对服务器的引用，然后重复使用它来执行多个操作。在ANT任务中，我基于访问密钥和秘密密钥创建了一组凭据，并将它们绑定到对服务的引用中：</p>
+<pre><code class="prettyprint java"><br>AWSCredentials credentials = new AWSCredentials(accessKey, secretKey);
 S3Service service = new RestS3Service(credentials);
 
 for (Upload upload : uploads) {
 	upload.upload(service);
 }
-</code></pre><p>As you can see, I&rsquo;ve modularized the upload action, so that in the future if I need to expand the s3 task to do other things (downloading, setting permissions, etc) I can. The <span style="font-family:courier">Upload</span> object does the heavy lifting. It creates a reference to a bucket based on the <span style="font-family:courier">bucketName</span>, creates a reference to the new object based on the <span style="font-family:courier">toFile</span> value, and then uploads the contents of the file via HTTP.</p>
-<pre><code class="prettyprint java"><br />private S3Bucket getBucket() {
+</code></pre><p>如您所见，我已经对上传操作进行了模块化，以便将来如果需要扩展s3任务来执行其他操作（下载，设置权限等），我可以这样做。The <span style="font-family:courier">Upload</span> object does the heavy lifting. It creates a reference to a bucket based on the <span style="font-family:courier">bucketName</span>, creates a reference to the new object based on the <span style="font-family:courier">toFile</span> value, and then uploads the contents of the file via HTTP.</p>
+<pre><code class="prettyprint java"><br>private S3Bucket getBucket() {
 	return new S3Bucket(bucketName);
 }
 </code></pre>
-<pre><code class="prettyprint java"><br />private S3Object getObject() {
+<pre><code class="prettyprint java"><br>private S3Object getObject() {
 	S3Object object = new S3Object(toFile);
 	if (publicRead) {
 		object.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
@@ -219,10 +200,10 @@ for (Upload upload : uploads) {
 	return object;
 }
 </code></pre>
-<pre><code class="prettyprint java"><br />S3Bucket bucket = getBucket();
+<pre><code class="prettyprint java"><br>S3Bucket bucket = getBucket();
 S3Object object = getObject();
 service.putObject(bucket, object);
-</code></pre><p>In the actual code for this task, I&rsquo;ve added some pretty output so that you can see how fast the file is uploaded and what the upload speed is:</p>
+</code></pre><p>In the actual code for this task, I’ve added some pretty output so that you can see how fast the file is uploaded and what the upload speed is:</p>
 <pre>upload-s3:
    [aws:s3] Uploading /opt/j2ee/domains/springframework.org/build/bamboo-home/xml-data/build-dir/
                 SPR-NIGHTLY/spring/target/release/spring-framework-2.0.5-with-dependencies.zip (65132641B)
@@ -231,12 +212,10 @@ service.putObject(bucket, object);
    [aws:s3] Uploading /opt/j2ee/domains/springframework.org/build/bamboo-home/xml-data/build-dir/
                 SPR-NIGHTLY/spring/target/release/spring-framework-2.0.5.zip (10752085B)
                 to bucket static.springframework.org
-   [aws:s3] Transfer Time: 6.0s - Transfer Rate: 1792014.1B/​s
-</pre><p>The effort was so successful for us that we&rsquo;ve expanded it all of the ANT based builds in the Spring portfolio. The Spring Framework, Spring LDAP, Spring Web Flow, and Spring Modules all now upload to this S3 nightly snapshot repository and on my list of things to do is to give some love to the Maven projects as well. The upshot to this is that we&rsquo;ve freed up over 30GB of space and drastically reduced bandwidth usage all for about US$4.00 over the last two months.</p><p>Since I had to write some code to make this all work, I dropped it into our source control area. I also went ahead and put it up on our internal private Maven repo which is mirrored to the public Maven repo. If you&rsquo;re interested in seeing the code take a look in the <a href="https://springframework.svn.sourceforge.net/svnroot/springframework/spring-aws/">SVN repository</a>. If you&rsquo;d like to use the ANT task you can grab it from Maven with a <span style="font-family:courier">groupId</span> of <span style="font-family:courier">org.springframework.aws</span> and an <span style="font-family:courier">artifactId</span> of <span style="font-family:courier">spring-aws-ant</span>. <b>Please note that this is totally unsupported and undocumented code!</b> What it does is very limited and there are no current plans to improve or document it in any way. If I get some spare time, that might change, but don&rsquo;t count on it :)</p><p>It appears that my flight is landing now, so I&rsquo;ll take this opportunity to finish up. Look for a following post that describes how we build the snapshot download pages so you can grab the snapshots directly from S3.</p></div>
+   [aws:s3] Transfer Time: 6.0s - Transfer Rate: 1792014.1B/​s</pre><p>The effort was so successful for us that we’ve expanded it all of the ANT based builds in the Spring portfolio. The Spring Framework, Spring LDAP, Spring Web Flow, and Spring Modules all now upload to this S3 nightly snapshot repository and on my list of things to do is to give some love to the Maven projects as well. The upshot to this is that we’ve freed up over 30GB of space and drastically reduced bandwidth usage all for about US$4.00 over the last two months.</p><p>Since I had to write some code to make this all work, I dropped it into our source control area. I also went ahead and put it up on our internal private Maven repo which is mirrored to the public Maven repo. If you’re interested in seeing the code take a look in the <a href="https://springframework.svn.sourceforge.net/svnroot/springframework/spring-aws/">SVN repository</a>. If you’d like to use the ANT task you can grab it from Maven with a <span style="font-family:courier">groupId</span> of <span style="font-family:courier">org.springframework.aws</span> and an <span style="font-family:courier">artifactId</span> of <span style="font-family:courier">spring-aws-ant</span>. <b>Please note that this is totally unsupported and undocumented code!</b> What it does is very limited and there are no current plans to improve or document it in any way. If I get some spare time, that might change, but don’t count on it :)</p><p>看来我的航班现在正在降落，所以我将借此机会结束。寻找以下说明我们如何构建快照下载页面的帖子，以便您可以直接从S3抓取快照。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 68;
 
       (function(disqus_shortname, document) {
@@ -250,15 +229,12 @@ service.putObject(bucket, object);
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -266,23 +242,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -292,17 +264,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -316,18 +286,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

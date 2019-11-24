@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Micrometer: Spring Boot 2&#39;s new application metrics collector</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>千分尺：Spring Boot 2的新应用程序指标收集器</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,137 +16,135 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Micrometer: Spring Boot 2&#39;s new application metrics collector" />
-<meta name="twitter:description" content="&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt; 
- &lt;div id=&quot;toctitle&quot;&gt;
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Micrometer: Spring Boot 2's new application metrics collector">
+<meta name="twitter:description" class="toc" content="<div id=" to="="> 
+ </head><body dir="ltr"><div id="toctitle">
   Table of Contents
- &lt;/div&gt; 
- &lt;ul class=&quot;sectlevel1&quot;&gt; 
-  &lt;li&gt;&lt;a href=&quot;#what-is-it&quot;&gt;What is it?&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#what-do-i-get-out-of-the-box&quot;&gt;What do I get out of the box?&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#which-monitoring-systems-does-micrometer-support&quot;&gt;Which monitoring systems does Micrometer support?&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#the-distinction-between-metrics-and-tracing&quot;&gt;The distinction between metrics and tracing&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#the-importance-of-dimensionality&quot;&gt;The importance of dimensionality&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#meter-filters&quot;&gt;Meter filters&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#why-the-actuator-metrics-endpoint-changed-in-spring-boot-2&quot;&gt;Why the /actuator/metrics endpoint changed in Spring Boot 2&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#get-involved&quot;&gt;Get involved&lt;/a&gt;&lt;/li&gt; 
- &lt;/ul&gt; 
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt; 
- &lt;h2 id=&quot;what-is-it&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#what-is-it&quot;&gt;&lt;/a&gt;What is it?&lt;/h2&gt; 
- &lt;div class=&quot;sectionbody&quot;&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Micrometer is a &lt;em&gt;dimensional-first&lt;/em&gt; metrics collection facade whose aim is to allow you to time, count, and gauge your code with a vendor neutral API. Through classpath and configuration, you may select one or several monitoring systems to export your metrics data to. Think of it like SLF4J, but for metrics!&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Micrometer is the metrics collection facility included in Spring Boot 2’s Actuator. It has also been &lt;a href=&quot;https://micrometer.io/docs/ref/spring/1.5&quot;&gt;backported&lt;/a&gt; to Spring Boot 1.5, 1.4, and 1.3 with the addition of another dependency.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Micrometer adds richer meter primitives to the counters and gauges that existed in Spring Boot 1. For example, a single Micrometer &lt;code&gt;Timer&lt;/code&gt; is capable of producing time series related to throughput, total time, maximum latency of recent samples, pre-computed percentiles, percentile histograms, and SLA boundary counts.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;imageblock&quot;&gt; 
-   &lt;div class=&quot;content&quot;&gt; 
-    &lt;img src=&quot;https://raw.githubusercontent.com/micrometer-metrics/micrometer-docs/665b47c637743d6a7a328f42ad15b62e0c3130d5/blogs/spring/timer-example-3-15-18.png&quot; alt=&quot;An Kibana-rendered timer&quot;&gt; 
-   &lt;/div&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Despite its focus on dimensional metrics, Micrometer does map to hierarchical names to continue to serve older monitoring solutions like Ganglia or narrower scoped tools like JMX. The change to Micrometer arose out of a desire to better serve a wave of dimensional monitoring systems (think Prometheus, Datadog, Wavefront, SignalFx, Influx, etc). One of Spring’s strengths is the enablement of choice through abstraction. By integrating with Micrometer, Spring Boot is enabling you to choose one or more monitoring systems to use today, and change your mind later as your needs change without requiring a rewrite of your custom metrics instrumentation.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Before opting to develop &quot;yet another&quot; metrics collection library, we looked hard at existing or up-and-coming dimensional collectors. But as we looked at exporting to more and more monitoring systems, the importance of the structure of names and data became apparent. Micrometer builds in concepts of naming convention normalization, base unit of time scaling, and support for proprietary expressions of structures like histogram data that are essential to make metrics shine in each target system. Along the way, we added meter filtering as well, allowing you to exercise greater control over the instrumentation of your upstream dependencies.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;admonitionblock tip&quot;&gt; 
-   &lt;table&gt; 
-    &lt;tbody&gt;
-     &lt;tr&gt; 
-      &lt;td class=&quot;icon&quot;&gt; 
-       &lt;div class=&quot;title&quot;&gt;
-        Tip
-       &lt;/div&gt; &lt;/td&gt; 
-      &lt;td class=&quot;content&quot;&gt; To learn more about Micrometer’s capabilities, please refer to its &lt;a href=&quot;https://micrometer.io/docs&quot;&gt;reference documentation&lt;/a&gt;, in particular the &lt;a href=&quot;https://micrometer.io/docs/concepts&quot;&gt;concepts section&lt;/a&gt;. &lt;/td&gt; 
-     &lt;/tr&gt; 
-    &lt;/tbody&gt;
-   &lt;/table&gt; 
-  &lt;/div&gt; 
- &lt;/div&gt; 
-&lt;/div&gt;
-" />
-<meta name="twitter:creator" content="@jon_k_schneider" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/acdea246313ec67505a196fff761e514?s=200" />
+ </div> 
+ <ul class="sectlevel1"> 
+  <li><a href="#what-is-it">What is it?</a></li> 
+  <li><a href="#what-do-i-get-out-of-the-box">What do I get out of the box?</a></li> 
+  <li><a href="#which-monitoring-systems-does-micrometer-support">Which monitoring systems does Micrometer support?</a></li> 
+  <li><a href="#the-distinction-between-metrics-and-tracing">The distinction between metrics and tracing</a></li> 
+  <li><a href="#the-importance-of-dimensionality">The importance of dimensionality</a></li> 
+  <li><a href="#meter-filters">Meter filters</a></li> 
+  <li><a href="#why-the-actuator-metrics-endpoint-changed-in-spring-boot-2">Why the /actuator/metrics endpoint changed in Spring Boot 2</a></li> 
+  <li><a href="#get-involved">Get involved</a></li> 
+ </ul> 
 
-<meta property="og:title" content="Micrometer: Spring Boot 2&#39;s new application metrics collector" />
-<meta property="og:image" content="https://gravatar.com/avatar/acdea246313ec67505a196fff761e514?s=200" />
-<meta property="og:description" content="&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt; 
- &lt;div id=&quot;toctitle&quot;&gt;
+<div class="sect1"> 
+ <h2 id="what-is-it"><a class="anchor" href="#what-is-it"></a>What is it?</h2> 
+ <div class="sectionbody"> 
+  <div class="paragraph"> 
+   <p>Micrometer is a <em>dimensional-first</em> metrics collection facade whose aim is to allow you to time, count, and gauge your code with a vendor neutral API. Through classpath and configuration, you may select one or several monitoring systems to export your metrics data to. Think of it like SLF4J, but for metrics!</p> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Micrometer is the metrics collection facility included in Spring Boot 2’s Actuator. It has also been <a href="https://micrometer.io/docs/ref/spring/1.5">backported</a> to Spring Boot 1.5, 1.4, and 1.3 with the addition of another dependency.</p> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Micrometer adds richer meter primitives to the counters and gauges that existed in Spring Boot 1. For example, a single Micrometer <code>Timer</code> is capable of producing time series related to throughput, total time, maximum latency of recent samples, pre-computed percentiles, percentile histograms, and SLA boundary counts.</p> 
+  </div> 
+  <div class="imageblock"> 
+   <div class="content"> 
+    <img src="https://raw.githubusercontent.com/micrometer-metrics/micrometer-docs/665b47c637743d6a7a328f42ad15b62e0c3130d5/blogs/spring/timer-example-3-15-18.png" alt="一个Kibana渲染的计时器"> 
+   </div> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Despite its focus on dimensional metrics, Micrometer does map to hierarchical names to continue to serve older monitoring solutions like Ganglia or narrower scoped tools like JMX. The change to Micrometer arose out of a desire to better serve a wave of dimensional monitoring systems (think Prometheus, Datadog, Wavefront, SignalFx, Influx, etc). One of Spring’s strengths is the enablement of choice through abstraction. By integrating with Micrometer, Spring Boot is enabling you to choose one or more monitoring systems to use today, and change your mind later as your needs change without requiring a rewrite of your custom metrics instrumentation.</p> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Before opting to develop "yet another" metrics collection library, we looked hard at existing or up-and-coming dimensional collectors. But as we looked at exporting to more and more monitoring systems, the importance of the structure of names and data became apparent. Micrometer builds in concepts of naming convention normalization, base unit of time scaling, and support for proprietary expressions of structures like histogram data that are essential to make metrics shine in each target system. Along the way, we added meter filtering as well, allowing you to exercise greater control over the instrumentation of your upstream dependencies.</p> 
+  </div> 
+  <div class="admonitionblock tip"> 
+   <table> 
+    <tbody>
+     <tr> 
+      <td class="icon"> 
+       <div class="title">
+        Tip
+       </div> </td> 
+      <td class="content"> To learn more about Micrometer’s capabilities, please refer to its <a href="https://micrometer.io/docs">reference documentation</a>, in particular the <a href="https://micrometer.io/docs/concepts">concepts section</a>. </td> 
+     </tr> 
+    </tbody>
+   </table> 
+  </div> 
+ </div> 
+</div>
+">
+<meta name="twitter:creator" content="@jon_k_schneider">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/acdea246313ec67505a196fff761e514?s=200">
+
+<meta property="og:title" content="Micrometer: Spring Boot 2's new application metrics collector">
+<meta property="og:image" content="https://gravatar.com/avatar/acdea246313ec67505a196fff761e514?s=200">
+<meta class="toc" property="og:description" content="<div id=" to="="> 
+ <div id="toctitle">
   Table of Contents
- &lt;/div&gt; 
- &lt;ul class=&quot;sectlevel1&quot;&gt; 
-  &lt;li&gt;&lt;a href=&quot;#what-is-it&quot;&gt;What is it?&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#what-do-i-get-out-of-the-box&quot;&gt;What do I get out of the box?&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#which-monitoring-systems-does-micrometer-support&quot;&gt;Which monitoring systems does Micrometer support?&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#the-distinction-between-metrics-and-tracing&quot;&gt;The distinction between metrics and tracing&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#the-importance-of-dimensionality&quot;&gt;The importance of dimensionality&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#meter-filters&quot;&gt;Meter filters&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#why-the-actuator-metrics-endpoint-changed-in-spring-boot-2&quot;&gt;Why the /actuator/metrics endpoint changed in Spring Boot 2&lt;/a&gt;&lt;/li&gt; 
-  &lt;li&gt;&lt;a href=&quot;#get-involved&quot;&gt;Get involved&lt;/a&gt;&lt;/li&gt; 
- &lt;/ul&gt; 
-&lt;/div&gt;
-&lt;div class=&quot;sect1&quot;&gt; 
- &lt;h2 id=&quot;what-is-it&quot;&gt;&lt;a class=&quot;anchor&quot; href=&quot;#what-is-it&quot;&gt;&lt;/a&gt;What is it?&lt;/h2&gt; 
- &lt;div class=&quot;sectionbody&quot;&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Micrometer is a &lt;em&gt;dimensional-first&lt;/em&gt; metrics collection facade whose aim is to allow you to time, count, and gauge your code with a vendor neutral API. Through classpath and configuration, you may select one or several monitoring systems to export your metrics data to. Think of it like SLF4J, but for metrics!&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Micrometer is the metrics collection facility included in Spring Boot 2’s Actuator. It has also been &lt;a href=&quot;https://micrometer.io/docs/ref/spring/1.5&quot;&gt;backported&lt;/a&gt; to Spring Boot 1.5, 1.4, and 1.3 with the addition of another dependency.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Micrometer adds richer meter primitives to the counters and gauges that existed in Spring Boot 1. For example, a single Micrometer &lt;code&gt;Timer&lt;/code&gt; is capable of producing time series related to throughput, total time, maximum latency of recent samples, pre-computed percentiles, percentile histograms, and SLA boundary counts.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;imageblock&quot;&gt; 
-   &lt;div class=&quot;content&quot;&gt; 
-    &lt;img src=&quot;https://raw.githubusercontent.com/micrometer-metrics/micrometer-docs/665b47c637743d6a7a328f42ad15b62e0c3130d5/blogs/spring/timer-example-3-15-18.png&quot; alt=&quot;An Kibana-rendered timer&quot;&gt; 
-   &lt;/div&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Despite its focus on dimensional metrics, Micrometer does map to hierarchical names to continue to serve older monitoring solutions like Ganglia or narrower scoped tools like JMX. The change to Micrometer arose out of a desire to better serve a wave of dimensional monitoring systems (think Prometheus, Datadog, Wavefront, SignalFx, Influx, etc). One of Spring’s strengths is the enablement of choice through abstraction. By integrating with Micrometer, Spring Boot is enabling you to choose one or more monitoring systems to use today, and change your mind later as your needs change without requiring a rewrite of your custom metrics instrumentation.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;paragraph&quot;&gt; 
-   &lt;p&gt;Before opting to develop &quot;yet another&quot; metrics collection library, we looked hard at existing or up-and-coming dimensional collectors. But as we looked at exporting to more and more monitoring systems, the importance of the structure of names and data became apparent. Micrometer builds in concepts of naming convention normalization, base unit of time scaling, and support for proprietary expressions of structures like histogram data that are essential to make metrics shine in each target system. Along the way, we added meter filtering as well, allowing you to exercise greater control over the instrumentation of your upstream dependencies.&lt;/p&gt; 
-  &lt;/div&gt; 
-  &lt;div class=&quot;admonitionblock tip&quot;&gt; 
-   &lt;table&gt; 
-    &lt;tbody&gt;
-     &lt;tr&gt; 
-      &lt;td class=&quot;icon&quot;&gt; 
-       &lt;div class=&quot;title&quot;&gt;
+ </div> 
+ <ul class="sectlevel1"> 
+  <li><a href="#what-is-it">What is it?</a></li> 
+  <li><a href="#what-do-i-get-out-of-the-box">What do I get out of the box?</a></li> 
+  <li><a href="#which-monitoring-systems-does-micrometer-support">Which monitoring systems does Micrometer support?</a></li> 
+  <li><a href="#the-distinction-between-metrics-and-tracing">The distinction between metrics and tracing</a></li> 
+  <li><a href="#the-importance-of-dimensionality">The importance of dimensionality</a></li> 
+  <li><a href="#meter-filters">Meter filters</a></li> 
+  <li><a href="#why-the-actuator-metrics-endpoint-changed-in-spring-boot-2">Why the /actuator/metrics endpoint changed in Spring Boot 2</a></li> 
+  <li><a href="#get-involved">Get involved</a></li> 
+ </ul> 
+
+<div class="sect1"> 
+ <h2 id="what-is-it"><a class="anchor" href="#what-is-it"></a>What is it?</h2> 
+ <div class="sectionbody"> 
+  <div class="paragraph"> 
+   <p>Micrometer is a <em>dimensional-first</em> metrics collection facade whose aim is to allow you to time, count, and gauge your code with a vendor neutral API. Through classpath and configuration, you may select one or several monitoring systems to export your metrics data to. Think of it like SLF4J, but for metrics!</p> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Micrometer is the metrics collection facility included in Spring Boot 2’s Actuator. It has also been <a href="https://micrometer.io/docs/ref/spring/1.5">backported</a> to Spring Boot 1.5, 1.4, and 1.3 with the addition of another dependency.</p> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Micrometer adds richer meter primitives to the counters and gauges that existed in Spring Boot 1. For example, a single Micrometer <code>Timer</code> is capable of producing time series related to throughput, total time, maximum latency of recent samples, pre-computed percentiles, percentile histograms, and SLA boundary counts.</p> 
+  </div> 
+  <div class="imageblock"> 
+   <div class="content"> 
+    <img src="https://raw.githubusercontent.com/micrometer-metrics/micrometer-docs/665b47c637743d6a7a328f42ad15b62e0c3130d5/blogs/spring/timer-example-3-15-18.png" alt="一个Kibana渲染的计时器"> 
+   </div> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Despite its focus on dimensional metrics, Micrometer does map to hierarchical names to continue to serve older monitoring solutions like Ganglia or narrower scoped tools like JMX. The change to Micrometer arose out of a desire to better serve a wave of dimensional monitoring systems (think Prometheus, Datadog, Wavefront, SignalFx, Influx, etc). One of Spring’s strengths is the enablement of choice through abstraction. By integrating with Micrometer, Spring Boot is enabling you to choose one or more monitoring systems to use today, and change your mind later as your needs change without requiring a rewrite of your custom metrics instrumentation.</p> 
+  </div> 
+  <div class="paragraph"> 
+   <p>Before opting to develop "yet another" metrics collection library, we looked hard at existing or up-and-coming dimensional collectors. But as we looked at exporting to more and more monitoring systems, the importance of the structure of names and data became apparent. Micrometer builds in concepts of naming convention normalization, base unit of time scaling, and support for proprietary expressions of structures like histogram data that are essential to make metrics shine in each target system. Along the way, we added meter filtering as well, allowing you to exercise greater control over the instrumentation of your upstream dependencies.</p> 
+  </div> 
+  <div class="admonitionblock tip"> 
+   <table> 
+    <tbody>
+     <tr> 
+      <td class="icon"> 
+       <div class="title">
         Tip
-       &lt;/div&gt; &lt;/td&gt; 
-      &lt;td class=&quot;content&quot;&gt; To learn more about Micrometer’s capabilities, please refer to its &lt;a href=&quot;https://micrometer.io/docs&quot;&gt;reference documentation&lt;/a&gt;, in particular the &lt;a href=&quot;https://micrometer.io/docs/concepts&quot;&gt;concepts section&lt;/a&gt;. &lt;/td&gt; 
-     &lt;/tr&gt; 
-    &lt;/tbody&gt;
-   &lt;/table&gt; 
-  &lt;/div&gt; 
- &lt;/div&gt; 
-&lt;/div&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2018-03-16 14:50:00.0" />
-</head>
-<body>
+       </div> </td> 
+      <td class="content"> To learn more about Micrometer’s capabilities, please refer to its <a href="https://micrometer.io/docs">reference documentation</a>, in particular the <a href="https://micrometer.io/docs/concepts">concepts section</a>. </td> 
+     </tr> 
+    </tbody>
+   </table> 
+  </div> 
+ </div> 
+</div>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2018-03-16 14:50:00.0">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -162,16 +154,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -187,9 +179,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -199,40 +191,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -258,476 +240,151 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Micrometer: Spring Boot 2&#39;s new application metrics collector</h1>
+<h1 class="blog--title">千分尺：Spring Boot 2的新应用程序指标收集器</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/acdea246313ec67505a196fff761e514?s=20&amp;d=mm" />
-<span class="author">Jon Schneider</span>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/acdea246313ec67505a196fff761e514?s=20&d=mm"> <span class="author">乔恩·施耐德</span>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2018-03-16 14:50:00.0">March 16, 2018</time>
+<time class="date" pubdate="" datetime="2018-03-16 14:50:00.0">2018年3月16日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="3209" href="/blog/2018/03/16/micrometer-spring-boot-2-s-new-application-metrics-collector#disqus_thread">
+<a class="comments" href="/blog/2018/03/16/micrometer-spring-boot-2-s-new-application-metrics-collector#disqus_thread" data-disqus-identifier="3209">
 </a></div>
 </div>
 </header>
 <div class="blog--post"><div id="toc" class="toc">
-<div id="toctitle">Table of Contents</div>
+<div id="toctitle">目录</div>
 <ul class="sectlevel1">
-<li><a href="#what-is-it">What is it?</a></li>
-<li><a href="#what-do-i-get-out-of-the-box">What do I get out of the box?</a></li>
-<li><a href="#which-monitoring-systems-does-micrometer-support">Which monitoring systems does Micrometer support?</a></li>
-<li><a href="#the-distinction-between-metrics-and-tracing">The distinction between metrics and tracing</a></li>
-<li><a href="#the-importance-of-dimensionality">The importance of dimensionality</a></li>
-<li><a href="#meter-filters">Meter filters</a></li>
-<li><a href="#why-the-actuator-metrics-endpoint-changed-in-spring-boot-2">Why the /actuator/metrics endpoint changed in Spring Boot 2</a></li>
-<li><a href="#get-involved">Get involved</a></li>
+<li><a href="#what-is-it">它是什么？</a></li>
+<li><a href="#what-do-i-get-out-of-the-box">开箱即用</a></li>
+<li><a href="#which-monitoring-systems-does-micrometer-support">千分尺支持哪些监视系统？</a></li>
+<li><a href="#the-distinction-between-metrics-and-tracing">指标和跟踪之间的区别</a></li>
+<li><a href="#the-importance-of-dimensionality">尺寸的重要性</a></li>
+<li><a href="#meter-filters">仪表过滤器</a></li>
+<li><a href="#why-the-actuator-metrics-endpoint-changed-in-spring-boot-2">为什么/ actuator / metrics端点在Spring Boot 2中发生了变化</a></li>
+<li><a href="#get-involved">参与其中</a></li>
 </ul>
 </div>
 <div class="sect1">
-<h2 id="what-is-it"><a class="anchor" href="#what-is-it"></a>What is it?</h2>
+<h2 id="what-is-it"><a class="anchor" href="#what-is-it"></a>它是什么？</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Micrometer is a <em>dimensional-first</em> metrics collection facade whose aim is to allow you to time, count, and gauge your code with a vendor neutral API. Through classpath and configuration, you may select one or several monitoring systems to export your metrics data to. Think of it like SLF4J, but for metrics!</p>
+<p>千分尺是一种<em>尺寸优先的</em>度量标准收集外观，其目的是允许您使用供应商中性API来计时，计数和评估代码。通过类路径和配置，您可以选择一个或多个监视系统来将指标数据导出到其中。可以将其像SLF4J一样，但是用于度量！</p>
 </div>
 <div class="paragraph">
-<p>Micrometer is the metrics collection facility included in Spring Boot 2&#8217;s Actuator. It has also been <a href="https://micrometer.io/docs/ref/spring/1.5">backported</a> to Spring Boot 1.5, 1.4, and 1.3 with the addition of another dependency.</p>
+<p>千分尺是Spring Boot 2的执行器中包含的指标收集工具。还添加了另一个依赖项，将其<a href="https://micrometer.io/docs/ref/spring/1.5">反向移植</a>到Spring Boot <a href="https://micrometer.io/docs/ref/spring/1.5">1.5、1.4</a>和1.3。</p>
 </div>
 <div class="paragraph">
-<p>Micrometer adds richer meter primitives to the counters and gauges that existed in Spring Boot 1. For example, a single Micrometer <code>Timer</code> is capable of producing time series related to throughput, total time, maximum latency of recent samples, pre-computed percentiles, percentile histograms, and SLA boundary counts.</p>
+<p>千分尺为Spring Boot 1中存在的计数器和仪表增加了更丰富的仪表原语。例如，单个千分尺<code>Timer</code>能够生成与吞吐量，总时间，最近采样的最大等待时间，预先计算的百分位数，百分位数直方图和SLA边界计数相关的时间序列。</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="https://raw.githubusercontent.com/micrometer-metrics/micrometer-docs/665b47c637743d6a7a328f42ad15b62e0c3130d5/blogs/spring/timer-example-3-15-18.png" alt="An Kibana-rendered timer">
+<img src="https://raw.githubusercontent.com/micrometer-metrics/micrometer-docs/665b47c637743d6a7a328f42ad15b62e0c3130d5/blogs/spring/timer-example-3-15-18.png" alt="一个Kibana渲染的计时器">
 </div>
 </div>
 <div class="paragraph">
-<p>Despite its focus on dimensional metrics, Micrometer does map to hierarchical names to continue to serve older monitoring solutions like Ganglia or narrower scoped tools like JMX. The change to Micrometer arose out of a desire to better serve a wave of dimensional monitoring systems (think Prometheus, Datadog, Wavefront, SignalFx, Influx, etc). One of Spring&#8217;s strengths is the enablement of choice through abstraction. By integrating with Micrometer, Spring Boot is enabling you to choose one or more monitoring systems to use today, and change your mind later as your needs change without requiring a rewrite of your custom metrics instrumentation.</p>
+<p>尽管Micrometer专注于维度指标，但它确实映射到层次结构名称，以继续为Ganglia等较早的监视解决方案或JMX等较窄范围的工具提供服务。出于对更好地服务于一系列尺寸监控系统（例如Prometheus，Datadog，Wavefront，SignalFx，Influx等）的需求，对Micrometer进行了更改。Spring的优势之一是通过抽象实现选择。通过与Micrometer集成，Spring Boot使您能够选择一个或多个今天要使用的监控系统，并在以后需求改变时改变主意，而无需重写自定义指标工具。</p>
 </div>
 <div class="paragraph">
-<p>Before opting to develop "yet another" metrics collection library, we looked hard at existing or up-and-coming dimensional collectors. But as we looked at exporting to more and more monitoring systems, the importance of the structure of names and data became apparent. Micrometer builds in concepts of naming convention normalization, base unit of time scaling, and support for proprietary expressions of structures like histogram data that are essential to make metrics shine in each target system. Along the way, we added meter filtering as well, allowing you to exercise greater control over the instrumentation of your upstream dependencies.</p>
+<p>在选择开发“又一个”度量标准收集库之前，我们仔细研究了现有的或即将出现的维度收集器。但是，当我们考虑将其导出到越来越多的监视系统时，名称和数据结构的重要性变得显而易见。千分尺内置了命名约定规范化，时间缩放的基本单位以及对结构专有表达式（如直方图数据）的支持的概念，这些对于使指标在每个目标系统中发挥作用至关重要。在此过程中，我们还添加了仪表过滤功能，使您可以更好地控制上游依赖项的检测。</p>
 </div>
 <div class="admonitionblock tip">
 <table>
-<tr>
+<tbody><tr>
 <td class="icon">
-<div class="title">Tip</div>
+<div class="title">小费</div>
 </td>
-<td class="content">
-To learn more about Micrometer’s capabilities, please refer to its <a href="https://micrometer.io/docs">reference documentation</a>, in particular the <a href="https://micrometer.io/docs/concepts">concepts section</a>.
+<td class="content">要了解有关Micrometer功能的更多信息，请参阅其<a href="https://micrometer.io/docs">参考文档</a> ，特别是<a href="https://micrometer.io/docs/concepts">概念部分</a> 。
 </td>
 </tr>
-</table>
+</tbody></table>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="what-do-i-get-out-of-the-box"><a class="anchor" href="#what-do-i-get-out-of-the-box"></a>What do I get out of the box?</h2>
+<h2 id="what-do-i-get-out-of-the-box"><a class="anchor" href="#what-do-i-get-out-of-the-box"></a>开箱即用</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Spring Boot 2 <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-metrics-meter">autoconfigures</a> quite a few metrics for you, including:</p>
+<p>Spring Boot 2为您<a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-metrics-meter">自动配置</a>了许多指标，包括：</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>JVM, report utilization of:</p>
+<p>JVM，报告以下方面的利用率：</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Various memory and buffer pools</p>
+<p>各种内存和缓冲池</p>
 </li>
 <li>
-<p>Statistics related to garbage collection</p>
+<p>与垃圾收集有关的统计数据</p>
 </li>
 <li>
-<p>Thread utilization</p>
+<p>线程利用率</p>
 </li>
 <li>
-<p>Number of classes loaded/unloaded</p>
+<p>加载/卸载的类数</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>CPU usage</p>
+<p>CPU使用率</p>
 </li>
 <li>
-<p>Spring MVC and WebFlux request latencies</p>
+<p>Spring MVC和WebFlux请求延迟</p>
 </li>
 <li>
-<p>RestTemplate latencies</p>
+<p>RestTemplate延迟</p>
 </li>
 <li>
-<p>Cache utilization</p>
+<p>缓存利用率</p>
 </li>
 <li>
-<p>Datasource utilization, including HikariCP pool metrics</p>
+<p>数据源利用率，包括HikariCP池指标</p>
 </li>
 <li>
-<p>RabbitMQ connection factories</p>
+<p>RabbitMQ连接工厂</p>
 </li>
 <li>
-<p>File descriptor usage</p>
+<p>文件描述符的用法</p>
 </li>
 <li>
-<p>Logback: record the number of events logged to Logback at each level</p>
+<p>Logback：记录每个级别记录到Logback的事件数</p>
 </li>
 <li>
-<p>Uptime: report a gauge for uptime and a fixed gauge representing the application’s absolute start time</p>
+<p>正常运行时间：报告正常运行时间的量度和代表应用程序绝对启动时间的固定量度</p>
 </li>
 <li>
-<p>Tomcat usage</p>
+<p>Tomcat用法</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Many of these metrics existed in a form in Spring Boot 1, but have been enriched with greater detail and tags in Spring Boot 2.</p>
+<p>这些指标中的许多指标在Spring Boot 1中以表格的形式存在，但在Spring Boot 2中已包含更多详细信息和标签。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="which-monitoring-systems-does-micrometer-support"><a class="anchor" href="#which-monitoring-systems-does-micrometer-support"></a>Which monitoring systems does Micrometer support?</h2>
+<h2 id="which-monitoring-systems-does-micrometer-support"><a class="anchor" href="#which-monitoring-systems-does-micrometer-support"></a>千分尺支持哪些监视系统？</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Micrometer provides a vendor-neutral metrics collection API (rooted in <code>io.micrometer.core.instrument.MeterRegistry</code>) and implementations for a variety of monitoring systems:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Netflix Atlas</p>
-</li>
-<li>
-<p>CloudWatch</p>
-</li>
-<li>
-<p>Datadog</p>
-</li>
-<li>
-<p>Ganglia</p>
-</li>
-<li>
-<p>Graphite</p>
-</li>
-<li>
-<p>InfluxDB</p>
-</li>
-<li>
-<p>JMX</p>
-</li>
-<li>
-<p>New Relic</p>
-</li>
-<li>
-<p>Prometheus</p>
-</li>
-<li>
-<p>SignalFx</p>
-</li>
-<li>
-<p>StatsD (Etsy, dogstatsd, Telegraf, and proprietary formats)</p>
-</li>
-<li>
-<p>Wavefront</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Support for additional systems is underway or planned for the 1.1.0 release slated for mid-2018:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>AppOptics</p>
-</li>
-<li>
-<p>Azure Application Insights</p>
-</li>
-<li>
-<p>Dynatrace</p>
-</li>
-<li>
-<p>Elasticsearch</p>
-</li>
-<li>
-<p>StackDriver</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Spring Boot 2 configures a composite <code>MeterRegistry</code> to which any number of registry implementations can be added, allowing you to ship your metrics to more than one monitoring system. Through, <code>MeterRegistryCustomizer</code>, you can <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-metrics-getting-started">customize</a> the whole set of registries at once or individual implementations in particular. For example, a commonly requested setup is to (1) export metrics to both Prometheus and CloudWatch, (2) add a set of common tags to metrics flowing to both (for example, host and application identifying tags) and (3) whitelist only a small subset of metrics to CloudWatch.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="the-distinction-between-metrics-and-tracing"><a class="anchor" href="#the-distinction-between-metrics-and-tracing"></a>The distinction between metrics and tracing</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>By metrics, we specifically mean the class of information that allows you to reason about the performance of a system in the aggregate (across different components of a single app, instances of an in a cluster, clusters operating in different environments or regions, etc.).</p>
-</div>
-<div class="paragraph">
-<p>Notably this excludes information intended to reason about the contribution of various components to the total latency of a single request as it passes through a series of services; this is the responsibility of distributed tracing collectors like <a href="https://github.com/spring-cloud/spring-cloud-sleuth">Spring Cloud Sleuth</a>, Zipkin&#8217;s <a href="https://github.com/openzipkin/brave">Brave</a>, etc.</p>
-</div>
-<div class="paragraph">
-<p>Distributed tracing systems provide detailed information about subsystem latency, but generally downsample in order to scale (e.g. Spring Cloud Sleuth ships 10% of samples by default). Metrics data is generally pre-aggregated and so naturally lacks correlative information, but is also <em>not</em> downsampled. So, for a series of 100,000 requests in a minute interval that feature an interaction with service A and, depending on the input, maybe an interaction with service B:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Metrics data will tell you that in the aggregate, service A&#8217;s observed throughput was 100k requests and service B&#8217;s observed throughput was 60k requests. Additionally, in that minute, service A&#8217;s max overall average latency was 100ms and service B&#8217;s max overall average latency was 50ms. It will also provide information on maximum latencies and other distribution statistics in that period.</p>
-</li>
-<li>
-<p>A distributed tracing system will tell you that for a <em>particular request</em> (but not the entire population of requests, because remember downsampling is happening), service A took 50 ms and service B took 90ms.</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>You might reasonably infer from the metrics data that roughly half the time spent in the worst-case user experience was spent in each of A and B, but you can&#8217;t be <em>certain</em> since you are looking at an aggregate, and it is entirely possible that in the worst case all 100ms was spent in service A and B was never called at all.</p>
-</div>
-<div class="paragraph">
-<p>Conversely, from tracing data you cannot reason about throughput over an interval or the worst-case user experience.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="the-importance-of-dimensionality"><a class="anchor" href="#the-importance-of-dimensionality"></a>The importance of dimensionality</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Spring Boot 1&#8217;s metrics interfaces were hierarchical in nature. This means that published metrics were identified entirely by their name. So you might have a metric named <code>jvm.memory.used</code>.</p>
-</div>
-<div class="paragraph">
-<p>When you&#8217;re looking at metrics from a single application instance, this seems suitable. But what if you have 10 instances all publishing <code>jvm.memory.used</code> to the same monitoring system? How do we distinguish between them in the event that memory consumption spikes unexpectedly on one instance?</p>
-</div>
-<div class="paragraph">
-<p>The answer is generally to add to the name, for example by adding a prefix or suffix to the name. So we might change the name to <code>${HOST}.jvm.memory.used</code>, where we substitute <code>${HOST}</code> for the host name. After redeploying all 10 instances, we now can identify which instance is under memory pressure. And in a typical hierarchical monitoring system, we can reason about the sum of memory used across all instances by wildcarding the name somehow:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-txt" data-lang="txt">*.jvm.memory.used</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Suppose now we have 10 application instances in each of 3 deployment regions. Further, we want to reason about the average or maximum memory footprint of our application by region. Now, if we add an additional prefix to the metric name (so that it looks like <code>${REGION}.${HOST}.jvm.memory.used</code>, we have broken our existing queries. We could update the query to reason about the sum of memory used across all instances:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-txt" data-lang="txt">*.*.jvm.memory.used</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Unfortunately, this blinds us on our existing infrastructure until it has all been redeployed with the new prefix. This is just an example of one limitation of the hierarchical naming approach.</p>
-</div>
-<div class="paragraph">
-<p>We mentioned already that Micometer is a <em>dimensional-first</em> metrics collector. The same metric in Micrometer would have been recorded with tags (a.k.a. dimensions):</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Gauge.builder("jvm.memory.used", ..)
-  .tag("host", "MYHOST")
-  .tag("region", "us-east-1")
-  .register(registry);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Dimensional monitoring systems naturally display <code>jvm.memory.used</code> in the aggregate across all tags until you drill into one or more of them. A query in a dimensional monitoring system would select the name first (<code>jvm.memory.used</code>) and allow for subsequent filtering by tag. In our scenario from above, if we had an existing chart/alert based on exploding memory consumption by host and then <em>later</em> added an additional tag for region, the host-based query would continue to work uninterrupted as the new region-imbued metrics rolled out across your infrastructure.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="meter-filters"><a class="anchor" href="#meter-filters"></a>Meter filters</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Meter filters allow you to control how and when meters are registered and what kinds of statistics they emit. Meter filters serve three basic functions:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Deny</strong> (or accept) meters from being registered.</p>
-</li>
-<li>
-<p><strong>Transform</strong> meter IDs (e.g. changing the name, adding or removing tags, changing description or base units).</p>
-</li>
-<li>
-<p><strong>Configure</strong> distribution statistics for some meter types (e.g. percentiles, histograms, SLAs for timers and distribution summaries).</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Spring Boot 2 binds a <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#_per_meter_properties">series of properties</a> to an out-of-the-box meter filter that allows you to control metrics emission through properties. For example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-txt" data-lang="txt">management.metrics.enable.jvm=false
-management.metrics.distribution.percentiles-histogram.http.server.requests=true
-management.metrics.distribution.sla.http.server.requests=1ms,5ms</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The above turns off all metrics beginning with the prefix "jvm", publishes percentile histograms for http server request metrics that are autoconfigured by Spring Boot, and ships counts of requests less than or equal to 1ms and 5ms SLA boundaries so you can see exactly how many requests are meeting your expectations. The SLA distribution configuration is also the core feature that enables you to visualize more complicated measurements like <a href="https://medium.com/@tristan_96324/prometheus-apdex-alerting-d17a065e39d0">Apdex scores</a>.</p>
-</div>
-<div class="paragraph">
-<p>You can flip enablement of metrics entirely at the root to generate a whitelist for just a handful of metrics you want. Suppose you want JVM metrics and nothing else:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-txt" data-lang="txt">management.metrics.enable.root=false
-management.metrics.enable.jvm=true</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="why-the-actuator-metrics-endpoint-changed-in-spring-boot-2"><a class="anchor" href="#why-the-actuator-metrics-endpoint-changed-in-spring-boot-2"></a>Why the /actuator/metrics endpoint changed in Spring Boot 2</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>It was trivial to provide a single REST endpoint that listed all metrics in Spring Boot 1, because we only had counters and gauges and both were hierarchical. More complex types like timers represent more than one time series (they contain at a minimum a count, a maximum, and a total sum). Also, our metrics went dimensional. It quickly became clear that there was no way to output all this information in a single payload. Even for a dimensional counter, do we display an aggregate for every permutation of tags? Flattening to hierarchical names for brevity, this turns into something like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code>http.server.requests.method.GET.response.200.uri./foo=100
-http.server.requests.method.GET.response.500.uri./foo=1
-http.server.requests.method.GET.response.200.uri./bar=5
-http.server.requests.method.GET.response.400.uri./foo=1
-
-# and now the aggregates...
-http.server.requests.method.GET=107
-http.server.requests.method.GET.response.200=105
-http.server.requests.method.GET.uri./foo=101
-http.server.requests.response.200.uri./foo=100
-http.server.requests.response.500.uri./foo=1
-http.server.requests.response.200.uri./bar=5
-...</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>As you can see, this quickly becomes untenable. If you were wanting to build a custom UI, for example, on the contents of <code>MeterRegistry</code> and you know that your UI is only interested in http throughput by URI irrespective of the method, status, etc then the output can be substantially curtailed. For these kinds of cases, we recommend creating a component that presents your UI with just the data that it needs. Inject <code>MeterRegistry</code> into your component and use its <code>find</code> and <code>get</code> methods to search for the metrics you need to expose. Then serialize them in a format that is tailored to your use.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="get-involved"><a class="anchor" href="#get-involved"></a>Get involved</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Micrometer support is available on slack at <a href="https://slack.micrometer.io">slack.micrometer.io</a>, on Twitter <a href="https://twitter.com/micrometerio">@micrometerio</a>, and on <a href="https://github.com/micrometer-metrics/micrometer">Github</a>. Don&#8217;t hesitate to reach out with questions, suggestions, or problems!</p>
-</div>
-</div>
-</div></div>
-</div>
-<section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
-      var disqus_identifier = 3209;
-
-      (function(disqus_shortname, document) {
-        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
-        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
-
-        function injectScript(url) {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = url;
-          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
-        }
-
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
-<div class="mobile-only">
-<p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
-</div>
-</article>
-<aside class="span4 mobile-right-pane" id="sidebar">
-<div>
-<ul class="right-pane-widget--container secondary-nav with-icon">
-<li class="blog-category">
-<div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category active">
-<div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category">
-<div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category">
-<div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
-</li>
-</ul>
-<ul class="social-btn--container">
-<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
-
-<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
-<a class="social-btn youtube" href="/videos"></a>
-</ul>
-<div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
-<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
-<form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
-          form.onSuccess(function(values, followUpUrl) {
-            form.getFormElem().html("<p>Thank you!</p>");
-            return false;
-          });
-        });
-      </script>
-</div>
-</div>
-</aside>
-</div>
-</div>
-</div>
-<footer class="footer">
-<div class="container-fluid">
-<div class="row-fluid">
-<div class="span12">
-<div class="navbar">
-<div class="container">
-<ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
-</ul>
-</div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
-</div>
-</div>
-</div>
-</footer>
-<div id="scrim"></div>
-</div>
-</body></html>
+<p>Micrometer提供了与供应商<code>io.micrometer.core.instrument.MeterRegistry</code></p><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></article><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></div><code>io.micrometer.core.instrument.MeterRegistry</code></body></html>

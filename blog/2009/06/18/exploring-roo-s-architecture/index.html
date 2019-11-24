@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Exploring Roo&#39;s Architecture</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<title>探索Roo的架构</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,30 +16,28 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Exploring Roo&#39;s Architecture" />
-<meta name="twitter:description" content="&lt;p&gt;Last month we discovered how easy it is to &lt;a href=&quot;http://blog.springsource.com/2009/05/27/roo-part-2/&quot;&gt;build a fully-fledged enterprise application&lt;/a&gt; in just a few minutes using &lt;a href=&quot;http://www.springsource.org/roo&quot;&gt;Spring Roo&lt;/a&gt; - our new productivity tool for Java developers. While many Java developers have &lt;a href=&quot;http://twitter.com/kalayl/statuses/2197250433&quot;&gt;already&lt;/a&gt; &lt;a href=&quot;http://twitter.com/jayjwagner/statuses/2198297867&quot;&gt;started&lt;/a&gt; &lt;a href=&quot;http://twitter.com/alexcuesta/statuses/2193076123&quot;&gt;evaluating&lt;/a&gt; &lt;a href=&quot;http://twitter.com/mingjin/statuses/2188877538&quot;&gt;Roo&lt;/a&gt; &lt;a href=&quot;http://twitter.com/royvanrijn/statuses/2180948379&quot;&gt;to&lt;/a&gt; &lt;a href=&quot;http://twitter.com/kellerds/statuses/2062301262&quot;&gt;help&lt;/a&gt; &lt;a href=&quot;http://twitter.com/jungho_kim/statuses/2155503471&quot;&gt;save&lt;/a&gt; &lt;a href=&quot;http://twitter.com/techcast/statuses/2131191020&quot;&gt;time&lt;/a&gt; &lt;a href=&quot;http://twitter.com/diversit/statuses/2079233314&quot;&gt;on&lt;/a&gt; &lt;a href=&quot;http://twitter.com/desmax74/statuses/2073967984&quot;&gt;their&lt;/a&gt; &lt;a href=&quot;http://twitter.com/jcatron/statuses/2065733225&quot;&gt;projects&lt;/a&gt;, I’ve received a lot of questions from people curious about how Roo actually works. In this blog entry I will explore Roo’s architecture in depth, including its goals, alternatives prototyped, design rationale and implementation details. By the end you’ll have a good understanding of what makes Roo tick and why its approach works well for Java projects.&lt;/p&gt;
-" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Exploring Roo's Architecture">
+<meta name="twitter:description" content="<p>Last month we discovered how easy it is to <a href=" http: ="" blog.springsource.com="" 2009="" 05="" 27="" roo-part-2="" ="="></meta>build a fully-fledged enterprise application in just a few minutes using <a href=" www.springsource.org roo">Spring Roo - our new productivity tool for Java developers. While many Java developers have <a href="http://twitter.com/kalayl/statuses/2197250433">already</a> <a href="http://twitter.com/jayjwagner/statuses/2198297867">started</a> <a href="http://twitter.com/alexcuesta/statuses/2193076123">evaluating</a> <a href="http://twitter.com/mingjin/statuses/2188877538">Roo</a> <a href="http://twitter.com/royvanrijn/statuses/2180948379">to</a> <a href="http://twitter.com/kellerds/statuses/2062301262">help</a> <a href="http://twitter.com/jungho_kim/statuses/2155503471">save</a> <a href="http://twitter.com/techcast/statuses/2131191020">time</a> <a href="http://twitter.com/diversit/statuses/2079233314">on</a> <a href="http://twitter.com/desmax74/statuses/2073967984">their</a> <a href="http://twitter.com/jcatron/statuses/2065733225">projects</a>, I’ve received a lot of questions from people curious about how Roo actually works. In this blog entry I will explore Roo’s architecture in depth, including its goals, alternatives prototyped, design rationale and implementation details. By the end you’ll have a good understanding of what makes Roo tick and why its approach works well for Java projects.
+">
 
-<meta property="og:title" content="Exploring Roo&#39;s Architecture" />
-<meta property="og:description" content="&lt;p&gt;Last month we discovered how easy it is to &lt;a href=&quot;http://blog.springsource.com/2009/05/27/roo-part-2/&quot;&gt;build a fully-fledged enterprise application&lt;/a&gt; in just a few minutes using &lt;a href=&quot;http://www.springsource.org/roo&quot;&gt;Spring Roo&lt;/a&gt; - our new productivity tool for Java developers. While many Java developers have &lt;a href=&quot;http://twitter.com/kalayl/statuses/2197250433&quot;&gt;already&lt;/a&gt; &lt;a href=&quot;http://twitter.com/jayjwagner/statuses/2198297867&quot;&gt;started&lt;/a&gt; &lt;a href=&quot;http://twitter.com/alexcuesta/statuses/2193076123&quot;&gt;evaluating&lt;/a&gt; &lt;a href=&quot;http://twitter.com/mingjin/statuses/2188877538&quot;&gt;Roo&lt;/a&gt; &lt;a href=&quot;http://twitter.com/royvanrijn/statuses/2180948379&quot;&gt;to&lt;/a&gt; &lt;a href=&quot;http://twitter.com/kellerds/statuses/2062301262&quot;&gt;help&lt;/a&gt; &lt;a href=&quot;http://twitter.com/jungho_kim/statuses/2155503471&quot;&gt;save&lt;/a&gt; &lt;a href=&quot;http://twitter.com/techcast/statuses/2131191020&quot;&gt;time&lt;/a&gt; &lt;a href=&quot;http://twitter.com/diversit/statuses/2079233314&quot;&gt;on&lt;/a&gt; &lt;a href=&quot;http://twitter.com/desmax74/statuses/2073967984&quot;&gt;their&lt;/a&gt; &lt;a href=&quot;http://twitter.com/jcatron/statuses/2065733225&quot;&gt;projects&lt;/a&gt;, I’ve received a lot of questions from people curious about how Roo actually works. In this blog entry I will explore Roo’s architecture in depth, including its goals, alternatives prototyped, design rationale and implementation details. By the end you’ll have a good understanding of what makes Roo tick and why its approach works well for Java projects.&lt;/p&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2009-06-18 13:29:00.0" />
-</head>
-<body>
+<meta property="og:title" content="Exploring Roo's Architecture">
+<meta property="og:description" content="<p>Last month we discovered how easy it is to <a href=" http: ="" blog.springsource.com="" 2009="" 05="" 27="" roo-part-2="" ="="></meta>build a fully-fledged enterprise application in just a few minutes using <a href=" www.springsource.org roo">Spring Roo - our new productivity tool for Java developers. While many Java developers have <a href="http://twitter.com/kalayl/statuses/2197250433">already</a> <a href="http://twitter.com/jayjwagner/statuses/2198297867">started</a> <a href="http://twitter.com/alexcuesta/statuses/2193076123">evaluating</a> <a href="http://twitter.com/mingjin/statuses/2188877538">Roo</a> <a href="http://twitter.com/royvanrijn/statuses/2180948379">to</a> <a href="http://twitter.com/kellerds/statuses/2062301262">help</a> <a href="http://twitter.com/jungho_kim/statuses/2155503471">save</a> <a href="http://twitter.com/techcast/statuses/2131191020">time</a> <a href="http://twitter.com/diversit/statuses/2079233314">on</a> <a href="http://twitter.com/desmax74/statuses/2073967984">their</a> <a href="http://twitter.com/jcatron/statuses/2065733225">projects</a>, I’ve received a lot of questions from people curious about how Roo actually works. In this blog entry I will explore Roo’s architecture in depth, including its goals, alternatives prototyped, design rationale and implementation details. By the end you’ll have a good understanding of what makes Roo tick and why its approach works well for Java projects.
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2009-06-18 13:29:00.0">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -55,16 +47,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -80,9 +72,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -92,40 +84,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -151,87 +133,86 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Exploring Roo&#39;s Architecture</h1>
+<h1 class="blog--title">探索Roo的架构</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
-<span class="author">Ben Alex</span>
+<img class="meta-data--icon" src="null?s=20&d=mm"> <span class="author">本·亚历克斯</span>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2009-06-18 13:29:00.0">June 18, 2009</time>
+<time class="date" pubdate="" datetime="2009-06-18 13:29:00.0">2009年6月18日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="245" href="/blog/2009/06/18/exploring-roo-s-architecture#disqus_thread">
+<a class="comments" href="/blog/2009/06/18/exploring-roo-s-architecture#disqus_thread" data-disqus-identifier="245">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Last month we discovered how easy it is to <a href="http://blog.springsource.com/2009/05/27/roo-part-2/">build a fully-fledged enterprise application</a> in just a few minutes using <a href="http://www.springsource.org/roo">Spring Roo</a> - our new productivity tool for Java developers. While many Java developers have <a href="https://twitter.com/kalayl/statuses/2197250433">already</a> <a href="https://twitter.com/jayjwagner/statuses/2198297867">started</a> <a href="https://twitter.com/alexcuesta/statuses/2193076123">evaluating</a> <a href="https://twitter.com/mingjin/statuses/2188877538">Roo</a> <a href="https://twitter.com/royvanrijn/statuses/2180948379">to</a> <a href="https://twitter.com/kellerds/statuses/2062301262">help</a> <a href="https://twitter.com/jungho_kim/statuses/2155503471">save</a> <a href="https://twitter.com/techcast/statuses/2131191020">time</a> <a href="https://twitter.com/diversit/statuses/2079233314">on</a> <a href="https://twitter.com/desmax74/statuses/2073967984">their</a> <a href="https://twitter.com/jcatron/statuses/2065733225">projects</a>, I&rsquo;ve received a lot of questions from people curious about how Roo actually works. In this blog entry I will explore Roo&rsquo;s architecture in depth, including its goals, alternatives prototyped, design rationale and implementation details. By the end you&rsquo;ll have a good understanding of what makes Roo tick and why its approach works well for Java projects.</p>
-<h2>New Roo and STS Releases</h2><p>Before I get into the detail of Roo&rsquo;s architecture, I should briefly mention we have today released <a href="http://www.springsource.com/download/community?project=Spring%20Roo">Spring Roo 1.0.0.M2</a>. Featuring <a href="http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10340&styleName=Html&version=11227">dozens of bug fixes and minor enhancements</a>, this new release also includes:</p>
+<div class="blog--post"><p>上个月，我们发现使用<a href="http://www.springsource.org/roo">Spring Roo</a> （我们为Java开发人员提供的新型生产力工具）在短短几分钟内<a href="http://blog.springsource.com/2009/05/27/roo-part-2/">构建成熟的企业应用程序</a>是多么容易。虽然许多Java开发者<a href="https://twitter.com/kalayl/statuses/2197250433">已经</a> <a href="https://twitter.com/jayjwagner/statuses/2198297867">开始</a> <a href="https://twitter.com/alexcuesta/statuses/2193076123">评估</a> <a href="https://twitter.com/mingjin/statuses/2188877538">Roo的</a> <a href="https://twitter.com/royvanrijn/statuses/2180948379">，以</a> <a href="https://twitter.com/kellerds/statuses/2062301262">帮助</a> <a href="https://twitter.com/jungho_kim/statuses/2155503471">节省</a> <a href="https://twitter.com/techcast/statuses/2131191020">时间</a> <a href="https://twitter.com/diversit/statuses/2079233314">在</a> <a href="https://twitter.com/desmax74/statuses/2073967984">自己的</a> <a href="https://twitter.com/jcatron/statuses/2065733225">项目</a> ，我已经收到了很多的问题，从人们好奇的袋鼠是如何工作。在此博客文章中，我将深入探讨Roo的体系结构，包括其目标，原型替代方案，设计原理和实施细节。到最后，您将对Roo产生什么影响以及为什么它的方法在Java项目中运行良好有一个很好的了解。</p>
+<h2>新的Roo和STS版本</h2><p>在详细介绍Roo的体系结构之前，我应该简要地提到我们今天发布了<a href="http://www.springsource.com/download/community?project=Spring Roo">Spring Roo 1.0.0。M2</a> 。此新版本具有<a href="http://jira.springsource.org/secure/ReleaseNote.jspa?projectId=10340&styleName=Html&version=11227">许多错误修复和较小的增强功能</a> ，还包括：</p>
 <ul>
-<li>A very nice unit test mocking capability (written by Rod Johnson)</li>
-<li>Java and SQL reserved word detection (so no longer will you accidentally call a field something like "from")</li>
-<li>The ability to specify the particular Java version you'd like to use (of particular importance to Apple users)</li>
-<li>Extra <a href="http://www.springsource.org/webflow">Spring Web Flow</a> configuration (so you now have a proper flow to play with)</li>
-<li>Automatic exposure of dynamic finders to the web tier</li>
-<li>Improved support for Windows users and those with non-English default locales</li>
-</ul><p>We&rsquo;ve also released <a href="http://www.springsource.com/products/sts">SpringSource Tool Suite</a> (STS) 2.1.0.M2 since my <a href="http://blog.springsource.com/2009/05/27/roo-part-2/">last blog</a> entry. The Roo support in STS continues to improve, and you can now even configure STS to point to a separately-downloaded Roo installation. This is great news for the increasing number of people writing their own Roo add-ons or simply wanting to use the latest Roo releases with STS. Other nice Roo features in STS include CTRL + R &ldquo;Roo command&rdquo; dispatch, an inbuilt Roo shell, extra Roo commands to execute integration tests or deployments (including to a cloud environment!) and more. I thoroughly recommend downloading STS 2.1.0.M2 if you haven&rsquo;t already done so.</p>
-<h2>Roo Core versus Roo Add-Ons</h2><p>At its heart, Roo offers a core set of services that permit &ldquo;add-os&rdquo; to be used. These core services include a shell, file system manager, file system monitor, file undo capability, classpath abstraction, Abstract Syntax Tree (AST) parsing and binding, project build system interface, metadata model, process management, bootstrap and utility services. While we&rsquo;ll indirectly explore some of these core services later on, the vast majority of functionality that end users are interested in come from add-ons. Without any add-ons, Roo is just an elaborate console.</p><p>When you download Roo, we ship the core services plus a series of common add-ons. All of the add-ons can be identified via the &ldquo;addon&rdquo; keyword appearing in their JAR name. Every add-on that ships with Roo is optional and end users are free to enhance existing add-ons or create new ones. Indeed we very much welcome the community to develop and share add-ons they find useful.</p><p>Given there is a design separation between Roo&rsquo;s core services and the add-ons a user may wish to use, the focus of our energy for Roo 1.0.0 is on ensuring mainstream web applications can be easily and productively developed. In subsequent versions of Roo we will ship an increasingly richer array of add-ons that help users build other classes of application.</p><p>One area I&rsquo;ve been asked frequently about is Roo&rsquo;s use of <a href="https://maven.apache.org/">Maven</a>. As noted in my <a href="http://blog.springsource.com/2009/05/27/roo-part-2/">last blog</a> entry, the projects that Roo 1.0.0 creates use Maven. Because this Maven usage is implemented via an add-on, it is easy to add support for other project build systems as well. Indeed we&rsquo;ve had many requests for <a href="https://ant.apache.org/">Ant</a>/<a href="https://ant.apache.org/ivy/">Ivy</a> support, and there is already a feature request in Jira (<a href="http://jira.springsource.org/browse/ROO-91">ROO-91</a>) for this.</p><p>On a similar note, Roo also currently ships <a href="https://en.wikipedia.org/wiki/Java_Persistence_API">JPA</a> and <a href="http://java.sun.com/products/jsp/">JSP</a> add-ons. Both of these are pragmatic choices we made to support typical web application development in Roo 1.0.0. There is no technical reason at all preventing the development of <a href="http://java.sun.com/javase/technologies/database/">JDBC</a>, <a href="http://java.sun.com/jdo/">JDO</a>, <a href="http://java.sun.com/javaee/javaserverfaces/">JSF</a>, <a href="https://velocity.apache.org/">Velocity</a> and <a href="http://freemarker.org/">FreeMarker</a> add-ons, and we hope to see such add-ons over time.</p><p>Because this blog entry is focused on Roo&rsquo;s architecture, I&rsquo;ll conclude discussion of individual add-ons at this point. You can read my <a href="http://blog.springsource.com/2009/05/27/roo-part-2/">last blog</a> entry if you&rsquo;d like to learn more about how the current Roo 1.0.0 add-ons can be used to build applications. For now, let&rsquo;s dig a little deeper into how Roo actually works.</p>
-<h2>Roo's Design Goals</h2><p>Whenever reviewing any technology, it is important to consider the design goals and objectives that influenced its architectural choices. I explored some of these goals in my <a href="http://blog.springsource.com/2009/05/01/roo-part-1/">original Roo blog entry</a>, but let&rsquo;s revisit the topic here in a little more detail.</p><p>Most importantly, we wanted Roo to be a productivity solution for Java developers. There are many developers who prefer to (or need to) work in Java, and Java remains the most <a href="http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html">widely used programming language on the planet</a>. Providing a first-class productivity tool to this very large group of developers represents Roo&rsquo;s most fundamental goal.</p><p>Second, we wanted to ensure we eliminated barriers to adopting Roo. There is no point having a great productivity tool if people aren&rsquo;t comfortable (or simply aren&rsquo;t allowed) to use it. Specifically, that meant having no <a href="https://en.wikipedia.org/wiki/Vendor_lock-in#Lock-in_in_electronics_and_computers">lock-in</a> (ie easy removal of Roo), no runtime portion (and potential approval hurdles in many organizations), no unnatural development techniques, no IDE dependencies, no licensing costs, no strange dependencies to make it work, no steep learning curve, and no compromises to speed, performance or flexibility.</p><p>Third, we wanted to deliver a solution that built on the many strengths of Java. These include extremely good runtime performance, availability of standards (like <a href="https://en.wikipedia.org/wiki/Java_Persistence_API">JPA</a>, <a href="https://jcp.org/en/jsr/detail?id=303">Bean Validation</a>, <a href="https://en.wikipedia.org/wiki/Representational_State_Transfer">REST</a>, <a href="http://java.sun.com/products/servlet">Servlet API</a> etc), fantastic IDE support (like debuggers, code assist, refactoring etc), established technologies, type safety, and a massive pool of existing developer knowledge, skills and experience (not only in Java itself but also the de facto Java building blocks like Spring, JSP, Hibernate etc).</p>
-<h2>Alternatives to Roo's Architecture</h2><p>With the above requirements in mind, in 2008 I prototyped a number of different techniques including <a href="https://jcp.org/en/jsr/detail?id=269">JSR 269</a> (the Pluggable Annotation Processing API in Java 6), build-time source code generation, IDE plugins, bytecode generation at development time, bytecode generation at runtime and advanced reflective approaches such as extensions to Spring Framework AOP. I didn&rsquo;t prototype other JVM languages because the principal motivation underpinning Roo was a tool to enable Java programming.</p><p>In one way or another each approach I prototyped had issues that ruled it out. Every approach needed a special runtime, special IDE plugin or suboptimal build step (or a combination thereof). Most also permanently locked the user into the approach, with removal unduly difficult and therefore creating a barrier to adoption that would stop many Java developers from enjoying the productivity gains on offer. Many approaches also relied on reflective techniques at runtime that would be slow and confusing to debug, and most offered little to no IDE integration. I also particularly preferred providing a lightweight, command-line tool, as I strongly believed this would deliver better a usability experience than a GUI. These are the reasons why we didn&rsquo;t use the approaches listed above.</p>
-<h2>Roo Architecture Summary</h2><p>After considerable prototyping we arrived at the Roo architecture, the key elements of which are:</p>
+<li>一个非常好的单元测试模拟功能（由Rod Johnson撰写）</li>
+<li>Java和SQL保留字检测（因此您不再会不小心调用“ from”之类的字段）</li>
+<li>可以指定您要使用的特定Java版本（对Apple用户而言尤其重要）</li>
+<li>额外的<a href="http://www.springsource.org/webflow">Spring Web Flow</a>配置（因此您现在可以使用适当的流程）</li>
+<li>自动将动态查找器公开到Web层</li>
+<li>改进了对Windows用户和具有非英语默认语言环境的用户的支持</li>
+</ul><p>我们还发布了<a href="http://www.springsource.com/products/sts">SpringSource Tool Suite</a> （STS）2.1.0。自从我<a href="http://blog.springsource.com/2009/05/27/roo-part-2/">上次写博客</a>以来的M2STS对Roo的支持在不断提高，您现在甚至可以将STS配置为指向单独下载的Roo安装。对于越来越多的人编写自己的Roo附加组件或者只是想在STS中使用最新的Roo版本而言，这是个好消息。 STS中其他出色的Roo功能包括CTRL + R“ Roo命令”调度，内置的Roo Shell，用于执行集成测试或部署（包括到云环境的额外Roo命令）！和更多。我完全建议下载STS 2.1.0。M2（如果尚未执行此操作）。</p>
+<h2>Roo Core与Roo附加组件</h2><p>Roo的核心是提供一组核心服务，允许使用“ add-os”。这些核心服务包括外壳程序，文件系统管理器，文件系统监视器，文件撤消功能，类路径抽象，抽象语法树（AST）解析和绑定，项目构建系统接口，元数据模型，过程管理，引导程序和实用程序服务。稍后我们将间接探索其中一些核心服务，而最终用户感兴趣的绝大多数功能都来自附加组件。没有任何附加组件，Roo只是一个精致的控制台。</p><p>当您下载Roo时，我们将提供核心服务以及一系列常见的附加组件。可以通过JAR名称中出现的“ addon”关键字来标识所有附加组件。Roo附带的每个附加组件都是可选的，最终用户可以自由地增强现有的附加组件或创建新的附加组件。实际上，我们非常欢迎社区开发和共享他们认为有用的附加组件。</p><p>鉴于Roo的核心服务与用户可能希望使用的附加组件之间存在设计上的分离，因此我们对Roo 1.0.0的关注重点是确保可以轻松，高效地开发主流Web应用程序。在后续版本的Roo中，我们将提供越来越丰富的附加组件，以帮助用户构建其他类的应用程序。</p><p>我经常被问到的一个领域是Roo对<a href="https://maven.apache.org/">Maven</a>的使用。正如我在<a href="http://blog.springsource.com/2009/05/27/roo-part-2/">上一篇博客文章中</a>所述，Roo 1.0.0创建的项目使用Maven。由于此Maven用法是通过附加组件实现的，因此也很容易添加对其他项目构建系统的支持。确实，我们已经获得了许多对<a href="https://ant.apache.org/">Ant</a> / <a href="https://ant.apache.org/ivy/">Ivy</a>支持的请求，并且Jira（ <a href="http://jira.springsource.org/browse/ROO-91">ROO-91</a> ）已经为此提供了功能请求。</p><p>类似地，Roo当前还提供了<a href="https://en.wikipedia.org/wiki/Java_Persistence_API">JPA</a>和<a href="http://java.sun.com/products/jsp/">JSP</a>附加组件。这两个都是我们为支持Roo 1.0.0中的典型Web应用程序开发而做出的务实选择。完全没有技术上的理由阻止<a href="http://java.sun.com/javase/technologies/database/">JDBC</a> ， <a href="http://java.sun.com/jdo/">JDO</a> ， <a href="http://java.sun.com/javaee/javaserverfaces/">JSF</a> ， <a href="https://velocity.apache.org/">Velocity</a>和<a href="http://freemarker.org/">FreeMarker</a>附加组件的开发，我们希望随着时间的推移会看到这种附加组件。</p><p>因为此博客文章侧重于Roo的体系结构，所以在这一点上，我将结束对各个附加组件的讨论。如果您想了解有关如何使用当前Roo 1.0.0附加组件来构建应用程序的更多信息，则可以阅读我的<a href="http://blog.springsource.com/2009/05/27/roo-part-2/">最后一篇博客文章</a> 。现在，让我们更深入地研究Roo的实际工作方式。</p>
+<h2>Roo的设计目标</h2><p>每当审查任何技术时，重要的是要考虑影响其体系结构选择的设计目标。我在<a href="http://blog.springsource.com/2009/05/01/roo-part-1/">原始的Roo博客文章中</a>探讨了其中一些目标，但让我们在这里更详细地讨论一下该主题。</p><p>最重要的是，我们希望Roo成为Java开发人员的生产力解决方案。有许多开发人员喜欢（或需要）使用Java进行工作，而Java仍然<a href="http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html">是地球上使用</a>最<a href="http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html">广泛的编程语言</a> 。为庞大的开发人员群体提供一流的生产力工具是Roo的最基本目标。</p><p>第二，我们要确保消除采用Roo的障碍。如果人们不习惯（或根本不允许）使用它，那么没有一个出色的生产力工具是没有意义的。具体来说，这意味着没有<a href="https://en.wikipedia.org/wiki/Vendor_lock-in#Lock-in_in_electronics_and_computers">锁定</a> （即轻松删除Roo），没有运行时部分（以及许多组织中的潜在批准障碍），没有不自然的开发技术，没有IDE依赖项，没有许可成本，没有使其工作的奇怪依赖关系，没有陡峭的学习曲线，也不会影响速度，性能或灵活性。</p><p>第三，我们想提供一种基于Java众多优势的解决方案。这些包括极佳的运行时性能，标准的可用性（例如<a href="https://en.wikipedia.org/wiki/Java_Persistence_API">JPA</a> ， <a href="https://jcp.org/en/jsr/detail?id=303">Bean验证</a> ， <a href="https://en.wikipedia.org/wiki/Representational_State_Transfer">REST</a> ， <a href="http://java.sun.com/products/servlet">Servlet API</a>等），出色的IDE支持（例如调试器，代码辅助，重构等），已建立的技术，类型安全性以及大量现有资源开发人员的知识，技能和经验（不仅包括Java本身，而且包括事实上的Java构建块，如Spring，JSP，Hibernate等）。</p>
+<h2>Roo架构的替代方案</h2><p>考虑到上述要求，在2008年，我对许多不同的技术进行了原型设计，包括<a href="https://jcp.org/en/jsr/detail?id=269">JSR 269</a> （Java 6中的可插拔注释处理API），生成时源代码，IDE插件，开发时的字节码生成，运行时的字节码生成。以及高级反射方法，例如对Spring Framework AOP的扩展。我没有为其他JVM语言创建原型，因为Roo的主要动机是启用Java编程的工具。</p><p>我原型化的每种方法都以某种方式排除了它的问题。每种方法都需要特殊的运行时，特殊的IDE插件或次优的构建步骤（或其组合）。大多数人还永久地将用户锁定在该方法中，移除过程过于困难，因此为采用提供了障碍，这将阻止许多Java开发人员享受所提供的生产率提高。许多方法在运行时还依赖于反射技术，这些方法会很慢且易于调试，并且大多数提供的IDE集成很少甚至没有。我还特别喜欢提供一个轻量级的命令行工具，因为我坚信这将比GUI提供更好的可用性体验。这就是为什么我们不使用上面列出的方法的原因。</p>
+<h2>Roo体系结构摘要</h2><p>经过大量的原型设计，我们到达了Roo体系结构，其关键要素是：</p>
 <ul>
-<li>A tab-completing, context-aware, hint-providing command line shell that can be loaded and exited by the user at any time and supports concurrent use with text editors and IDEs</li>
-<li>Use of @Roo* annotations which have <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/annotation/RetentionPolicy.html#SOURCE">source-level retention</a> only (not runtime retention)</li>
-<li><a href="https://www.eclipse.org/aspectj/">AspectJ</a> <a href="https://www.eclipse.org/aspectj/doc/released/progguide/language-interType.html">inter-type declarations</a> (ITDs, also known as "introductions" or "mixins") for automatically maintained Java members (we'll discuss ITDs in depth below)</li>
-<li>A <a href="https://en.wikipedia.org/wiki/Metadata">metadata</a> model to facilitate easy development of custom Roo add-ons (we'll also discuss the metadata model below)</li>
-<li>Full round-trip capabilities, courtesy of the metadata model and various core services mentioned above</li>
-</ul><p>This architecture didn&rsquo;t need a special build system, runtime component, IDE plugin or alike. It also met all of the design requirements mentioned earlier.</p>
-<h2>Roo's Secret Sauce</h2><p>The &ldquo;new idea&rdquo; that made this possible was to automatically use ITDs as a code generation artifact. Using ITDs in this manner delivers considerable practical benefits, because it allows Roo to generate code that is in a separate <a href="http://hell.org.ua/Docs/oreilly/java/exp/ch05_06.htm">compilation unit</a> (ie physical file) from the code that the developer writes. Despite being in a separate file, the ITDs are combined into the same compiled .class file at compilation time. Because the resultant class is essentially the same as if the developer had written all the code themselves, all the benefits of traditional Java programming (like IDEs, debugger support, code assist, type introspection, type safety etc) work just as you&rsquo;d expect. Also, because the compiled class is just a class file, everything works perfectly at runtime. Specifically, you don&rsquo;t have to worry about issues like <a href="https://stackoverflow.com/questions/435553/java-reflection-performance">reflection performance</a>, memory usage, confusing and difficult to debug operation, extra libraries that may need approval and upgrading etc.</p><p>What&rsquo;s also exciting about using ITDs for code generation is the <a href="https://en.wikipedia.org/wiki/Separation_of_concerns">separation of concerns</a> it delivers. Separation of concerns benefits the application developer, as they can safely ignore the ITD files created by Roo (because the developer knows Roo will manage them). But the separation of concerns is also excellent for Roo add-ons as well. The development of add-ons is much easier as the add-on developer knows they control the entire ITD compilation unit contents. A more subtle benefit is the automatic upgrade support this delivers. We&rsquo;ve seen many examples during Roo&rsquo;s development where we&rsquo;ve improved an add-on and then users who subsequently load Roo receive an automatically upgraded ITD. Similarly users can remove add-ons from their environment and the relevant ITDs will automatically be removed by Roo. This is an extremely pragmatic and useful technique that we&rsquo;ve found invaluable.</p><p>The final major benefit of ITDs is lock-in avoidance. As we&rsquo;ll see later, ITDs are essentially normal Java source files. They just sit on your disk with all of the other source code, meaning developers can elect to never load Roo again and their project will still work. Those wanting a more complete removal can use features like <a href="https://www.eclipse.org/ajdt/">Eclipse AJDT</a>&rsquo;s &ldquo;<a href="https://contraptionsforprogramming.blogspot.com/2009/05/push-in-refactoring-for-ajdt.html">push in refactoring</a>&rdquo;. What this does is automatically move all source code from ITDs to the correct Java source file. This means if you don&rsquo;t want to use Roo anymore, just &ldquo;push in refactor&rdquo; your project and you have a perfectly normal Java project - just as if you&rsquo;d written it all by hand yourself. This is fantastic news:</p>
+<li>制表符完成，上下文感知，提供提示的命令行外壳，可由用户随时加载和退出，并支持与文本编辑器和IDE并发使用</li>
+<li>使用仅具有<a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/annotation/RetentionPolicy.html#SOURCE">源代码级保留</a> （而不保留运行时保留）的@ Roo *annotation</li>
+<li>自动维护的Java成员的<a href="https://www.eclipse.org/aspectj/">AspectJ</a> <a href="https://www.eclipse.org/aspectj/doc/released/progguide/language-interType.html">类型间声明</a> （ITD，也称为“介绍”或“混合”）（我们将在下面深入讨论ITD）</li>
+<li>一个<a href="https://en.wikipedia.org/wiki/Metadata">元数据</a>模型，以方便轻松开发自定义Roo插件（我们还将在下面讨论元数据模型）</li>
+<li>完整的往返功能，由上述元数据模型和各种核心服务提供</li>
+</ul><p>该体系结构不需要特殊的构建系统，运行时组件，IDE插件等。它还满足了前面提到的所有设计要求。</p>
+<h2>小王的秘制酱</h2><p>使之成为可能的“新想法”是自动将ITD用作代码生成工件。以这种方式使用ITD带来了可观的实际好处，因为它允许Roo生成与开发人员编写的代码位于单独的<a href="http://hell.org.ua/Docs/oreilly/java/exp/ch05_06.htm">编译单元</a> （即物理文件）中的代码。尽管在单独的文件中，但ITD在编译时仍合并到相同的已编译.class文件中。因为生成的类与开发人员自己编写了所有代码基本相同，所以传统Java编程的所有好处（如IDE，调试器支持，代码辅助，类型自省，类型安全等）都可以按您期望的那样工作。另外，由于编译后的类只是一个类文件，因此所有内容都可以在运行时完美运行。具体来说，您不必担心<a href="https://stackoverflow.com/questions/435553/java-reflection-performance">反射性能</a> ，内存使用，令人困惑且难以调试的操作，可能需要批准和升级的额外库等问题。</p><p>使用ITD进行代码生成的另一个令人兴奋的地方是它所提供<a href="https://en.wikipedia.org/wiki/Separation_of_concerns">的关注点分离</a> 。关注点分离对应用程序开发人员有好处，因为他们可以安全地忽略Roo创建的ITD文件（因为开发人员知道Roo将对其进行管理）。但是，对于Roo附加组件，关注点分离也非常好。附件开发人员非常容易，因为附件开发人员知道他们可以控制整个ITD编译单元的内容。另一个更微妙的好处是它提供了自动升级支持。在Roo的开发过程中，我们已经看到了许多示例，其中我们改进了附加组件，然后随后加载Roo的用户将收到自动升级的ITD。同样，用户可以从其环境中删除加载项，并且Roo会自动删除相关的ITD。这是我们发现无价的非常实用和有用的技术。</p><p>ITD的最终主要好处是避免锁定。稍后我们将看到，ITD本质上是普通的Java源文件。它们只是与所有其他源代码一起放在您的磁盘上，这意味着开发人员可以选择不再加载Roo，并且他们的项目仍然可以工作。那些想要更彻底地删除的人可以使用<a href="https://www.eclipse.org/ajdt/">Eclipse AJDT</a>的“ <a href="https://contraptionsforprogramming.blogspot.com/2009/05/push-in-refactoring-for-ajdt.html">推送重构</a> ”之类的功能。这样做是自动将所有源代码从ITD移动到正确的Java源文件。这意味着，如果您不想再使用Roo，只需“推动重构”您的项目，您就可以拥有一个完全正常的Java项目-就像您自己亲自编写一样。这真是个好消息：</p>
 <ul>
-<li>People just wanting to kick-start a project can do so with incredible ease and then remove Roo (as an aside they can also resume using Roo again at any time and it will work fine)</li>
-<li>People wanting to use Roo for long term productivity gains can do so with complete confidence, knowing they can very easily remove it at any future time with just a couple of mouse clicks</li>
-</ul><p>Roo uses ITDs as provided by AspectJ. <a href="http://www.springsource.com/">SpringSource</a> are big supporters and users of AspectJ, and here are just some of the reasons we feel it&rsquo;s a good fit for Roo-based projects:</p>
+<li>只是想启动一个项目的人可以轻松地做到这一点，然后删除Roo（顺便说一句，他们也可以随时再次使用Roo，它将正常工作）</li>
+<li>希望长期使用Roo的人们可以完全放心地这样做，因为他们知道在将来的任何时候只需单击几下鼠标，就可以很轻松地将其删除。</li>
+</ul><p>Roo使用AspectJ提供的ITD。 <a href="http://www.springsource.com/">SpringSource</a>是AspectJ的大力支持者和用户，以下是一些我们认为它非常适合基于Roo的项目的原因：</p>
 <ul>
-<li>AspectJ is an active project with a large community</li>
-<li>AspectJ is mature, reliable and robust, having origins back in 2001 at PARC</li>
-<li>AspectJ is widely supported by mainstream technologies like Maven, Ant and IDEs</li>
-<li>Using AspectJ delivers existing IDE support without us needing to write extra plugins</li>
-<li>Our research showed around half of all Spring users were already using AspectJ anyway</li>
-<li>AspectJ is not used at runtime (the AspectJ runtime JAR is needed, but this has been a Spring Framework dependency since Spring 2.0 and as such would already be approved by organizations using Spring 2.0 and above)</li>
-<li>AspectJ operates at build time and therefore ensures Java's performance and <a href="http://blogs.sun.com/jonthecollector/entry/presenting_the_permanent_generation">perm gen space</a> is not compromised</li>
-<li>Roo's ITD usage pattern is automatic, transparent and does not require users to have any AspectJ (or ITD) knowledge, skills or experience</li>
-<li>Using AspectJ permits more advanced programming patterns to be employed such as <a href="https://en.wikipedia.org/wiki/Domain-driven_design">domain driven design</a> (DDD) and <a href="https://www.eclipse.org/aspectj/doc/next/progguide/starting-development.html">enforcement aspects</a>, should developers wish to employ them</li>
-<li>SpringSource employs the current leads of AspectJ (Andy Clement) and AJDT (Andrew Eisenberg), plus highly regarded AspectJ experts (like Ramnivas Laddard and Adrian Colyer), so we knew we had considerable in-house skills to ensure AspectJ would work very well with Roo</li>
-<li>Many other production-proven technologies from SpringSource are also built on or support AspectJ, including <a href="http://www.springsource.org/about">Spring Framework</a>, <a href="http://www.springsource.org/security">Spring Security</a>, <a href="http://www.springsource.com/products/ams">SpringSource Application Management Suite</a>, <a href="http://www.springsource.com/products/dmserver">SpringSource dm Server</a>, <a href="http://www.springsource.com/products/dmserver">SpringSource tc Server</a> and more</li>
+<li>AspectJ是一个活跃的项目，具有很大的社区</li>
+<li>AspectJ成熟，可靠且强大，起源于2001年成立于PARC</li>
+<li>Maven，Ant和IDE等主流技术广泛支持AspectJ</li>
+<li>使用AspectJ可提供现有的IDE支持，而无需我们编写额外的插件</li>
+<li>我们的研究表明，大约有一半的Spring用户已经在使用AspectJ。</li>
+<li>在运行时不使用AspectJ（需要AspectJ运行时JAR，但是自Spring 2.0以来，这一直是Spring Framework的依赖关系，因此已经由使用Spring 2.0及更高版本的组织批准了）</li>
+<li>AspectJ在构建时运行，因此确保Java的性能和<a href="http://blogs.sun.com/jonthecollector/entry/presenting_the_permanent_generation">烫发空间</a>不受影响</li>
+<li>Roo的ITD使用模式是自动，透明的，不需要用户具备任何AspectJ（或ITD）知识，技能或经验</li>
+<li>如果开发人员希望使用AspectJ，则可以使用更高级的编程模式，例如<a href="https://en.wikipedia.org/wiki/Domain-driven_design">域驱动设计</a> （DDD）和<a href="https://www.eclipse.org/aspectj/doc/next/progguide/starting-development.html">实施方面</a> 。</li>
+<li>SpringSource聘用了AspectJ（安迪·克莱门特（Andy Clement）和AJDT（安德鲁·艾森伯格（Andrew Eisenberg））的现任负责人，以及受人尊敬的AspectJ专家（如Ramnivas Laddard和Adrian Colyer），因此我们知道我们拥有大量的内部技能，可以确保AspectJ可以很好地与o</li>
+<li>SpringSource的许多其他经过生产验证的技术也基于或支持AspectJ，包括<a href="http://www.springsource.org/about">Spring Framework</a> ， <a href="http://www.springsource.org/security">Spring Security</a> ， <a href="http://www.springsource.com/products/ams">SpringSource Application Management Suite</a> ， <a href="http://www.springsource.com/products/dmserver">SpringSource dm Server</a> ， <a href="http://www.springsource.com/products/dmserver">SpringSource tc Server</a>等。</li>
 </ul>
-<h2>Roo Usage in More Detail</h2><p>Let&rsquo;s explore Roo&rsquo;s ITD usage and metadata model by creating a new project. Assuming you&rsquo;ve installed Roo 1.0.0.M2, let&rsquo;s create a new directory for our project and start Roo:</p>
+<h2>Roo使用情况的详细信息</h2><p>让我们通过创建一个新项目来探索Roo的ITD用法和元数据模型。假设您已经安装了Roo 1.0.0。M2，让我们为项目创建一个新目录并启动Roo：</p>
 <pre><code class="prettyprint code">$ mkdir architecture
 $ cd architecture
 $ roo
-</code></pre><p>Once you receive the welcome screen, enter the following commands:</p>
-<pre><code class="prettyprint code">roo&gt; project --topLevelPackage com.hello
-roo&gt; persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
-roo&gt; entity --name World 
-roo&gt; field string name 
-</code></pre><p>Graphically your screen will look something like this:</p><p><center><img src="http://blog.springsource.com/wp-content/uploads/2009/10/first-commands.png" alt="first-commands" title="first-commands" width="631" height="557" class="aligncenter size-full wp-image-2874" /></center><br /></p><p>Let&rsquo;s now open up a text editor and take a look inside the World.java file:</p>
-<pre><code class="prettyprint java"><br />package com.hello; 
+</code></pre><p>收到欢迎屏幕后，输入以下命令：</p>
+<pre><code class="prettyprint code">roo> project --topLevelPackage com.hello
+roo> persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+roo> entity --name World 
+roo> field string name 
+</code></pre><p>图形上，您的屏幕将如下所示：</p><p></p><center><img src="http://blog.springsource.com/wp-content/uploads/2009/10/first-commands.png" alt="第一命令" title="第一命令" width="631" height="557" class="aligncenter size-full wp-image-2874"></center><br><p></p><p>现在让我们打开一个文本编辑器，看看World.java文件内部：</p>
+<pre><code class="prettyprint java"><br>package com.hello; 
 
 import javax.persistence.Entity; 
 import org.springframework.roo.addon.javabean.RooJavaBean; 
@@ -245,45 +226,45 @@ import org.springframework.roo.addon.entity.RooEntity;
 public class World { 
    private String name; 
 } 
-</code></pre><p>As shown, there are several @Roo* annotations. These annotations are included in Roo add-ons and instruct Roo to create an ITD if required. The @RooEntity annotation is indicating that you&rsquo;d like Roo to automatically provide typical JPA methods and fields (including an identifier and version property). The @RooJavaBean is requesting getters and setters to be created for each field. The @RooToString is requesting a toString() method to be created.</p><p>All ITDs created by Roo adopt a specific naming convention. The convention is SimpleTypeName + &ldquo;<em>Roo</em>&rdquo; + AddOnSpecificKeyword + &ldquo;.aj&rdquo;. Roo automatically ensures all files matching this format are properly managed by a relevant add-on. If there is no add-on installed for a particular keyword, Roo will delete the orphaned ITD file. This ensures you can change your add-on configuration at any time and not have to manually deal with cleaning up.</p><p>Let&rsquo;s have a look inside the World_Roo_ToString.aj ITD:</p>
-<pre><code class="prettyprint java"><br />package com.hello; 
+</code></pre><p>如图所示，有几个@ Roo *注释。这些注释包含在Roo附加组件中，并在需要时指示Roo创建ITD。@RooEntityannotation表示您希望Roo自动提供典型的JPA方法和字段（包括标识符和版本属性）。@RooJavaBean请求为每个字段创建getter和setter。@RooToString正在请求创建toString（）方法。</p><p>Roo创建的所有ITD均采用特定的命名约定。约定为SimpleTypeName +“ <em>Roo</em> ” + AddOnSpecificKeyword +“ .aj”。Roo会自动确保由相关附件正确管理所有与此格式匹配的文件。如果没有为特定关键字安装附加组件，则Roo会删除孤立的ITD文件。这样可以确保您可以随时更改加载项配置，而不必手动进行清理。</p><p>我们来看看World_Roo_ToString.aj ITD：</p>
+<pre><code class="prettyprint java"><br>package com.hello; 
 
 privileged aspect World_Roo_ToString { 
 
     public String World.toString() {    
         StringBuilder sb = new StringBuilder();        
-        sb.append(&quot;id: &quot;).append(getId()).append(&quot;, &quot;);        
-        sb.append(&quot;version: &quot;).append(getVersion()).append(&quot;, &quot;);        
-        sb.append(&quot;name: &quot;).append(getName());        
+        sb.append("id: ").append(getId()).append(", ");        
+        sb.append("version: ").append(getVersion()).append(", ");        
+        sb.append("name: ").append(getName());        
         return sb.toString();        
     }    
     
 } 
-</code></pre><p>As you can see, an ITD looks just like a normal Java source file. There is only one difference: in the method signature there is a &ldquo;World.&rdquo; prefix before the &ldquo;toString()&rdquo; method name. This is directing AspectJ to introduce the toString() method into the World.class file during compilation. As you can see, ITDs are incredibly simple even if you&rsquo;ve never encountered them before. In particular, there are no pointcuts required.</p><p>Let&rsquo;s edit the World.java file and add another field to it:</p>
-<pre><code class="prettyprint java"><br />private String comment;
-</code></pre><p>If you&rsquo;ve left Roo running, as soon as you save World.java you will notice that it instantly modifies the World_Roo_JavaBean.aj and World_Roo_ToString.aj files. This is because Roo monitors the file system for any changes you make outside of the Roo shell, such as through your preferred IDE. You could have also used Roo&rsquo;s &ldquo;add field string&rdquo; command if you preferred.</p><p>If you didn&rsquo;t have Roo running, the next time that you load it an automatic startup-time scan will be performed. This includes automatically upgrading any existing ITDs if the relevant add-on has been upgraded (or even deleting the ITD if the add-on no longer exists). The point is all of this happens automatically and naturally, without you needing to worry about following special rules and constraints about when Roo must run or how you must change files etc.</p>
-<h2>Customizing What Roo Generates</h2><p>All @Roo* annotations allow you to control the member name being used, and also provide the member yourself. Let&rsquo;s edit the World.java file and change the @RooToString annotation to:</p>
-<pre><code class="prettyprint java"><br />@RooToString(toStringMethod=&quot;rooIsFun&quot;)
-</code></pre><p>If you now have a look in the World_Roo_ToString.aj file, you&rsquo;ll see the method name has automatically changed:</p>
-<pre><code class="prettyprint java"><br />package com.hello; 
+</code></pre><p>如您所见，ITD看起来就像普通的Java源文件。仅有一个区别：在方法签名中，“ toString（）”方法名称之前有一个“ World。”前缀。这指示AspectJ在编译期间将toString（）方法引入World.class文件中。如您所见，ITD非常简单，即使您以前从未遇到过。特别是，不需要切入点。</p><p>让我们编辑World.java文件并向其中添加另一个字段：</p>
+<pre><code class="prettyprint java"><br>private String comment;
+</code></pre><p>如果您让Roo保持运行状态，则保存World.java后，您会立即注意到它会立即修改World_Roo_JavaBean.aj和World_Roo_ToString.aj文件。这是因为Roo会监视文件系统，以查看您在Roo Shell之外进行的任何更改，例如通过首选的IDE。如果愿意，您也可以使用Roo的“添加字段字符串”命令。</p><p>如果您没有运行Roo，则下次加载它时，将执行自动启动时扫描。这包括如果相关附件已升级，则自动升级任何现有的ITD（如果该附件不再存在，甚至删除ITD）。关键是所有这些都是自动自然发生的，而您不必担心遵循特定的规则和约束，即Roo必须何时运行或如何更改文件等。</p>
+<h2>自定义Roo生成的内容</h2><p>所有@ Roo *annotation均允许您控制所使用的成员名称，也可以自己提供成员。让我们编辑World.java文件，并将@RooToStringannotation更改为：</p>
+<pre><code class="prettyprint java"><br>@RooToString(toStringMethod="rooIsFun")
+</code></pre><p>如果现在查看World_Roo_ToString.aj文件，您会看到方法名称已自动更改：</p>
+<pre><code class="prettyprint java"><br>package com.hello; 
 
 privileged aspect World_Roo_ToString { 
     
     public String World.rooIsFun() {    
         StringBuilder sb = new StringBuilder();        
-        sb.append(&quot;id: &quot;).append(getId()).append(&quot;, &quot;);        
-        sb.append(&quot;version: &quot;).append(getVersion()).append(&quot;, &quot;);        
-        sb.append(&quot;comment: &quot;).append(getComment()).append(&quot;, &quot;);        
-        sb.append(&quot;name: &quot;).append(getName());        
+        sb.append("id: ").append(getId()).append(", ");        
+        sb.append("version: ").append(getVersion()).append(", ");        
+        sb.append("comment: ").append(getComment()).append(", ");        
+        sb.append("name: ").append(getName());        
         return sb.toString();        
     }    
     
 } 
-</code></pre><p>Let&rsquo;s say you don&rsquo;t like Roo&rsquo;s toString() method (which is now rooIsFun(), remember!). You have two ways of removing it. You can either delete or comment out the @RooToString annotation in the World.java file, or you can simply provide your own rooIsFun() method directly in World.java. Feel free to try both techniques. In both cases you&rsquo;ll see Roo automatically deletes the World_Roo_ToString.aj file, as it can see you don&rsquo;t need Roo to provide the method for you anymore. This reflects Roo&rsquo;s approach: you are always in total control and there aren&rsquo;t any surprises.</p>
-<h2>Metadata Model</h2><p>While you certainly don&rsquo;t need to understand Roo&rsquo;s internals to simply use Roo, curious readers might be wondering how the World_Roo_ToString.aj file even knew there were getId(), getVersion(), getComment() and getName() methods available. This is particularly interesting given these methods aren&rsquo;t even in the World.java file. Let&rsquo;s explore this a little more.</p><p>In the Roo shell, enter the following command:</p>
-<pre><code class="prettyprint code">roo&gt; metadata for type --type com.hello.World
-</code></pre><p>The resultant screen should look similar to:</p><p><center><img src="http://blog.springsource.com/wp-content/uploads/2009/10/metadata.png" alt="metadata" title="metadata" width="825" height="596" class="aligncenter size-full wp-image-2875" /></center><br /></p><p>What this is summarizing is Roo&rsquo;s internal representation of the World.java type. This is built from an AST parse and bind of the World.java file. You may have noticed there are downstream dependencies listed. These represent other metadata items that wish to be notified should the World.java metadata ever change. Add-ons will generally listen for changes to other metadata items and then modify ITDs (or XML files or JSPs etc) accordingly.</p><p>You can watch the metadata event notifications take place by typing &ldquo;metadata trace 1&rdquo; and then changing the World.java file. The notification messages will appear similar to the following:</p><p><center><img src="http://blog.springsource.com/wp-content/uploads/2009/10/tracing.png" alt="tracing" title="tracing" width="826" height="495" class="aligncenter size-full wp-image-2876" /></center><br /></p><p>Before concluding this introduction to Roo&rsquo;s metadata model, I will note that Roo does not require metadata to be retained in memory. This ensures very large projects can still use Roo without running out of memory. Roo automatically tracks cache statistics and also the runtime profile of individual add-ons. Those systems with sufficient memory will enjoy an automatic <a href="https://en.wikipedia.org/wiki/Cache_algorithms#Least_Recently_Used">LRU</a> cache. If you&rsquo;re curious about the LRU cache statistics, these are available via the &ldquo;metadata status&rdquo; command (note the cache hit ratio is pleasingly high):</p>
-<pre><code class="prettyprint code">roo&gt; metadata status 
+</code></pre><p>假设您不喜欢Roo的toString（）方法（现在是rooIsFun（），请记住！）。您有两种删除方法。您可以删除或注释掉World.java文件中的@RooToStringannotation，也可以直接在World.java中直接提供自己的rooIsFun（）方法。随意尝试这两种技术。在这两种情况下，您都会看到Roo自动删除World_Roo_ToString.aj文件，因为它可以看到您不再需要Roo为您提供该方法。这反映了Roo的方法：您始终处于完全掌控之中，没有任何意外。</p>
+<h2>元数据模型</h2><p>虽然您当然不需要了解Roo的内部知识就可以简单地使用Roo，但好奇的读者可能会想知道World_Roo_ToString.aj文件如何甚至知道有getId（），getVersion（），getComment（）和getName（）方法可用。鉴于这些方法甚至不在World.java文件中，因此这特别有趣。让我们再探讨一下。</p><p>在Roo Shell中，输入以下命令：</p>
+<pre><code class="prettyprint code">roo> metadata for type --type com.hello.World
+</code></pre><p>结果屏幕看起来类似于：</p><p></p><center><img src="http://blog.springsource.com/wp-content/uploads/2009/10/metadata.png" alt="元数据" title="元数据" width="825" height="596" class="aligncenter size-full wp-image-2875"></center><br><p></p><p>这就是Roo对World.java类型的内部表示。这是根据World.java文件的AST解析和绑定构建的。您可能已经注意到其中列出了下游依赖性。这些代表希望World.java元数据发生更改时希望得到通知的其他元数据项。加载项通常会侦听对其他元数据项的更改，然后相应地修改ITD（或XML文件或JSP等）。</p><p>您可以通过键入“元数据跟踪1”然后更改World.java文件来观看元数据事件通知的发生。通知消息将类似于以下内容：</p><p></p><center><img src="http://blog.springsource.com/wp-content/uploads/2009/10/tracing.png" alt="追踪" title="追踪" width="826" height="495" class="aligncenter size-full wp-image-2876"></center><br><p></p><p>在结束对Roo元数据模型的介绍之前，我会注意到Roo不需要将元数据保留在内存中。这样可以确保非常大的项目仍可以使用Roo而不会耗尽内存。Roo自动跟踪缓存统计信息以及各个附加组件的运行时配置文件。那些具有足够内存的系统将享受自动<a href="https://en.wikipedia.org/wiki/Cache_algorithms#Least_Recently_Used">LRU</a>缓存。如果您对LRU缓存统计信息感到好奇，可以通过“元数据状态”命令获得这些信息（请注意，缓存命中率非常高）：</p>
+<pre><code class="prettyprint code">roo> metadata status 
 2: org.springframework.roo.addon.configurable.ConfigurableMetadata
 5: org.springframework.roo.addon.javabean.JavaBeanMetadata
 8: org.springframework.roo.addon.finder.FinderMetadata
@@ -292,13 +273,12 @@ privileged aspect World_Roo_ToString {
 64: org.springframework.roo.addon.entity.EntityMetadata
 124: org.springframework.roo.addon.tostring.ToStringMetadata
 862: org.springframework.roo.process.manager.internal.DefaultFileManager
-[<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3f7b5a595e4a534b725a4b5e5b5e4b5e6c5a4d49565c5a7f090f0c0f5906">[email&#160;protected]</a> providers = 14, validGets = 369, cachePuts = 17, cacheHits = 352, cacheMisses = 17, cacheEvictions = 0, cacheCurrentSize = 6, cacheMaximumSize = 1000]
+[<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3f7b5a595e4a534b725a4b5e5b5e4b5e6c5a4d49565c5a7f090f0c0f5906">[email protected]</a> providers = 14, validGets = 369, cachePuts = 17, cacheHits = 352, cacheMisses = 17, cacheEvictions = 0, cacheCurrentSize = 6, cacheMaximumSize = 1000]
 </code></pre>
-<h2>Conclusion</h2><p>I hope that you have found this discussion of how Roo works interesting. We&rsquo;ve seen that Roo uses ITDs to achieve sustainable productivity gains for Java developers. We&rsquo;ve looked at the benefits of Roo&rsquo;s ITD approach and seen how it actually works in depth, including how they are customized, how they operate at a metadata level and how their lifecycle is transparently and automatically linked to add-on upgrades. We&rsquo;ve also discussed how ITDs deliver mature and proven separation of concerns while concurrently avoiding lock-in, runtime implications and other subtle issues that are important in large, real-world projects. Finally, we reviewed Roo&rsquo;s metadata system and explored some of its event notifications, type introspection and scalability features.</p><p>We look forward to supporting the community in becoming involved in Roo and developing new add-ons. We invite you to <a href="http://www.springsource.com/download/community?project=Spring%20Roo">try out Roo</a> and we very much welcome your <a href="http://forum.springsource.org/forumdisplay.php?f=67">feedback</a>, <a href="http://jira.springsource.org/browse/ROO">bug reports</a>, <a href="http://jira.springsource.org/browse/ROO">feature ideas</a> and <a href="https://search.twitter.com/search?q=%23roo">comments</a>. I hope that you enjoy using <a href="http://www.springsource.org/roo">Roo</a>.</p></div>
+<h2>结论</h2><p>我希望您发现有关Roo的工作方式的讨论很有趣。我们已经看到Roo使用ITD来为Java开发人员实现可持续的生产力增长。我们已经研究了Roo的ITD方法的好处，并深入了解了它的实际工作原理，包括如何进行自定义，如何在元数据级别上进行操作以及其生命周期如何透明地自动链接到附加升级。我们还讨论了ITD如何将成熟的事实证明为关注点分离，同时又避免了在大型现实项目中很重要的锁定，运行时影响和其他细微问题。最后，我们回顾了Roo的元数据系统，并探讨了其一些事件通知，类型自省和可伸缩性功能。</p><p>我们期待支持社区参与Roo并开发新的附件。我们邀请您<a href="http://www.springsource.com/download/community?project=Spring Roo">试用Roo</a> ，非常欢迎您提供<a href="http://forum.springsource.org/forumdisplay.php?f=67">反馈</a> ， <a href="http://jira.springsource.org/browse/ROO">错误报告</a> ， <a href="http://jira.springsource.org/browse/ROO">功能思想</a>和<a href="https://search.twitter.com/search?q=%23roo">评论</a> 。希望您喜欢使用<a href="http://www.springsource.org/roo">Roo</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" data-cfasync="false"></script><script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 245;
 
       (function(disqus_shortname, document) {
@@ -312,15 +292,12 @@ privileged aspect World_Roo_ToString {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -328,23 +305,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -354,17 +327,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -378,18 +349,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Content Negotiation using Views</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>使用视图进行内容协商</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,82 +16,80 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Content Negotiation using Views" />
-<meta name="twitter:description" content="&lt;p&gt;In my previous &lt;a href=&quot;http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/&quot;&gt;post&lt;/a&gt; I introduced the concept of content negotiation and the three strategies Spring MVC uses to determine the content requested.&lt;/p&gt;
-&lt;p&gt;In this post I want to extend the concept specifically to supporting multiple views for different content-types using the &lt;code style=&quot;font-size:100%; color:black&quot;&gt;ContentNegotiatingViewResolver&lt;/code&gt; (or CNVR).&lt;/p&gt;
-&lt;h2&gt;Quick Overview&lt;/h2&gt;
-&lt;p&gt;Since we already know how to setup content-negotiation from the previous &lt;a href=&quot;http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/&quot;&gt;post&lt;/a&gt;, using it to select between multiple views is very straightforward. Simply define a CNVR like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;prettyprint xml&quot;&gt;&lt;br&gt;    &amp;lt;!--
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Content Negotiation using Views">
+<meta name="twitter:description" content="<p>In my previous <a href=" http:="" ="" blog.springsource.org="" 2013="" 05="" 11="" content-negotiation-using-spring-mvc="" ="="></meta>post I introduced the concept of content negotiation and the three strategies Spring MVC uses to determine the content requested.
+<p>In this post I want to extend the concept specifically to supporting multiple views for different content-types using the <code style=" font-size:100%;color:black"></head><body dir="ltr">ContentNegotiatingViewResolver (or CNVR).<p></p>
+<h2>Quick Overview</h2>
+<p>Since we already know how to setup content-negotiation from the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a>, using it to select between multiple views is very straightforward. Simply define a CNVR like this:</p>
+<pre><code class="prettyprint xml"><br>    <!--
       // View resolver that delegates to other view resolvers based on the
       // content type
-      --&amp;gt;
-    &amp;lt;bean class=&quot;org.springframework.web.servlet.view.
-                                           ContentNegotiatingViewResolver&quot;&amp;gt;
-       &amp;lt;!-- All configuration now done by manager - since Spring V3.2 --&amp;gt;
-       &amp;lt;property name=&quot;contentNegotiationManager&quot; ref=&quot;cnManager&quot;/&amp;gt;
-    &amp;lt;/bean&amp;gt;
+      -->
+    <bean class="org.springframework.web.servlet.view.
+                                           ContentNegotiatingViewResolver">
+       <!-- All configuration now done by manager - since Spring V3.2 -->
+       <property name="contentNegotiationManager" ref="cnManager"/>
+    </bean>
     
-    &amp;lt;!--
+    <!--
       // Setup a simple strategy:
       //  1. Only path extension is taken into account, Accept headers
       //      are ignored.
       //  2. Return HTML by default when not sure.
-      --&amp;gt;
-    &amp;lt;bean id=&quot;cnManager&quot; class=&quot;org.springframework.web.accept.
-                                   ContentNegotiationManagerFactoryBean&quot;&amp;gt;
-        &amp;lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot;/&amp;gt;        
-        &amp;lt;property name=&quot;defaultContentType&quot; value=&quot;text/html&quot; /&amp;gt;
-    &amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200" />
+      -->
+    <bean id="cnManager" class="org.springframework.web.accept.
+                                   ContentNegotiationManagerFactoryBean">
+        <property name="ignoreAcceptHeader" value="true"/>        
+        <property name="defaultContentType" value="text/html" />
+    </bean>
+</code></pre>
+">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200">
 
-<meta property="og:title" content="Content Negotiation using Views" />
-<meta property="og:image" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200" />
-<meta property="og:description" content="&lt;p&gt;In my previous &lt;a href=&quot;http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/&quot;&gt;post&lt;/a&gt; I introduced the concept of content negotiation and the three strategies Spring MVC uses to determine the content requested.&lt;/p&gt;
-&lt;p&gt;In this post I want to extend the concept specifically to supporting multiple views for different content-types using the &lt;code style=&quot;font-size:100%; color:black&quot;&gt;ContentNegotiatingViewResolver&lt;/code&gt; (or CNVR).&lt;/p&gt;
-&lt;h2&gt;Quick Overview&lt;/h2&gt;
-&lt;p&gt;Since we already know how to setup content-negotiation from the previous &lt;a href=&quot;http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/&quot;&gt;post&lt;/a&gt;, using it to select between multiple views is very straightforward. Simply define a CNVR like this:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;prettyprint xml&quot;&gt;&lt;br&gt;    &amp;lt;!--
+<meta property="og:title" content="Content Negotiation using Views">
+<meta property="og:image" content="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=200">
+<meta property="og:description" content="<p>In my previous <a href=" http:="" ="" blog.springsource.org="" 2013="" 05="" 11="" content-negotiation-using-spring-mvc="" ="="></meta>post I introduced the concept of content negotiation and the three strategies Spring MVC uses to determine the content requested.
+<p>In this post I want to extend the concept specifically to supporting multiple views for different content-types using the <code style=" font-size:100%;color:black">ContentNegotiatingViewResolver (or CNVR).<p></p>
+<h2>Quick Overview</h2>
+<p>Since we already know how to setup content-negotiation from the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a>, using it to select between multiple views is very straightforward. Simply define a CNVR like this:</p>
+<pre><code class="prettyprint xml"><br>    <!--
       // View resolver that delegates to other view resolvers based on the
       // content type
-      --&amp;gt;
-    &amp;lt;bean class=&quot;org.springframework.web.servlet.view.
-                                           ContentNegotiatingViewResolver&quot;&amp;gt;
-       &amp;lt;!-- All configuration now done by manager - since Spring V3.2 --&amp;gt;
-       &amp;lt;property name=&quot;contentNegotiationManager&quot; ref=&quot;cnManager&quot;/&amp;gt;
-    &amp;lt;/bean&amp;gt;
+      -->
+    <bean class="org.springframework.web.servlet.view.
+                                           ContentNegotiatingViewResolver">
+       <!-- All configuration now done by manager - since Spring V3.2 -->
+       <property name="contentNegotiationManager" ref="cnManager"/>
+    </bean>
     
-    &amp;lt;!--
+    <!--
       // Setup a simple strategy:
       //  1. Only path extension is taken into account, Accept headers
       //      are ignored.
       //  2. Return HTML by default when not sure.
-      --&amp;gt;
-    &amp;lt;bean id=&quot;cnManager&quot; class=&quot;org.springframework.web.accept.
-                                   ContentNegotiationManagerFactoryBean&quot;&amp;gt;
-        &amp;lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot;/&amp;gt;        
-        &amp;lt;property name=&quot;defaultContentType&quot; value=&quot;text/html&quot; /&amp;gt;
-    &amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2013-06-03 18:26:00.0" />
-</head>
-<body>
+      -->
+    <bean id="cnManager" class="org.springframework.web.accept.
+                                   ContentNegotiationManagerFactoryBean">
+        <property name="ignoreAcceptHeader" value="true"/>        
+        <property name="defaultContentType" value="text/html" />
+    </bean>
+</code></pre>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2013-06-03 18:26:00.0">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -107,16 +99,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -132,9 +124,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -144,40 +136,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -203,80 +185,79 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Content Negotiation using Views</h1>
+<h1 class="blog--title">使用视图进行内容协商</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=20&amp;d=mm" />
-<span class="author">Paul Chapman</span>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/0b0bedf6c0dab07b13a322eed9350873?s=20&d=mm"> <span class="author">保罗·查普曼</span>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2013-06-03 18:26:00.0">June 03, 2013</time>
+<time class="date" pubdate="" datetime="2013-06-03 18:26:00.0">2013年6月3日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="515" href="/blog/2013/06/03/content-negotiation-using-views#disqus_thread">
+<a class="comments" href="/blog/2013/06/03/content-negotiation-using-views#disqus_thread" data-disqus-identifier="515">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>In my previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a> I introduced the concept of content negotiation and the three strategies Spring MVC uses to determine the content requested.</p>
-<p>In this post I want to extend the concept specifically to supporting multiple views for different content-types using the <code style="font-size:100%; color:black">ContentNegotiatingViewResolver</code> (or CNVR).</p>
-<h2>Quick Overview</h2>
-<p>Since we already know how to setup content-negotiation from the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a>, using it to select between multiple views is very straightforward. Simply define a CNVR like this:</p>
-<pre><code class="prettyprint xml"><br />    &lt;!--
+<div class="blog--post"><p>在我以前的<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章中，</a>我介绍了内容协商的概念以及Spring MVC用于确定请求的内容的三种策略。</p>
+<p>在本文中，我想将概念专门扩展为使用<code style="font-size:100%;color:black">ContentNegotiatingViewResolver</code> （或CNVR）支持不同内容类型的多个视图。</p>
+<h2>快速概述</h2>
+<p>由于我们已经从上一篇<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章中</a>了解了如何设置内容协商，因此使用它在多个视图之间进行选择非常简单。只需这样定义CNVR：</p>
+<pre><code class="prettyprint xml"><br>    <!--
       // View resolver that delegates to other view resolvers based on the
       // content type
-      --&gt;
-    &lt;bean class=&quot;org.springframework.web.servlet.view.
-                                           ContentNegotiatingViewResolver&quot;&gt;
-       &lt;!-- All configuration now done by manager - since Spring V3.2 --&gt;
-       &lt;property name=&quot;contentNegotiationManager&quot; ref=&quot;cnManager&quot;/&gt;
-    &lt;/bean&gt;
+      -->
+    <bean class="org.springframework.web.servlet.view.
+                                           ContentNegotiatingViewResolver">
+       <!-- All configuration now done by manager - since Spring V3.2 -->
+       <property name="contentNegotiationManager" ref="cnManager"/>
+    </bean>
     
-    &lt;!--
+    <!--
       // Setup a simple strategy:
       //  1. Only path extension is taken into account, Accept headers
       //      are ignored.
       //  2. Return HTML by default when not sure.
-      --&gt;
-    &lt;bean id=&quot;cnManager&quot; class=&quot;org.springframework.web.accept.
-                                   ContentNegotiationManagerFactoryBean&quot;&gt;
-        &lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot;/&gt;        
-        &lt;property name=&quot;defaultContentType&quot; value=&quot;text/html&quot; /&gt;
-    &lt;/bean&gt;
+      -->
+    <bean id="cnManager" class="org.springframework.web.accept.
+                                   ContentNegotiationManagerFactoryBean">
+        <property name="ignoreAcceptHeader" value="true"/>        
+        <property name="defaultContentType" value="text/html" />
+    </bean>
 </code></pre>
-<p>For every request, a <code style="font-size:100%; color:black">@Controller</code> would typically return a <em>logical view name</em> (or Spring MVC will determine one, by convention from the incoming URL). The CNVR will consult all the other view-resolvers defined in the configuration to see 1) if it has a view with the right name and 2) if it has a view that it also generates the right content - all Views &lsquo;know&rsquo; what content-type they return. The desired content-type is determined in the exact same way discussed in the previous post.</p>
-<p>For the equivalent Java configuration see <a href="#javaconfig1">here</a>. And for an extended configuration see <a href="#config2">here</a>. There is a demo application at Github: <a href="https://github.com/paulc4/mvc-content-neg-views"><a href="https://github.com/paulc4/mvc-content-neg-views">https://github.com/paulc4/mvc-content-neg-views</a></a>. </p>
-<p>For those of you in a hurry, that&rsquo;s it in a nutshell.</p>
-<p>For the rest of you, this post shows how we got to it. It discusses the concept of multiple-views in Spring MVC and builds upon that idea to define what the CNVR is, how to use it and how it works. It takes the same Accounts application from the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a> and builds it up to return account information in HTML, as a Spreadsheet, as JSON and in XML. All using <em>just</em> views.</p>
-<h2>Why Multiple Views?</h2>
-<p>One of the strengths of the MVC pattern is the ability to have multiple views for the same data.  In Spring MVC we achieve this using &rsquo;&rsquo;<em>Content Negotiation&ldquo;</em>&rdquo;. My previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a> discussed content-negotiation in general and showed examples of RESTful controllers using HTTP Message Converters. But content-negotiation can also be used with Views as well.</p>
-<p>For example, suppose I wish to display account information not just as a web-page, but also make it available as a spreadsheet too.  I could use a different URL for each, put two methods on my Spring controller and have each return the correct View type.  (BTW, if you aren´t sure how Spring can create a spreadsheet, I´ll show you that later).</p>
-<pre><code class="prettyprint java"><br />@Controller
+<p>对于每个请求， <code style="font-size:100%;color:black">@Controller</code>通常会返回一个<em>逻辑视图名称</em> （或者，按照惯例，Spring MVC将根据传入的URL确定一个<em>名称</em> ）。CNVR将参考配置中定义的所有其他视图解析器，以查看1）如果它具有名称正确的视图，以及2）如果它具有还生成正确内容的视图-所有视图“知道”什么内容-他们返回。所需的内容类型以与上一篇文章中讨论的完全相同的方式确定。</p>
+<p>有关等效的Java配置，请参见<a href="#javaconfig1">此处</a> 。有关扩展配置，请参见<a href="#config2">此处</a> 。Github上有一个演示应用程序： <a href="https://github.com/paulc4/mvc-content-neg-views"></a> <a href="https://github.com/paulc4/mvc-content-neg-views">https://github.com/paulc4/mvc-content-neg-views</a> 。</p>
+<p>对于匆忙的你们，简而言之就是这样。</p>
+<p>对于其余的人，这篇文章展示了我们是如何做到的。它讨论了Spring MVC中的多视图的概念，并基于该思想来定义CNVR是什么，如何使用它以及如何工作。它采用与上一篇<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章</a>相同的Accounts应用程序，并将其构建为以HTML，电子表格，JSON和XML的形式返回帐户信息。全部<em>只</em>使用视图。</p>
+<h2>为什么要有多个视图？</h2>
+<p>MVC模式的优势之一是能够为同一数据提供多个视图。在Spring MVC中，我们使用“ <em>内容协商”</em>来实现这一点。我以前的<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章</a>一般讨论了内容协商，并展示了使用HTTP消息转换器的RESTful控制器的示例。但是内容协商也可以与Views一起使用。</p>
+<p>例如，假设我希望不仅将帐户信息显示为网页，还希望将其显示为电子表格。我可以为每个URL使用不同的URL，在Spring控制器上放置两个方法，并让每个方法返回正确的视图类型。（顺便说一句，如果您不确定Spring如何创建电子表格，我稍后将向您展示）。</p>
+<pre><code class="prettyprint java"><br>@Controller
 class AccountController {
-    @RequestMapping(&quot;/accounts.htm&quot;)
+    @RequestMapping("/accounts.htm")
     public String listAsHtml(Model model, Principal principal) {
         // Duplicated logic
         model.addAttribute( accountManager.getAccounts(principal) );
         return ¨accounts/list¨;         // View determined by view-resolution
     }
 
-    @RequestMapping(&quot;/accounts.xls&quot;)
+    @RequestMapping("/accounts.xls")
     public AccountsExcelView listAsXls(Model model, Principal principal) {
         // Duplicated logic
         model.addAttribute( accountManager.getAccounts(principal) );
@@ -284,87 +265,87 @@ class AccountController {
     }
 }
 </code></pre>
-<p>Using multiple methods is inelegant, defeats the MVC pattern and gets even uglier if I want to support other data formats too - such as PDF, CSV &hellip;  If you recall in the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a> we had a similar problem wanting a single method to return JSON or XML (which we solved by returning a single <code style="font-size:100%; color:black">@RequestBody</code> object and picking the right HTTP Message Converter).</p>
-<p>[caption id=&ldquo;attachment_13458&rdquo; align=&ldquo;alignleft&rdquo; width=&ldquo;380&rdquo; caption=&ldquo;Picking the right view via Content-Negotiation.&rdquo;]<a href="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-flow.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-flow.png" alt="" title="View Resolution using CNVR" width="380" class="size-full wp-image-13458" /></a>[/caption]</p>
-<p>Now we need a &ldquo;smart&rdquo; view resolver that picks the <em>right</em> View from <em>multiple</em> possible views.</p>
-<p>Spring MVC has long supported multiple view resolvers, and goes to each in turn to find a view. Although the order that view resolvers are consulted can be specified, Spring MVC always picks the <em>first</em> view offered.  The &rsquo;&lsquo;<em>Content Negotiating View Resolver</em>&rsquo;&rsquo; (CNVR) negotiates between <em>all</em> the view resolvers to find the <em>best</em> match for the format desired - this <em>is</em> our &ldquo;smart&rdquo; view resolver.</p>
-<h2>Listing User Accounts Example</h2>
-<a href="http://blog.springsource.org/wp-content/uploads/2013/05/acounts-html.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/05/acounts-html.png" alt="" title="Accounts Page as HTML" width="370" class="size-full wp-image-13352" /></a>
-<p>Here is a simple account listing application which we will use as our worked example to list accounts in HTML, in a spreadsheet and (later) in JSON and XML formats - just using views.</p>
-<p>The complete code can be found at Github: <a href="https://github.com/paulc4/mvc-content-neg-views"><a href="https://github.com/paulc4/mvc-content-neg-views">https://github.com/paulc4/mvc-content-neg-views</a></a>. It is a variation on the application I showed you last time that <em>only</em> uses views to generate output. <strong>Note</strong>: to keep the examples below simple I have used JSPs directly and an <code style="font-size:100%; color:black">InternalResourceViewResolver</code>. The Github project uses Tiles and JSPs because it&rsquo;s easier than raw JSPs.</p>
-<p>The screenshot of the accounts list HTML page shows all the accounts for the currently logged in user. You will see screenshots of the spreadsheet and JSON output later.</p>
-<p>The Spring MVC controller that generated our page is below. Note that the HTML output is generated by the logical view <code style="font-size:100%; color:navy">accounts/list</code>.</p>
-<pre><code class="prettyprint java"><br />@Controller
+<p>如果我也想支持其他数据格式（例如PDF，CSV），则使用多种方法是不雅的，失败了MVC模式，并且变得更加难看。如果您回想起上一篇<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章，</a>我们也遇到了类似的问题，我们想要一个方法来返回JSON或XML（我们通过返回单个<code style="font-size:100%;color:black">@RequestBody</code>对象并选择正确的HTTP消息转换器来解决）。</p>
+<p>[caption id =” attachment_13458” align =” alignleft” width =“ 380” caption =”通过内容协商选择右视图。”] <a href="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-flow.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-flow.png" alt="" title="使用CNVR查看分辨率" width="380" class="size-full wp-image-13458"></a> [/字幕]</p>
+<p>现在，我们需要一个“智能”视图解析器，从<em>多个</em>可能的视图中选择<em>正确的</em>视图。</p>
+<p>Spring MVC长期以来一直支持多个视图解析器，并且依次转到每个视图解析器来查找视图。尽管可以指定协商视图解析器的顺序，但是Spring MVC始终会选择提供的<em>第一个</em>视图。<em>内容协商视图解析器</em> （CNVR）在<em>所有</em>视图解析器之间进行协商，以找到所需格式的<em>最佳</em>匹配-这<em>是</em>我们的“智能”视图解析器。</p>
+<h2>列出用户帐户示例</h2>
+<a href="http://blog.springsource.org/wp-content/uploads/2013/05/acounts-html.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/05/acounts-html.png" alt="" title="帐户页面为HTML" width="370" class="size-full wp-image-13352"></a>
+<p>这是一个简单的帐户列表应用程序，我们将使用该示例作为示例，以HTML，电子表格以及（后来）JSON和XML格式（仅使用视图）列出帐户。</p>
+<p>完整的代码可以在Github上找到： <a href="https://github.com/paulc4/mvc-content-neg-views"></a> <a href="https://github.com/paulc4/mvc-content-neg-views">https://github.com/paulc4/mvc-content-neg-views</a> 。这是我上次向您展示的应用程序的一种变体，该应用程序<em>仅</em>使用视图来生成输出。<strong>注意</strong> ：为了使下面的示例简单易行，我直接使用了JSP和<code style="font-size:100%;color:black">InternalResourceViewResolver</code> 。Github项目使用Tiles和JSP，因为它比原始JSP容易。</p>
+<p>帐户列表HTML页面的屏幕快照显示了当前登录用户的所有帐户。稍后，您将看到电子表格的屏幕截图和JSON输出。</p>
+<p>生成我们页面的Spring MVC控制器如下。请注意，HTML输出是由逻辑视图<code style="font-size:100%;color:navy">accounts/list</code>生成的。</p>
+<pre><code class="prettyprint java"><br>@Controller
 class AccountController {
-    @RequestMapping(&quot;/accounts&quot;)
+    @RequestMapping("/accounts")
     public String list(Model model, Principal principal) {
         model.addAttribute( accountManager.getAccounts(principal) );
         return ¨accounts/list¨;
     }
 }
 </code></pre>
-<p>To show two types of views we need two types of view resolver - one for HTML and one for the spreadsheet (to keep it simple, I will use a JSP for the HTML view). Here is the Java Configuration:</p>
-<pre><code class="prettyprint java"><br />@Configuration
+<p>要显示两种类型的视图，我们需要两种类型的视图解析器-一种用于HTML，另一种用于电子表格（为简单起见，我将在HTML视图中使用JSP）。这是Java配置：</p>
+<pre><code class="prettyprint java"><br>@Configuration
 @EnableWebMvc
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
     @Autowired
     ServletContext servletContext;
 
-    // Will map to bean called &quot;accounts/list&quot; in &quot;spreadsheet-views.xml&quot;
-    @Bean(name=&quot;excelViewResolver&quot;)
+    // Will map to bean called "accounts/list" in "spreadsheet-views.xml"
+    @Bean(name="excelViewResolver")
     public ViewResolver getXmlViewResolver() {
         XmlViewResolver resolver = new XmlViewResolver();
         resolver.setLocation(new ServletContextResource(servletContext,
-                    &quot;/WEB-INF/spring/spreadsheet-views.xml&quot;));
+                    "/WEB-INF/spring/spreadsheet-views.xml"));
         resolver.setOrder(1);
         return resolver;
     }
 
-    // Will map to the JSP page: &quot;WEB-INF/views/accounts/list.jsp&quot;
-    @Bean(name=&quot;jspViewResolver&quot;)
+    // Will map to the JSP page: "WEB-INF/views/accounts/list.jsp"
+    @Bean(name="jspViewResolver")
     public ViewResolver getJspViewResolver() {
         InternalResourceViewResolver resolver =
                             new InternalResourceViewResolver();
-        resolver.setPrefix(&quot;WEB-INF/views&quot;);
-        resolver.setSuffix(&quot;.jsp&quot;);
+        resolver.setPrefix("WEB-INF/views");
+        resolver.setSuffix(".jsp");
         resolver.setOrder(2);
         return resolver;
     }
 }
 </code></pre>
-<p>Or in XML:</p>
-<pre><code class="prettyprint xml"><br />  &lt;!-- Maps to a bean called &quot;accounts/list&quot; in &quot;spreadsheet-views.xml&quot; --&gt;
-  &lt;bean class=&quot;org.springframework.web.servlet.view.XmlViewResolver&quot;&gt;
-    &lt;property name=&quot;order&quot; value=&quot;1&quot;/&gt;
-    &lt;property name=&quot;location&quot; value=&quot;WEB-INF/spring/spreadsheet-views.xml&quot;/&gt;
-  &lt;/bean&gt;
+<p>或使用XML：</p>
+<pre><code class="prettyprint xml"><br>  <!-- Maps to a bean called "accounts/list" in "spreadsheet-views.xml" -->
+  <bean class="org.springframework.web.servlet.view.XmlViewResolver">
+    <property name="order" value="1"/>
+    <property name="location" value="WEB-INF/spring/spreadsheet-views.xml"/>
+  </bean>
 
-  &lt;!-- Maps to &quot;WEB-INF/views/accounts/list.jsp&quot; --&gt;
-  &lt;bean class=&quot;org.springframework.web.servlet.view.
-                                        InternalResourceViewResolver&quot;&gt;
-    &lt;property name=&quot;order&quot; value=&quot;2&quot;/&gt;
-    &lt;property name=&quot;prefix&quot; value=&quot;WEB-INF/views&quot;/&gt;
-    &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;/&gt;
-  &lt;/bean&gt;
+  <!-- Maps to "WEB-INF/views/accounts/list.jsp" -->
+  <bean class="org.springframework.web.servlet.view.
+                                        InternalResourceViewResolver">
+    <property name="order" value="2"/>
+    <property name="prefix" value="WEB-INF/views"/>
+    <property name="suffix" value=".jsp"/>
+  </bean>
 </code></pre>
-<p>And in <code style="font-size:100%; color:navy">WEB-INF/spring/spreadsheet-beans.xml</code> you will find</p>
-<pre><code class="prettyprint xml">  &lt;bean id=&quot;accounts/list&quot; class=&quot;rewardsonline.accounts.AccountExcelView&quot;/&gt;
+<p>在<code style="font-size:100%;color:navy">WEB-INF/spring/spreadsheet-beans.xml</code>您会找到</p>
+<pre><code class="prettyprint xml">  <bean id="accounts/list" class="rewardsonline.accounts.AccountExcelView"/>
 </code></pre>
-<p>The generated spreadsheet looks like this:</p>
-<a href="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-xls.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-xls.png" alt="" title="account-list-xls" width="580" class="alignnone size-full wp-image-13161" /></a>
-<p>Here is how to create a spreadsheet using a view (this is a simplified version, the full implementation is much longer, but you get the idea):</p>
+<p>生成的电子表格如下所示：</p>
+<a href="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-xls.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-xls.png" alt="" title="帐户清单xls" width="580" class="alignnone size-full wp-image-13161"></a>
+<p>这是使用视图创建电子表格的方法（这是简化版本，完整实现要花更长的时间，但您会明白的）：</p>
 <pre><code class="prettyprint java">class AccountExcelView extends AbstractExcelView {
     @Override
-    protected void buildExcelDocument(Map&lt;String, Object&gt; model,
+    protected void buildExcelDocument(Map<String, Object> model,
             HSSFWorkbook workbook, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List&lt;Account&gt; accounts = (List&lt;Account&gt;) model.get(&quot;accountList&quot;);
+        List<Account> accounts = (List<Account>) model.get("accountList");
         HSSFCellStyle dateStyle = workbook.createCellStyle();
-        dateStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat(&quot;m/d/yy&quot;));
+        dateStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("m/d/yy"));
         HSSFSheet sheet = workbook.createSheet();
     
-        for (short i = 0; i &lt; accounts.size(); i++) {
+        for (short i = 0; i < accounts.size(); i++) {
             Account account = accounts.get(i);
             HSSFRow row = sheet.createRow(i);
             addStringCell(row, 0, account.getName());
@@ -388,18 +369,18 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     }   
 } 
 </code></pre>
-<h2>Adding Content Negotiation</h2>
-<p>As it currently stands this setup will always return the spreadsheet because the <code style="font-size:100%; color:black">XmlViewResolver</code> is consulted first (its <code style="font-size:100%; color:black">order</code> property is 1) and it always returns the <code style="font-size:100%; color:black">AccountExcelView</code>.  The <code style="font-size:100%; color:black">InternalResourceViewResolver</code> is never consulted (its <code style="font-size:100%; color:black">order</code> is 2 and we never get that far).</p>
-<p>This is where the CNVR comes in. Let&rsquo;s quickly review what we know about the content selection strategy discussed in the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a>. The requested content-type is determined by checking, in this order:</p>
+<h2>添加内容协商</h2>
+<p>就目前情况而言，此设置将始终返回电子表格，因为首先会查询<code style="font-size:100%;color:black">XmlViewResolver</code> （其<code style="font-size:100%;color:black">order</code>属性为1），并且始终返回<code style="font-size:100%;color:black">AccountExcelView</code> 。永远不会查询<code style="font-size:100%;color:black">InternalResourceViewResolver</code> （它的<code style="font-size:100%;color:black">order</code>是2，所以我们永远不会走那么远）。</p>
+<p>这就是CNVR的来历。让我们快速回顾一下我们对上一篇<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章中</a>讨论的内容选择策略的了解。通过按以下顺序检查来确定请求的内容类型：</p>
 <ul>
-<li>A URL suffix (path extension) - for example <code style="font-size:100%; color:navy">http://...accounts.json</code> to indicate JSON format.</li>
-<li>Or a URL parameter can be used. By default it is named <code style="font-size:100%; color:black">format</code>, for example <code style="font-size:100%; color:navy">http://...accounts?format=json</code>.</li>
-<li>Or the HTTP <code style="font-size:100%; color:black">Accept</code> header property will be used (which is actually how HTTP is defined to work, but is not always convenient to use - especially when the client is a browser).</li>
+<li>URL后缀（路径扩展名）-例如用于表示JSON格式的<code style="font-size:100%;color:navy">http://...accounts.json</code> 。</li>
+<li>或者可以使用URL参数。默认情况下，其名称为<code style="font-size:100%;color:black">format</code> ，例如<code style="font-size:100%;color:navy">http://...accounts?format=json</code> 。</li>
+<li>或将使用HTTP <code style="font-size:100%;color:black">Accept</code>标头属性（实际上是HTTP定义的工作方式，但使用起来并不总是很方便-尤其是当客户端是浏览器时）。</li>
 </ul>
-<p>In the first two cases the suffix or parameter value (<code style="font-size:100%; color:black">xml</code>, <code style="font-size:100%; color:black">json</code> &hellip;) must be mapped to the correct mime-type. Either the <em>JavaBeans Activation Framework</em> can be used or the mappings can be specified explicitly. With the <code style="font-size:100%; color:black">Accept</code> header property, its value <em>is</em> the mine-type.</p>
-<h2>The Content Negotiating View Resolver</h2>
-<p>This is a special view resolver that has our strategy plugged into it. Here is the <a name="javaconfig1">Java Configuration</a>:</p>
-<pre><code class="prettyprint java"><br />@Configuration
+<p>在前两种情况下，必须将后缀或参数值（ <code style="font-size:100%;color:black">xml</code> ， <code style="font-size:100%;color:black">json</code> …）映射到正确的mime类型。可以使用<em>JavaBeans激活框架，</em>也可以显式指定映射。随着<code style="font-size:100%;color:black">Accept</code>标头属性，其价值<em>是</em>矿山型。</p>
+<h2>内容协商视图解析器</h2>
+<p>这是一个特殊的视图解析器，已将我们的策略插入其中。这是<a name="javaconfig1">Java配置</a> ：</p>
+<pre><code class="prettyprint java"><br>@Configuration
 @EnableWebMvc
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
  
@@ -429,36 +410,36 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
   }
 }
 </code></pre>
-<p>Or in XML:</p>
-<pre><code class="prettyprint xml"><br />    &lt;!--
+<p>或使用XML：</p>
+<pre><code class="prettyprint xml"><br>    <!--
       // View resolver that delegates to other view resolvers based on the
       // content type
-      --&gt;
-    &lt;bean class=&quot;org.springframework.web.servlet.view.
-                                      ContentNegotiatingViewResolver&quot;&gt;
-       &lt;!-- All configuration now done by manager - since Spring V3.2 --&gt;
-       &lt;property name=&quot;contentNegotiationManager&quot; ref=&quot;cnManager&quot;/&gt;
-    &lt;/bean&gt;
+      -->
+    <bean class="org.springframework.web.servlet.view.
+                                      ContentNegotiatingViewResolver">
+       <!-- All configuration now done by manager - since Spring V3.2 -->
+       <property name="contentNegotiationManager" ref="cnManager"/>
+    </bean>
     
-    &lt;!--
+    <!--
       // Setup a simple strategy:
       //  1. Only path extension taken into account, Accept headers ignored.
       //  2. Return HTML by default when not sure.
-      --&gt;
-    &lt;bean id=&quot;cnManager&quot; class=&quot;org.springframework.web.accept.
-                                  ContentNegotiationManagerFactoryBean&quot;&gt;
-        &lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot;/&gt;        
-        &lt;property name=&quot;defaultContentType&quot; value=&quot;text/html&quot; /&gt;
-    &lt;/bean&gt;
+      -->
+    <bean id="cnManager" class="org.springframework.web.accept.
+                                  ContentNegotiationManagerFactoryBean">
+        <property name="ignoreAcceptHeader" value="true"/>        
+        <property name="defaultContentType" value="text/html" />
+    </bean>
 </code></pre>
-<p>The <code style="font-size:100%; color:black">ContentNegotiationManager</code> is exactly the same bean I discussed in the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a>.</p>
-<p>The CNVR automatically goes to <em>every</em> other view resolver bean defined to Spring and asks it for a <code style="font-size:100%; color:black">View</code> instance corresponding to the view-name returned by the controller - in this case <code style="font-size:100%; color:navy">accounts/list</code>.  Each <code style="font-size:100%; color:black">View</code> &lsquo;knows&rsquo; what sort of content it can generate because there is a <code style="font-size:100%; color:black">getContentType()</code> method on it (inherited from the <code style="font-size:100%; color:black">View</code> interface).  The JSP page is rendered by a <code style="font-size:100%; color:black">JstlView</code> (returned by the <code style="font-size:100%; color:black">InternalResourceViewResolver</code>) and its content-type is <code style="font-size:100%; color:navy">text/html</code>, whilst the <code style="font-size:100%; color:black">AccountExcelView</code> generates <code style="font-size:100%; color:navy">application/vnd.ms-excel</code>.</p>
-<p>How the CNVR is actually configured is delegated to the <code style="font-size:100%; color:black">ContentNegotiationManager</code> which is created in turn via the configurer (Java Configuration) or one of Spring&rsquo;s many factory beans (XML).</p>
-<p>The last piece of the puzzle is: <em>how does the CNVR know what content-type was requested</em>? Because the content-negotiation strategy tells it what to do: either a URL suffix is recognized, or a URL parameter or an Accept header. Exactly the same strategy setup described in the previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a>, reused by the CNVR.</p>
-<p><blockquote>Note that when content-negotiation strategies were introduced by Spring 3.0 they only applied to selecting Views. Since 3.2 this facility is available across the board (as per my previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">post</a>). The examples in this post use Spring 3.2 and may be different to older examples you have seen before. In particular most of the properties for configuring the content-negotiation strategy are now on the <code style="font-size:100%; color:black">ContentNegotiationManagerFactoryBean</code> and not on the <code style="font-size:100%; color:black">ContentNegotiatingViewResolver</code>. The properties on the CNVR are now deprecated in favor of those on the manager but the CNVR itself works exactly the same way that it always did.</blockquote></p>
-<h2 id="config2">Configuring the Content Negotiating View Resolver</h2>
-<p>By default the CNVR automatically detects all <code style="font-size:100%; color:black">ViewResolvers</code> defined to Spring and negotiates between them. If you prefer, the CNVR itself has a <code style="font-size:100%; color:black">viewResolvers</code> property so you can tell it <em>explicitly</em> which view resolvers to use. This makes it obvious that the CNVR is the master resolver and the others are subordinate to it. Note that the <code style="font-size:100%; color:black">order</code> property is no longer needed.</p>
-<pre><code class="prettyprint java"><br />@Configuration
+<p><code style="font-size:100%;color:black">ContentNegotiationManager</code>与我在上<code style="font-size:100%;color:black">ContentNegotiationManager</code> <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章中</a>讨论的bean完全相同。</p>
+<p>CNVR自动转到定义给Spring的<em>每个</em>其他视图解析器bean，并向其请求与控制器返回的视图名称相对应的<code style="font-size:100%;color:black">View</code>实例-在这种情况下为<code style="font-size:100%;color:navy">accounts/list</code> 。每个<code style="font-size:100%;color:black">View</code> “知道”它可以生成什么样的内容，因为它上面有一个<code style="font-size:100%;color:black">getContentType()</code>方法（从<code style="font-size:100%;color:black">View</code>接口继承）。JSP页面由<code style="font-size:100%;color:black">JstlView</code>呈现（由<code style="font-size:100%;color:black">InternalResourceViewResolver</code>返回），其内容类型为<code style="font-size:100%;color:navy">text/html</code> ，而<code style="font-size:100%;color:black">AccountExcelView</code>生成<code style="font-size:100%;color:navy">application/vnd.ms-excel</code> 。</p>
+<p>CNVR的实际配置方式委托给<code style="font-size:100%;color:black">ContentNegotiationManager</code> ，后者通过配置程序（Java配置）或Spring的许多工厂bean（XML）之一依次创建。</p>
+<p>最后一个难题是： <em>CNVR如何知道请求的内容类型</em> ？因为内容协商策略告诉它要做什么：识别URL后缀，或者URL参数或Accept标头。与上一篇<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章中</a>描述的策略设置完全相同，由CNVR重用。</p>
+<p></p><blockquote>请注意，当Spring 3.0引入内容协商策略时，它们仅适用于选择视图。从3.2开始，这个功能就可以使用了（根据我以前的<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/">文章</a> ）。本文中的示例使用Spring 3.2，并且可能与您之前看到的旧示例有所不同。特别是，大多数用于配置内容协商策略的属性现在位于<code style="font-size:100%;color:black">ContentNegotiationManagerFactoryBean</code> ，而不位于<code style="font-size:100%;color:black">ContentNegotiatingViewResolver</code> 。现在不推荐使用CNVR上的属性，而推荐使用管理器上的属性，但是CNVR本身的工作方式与以前一样。</blockquote><p></p>
+<h2 id="config2">配置内容协商视图解析器</h2>
+<p>默认情况下，CNVR自动检测所有定义为Spring的<code style="font-size:100%;color:black">ViewResolvers</code>并在它们之间进行协商。如果愿意，CNVR本身也具有<code style="font-size:100%;color:black">viewResolvers</code>属性，因此您可以<em>明确</em>告知要使用的视图解析器。显然，CNVR是主解析器，其他解析器从属于它。请注意，不再需要<code style="font-size:100%;color:black">order</code>属性。</p>
+<pre><code class="prettyprint java"><br>@Configuration
 @EnableWebMvc
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
  
@@ -473,19 +454,19 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
   public ViewResolver contentNegotiatingViewResolver(
                         ContentNegotiationManager manager) {
     // Define the view resolvers
-    List&lt;ViewResolver&gt; resolvers = new ArrayList&lt;ViewResolver&gt;();
+    List<ViewResolver> resolvers = new ArrayList<ViewResolver>();
 
     XmlViewResolver r1 = new XmlViewResolver();
     resolver.setLocation(new ServletContextResource(servletContext,
-            &quot;/WEB-INF/spring/spreadsheet-views.xml&quot;));
+            "/WEB-INF/spring/spreadsheet-views.xml"));
     resolvers.add(r1);
 
     InternalResourceViewResolver r2 = new InternalResourceViewResolver();
-    r2.setPrefix(&quot;WEB-INF/views&quot;);
-    r2.setSuffix(&quot;.jsp&quot;);
+    r2.setPrefix("WEB-INF/views");
+    r2.setSuffix(".jsp");
     resolvers.add(r2);
 
-    // Create CNVR plugging in the resolvers &amp; content-negotiation manager
+    // Create CNVR plugging in the resolvers & content-negotiation manager
     ContentNegotiatingViewResolver resolver =
                         new ContentNegotiatingViewResolver();
     resolver.setViewResolvers(resolvers);
@@ -494,32 +475,32 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
   }
 }
 </code></pre>
-<p>Or in XML:</p>
-<pre><code class="prettyprint xml"><br />  &lt;bean class=&quot;org.springframework.web.servlet.view.
-                                ContentNegotiatingViewResolver&quot;&gt;
-    &lt;property name=&quot;contentNegotiationManager&quot; ref=&quot;cnManager&quot;/&gt;
+<p>或使用XML：</p>
+<pre><code class="prettyprint xml"><br>  <bean class="org.springframework.web.servlet.view.
+                                ContentNegotiatingViewResolver">
+    <property name="contentNegotiationManager" ref="cnManager"/>
 
-    &lt;!-- Define the view resolvers explicitly --&gt;
-    &lt;property name=&quot;viewResolvers&quot;&gt;
-      &lt;list&gt;
-        &lt;bean class=&quot;org.springframework.web.servlet.view.XmlViewResolver&quot;&gt;
-          &lt;property name=&quot;location&quot; value=&quot;spreadsheet-views.xml&quot;/&gt;
-        &lt;/bean&gt;
+    <!-- Define the view resolvers explicitly -->
+    <property name="viewResolvers">
+      <list>
+        <bean class="org.springframework.web.servlet.view.XmlViewResolver">
+          <property name="location" value="spreadsheet-views.xml"/>
+        </bean>
     
-        &lt;bean class=&quot;org.springframework.web.servlet.view.
-                                InternalResourceViewResolver&quot;&gt;
-          &lt;property name=&quot;prefix&quot; value=&quot;WEB-INF/views&quot;/&gt;
-          &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;/&gt;
-        &lt;/bean&gt;
-      &lt;/list&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt;
+        <bean class="org.springframework.web.servlet.view.
+                                InternalResourceViewResolver">
+          <property name="prefix" value="WEB-INF/views"/>
+          <property name="suffix" value=".jsp"/>
+        </bean>
+      </list>
+    </property>
+  </bean>
 </code></pre>
-<p>The Github demo project uses 2 sets of Spring profiles. In the <code style="font-size:100%; color:black">web.xml</code>, you can specify <code style="font-size:100%; color:black">xml</code> or <code style="font-size:100%; color:black">javaconfig</code> for XML or Java configuration respectively. And for either of them, specify either <code style="font-size:100%; color:black">separate</code> or <code style="font-size:100%; color:black">combined</code>. The <code style="font-size:100%; color:black">separate</code> profile defines all view resolvers as top-level beans and lets the CNVR scan the context to find them (as discussed in the previous section). In the <code style="font-size:100%; color:black">combined</code> profile the view resolvers are defined explicitly, not as Spring beans and passed to the CNVR via its <code style="font-size:100%; color:black">viewResolvers</code> property (as shown in this section). </p>
-<h2>JSON Support</h2>
-<p>Spring provides a <code style="font-size:100%; color:black">MappingJacksonJsonView</code> that supports the generation of JSON data from Java objects using the Jackson Object to JSON mapping library.  The <code style="font-size:100%; color:black">MappingJacksonJsonView</code> automatically converts all attributes found in the Model to JSON.  The only exception is that it ignores <code style="font-size:100%; color:black">BindingResult</code> objects since these are internal to Spring MVC form-handling and not needed.</p>
-<p>A suitable view resolver is needed and Spring doesn&rsquo;t provide one.  Fortunately it is very simple to write your own:</p>
-<pre><code class="prettyprint java"><br />public class JsonViewResolver implements ViewResolver {
+<p>Github演示项目使用2套Spring配置文件。在<code style="font-size:100%;color:black">web.xml</code> ，可以分别为XML或Java配置指定<code style="font-size:100%;color:black">xml</code>或<code style="font-size:100%;color:black">javaconfig</code> 。并为它们中的任何一个指定<code style="font-size:100%;color:black">separate</code>或<code style="font-size:100%;color:black">combined</code> 。<code style="font-size:100%;color:black">separate</code>配置文件将所有视图解析器定义为顶级Bean，并允许CNVR扫描上下文以找到它们（如上一节所述）。在<code style="font-size:100%;color:black">combined</code>配置文件中，视图解析器不是显式定义为Spring Bean，而是通过其<code style="font-size:100%;color:black">viewResolvers</code>属性传递给<code style="font-size:100%;color:black">viewResolvers</code> （如本节所示）。</p>
+<h2>JSON支持</h2>
+<p>Spring提供了一个<code style="font-size:100%;color:black">MappingJacksonJsonView</code> ，它支持使用Jackson对象到JSON映射库从Java对象生成JSON数据。<code style="font-size:100%;color:black">MappingJacksonJsonView</code>会将模型中找到的所有属性自动转换为JSON。唯一的例外是它会忽略<code style="font-size:100%;color:black">BindingResult</code>对象，因为它们是Spring MVC表单处理的内部对象，因此不需要。</p>
+<p>需要一个合适的视图解析器，而Spring没有提供。幸运的是，编写自己的代码非常简单：</p>
+<pre><code class="prettyprint java"><br>public class JsonViewResolver implements ViewResolver {
     /**
      * Get the view to use.
      *
@@ -534,13 +515,13 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     }
 }
 </code></pre>
-<p>Simply declaring this view resolver as a Spring bean means JSON format data can be returned. The JAF already maps <code style="font-size:100%; color:black">json</code> to <code style="font-size:100%; color:navy">application/json</code> so we are done. A URL like <code style="font-size:100%; color:navy"><a href="http://myserver/myapp/accounts/list.json">http://myserver/myapp/accounts/list.json</a></code> can now return the account information in JSON. Here is the output from our Accounts application:</p>
-<a href="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png" alt="" title="account-list-json" width="580" class="alignright size-full wp-image-13160" /></a>
-<p>For more on this View, see the <a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/servlet/view/json/MappingJacksonJsonView.html">Spring Javadoc</a>.</p>
-<h2>XML Support</h2>
-<p>There is a similar class for generating XML output - the <a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/servlet/view/xml/MarshallingView.html">MarshallingView</a>. It takes the first object in the model that can be marshalled and processes it. You can optionally configure the view by telling it which Model attribute (key) to pick - see <code style="font-size:100%; color:black">setModelKey()</code>.</p>
-<p>Again we need a view resolver for it. Spring supports several marshalling technologies via Spring&rsquo;s <a href="http://static.springsource.org/spring/docs/current/spring-framework-reference/html/oxm.html">Object to XML Marshalling (OXM)</a> abstraction. Let&rsquo;s just use JAXB2 since it is built into the JDK (since JDK 6). Here is the resolver:</p>
-<pre><code class="prettyprint java"><br />/**
+<p>只需将此视图解析器声明为Spring bean，即可返回JSON格式的数据。JAF已经将<code style="font-size:100%;color:black">json</code>映射到<code style="font-size:100%;color:navy">application/json</code>所以我们完成了。像<code style="font-size:100%;color:navy"><a href="http://myserver/myapp/accounts/list.json">http://myserver/myapp/accounts/list.json</a></code>这样的URL现在可以使用JSON返回帐户信息。这是“帐户”应用程序的输出：</p>
+<a href="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png" alt="" title="account-list-json" width="580" class="alignright size-full wp-image-13160"></a>
+<p>有关此视图的更多信息，请参见<a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/servlet/view/json/MappingJacksonJsonView.html">Spring Javadoc</a> 。</p>
+<h2>XML支持</h2>
+<p>有一个类似的类用于生成XML输出<a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/servlet/view/xml/MarshallingView.html">-MarshallingView</a> 。它采用模型中可以编组的第一个对象并对其进行处理。您可以通过告诉视图选择哪个Model属性（键）来选择配置视图，请参见<code style="font-size:100%;color:black">setModelKey()</code> 。</p>
+<p>同样，我们需要一个视图解析器。Spring通过Spring的<a href="http://static.springsource.org/spring/docs/current/spring-framework-reference/html/oxm.html">Object to XML Marshalling（OXM）</a>抽象支持多种封送技术。让我们只使用JAXB2，因为它内置在JDK中（自JDK 6起）。这是解析器：</p>
+<pre><code class="prettyprint java"><br>/**
  * View resolver for returning XML in a view-based system.
  */
 public class MarshallingXmlViewResolver implements ViewResolver {
@@ -566,9 +547,9 @@ public class MarshallingXmlViewResolver implements ViewResolver {
     }
 }
 </code></pre>
-<p>Again my classes need annotating to work with JAXB (in response to comments, I have added an example of this to the end of my previous <a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/#annotated-account-class">post</a>). </p>
-<p>Configure the new resolver as a Spring bean using Java Configuration:</p>
-<pre><code class="prettyprint java"><br />  @Bean(name = &quot;marshallingXmlViewResolver&quot;)
+<p>同样，我的班级需要注释才能与JAXB一起使用（为回应评论，我在上一篇<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/#annotated-account-class">文章</a>的末尾添加了一个示例）。</p>
+<p>使用Java配置将新的解析器配置为Spring bean：</p>
+<pre><code class="prettyprint java"><br>  @Bean(name = "marshallingXmlViewResolver")
   public ViewResolver getMarshallingXmlViewResolver() {
       Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
 
@@ -579,42 +560,41 @@ public class MarshallingXmlViewResolver implements ViewResolver {
       return new MarshallingXmlViewResolver(marshaller);
   }
 </code></pre>
-<p>Or we can do the same thing in XML - note the use of the oxm namespace:</p>
-<pre><code class="prettyprint xml">&lt;oxm:jaxb2-marshaller id=&quot;marshaller&quot; &gt;
-    &lt;oxm:class-to-be-bound name=&quot;rewardsonline.accounts.Account&quot;/&gt;
-    &lt;oxm:class-to-be-bound name=&quot;rewardsonline.accounts.Customer&quot;/&gt;
-    &lt;oxm:class-to-be-bound name=&quot;rewardsonline.accounts.Transaction&quot;/&gt;
-&lt;/oxm:jaxb2-marshaller&gt;
+<p>或者我们可以在XML中做同样的事情-注意oxm名称空间的使用：</p>
+<pre><code class="prettyprint xml"><oxm:jaxb2-marshaller id="marshaller" >
+    <oxm:class-to-be-bound name="rewardsonline.accounts.Account"/>
+    <oxm:class-to-be-bound name="rewardsonline.accounts.Customer"/>
+    <oxm:class-to-be-bound name="rewardsonline.accounts.Transaction"/>
+</oxm:jaxb2-marshaller>
 
-&lt;!-- View resolver that returns an XML Marshalling view. --&gt;
-&lt;bean class=&quot;rewardsonline.accounts.MarshallingXmlViewResolver&quot; &gt;
-    &lt;constructor-arg ref=&quot;marshaller&quot;/&gt;
-&lt;/bean&gt;
+<!-- View resolver that returns an XML Marshalling view. -->
+<bean class="rewardsonline.accounts.MarshallingXmlViewResolver" >
+    <constructor-arg ref="marshaller"/>
+</bean>
 </code></pre>
-<p>This is our finished system:</p>
-<a href="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-all-flow.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-all-flow.png" alt="Full system with CNVR and 4 view-resolvers" title="cnvr-all-flow" width="480" class="size-full wp-image-13471" /></a>
-<h2>Comparing RESTful Approaches</h2>
-<p>Full support for a RESTful approach with MVC is available using <code style="font-size:100%; color:black">@ResponseBody</code>, <code style="font-size:100%; color:black">@ResponseStatus</code> and other REST related MVC annotations.  Something like this:</p>
-<pre><code class="prettyprint java"><br />@RequestMapping(value=&quot;/accounts&quot;,
-                produces={&quot;application/json&quot;, &quot;application/xml&quot;})
+<p>这是我们完成的系统：</p>
+<a href="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-all-flow.png"><img src="http://blog.springsource.org/wp-content/uploads/2013/06/cnvr-all-flow.png" alt="带有CNVR和4个视图解析器的完整系统" title="cnvr全流" width="480" class="size-full wp-image-13471"></a>
+<h2>比较RESTful方法</h2>
+<p>使用<code style="font-size:100%;color:black">@ResponseBody</code> ， <code style="font-size:100%;color:black">@ResponseStatus</code>和其他与REST相关的MVC注释，可以完全支持MVC的RESTful方法。像这样：</p>
+<pre><code class="prettyprint java"><br>@RequestMapping(value="/accounts",
+                produces={"application/json", "application/xml"})
 @ResponseStatus(HttpStatus.OK)
-public @ResponseBody List&lt;Account&gt; list(Principal principal) {
+public @ResponseBody List<Account> list(Principal principal) {
     return accountManager.getAccounts(principal);
 }
 </code></pre>
-<p>To enable the same content-negotiation for our <code style="font-size:100%; color:black">@RequestMapping</code> methods, we must reuse our content-negotiation manager (this allows the <code style="font-size:100%; color:black">produces</code> option to work).</p>
-<pre><code class="prettyprint java"><br />&lt;mvc:annotation-driven
-          content-negotiation-manager=&quot;contentNegotiationManager&quot; /&gt;
+<p>要为我们的<code style="font-size:100%;color:black">@RequestMapping</code>方法启用相同的内容协商，我们必须重用我们的内容协商管理器（这可以使<code style="font-size:100%;color:black">produces</code>选项起作用）。</p>
+<pre><code class="prettyprint java"><br><mvc:annotation-driven
+          content-negotiation-manager="contentNegotiationManager" />
 </code></pre>
-<p>However this produces a different style of Controller method, the advantage being it is also more powerful. So which way to go: Views or <code style="font-size:100%; color:black">@ResponseBody</code>?</p>
-<p>For an existing web-site already using Spring MVC and views, the <code style="font-size:100%; color:black">MappingJacksonJsonView</code> and <code style="font-size:100%; color:black">MarshallingView</code> provide an easy way to extend the web-application to return JSON and/or XML as well.  In many cases, these are the only data-formats you need and is an easy way to support read-only mobile apps and/or AJAX enabled web-pages where RESTful requests are only used to <em>GET</em> data.</p>
-<p>Full support for REST, including the ability to modify data, involves the use of annotated controller methods in conjunction with HTTP Message Converters. Using views in this case doesn&rsquo;t make sense, just return a <code style="font-size:100%; color:black">@ResponseBody</code> object and let the converter do the work.</p>
-<p>However, as shown &lt;a href=&quot;<a href="http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/#combined-controller" "">http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/#combined-controller""</a>here</a> in my previous post, it is perfectly possible for a controller to use both approaches at the same time. Now the same controller can support both traditional web-applications and implement a full RESTful interface, enhancing web-applications that may have been built-up and developed over many years.</p>
-<p>Spring has always been strong on offering developers flexibility and choice. This is no exception.</p></div>
+<p>但是，这会产生不同样式的Controller方法，优点是它也更强大。那么<code style="font-size:100%;color:black">@ResponseBody</code> ：Views或<code style="font-size:100%;color:black">@ResponseBody</code>呢？</p>
+<p>对于已经使用Spring MVC和视图的现有网站， <code style="font-size:100%;color:black">MappingJacksonJsonView</code>和<code style="font-size:100%;color:black">MarshallingView</code>提供了一种简便的方法来扩展Web应用程序以返回JSON和/或XML。在许多情况下，这些是您唯一需要的数据格式，并且是一种支持只读移动应用程序和/或启用AJAX的网页的简便方法，其中RESTful请求仅用于<em>获取</em>数据。</p>
+<p>对REST的完全支持（包括修改数据的能力）涉及将带注释的控制器方法与HTTP消息转换器一起使用。在这种情况下，使用视图没有意义，只需返回一个<code style="font-size:100%;color:black">@ResponseBody</code>对象，然后让转换器完成工作即可。</p>
+<p>但是，如我之前的文章中所示<a href="javascript:void(0);" http:="" ="" blog.springsource.org="" 2013="" 05="" 11="" content-negotiation-using-spring-mvc="" #combined-controlle="=">http://blog.springsource.org/2013/05/11/content-negotiation-using-spring-mvc/#combined-controller“”</a>所示，控制器完全有可能同时使用两种方法。现在，同一控制器既可以支持传统的Web应用程序，又可以实现完整的RESTful接口，从而增强了可能已经建立和开发多年的Web应用程序。</p>
+<p>Spring一直在为开发人员提供灵活性和选择力。也不例外。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 515;
 
       (function(disqus_shortname, document) {
@@ -628,15 +608,12 @@ public @ResponseBody List&lt;Account&gt; list(Principal principal) {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -644,23 +621,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -670,17 +643,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -694,18 +665,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

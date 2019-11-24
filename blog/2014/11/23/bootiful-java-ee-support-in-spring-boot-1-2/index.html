@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>&quot;Bootiful&quot; Java EE Support in Spring Boot 1.2</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>Spring Boot 1.2中的“ Bootiful” Java EE支持</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,481 +16,16 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="&quot;Bootiful&quot; Java EE Support in Spring Boot 1.2" />
-<meta name="twitter:description" content="&lt;p&gt;In this blog, I want to look at - and demonstrate - some of the &lt;em&gt;many&lt;/em&gt; new features in &lt;a href=&quot;http://projects.spring.io/spring-boot/&quot;&gt;Spring Boot 1.2&lt;/a&gt; that make the lives of those coming from, or otherwise building on, Java EE easier. &lt;/p&gt;
-&lt;p&gt;It&#39;s worth mentioning that a lot of this support has been possible with Spring before, of course, but now with Spring Boot 1.2, it&#39;s just so darned easy!&lt;/p&gt;
-&lt;p&gt;First, here&#39;s an example program with notes after.&lt;/p&gt;
-&lt;div class=&quot;highlight highlight-java&quot;&gt;
- &lt;pre&gt;
-&lt;span class=&quot;pl-k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;pl-smp&quot;&gt;demo&lt;/span&gt;;
-
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.glassfish.jersey.jackson.JacksonFeature&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.glassfish.jersey.server.ResourceConfig&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.boot.SpringApplication&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.boot.autoconfigure.SpringBootApplication&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.jms.annotation.JmsListener&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.jms.core.JmsTemplate&lt;/span&gt;;
-
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.annotation.PostConstruct&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.inject.Inject&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.inject.Named&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.jms.JMSException&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.persistence.*&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.transaction.Transactional&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.ws.rs.*&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.ws.rs.core.MediaType&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;java.io.Serializable&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;java.util.Collection&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;java.util.logging.Logger&lt;/span&gt;;
-
-@&lt;span class=&quot;pl-stj&quot;&gt;SpringBootApplication&lt;/span&gt;
-&lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;Application&lt;/span&gt; {
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;JerseyConfig&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;pl-e&quot;&gt;ResourceConfig&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;JerseyConfig&lt;/span&gt;() {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;register(&lt;span class=&quot;pl-stj&quot;&gt;GreetingEndpoint&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class);
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;register(&lt;span class=&quot;pl-stj&quot;&gt;JacksonFeature&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-st&quot;&gt;@Transactional&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingService&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Inject&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;JmsTemplate&lt;/span&gt; jmsTemplate;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@PersistenceContext&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;EntityManager&lt;/span&gt; entityManager;
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;createGreeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;, &lt;span class=&quot;pl-st&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;fail&lt;/span&gt;) {
-            &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; greeting &lt;span class=&quot;pl-k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;(name);
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;entityManager&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;persist(greeting);
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;jmsTemplate&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;convertAndSend(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;greetings&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, greeting);
-            &lt;span class=&quot;pl-k&quot;&gt;if&lt;/span&gt; (fail) {
-                &lt;span class=&quot;pl-k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;RuntimeException&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;simulated error&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            }
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;createGreeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;) {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(name, &lt;span class=&quot;pl-c1&quot;&gt;false&lt;/span&gt;);
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;Collection&amp;lt;&lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;findAll&lt;/span&gt;() {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;entityManager
-                    .createQuery(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;select g from &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;getName() &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt; g&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class)
-                    .getResultList();
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;find&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;id&lt;/span&gt;) {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;entityManager&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;find(&lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class, id);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-st&quot;&gt;@Path&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;/hello&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;)
-    &lt;span class=&quot;pl-st&quot;&gt;@Produces&lt;/span&gt;({&lt;span class=&quot;pl-stj&quot;&gt;MediaType&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;APPLICATION_JSON&lt;/span&gt;})
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingEndpoint&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Inject&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;GreetingService&lt;/span&gt; greetingService;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@POST&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;post&lt;/span&gt;(&lt;span class=&quot;pl-st&quot;&gt;@QueryParam&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;name&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;) &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;) {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(name);
-        }
-
-        &lt;span class=&quot;pl-st&quot;&gt;@GET&lt;/span&gt;
-        &lt;span class=&quot;pl-st&quot;&gt;@Path&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;/{id}&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;)
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;get&lt;/span&gt;(&lt;span class=&quot;pl-st&quot;&gt;@PathParam&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;id&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;) &lt;span class=&quot;pl-stj&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;id&lt;/span&gt;) {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;find(id);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Entity&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;pl-e&quot;&gt;Serializable&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Id&lt;/span&gt;
-        &lt;span class=&quot;pl-st&quot;&gt;@GeneratedValue&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Long&lt;/span&gt; id;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Override&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;toString&lt;/span&gt;() {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Greeting{&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt;
-                    &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;id=&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; id &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt;
-                    &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;, message=&#39;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; message &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;&lt;span class=&quot;pl-cce&quot;&gt;\&#39;&lt;/span&gt;&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt;
-                    &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;}&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;&lt;/span&gt;;
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; message;
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;getMessage&lt;/span&gt;() {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; message;
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;Greeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;) {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;message &lt;span class=&quot;pl-k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Hi, &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; name &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;!&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;;
-        }
-
-        &lt;span class=&quot;pl-en&quot;&gt;Greeting&lt;/span&gt;() {
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingServiceClient&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Inject&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;GreetingService&lt;/span&gt; greetingService;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@PostConstruct&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;afterPropertiesSet&lt;/span&gt;() &lt;span class=&quot;pl-s&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Exception&lt;/span&gt; {
-            greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Phil&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Dave&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            &lt;span class=&quot;pl-k&quot;&gt;try&lt;/span&gt; {
-                greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Josh&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;true&lt;/span&gt;);
-            } &lt;span class=&quot;pl-k&quot;&gt;catch&lt;/span&gt; (&lt;span class=&quot;pl-stj&quot;&gt;RuntimeException&lt;/span&gt; re) {
-                &lt;span class=&quot;pl-stj&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;getLogger(&lt;span class=&quot;pl-stj&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;getName())&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;info(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;caught exception...&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            }
-            greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;findAll()&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;forEach(&lt;span class=&quot;pl-stj&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;out&lt;span class=&quot;pl-k&quot;&gt;::&lt;/span&gt;println);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingMessageProcessor&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@JmsListener&lt;/span&gt;(&lt;span class=&quot;pl-c1&quot;&gt;destination&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;greetings&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;)
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;processGreeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;greeting&lt;/span&gt;) &lt;span class=&quot;pl-s&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;JMSException&lt;/span&gt; {
-            &lt;span class=&quot;pl-stj&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;out&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;println(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;received message: &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; greeting);
-        }
-    }
-
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;main&lt;/span&gt;(&lt;span class=&quot;pl-st&quot;&gt;String&lt;/span&gt;[] &lt;span class=&quot;pl-v&quot;&gt;args&lt;/span&gt;) {
-        &lt;span class=&quot;pl-stj&quot;&gt;SpringApplication&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;run(&lt;span class=&quot;pl-stj&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class, args);
-    }
-}
-&lt;/pre&gt;
-&lt;/div&gt;
-" />
-<meta name="twitter:creator" content="@starbuxman" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
-
-<meta property="og:title" content="&quot;Bootiful&quot; Java EE Support in Spring Boot 1.2" />
-<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200" />
-<meta property="og:description" content="&lt;p&gt;In this blog, I want to look at - and demonstrate - some of the &lt;em&gt;many&lt;/em&gt; new features in &lt;a href=&quot;http://projects.spring.io/spring-boot/&quot;&gt;Spring Boot 1.2&lt;/a&gt; that make the lives of those coming from, or otherwise building on, Java EE easier. &lt;/p&gt;
-&lt;p&gt;It&#39;s worth mentioning that a lot of this support has been possible with Spring before, of course, but now with Spring Boot 1.2, it&#39;s just so darned easy!&lt;/p&gt;
-&lt;p&gt;First, here&#39;s an example program with notes after.&lt;/p&gt;
-&lt;div class=&quot;highlight highlight-java&quot;&gt;
- &lt;pre&gt;
-&lt;span class=&quot;pl-k&quot;&gt;package&lt;/span&gt; &lt;span class=&quot;pl-smp&quot;&gt;demo&lt;/span&gt;;
-
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.glassfish.jersey.jackson.JacksonFeature&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.glassfish.jersey.server.ResourceConfig&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.boot.SpringApplication&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.boot.autoconfigure.SpringBootApplication&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.jms.annotation.JmsListener&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;org.springframework.jms.core.JmsTemplate&lt;/span&gt;;
-
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.annotation.PostConstruct&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.inject.Inject&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.inject.Named&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.jms.JMSException&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.persistence.*&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.transaction.Transactional&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.ws.rs.*&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;javax.ws.rs.core.MediaType&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;java.io.Serializable&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;java.util.Collection&lt;/span&gt;;
-&lt;span class=&quot;pl-k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;pl-smi&quot;&gt;java.util.logging.Logger&lt;/span&gt;;
-
-@&lt;span class=&quot;pl-stj&quot;&gt;SpringBootApplication&lt;/span&gt;
-&lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;Application&lt;/span&gt; {
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;JerseyConfig&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;pl-e&quot;&gt;ResourceConfig&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;JerseyConfig&lt;/span&gt;() {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;register(&lt;span class=&quot;pl-stj&quot;&gt;GreetingEndpoint&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class);
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;register(&lt;span class=&quot;pl-stj&quot;&gt;JacksonFeature&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-st&quot;&gt;@Transactional&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingService&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Inject&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;JmsTemplate&lt;/span&gt; jmsTemplate;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@PersistenceContext&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;EntityManager&lt;/span&gt; entityManager;
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;createGreeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;, &lt;span class=&quot;pl-st&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;fail&lt;/span&gt;) {
-            &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; greeting &lt;span class=&quot;pl-k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;(name);
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;entityManager&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;persist(greeting);
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;jmsTemplate&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;convertAndSend(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;greetings&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, greeting);
-            &lt;span class=&quot;pl-k&quot;&gt;if&lt;/span&gt; (fail) {
-                &lt;span class=&quot;pl-k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;RuntimeException&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;simulated error&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            }
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;createGreeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;) {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(name, &lt;span class=&quot;pl-c1&quot;&gt;false&lt;/span&gt;);
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;Collection&amp;lt;&lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;findAll&lt;/span&gt;() {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;entityManager
-                    .createQuery(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;select g from &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;getName() &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt; g&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class)
-                    .getResultList();
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;find&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;id&lt;/span&gt;) {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;entityManager&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;find(&lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class, id);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-st&quot;&gt;@Path&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;/hello&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;)
-    &lt;span class=&quot;pl-st&quot;&gt;@Produces&lt;/span&gt;({&lt;span class=&quot;pl-stj&quot;&gt;MediaType&lt;/span&gt;&lt;span class=&quot;pl-c1&quot;&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;APPLICATION_JSON&lt;/span&gt;})
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingEndpoint&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Inject&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;GreetingService&lt;/span&gt; greetingService;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@POST&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;post&lt;/span&gt;(&lt;span class=&quot;pl-st&quot;&gt;@QueryParam&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;name&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;) &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;) {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(name);
-        }
-
-        &lt;span class=&quot;pl-st&quot;&gt;@GET&lt;/span&gt;
-        &lt;span class=&quot;pl-st&quot;&gt;@Path&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;/{id}&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;)
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;get&lt;/span&gt;(&lt;span class=&quot;pl-st&quot;&gt;@PathParam&lt;/span&gt;(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;id&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;) &lt;span class=&quot;pl-stj&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;id&lt;/span&gt;) {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;find(id);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Entity&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;pl-e&quot;&gt;Serializable&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Id&lt;/span&gt;
-        &lt;span class=&quot;pl-st&quot;&gt;@GeneratedValue&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Long&lt;/span&gt; id;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Override&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;toString&lt;/span&gt;() {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Greeting{&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt;
-                    &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;id=&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; id &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt;
-                    &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;, message=&#39;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; message &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;&lt;span class=&quot;pl-cce&quot;&gt;\&#39;&lt;/span&gt;&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt;
-                    &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;}&lt;span class=&quot;pl-pds&quot;&gt;&#39;&lt;/span&gt;&lt;/span&gt;;
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; message;
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;getMessage&lt;/span&gt;() {
-            &lt;span class=&quot;pl-k&quot;&gt;return&lt;/span&gt; message;
-        }
-
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;Greeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;name&lt;/span&gt;) {
-            &lt;span class=&quot;pl-v&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;message &lt;span class=&quot;pl-k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Hi, &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; name &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;!&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;;
-        }
-
-        &lt;span class=&quot;pl-en&quot;&gt;Greeting&lt;/span&gt;() {
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingServiceClient&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@Inject&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;GreetingService&lt;/span&gt; greetingService;
-
-        &lt;span class=&quot;pl-st&quot;&gt;@PostConstruct&lt;/span&gt;
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;afterPropertiesSet&lt;/span&gt;() &lt;span class=&quot;pl-s&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;Exception&lt;/span&gt; {
-            greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Phil&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Dave&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            &lt;span class=&quot;pl-k&quot;&gt;try&lt;/span&gt; {
-                greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;createGreeting(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;Josh&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class=&quot;pl-c1&quot;&gt;true&lt;/span&gt;);
-            } &lt;span class=&quot;pl-k&quot;&gt;catch&lt;/span&gt; (&lt;span class=&quot;pl-stj&quot;&gt;RuntimeException&lt;/span&gt; re) {
-                &lt;span class=&quot;pl-stj&quot;&gt;Logger&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;getLogger(&lt;span class=&quot;pl-stj&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;getName())&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;info(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;caught exception...&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;);
-            }
-            greetingService&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;findAll()&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;forEach(&lt;span class=&quot;pl-stj&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;out&lt;span class=&quot;pl-k&quot;&gt;::&lt;/span&gt;println);
-        }
-    }
-
-    &lt;span class=&quot;pl-st&quot;&gt;@Named&lt;/span&gt;
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;GreetingMessageProcessor&lt;/span&gt; {
-
-        &lt;span class=&quot;pl-st&quot;&gt;@JmsListener&lt;/span&gt;(&lt;span class=&quot;pl-c1&quot;&gt;destination&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;greetings&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt;)
-        &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;processGreeting&lt;/span&gt;(&lt;span class=&quot;pl-stj&quot;&gt;Greeting&lt;/span&gt; &lt;span class=&quot;pl-v&quot;&gt;greeting&lt;/span&gt;) &lt;span class=&quot;pl-s&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;pl-stj&quot;&gt;JMSException&lt;/span&gt; {
-            &lt;span class=&quot;pl-stj&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;out&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;println(&lt;span class=&quot;pl-s1&quot;&gt;&lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;received message: &lt;span class=&quot;pl-pds&quot;&gt;&quot;&lt;/span&gt;&lt;/span&gt; &lt;span class=&quot;pl-k&quot;&gt;+&lt;/span&gt; greeting);
-        }
-    }
-
-    &lt;span class=&quot;pl-s&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;pl-s&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;pl-st&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;pl-en&quot;&gt;main&lt;/span&gt;(&lt;span class=&quot;pl-st&quot;&gt;String&lt;/span&gt;[] &lt;span class=&quot;pl-v&quot;&gt;args&lt;/span&gt;) {
-        &lt;span class=&quot;pl-stj&quot;&gt;SpringApplication&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;run(&lt;span class=&quot;pl-stj&quot;&gt;Application&lt;/span&gt;&lt;span class=&quot;pl-k&quot;&gt;.&lt;/span&gt;class, args);
-    }
-}
-&lt;/pre&gt;
-&lt;/div&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2014-11-23 13:37:00.0" />
-</head>
-<body>
-
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
-
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
-    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
-      document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
-<div class="viewport">
-<header class="navbar header--navbar desktop-only">
-<div class="navbar-inner">
-<div class="container-fluid">
-<div class="spring-logo--container">
-<a class="spring-logo" href="/"><span></span></a>
-</div>
-<ul class="nav pull-right">
-<li class="navbar-link">
-<a href="/projects">Projects</a>
-</li>
-<li class="navbar-link">
-<a href="/guides">Guides</a>
-</li>
-<li class="navbar-link active">
-<a href="/blog">Blog</a>
-</li>
-<li class="navbar-link">
-<a href="/services">Training & Certification</a>
-</li>
-<li class="navbar-link nav-search js-nav-search">
-<a>
-<i class="icon-search navbar-search--icon js-search-input-open"></i>
-<span class="search-input-close js-search-input-close">
-<i class="icon-remove"></i>
-</span>
-</a>
-</li>
-</ul>
-</div>
-</div>
-<div class="search-dropdown--container js-search-dropdown">
-<div class="container-fluid">
-<div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-</form>
-</div>
-</div>
-</div>
-</header>
-<div>
-<div class="mobile-navigation--wrapper mobile-only">
-<div class="navigation-drawer--container">
-<div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
-</form>
-</div>
-<div class="navigation-item-list">
-<div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
-</a>
-</div>
-<div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
-</a>
-</div>
-<div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
-</a>
-</div>
-<div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
-</a>
-</div>
-<div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
-</a>
-</div>
-</div>
-</div>
-<div class="mobile-nav">
-<div class="nav-icon js-open-nav-drawer">
-<i class="icon-reorder"></i>
-</div>
-<div class="header-center-icon">
-<a href="/">
-<div class="icon icon-spring-logo-mobile"></div>
-</a>
-</div>
-</div>
-</div>
-</div>
-<div class="header--container"></div>
-<div class="container-fluid"></div>
-<div></div>
-<div class="container-fluid">
-<div class="main-body--wrapper">
-<div class="row-fluid blog--wrapper">
-<article class="span8 mobile-left-pane" id="content">
-<header class="desktop-only">
-<div class="blog-category active content--title">
-<div>Engineering</div>
-</div>
-<div class="blog-category content--title">
-<div>Releases</div>
-</div>
-<div class="blog-category content--title">
-<div>News and Events</div>
-</div>
-</header>
-<div class="blog--container">
-<header>
-<h1 class="blog--title">&quot;Bootiful&quot; Java EE Support in Spring Boot 1.2</h1>
-<div class="meta-data--container">
-<div class="meta-data--item desktop-only">
-<div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
-</div>
-<div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&amp;d=mm" />
-<a class="author" rel="author" href="/team/jlong">Josh Long</a>
-</div>
-<div class="meta-data--item">
-<div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2014-11-23 13:37:00.0">November 23, 2014</time>
-</div>
-<div class="meta-data--item">
-<div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="1853" href="/blog/2014/11/23/bootiful-java-ee-support-in-spring-boot-1-2#disqus_thread">
-</a></div>
-</div>
-</header>
-<div class="blog--post"><p>In this blog, I want to look at - and demonstrate - some of the <em>many</em> new features in <a href="https://projects.spring.io/spring-boot/">Spring Boot 1.2</a> that make the lives of those coming from, or otherwise building on, Java EE easier. </p>
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="" bootifu="=" ="">
+<meta name="twitter:description" content="<p>In this blog, I want to look at - and demonstrate - some of the <em>many</em> new features in <a href=" http:="" ="" projects.spring.io="" spring-boot="" ="="></meta>Spring Boot 1.2 that make the lives of those coming from, or otherwise building on, Java EE easier. 
 <p>It's worth mentioning that a lot of this support has been possible with Spring before, of course, but now with Spring Boot 1.2, it's just so darned easy!</p>
 <p>First, here's an example program with notes after.</p>
-<div class="highlight highlight-java"><pre><span class="pl-k">package</span> <span class="pl-smp">demo</span>;
+<div class=" highlight highlight-java">
+ </head><body dir="ltr"><pre><span class="pl-k">package</span> <span class="pl-smp">demo</span>;
 
 <span class="pl-k">import</span> <span class="pl-smi">org.glassfish.jersey.jackson.JacksonFeature</span>;
 <span class="pl-k">import</span> <span class="pl-smi">org.glassfish.jersey.server.ResourceConfig</span>;
@@ -552,7 +81,7 @@ Training & Certification
             <span class="pl-v">this</span><span class="pl-k">.</span>createGreeting(name, <span class="pl-c1">false</span>);
         }
 
-        <span class="pl-s">public</span> <span class="pl-st">Collection&lt;<span class="pl-stj">Greeting</span>&gt;</span> <span class="pl-en">findAll</span>() {
+        <span class="pl-s">public</span> <span class="pl-st">Collection<<span class="pl-stj">Greeting</span>></span> <span class="pl-en">findAll</span>() {
             <span class="pl-k">return</span> <span class="pl-v">this</span><span class="pl-k">.</span>entityManager
                     .createQuery(<span class="pl-s1"><span class="pl-pds">"</span>select g from <span class="pl-pds">"</span></span> <span class="pl-k">+</span> <span class="pl-stj">Greeting</span><span class="pl-k">.</span>class<span class="pl-k">.</span>getName() <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">"</span> g<span class="pl-pds">"</span></span>, <span class="pl-stj">Greeting</span><span class="pl-k">.</span>class)
                     .getResultList();
@@ -644,133 +173,460 @@ Training & Certification
         <span class="pl-stj">SpringApplication</span><span class="pl-k">.</span>run(<span class="pl-stj">Application</span><span class="pl-k">.</span>class, args);
     }
 }
-</pre></div>
-<p>The complete code listings, including the very sparce <a href="https://github.com/joshlong/techtips/blob/master/examples/jaxrs-jta-jms-jpa-330-250-undertow/src/main/resources/application.properties"><code>application.properties</code></a> and the <a href="https://github.com/joshlong/techtips/blob/master/examples/jaxrs-jta-jms-jpa-330-250-undertow/pom.xml">Maven build</a>, are available online. </p>
-<h2>
-<a id="user-content-jax-rs-with-jersey" class="anchor" href="#jax-rs-with-jersey" aria-hidden="true"><span class="octicon octicon-link"></span></a>JAX-RS with Jersey</h2>
-<p>The example <a href="https://docs.spring.io/spring-boot/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#boot-features-jersey">demonstrates Boot's new JAX-RS auto-configuration</a> (in this case, using <a href="https://jersey.java.net/">Jersey 2.x</a>) in the <code>GreetingEndpoint</code>. Note how convenient it is to get it all working! The only thing to be weary of is that you need to specify a <code>ResourceConfig</code> subclass to let Jersey know which components to register.</p>
-<h2>
-<a id="user-content-global-transactions-with-jta" class="anchor" href="#global-transactions-with-jta" aria-hidden="true"><span class="octicon octicon-link"></span></a>Global Transactions with JTA</h2>
-<p>It demonstrates global transactions with the <a href="https://docs.spring.io/spring-boot/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#boot-features-jta">new auto-configured JTA support</a>. JTA is a Java API for the X/Open XA protocol which lets multiple, compliant, transaction resources (like a message queue and a database) participate in a single transaction. To do this, we've used the <a href="http://www.atomikos.com/">Atomikos</a> standalone JTA provider. We could have as easily used Bitronix, as well; both are auto-configured if you bring the appropriate starter along. In this example, in the <code>GreetingService</code>, JMS and JPA work is done as part of a global transaction. We demonstrate this by creating 3 transactions and simulating a rollback on the third one. You should see printed to the console that there are two records that come back from the JDBC <code>javax.sql.DataSource</code> data source and two records that are received from the embedded JMS <code>javax.jms.Destination</code> destination.</p>
-<h2>
-<a id="user-content-the-undertow-embedded-web-server" class="anchor" href="#the-undertow-embedded-web-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Undertow embedded web-server</h2>
-<p>This example also uses the Wildfly (from RedHat) application server's <em>awesome</em> <a href="http://undertow.io/">Undertow embedded HTTP server</a> instead of (the default) Apache Tomcat. It's as easy to use Undertow as it is to use Jetty or Tomcat - just exclude <code>org.springframework.boot:spring-boot-starter-tomcat</code> and add <code>org.springframework.boot:spring-boot-starter-undertow</code>! This contribution originated as a third-party PR - thanks Ivan Sopov! It's awesome.</p>
-<h2>
-<a id="user-content-odds-and-ends" class="anchor" href="#odds-and-ends" aria-hidden="true"><span class="octicon octicon-link"></span></a>Odds and Ends</h2>
-<p>Just for consistency, the example also uses JSR 330. JSR 330 describes a set of annotations that you can use in proprietary application servers like WebLogic as well as in a portable manner in dependency injection containers like Google Guice or Spring. I also use a JSR 250 annotation (defined as part of Java EE 5) to demonstrate lifecycle hooks.</p>
-<p>This example relies on a Spring Boot <a href="https://docs.spring.io/spring-boot/docs/1.2.0.RC2/reference/htmlsingle/#howto-configure-a-datasource">auto-configured and embedded</a>, in-memory <a href="http://www.h2database.com/html/main.html">H2</a> <code>javax.sql.DataSource</code> and - a Spring Boot <a href="https://docs.spring.io/spring-boot/docs/1.2.0.RC2/reference/htmlsingle/#boot-features-hornetq">auto-configured and embedded</a>, in-memory <a href="http://hornetq.jboss.org">HornetQ</a> <code>javax.jms.ConnectionFactory</code>. If you wanted to connect to traditional, non-embedded instances, it's straightforward to either specify properties in <code>application.yml</code> or <code>application.properties</code> like <code>spring.hornetq.host</code> or simply define <code>@Bean</code>s of the appropriate type.</p>
-<p>This example <em>also</em> uses the new <code>@SpringBootApplication</code> annotation which combines <code>@Configuration</code>, <code>@EnableAutoConfiguration</code> and <code>@ComponentScan</code>. Nice!</p>
-<h2>
-<a id="user-content-deployment" class="anchor" href="#deployment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deployment</h2>
-<p>Though this example uses a lot of fairly familiar Java EE APIs, this is still just typical Spring Boot, so by default you can run this application using <code>java -jar ee.jar</code> or easily deploy it to process-centric <a href="https://en.wikipedia.org/wiki/Platform_as_a_service">platforms-as-a-service</a> offerings like - Heroku or <a href="http://cloudfoundry.org">Cloud Foundry</a>. If you want to deploy it to a standalone application server like (like Apache Tomcat, or Websphere, or anything in between), it's straightforward to convert the build into a <code>.war</code> and deploy it accordingly to any Servlet 3 container.</p>
-<p>If you deploy the application to a more classic application server, Spring Boot can take advantage of the AS's facilities, instead. For example, it's dead-simple to consume a JNDI-bound <a href="https://docs.spring.io/spring-boot/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#boot-features-jms-jndi">JMS <code>ConnectionFactory</code></a>, <a href="https://docs.spring.io/spring-boot/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#boot-features-connecting-to-a-jndi-datasource">JDBC <code>DataSource</code></a> or <a href="https://docs.spring.io/spring-boot/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#_using_a_java_ee_managed_transaction_manager">JTA <code>UserTransaction</code></a>.</p>
-<h2>
-<a id="user-content-spring-boot-12-choice-and-power" class="anchor" href="#spring-boot-12-choice-and-power" aria-hidden="true"><span class="octicon octicon-link"></span></a>Spring Boot 1.2: Choice <em>and</em> Power</h2>
-<p>I, personally, would question a lot of these APIs. Do you <em>really</em> need distributed, multi-resource transactions? In today's <a href="http://www.eaipatterns.com/ramblings/18_starbucks.html">distributed world, consider global transaction managers are an architecture smell</a>. Do you <em>really</em> need to use JAX-RS when Spring offers a richer, integrated Spring MVC-based stack complete with MVC, REST, HATEOAS, OAuth and websockets support? JPA's a nice API for talking to a SQL-based <code>javax.sql.DataSource</code>, but Spring Data repositories (which include support for JPA, of course, but <em>also</em> for Cassandra, MongoDB, Redis, CouchBase, and an increasingly long list of alternative technologies) reduce much of the boilerplate to a simple interface definition for the common cases. So, do you really need all of this? It might well be that you do, and - as always - the choice is yours. That's why this release is so cool! More power, more choice. </p>
-<h2>
-<a id="user-content-what-else" class="anchor" href="#what-else" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Else?</h2>
-<p>A <em>lot</em>, actually. There are a <em>slew</em> of new features. I couldn't even begin to cover them all here. So I won't try. Check out the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.2-Release-Notes">release notes</a> for the full scoop! </p>
-<p>Spring Boot 1.2 is fast approaching GA, and now's a very good time to <a href="https://start.spring.io">try the bits, kick the tires</a>, <a href="https://github.com/spring-projects/spring-boot/issues">file issues</a> and <a href="https://stackoverflow.com/questions/tagged/spring-boot">ask questions</a>!</p>
-</div>
-</div>
-<section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
-      var disqus_identifier = 1853;
+</pre>
 
-      (function(disqus_shortname, document) {
-        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
-        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+">
+<meta name="twitter:creator" content="@starbuxman">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200">
 
-        function injectScript(url) {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = url;
-          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+<meta property="og:title" content="" bootifu="=" ="">
+<meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200">
+<meta property="og:description" content="<p>In this blog, I want to look at - and demonstrate - some of the <em>many</em> new features in <a href=" http:="" ="" projects.spring.io="" spring-boot="" ="="></meta>Spring Boot 1.2 that make the lives of those coming from, or otherwise building on, Java EE easier. 
+<p>It's worth mentioning that a lot of this support has been possible with Spring before, of course, but now with Spring Boot 1.2, it's just so darned easy!</p>
+<p>First, here's an example program with notes after.</p>
+<div class=" highlight highlight-java">
+ <pre><span class="pl-k">package</span> <span class="pl-smp">demo</span>;
+
+<span class="pl-k">import</span> <span class="pl-smi">org.glassfish.jersey.jackson.JacksonFeature</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.glassfish.jersey.server.ResourceConfig</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.boot.SpringApplication</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.boot.autoconfigure.SpringBootApplication</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.jms.annotation.JmsListener</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.jms.core.JmsTemplate</span>;
+
+<span class="pl-k">import</span> <span class="pl-smi">javax.annotation.PostConstruct</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.inject.Inject</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.inject.Named</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.jms.JMSException</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.persistence.*</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.transaction.Transactional</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.ws.rs.*</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.ws.rs.core.MediaType</span>;
+<span class="pl-k">import</span> <span class="pl-smi">java.io.Serializable</span>;
+<span class="pl-k">import</span> <span class="pl-smi">java.util.Collection</span>;
+<span class="pl-k">import</span> <span class="pl-smi">java.util.logging.Logger</span>;
+
+@<span class="pl-stj">SpringBootApplication</span>
+<span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-en">Application</span> {
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">JerseyConfig</span> <span class="pl-s">extends</span> <span class="pl-e">ResourceConfig</span> {
+
+        <span class="pl-s">public</span> <span class="pl-en">JerseyConfig</span>() {
+            <span class="pl-v">this</span><span class="pl-k">.</span>register(<span class="pl-stj">GreetingEndpoint</span><span class="pl-k">.</span>class);
+            <span class="pl-v">this</span><span class="pl-k">.</span>register(<span class="pl-stj">JacksonFeature</span><span class="pl-k">.</span>class);
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-st">@Transactional</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingService</span> {
+
+        <span class="pl-st">@Inject</span>
+        <span class="pl-s">private</span> <span class="pl-stj">JmsTemplate</span> jmsTemplate;
+
+        <span class="pl-st">@PersistenceContext</span>
+        <span class="pl-s">private</span> <span class="pl-stj">EntityManager</span> entityManager;
+
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">createGreeting</span>(<span class="pl-stj">String</span> <span class="pl-v">name</span>, <span class="pl-st">boolean</span> <span class="pl-v">fail</span>) {
+            <span class="pl-stj">Greeting</span> greeting <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">Greeting</span>(name);
+            <span class="pl-v">this</span><span class="pl-k">.</span>entityManager<span class="pl-k">.</span>persist(greeting);
+            <span class="pl-v">this</span><span class="pl-k">.</span>jmsTemplate<span class="pl-k">.</span>convertAndSend(<span class="pl-s1"><span class="pl-pds">"</span>greetings<span class="pl-pds">"</span></span>, greeting);
+            <span class="pl-k">if</span> (fail) {
+                <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-stj">RuntimeException</span>(<span class="pl-s1"><span class="pl-pds">"</span>simulated error<span class="pl-pds">"</span></span>);
+            }
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
-<div class="mobile-only">
-<p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
-</div>
-</article>
-<aside class="span4 mobile-right-pane" id="sidebar">
-<div>
-<ul class="right-pane-widget--container secondary-nav with-icon">
-<li class="blog-category">
-<div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category active">
-<div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category">
-<div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category">
-<div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
-</li>
-</ul>
-<ul class="social-btn--container">
-<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">createGreeting</span>(<span class="pl-stj">String</span> <span class="pl-v">name</span>) {
+            <span class="pl-v">this</span><span class="pl-k">.</span>createGreeting(name, <span class="pl-c1">false</span>);
+        }
 
-<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
-<a class="social-btn youtube" href="/videos"></a>
-</ul>
-<div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
-<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
-<form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
-          form.onSuccess(function(values, followUpUrl) {
-            form.getFormElem().html("<p>Thank you!</p>");
-            return false;
-          });
-        });
-      </script>
-</div>
-</div>
-</aside>
-</div>
-</div>
-</div>
-<footer class="footer">
+        <span class="pl-s">public</span> <span class="pl-st">Collection<<span class="pl-stj">Greeting</span>></span> <span class="pl-en">findAll</span>() {
+            <span class="pl-k">return</span> <span class="pl-v">this</span><span class="pl-k">.</span>entityManager
+                    .createQuery(<span class="pl-s1"><span class="pl-pds">"</span>select g from <span class="pl-pds">"</span></span> <span class="pl-k">+</span> <span class="pl-stj">Greeting</span><span class="pl-k">.</span>class<span class="pl-k">.</span>getName() <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">"</span> g<span class="pl-pds">"</span></span>, <span class="pl-stj">Greeting</span><span class="pl-k">.</span>class)
+                    .getResultList();
+        }
+
+        <span class="pl-s">public</span> <span class="pl-stj">Greeting</span> <span class="pl-en">find</span>(<span class="pl-stj">Long</span> <span class="pl-v">id</span>) {
+            <span class="pl-k">return</span> <span class="pl-v">this</span><span class="pl-k">.</span>entityManager<span class="pl-k">.</span>find(<span class="pl-stj">Greeting</span><span class="pl-k">.</span>class, id);
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-st">@Path</span>(<span class="pl-s1"><span class="pl-pds">"</span>/hello<span class="pl-pds">"</span></span>)
+    <span class="pl-st">@Produces</span>({<span class="pl-stj">MediaType</span><span class="pl-c1"><span class="pl-k">.</span>APPLICATION_JSON</span>})
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingEndpoint</span> {
+
+        <span class="pl-st">@Inject</span>
+        <span class="pl-s">private</span> <span class="pl-stj">GreetingService</span> greetingService;
+
+        <span class="pl-st">@POST</span>
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">post</span>(<span class="pl-st">@QueryParam</span>(<span class="pl-s1"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>) <span class="pl-stj">String</span> <span class="pl-v">name</span>) {
+            <span class="pl-v">this</span><span class="pl-k">.</span>greetingService<span class="pl-k">.</span>createGreeting(name);
+        }
+
+        <span class="pl-st">@GET</span>
+        <span class="pl-st">@Path</span>(<span class="pl-s1"><span class="pl-pds">"</span>/{id}<span class="pl-pds">"</span></span>)
+        <span class="pl-s">public</span> <span class="pl-stj">Greeting</span> <span class="pl-en">get</span>(<span class="pl-st">@PathParam</span>(<span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>) <span class="pl-stj">Long</span> <span class="pl-v">id</span>) {
+            <span class="pl-k">return</span> <span class="pl-v">this</span><span class="pl-k">.</span>greetingService<span class="pl-k">.</span>find(id);
+        }
+    }
+
+    <span class="pl-st">@Entity</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">Greeting</span> <span class="pl-s">implements</span> <span class="pl-e">Serializable</span> {
+
+        <span class="pl-st">@Id</span>
+        <span class="pl-st">@GeneratedValue</span>
+        <span class="pl-s">private</span> <span class="pl-stj">Long</span> id;
+
+        <span class="pl-st">@Override</span>
+        <span class="pl-s">public</span> <span class="pl-stj">String</span> <span class="pl-en">toString</span>() {
+            <span class="pl-k">return</span> <span class="pl-s1"><span class="pl-pds">"</span>Greeting{<span class="pl-pds">"</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s1"><span class="pl-pds">"</span>id=<span class="pl-pds">"</span></span> <span class="pl-k">+</span> id <span class="pl-k">+</span>
+                    <span class="pl-s1"><span class="pl-pds">"</span>, message='<span class="pl-pds">"</span></span> <span class="pl-k">+</span> message <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">'</span><span class="pl-cce">\'</span><span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s1"><span class="pl-pds">'</span>}<span class="pl-pds">'</span></span>;
+        }
+
+        <span class="pl-s">private</span> <span class="pl-stj">String</span> message;
+
+        <span class="pl-s">public</span> <span class="pl-stj">String</span> <span class="pl-en">getMessage</span>() {
+            <span class="pl-k">return</span> message;
+        }
+
+        <span class="pl-s">public</span> <span class="pl-en">Greeting</span>(<span class="pl-stj">String</span> <span class="pl-v">name</span>) {
+            <span class="pl-v">this</span><span class="pl-k">.</span>message <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>Hi, <span class="pl-pds">"</span></span> <span class="pl-k">+</span> name <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">"</span>!<span class="pl-pds">"</span></span>;
+        }
+
+        <span class="pl-en">Greeting</span>() {
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingServiceClient</span> {
+
+        <span class="pl-st">@Inject</span>
+        <span class="pl-s">private</span> <span class="pl-stj">GreetingService</span> greetingService;
+
+        <span class="pl-st">@PostConstruct</span>
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">afterPropertiesSet</span>() <span class="pl-s">throws</span> <span class="pl-stj">Exception</span> {
+            greetingService<span class="pl-k">.</span>createGreeting(<span class="pl-s1"><span class="pl-pds">"</span>Phil<span class="pl-pds">"</span></span>);
+            greetingService<span class="pl-k">.</span>createGreeting(<span class="pl-s1"><span class="pl-pds">"</span>Dave<span class="pl-pds">"</span></span>);
+            <span class="pl-k">try</span> {
+                greetingService<span class="pl-k">.</span>createGreeting(<span class="pl-s1"><span class="pl-pds">"</span>Josh<span class="pl-pds">"</span></span>, <span class="pl-c1">true</span>);
+            } <span class="pl-k">catch</span> (<span class="pl-stj">RuntimeException</span> re) {
+                <span class="pl-stj">Logger</span><span class="pl-k">.</span>getLogger(<span class="pl-stj">Application</span><span class="pl-k">.</span>class<span class="pl-k">.</span>getName())<span class="pl-k">.</span>info(<span class="pl-s1"><span class="pl-pds">"</span>caught exception...<span class="pl-pds">"</span></span>);
+            }
+            greetingService<span class="pl-k">.</span>findAll()<span class="pl-k">.</span>forEach(<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">::</span>println);
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingMessageProcessor</span> {
+
+        <span class="pl-st">@JmsListener</span>(<span class="pl-c1">destination</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>greetings<span class="pl-pds">"</span></span>)
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">processGreeting</span>(<span class="pl-stj">Greeting</span> <span class="pl-v">greeting</span>) <span class="pl-s">throws</span> <span class="pl-stj">JMSException</span> {
+            <span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println(<span class="pl-s1"><span class="pl-pds">"</span>received message: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> greeting);
+        }
+    }
+
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-st">void</span> <span class="pl-en">main</span>(<span class="pl-st">String</span>[] <span class="pl-v">args</span>) {
+        <span class="pl-stj">SpringApplication</span><span class="pl-k">.</span>run(<span class="pl-stj">Application</span><span class="pl-k">.</span>class, args);
+    }
+}
+</pre>
+
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2014-11-23 13:37:00.0">
+
+
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
+      document.body.style.WebkitTextStroke = "0.5px";
+    }</script>
+<div class="viewport">
+<header class="navbar header--navbar desktop-only">
+<div class="navbar-inner">
 <div class="container-fluid">
-<div class="row-fluid">
-<div class="span12">
-<div class="navbar">
-<div class="container">
-<ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<div class="spring-logo--container">
+<a class="spring-logo" href="/"><span></span></a>
+</div>
+<ul class="nav pull-right">
+<li class="navbar-link">
+<a href="/projects">专案</a>
+</li>
+<li class="navbar-link">
+<a href="/guides">导游</a>
+</li>
+<li class="navbar-link active">
+<a href="/blog">博客</a>
+</li>
+<li class="navbar-link">
+<a href="/services">培训与认证</a>
+</li>
+<li class="navbar-link nav-search js-nav-search">
+<a>
+<i class="icon-search navbar-search--icon js-search-input-open"></i>
+<span class="search-input-close js-search-input-close">
+<i class="icon-remove"></i>
+</span>
+</a>
+</li>
 </ul>
 </div>
 </div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+<div class="search-dropdown--container js-search-dropdown">
+<div class="container-fluid">
+<div class="search-form--container">
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
+</form>
 </div>
 </div>
 </div>
-</footer>
-<div id="scrim"></div>
+</header>
+<div>
+<div class="mobile-navigation--wrapper mobile-only">
+<div class="navigation-drawer--container">
+<div class="mobile-search--container">
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
+</form>
 </div>
-</body></html>
+<div class="navigation-item-list">
+<div class="navbar-link">
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link active">
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+<div class="navbar-link">
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="mobile-nav">
+<div class="nav-icon js-open-nav-drawer">
+<i class="icon-reorder"></i>
+</div>
+<div class="header-center-icon">
+<a href="/">
+<div class="icon icon-spring-logo-mobile"></div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<div class="header--container"></div>
+<div class="container-fluid"></div>
+<div></div>
+<div class="container-fluid">
+<div class="main-body--wrapper">
+<div class="row-fluid blog--wrapper">
+<article class="span8 mobile-left-pane" id="content">
+<header class="desktop-only">
+<div class="blog-category active content--title">
+<div>工程</div>
+</div>
+<div class="blog-category content--title">
+<div>发布</div>
+</div>
+<div class="blog-category content--title">
+<div>新闻与活动</div>
+</div>
+</header>
+<div class="blog--container">
+<header>
+<h1 class="blog--title">Spring Boot 1.2中的“ Bootiful” Java EE支持</h1>
+<div class="meta-data--container">
+<div class="meta-data--item desktop-only">
+<div class="meta-data--icon icon blog-icon engineering"></div>
+<a class="category">工程</a>
+</div>
+<div class="meta-data--item">
+<img class="meta-data--icon" src="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=20&d=mm"> <a class="author" rel="author" href="/team/jlong">乔什·朗（Josh Long）</a>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon calendar"></div>
+<time class="date" pubdate="" datetime="2014-11-23 13:37:00.0">2014年11月23日</time>
+</div>
+<div class="meta-data--item">
+<div class="meta-data--icon icon blog-icon comments"></div>
+<a class="comments" href="/blog/2014/11/23/bootiful-java-ee-support-in-spring-boot-1-2#disqus_thread" data-disqus-identifier="1853">
+</a></div>
+</div>
+</header>
+<div class="blog--post"><p>在这个博客中，我想研究并演示<a href="https://projects.spring.io/spring-boot/">Spring Boot 1.2</a>中的<em>许多</em>新功能， <em>这些</em>新功能使来自Java EE或以Java EE为基础的人的生活变得更加轻松。</p>
+<p>值得一提的是，Spring以前当然可以提供很多支持，但是现在有了Spring Boot 1.2，就这么简单！</p>
+<p>首先，这是一个带有注释的示例程序。</p>
+<div class="highlight highlight-java"><pre><span class="pl-k">package</span> <span class="pl-smp">demo</span>;
+
+<span class="pl-k">import</span> <span class="pl-smi">org.glassfish.jersey.jackson.JacksonFeature</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.glassfish.jersey.server.ResourceConfig</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.boot.SpringApplication</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.boot.autoconfigure.SpringBootApplication</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.jms.annotation.JmsListener</span>;
+<span class="pl-k">import</span> <span class="pl-smi">org.springframework.jms.core.JmsTemplate</span>;
+
+<span class="pl-k">import</span> <span class="pl-smi">javax.annotation.PostConstruct</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.inject.Inject</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.inject.Named</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.jms.JMSException</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.persistence.*</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.transaction.Transactional</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.ws.rs.*</span>;
+<span class="pl-k">import</span> <span class="pl-smi">javax.ws.rs.core.MediaType</span>;
+<span class="pl-k">import</span> <span class="pl-smi">java.io.Serializable</span>;
+<span class="pl-k">import</span> <span class="pl-smi">java.util.Collection</span>;
+<span class="pl-k">import</span> <span class="pl-smi">java.util.logging.Logger</span>;
+
+@<span class="pl-stj">SpringBootApplication</span>
+<span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-en">Application</span> {
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">JerseyConfig</span> <span class="pl-s">extends</span> <span class="pl-e">ResourceConfig</span> {
+
+        <span class="pl-s">public</span> <span class="pl-en">JerseyConfig</span>() {
+            <span class="pl-v">this</span><span class="pl-k">.</span>register(<span class="pl-stj">GreetingEndpoint</span><span class="pl-k">.</span>class);
+            <span class="pl-v">this</span><span class="pl-k">.</span>register(<span class="pl-stj">JacksonFeature</span><span class="pl-k">.</span>class);
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-st">@Transactional</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingService</span> {
+
+        <span class="pl-st">@Inject</span>
+        <span class="pl-s">private</span> <span class="pl-stj">JmsTemplate</span> jmsTemplate;
+
+        <span class="pl-st">@PersistenceContext</span>
+        <span class="pl-s">private</span> <span class="pl-stj">EntityManager</span> entityManager;
+
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">createGreeting</span>(<span class="pl-stj">String</span> <span class="pl-v">name</span>, <span class="pl-st">boolean</span> <span class="pl-v">fail</span>) {
+            <span class="pl-stj">Greeting</span> greeting <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">Greeting</span>(name);
+            <span class="pl-v">this</span><span class="pl-k">.</span>entityManager<span class="pl-k">.</span>persist(greeting);
+            <span class="pl-v">this</span><span class="pl-k">.</span>jmsTemplate<span class="pl-k">.</span>convertAndSend(<span class="pl-s1"><span class="pl-pds">"</span>greetings<span class="pl-pds">"</span></span>, greeting);
+            <span class="pl-k">if</span> (fail) {
+                <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-stj">RuntimeException</span>(<span class="pl-s1"><span class="pl-pds">"</span>simulated error<span class="pl-pds">"</span></span>);
+            }
+        }
+
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">createGreeting</span>(<span class="pl-stj">String</span> <span class="pl-v">name</span>) {
+            <span class="pl-v">this</span><span class="pl-k">.</span>createGreeting(name, <span class="pl-c1">false</span>);
+        }
+
+        <span class="pl-s">public</span> <span class="pl-st">Collection<<span class="pl-stj">Greeting</span>></span> <span class="pl-en">findAll</span>() {
+            <span class="pl-k">return</span> <span class="pl-v">this</span><span class="pl-k">.</span>entityManager
+                    .createQuery(<span class="pl-s1"><span class="pl-pds">"</span>select g from <span class="pl-pds">"</span></span> <span class="pl-k">+</span> <span class="pl-stj">Greeting</span><span class="pl-k">.</span>class<span class="pl-k">.</span>getName() <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">"</span> g<span class="pl-pds">"</span></span>, <span class="pl-stj">Greeting</span><span class="pl-k">.</span>class)
+                    .getResultList();
+        }
+
+        <span class="pl-s">public</span> <span class="pl-stj">Greeting</span> <span class="pl-en">find</span>(<span class="pl-stj">Long</span> <span class="pl-v">id</span>) {
+            <span class="pl-k">return</span> <span class="pl-v">this</span><span class="pl-k">.</span>entityManager<span class="pl-k">.</span>find(<span class="pl-stj">Greeting</span><span class="pl-k">.</span>class, id);
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-st">@Path</span>(<span class="pl-s1"><span class="pl-pds">"</span>/hello<span class="pl-pds">"</span></span>)
+    <span class="pl-st">@Produces</span>({<span class="pl-stj">MediaType</span><span class="pl-c1"><span class="pl-k">.</span>APPLICATION_JSON</span>})
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingEndpoint</span> {
+
+        <span class="pl-st">@Inject</span>
+        <span class="pl-s">private</span> <span class="pl-stj">GreetingService</span> greetingService;
+
+        <span class="pl-st">@POST</span>
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">post</span>(<span class="pl-st">@QueryParam</span>(<span class="pl-s1"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>) <span class="pl-stj">String</span> <span class="pl-v">name</span>) {
+            <span class="pl-v">this</span><span class="pl-k">.</span>greetingService<span class="pl-k">.</span>createGreeting(name);
+        }
+
+        <span class="pl-st">@GET</span>
+        <span class="pl-st">@Path</span>(<span class="pl-s1"><span class="pl-pds">"</span>/{id}<span class="pl-pds">"</span></span>)
+        <span class="pl-s">public</span> <span class="pl-stj">Greeting</span> <span class="pl-en">get</span>(<span class="pl-st">@PathParam</span>(<span class="pl-s1"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>) <span class="pl-stj">Long</span> <span class="pl-v">id</span>) {
+            <span class="pl-k">return</span> <span class="pl-v">this</span><span class="pl-k">.</span>greetingService<span class="pl-k">.</span>find(id);
+        }
+    }
+
+    <span class="pl-st">@Entity</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">Greeting</span> <span class="pl-s">implements</span> <span class="pl-e">Serializable</span> {
+
+        <span class="pl-st">@Id</span>
+        <span class="pl-st">@GeneratedValue</span>
+        <span class="pl-s">private</span> <span class="pl-stj">Long</span> id;
+
+        <span class="pl-st">@Override</span>
+        <span class="pl-s">public</span> <span class="pl-stj">String</span> <span class="pl-en">toString</span>() {
+            <span class="pl-k">return</span> <span class="pl-s1"><span class="pl-pds">"</span>Greeting{<span class="pl-pds">"</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s1"><span class="pl-pds">"</span>id=<span class="pl-pds">"</span></span> <span class="pl-k">+</span> id <span class="pl-k">+</span>
+                    <span class="pl-s1"><span class="pl-pds">"</span>, message='<span class="pl-pds">"</span></span> <span class="pl-k">+</span> message <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">'</span><span class="pl-cce">\'</span><span class="pl-pds">'</span></span> <span class="pl-k">+</span>
+                    <span class="pl-s1"><span class="pl-pds">'</span>}<span class="pl-pds">'</span></span>;
+        }
+
+        <span class="pl-s">private</span> <span class="pl-stj">String</span> message;
+
+        <span class="pl-s">public</span> <span class="pl-stj">String</span> <span class="pl-en">getMessage</span>() {
+            <span class="pl-k">return</span> message;
+        }
+
+        <span class="pl-s">public</span> <span class="pl-en">Greeting</span>(<span class="pl-stj">String</span> <span class="pl-v">name</span>) {
+            <span class="pl-v">this</span><span class="pl-k">.</span>message <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>Hi, <span class="pl-pds">"</span></span> <span class="pl-k">+</span> name <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">"</span>!<span class="pl-pds">"</span></span>;
+        }
+
+        <span class="pl-en">Greeting</span>() {
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingServiceClient</span> {
+
+        <span class="pl-st">@Inject</span>
+        <span class="pl-s">private</span> <span class="pl-stj">GreetingService</span> greetingService;
+
+        <span class="pl-st">@PostConstruct</span>
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">afterPropertiesSet</span>() <span class="pl-s">throws</span> <span class="pl-stj">Exception</span> {
+            greetingService<span class="pl-k">.</span>createGreeting(<span class="pl-s1"><span class="pl-pds">"</span>Phil<span class="pl-pds">"</span></span>);
+            greetingService<span class="pl-k">.</span>createGreeting(<span class="pl-s1"><span class="pl-pds">"</span>Dave<span class="pl-pds">"</span></span>);
+            <span class="pl-k">try</span> {
+                greetingService<span class="pl-k">.</span>createGreeting(<span class="pl-s1"><span class="pl-pds">"</span>Josh<span class="pl-pds">"</span></span>, <span class="pl-c1">true</span>);
+            } <span class="pl-k">catch</span> (<span class="pl-stj">RuntimeException</span> re) {
+                <span class="pl-stj">Logger</span><span class="pl-k">.</span>getLogger(<span class="pl-stj">Application</span><span class="pl-k">.</span>class<span class="pl-k">.</span>getName())<span class="pl-k">.</span>info(<span class="pl-s1"><span class="pl-pds">"</span>caught exception...<span class="pl-pds">"</span></span>);
+            }
+            greetingService<span class="pl-k">.</span>findAll()<span class="pl-k">.</span>forEach(<span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">::</span>println);
+        }
+    }
+
+    <span class="pl-st">@Named</span>
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">GreetingMessageProcessor</span> {
+
+        <span class="pl-st">@JmsListener</span>(<span class="pl-c1">destination</span> <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>greetings<span class="pl-pds">"</span></span>)
+        <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">processGreeting</span>(<span class="pl-stj">Greeting</span> <span class="pl-v">greeting</span>) <span class="pl-s">throws</span> <span class="pl-stj">JMSException</span> {
+            <span class="pl-stj">System</span><span class="pl-k">.</span>out<span class="pl-k">.</span>println(<span class="pl-s1"><span class="pl-pds">"</span>received message: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> greeting);
+        }
+    }
+
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-st">void</span> <span class="pl-en">main</span>(<span class="pl-st">String</span>[] <span class="pl-v">args</span>) {
+        <span class="pl-stj">SpringApplication</span><span class="pl-k">.</span>run(<span class="pl-stj">Application</span><span class="pl-k">.</span>class, args);
+    }
+}</pre></div>
+<p>完整的代码清单，包括非常稀疏的<a href="https://github.com/joshlong/techtips/blob/master/examples/jaxrs-jta-jms-jpa-330-250-undertow/src/main/resources/application.properties"><code>application.properties</code></a>和<a href="https://github.com/joshlong/techtips/blob/master/examples/jaxrs-jta-jms-jpa-330-250-undertow/pom.xml">Maven build</a> ，可在线获得。</p>
+<h2>
+<a id="user-content-jax-rs-with-jersey" class="anchor" href="#jax-rs-with-jersey" aria-hidden="true"><span class="octicon octicon-link"></span></a> JAX-RS与泽西岛</h2>
+<p>该示例在<code>GreetingEndpoint</code> <a href="https://docs.spring.io/spring-boot/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#boot-features-jersey">演示了Boot的新JAX-RS自动配置</a> （在这种情况下，使用<a href="https://jersey.java.net/">Jersey 2.x</a> ）。请注意使所有功能正常运行非常方便！唯一要烦的是，您需要指定<code>ResourceConfig</code>子类以让Jersey知道要注册的组件。</p>
+<h2>
+<a id="user-content-global-transactions-with-jta" class="anchor" href="#global-transactions-with-jta" aria-hidden="true"><span class="octicon octicon-link"></span></a>与JTA的全球交易</h2>
+<p>它通过<a href="https://docs.spring.io/spring-boot/docs/1.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#boot-features-jta">新的自动配置的JTA支持</a>演示了全局事务。JTA是用于X / Open XA协议的Java API，它允许多个兼容的事务资源（例如消息队列和数据库）参与单个事务。为此，我们使用了<a href="http://www.atomikos.com/">Atomikos</a>独立的JTA提供程序。我们也可以像使用Bitronix一样容易地使用它。如果带上合适的启动器，两者都将自动配置。在此示例中，在<code>GreetingService</code> ，JMS和JPA工作作为全局事务的一部分完成。我们通过创建3个事务并在第三个事务上模拟回滚来演示这一点。您应该在控制台上看到从JDBC <code>javax.sql.DataSource</code></p><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></article><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></body></html>

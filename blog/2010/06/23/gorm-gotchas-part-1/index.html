@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>GORM Gotchas (Part 1)</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>GORM陷阱（第1部分）</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,32 +16,30 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="GORM Gotchas (Part 1)" />
-<meta name="twitter:description" content="&lt;p&gt;Are you new to Grails? Or have you perhaps run into your first GORM “oddity”? If so, then you’ll want to read this series on GORM gotchas. Not only will the articles highlight those little idiosyncrasies that often catch people out, but they will also explain why GORM behaves in these ways.&lt;/p&gt;
-&lt;p&gt;Hopefully you will already know that GORM is the database access library that comes with Grails. It’s based on probably the most popular Java ORM out there: Hibernate. As you can imagine, Hibernate is a powerful and flexible library and it brings big benefits to GORM. But there is a cost to using it: many of the problems that users of GORM run into stem from the way Hibernate works. GORM tries to hide the implementation details as best it can, but they do leak out on occasion.&lt;/p&gt;
-" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="GORM Gotchas (Part 1)">
+<meta name="twitter:description" content="<p>Are you new to Grails? Or have you perhaps run into your first GORM “oddity”? If so, then you’ll want to read this series on GORM gotchas. Not only will the articles highlight those little idiosyncrasies that often catch people out, but they will also explain why GORM behaves in these ways.</p>
+<p>Hopefully you will already know that GORM is the database access library that comes with Grails. It’s based on probably the most popular Java ORM out there: Hibernate. As you can imagine, Hibernate is a powerful and flexible library and it brings big benefits to GORM. But there is a cost to using it: many of the problems that users of GORM run into stem from the way Hibernate works. GORM tries to hide the implementation details as best it can, but they do leak out on occasion.</p>
+">
 
-<meta property="og:title" content="GORM Gotchas (Part 1)" />
-<meta property="og:description" content="&lt;p&gt;Are you new to Grails? Or have you perhaps run into your first GORM “oddity”? If so, then you’ll want to read this series on GORM gotchas. Not only will the articles highlight those little idiosyncrasies that often catch people out, but they will also explain why GORM behaves in these ways.&lt;/p&gt;
-&lt;p&gt;Hopefully you will already know that GORM is the database access library that comes with Grails. It’s based on probably the most popular Java ORM out there: Hibernate. As you can imagine, Hibernate is a powerful and flexible library and it brings big benefits to GORM. But there is a cost to using it: many of the problems that users of GORM run into stem from the way Hibernate works. GORM tries to hide the implementation details as best it can, but they do leak out on occasion.&lt;/p&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2010-06-23 17:34:00.0" />
+<meta property="og:title" content="GORM Gotchas (Part 1)">
+<meta property="og:description" content="<p>Are you new to Grails? Or have you perhaps run into your first GORM “oddity”? If so, then you’ll want to read this series on GORM gotchas. Not only will the articles highlight those little idiosyncrasies that often catch people out, but they will also explain why GORM behaves in these ways.</p>
+<p>Hopefully you will already know that GORM is the database access library that comes with Grails. It’s based on probably the most popular Java ORM out there: Hibernate. As you can imagine, Hibernate is a powerful and flexible library and it brings big benefits to GORM. But there is a cost to using it: many of the problems that users of GORM run into stem from the way Hibernate works. GORM tries to hide the implementation details as best it can, but they do leak out on occasion.</p>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2010-06-23 17:34:00.0">
 </head>
-<body>
+<body dir="ltr">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -57,16 +49,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -82,9 +74,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -94,40 +86,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -153,59 +135,57 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">GORM Gotchas (Part 1)</h1>
+<h1 class="blog--title">GORM陷阱（第1部分）</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="null?s=20&amp;d=mm" />
-<span class="author">Peter Ledbrook</span>
+<img class="meta-data--icon" src="null?s=20&d=mm"> <span class="author">彼得·莱德布鲁克</span>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2010-06-23 17:34:00.0">June 23, 2010</time>
+<time class="date" pubdate="" datetime="2010-06-23 17:34:00.0">2010年6月23日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="333" href="/blog/2010/06/23/gorm-gotchas-part-1#disqus_thread">
+<a class="comments" href="/blog/2010/06/23/gorm-gotchas-part-1#disqus_thread" data-disqus-identifier="333">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Are you new to Grails? Or have you perhaps run into your first GORM &ldquo;oddity&rdquo;? If so, then you&rsquo;ll want to read this series on GORM gotchas. Not only will the articles highlight those little idiosyncrasies that often catch people out, but they will also explain why GORM behaves in these ways.</p><p>Hopefully you will already know that GORM is the database access library that comes with Grails. It&rsquo;s based on probably the most popular Java ORM out there: Hibernate. As you can imagine, Hibernate is a powerful and flexible library and it brings big benefits to GORM. But there is a cost to using it: many of the problems that users of GORM run into stem from the way Hibernate works. GORM tries to hide the implementation details as best it can, but they do leak out on occasion.</p><p>In the rest of this post, I&rsquo;ll describe the basics of persisting objects to the database. Sounds simple, but GORM doesn&rsquo;t quite work as you might expect even on something so basic.</p>
-<h2>When I call save(), I mean save!</h2><p>Problems with saving domain instances are probably the first ones that developers come across. How many of you have gone through the &ldquo;I saved it, so why isn&rsquo;t it in the database?&rdquo; phase? If it makes you feel any better, I&rsquo;ve been through it too. Why does this happen? There are a couple of possibilities.</p>
-<h3>Don't forget the validation!</h3><p>Every time you save a domain instance, Grails validates it using the constraints that you have defined. If any values in the domain instance violate those constraints, the save will fail and the constraint errors will be attached to the domain instance. The trouble is, this failure to save the domain instance happens quietly: you won&rsquo;t know about it unless you check the return value of <tt>save()</tt> or call <tt>hasErrors()</tt>. </p><p>When you are binding user data to a domain instance, this is typically the behaviour you want. It&rsquo;s hardly a surprise if user input happens not to fit the constraints. Throwing an exception in this case just isn&rsquo;t appropriate, particularly when you&rsquo;re web application has quite a few concurrent users. In these circumstances it&rsquo;s always best to check the return value of <tt>save()</tt> and react accordingly (it returns <tt>null</tt> if the save failed, otherwise it returns the domain instance):</p>
+<div class="blog--post"><p>您是Grails的新手吗？还是您遇到了您的第一个GORM“奇特”？如果是这样，那么您将需要阅读有关GORM陷阱的本系列文章。这些文章不仅将突出那些经常引起人们注意的小特质，而且还将解释GORM为什么以这种方式行事。</p><p>希望您已经知道GORM是Grails随附的数据库访问库。它基于最流行的Java ORM：Hibernate。可以想象，Hibernate是一个强大而灵活的库，它为GORM带来了巨大的好处。但是使用它有成本：GORM用户遇到的许多问题都源于Hibernate的工作方式。GORM尝试尽最大可能隐藏实施细节，但有时确实会泄漏出去。</p><p>在本文的其余部分，我将介绍将对象持久保存到数据库的基础。听起来很简单，但即使在如此基本的东西上，GORM也不如您期望的那样工作。</p>
+<h2>当我调用save（）时，我的意思是保存！</h2><p>保存域实例的问题可能是开发人员首先遇到的问题。你们中有多少人经历过“我保存了它，为什么不将它保存在数据库中？”相？如果让您感觉更好，我也经历过。为什么会这样？有两种可能性。</p>
+<h3>不要忘记验证！</h3><p>每次保存域实例时，Grails都会使用已定义的约束对其进行验证。如果域实例中的任何值违反这些约束，则保存将失败，并且约束错误将附加到该域实例。麻烦的是，这种故障保存域实例悄然发生：你不会知道它，除非你检查的返回值<tt>保存（）</tt>或致电<tt>hasErrors（）。</tt></p><p>将用户数据绑定到域实例时，通常这是您想要的行为。如果用户输入碰巧不符合约束条件，这也就不足为奇了。在这种情况下抛出异常是不合适的，特别是当您的Web应用程序有很多并发用户时。在这种情况下，它总是最好检查<tt>保存</tt>返回值<tt>（），</tt>并做出相应的反应（如果保存失败，否则返回域实例返回<tt>null）：</tt></p>
 <pre><code class="prettyprint groovy">def book = new Book(params)
 if (!book.save()) {
     // Save failed! Present the errors to the user.
     ...
 }
-</code></pre><p>On the other hand, when you&rsquo;re setting up test data in BootStrap or in the Grails console, you usually expect the save to work. If there are any validation errors, it means a mistake on your part. In such cases as these, you don&rsquo;t want to mess around with checking the return value of every <tt>save()</tt> and you&rsquo;d be more than happy if Grails were to throw an exception for validation failures. This isn&rsquo;t the default behaviour, but you can easily switch it on via a <tt>failOnError</tt> argument:</p>
+</code></pre><p>另一方面，当您在BootStrap或Grails控制台中设置测试数据时，通常希望保存有效。如果有任何验证错误，则意味着您有错误。在这种情况下，您不想弄乱检查每个<tt>save（）</tt>的返回值，并且如果Grails为验证失败抛出异常，您会非常高兴。这不是默认的行为，但是您可以通过<tt>failOnError</tt>参数轻松地将其打开：</p>
 <pre><code class="prettyprint groovy">book.save(failOnError: true)
-</code></pre><p>If you insist, you can even make it the default: simply set <tt>grails.gorm.failOnError</tt> to <tt>true</tt> in grails-app/conf/Config.groovy. And don&rsquo;t forget, all domain properties have an implicit <tt>nullable: false</tt> constraint!</p><p>That&rsquo;s probably the most common reason for domain instances not being saved when you expect them to be. So what&rsquo;s the other?</p>
-<h3>Hibernate's session</h3><p>On rare occasions, you can find yourself saving a domain instance only to discover that a following query doesn&rsquo;t pick it up, even when the instance passes validation. This is a symptom of a wider issue connected with using Hibernate under the hood.</p><p><b>Hibernate is a session-based ORM framework.</b></p><p>This is a very important point and anyone that hopes to truly be comfortable with GORM has to understand what the session is and what impact it has on applications. So what is a session? It&rsquo;s basically an in-memory cache of objects that are backed by a database. When you save a new domain instance, it is implicitly attached to the session, i.e. it is added to the cache and becomes a Hibernate-managed object. <em>But it may not be persisted to the database at that point!</em> The following diagram illustrates this behaviour:</p><p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/hibernate-session-in-action.png" alt="hibernate-session-in-action" title="hibernate-session-in-action" width="440" height="248" class="aligncenter size-full wp-image-5037" /></p><p>When you save instances, they will immediately be available from the session. But Hibernate uses it&rsquo;s discretion to decide when to persist the new instances to the database, which means it can optimise the order of the SQL statements. Normally you won&rsquo;t notice any of this because Grails and Hibernate take care of things, but occasionally you will get caught out.</p><p>As you&rsquo;d expect, though, Grails does allow you to control when data is actually persisted to the database. Have you ever seen code like this in examples?</p>
+</code></pre><p>如果您坚持，甚至可以将其设置为默认值：只需在grails-app / conf / Config.groovy中将<tt>grails.gorm.failOnError</tt>设置为<tt>true</tt> 。而且请不要忘记，所有域属性都有一个隐式<tt>可空值：false</tt>约束！</p><p>这可能是您不希望保存域实例的最常见原因。那又是什么？</p>
+<h3>休眠会话</h3><p>在极少数情况下，即使发现实例通过验证，也发现自己保存域实例只是发现以下查询没有选择该实例。这是与在后台使用Hibernate有关的更广泛问题的征兆。</p><p><b>Hibernate是一个基于会话的ORM框架。</b></p><p>这是非常重要的一点，任何希望真正熟悉GORM的人都必须了解会话是什么以及会话对应用程序有什么影响。那么什么是会话？它基本上是数据库支持的对象的内存中缓存。当您保存一个新的域实例时，它隐式地附加在会话上，即它被添加到缓存中并成为一个Hibernate管理的对象。<em>但是，此时可能无法将其持久化到数据库中！</em> 下图说明了这种行为：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/hibernate-session-in-action.png" alt="休眠会话在行动" title="休眠会话在行动" width="440" height="248" class="aligncenter size-full wp-image-5037"></p><p>保存实例时，实例将立即在会话中可用。但是Hibernate可以自行决定何时将新实例持久保存到数据库中，这意味着它可以优化SQL语句的顺序。通常，您不会注意到其中的任何一个，因为Grails和Hibernate会处理所有事情，但是偶尔您会被发现。</p><p>但是，正如您所期望的，Grails确实可以控制何时将数据实际持久化到数据库中。您是否在示例中看到过这样的代码？</p>
 <pre><code class="prettyprint groovy">book.save(flush: true)
-</code></pre><p>The <tt>flush: true</tt> forces Hibernate to persist all changes to the database right away. It corresponds to what is known as <em>flushing the session</em>.</p><p>The danger now is that you will go away and put <tt>flush: true</tt> everywhere. Don&rsquo;t. Let Hibernate do it&rsquo;s job and only manually flush the session when you have to, or at least only at the end of a batch of updates. You should only really use if you&rsquo;re not seeing the data in the database when it should be there. I know that&rsquo;s a bit wishy-washy, but the circumstances when such action is necessary depend on the database implementation and other factors. One area where manual flushing can be very useful is when you are interacting with another application or internal service that is accessing the same database as you but outside of your current session.</p><p>If you&rsquo;re still a little hazy on the session, don&rsquo;t worry - we&rsquo;ll be coming back to the Hibernate session again and again, because it is fundamental to many of the gotchas related to GORM. In fact, it&rsquo;s the reason why people are hit by the next problem.</p>
-<h3>Now you're saving when I don't want you to?!</h3><p>Failing to persist a domain instance when you call <tt>save()</tt> is pretty common. Now consider the reverse situation: objects being persisted without a corresponding call to <tt>save()</tt>. If you haven&rsquo;t come across this behaviour yet, I can almost guarantee that you will. So why might might it happen?</p><p>Hibernate supports the concept of dirty-checking. What this means is that Hibernate checks whether any values of a domain instance&rsquo;s (persistent) properties have changed <em>after that instance has been pulled from the database</em>, and will persist those changes to the database. That&rsquo;s a bit of a mouthful so hopefully an example will help clarify this explanation. Let&rsquo;s say we have a <tt>Book</tt> domain class with <tt>title</tt> and <tt>author</tt> properties, and the following code is in a controller action:</p>
+</code></pre><p><tt>flush：true</tt>强制Hibernate立即将对数据库的所有更改持久化。它对应于所谓<em>冲洗会议</em> 。</p><p>现在的危险是，您将离开并变得<tt>同花顺：</tt>在任何地方都是<tt>如此</tt> 。别。让Hibernate来做它的工作，并且仅在必要时或至少在一批更新结束时才手动刷新会话。仅当您没有看到数据库中的数据时才应该真正使用它。我知道这有点麻烦，但是需要采取这种措施的情况取决于数据库实现和其他因素。手动刷新可能非常有用的一个方面是，当您与另一个应用程序或内部服务交互时，该应用程序或内部服务正在访问与您相同的数据库，但不在当前会话中。</p><p>如果您在会话中仍然有些朦胧，请不要担心-我们将一次又一次地回到Hibernate会话，因为它对于与GORM相关的许多陷阱至关重要。实际上，这就是人们受到下一个问题打击的原因。</p>
+<h3>现在，当我不想要您时，您正在省钱吗？</h3><p>在调用<tt>save（）</tt>时无法持久保留域实例是很常见的。现在考虑相反的情况：对象被持久保存而没有对<tt>save（）</tt>的相应调用。如果您还没有遇到这种行为，我几乎可以保证您会这样做。那么为什么会发生呢？</p><p>Hibernate支持脏检查的概念。这意味着Hibernate <em>在将实例从数据库中拉出后会</em>检查该域实例的（持久）属性的值是否已更改，并将这些更改持久保存到数据库中。这有点令人mouth舌，因此希望有一个例子可以帮助您澄清这一解释。假设我们有一个带有<tt>title</tt>和<tt>author</tt>属性的<tt>Book</tt>域类，并且以下代码在控制器操作中：</p>
 <pre><code class="prettyprint groovy">def b = Book.findByAuthor(params.author)
 b.title = b.title.reverse()
-</code></pre><p>Note that there is no call to <tt>save()</tt> here. When the request has completed you will find that the book&rsquo;s title has been reversed in the database - the change has been persisted without an explicit save. This is because:<br /><ol><br /><li>the book is attached to the session (by virtue of being retrieved by a query);</li><br /><li>the <tt>title</tt> property is persistent (all properties are persistent unless configured as transient); and</li><br /><li>the property value has changed by the time the session closes.</li><br /></ol></p><p>Let&rsquo;s look at those in a little more detail. First, I have already mentioned that objects can be &ldquo;attached&rdquo; to the session, i.e. managed by Hibernate and backed by the database, but how do objects become attached? If you use GORM to retrieve a domain instance in any way, for example via the <tt>get()</tt> method or any type of query, then the object is automatically associated with the session. If you just create a new instance via the <tt>new</tt> keyword, then the object is <em>not</em> attached to the session until the <tt>save()</tt> method is called.</p><p>Second, domain class properties are persistent by default, i.e. they have matching columns in the database where their values are stored. You can make properties transient by adding their names to the static <tt>transients</tt> list property, which means that their values aren&rsquo;t stored in the database.</p><p>Finally, I mentioned that changes are persisted if they exist when the session closes. What did I mean by that? In order to do anything with the database via Hibernate, you must have an open session. Once the session is closed, you can no longer use it for database access. Also, the session is flushed when it&rsquo;s closed, which is why changes are persisted at the end of our controller action above (Grails automatically opens a session at the start of a request and closes it at the end).</p><p>Can you prevent such changes being persisted? Sure. One option is to call <tt>save()</tt> on your domain instance: if any of the property values fail validation, the changes will <em>not</em> be persisted. Of course, if the values are valid and yet you still don&rsquo;t want to persist them, you can call <tt>discard()</tt> on your instance. This won&rsquo;t reset the values of the instance&rsquo;s properties, but it will ensure that they aren&rsquo;t saved to the database.</p><p>That&rsquo;s a fair bit of information to digest for just a few gotchas. The key is understanding how the Hibernate session affects persistence of domain instances. Even if you haven&rsquo;t quite grokked it yet, future GORM gotcha articles will provide more information and examples.</p><p>In general, I recommend that you always use <tt>save()</tt> to persist objects rather than relying on dirty-checking. It makes it clear in the code that you want to persist the changes and those changes get validated at the same time. I also recommend that you always check the return value of <tt>save()</tt> in application code, although you&rsquo;re better off using the <tt>failOnError: true</tt> option when setting up bootstrap or test data.</p><p>If you&rsquo;re at all intimidated by or wary of GORM at this point, don&rsquo;t be. It really does make playing around with a database easy and fun, and with the information gleaned from this series of articles, you&rsquo;ll have the confidence to deal with any problems that may crop up.</p><p>Until next time! </p></div>
+</code></pre><p>请注意，没有调用<tt>save（）</tt>在这里。请求完成后，您会发现该书的书名在数据库中已被颠倒-更改一直存在，没有显式保存。这是因为：<br></p><ol><br><li>这本书被附加到会话中（由于被查询检索）；</li><br><li><tt>title</tt>属性是持久的（除非配置为瞬态，否则所有属性都是持久的）；和</li><br><li>会话关闭时属性值已更改。</li><br></ol><p></p><p>让我们更详细地看一下。首先，我已经提到可以将对象“附加”到会话，即由Hibernate管理并由数据库支持，但是对象如何附加？如果使用GORM以任何方式（例如通过<tt>get（）</tt>方法或任何类型的查询<tt>）</tt>检索域实例，则该对象将自动与会话关联。如果你只是通过<tt>新的</tt>关键字创建新实例，则该对象<em>直到</em> <tt>save（）</tt>方法被调用连接到会议。</p><p>其次，默认情况下，域类属性是持久性的，即它们在存储其值的数据库中具有匹配的列。您可以通过将属性的名称添加到静态<tt>瞬态</tt>列表属性来使属性变为<tt>瞬态</tt> ，这意味着它们的值不会存储在数据库中。</p><p>最后，我提到如果会话关闭时存在更改，这些更改将保留。那是什么意思为了通过Hibernate对数据库进行任何操作，您必须有一个开放会话。会话关闭后，您将无法再使用它进行数据库访问。此外，会话在关闭时会刷新，这就是为什么更改在我们上面的控制器操作结束时仍然存在的原因（Grails在请求开始时会自动打开一个会话，并在请求结束时将其关闭）。</p><p>您可以防止这种更改持续存在吗？当然。一种选择是在域实例上调用<tt>save（）</tt> ：如果任何属性值<em>均未</em>通过验证，则更改将<em>不会</em> <tt>保留</tt> 。当然，如果这些值是有效的，但您仍然不想保留它们，则可以在实例上调用<tt>throw（）</tt> 。这不会重置实例属性的值，但会确保它们不会保存到数据库中。</p><p>只需几个陷阱就可以消化很多信息。关键是要了解Hibernate会话如何影响域实例的持久性。即使您还不太了解它，将来的GORM陷阱文章也会提供更多信息和示例。</p><p>通常，我建议您始终使用<tt>save（）</tt>来持久化对象，而不要依赖于脏检查。它在代码中清楚表明您要保留更改，并且这些更改将同时得到验证。我也建议您始终检查应用程序代码中<tt>save（）</tt>的返回值，尽管最好在设置引导程序或测试数据时使用<tt>failOnError：true</tt>选项。</p><p>如果您此时对GORM感到完全恐惧或警惕，那就不要了。它的确使使用数据库变得轻松而有趣，并且从本系列文章中收集的信息中，您将有信心处理可能出现的任何问题。</p><p>直到下一次！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 333;
 
       (function(disqus_shortname, document) {
@@ -219,15 +199,12 @@ b.title = b.title.reverse()
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -235,23 +212,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -261,17 +234,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -285,18 +256,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

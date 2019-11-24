@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Optimising and Tuning Apache Tomcat - Part 2</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>优化和调整Apache Tomcat-第2部分</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,84 +16,82 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Optimising and Tuning Apache Tomcat - Part 2" />
-<meta name="twitter:description" content="&lt;p&gt;A few weeks ago Filip Hanik and I gave the second in a series of webinars on Optimising and Tuning Apache Tomcat. A recording of the webinar and a copy of the slides can be obtained from the &lt;a href=&quot;http://www.springsource.com/webinars&quot;&gt;webinars section of the SpringSource website&lt;/a&gt;. The same page has links for all the previous SpringSource webinars, as well as the &lt;a href=&quot;http://www.covalent.net/services/training/webinars_archived.html&quot;&gt;Covalent webinar archive&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;We weren’t able to get to all of the questions during the Q&amp;amp;A session so, as promised, here are the remaining questions and our answers.&lt;br&gt;&lt;/p&gt;
-&lt;ul&gt;
- &lt;p&gt;&lt;/p&gt; 
- &lt;li&gt;&lt;strong&gt;How do you identify memory leaks in a Tomcat application?&lt;/strong&gt; &lt;p&gt;You will almost certainly need to use a profiler to identify the root cause of a memory leak. The latest Sun JDKs include &lt;a href=&quot;http://java.sun.com/javase/6/docs/technotes/tools/index.html#troubleshoot&quot;&gt;tools like jhat and jmap&lt;/a&gt;. There are also many other profilers available, both free and commercial. Filip and I use &lt;a href=&quot;http://www.yourkit.com&quot;&gt;YourKit&lt;/a&gt; when investigating Tomcat memory leaks as YourKit provide free licences to open source developers.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;How can redeployment cause a memory leak?&lt;/strong&gt; &lt;p&gt;This usually occurs when a class loaded by Tomcat retains a reference to a class loaded by the web application. When the web application is stopped, the Tomcat class loader continues to retain the reference to the class loaded by the web application. This class retains a reference to the web application&#39;s class loader which in turn, retains references to all the classes it loaded. Therefore, the web application class loader and all the classes it loaded are not eligible for garbage collection. This causes a memory leak. The typical root causes of this are JDBC drivers and logging frameworks.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is the best way to change the JVM Tomcat uses?&lt;/strong&gt; &lt;p&gt;The JVM to use is set using the JAVA_HOME (full JDK) or JRE_HOME (JRE only) environment variable. The correct place to set this will depend on your environment, particularly if Tomcat is configured to start automatically at system start. If you have a free choice on where to set this then use setenv.bat or setenv.sh as appropriate for your operating system.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Do you recommend a particular JVM?&lt;/strong&gt; &lt;p&gt;No, we do not. The JVM vendor you choose depends on your OS.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Which connector should I use to connect Apache httpd to Tomcat?&lt;/strong&gt; &lt;p&gt;We recommend mod_proxy_http with mod_jk a close second. Generally, mod_proxy_ajp is less stable than either mod_proxy_http or mod_jk. Note that mod_jk2 has been deprecated and should no longer be used.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is the correct setting for maxKeepAliveRequests when using SSL?&lt;/strong&gt; &lt;p&gt;When using SSL HTTP keep alive should be enabled as the SSL handshake is a relatively expensive operation to perform for every request.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;If we run Tomcat on Solaris, do you recommend against using the native APR connector?&lt;/strong&gt; &lt;p&gt;Yes, we do. The feedback we have received from clients is that the APR connector is not stable on Solaris.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;We previously tried moving to mod_proxy_http on Solaris but we encountered several bugs. Have these bugs been resolved?&lt;/strong&gt; &lt;p&gt;Without knowing the exact bugs or version you were using, it is difficult to comment. All known Apache httpd issues and the current status can be found in the &lt;a href=&quot;https://issues.apache.org/bugzilla/&quot;&gt;ASF Bugzilla Database&lt;/a&gt;. Tomcat issues can also be found in Bugzilla.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What value should I use for maxKeepAliveRequests with the default blocking IO HTTP connector?&lt;/strong&gt; &lt;p&gt;For high concurrency environments, set it to 1. Otherwise, set it to the average number of objects you have on a page, anywhere between 10 and 100.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;How do I configure JkOptions +DisableReuse?&lt;/strong&gt; &lt;p&gt;JkOptions +DisableReuse should be placed in your httpd.conf file with your other mod_jk settings.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;When is it best to use the bon-blocking IO HTTP connector?&lt;/strong&gt; &lt;p&gt;When you need to support high concurrency with keep alive and APR is not an option, e.g. because it is unstable on your platform.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Will I see better performance if I use Apache httpd in front of Apache Tomcat?&lt;/strong&gt; &lt;p&gt;It depends. If you proxy all of the requests to Tomcat then performance will decrease slightly. If httpd handles some requests (eg all the static content) then you will probably see some benefit. There are a number of benchmarks that attempt to demonstrate that one connector is better than another. However, it is very unlikely that any of these benchmarks will be representative of your application. The only way to know for sure is to test it in your environment with realistic load and usage patterns.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Can Tomcat be used in production without a web server in front of it?&lt;/strong&gt; &lt;p&gt;Yes. Whether this offers the best performance for your environment will depend on that environment and your application. As with the previous question, the only way to know for sure is to test it in your environment with realistic load and usage patterns.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Will using Apache httpd in front of Tomcat increase security?&lt;/strong&gt; &lt;p&gt;The security of your installation will depend on many factors. The use, or not, of Apache httpd is unlikely to significantly change the security of your installation. Other factors such as keep up to date with patches and using a firewall usually have a much greater impact on your overall level of security.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Which Apache httpd MPM provides the best performance?&lt;/strong&gt; &lt;p&gt;As always, it will depend on your environment but the &lt;a href=&quot;http://httpd.apache.org/docs/2.2/misc/perf-tuning.html&quot;&gt;httpd performance tuning documentation&lt;/a&gt; offers some useful general guidance.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is the performance difference between SpringSource ERS and Apache Tomcat?&lt;/strong&gt; &lt;p&gt;SpringSource ERS is much more than just Apache Tomcat. From a pure Tomcat perspective, performance isn&#39;t the differentiating factor. The benefits of ERS are the simple installation, the easy to manage upgrades and patching, support for multiple instances and the integration of all of the components.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;My company uses Tomcat and XYZ application server. How does Tomcat compare to XYZ application server and are there benefits in consolidating?&lt;/strong&gt; &lt;p&gt;There will be lots of differences and the differences that matter will vary from organisation to organisation. Start by working out what you want from an application server and then compare that list to the market. There are benefits in consolidating. Greater consistency means simpler maintenance, less training and so on. However, there are also costs. You would need to look at your organisation and how it planned to consolidate (new projects only, all projects for next major release, everything now, etc) to compare the costs with the associated benefit.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Do you have performance comparisons available for Tomcat and XYZ application server?&lt;/strong&gt; &lt;p&gt;Various reports have been published in this area. How useful the results are depends on how well matches the test is to your load. As always, the only way to know for sure is to test in your environment with realistic load and usage patterns.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is a good method for load testing a Tomcat server?&lt;/strong&gt; &lt;p&gt;There are several options available with tools that drive load, both free and commercial. The free tools include &lt;a href=&quot;http://httpd.apache.org/docs/2.0/programs/ab.html&quot;&gt;ab&lt;/a&gt; and &lt;a href=&quot;http://jakarta.apache.org/jmeter/index.html&quot;&gt;JMeter&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;For high availability and performance, can Tomcat be configured to launch multiple JVMs for the same web application?&lt;/strong&gt; &lt;p&gt;Tomcat does not provide this as a configuration option. You can, of course, create multiple Tomcat instances, install your application on each instance and then load-balance across the instances.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Is there a generic health-check script for Tomcat?&lt;/strong&gt; &lt;p&gt;The &lt;a href=&quot;http://localhost:8080/manager/status&quot;&gt;Manager status page&lt;/a&gt; is probably a good place to start. You can use the code for that Servlet as the basis for your own, more specific/extensive checks if required. If you do enhance it, consider contributing your enhancements back to the Apache Tomcat community.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Where is the logging.properties file located?&lt;/strong&gt; &lt;p&gt;The default location is in $CATALINA_BASE/conf.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/577206bcaeb70e2e0a63ab5418b203e5?s=200" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Optimising and Tuning Apache Tomcat - Part 2">
+<meta name="twitter:description" content="<p>A few weeks ago Filip Hanik and I gave the second in a series of webinars on Optimising and Tuning Apache Tomcat. A recording of the webinar and a copy of the slides can be obtained from the <a href=" http:="" ="" www.springsource.com="" webinar="="></head><body dir="ltr">webinars section of the SpringSource website. The same page has links for all the previous SpringSource webinars, as well as the <a href="http://www.covalent.net/services/training/webinars_archived.html">Covalent webinar archive</a>.
+<p>We weren’t able to get to all of the questions during the Q&A session so, as promised, here are the remaining questions and our answers.<br></p>
+<ul>
+ <p></p> 
+ <li><strong>How do you identify memory leaks in a Tomcat application?</strong> <p>You will almost certainly need to use a profiler to identify the root cause of a memory leak. The latest Sun JDKs include <a href="http://java.sun.com/javase/6/docs/technotes/tools/index.html#troubleshoot">tools like jhat and jmap</a>. There are also many other profilers available, both free and commercial. Filip and I use <a href="http://www.yourkit.com">YourKit</a> when investigating Tomcat memory leaks as YourKit provide free licences to open source developers.</p></li> 
+ <li><strong>How can redeployment cause a memory leak?</strong> <p>This usually occurs when a class loaded by Tomcat retains a reference to a class loaded by the web application. When the web application is stopped, the Tomcat class loader continues to retain the reference to the class loaded by the web application. This class retains a reference to the web application's class loader which in turn, retains references to all the classes it loaded. Therefore, the web application class loader and all the classes it loaded are not eligible for garbage collection. This causes a memory leak. The typical root causes of this are JDBC drivers and logging frameworks.</p></li> 
+ <li><strong>What is the best way to change the JVM Tomcat uses?</strong> <p>The JVM to use is set using the JAVA_HOME (full JDK) or JRE_HOME (JRE only) environment variable. The correct place to set this will depend on your environment, particularly if Tomcat is configured to start automatically at system start. If you have a free choice on where to set this then use setenv.bat or setenv.sh as appropriate for your operating system.</p></li> 
+ <li><strong>Do you recommend a particular JVM?</strong> <p>No, we do not. The JVM vendor you choose depends on your OS.</p></li> 
+ <li><strong>Which connector should I use to connect Apache httpd to Tomcat?</strong> <p>We recommend mod_proxy_http with mod_jk a close second. Generally, mod_proxy_ajp is less stable than either mod_proxy_http or mod_jk. Note that mod_jk2 has been deprecated and should no longer be used.</p></li> 
+ <li><strong>What is the correct setting for maxKeepAliveRequests when using SSL?</strong> <p>When using SSL HTTP keep alive should be enabled as the SSL handshake is a relatively expensive operation to perform for every request.</p></li> 
+ <li><strong>If we run Tomcat on Solaris, do you recommend against using the native APR connector?</strong> <p>Yes, we do. The feedback we have received from clients is that the APR connector is not stable on Solaris.</p></li> 
+ <li><strong>We previously tried moving to mod_proxy_http on Solaris but we encountered several bugs. Have these bugs been resolved?</strong> <p>Without knowing the exact bugs or version you were using, it is difficult to comment. All known Apache httpd issues and the current status can be found in the <a href="https://issues.apache.org/bugzilla/">ASF Bugzilla Database</a>. Tomcat issues can also be found in Bugzilla.</p></li> 
+ <li><strong>What value should I use for maxKeepAliveRequests with the default blocking IO HTTP connector?</strong> <p>For high concurrency environments, set it to 1. Otherwise, set it to the average number of objects you have on a page, anywhere between 10 and 100.</p></li> 
+ <li><strong>How do I configure JkOptions +DisableReuse?</strong> <p>JkOptions +DisableReuse should be placed in your httpd.conf file with your other mod_jk settings.</p></li> 
+ <li><strong>When is it best to use the bon-blocking IO HTTP connector?</strong> <p>When you need to support high concurrency with keep alive and APR is not an option, e.g. because it is unstable on your platform.</p></li> 
+ <li><strong>Will I see better performance if I use Apache httpd in front of Apache Tomcat?</strong> <p>It depends. If you proxy all of the requests to Tomcat then performance will decrease slightly. If httpd handles some requests (eg all the static content) then you will probably see some benefit. There are a number of benchmarks that attempt to demonstrate that one connector is better than another. However, it is very unlikely that any of these benchmarks will be representative of your application. The only way to know for sure is to test it in your environment with realistic load and usage patterns.</p></li> 
+ <li><strong>Can Tomcat be used in production without a web server in front of it?</strong> <p>Yes. Whether this offers the best performance for your environment will depend on that environment and your application. As with the previous question, the only way to know for sure is to test it in your environment with realistic load and usage patterns.</p></li> 
+ <li><strong>Will using Apache httpd in front of Tomcat increase security?</strong> <p>The security of your installation will depend on many factors. The use, or not, of Apache httpd is unlikely to significantly change the security of your installation. Other factors such as keep up to date with patches and using a firewall usually have a much greater impact on your overall level of security.</p></li> 
+ <li><strong>Which Apache httpd MPM provides the best performance?</strong> <p>As always, it will depend on your environment but the <a href="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">httpd performance tuning documentation</a> offers some useful general guidance.</p></li> 
+ <li><strong>What is the performance difference between SpringSource ERS and Apache Tomcat?</strong> <p>SpringSource ERS is much more than just Apache Tomcat. From a pure Tomcat perspective, performance isn't the differentiating factor. The benefits of ERS are the simple installation, the easy to manage upgrades and patching, support for multiple instances and the integration of all of the components.</p></li> 
+ <li><strong>My company uses Tomcat and XYZ application server. How does Tomcat compare to XYZ application server and are there benefits in consolidating?</strong> <p>There will be lots of differences and the differences that matter will vary from organisation to organisation. Start by working out what you want from an application server and then compare that list to the market. There are benefits in consolidating. Greater consistency means simpler maintenance, less training and so on. However, there are also costs. You would need to look at your organisation and how it planned to consolidate (new projects only, all projects for next major release, everything now, etc) to compare the costs with the associated benefit.</p></li> 
+ <li><strong>Do you have performance comparisons available for Tomcat and XYZ application server?</strong> <p>Various reports have been published in this area. How useful the results are depends on how well matches the test is to your load. As always, the only way to know for sure is to test in your environment with realistic load and usage patterns.</p></li> 
+ <li><strong>What is a good method for load testing a Tomcat server?</strong> <p>There are several options available with tools that drive load, both free and commercial. The free tools include <a href="http://httpd.apache.org/docs/2.0/programs/ab.html">ab</a> and <a href="http://jakarta.apache.org/jmeter/index.html">JMeter</a>.</p></li> 
+ <li><strong>For high availability and performance, can Tomcat be configured to launch multiple JVMs for the same web application?</strong> <p>Tomcat does not provide this as a configuration option. You can, of course, create multiple Tomcat instances, install your application on each instance and then load-balance across the instances.</p></li> 
+ <li><strong>Is there a generic health-check script for Tomcat?</strong> <p>The <a href="http://localhost:8080/manager/status">Manager status page</a> is probably a good place to start. You can use the code for that Servlet as the basis for your own, more specific/extensive checks if required. If you do enhance it, consider contributing your enhancements back to the Apache Tomcat community.</p></li> 
+ <li><strong>Where is the logging.properties file located?</strong> <p>The default location is in $CATALINA_BASE/conf.</p></li>
+</ul>
+">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/577206bcaeb70e2e0a63ab5418b203e5?s=200">
 
-<meta property="og:title" content="Optimising and Tuning Apache Tomcat - Part 2" />
-<meta property="og:image" content="https://gravatar.com/avatar/577206bcaeb70e2e0a63ab5418b203e5?s=200" />
-<meta property="og:description" content="&lt;p&gt;A few weeks ago Filip Hanik and I gave the second in a series of webinars on Optimising and Tuning Apache Tomcat. A recording of the webinar and a copy of the slides can be obtained from the &lt;a href=&quot;http://www.springsource.com/webinars&quot;&gt;webinars section of the SpringSource website&lt;/a&gt;. The same page has links for all the previous SpringSource webinars, as well as the &lt;a href=&quot;http://www.covalent.net/services/training/webinars_archived.html&quot;&gt;Covalent webinar archive&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;We weren’t able to get to all of the questions during the Q&amp;amp;A session so, as promised, here are the remaining questions and our answers.&lt;br&gt;&lt;/p&gt;
-&lt;ul&gt;
- &lt;p&gt;&lt;/p&gt; 
- &lt;li&gt;&lt;strong&gt;How do you identify memory leaks in a Tomcat application?&lt;/strong&gt; &lt;p&gt;You will almost certainly need to use a profiler to identify the root cause of a memory leak. The latest Sun JDKs include &lt;a href=&quot;http://java.sun.com/javase/6/docs/technotes/tools/index.html#troubleshoot&quot;&gt;tools like jhat and jmap&lt;/a&gt;. There are also many other profilers available, both free and commercial. Filip and I use &lt;a href=&quot;http://www.yourkit.com&quot;&gt;YourKit&lt;/a&gt; when investigating Tomcat memory leaks as YourKit provide free licences to open source developers.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;How can redeployment cause a memory leak?&lt;/strong&gt; &lt;p&gt;This usually occurs when a class loaded by Tomcat retains a reference to a class loaded by the web application. When the web application is stopped, the Tomcat class loader continues to retain the reference to the class loaded by the web application. This class retains a reference to the web application&#39;s class loader which in turn, retains references to all the classes it loaded. Therefore, the web application class loader and all the classes it loaded are not eligible for garbage collection. This causes a memory leak. The typical root causes of this are JDBC drivers and logging frameworks.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is the best way to change the JVM Tomcat uses?&lt;/strong&gt; &lt;p&gt;The JVM to use is set using the JAVA_HOME (full JDK) or JRE_HOME (JRE only) environment variable. The correct place to set this will depend on your environment, particularly if Tomcat is configured to start automatically at system start. If you have a free choice on where to set this then use setenv.bat or setenv.sh as appropriate for your operating system.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Do you recommend a particular JVM?&lt;/strong&gt; &lt;p&gt;No, we do not. The JVM vendor you choose depends on your OS.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Which connector should I use to connect Apache httpd to Tomcat?&lt;/strong&gt; &lt;p&gt;We recommend mod_proxy_http with mod_jk a close second. Generally, mod_proxy_ajp is less stable than either mod_proxy_http or mod_jk. Note that mod_jk2 has been deprecated and should no longer be used.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is the correct setting for maxKeepAliveRequests when using SSL?&lt;/strong&gt; &lt;p&gt;When using SSL HTTP keep alive should be enabled as the SSL handshake is a relatively expensive operation to perform for every request.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;If we run Tomcat on Solaris, do you recommend against using the native APR connector?&lt;/strong&gt; &lt;p&gt;Yes, we do. The feedback we have received from clients is that the APR connector is not stable on Solaris.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;We previously tried moving to mod_proxy_http on Solaris but we encountered several bugs. Have these bugs been resolved?&lt;/strong&gt; &lt;p&gt;Without knowing the exact bugs or version you were using, it is difficult to comment. All known Apache httpd issues and the current status can be found in the &lt;a href=&quot;https://issues.apache.org/bugzilla/&quot;&gt;ASF Bugzilla Database&lt;/a&gt;. Tomcat issues can also be found in Bugzilla.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What value should I use for maxKeepAliveRequests with the default blocking IO HTTP connector?&lt;/strong&gt; &lt;p&gt;For high concurrency environments, set it to 1. Otherwise, set it to the average number of objects you have on a page, anywhere between 10 and 100.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;How do I configure JkOptions +DisableReuse?&lt;/strong&gt; &lt;p&gt;JkOptions +DisableReuse should be placed in your httpd.conf file with your other mod_jk settings.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;When is it best to use the bon-blocking IO HTTP connector?&lt;/strong&gt; &lt;p&gt;When you need to support high concurrency with keep alive and APR is not an option, e.g. because it is unstable on your platform.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Will I see better performance if I use Apache httpd in front of Apache Tomcat?&lt;/strong&gt; &lt;p&gt;It depends. If you proxy all of the requests to Tomcat then performance will decrease slightly. If httpd handles some requests (eg all the static content) then you will probably see some benefit. There are a number of benchmarks that attempt to demonstrate that one connector is better than another. However, it is very unlikely that any of these benchmarks will be representative of your application. The only way to know for sure is to test it in your environment with realistic load and usage patterns.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Can Tomcat be used in production without a web server in front of it?&lt;/strong&gt; &lt;p&gt;Yes. Whether this offers the best performance for your environment will depend on that environment and your application. As with the previous question, the only way to know for sure is to test it in your environment with realistic load and usage patterns.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Will using Apache httpd in front of Tomcat increase security?&lt;/strong&gt; &lt;p&gt;The security of your installation will depend on many factors. The use, or not, of Apache httpd is unlikely to significantly change the security of your installation. Other factors such as keep up to date with patches and using a firewall usually have a much greater impact on your overall level of security.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Which Apache httpd MPM provides the best performance?&lt;/strong&gt; &lt;p&gt;As always, it will depend on your environment but the &lt;a href=&quot;http://httpd.apache.org/docs/2.2/misc/perf-tuning.html&quot;&gt;httpd performance tuning documentation&lt;/a&gt; offers some useful general guidance.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is the performance difference between SpringSource ERS and Apache Tomcat?&lt;/strong&gt; &lt;p&gt;SpringSource ERS is much more than just Apache Tomcat. From a pure Tomcat perspective, performance isn&#39;t the differentiating factor. The benefits of ERS are the simple installation, the easy to manage upgrades and patching, support for multiple instances and the integration of all of the components.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;My company uses Tomcat and XYZ application server. How does Tomcat compare to XYZ application server and are there benefits in consolidating?&lt;/strong&gt; &lt;p&gt;There will be lots of differences and the differences that matter will vary from organisation to organisation. Start by working out what you want from an application server and then compare that list to the market. There are benefits in consolidating. Greater consistency means simpler maintenance, less training and so on. However, there are also costs. You would need to look at your organisation and how it planned to consolidate (new projects only, all projects for next major release, everything now, etc) to compare the costs with the associated benefit.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Do you have performance comparisons available for Tomcat and XYZ application server?&lt;/strong&gt; &lt;p&gt;Various reports have been published in this area. How useful the results are depends on how well matches the test is to your load. As always, the only way to know for sure is to test in your environment with realistic load and usage patterns.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;What is a good method for load testing a Tomcat server?&lt;/strong&gt; &lt;p&gt;There are several options available with tools that drive load, both free and commercial. The free tools include &lt;a href=&quot;http://httpd.apache.org/docs/2.0/programs/ab.html&quot;&gt;ab&lt;/a&gt; and &lt;a href=&quot;http://jakarta.apache.org/jmeter/index.html&quot;&gt;JMeter&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;For high availability and performance, can Tomcat be configured to launch multiple JVMs for the same web application?&lt;/strong&gt; &lt;p&gt;Tomcat does not provide this as a configuration option. You can, of course, create multiple Tomcat instances, install your application on each instance and then load-balance across the instances.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Is there a generic health-check script for Tomcat?&lt;/strong&gt; &lt;p&gt;The &lt;a href=&quot;http://localhost:8080/manager/status&quot;&gt;Manager status page&lt;/a&gt; is probably a good place to start. You can use the code for that Servlet as the basis for your own, more specific/extensive checks if required. If you do enhance it, consider contributing your enhancements back to the Apache Tomcat community.&lt;/p&gt;&lt;/li&gt; 
- &lt;li&gt;&lt;strong&gt;Where is the logging.properties file located?&lt;/strong&gt; &lt;p&gt;The default location is in $CATALINA_BASE/conf.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2008-10-14 17:09:00.0" />
-</head>
-<body>
+<meta property="og:title" content="Optimising and Tuning Apache Tomcat - Part 2">
+<meta property="og:image" content="https://gravatar.com/avatar/577206bcaeb70e2e0a63ab5418b203e5?s=200">
+<meta property="og:description" content="<p>A few weeks ago Filip Hanik and I gave the second in a series of webinars on Optimising and Tuning Apache Tomcat. A recording of the webinar and a copy of the slides can be obtained from the <a href=" http:="" ="" www.springsource.com="" webinar="=">webinars section of the SpringSource website. The same page has links for all the previous SpringSource webinars, as well as the <a href="http://www.covalent.net/services/training/webinars_archived.html">Covalent webinar archive</a>.
+<p>We weren’t able to get to all of the questions during the Q&A session so, as promised, here are the remaining questions and our answers.<br></p>
+<ul>
+ <p></p> 
+ <li><strong>How do you identify memory leaks in a Tomcat application?</strong> <p>You will almost certainly need to use a profiler to identify the root cause of a memory leak. The latest Sun JDKs include <a href="http://java.sun.com/javase/6/docs/technotes/tools/index.html#troubleshoot">tools like jhat and jmap</a>. There are also many other profilers available, both free and commercial. Filip and I use <a href="http://www.yourkit.com">YourKit</a> when investigating Tomcat memory leaks as YourKit provide free licences to open source developers.</p></li> 
+ <li><strong>How can redeployment cause a memory leak?</strong> <p>This usually occurs when a class loaded by Tomcat retains a reference to a class loaded by the web application. When the web application is stopped, the Tomcat class loader continues to retain the reference to the class loaded by the web application. This class retains a reference to the web application's class loader which in turn, retains references to all the classes it loaded. Therefore, the web application class loader and all the classes it loaded are not eligible for garbage collection. This causes a memory leak. The typical root causes of this are JDBC drivers and logging frameworks.</p></li> 
+ <li><strong>What is the best way to change the JVM Tomcat uses?</strong> <p>The JVM to use is set using the JAVA_HOME (full JDK) or JRE_HOME (JRE only) environment variable. The correct place to set this will depend on your environment, particularly if Tomcat is configured to start automatically at system start. If you have a free choice on where to set this then use setenv.bat or setenv.sh as appropriate for your operating system.</p></li> 
+ <li><strong>Do you recommend a particular JVM?</strong> <p>No, we do not. The JVM vendor you choose depends on your OS.</p></li> 
+ <li><strong>Which connector should I use to connect Apache httpd to Tomcat?</strong> <p>We recommend mod_proxy_http with mod_jk a close second. Generally, mod_proxy_ajp is less stable than either mod_proxy_http or mod_jk. Note that mod_jk2 has been deprecated and should no longer be used.</p></li> 
+ <li><strong>What is the correct setting for maxKeepAliveRequests when using SSL?</strong> <p>When using SSL HTTP keep alive should be enabled as the SSL handshake is a relatively expensive operation to perform for every request.</p></li> 
+ <li><strong>If we run Tomcat on Solaris, do you recommend against using the native APR connector?</strong> <p>Yes, we do. The feedback we have received from clients is that the APR connector is not stable on Solaris.</p></li> 
+ <li><strong>We previously tried moving to mod_proxy_http on Solaris but we encountered several bugs. Have these bugs been resolved?</strong> <p>Without knowing the exact bugs or version you were using, it is difficult to comment. All known Apache httpd issues and the current status can be found in the <a href="https://issues.apache.org/bugzilla/">ASF Bugzilla Database</a>. Tomcat issues can also be found in Bugzilla.</p></li> 
+ <li><strong>What value should I use for maxKeepAliveRequests with the default blocking IO HTTP connector?</strong> <p>For high concurrency environments, set it to 1. Otherwise, set it to the average number of objects you have on a page, anywhere between 10 and 100.</p></li> 
+ <li><strong>How do I configure JkOptions +DisableReuse?</strong> <p>JkOptions +DisableReuse should be placed in your httpd.conf file with your other mod_jk settings.</p></li> 
+ <li><strong>When is it best to use the bon-blocking IO HTTP connector?</strong> <p>When you need to support high concurrency with keep alive and APR is not an option, e.g. because it is unstable on your platform.</p></li> 
+ <li><strong>Will I see better performance if I use Apache httpd in front of Apache Tomcat?</strong> <p>It depends. If you proxy all of the requests to Tomcat then performance will decrease slightly. If httpd handles some requests (eg all the static content) then you will probably see some benefit. There are a number of benchmarks that attempt to demonstrate that one connector is better than another. However, it is very unlikely that any of these benchmarks will be representative of your application. The only way to know for sure is to test it in your environment with realistic load and usage patterns.</p></li> 
+ <li><strong>Can Tomcat be used in production without a web server in front of it?</strong> <p>Yes. Whether this offers the best performance for your environment will depend on that environment and your application. As with the previous question, the only way to know for sure is to test it in your environment with realistic load and usage patterns.</p></li> 
+ <li><strong>Will using Apache httpd in front of Tomcat increase security?</strong> <p>The security of your installation will depend on many factors. The use, or not, of Apache httpd is unlikely to significantly change the security of your installation. Other factors such as keep up to date with patches and using a firewall usually have a much greater impact on your overall level of security.</p></li> 
+ <li><strong>Which Apache httpd MPM provides the best performance?</strong> <p>As always, it will depend on your environment but the <a href="http://httpd.apache.org/docs/2.2/misc/perf-tuning.html">httpd performance tuning documentation</a> offers some useful general guidance.</p></li> 
+ <li><strong>What is the performance difference between SpringSource ERS and Apache Tomcat?</strong> <p>SpringSource ERS is much more than just Apache Tomcat. From a pure Tomcat perspective, performance isn't the differentiating factor. The benefits of ERS are the simple installation, the easy to manage upgrades and patching, support for multiple instances and the integration of all of the components.</p></li> 
+ <li><strong>My company uses Tomcat and XYZ application server. How does Tomcat compare to XYZ application server and are there benefits in consolidating?</strong> <p>There will be lots of differences and the differences that matter will vary from organisation to organisation. Start by working out what you want from an application server and then compare that list to the market. There are benefits in consolidating. Greater consistency means simpler maintenance, less training and so on. However, there are also costs. You would need to look at your organisation and how it planned to consolidate (new projects only, all projects for next major release, everything now, etc) to compare the costs with the associated benefit.</p></li> 
+ <li><strong>Do you have performance comparisons available for Tomcat and XYZ application server?</strong> <p>Various reports have been published in this area. How useful the results are depends on how well matches the test is to your load. As always, the only way to know for sure is to test in your environment with realistic load and usage patterns.</p></li> 
+ <li><strong>What is a good method for load testing a Tomcat server?</strong> <p>There are several options available with tools that drive load, both free and commercial. The free tools include <a href="http://httpd.apache.org/docs/2.0/programs/ab.html">ab</a> and <a href="http://jakarta.apache.org/jmeter/index.html">JMeter</a>.</p></li> 
+ <li><strong>For high availability and performance, can Tomcat be configured to launch multiple JVMs for the same web application?</strong> <p>Tomcat does not provide this as a configuration option. You can, of course, create multiple Tomcat instances, install your application on each instance and then load-balance across the instances.</p></li> 
+ <li><strong>Is there a generic health-check script for Tomcat?</strong> <p>The <a href="http://localhost:8080/manager/status">Manager status page</a> is probably a good place to start. You can use the code for that Servlet as the basis for your own, more specific/extensive checks if required. If you do enhance it, consider contributing your enhancements back to the Apache Tomcat community.</p></li> 
+ <li><strong>Where is the logging.properties file located?</strong> <p>The default location is in $CATALINA_BASE/conf.</p></li>
+</ul>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2008-10-14 17:09:00.0">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -109,16 +101,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -134,9 +126,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -146,40 +138,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -205,86 +187,84 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Optimising and Tuning Apache Tomcat - Part 2</h1>
+<h1 class="blog--title">优化和调整Apache Tomcat-第2部分</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/577206bcaeb70e2e0a63ab5418b203e5?s=20&amp;d=mm" />
-<span class="author">Mark Thomas</span>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/577206bcaeb70e2e0a63ab5418b203e5?s=20&d=mm"> <span class="author">马克·托马斯</span>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2008-10-14 17:09:00.0">October 14, 2008</time>
+<time class="date" pubdate="" datetime="2008-10-14 17:09:00.0">2008年10月14日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="176" href="/blog/2008/10/14/optimising-and-tuning-apache-tomcat-part-2#disqus_thread">
+<a class="comments" href="/blog/2008/10/14/optimising-and-tuning-apache-tomcat-part-2#disqus_thread" data-disqus-identifier="176">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>A few weeks ago Filip Hanik and I gave the second in a series of webinars on Optimising and Tuning Apache Tomcat. A recording of the webinar and a copy of the slides can be obtained from the <a href="http://www.springsource.com/webinars">webinars section of the SpringSource website</a>. The same page has links for all the previous SpringSource webinars, as well as the <a href="http://www.covalent.net/services/training/webinars_archived.html">Covalent webinar archive</a>.</p><p>We weren&rsquo;t able to get to all of the questions during the Q&amp;A session so, as promised, here are the remaining questions and our answers.<br /><ul></p>
-<li><strong>How do you identify memory leaks in a Tomcat application?</strong>
-<p>You will almost certainly need to use a profiler to identify the root cause of a memory leak. The latest Sun JDKs include <a href="http://java.sun.com/javase/6/docs/technotes/tools/index.html#troubleshoot">tools like jhat and jmap</a>. There are also many other profilers available, both free and commercial. Filip and I use <a href="http://www.yourkit.com">YourKit</a> when investigating Tomcat memory leaks as YourKit provide free licences to open source developers.</li>
-<li><strong>How can redeployment cause a memory leak?</strong>
-<p>This usually occurs when a class loaded by Tomcat retains a reference to a class loaded by the web application. When the web application is stopped, the Tomcat class loader continues to retain the reference to the class loaded by the web application. This class retains a reference to the web application's class loader which in turn, retains references to all the classes it loaded. Therefore, the web application class loader and all the classes it loaded are not eligible for garbage collection. This causes a memory leak. The typical root causes of this are JDBC drivers and logging frameworks.</li>
-<li><strong>What is the best way to change the JVM Tomcat uses?</strong>
-<p>The JVM to use is set using the JAVA_HOME (full JDK) or JRE_HOME (JRE only) environment variable. The correct place to set this will depend on your environment, particularly if Tomcat is configured to start automatically at system start. If you have a free choice on where to set this then use setenv.bat or setenv.sh as appropriate for your operating system.</li>
-<li><strong>Do you recommend a particular JVM?</strong>
-<p>No, we do not. The JVM vendor you choose depends on your OS.</li>
-<li><strong>Which connector should I use to connect Apache httpd to Tomcat?</strong>
-<p>We recommend mod_proxy_http with mod_jk a close second. Generally, mod_proxy_ajp is less stable than either mod_proxy_http or mod_jk. Note that mod_jk2 has been deprecated and should no longer be used.</li>
-<li><strong>What is the correct setting for maxKeepAliveRequests when using SSL?</strong>
-<p>When using SSL HTTP keep alive should be enabled as the SSL handshake is a relatively expensive operation to perform for every request.</li>
-<li><strong>If we run Tomcat on Solaris, do you recommend against using the native APR connector?</strong>
-<p>Yes, we do. The feedback we have received from clients is that the APR connector is not stable on Solaris.</li>
-<li><strong>We previously tried moving to mod_proxy_http on Solaris but we encountered several bugs. Have these bugs been resolved?</strong>
-<p>Without knowing the exact bugs or version you were using, it is difficult to comment. All known Apache httpd issues and the current status can be found in the <a href="https://issues.apache.org/bugzilla/">ASF Bugzilla Database</a>. Tomcat issues can also be found in Bugzilla.</li>
-<li><strong>What value should I use for maxKeepAliveRequests with the default blocking IO HTTP connector?</strong>
-<p>For high concurrency environments, set it to 1. Otherwise, set it to the average number of objects you have on a page, anywhere between 10 and 100.</li>
-<li><strong>How do I configure JkOptions +DisableReuse?</strong>
-<p>JkOptions +DisableReuse should be placed in your httpd.conf file with your other mod_jk settings.</li>
-<li><strong>When is it best to use the bon-blocking IO HTTP connector?</strong>
-<p>When you need to support high concurrency with keep alive and APR is not an option, e.g. because it is unstable on your platform.</li>
-<li><strong>Will I see better performance if I use Apache httpd in front of Apache Tomcat?</strong>
-<p>It depends. If you proxy all of the requests to Tomcat then performance will decrease slightly. If httpd handles some requests (eg all the static content) then you will probably see some benefit. There are a number of benchmarks that attempt to demonstrate that one connector is better than another. However, it is very unlikely that any of these benchmarks will be representative of your application. The only way to know for sure is to test it in your environment with realistic load and usage patterns.</li>
-<li><strong>Can Tomcat be used in production without a web server in front of it?</strong>
-<p>Yes. Whether this offers the best performance for your environment will depend on that environment and your application. As with the previous question, the only way to know for sure is to test it in your environment with realistic load and usage patterns.</li>
-<li><strong>Will using Apache httpd in front of Tomcat increase security?</strong>
-<p>The security of your installation will depend on many factors. The use, or not, of Apache httpd is unlikely to significantly change the security of your installation. Other factors such as keep up to date with patches and using a firewall usually have a much greater impact on your overall level of security.</li>
-<li><strong>Which Apache httpd MPM provides the best performance?</strong>
-<p>As always, it will depend on your environment but the <a href="https://httpd.apache.org/docs/2.2/misc/perf-tuning.html">httpd performance tuning documentation</a> offers some useful general guidance.</li>
-<li><strong>What is the performance difference between SpringSource ERS and Apache Tomcat?</strong>
-<p>SpringSource ERS is much more than just Apache Tomcat. From a pure Tomcat perspective, performance isn't the differentiating factor. The benefits of ERS are the simple installation, the easy to manage upgrades and patching, support for multiple instances and the integration of all of the components.</li>
-<li><strong>My company uses Tomcat and XYZ application server. How does Tomcat compare to XYZ application server and are there benefits in consolidating?</strong>
-<p>There will be lots of differences and the differences that matter will vary from organisation to organisation. Start by working out what you want from an application server and then compare that list to the market. There are benefits in consolidating. Greater consistency means simpler maintenance, less training and so on. However, there are also costs. You would need to look at your organisation and how it planned to consolidate (new projects only, all projects for next major release, everything now, etc) to compare the costs with the associated benefit.</li>
-<li><strong>Do you have performance comparisons available for Tomcat and XYZ application server?</strong>
-<p>Various reports have been published in this area. How useful the results are depends on how well matches the test is to your load. As always, the only way to know for sure is to test in your environment with realistic load and usage patterns.</li>
-<li><strong>What is a good method for load testing a Tomcat server?</strong>
-<p>There are several options available with tools that drive load, both free and commercial. The free tools include <a href="https://httpd.apache.org/docs/2.0/programs/ab.html">ab</a> and <a href="https://jakarta.apache.org/jmeter/index.html">JMeter</a>.</li>
-<li><strong>For high availability and performance, can Tomcat be configured to launch multiple JVMs for the same web application?</strong>
-<p>Tomcat does not provide this as a configuration option. You can, of course, create multiple Tomcat instances, install your application on each instance and then load-balance across the instances.</li>
-<li><strong>Is there a generic health-check script for Tomcat?</strong>
-<p>The <a href="http://localhost:8080/manager/status">Manager status page</a> is probably a good place to start. You can use the code for that Servlet as the basis for your own, more specific/extensive checks if required. If you do enhance it, consider contributing your enhancements back to the Apache Tomcat community.</li>
-<li><strong>Where is the logging.properties file located?</strong>
-<p>The default location is in $CATALINA_BASE/conf.</li></div>
+<div class="blog--post"><p>几周前，我和Filip Hanik进行了有关优化和调整Apache Tomcat的一系列网络研讨会中的第二篇。可以从<a href="http://www.springsource.com/webinars">SpringSource网站</a>的<a href="http://www.springsource.com/webinars">网络研讨会部分</a>获得网络研讨会的记录和幻灯片的副本。同一页面上包含所有以前的SpringSource网络研讨会以及<a href="http://www.covalent.net/services/training/webinars_archived.html">Covalent网络研讨会档案的链接</a> 。</p><p>在问答环节中，我们无法解决所有问题，因此，如所承诺的，这是剩余的问题和我们的答案。<br></p><ul><p></p>
+<li><strong>如何识别Tomcat应用程序中的内存泄漏？</strong>
+<p>几乎可以肯定，您将需要使用探查器来确定内存泄漏的根本原因。最新的Sun JDK包括<a href="http://java.sun.com/javase/6/docs/technotes/tools/index.html#troubleshoot">jhat和jmap之类的工具</a> 。还有许多其他的探查器，免费和商用。Filip和我在调查Tomcat内存泄漏时使用<a href="http://www.yourkit.com">YourKit</a> ，因为YourKit向开源开发人员提供免费许可证。</p></li>
+<li><strong>重新部署如何导致内存泄漏？</strong>
+<p>当Tomcat加载的类保留对Web应用程序加载的类的引用时，通常会发生这种情况。当Web应用程序停止时，Tomcat类加载器将继续保留对该Web应用程序加载的类的引用。此类保留对Web应用程序的类加载器的引用，而该引用又保留对其加载的所有类的引用。因此，Web应用程序类加载器及其加载的所有类都不符合垃圾回收的条件。这会导致内存泄漏。造成这种情况的典型根本原因是JDBC驱动程序和日志记录框架。</p></li>
+<li><strong>更改Tomcat使用的JVM的最佳方法是什么？</strong>
+<p>使用JAVA_HOME（完整JDK）或JRE_HOME（仅JRE）环境变量设置要使用的JVM。设置此位置的正确位置将取决于您的环境，尤其是如果将Tomcat配置为在系统启动时自动启动。如果可以自由选择在何处进行设置，请根据您的操作系统使用setenv.bat或setenv.sh。</p></li>
+<li><strong>您是否推荐特定的JVM？</strong>
+<p>不我们没有。您选择的JVM供应商取决于您的操作系统。</p></li>
+<li><strong>我应该使用哪个连接器将Apache httpd连接到Tomcat？</strong>
+<p>我们建议将mod_proxy_http与mod_jk并用。通常，mod_proxy_ajp的稳定性低于mod_proxy_http或mod_jk。请注意，mod_jk2已被弃用，不应再使用。</p></li>
+<li><strong>使用SSL时，maxKeepAliveRequests的正确设置是什么？</strong>
+<p>使用SSL HTTP时，应启用保持活动状态，因为SSL握手是针对每个请求执行的相对昂贵的操作。</p></li>
+<li><strong>如果我们在Solaris上运行Tomcat，建议不要使用本机APR连接器？</strong>
+<p>是的，我们愿意。我们从客户端收到的反馈是APR连接器在Solaris上不稳定。</p></li>
+<li><strong>我们之前曾尝试在Solaris上迁移到mod_proxy_http，但遇到了几个错误。这些错误是否已解决？</strong>
+<p>如果不知道您所使用的确切错误或版本，就很难发表评论。所有已知的Apache httpd问题和当前状态都可以在<a href="https://issues.apache.org/bugzilla/">ASF Bugzilla数据库中找到</a> 。在Bugzilla中也可以找到Tomcat问题。</p></li>
+<li><strong>对于带有默认阻止IO HTTP连接器的maxKeepAliveRequests，我应该使用什么值？</strong>
+<p>对于高并发环境，请将其设置为1。否则，将其设置为页面上的平均对象数，介于10到100之间。</p></li>
+<li><strong>如何配置JkOptions + DisableReuse？</strong>
+<p>JkOptions + DisableReuse应该和其他mod_jk设置一起放在您的httpd.conf文件中。</p></li>
+<li><strong>什么时候最好使用bon-blocking IO HTTP连接器？</strong>
+<p>当您需要通过保持活动来支持高并发性时，则无法选择APR，例如，因为它在您的平台上不稳定。</p></li>
+<li><strong>如果我在Apache Tomcat之前使用Apache httpd，会不会看到更好的性能？</strong>
+<p>这取决于。如果将所有请求代理到Tomcat，则性能将略有下降。如果httpd处理了一些请求（例如，所有静态内容），那么您可能会看到一些好处。有许多基准测试试图证明一个连接器比另一个更好。但是，这些基准中的任何一个都不太可能代表您的应用程序。唯一可以确定的方法就是在您的环境中使用实际的负载和使用模式对其进行测试。</p></li>
+<li><strong>Tomcat是否可以在没有Web服务器的情况下用于生产环境？</strong>
+<p>是。这是否为您的环境提供最佳性能将取决于该环境和您的应用程序。与上一个问题一样，唯一可以确定的方法是在您的环境中使用实际的负载和使用模式对其进行测试。</p></li>
+<li><strong>在Tomcat之前使用Apache httpd会增加安全性吗？</strong>
+<p>安装的安全性将取决于许多因素。是否使用Apache httpd不太可能显着改变安装的安全性。其他因素（例如更新补丁程序和使用防火墙）通常会对整体安全级别产生更大的影响。</p></li>
+<li><strong>哪种Apache httpd MPM提供最佳性能？</strong>
+<p>与往常一样，这将取决于您的环境，但是<a href="https://httpd.apache.org/docs/2.2/misc/perf-tuning.html">httpd性能调整文档</a>提供了一些有用的常规指导。</p></li>
+<li><strong>SpringSource ERS和Apache Tomcat之间的性能差异是什么？</strong>
+<p>SpringSource ERS不仅限于Apache Tomcat。从纯Tomcat的角度来看，性能并不是差异化因素。ERS的好处是安装简单，易于管理升级和修补，支持多个实例以及集成所有组件。</p></li>
+<li><strong>我公司使用Tomcat和XYZ应用程序服务器。Tomcat与XYZ应用程序服务器相比如何？合并有什么好处？</strong>
+<p>会有很多差异，重要的差异因组织而异。首先从应用服务器中确定您想要的内容，然后将该列表与市场进行比较。合并有好处。更高的一致性意味着更简单的维护，更少的培训等。但是，也有费用。您将需要查看您的组织及其合并计划（仅新项目，下一个主要版本的所有项目，现在的所有项目等），以便将成本与相关收益进行比较。</p></li>
+<li><strong>您是否有可用于Tomcat和XYZ应用程序服务器的性能比较？</strong>
+<p>该领域已发表了各种报告。结果的有用程度取决于测试与负载的匹配程度。与往常一样，唯一可以确定的方法就是在您的环境中使用实际的负载和使用模式进行测试。</p></li>
+<li><strong>什么是对Tomcat服务器进行负载测试的好方法？</strong>
+<p>有多种工具可用来驱动负载，包括免费和商业两种。免费的工具包括<a href="https://httpd.apache.org/docs/2.0/programs/ab.html">AB</a>和<a href="https://jakarta.apache.org/jmeter/index.html">JMeter的</a> 。</p></li>
+<li><strong>为了获得高可用性和高性能，是否可以将Tomcat配置为针对同一Web应用程序启动多个JVM？</strong>
+<p>Tomcat不提供此选项作为配置选项。当然，您可以创建多个Tomcat实例，在每个实例上安装应用程序，然后在这些实例之间进行负载平衡。</p></li>
+<li><strong>Tomcat是否有通用的运行状况检查脚本？</strong>
+<p><a href="http://localhost:8080/manager/status">Manager状态页面</a>可能是一个不错的起点。您可以使用该Servlet的代码作为自己进行更具体/广泛检查的基础（如果需要）。如果您确实进行了增强，请考虑将增强功能贡献回Apache Tomcat社区。</p></li>
+<li><strong>logging.properties文件位于何处？</strong>
+<p>默认位置在$ CATALINA_BASE / conf中。</p></li></ul></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 176;
 
       (function(disqus_shortname, document) {
@@ -298,15 +278,12 @@ Training & Certification
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -314,23 +291,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -340,17 +313,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -364,18 +335,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

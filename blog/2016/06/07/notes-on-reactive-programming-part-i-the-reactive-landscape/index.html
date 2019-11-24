@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Notes on Reactive Programming Part I: The Reactive Landscape</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>关于反应式编程的注释第一部分：反应式环境</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,37 +16,35 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Notes on Reactive Programming Part I: The Reactive Landscape" />
-<meta name="twitter:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
- &lt;p&gt;Reactive Programming is interesting (again) and there is a lot of noise about it at the moment, not all of which is very easy to understand for an outsider and simple enterprise Java developer, such as the author. This article (the first in a series) might help to clarify your understanding of what the fuss is about. The approach is as concrete as possible, and there is no mention of &quot;denotational semantics&quot;. If you are looking for a more academic approach and loads of code samples in Haskell, the internet is full of them, but you probably don’t want to be here.&lt;/p&gt; 
-&lt;/div&gt;
-" />
-<meta name="twitter:creator" content="@david_syer" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Notes on Reactive Programming Part I: The Reactive Landscape">
+<meta name="twitter:description" content="<div class=" paragrap="="> 
+ </head><body dir="ltr"><p>Reactive Programming is interesting (again) and there is a lot of noise about it at the moment, not all of which is very easy to understand for an outsider and simple enterprise Java developer, such as the author. This article (the first in a series) might help to clarify your understanding of what the fuss is about. The approach is as concrete as possible, and there is no mention of "denotational semantics". If you are looking for a more academic approach and loads of code samples in Haskell, the internet is full of them, but you probably don’t want to be here.</p> 
 
-<meta property="og:title" content="Notes on Reactive Programming Part I: The Reactive Landscape" />
-<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200" />
-<meta property="og:description" content="&lt;div class=&quot;paragraph&quot;&gt; 
- &lt;p&gt;Reactive Programming is interesting (again) and there is a lot of noise about it at the moment, not all of which is very easy to understand for an outsider and simple enterprise Java developer, such as the author. This article (the first in a series) might help to clarify your understanding of what the fuss is about. The approach is as concrete as possible, and there is no mention of &quot;denotational semantics&quot;. If you are looking for a more academic approach and loads of code samples in Haskell, the internet is full of them, but you probably don’t want to be here.&lt;/p&gt; 
-&lt;/div&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2016-06-07 12:15:00.0" />
-</head>
-<body>
+">
+<meta name="twitter:creator" content="@david_syer">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<meta property="og:title" content="Notes on Reactive Programming Part I: The Reactive Landscape">
+<meta property="og:image" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200">
+<meta property="og:description" content="<div class=" paragrap="="> 
+ <p>Reactive Programming is interesting (again) and there is a lot of noise about it at the moment, not all of which is very easy to understand for an outsider and simple enterprise Java developer, such as the author. This article (the first in a series) might help to clarify your understanding of what the fuss is about. The approach is as concrete as possible, and there is no mention of "denotational semantics". If you are looking for a more academic approach and loads of code samples in Haskell, the internet is full of them, but you probably don’t want to be here.</p> 
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2016-06-07 12:15:00.0">
+
+
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -62,16 +54,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -87,9 +79,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -99,40 +91,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -158,54 +140,53 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Notes on Reactive Programming Part I: The Reactive Landscape</h1>
+<h1 class="blog--title">关于反应式编程的注释第一部分：反应式环境</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&amp;d=mm" />
-<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&d=mm"> <a class="author" rel="author" href="/team/dsyer">戴夫·瑟</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2016-06-07 12:15:00.0">June 07, 2016</time>
+<time class="date" pubdate="" datetime="2016-06-07 12:15:00.0">2016年6月7日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="2509" href="/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape#disqus_thread">
+<a class="comments" href="/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape#disqus_thread" data-disqus-identifier="2509">
 </a></div>
 </div>
 </header>
 <div class="blog--post"><div class="paragraph">
-<p>Reactive Programming is interesting (again) and there is a lot of noise about it at the moment, not all of which is very easy to understand for an outsider and simple enterprise Java developer, such as the author. This article (the first in a series) might help to clarify your understanding of what the fuss is about. The approach is as concrete as possible, and there is no mention of "denotational semantics". If you are looking for a more academic approach and loads of code samples in Haskell, the internet is full of them, but you probably don&#8217;t want to be here.</p>
+<p>响应式编程很有趣（再次），目前有很多杂音，对于局外人和简单的企业Java开发人员（例如作者）而言，并不是所有的内容都很容易理解。本文（系列文章的第一篇）可能有助于阐明您对这些大惊小怪的理解。该方法尽可能具体，没有提及“符号语义”。如果您正在寻找一种更具学术性的方法和Haskell中的大量代码示例，则Internet上到处都是，但是您可能不想在这里。</p>
 </div>
 <div class="paragraph">
-<p>Reactive Programming is often conflated with concurrent programming and high performance to such an extent that it&#8217;s hard to separate those concepts, when actually they are in principle completely different. This inevitably leads to confusion. Reactive Programming is also often referred to as or conflated with Functional Reactive Programming, or FRP (and we use the two interchangeably here). Some people think Reactive is nothing new, and it&#8217;s what they do all day anyway (mostly they use JavaScript). Others seem to think that it&#8217;s a gift from Microsoft (who made a big splash about it when they released some C# extensions a while ago). In the Enterprise Java space there has been something of a buzz recently (e.g. see the <a href="http://www.reactive-streams.org/">Reactive Streams initiative</a>), and as with anything shiny and new, there are a lot of easy mistakes to make out there, about when and where it can and should be used.</p>
+<p>响应式编程通常与并发编程和高性能混为一谈，以至于很难将这些概念分开，而实际上它们在原理上是完全不同的。这不可避免地导致混乱。反应式编程也经常被称为功能性反应式编程或FRP或与功能性反应式编程（FRP）结合使用（在这里我们将二者互换使用）。有些人认为Reactive并不是什么新鲜事物，而是整天都在做的事情（大多数情况下使用JavaScript）。其他人似乎认为这是来自微软的礼物（当他们不久前发布一些C＃扩展时，微软对此给予了极大的关注）。在企业Java领域中，最近出现了一些嗡嗡声（例如，请参见<a href="http://www.reactive-streams.org/">Reactive Streams计划</a> ），并且与任何闪亮的事物和新事物一样，在何时何地以及应该何时何地存在许多容易犯的错误。使用。</p>
 </div>
 <div class="sect1">
-<h2 id="what-is-it"><a class="anchor" href="#what-is-it"></a>What Is It?</h2>
+<h2 id="what-is-it"><a class="anchor" href="#what-is-it"></a>它是什么？</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Reactive Programming is a style of micro-architecture involving intelligent routing and consumption of events, all combining to change behaviour. That&#8217;s a bit abstract, and so are many of the other definitions you will come across online. We attempt build up some more concrete notions of what it means to be reactive, or why it might be important in what follows.</p>
+<p>响应式编程是一种微体系结构，涉及智能路由和事件消耗，所有这些都结合在一起以改变行为。这有点抽象，您在网上也会遇到许多其他定义。我们尝试建立一些更具体的概念，以表示反应是什么意思，或者为什么它在接下来的事情中可能很重要。</p>
 </div>
 <div class="paragraph">
-<p>The origins of Reactive Programming can probably be traced to the 1970s or even earlier, so there&#8217;s nothing new about the idea, but they are really resonating with something in the modern enterprise. This resonance has arrived (not accidentally) at the same time as the rise of microservices, and the ubiquity of multi-core processors. Some of the reasons for that will hopefully become clear.</p>
+<p>响应式编程的起源可能可以追溯到1970年代甚至更早，所以这个想法没有什么新意，但是它们确实在现代企业中引起了共鸣。在微服务兴起和多核处理器无处不在的同时，这种共鸣已经（并非偶然）到达。希望其中的一些原因将变得清楚。</p>
 </div>
 <div class="paragraph">
-<p>Here are some useful potted definitions from other sources:</p>
+<p>以下是来自其他来源的一些有用的封装定义：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -216,7 +197,7 @@ that change over time.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>and&#8230;&#8203;</p>
+<p>还有...</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -230,200 +211,64 @@ the mouse would be a good example.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>(from <a href="https://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming">Terminology Question on Stackoverflow</a>)</p>
+<p>（来自<a href="https://stackoverflow.com/questions/1028250/what-is-functional-reactive-programming">Stackoverflow的术语问题</a> ）</p>
 </div>
 <div class="paragraph">
-<p>FRP has a strong affinity with high-performance, concurrency, asynchronous operations and non-blocking IO. However, it might be helpful to start with a suspicion that FRP has nothing to do with any of them. It is certainly the case that such concerns can be naturally handled, often transparently to the caller, when using a Reactive model. But the actual benefit, in terms of handling those concerns effectively or efficiently is entirely up to the implementation in question (and therefore should be subject to a high degree of scrutiny). It is also possible to implement a perfectly sane and useful FRP framework in a synchronous, single-threaded way, but that isn&#8217;t really likely to be helpful in trying to use any of the new tools and libraries.</p>
+<p>FRP与高性能，并发性，异步操作和无阻塞IO具有很强的亲和力。但是，从怀疑FRP与它们中的任何一个都没有关系开始可能会有所帮助。当然，在使用响应式模型时，这种顾虑可以自然地处理，通常对调用者透明。但是，就有效或有效处理这些问题而言，实际收益完全取决于所讨论的实现（因此应受到高度审查）。也有可能以同步，单线程的方式实现一个完美而又有用的FRP框架，但这在尝试使用任何新工具和库中实际上并没有帮助。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="reactive-use-cases"><a class="anchor" href="#reactive-use-cases"></a>Reactive Use Cases</h2>
+<h2 id="reactive-use-cases"><a class="anchor" href="#reactive-use-cases"></a>反应性用例</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The hardest question to get an answer to as a newbie seems to be "what is it good for?" Here are some examples from an enterprise setting that illustrate general patterns of use:</p>
+<p>作为新手，最难回答的问题似乎是“这有什么用？“以下是来自企业环境的一些示例，这些示例说明了一般的使用模式：</p>
 </div>
 <div class="paragraph">
-<p><strong>External Service Calls</strong> Many backend services these days are REST-ful (i.e. they operate over HTTP) so the underlying protocol is fundamentally blocking and synchronous. Not obvious territory for FRP maybe, but actually it&#8217;s quite fertile ground because the implementation of such services often involves calling other services, and then yet more services depending on the results from the first calls. With so much IO going on if you were to wait for one call to complete before sending the next request, your poor client would give up in frustration before you managed to assemble a reply. So external service calls, especially complex orchestrations of dependencies between calls, are a good thing to optimize. FRP offers the promise of "composability" of the logic driving those operations, so that it is easier to write for the developer of the calling service.</p>
+<p><strong>外部服务调用</strong>如今，许多后端服务都是基于REST的（即，它们通过HTTP运行），因此底层协议从根本上是阻塞和同步的。FRP的领域可能并不明显，但实际上这是一块肥沃的土地，因为此类服务的实施通常涉及调用其他服务，然后再根据首次调用的结果调用更多服务。如果要在发送下一个请求之前等待一个呼叫完成，那么会有大量的IO进行，那么可怜的客户端会在您设法收集答复之前感到沮丧。因此，优化外部服务调用，尤其是调用之间的依赖关系的复杂编排，是一件好事。FRP保证了驱动这些操作的逻辑的“可组合性”，因此对于调用服务的开发人员来说更容易编写。</p>
 </div>
 <div class="paragraph">
-<p><strong>Highly Concurrent Message Consumers</strong> Message processing, in particular when it is highly concurrent, is a common enterprise use case. Reactive frameworks like to measure micro benchmarks, and brag about how many messages per second you can process in the JVM. The results are truly staggering (tens of millions of messages per second are easy to achieve), but possibly somewhat artificial - you wouldn&#8217;t be so impressed if they said they were benchmarking a simple "for" loop. However, we should not be too quick to write off such work, and it&#8217;s easy to see that when performance matters, all contributions should be gratefully accepted. Reactive patterns fit naturally with message processing (since an event translates nicely into a message), so if there is a way to process more messages faster we should pay attention.</p>
+<p><strong>高度并发的消息使用者</strong>消息处理，尤其是高度并发的消息处理，是企业常见的用例。响应式框架喜欢测量微基准，并吹嘘您可以在JVM中每秒处理多少消息。结果确实是惊人的（每秒很容易获得数千万条消息），但可能有些人为-如果他们说他们正在对一个简单的“ for”循环进行基准测试，您将不会感到印象深刻。但是，我们不应该过快地注销此类工作，并且很容易看出，当绩效很重要时，所有贡献都应被感激地接受。反应模式自然适合消息处理（因为事件可以很好地转换为消息），因此，如果有一种方法可以更快地处理更多消息，则应引起注意。</p>
 </div>
 <div class="paragraph">
-<p><strong>Spreadsheets</strong> Perhaps not really an enterprise use case, but one that everyone in the enterprise can easily relate to, and it nicely captures the philosophy of, and difficulty of implementing FRP. If cell B depends on cell A, and cell C depends on both cells A and B, then how do you propagate changes in A, ensuring that C is updated before any change events are sent to B? If you have a truly reactive framework to build on, then the answer is "you don&#8217;t care, you just declare the dependencies," and that is really the power of a spreadsheet in a nutshell. It also highlights the difference between FRP and simple event-driven programming&#8201;&#8212;&#8201;it puts the "intelligent" in "intelligent routing".</p>
+<p><strong>电子表格</strong>也许不是真正的企业用例，但企业中的每个人都可以轻松地联系到一个用例，它很好地体现了FRP的理念和实施难度。如果单元格B依赖于单元格A，并且单元格C同时依赖于单元格A和B，那么您如何传播A中的更改，确保在将任何更改事件发送到B之前更新C？如果您有一个真正的可响应框架可以构建，那么答案是“您不在乎，您只需声明依赖项”，这简而言之就是电子表格的强大功能。它还强调了FRP和简单的事件驱动编程之间的区别-将“智能”置于“智能路由”中。</p>
 </div>
 <div class="paragraph">
-<p><strong>Abstraction Over (A)synchronous Processing</strong> This is more of an abstract use case, so straying into the territory we should perhaps be avoiding. There is also some (a lot) of overlap between this and the more concrete use cases already mentioned, but hopefully it is still worth some discussion. The basic claim is a familiar (and justifiable) one, that as long as developers are willing to accept an extra layer of abstraction, they can forget about whether the code they are calling is synchronous or asynchronous. Since it costs precious brain cells to deal with asynchronous programming, there could be some useful ideas there. Reactive Programming is not the only approach to this issue, but some of the implementaters of FRP have thought hard enough about this problem that their tools are useful.</p>
+<p><strong>抽象在（A）的同步处理</strong>这更多的是一种抽象的使用案例，让误闯，我们或许应该避免领土。在此和已经提到的更具体的用例之间也存在（很多）重叠，但是希望仍然值得一些讨论。基本主张是一个熟悉的（并且是合理的）主张，即只要开发人员愿意接受额外的抽象层，他们就可以忘记所调用的代码是同步的还是异步的。由于处理异步编程需要花费宝贵的脑细胞，因此那里可能会有一些有用的想法。响应式编程不是解决此问题的唯一方法，但是FRP的一些实施者已经对此问题进行了充分的思考，以使其工具有用。</p>
 </div>
 <div class="paragraph">
-<p>This Netflix blog has some really useful concrete examples of real-life use cases: <a href="http://techblog.netflix.com/2013/02/rxjava-netflix-api.html">Netflix Tech Blog: Functional Reactive in the Netflix API with RxJava</a></p>
+<p>该Netflix博客提供了一些真实有用的实际用例示例： <a href="http://techblog.netflix.com/2013/02/rxjava-netflix-api.html">Netflix Tech博客：带有RxJava的Netflix API中的功能性响应</a></p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="comparisons"><a class="anchor" href="#comparisons"></a>Comparisons</h2>
+<h2 id="comparisons"><a class="anchor" href="#comparisons"></a>比较</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>If you haven&#8217;t been living in a cave since 1970 you will have come across some other concepts that are relevant to Reactive Programming and the kinds of problems people try and solve with it. Here are a few of them with my personal take on their relevance:</p>
+<p>如果您从1970年以来一直不在洞穴里生活，您将遇到其他一些与响应式编程以及人们尝试使用它解决的问题有关的概念。以下是其中一些与我个人相关的观点：</p>
 </div>
 <div class="paragraph">
-<p><strong>Ruby Event-Machine</strong> The <a href="https://github.com/eventmachine/eventmachine">Event Machine</a> is an abstraction over concurrent programming (usually involving non-blocking IO). Rubyists struggled for a long time to turn a language that was designed for single-threaded scripting into something that you could use to write a server application that a) worked, b) performed well, and c) stayed alive under load. Ruby has had threads for quite some time, but they aren&#8217;t used much and have a bad reputation because they don&#8217;t always perform very well. The alternative, which is ubiquitous now that it has been promoted (in Ruby 1.9) to the core of the language, is <a href="https://www.ruby-doc.org/core-1.9.3/Fiber.html">Fibers</a>(sic). The Fiber programming model is sort of a flavour of coroutines (see below), where a single native thread is used to process large numbers of concurrent requests (usually involving IO). The programming model itself is a bit abstract and hard to reason about, so most people use a wrapper, and the Event Machine is the most common. Event Machine doesn&#8217;t necessarily use Fibers (it abstracts those concerns), but it is easy to find examples of code using Event Machine with Fibers in Ruby web apps (e.g. <a href="https://www.igvita.com/2009/05/13/fibers-cooperative-scheduling-in-ruby">see this article by Ilya Grigorik</a>, or the <a href="https://github.com/igrigorik/em-http-request/blob/master/examples/fibered-http.rb">fibered example from em-http-request</a>). People do this a lot to get the benefit of scalability that comes from using Event Machine in an I/O intensive application, without the ugly programming model that you get with lots of nested callbacks.</p>
+<p><strong>Ruby Event-Machine</strong> <a href="https://github.com/eventmachine/eventmachine">Event Machine</a>是并发编程（通常涉及非阻塞IO）的抽象。Rubyists努力了很长时间才能将一种专为单线程脚本编写的语言转换为可用于编写服务器应用程序的语言，该服务器应用程序a）工作良好，b）性能良好，并且c）在负载下仍然有效。Ruby拥有线程已有很长一段时间了，但是它们使用不多且声誉不佳，因为它们并不总是性能很好。<a href="https://www.ruby-doc.org/core-1.9.3/Fiber.html">Fibers</a> （sic）是一种替代语言，现在已经无所不在（在Ruby 1.9中已被提升为该语言的核心）。Fiber编程模型有点像协程（请参见下文），其中一个本地线程用于处理大量并发请求（通常涉及IO）。编程模型本身有点抽象并且很难推理，因此大多数人都使用包装器，而事件机器是最常见的。Event Machine不一定要使用Fibers（它会抽象这些问题），但是很容易在Ruby Web应用程序中使用带有Fibers的Event Machine来查找代码示例（例如， <a href="https://www.igvita.com/2009/05/13/fibers-cooperative-scheduling-in-ruby">请参见Ilya Grigorik的本文</a>或<a href="https://github.com/igrigorik/em-http-request/blob/master/examples/fibered-http.rb">em-http中</a>的<a href="https://github.com/igrigorik/em-http-request/blob/master/examples/fibered-http.rb">纤维化示例-request</a> ）。人们经常这样做，以获得在I / O密集型应用程序中使用事件机器所带来的可伸缩性，而无需使用大量嵌套回调获得的丑陋编程模型。</p>
 </div>
 <div class="paragraph">
-<p><strong>Actor Model</strong> Similar to Object Oriented Programming, the Actor Model is a deep thread of Computer Science going back to the 1970s. Actors provide an abstraction over computation (as opposed to data and behaviour) that allows for concurrency as a natural consequence, so in practical terms they can form the basis of a concurrent system. Actors send each other messages, so they are reactive in some sense, and there is a lot of overlap between systems that style themselves as Actors or Reactive. Often the distinction is at the level of their implementation (e.g. <code>Actors</code> in <a href="http://doc.akka.io/docs/akka/current/java.html">Akka</a> can be distributed across processes, and that is a distinguishing feature of that framework).</p>
+<p><strong>Actor模型</strong>类似于面向对象的编程，Actor模型是可追溯到1970年代的计算机科学的深层线程。参与者提供了对计算的抽象（与数据和行为相反），从而自然而然地允许了并发，因此从实际意义上讲，它们可以构成并发系统的基础。Actor互相发送消息，因此它们在某种意义上是反应性的，并且在将自己称为Actor或Reactive的系统之间存在很多重叠。通常，区别在于它们的实现级别（例如， <a href="http://doc.akka.io/docs/akka/current/java.html">Akka中的</a> <code>Actors</code>可以分布在各个过程中，这是该框架的显着特征）。</p>
 </div>
 <div class="paragraph">
-<p><strong>Deferred results (Futures)</strong> Java 1.5 introduced a rich new set of libraries including Doug Lea&#8217;s "java.util.concurrent", and part of that is the concept of a deferred result, encapsulated in a <code>Future</code>. It&#8217;s a good example of a simple abstraction over an asynchronous pattern, without forcing the implementation to be asynchronous, or use any particular model of asynchronous processing. As the <a href="http://techblog.netflix.com/2013/02/rxjava-netflix-api.html">Netflix Tech Blog: Functional Reactive in the Netflix API with RxJava</a> shows nicely, <code>Futures</code> are great when all you need is concurrent processing of a set of similar tasks, but as soon as any of them want to depend on each other or execute conditionally you get into a form of "nested callback hell". Reactive Programming provides an antidote to that.</p>
+<p><strong>延迟结果（未来）</strong> Java 1.5引入了一组丰富的新库，其中包括Doug Lea的“ java.util.concurrent”，其中一部分是延迟结果的概念，封装在<code>Future</code> 。这是通过异步模式进行简单抽象的一个很好的示例，而无需强制实现异步或使用任何特定的异步处理模型。正如<a href="http://techblog.netflix.com/2013/02/rxjava-netflix-api.html">Netflix的Tech Blog：带有RxJava的Netflix API中的功能性响应</a>很好地显示的那样，如果您需要并发处理一组相似的任务，但是只要它们中的任何一个希望彼此依赖或有条件地执行，则<code>Futures</code>就是很好的选择您会陷入“嵌套回调地狱”的形式。响应式编程对此提供了解决方法。</p>
 </div>
 <div class="paragraph">
-<p><strong>Map-reduce and fork-join</strong> Abstractions over parallel processing are useful and there are many examples to choose from. Map-reduce and fork-join that have evolved recently in the Java world, driven by massively parallel distributed processing (<a href="http://research.google.com/archive/mapreduce-osdi04.pdf">MapReduce</a> and <a href="https://wiki.apache.org/hadoop/MapReduce">Hadoop</a>) and by the JDK itself in version 1.7 (<a href="http://gee.cs.oswego.edu/dl/papers/fj.pdf">Fork-Join</a>). These are useful abstractions but (like deferred results) they are shallow compared to FRP, which can be used as an abstraction over simple parallel processing, but which reaches beyond that into composability and declarative communication.</p>
+<p>并行处理中的<strong>Map-reduce和fork-join</strong>抽象很有用，并且有许多示例可供选择。在Java世界中最近发展起来的Map-reduce和fork-join由大规模并行分布式处理（ <a href="http://research.google.com/archive/mapreduce-osdi04.pdf">MapReduce</a>和<a href="https://wiki.apache.org/hadoop/MapReduce">Hadoop</a> ）以及1.7版的JDK本身（ <a href="http://gee.cs.oswego.edu/dl/papers/fj.pdf">Fork-Join</a> ）驱动。这些是有用的抽象，但是（如延迟的结果）与FRP相比，它们是浅薄的，FRP可以用作简单并行处理的抽象，但超出了可组合性和声明性通信。</p>
 </div>
 <div class="paragraph">
-<p><strong>Coroutines</strong> A <a href="https://en.wikipedia.org/wiki/Coroutines">"coroutine"</a> is a generalization of a "subroutine"&#8201;&#8212;&#8201;it has an entry point, and exit point(s) like a subroutine, but when it exits it passes control to another coroutine (not necessarily to its caller), and whatever state it accumulated is kept and remembered for the next time it is called. Coroutines can be used as a building block for higher level features like Actors and Streams. One of the goals of Reactive Programming is to provide the same kind of abstraction over communicating parallel processing agents, so coroutines (if they are available) are a useful building block. There are various flavours of coroutines, some of which are more restrictive than the general case, but more flexible than vanilla subroutines. Fibers (see the discussion on Event Machine) are one flavour, and Generators (familiar in Scala and Python) are another.</p>
+<p><strong>协同程序</strong>一个<a href="https://en.wikipedia.org/wiki/Coroutines">“协同程序”</a>是一个“子程序”的概括-它有一个进入点和退出点（S）与子例程类似，但它退出时，将控制传递给另一个协程（不一定是调用者），和任何累积的状态会在下次调用时保留并记住。协程可以用作Actor和Streams等更高级别功能的构建块。响应式编程的目标之一是通过通信并行处理代理提供相同类型的抽象，因此协程（如果可用）是有用的构建块。协程有多种口味，其中一些比一般情况下限制性更强，但比香草子程序更具灵活性。纤维（请参阅有关事件计算机的讨论）是一种味道，而生成器（熟悉Scala和Python）是另一种味道。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="reactive-programming-in-java"><a class="anchor" href="#reactive-programming-in-java"></a>Reactive Programming in Java</h2>
+<h2 id="reactive-programming-in-java"><a class="anchor" href="#reactive-programming-in-java"></a> Java的反应式编程</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Java is not a "reactive language" in the sense that it doesn&#8217;t support coroutines natively. There are other languages on the JVM (Scala and Clojure) that support reactive models more natively, but Java itself does not until version 9. Java, however, is a powerhouse of enterprise development, and there has been a lot of activity recently in providing Reactive layers on top of the JDK. We only take a very brief look at a few of them here.</p>
+<p>Java不是本地支持协程的，因此它不是“反应性语言”。JVM上还有其他语言（Scala和Clojure）更本地地支持响应模型，但是Java本身直到版本9才支持。但是，Java是企业开发的强大力量，最近在JDK之上提供Reactive层已开展了很多活动。我们在这里仅对其中的几个进行简要介绍。</p>
 </div>
 <div class="paragraph">
-<p><a href="http://www.reactive-streams.org/"><strong>Reactive Streams</strong></a> is a very low level contract, expressed as a handful of Java interfaces (plus a TCK), but also applicable to other languages. The interfaces express the basic building blocks of <code>Publisher</code> and <code>Subscriber</code> with explicit back pressure, forming a common language for interoperable libraries. Reactive Streams have been incorporated into the JDK as <code>java.util.concurrent.Flow</code> in version 9. The project is a collaboration between engineers from Kaazing, Netflix, Pivotal, Red Hat, Twitter, Typesafe and many others.</p>
-</div>
-<div class="paragraph">
-<p><a href="https://github.com/ReactiveX/RxJava/wiki"><strong>RxJava</strong></a>: Netflix were using reactive patterns internally for some time and then they released the tools they were using under an open source license as <a href="https://github.com/ReactiveX/RxJava/wiki">Netflix/RxJava</a> (subsequently re-branded as "ReactiveX/RxJava"). Netflix does a lot of programming in Groovy on top of RxJava, but it is open to Java usage and quite well suited to Java 8 through the use of Lambdas. There is a <a href="https://github.com/ReactiveX/RxJavaReactiveStreams">bridge to Reactive Streams</a>. RxJava is a "2nd Generation" library according to David Karnok&#8217;s <a href="https://akarnokd.blogspot.co.uk/2016/03/operator-fusion-part-1.html">Generations of Reactive</a> classification.</p>
-</div>
-<div class="paragraph">
-<p><a href="https://projectreactor.io/"><strong>Reactor</strong></a> is a Java framework from the <a href="http://www.gopivotal.com/oss">Pivotal</a> open source team (the one that created Spring). It builds directly on Reactive Streams, so there is no need for a bridge. The Reactor IO project provides wrappers around low-level network runtimes like Netty and Aeron. Reactor is a "4th Generation" library according to David Karnok&#8217;s <a href="https://akarnokd.blogspot.co.uk/2016/03/operator-fusion-part-1.html">Generations of Reactive</a> classification.</p>
-</div>
-<div class="paragraph">
-<p><a href="https://projects.spring.io/spring-framework/"><strong>Spring Framework 5.0</strong></a> (first milestone June 2016) has reactive features built into it, including tools for building HTTP servers and clients. Existing users of Spring in the web tier will find a very familiar programming model using annotations to decorate controller methods to handle HTTP requests, for the most part handing off the dispatching of reactive requests and back pressure concerns to the framework. Spring builds on Reactor, but also exposes APIs that allow its features to be expressed using a choice of libraries (e.g. Reactor or RxJava). Users can choose from Tomcat, Jetty, Netty (via Reactor IO) and Undertow for the server side network stack.</p>
-</div>
-<div class="paragraph">
-<p><a href="https://ratpack.io"><strong>Ratpack</strong></a> is a set of libraries for building high performance services over HTTP. It builds on Netty and implements Reactive Streams for interoperability (so you can use other Reactive Streams implementations higher up the stack, for instance). Spring is supported as a native component, and can be used to provide dependency injection using some simple utility classes. There is also some autoconfiguration so that Spring Boot users can embed Ratpack inside a Spring application, bringing up an HTTP endpoint and listening there instead of using one of the embedded servers supplied directly by Spring Boot.</p>
-</div>
-<div class="paragraph">
-<p><a href="http://akka.io/"><strong>Akka</strong></a> is a toolkit for building applications using the Actor pattern in Scala or Java, with interprocess communication using Akka Streams, and Reactive Streams contracts are built in. Akka is a "3rd Generation" library according to David Karnok&#8217;s <a href="https://akarnokd.blogspot.co.uk/2016/03/operator-fusion-part-1.html">Generations of Reactive</a> classification.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="why-now"><a class="anchor" href="#why-now"></a>Why Now?</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>What is driving the rise of Reactive in Enterprise Java? Well, it&#8217;s not (all) just a technology fad&#8201;&#8212;&#8201;people jumping on the bandwagon with the shiny new toys. The driver is efficient resource utilization, or in other words, spending less money on servers and data centres. The promise of Reactive is that you can do more with less, specifically you can process higher loads with fewer threads. This is where the intersection of Reactive and non-blocking, asynchronous I/O comes to the foreground. For the right problem, the effects are dramatic. For the wrong problem, the effects might go into reverse (you actually make things worse). Also remember, even if you pick the right problem, there is no such thing as a free lunch, and Reactive doesn&#8217;t solve the problems for you, it just gives you a toolbox that you can use to implement solutions.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="conclusion"><a class="anchor" href="#conclusion"></a>Conclusion</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>In this article we have taken a very broad and high level look at the Reactive movement, setting it in context in the modern enterprise. There are a number of Reactive libraries or frameworks for the JVM, all under active development. To a large extent they provide similar features, but increasingly, thanks to Reactive Streams, they are interoperable. In the <a href="https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code">next article</a> in the series we will get down to brass tacks and have a look at some actual code samples, to get a better picture of the specifics of what it means to be Reactive and why it matters. We will also devote some time to understanding why the "F" in FRP is important, and how the concepts of back pressure and non-blocking code have a profound impact on programming style. And most importantly, we will help you to make the important decision about when and how to go Reactive, and when to stay put on the older styles and stacks.</p>
-</div>
-</div>
-</div></div>
-</div>
-<section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
-      var disqus_identifier = 2509;
-
-      (function(disqus_shortname, document) {
-        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
-        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
-
-        function injectScript(url) {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = url;
-          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
-        }
-
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
-<div class="mobile-only">
-<p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
-</div>
-</article>
-<aside class="span4 mobile-right-pane" id="sidebar">
-<div>
-<ul class="right-pane-widget--container secondary-nav with-icon">
-<li class="blog-category">
-<div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category active">
-<div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category">
-<div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
-</li>
-<li class="blog-category">
-<div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
-</li>
-</ul>
-<ul class="social-btn--container">
-<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
-
-<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
-<a class="social-btn youtube" href="/videos"></a>
-</ul>
-<div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
-<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
-<form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
-          form.onSuccess(function(values, followUpUrl) {
-            form.getFormElem().html("<p>Thank you!</p>");
-            return false;
-          });
-        });
-      </script>
-</div>
-</div>
-</aside>
-</div>
-</div>
-</div>
-<footer class="footer">
-<div class="container-fluid">
-<div class="row-fluid">
-<div class="span12">
-<div class="navbar">
-<div class="container">
-<ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
-</ul>
-</div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
-</div>
-</div>
-</div>
-</footer>
-<div id="scrim"></div>
-</div>
-</body></html>
+<p><a href="http://www.reactive-streams.org/"><strong>反应性流</strong></a>是一种非常低级的协定，表示为少数Java接口（加上TCK），但也适用于其他语言。这些接口通过明显的背压表达了<code>Publisher</code>和<code>Subscriber</code>的基本构建块，从而形成了可互操作库的通用语言。反应性流已作为<code>java.util.concurrent.Flow</code></p><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></article><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></div><code>java.util.concurrent.Flow</code></body></html>

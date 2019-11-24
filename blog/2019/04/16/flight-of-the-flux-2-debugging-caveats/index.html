@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html data-code-prettify="" data-mobile-support="" data-search="">
-<head>
-<title>Flight of the Flux 2 - Debugging Caveats</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport" />
-<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png" />
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css" />
+<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>助焊剂的飞行2-调试警告</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
+<link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>
-    System.config({baseURL: "/b92013b"});
-  </script>
+<script>System.config({baseURL: "/b92013b"});</script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>
-      System.import('app/main.js')
-  </script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification" />
+<script>System.import('app/main.js')</script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,53 +16,51 @@
       'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-KZM7GF6');</script>
 
-<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css" />
+<link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card" />
-<meta content="@springcentral" name="twitter:site" />
-<meta name="twitter:title" content="Flight of the Flux 2 - Debugging Caveats" />
-<meta name="twitter:description" content="&lt;p&gt;This blog post is the second in a series of posts that aim at providing a deeper look into &lt;a href=&quot;https://github.com/reactor/reactor-core&quot;&gt;Reactor&lt;/a&gt;’s more advanced concepts and inner workings.&lt;/p&gt;
-&lt;p&gt;It is derived from my &lt;code&gt;Flight of the Flux&lt;/code&gt; talk, which content I found to be more adapted to a blog post format.&lt;/p&gt;
-&lt;p&gt;I’ll update the table below with links when the other posts are published, but here is the planned content:&lt;/p&gt;
-&lt;ol&gt; 
- &lt;li&gt;&lt;a href=&quot;https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription&quot;&gt;Assembly vs Subscription&lt;/a&gt;&lt;/li&gt; 
- &lt;li&gt;Debugging caveats (this post)&lt;/li&gt; 
- &lt;li&gt;Concurrent Agnostic&lt;/li&gt; 
- &lt;li&gt;Schedulers and &lt;code&gt;publishOn&lt;/code&gt; vs &lt;code&gt;subscribeOn&lt;/code&gt;&lt;/li&gt; 
- &lt;li&gt;Inner workings: work stealing&lt;/li&gt; 
- &lt;li&gt;Inner workings: operator fusion&lt;/li&gt; 
-&lt;/ol&gt;
-" />
-<meta name="twitter:creator" content="@simonbasle" />
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=200" />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
+<meta name="twitter:title" content="Flight of the Flux 2 - Debugging Caveats">
+<meta name="twitter:description" content="<p>This blog post is the second in a series of posts that aim at providing a deeper look into <a href=" https:="" ="" github.com="" reactor="" reactor-cor="="></head><body dir="ltr">Reactor’s more advanced concepts and inner workings.
+<p>It is derived from my <code>Flight of the Flux</code> talk, which content I found to be more adapted to a blog post format.</p>
+<p>I’ll update the table below with links when the other posts are published, but here is the planned content:</p>
+<ol> 
+ <li><a href="https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription">Assembly vs Subscription</a></li> 
+ <li>Debugging caveats (this post)</li> 
+ <li>Concurrent Agnostic</li> 
+ <li>Schedulers and <code>publishOn</code> vs <code>subscribeOn</code></li> 
+ <li>Inner workings: work stealing</li> 
+ <li>Inner workings: operator fusion</li> 
+</ol>
+">
+<meta name="twitter:creator" content="@simonbasle">
+<meta name="twitter:image:src" content="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=200">
 
-<meta property="og:title" content="Flight of the Flux 2 - Debugging Caveats" />
-<meta property="og:image" content="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=200" />
-<meta property="og:description" content="&lt;p&gt;This blog post is the second in a series of posts that aim at providing a deeper look into &lt;a href=&quot;https://github.com/reactor/reactor-core&quot;&gt;Reactor&lt;/a&gt;’s more advanced concepts and inner workings.&lt;/p&gt;
-&lt;p&gt;It is derived from my &lt;code&gt;Flight of the Flux&lt;/code&gt; talk, which content I found to be more adapted to a blog post format.&lt;/p&gt;
-&lt;p&gt;I’ll update the table below with links when the other posts are published, but here is the planned content:&lt;/p&gt;
-&lt;ol&gt; 
- &lt;li&gt;&lt;a href=&quot;https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription&quot;&gt;Assembly vs Subscription&lt;/a&gt;&lt;/li&gt; 
- &lt;li&gt;Debugging caveats (this post)&lt;/li&gt; 
- &lt;li&gt;Concurrent Agnostic&lt;/li&gt; 
- &lt;li&gt;Schedulers and &lt;code&gt;publishOn&lt;/code&gt; vs &lt;code&gt;subscribeOn&lt;/code&gt;&lt;/li&gt; 
- &lt;li&gt;Inner workings: work stealing&lt;/li&gt; 
- &lt;li&gt;Inner workings: operator fusion&lt;/li&gt; 
-&lt;/ol&gt;
-" />
-<meta content="article" property="og:type" />
-<meta property="og:article:published_time" content="2019-04-16 16:45:13.637" />
-</head>
-<body>
+<meta property="og:title" content="Flight of the Flux 2 - Debugging Caveats">
+<meta property="og:image" content="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=200">
+<meta property="og:description" content="<p>This blog post is the second in a series of posts that aim at providing a deeper look into <a href=" https:="" ="" github.com="" reactor="" reactor-cor="=">Reactor’s more advanced concepts and inner workings.
+<p>It is derived from my <code>Flight of the Flux</code> talk, which content I found to be more adapted to a blog post format.</p>
+<p>I’ll update the table below with links when the other posts are published, but here is the planned content:</p>
+<ol> 
+ <li><a href="https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription">Assembly vs Subscription</a></li> 
+ <li>Debugging caveats (this post)</li> 
+ <li>Concurrent Agnostic</li> 
+ <li>Schedulers and <code>publishOn</code> vs <code>subscribeOn</code></li> 
+ <li>Inner workings: work stealing</li> 
+ <li>Inner workings: operator fusion</li> 
+</ol>
+">
+<meta content="article" property="og:type">
+<meta property="og:article:published_time" content="2019-04-16 16:45:13.637">
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script>
+    }</script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -78,16 +70,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -103,9 +95,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="" />
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -115,40 +107,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="" />
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -174,59 +156,58 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Flight of the Flux 2 - Debugging Caveats</h1>
+<h1 class="blog--title">助焊剂的飞行2-调试警告</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=20&amp;d=mm" />
-<a class="author" rel="author" href="/team/simonbasle">Simon Baslé</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/056097e00486bcdf172708607f194b1e?s=20&d=mm"> <a class="author" rel="author" href="/team/simonbasle">西蒙·巴斯莱（SimonBaslé）</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2019-04-16 16:45:13.637">April 16, 2019</time>
+<time class="date" pubdate="" datetime="2019-04-16 16:45:13.637">2019年4月16日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="3647" href="/blog/2019/04/16/flight-of-the-flux-2-debugging-caveats#disqus_thread">
+<a class="comments" href="/blog/2019/04/16/flight-of-the-flux-2-debugging-caveats#disqus_thread" data-disqus-identifier="3647">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>This blog post is the second in a series of posts that aim at providing a deeper look into <a href="https://github.com/reactor/reactor-core">Reactor</a>&rsquo;s more advanced concepts and inner workings.</p>
-<p>It is derived from my <code>Flight of the Flux</code> talk, which content I found to be more adapted to a blog post format.</p>
-<p>I&rsquo;ll update the table below with links when the other posts are published, but here is the planned content:</p>
+<div class="blog--post"><p>该博客文章是一系列文章中的第二篇，旨在深入了解<a href="https://github.com/reactor/reactor-core">Reactor</a>的更高级概念和内部工作原理。</p>
+<p>它源自我的《 <code>Flight of the Flux</code>演讲，我发现该内容更适合于博客文章格式。</p>
+<p>发布其他帖子时，我将使用链接更新下表，但这是计划的内容：</p>
 <ol>
-<li><a href="https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription">Assembly vs Subscription</a></li>
-<li>Debugging caveats (this post)</li>
-<li>Concurrent Agnostic</li>
-<li>Schedulers and <code>publishOn</code> vs <code>subscribeOn</code></li>
-<li>Inner workings: work stealing</li>
-<li>Inner workings: operator fusion</li>
+<li><a href="https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription">组装与订阅</a></li>
+<li>调试警告（本文）</li>
+<li>并发不可知论</li>
+<li>调度和<code>publishOn</code> VS <code>subscribeOn</code></li>
+<li>内部工作：偷工作</li>
+<li>内部工作原理：操作员融合</li>
 </ol>
-<p>If you&rsquo;re missing an introduction to <em>Reactive Streams</em> and the basic concepts of Reactor, head out to the site&rsquo;s <a href="https://projectreactor.io/learn">learning section</a> and the <a href="https://projectreactor.io/docs/core/release/reference">reference guide</a>.</p>
-<p>Without further ado, let&rsquo;s jump in:</p><h2><a href="#debugging-in-a-reactive-world" class="anchor" name="debugging-in-a-reactive-world"></a>Debugging in a Reactive World</h2>
-<p>Switching from an imperative, blocking paradigm to a reactive, non-blocking one brings benefits but also comes with some caveats. One of these is the debugging experience. Why is that?</p>
-<p>Primarily because you&rsquo;ve learned to rely on the good old <em>stacktrace</em>, but suddenly this invaluable tool becomes far less valuable due to the <strong>asynchronous</strong> aspect of reactive programming. This is not specific to reactive programming though: as soon as you introduce asynchronous code, you create a boundary in the program between the code that <em>schedules</em> and the code that <em>asynchronously executes</em>.</p><h3><a href="#demonstrating-the-issue-with-vanilla-async-code" class="anchor" name="demonstrating-the-issue-with-vanilla-async-code"></a>Demonstrating the issue with vanilla async code</h3>
-<p>Let&rsquo;s take an example with an <code>ExecutorService</code> and a <code>Future</code> (no Reactor code here):</p>
+<p>如果你错过了介绍<em>无流</em>和电抗器的基本概念，伸头网站的<a href="https://projectreactor.io/learn">学习部分</a>和<a href="https://projectreactor.io/docs/core/release/reference">参考指南</a> 。</p>
+<p>事不宜迟，让我们进入：</p><h2><a href="#debugging-in-a-reactive-world" class="anchor" name="debugging-in-a-reactive-world"></a>在反应世界中进行调试</h2>
+<p>从命令式，阻塞性模式切换到反应性，非阻塞性模式带来了好处，但同时也带来了一些警告。其中之一就是调试经验。这是为什么？</p>
+<p>主要是因为您已经学会了依靠良好的旧<em>stacktrace</em> ，但是突然之间，由于反应式编程的<strong>异步</strong>方面，此无价之宝的价值变得远远不如之前。但是，这并不特定于反应式编程：一旦引入异步代码，便会在程序中<em>计划调度</em>的代码与<em>异步执行</em>的代码之间创建边界。</p><h3><a href="#demonstrating-the-issue-with-vanilla-async-code" class="anchor" name="demonstrating-the-issue-with-vanilla-async-code"></a>用香草异步代码演示问题</h3>
+<p>让我们以<code>ExecutorService</code>和<code>Future</code> （这里没有Reactor代码）为例：</p>
 <pre><code class="prettyprint java">	private static void imperative() throws ExecutionException, InterruptedException {
 		final ScheduledExecutorService executor =
 				Executors.newSingleThreadScheduledExecutor();
 
 		int seconds = LocalTime.now().getSecond();
-		List&lt;Integer&gt; source;
+		List<Integer> source;
 		if (seconds % 2 == 0) {
 			source = IntStream.range(1, 11).boxed().collect(Collectors.toList());
 		}
@@ -237,11 +218,11 @@ Training & Certification
 			source = Arrays.asList(1, 2, 3, 4);
 		}
 
-		executor.submit(() -&gt; source.get(5))  //line 76
+		executor.submit(() -> source.get(5))  //line 76
 		        .get();
 	}
 </code></pre>
-<p>This example is a bit contrived, but let&rsquo;s imagine that we have these two out of three path in the code that can lead to the asynchronous task throwing an <code>IndexOutOfBoundsException</code>&hellip; How helpful would the stacktrace be?</p>
+<p>这个示例有些人为，但是让我们想象一下，代码中的这三个路径中有这两个路径会导致异步任务抛出<code>IndexOutOfBoundsException</code> ……stacktrace对您有多大帮助？</p>
 <pre><code class="prettyprint">java.util.concurrent.ExecutionException: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 4
 	at java.base/java.util.concurrent.FutureTask.report(FutureTask.java:122)
 	at java.base/java.util.concurrent.FutureTask.get(FutureTask.java:191)
@@ -257,19 +238,19 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 	at java.base/java.lang.Thread.run(Thread.java:834)
 
 </code></pre>
-<p>We see that:</p>
+<p>我们看到：</p>
 <ul>
-<li>the <code>Future</code>&rsquo;s <code>get()</code> method threw an <code>ExecutionException</code></li>
-<li>the cause is an <code>IndexOutOfBoundsException</code></li>
-<li>the code throwing is in the <code>submit(() -&gt; source.get(5))</code> <strong>lambda</strong> line 76</li>
-<li>it executed in a <code>FutureTask</code>, from something called a <code>ThreadPoolExecutor</code>, itself running in a <code>Thread</code>&hellip;</li>
-<li>we have two potential sources that could cause this but no idea which one is the culprit (which path was taken in the test prior to calling <code>submit()</code>).</li>
+<li><code>Future</code>的<code>get()</code>方法引发了<code>ExecutionException</code></li>
+<li>原因是<code>IndexOutOfBoundsException</code></li>
+<li>代码抛出在<code>submit(() -> source.get(5))</code> <strong>lambda</strong>第76行中</li>
+<li>它是在<code>FutureTask</code>中从<code>ThreadPoolExecutor</code> ，它本身在<code>Thread</code>运行...</li>
+<li>我们有两个可能的原因可能导致这种情况，但不知道是谁（在调用<code>submit()</code>之前在测试中采用了哪条路径）。</li>
 </ul>
-<p>Not terribly useful :-(</p><h3><a href="#demonstrating-the-issue-in-reactor" class="anchor" name="demonstrating-the-issue-in-reactor"></a>Demonstrating the issue in Reactor</h3>
-<p>If we look for a Reactor equivalent to the above code, we can come up with this:</p>
+<p>不是很有用的:-(</p><h3><a href="#demonstrating-the-issue-in-reactor" class="anchor" name="demonstrating-the-issue-in-reactor"></a>在Reactor中演示问题</h3>
+<p>如果我们寻找与上述代码等效的Reactor，我们可以提出以下内容：</p>
 <pre><code class="prettyprint java">	private static void reactive() {
 		int seconds = LocalTime.now().getSecond();
-		Mono&lt;Integer&gt; source;
+		Mono<Integer> source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5);
@@ -287,7 +268,7 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 		      .block(); //line 97
 	}
 </code></pre>
-<p>Which triggers the following stacktrace:</p>
+<p>触发以下堆栈跟踪：</p>
 <pre><code class="prettyprint">java.lang.IndexOutOfBoundsException
 	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
 	at reactor.core.publisher.FluxArray$ArraySubscription.fastPath(FluxArray.java:176)
@@ -315,16 +296,16 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 		at Scratch.main(Scratch.java:51)
 </code></pre>
 <ul>
-<li>We see the <code>ArrayIndexOutOfBoundsException</code> again, hinting at a source that was too short for the <code>MonoElementAt</code> operator</li>
-<li>We see that it came from an <code>onComplete</code>, itself triggered by <code>request</code>&hellip; and a bunch of other steps in <code>reactor.core.publisher</code></li>
-<li>With a bit of familiarity with these reactor methods, we <em>might</em> deduce that the pipeline was made up of <code>range</code> (<code>FluxRange.subscribe</code>), <code>elementAt</code> and <code>subscribeOn</code>&hellip;</li>
-<li>It seems the throwing code was executed from the worker <code>Thread</code> of a <code>ThreadPoolExecutor</code></li>
-<li>The trail goes cold here&hellip;</li>
+<li>我们再次看到<code>ArrayIndexOutOfBoundsException</code> ，暗示源对于<code>MonoElementAt</code>运算符来说太短了</li>
+<li>我们看到，它从传来<code>onComplete</code> ，本身引发的<code>request</code> ......和一堆其他步骤<code>reactor.core.publisher</code></li>
+<li>对这些反应器方法有所了解后，我们<em>可以</em>推断出管道是由<code>range</code> （ <code>FluxRange.subscribe</code> ）， <code>elementAt</code>和<code>subscribeOn</code> 。</li>
+<li>似乎抛出代码是从<code>ThreadPoolExecutor</code>的工作<code>Thread</code>执行的</li>
+<li>这里的路很冷…</li>
 </ul>
-<p>Worse, even if we did get rid of <code>subscribeOn</code> we&rsquo;d still wouldn&rsquo;t discover which of the two possible error paths was triggered:</p>
+<p>更糟糕的是，即使我们确实摆脱了<code>subscribeOn</code>我们仍然不会发现触发了两个可能的错误路径中的哪一个：</p>
 <pre><code class="prettyprint java">	private static void reactiveNoSubscribeOn() {
 		int seconds = LocalTime.now().getSecond();
-		Mono&lt;Integer&gt; source;
+		Mono<Integer> source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5);
@@ -341,7 +322,7 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 		source.block(); //line 116
 	}
 </code></pre>
-<p>Gives the stacktrace:</p>
+<p>给出堆栈跟踪：</p>
 <pre><code class="prettyprint">java.lang.IndexOutOfBoundsException
 	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
 	at reactor.core.publisher.FluxArray$ArraySubscription.fastPath(FluxArray.java:176)
@@ -360,59 +341,59 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 		at reactor.core.publisher.Mono.block(Mono.java:1495)
 		... 2 more
 </code></pre>
-<p>That is because, as we saw previously, there is an additional &ldquo;boundary&rdquo; in code between <em>assembly</em> and <em>subscription</em>. The trail only goes back to the point of <strong>subscription</strong> (here the <code>block()</code>) :-(</p>
-<p>So using stacktraces for analysis and debugging purposes is harder in an asynchronous world, and even a bit harder in Reactor (because it is asynchronous and has a lazy-by-default approach with assembly vs subscription). But fortunately there are tools in the library to try and alleviate that fact.</p><h2><a href="#making-things-better" class="anchor" name="making-things-better"></a>Making Things Better</h2><h3><a href="#back-to-classics-code-log-code" class="anchor" name="back-to-classics-code-log-code"></a>Back to classics: <code>log</code></h3>
-<p>Remember when you sprinkled your imperative code with <code>print</code> statements? It might not be as cool as firing up the step debugger, but sometimes it is the quick and dirty solution you need.</p>
-<p>In Reactor, you have the <code>log()</code> operator:</p>
+<p>如前所述，这是因为在<em>汇编</em>和<em>订阅</em>之间，代码中还有一个附加的“边界”。跟踪仅返回到<strong>订阅</strong>点（此处为<code>block()</code> ）：-(</p>
+<p>因此，在异步环境中，将堆栈跟踪用于分析和调试目的变得更加困难，而在Reactor中则更加困难（因为它是异步的，并且具有汇编vs订阅的默认延迟方法）。但是幸运的是，库中有一些工具可以尝试缓解这一情况。</p><h2><a href="#making-things-better" class="anchor" name="making-things-better"></a>使事情变得更好</h2><h3><a href="#back-to-classics-code-log-code" class="anchor" name="back-to-classics-code-log-code"></a>返回经典： <code>log</code></h3>
+<p>还记得您在命令式代码中添加了<code>print</code>语句吗？它可能不像启动步进调试器那样酷，但是有时它是您需要的快速而肮脏的解决方案。</p>
+<p>在Reactor中，您具有<code>log()</code>运算符：</p>
 <ul>
-<li>It logs Reactive Stream signals: <code>onNext</code>, <code>onComplete</code>, <code>onError</code> (and <strong>even</strong> <code>onSubscribe</code>, <code>cancel</code> and <code>request</code>!)</li>
-<li>You can tune it to whitelist only part of these signals</li>
-<li>You can choose a particular <code>Logger</code> as well</li>
+<li>它记录无流信号： <code>onNext</code> ， <code>onComplete</code> ， <code>onError</code> （ <strong>甚至</strong> <code>onSubscribe</code> ， <code>cancel</code>和<code>request</code> ！）</li>
+<li>您可以将其调整为仅将这些信号的一部分列入白名单</li>
+<li>您也可以选择一个特定的<code>Logger</code></li>
 </ul>
-<p>In short, <code>log</code> is the quick and dirty solution to get an easy bird eye&rsquo;s view of what is going on at one step of your sequence. Use it liberally during development, with the possibility of specifying a &ldquo;name&rdquo; to each <code>log</code> call to differentiate them.</p>
-<p>Using <code>log(String)</code> can be diverted to get a hint at which source causes the error:</p>
+<p>简而言之， <code>log</code>是一种快速而又肮脏的解决方案，可让您轻松概览一下序列中正在发生的事情。在开发期间可以自由使用它，并可以为每个<code>log</code>调用指定一个“名称”以区分它们。</p>
+<p>可以改用<code>log(String)</code>来获取导致错误的原因的提示：</p>
 <pre><code class="prettyprint java">	private static void log() {
 		int seconds = LocalTime.now().getSecond();
-		Mono&lt;Integer&gt; source;
+		Mono<Integer> source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5)
-			             .log(&quot;source A&quot;);
+			             .log("source A");
 		}
 		else if (seconds % 3 == 0) {
 			source = Flux.range(0, 4)
 			             .elementAt(5)
-			             .log(&quot;source B&quot;);
+			             .log("source B");
 		}
 		else {
 			source = Flux.just(1, 2, 3, 4)
 			             .elementAt(5)
-			             .log(&quot;source C&quot;);
+			             .log("source C");
 		}
 
 		source.block(); //line 138
 	}
 </code></pre>
-<p>The stacktrace itself isn&rsquo;t much more interesting (apart from mentioning the <code>MonoLogFuseable</code> class, but the log itself contains this interesting tidbit:</p>
+<p>stacktrace本身并没有那么有趣（除了提到<code>MonoLogFuseable</code>类，但是日志本身包含了这个有趣的花絮：</p>
 <pre><code class="prettyprint">17:01:23.711 [main] INFO  source C - | onSubscribe([Fuseable] MonoElementAt.ElementAtSubscriber)
 17:01:23.716 [main] INFO  source C - | request(unbounded)
 17:01:23.717 [main] ERROR source C - | onError(java.lang.IndexOutOfBoundsException)
 17:01:23.721 [main] ERROR source C - 
 java.lang.IndexOutOfBoundsException: null
 </code></pre>
-<p>At least we get our hardcoded <code>source C</code> label&hellip;</p><h3><a href="#enriching-stacktraces-with-debug-mode" class="anchor" name="enriching-stacktraces-with-debug-mode"></a>Enriching stacktraces with Debug Mode</h3>
-<p>Another approach that is available in Reactor is to try and get back the assembly information in the runtime stacktraces.</p>
-<p>This can be done by activating the so-called &ldquo;debug mode&rdquo; via the <code>Hooks</code> class:</p>
+<p>至少我们得到了硬编码的<code>source C</code>标签…</p><h3><a href="#enriching-stacktraces-with-debug-mode" class="anchor" name="enriching-stacktraces-with-debug-mode"></a>使用调试模式丰富堆栈跟踪</h3>
+<p>Reactor中可用的另一种方法是尝试获取运行时堆栈跟踪中的程序集信息。</p>
+<p>这可以通过<code>Hooks</code>类激活所谓的“调试模式”来完成：</p>
 <pre><code class="prettyprint java">Hooks.onOperatorDebug();
 </code></pre>
-<p>What does it do? It makes each operator instantiation (aka assembly) capture a stacktrace and keep it for later.</p>
-<p>If an <code>onError</code> reaches one operator, it will attach that assembly stacktrace to the <code>onError</code> &rsquo;s <code>Throwable</code> (as a <strong>suppressed <code>Exception</code></strong>). As a result, when you see the stacktrace you&rsquo;ll get a more complete picture of both the runtime AND the assembly.</p>
-<p>With debug mode on, in our earlier example we would be able to see which assembly path was taken and which source was actually processed:</p>
+<p>它有什么作用？它使每个运算符实例化（又称程序集）捕获堆栈跟踪并保留以备后用。</p>
+<p>如果<code>onError</code>到达一个运算符，它将将该程序集堆栈跟踪附加到<code>onError</code>的<code>Throwable</code> （作为<strong>抑制的<code>Exception</code></strong> ）。结果，当您看到stacktrace时，您将获得运行时和程序集的更完整的图片。</p>
+<p>启用调试模式后，在我们之前的示例中，我们将能够看到采用了哪个汇编路径以及实际处理了哪个源：</p>
 <pre><code class="prettyprint java">	private static void hook() {
 		Hooks.onOperatorDebug();
 		try {
 			int seconds = LocalTime.now().getSecond();
-			Mono&lt;Integer&gt; source;
+			Mono<Integer> source;
 			if (seconds % 2 == 0) {
 				source = Flux.range(1, 10)
 				             .elementAt(5); //line 149
@@ -433,7 +414,7 @@ java.lang.IndexOutOfBoundsException: null
 		}
 	}
 </code></pre>
-<p>Which produces the following stacktrace:</p>
+<p>产生以下堆栈跟踪：</p>
 <pre><code class="prettyprint java">java.lang.IndexOutOfBoundsException
 	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
 (...)
@@ -447,33 +428,33 @@ Assembly trace from producer [reactor.core.publisher.MonoElementAt] :
 Error has been observed by the following operator(s):
 	|_	Flux.elementAt ⇢ Scratch.hook(Scratch.java:157)
 </code></pre>
-<p>Notice the last line? Yay :-D</p><h3><a href="#bringing-the-cost-down-with-code-checkpoint-code" class="anchor" name="bringing-the-cost-down-with-code-checkpoint-code"></a>Bringing the cost down with <code>checkpoint</code></h3>
-<p>One drawback of using <code>Hooks.onOperatorDebug()</code> is that it does the assembly stacktrace capture <strong>for every single operator used in the application</strong>. Filling a single stacktrace is a costly operation, so it goes without saying that this can have an heavy impact on performance. As a result, this is only recommended in a development setting.</p>
-<p>Fortunately, you can bring the cost down a little if you identify parts of your codebase that are prone to that sort of source ambiguity.</p>
-<p>By using the <code>checkpoint()</code> operator, it is possible to activate the assembly trace capture only at that specific point in the codebase. You can even do entirely without the filling of a stacktrace if you give the checkpoint a unique and meaningful name using <code>checkpoint(String)</code>:</p>
+<p>注意最后一行吗？耶:-D</p><h3><a href="#bringing-the-cost-down-with-code-checkpoint-code" class="anchor" name="bringing-the-cost-down-with-code-checkpoint-code"></a>通过<code>checkpoint</code>降低成本</h3>
+<p>使用<code>Hooks.onOperatorDebug()</code>一个缺点是，它会<strong>为应用程序中使用的每个单个运算符进行程序</strong>集<code>Hooks.onOperatorDebug()</code>捕获。填充单个stacktrace是一项昂贵的操作，因此，不用说这会对性能产生重大影响。因此，仅在开发环境中建议这样做。</p>
+<p>幸运的是，如果您确定代码库中容易产生这种源歧义的部分，则可以降低成本。</p>
+<p>通过使用<code>checkpoint()</code>运算符，可以仅在代码库中的特定点处激活程序集跟踪捕获。如果使用<code>checkpoint(String)</code>为检查点赋予唯一且有意义的名称，您甚至可以完全不用填充堆栈跟踪来完成操作：</p>
 <pre><code class="prettyprint java">	private static void checkpoint() {
 		int seconds = LocalTime.now().getSecond();
-		Mono&lt;Integer&gt; source;
+		Mono<Integer> source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5)
-			             .checkpoint(&quot;source range(1,10)&quot;);
+			             .checkpoint("source range(1,10)");
 		}
 		else if (seconds % 3 == 0) {
 			source = Flux.range(0, 4)
 			             .elementAt(5)
-			             .checkpoint(&quot;source range(0,4)&quot;);
+			             .checkpoint("source range(0,4)");
 		}
 		else {
 			source = Flux.just(1, 2, 3, 4)
 			             .elementAt(5)
-			             .checkpoint(&quot;source just(1,2,3,4)&quot;);
+			             .checkpoint("source just(1,2,3,4)");
 		}
 
 		source.block(); //line 186
 	}
 </code></pre>
-<p>This produces the following stacktrace:</p>
+<p>这将产生以下堆栈跟踪：</p>
 <pre><code class="prettyprint">java.lang.IndexOutOfBoundsException
 	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
 	at reactor.core.publisher.FluxArray$ArraySubscription.fastPath(FluxArray.java:176)
@@ -493,16 +474,15 @@ Error has been observed by the following operator(s):
 	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
 Assembly site of producer [reactor.core.publisher.MonoElementAt] is identified by light checkpoint [source just(1,2,3,4)].
 </code></pre>
-<p>Notice the <code>is identified by light checkpoint [source just(1,2,3,4)].</code>, which gives us our culprit (because we used a meaningful description for the checkpoint).</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>Conclusion</h2>
-<p>In this article, we&rsquo;ve learned that stacktraces can be less useful in asynchronous programming. This effect is further compounded by the lazy way Reactor let you build reactive sequences.</p>
-<p>We&rsquo;ve looked at the worst cases that can be encountered and at several ways this problem can be lessened.</p>
-<p>The whole code can be found in a gist <a href="https://gist.github.com/simonbasle/a4c6cfe79071610e1fe3bd27984d4381">here</a>.</p>
-<p>In the next instalment, we&rsquo;ll see why we sometimes say that Reactor is &ldquo;Concurrent Agnostic&rdquo;.</p>
-<p>In the meantime, happy reactive coding!</p></div>
+<p>请注意，它<code>is identified by light checkpoint [source just(1,2,3,4)].</code> ，这是我们的罪魁祸首（因为我们对检查点使用了有意义的描述）。</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h2>
+<p>在本文中，我们了解到在异步编程中，堆栈跟踪可能没有那么有用。懒惰的方式Reactor让您构建反应性序列，进一步加剧了这种效果。</p>
+<p>我们已经研究了可能遇到的最坏情况，并以多种方式减轻了此问题。</p>
+<p>整个代码可以在<a href="https://gist.github.com/simonbasle/a4c6cfe79071610e1fe3bd27984d4381">这里</a>找到要点。</p>
+<p>在下一期中，我们将了解为什么有时会说Reactor是“并发不可知的”。</p>
+<p>同时，快乐的反应式编码！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">
-      var disqus_shortname = 'spring-io';
+<script type="text/javascript">var disqus_shortname = 'spring-io';
       var disqus_identifier = 3647;
 
       (function(disqus_shortname, document) {
@@ -516,15 +496,12 @@ Assembly site of producer [reactor.core.publisher.MonoElementAt] is identified b
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));
-    </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));</script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -532,23 +509,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -558,17 +531,15 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>
-        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });
-      </script>
+        });</script>
 </div>
 </div>
 </aside>
@@ -582,18 +553,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-&copy; <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> &bullet;
-<a href="https://pivotal.io/privacy-policy">Privacy</a> &bullet;
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>
