@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Spring构建RESTful报价服务</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Building a RESTful quotation service with Spring">
 <meta name="twitter:description" class="anchor" content="<p>I was recently made aware that a public API we were using for one of our guides contained objectionable material. After confirming this, I immediately responded that we would pick another source. Wishing to avoid such an issue in the future, I decided the best solution was to build our own RESTful quote service. So I decided to use the best tools to do so, the Spring stack, and was able to migrate the very next day.</p>
-<h3><a href=" #picking-your-tool="="></head><body dir="ltr">Picking your tools
+<h3><a href=" #picking-your-tool="="></head><body >Picking your tools
 <p>To kick things off, I made a check list of what I knew would be the right tools for the job of creating a RESTful web service.</p>
 ">
 <meta name="twitter:creator" content="@gregturn">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -176,9 +182,9 @@
 <li><a href="https://projects.spring.io/spring-framework/">Spring MVC-</a>从Spring 3开始提供可靠的REST支持</li>
 <li><a href="https://projects.spring.io/spring-boot/">Spring Boot-轻松</a>创建所有必需的组件</li>
 <li><a href="https://start.spring.io">http</a> ://start.spring.io-通过简单地检查表单上所需的项目来组装项目</li>
-</ul><p>我很快放弃了通过网页添加，删除，管理或查看数据的愿望。相反，我的重点是提供一组与指南预期使用的结构完全相同的固定内容。</p><h3><a href="#picking-your-content" class="anchor" name="picking-your-content"></a>挑选你的内容</h3><p>该指南的原始内容是一系列“ Chunk Norris”笑话。我喜欢笑。但是，当我重新访问公共API时，我发现其中的一些笑话有些荒唐。经过与同事的简短讨论，这个想法被引用了历史名言。我接受了这个主意，然后稍微弯下腰。最近，出于个人原因，我从各种开发人员那里收集了有关Spring Boot的报价，因此我决定将其用作策划内容。</p><h3><a href="#time-to-code" class="anchor" name="time-to-code"></a>该写代码了！</h3><p>为了开始工作，我访问了<a href="https://start.spring.io">http://start.spring.io</a> 。这个<a href="https://github.com/spring-io/initializr">Spring Boot应用程序</a>使您可以输入新项目的详细信息，选择Java级别，然后选择所需的Spring Boot启动器。我在上面使用了清单，并创建了一个基于gradle的新项目。</p><h4><a href="#defining-your-domain" class="anchor" name="defining-your-domain"></a>定义您的域</h4><p>将项目解压缩并导入到我的IDE中后，我要做的第一件事是复制<a href="https://spring.io/guides/gs/messaging-reactor/#initial">Reactor指南中显示</a>的<a href="https://spring.io/guides/gs/messaging-reactor/#initial">域对象</a> 。这样，我可以确保我的REST服务发送的数据是正确的。由于我的<em>Quoters Incorporated</em>应用程序中的POJO几乎相同，因此我不会在此处发布它们。</p><p>然后，我创建了一个Spring Data存储库。</p>
-<pre><code class="prettyprint java">public interface QuoteRepository extends CrudRepository<Quote, Long> {}
-</code></pre><p>此空接口定义使用内部类型为<code>Long</code>的内部主键处理<code>Quote</code>对象。通过扩展Spring Data Commons <code>CrudRepository</code> ，它继承了我们稍后将使用的许多数据库操作。</p><p>下一步？初始化一些数据。我创建了这样的<code>DatabaseLoader</code> ：</p>
+</ul><p>我很快放弃了通过网页添加，删除，管理或查看数据的愿望。相反，我的重点是提供一组与指南预期使用的结构完全相同的固定内容。</p><h3><a href="#picking-your-content" class="anchor" name="picking-your-content"></a>挑选你的内容</h3><p>该指南的原始内容是一系列“ Chunk Norris”笑话。我喜欢笑。但是，当我重新访问公共API时，我发现其中的一些笑话有些荒唐。经过与同事的简短讨论，这个想法被引用了历史名言。我接受了这个主意，然后稍微弯下腰。最近，出于个人原因，我从各种开发人员那里收集了有关Spring Boot的报价，因此我决定将其用作策划内容。</p><h3><a href="#time-to-code" class="anchor" name="time-to-code"></a>该写代码了！</h3><p>为了开始工作，我访问了<a href="https://start.spring.io">http://start.spring.io</a> 。这个<a href="https://github.com/spring-io/initializr">Spring Boot应用程序</a>使您可以输入新项目的详细信息，选择Java级别，然后选择所需的Spring Boot启动器。我在上面使用了清单，并创建了一个基于gradle的新项目。</p><h4><a href="#defining-your-domain" class="anchor" name="defining-your-domain"></a>定义您的域</h4><p>将项目解压缩并导入到我的IDE中后，我要做的第一件事是复制<a href="https://spring.io/guides/gs/messaging-reactor/#initial">Reactor指南中显示</a>的<a href="https://spring.io/guides/gs/messaging-reactor/#initial">域对象</a> 。这样，我可以确保REST服务发送的数据正确无误。由于我的<em>Quoters Incorporated</em>应用程序中的POJO几乎相同，因此我不会在此处发布它们。</p><p>然后，我创建了一个Spring Data存储库。</p>
+<pre><code class="prettyprint java">public interface QuoteRepository extends CrudRepository&lt;Quote, Long&gt; {}
+</code></pre><p>此空接口定义处理<code>Quote</code>具有内部主键类型的对象<code>Long</code> 。通过扩展Spring Data Commons <code>CrudRepository</code> ，它继承了我们稍后将使用的许多数据库操作。</p><p>下一步？初始化一些数据。我创建了一个<code>DatabaseLoader</code>像这样：</p>
 <pre><code class="prettyprint java">@Service
 public class DatabaseLoader {
 
@@ -191,24 +197,24 @@ public class DatabaseLoader {
 
 	@PostConstruct
 	void init() {
-		repository.save(new Quote("Working with Spring Boot is like pair-programming with the Spring developers."));
+		repository.save(new Quote(&quot;Working with Spring Boot is like pair-programming with the Spring developers.&quot;));
 		// more quotes...
 	}
 
 }
 </code></pre>
 <ul>
-<li>它被标记为<code>@Service</code>因此在应用程序启动时它将被<code>@ComponentScan</code>自动提取。</li>
-<li>它使用构造函数注入和自动<code>QuoteRepository</code>来确保<code>QuoteRepository</code>的副本可用。</li>
+<li>标记为<code>@Service</code>因此它将由<code>@ComponentScan</code>应用启动时。</li>
+<li>它将构造函数注入与自动装配结合使用，以确保复制<code>QuoteRepository</code>可用。</li>
 <li><code>@PostConstruct</code>告诉Spring MVC在创建所有bean之后运行数据加载方法。</li>
-<li>最后， <code>init()</code>方法使用Spring Data JPA创建整个报价单。</li>
-</ul><p>因为我在<code>build.gradle</code> H2作为我的首选数据库（** com.h2database：h2 **），所以根本没有设置任何数据库（感谢Spring Boot）。</p><h4><a href="#creating-a-controller" class="anchor" name="creating-a-controller"></a>创建一个控制器</h4><p>构建此数据库层之后，我继续创建API。使用Spring MVC，一点都不难。</p>
+<li>最后， <code>init()</code>该方法使用Spring Data JPA创建整个报价单。</li>
+</ul><p>因为我将H2作为我选择的数据库（** com.h2database：h2 **）在<code>build.gradle</code> ，根本没有建立任何数据库（由于使用了Spring Boot）。</p><h4><a href="#creating-a-controller" class="anchor" name="creating-a-controller"></a>创建一个控制器</h4><p>构建此数据库层之后，我继续创建API。使用Spring MVC，一点都不难。</p>
 <pre><code class="prettyprint java">@RestController
 public class QuoteController {
 
 	private final QuoteRepository repository;
 
-	private final static Quote NONE = new Quote("None");
+	private final static Quote NONE = new Quote(&quot;None&quot;);
 
 	private final static Random RANDOMIZER = new Random();
 
@@ -217,23 +223,23 @@ public class QuoteController {
 		this.repository = repository;
 	}
 
-	@RequestMapping(value = "/api", method = RequestMethod.GET)
-	public List<QuoteResource> getAll() {
+	@RequestMapping(value = &quot;/api&quot;, method = RequestMethod.GET)
+	public List&lt;QuoteResource&gt; getAll() {
 		return StreamSupport.stream(repository.findAll().spliterator(), false)
-			.map(q -> new QuoteResource(q, "success"))
+			.map(q -&gt; new QuoteResource(q, &quot;success&quot;))
 			.collect(Collectors.toList());
 	}
 
-	@RequestMapping(value = "/api/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = &quot;/api/{id}&quot;, method = RequestMethod.GET)
 	public QuoteResource getOne(@PathVariable Long id) {
 		if (repository.exists(id)) {
-			return new QuoteResource(repository.findOne(id), "success");
+			return new QuoteResource(repository.findOne(id), &quot;success&quot;);
 		} else {
-			return new QuoteResource(NONE, "Quote " + id + " does not exist");
+			return new QuoteResource(NONE, &quot;Quote &quot; + id + &quot; does not exist&quot;);
 		}
 	}
 
-	@RequestMapping(value = "/api/random", method = RequestMethod.GET)
+	@RequestMapping(value = &quot;/api/random&quot;, method = RequestMethod.GET)
 	public QuoteResource getRandomOne() {
 		return getOne(nextLong(1, repository.count() + 1));
 	}
@@ -245,9 +251,9 @@ public class QuoteController {
 }
 </code></pre><p>让我们分解一下：</p>
 <ul>
-<li>整个类被标记为<code>@RestController</code> 。这意味着所有路线都返回对象而不是视图。</li>
-<li>我有一些静态对象，特别是<code>NONE</code>引号和Java 8 <code>Random</code>用于随机选择引号。</li>
-<li>它使用构造函数注入来获取<code>QuoteRepository</code> 。</li>
+<li>整个班级被标记为<code>@RestController</code> 。这意味着所有路线都返回对象而不是视图。</li>
+<li>我有一些静态物体，特别是<code>NONE</code>引用和Java 8 <code>Random</code>随机选择报价。</li>
+<li>它使用构造函数注入来获得<code>QuoteRepository</code> 。</li>
 </ul>
 <table>
 <thead>
@@ -270,9 +276,9 @@ public class QuoteController {
 <td>获取随机报价</td>
 </tr>
 </tbody>
-</table><p>为了获取所有引号，我使用Java 8流包装Spring数据的<code>findAll()</code> ，然后将每个包装到<code>QuoteResource</code> 。结果将转换为<code>List</code> 。</p><p>要获取单引号，它首先测试给定的id是否存在。如果不是，则返回<code>NONE</code> 。否则，返回包装的报价。</p><p>最后，要获取随机报价，我在<code>nextLong()</code>实用程序方法内使用Java 8的<code>Random</code>实用程序来获取带有<code>lowerRange</code>和<code>upperRange</code> （包括<code>lowerRange</code> <code>nextLong()</code>的<code>Long</code> 。</p>
-<blockquote><p><strong>问题：</strong>为什么要使用<code>QuoteResource</code> ？<code>Quote</code>是<code>QuoteRepository</code>返回的核心域对象。为了匹配先前的公共API，我将每个实例包装在一个<code>QuoteResource</code> ，其中包括一个<strong>状态</strong>代码。</p>
-</blockquote><h4><a href="#testing-the-results" class="anchor" name="testing-the-results"></a>测试结果</h4><p>完成此操作后，即可运行由<a href="https://start.spring.io">http://start.spring.io</a>创建的默认<code>Application</code>类。</p><p>` <code>$ curl localhost:8080/api/random { type: "success", value: { id: 1, quote: "Working with Spring Boot is like pair-programming with the Spring developers." } }</code></p><p>da！</p><p>最后，我构建了JAR文件并将其推送到<a href="https://run.pivotal.io/">Pivotal Web Services</a> 。您可以在<a href="https://gturnquist-quoters.cfapps.io/api/random">http://gturnquist-quoters.cfapps.io/api/random</a>上自己查看该网站。</p><p>可以说，我能够通过更改<a href="https://github.com/spring-guides/gs-messaging-reactor/blob/master/complete/src/main/java/hello/Receiver.java#L21">ONE CODE</a>来调整<a href="https://spring.io/guides/gs/messaging-reactor/">Reactor指南</a> 。设置好之后，我对内容进行了其他一些清理并完成了！</p><p>要查看代码，请访问<a href="https://github.com/gregturn/quoters">https://github.com/gregturn/quoters</a> 。</p><h3><a href="#outstanding-issues" class="anchor" name="outstanding-issues"></a>显着的问题</h3>
+</table><p>为了获取所有引号，我使用Java 8流来包装Spring数据的<code>findAll()</code>然后将每个包装成一个<code>QuoteResource</code> 。结果变成<code>List</code> 。</p><p>要获取单引号，它首先测试给定的id是否存在。如果没有，返回<code>NONE</code> 。否则，返回包装的报价。</p><p>最后，要获取随机报价，我使用Java 8 <code>Random</code>里面的实用程序<code>nextLong()</code>实用方法来获取<code>Long</code>与<code>lowerRange</code>和<code>upperRange</code> ，包括所有内容。</p>
+<blockquote><p><strong>问题：</strong>我为什么要使用<code>QuoteResource</code> ？ <code>Quote</code> 是由返回的核心域对象<code>QuoteRepository</code> 。为了匹配先前的公共API，我将每个实例包装在<code>QuoteResource</code>其中包括<strong>状态</strong>码。</p>
+</blockquote><h4><a href="#testing-the-results" class="anchor" name="testing-the-results"></a>测试结果</h4><p>有了这个，默认<code>Application</code>由<a href="https://start.spring.io">http://start.spring.io</a>创建的类已准备好运行。</p><p>`<code>$ curl localhost:8080/api/random { type: "success", value: { id: 1, quote: "Working with Spring Boot is like pair-programming with the Spring developers." } }</code></p><p>da！</p><p>最后，我构建了JAR文件并将其推送到<a href="https://run.pivotal.io/">Pivotal Web Services</a> 。您可以在<a href="https://gturnquist-quoters.cfapps.io/api/random">http://gturnquist-quoters.cfapps.io/api/random</a>上自己查看该网站。</p><p>可以说，我能够通过更改<a href="https://github.com/spring-guides/gs-messaging-reactor/blob/master/complete/src/main/java/hello/Receiver.java#L21">ONE CODE</a>来调整<a href="https://spring.io/guides/gs/messaging-reactor/">Reactor指南</a> 。设置好之后，我对内容进行了其他一些清理并完成了！</p><p>要查看代码，请访问<a href="https://github.com/gregturn/quoters">https://github.com/gregturn/quoters</a> 。</p><h3><a href="#outstanding-issues" class="anchor" name="outstanding-issues"></a>显着的问题</h3>
 <ul>
 <li>此RESTful服务满足Richardson成熟度模型的<a href="http://martinfowler.com/articles/richardsonMaturityModel.html#level2">第2级-HTTP动词</a> 。虽然不错，但是最好是为<a href="http://martinfowler.com/articles/richardsonMaturityModel.html#level3">Level 3-Hypermedia</a>拍摄。使用<a href="https://projects.spring.io/spring-hateoas">Spring HATEOAS</a> ，添加超媒体链接比以往更加容易。敬请关注。</li>
 <li>没有友好的网页。很好，但这不是必需的。</li>
@@ -280,7 +286,8 @@ public class QuoteController {
 </ul><p>这些是一些出色的东西，它们不符合时间预算，并且不需要解决涉及Reactor指南的原始问题。但是它们是您可以探索的好练习！您可以在github中克隆该项目，然后亲自尝试一下！</p><h3><a href="#springone-2gx-2014" class="anchor" name="springone-2gx-2014"></a> SpringOne 2GX 2014年</h3><p>即将于9月8日至11日在德克萨斯州达拉斯的<a href="https://2014.event.springone2gx.com/register">SpringOne</a>预订您的位置。这是发现第一手一切并提供直接反馈的最佳机会。您可以看到我自己和Roy Clarkson谈论<a href="https://2014.event.springone2gx.com/schedule/sessions/spring_data_rest_data_meets_hypermedia.html">Spring Data REST-Data Meets Hypermedia</a>以了解如何合并Spring Data和RESTful服务。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1741;
 
       (function(disqus_shortname, document) {
@@ -294,7 +301,8 @@ public class QuoteController {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -332,12 +340,14 @@ public class QuoteController {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

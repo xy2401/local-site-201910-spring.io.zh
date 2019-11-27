@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>域对象依赖注入功能的新改进</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,14 +36,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2008-01-24 00:57:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -167,8 +173,8 @@
 </header>
 <div class="blog--post"><p>Spring的依赖项注入（DI）机制允许配置在应用程序上下文中定义的bean。如果您想将相同的想法扩展到非bean，该怎么办？Spring对<em>领域对象DI</em>的支持利用AspectJ编织将DI扩展到任何对象，即使它是由Web或ORM框架创建的。由于域对象现在可以与注入的对象协作，因此可以创建域行为丰富的对象。在此博客中，我将讨论该领域中Spring框架的最新改进。</p><p>域对象DI背后的核心思想非常简单：AspectJ编织的方面选择与<em>创建</em>或<em>反序列</em>化符合特定规范的任何对象相对应的连接点。这些连接点的建议将依赖项注入正在创建或反序列化的对象中。当然，细节在于魔鬼。例如，如何选择与反序列化相对应的连接点，或者如何对每个对象仅注入一次依赖关系？通过提供一些预先编写的方面，Spring使开发人员免受所有这些细节的影响。</p><p>当前，大多数Spring用户使用<a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/annotation/Configurable.html">@Configurable</a>注释来指定可配置的类。随着即将发布的Spring 2.5.2的最新改进（ <a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR">从每晚版本379开始可用）</a> ，您还有更多选择，使此功能更强大。新的改进遵循“使简单事物变得简单，使复杂事物成为可能”的原则。根据您对AspectJ的熟悉程度和期望的设计复杂程度，这些选项之一会很好地起作用。图1显示了新的方面层次结构，它将简单性和灵活性结合在一起。</p>
 <p><img src="http://blog.springsource.com/main/wp-content/uploads/2008/01/SpringDomainObjectDI.png" alt="域对象依赖注入方面" style="text-align:center"></p>
-<p style="text-align:center"><strong>图1：域对象依赖项注入方面的继承层次结构。</strong></p><p>那么这些方面都提供了什么？让我们自下而上。</p><p><a name="AnnotationBeanConfigurerAspect"></a><br></p><h2>简单的事情很简单：AnnotationBeanConfigurerAspect</h2><br><span style="font-family:courier">AnnotationBeanConfigurerAspect</span>启用域对象DI，而无需任何用户AspectJ代码。因此，对于许多开发人员来说，这是最简单的选择。在这方面，您可以使用<span style="font-family:courier">@Configurable</span>annotation对需要依赖项注入的类进行annotation。例如，您可以对<span style="font-family:courier">Order</span>类进行如下注释：<p></p>
-<pre><code class="prettyprint java"><br>@Configurable
+<p style="text-align:center"><strong>图1：域对象依赖项注入方面的继承层次结构。</strong></p><p>那么这些方面都提供了什么？让我们自下而上。</p><p><a name="AnnotationBeanConfigurerAspect"></a><br></p><h2>简单的事情很简单：AnnotationBeanConfigurerAspect</h2><br><span style="font-family:courier">AnnotationBeanConfigurerAspect</span>启用域对象DI，而无需任何用户AspectJ代码。因此，对于许多开发人员来说，这是最简单的选择。在这方面，您可以使用<span style="font-family:courier">@Configurable</span>批注对需要依赖项注入的类进行批注。例如，您可以对<span style="font-family:courier">Order</span>类进行如下注释：<p></p>
+<pre><code class="prettyprint java"><br />@Configurable
 public class Order {
     private transient MailSender mailSender;
     
@@ -183,17 +189,17 @@ public class Order {
     }
 }
 </code></pre><p>接下来，您指导Spring如何配置<span style="font-family:courier">Order</span>类型的对象。这些指令遵循原型Bean的标准Bean定义，如下所示：</p>
-<pre><code class="prettyprint xml"><br><context:spring-configured/>
+<pre><code class="prettyprint xml"><br />&lt;context:spring-configured/&gt;
     
-<bean class="example.Order" scope="prototype">
-    <property name="mailSender" ref="externalMailSender"/>
-</bean>
+&lt;bean class=&quot;example.Order&quot; scope=&quot;prototype&quot;&gt;
+    &lt;property name=&quot;mailSender&quot; ref=&quot;externalMailSender&quot;/&gt;
+&lt;/bean&gt;
     
-<bean id="externalMailSender" ...>
+&lt;bean id=&quot;externalMailSender&quot; ...&gt;
     ...
-</bean>
+&lt;/bean&gt;
 </code></pre><p>现在，在创建或反序列化任何<span style="font-family:courier">Order时</span> ，Spring都将使用<span style="font-family:courier">externalMailSender</span> bean设置所创建对象的<span style="font-family:courier">mailSender</span>属性。</p><p>Spring 2.5具有一个新<a href="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-annotation-config">的基于注释的配置选项</a> ，该<a href="http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-annotation-config">选项</a>允许消除或减少附带的XML。基于@Configurable注释的DI也从中受益。例如，您可以将<span style="font-family:courier">mailSender</span>属性标记为<span style="font-family:courier">@Autowired</span> ，如下所示：</p>
-<pre><code class="prettyprint java"><br>@Configurable
+<pre><code class="prettyprint java"><br />@Configurable
 public class Order {
     private transient MailSender mailSender;
     
@@ -209,7 +215,7 @@ public class Order {
     }
 }
 </code></pre><p>您可以通过注释字段本身来消除设置器，将上述代码减少为：</p>
-<pre><code class="prettyprint java"><br>@Configurable
+<pre><code class="prettyprint java"><br />@Configurable
 public class Order {
     @Autowired private transient MailSender mailSender;
     
@@ -220,15 +226,15 @@ public class Order {
     }
 }
 </code></pre><p>无论哪种情况，伴随的XML配置都将简化为以下内容（请注意使用<context:annotation-config></context:annotation-config> ）：</p>
-<pre><code class="prettyprint xml"><br><context:spring-configured/>
+<pre><code class="prettyprint xml"><br />&lt;context:spring-configured/&gt;
     
-<context:annotation-config/>
+&lt;context:annotation-config/&gt;
     
-<bean id="externalMailSender" ...>
+&lt;bean id=&quot;externalMailSender&quot; ...&gt;
     ...
-</bean>
-</code></pre><p>有关此域对象DI选项的更多详细信息，请参见<a href="http://static.springframework.org/spring/docs/2.5.x/reference/aop.html#aop-atconfigurable">使用AspectJ通过Spring依赖注入域对象</a> 。</p><p><a name="AbstractInterfaceDrivenDependencyInjectionAspect"></a><br></p><h2>可能发生的复杂事情：AbstractInterfaceDrivenDependencyInjectionAspect</h2><br><span style="font-family:courier">AnnotationBeanConfigurerAspect</span>的基本方面<span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span>使用接口而非注释来标记可配置类。尽管看起来像是一个肤浅的变化，但它提供了一些有趣的选项，例如使用域接口和注释来指定依赖项注入，通过绕过反射来提高注入性能以及利用多个方面来配置对象。<p></p><p>在设计级别，此方面将配置其类型实现<span style="font-family:courier">ConfigurableObject</span>接口的任何域对象。虽然直接使用类型来实现<span style="font-family:courier">ConfigurableObject</span>接口无疑是一个有效的选择，但一种不错的选择是在另一个方面使用<span style="font-family:courier">声明父</span>声明（ <span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect的</span>一个子方面将是一个逻辑选择）。该语句将声明一个可配置类，以实现<span style="font-family:courier">ConfigurableObject</span>接口。这将使您的域类免受特定于Spring的工件的影响，同时受益于DI机制。让我们看一个这样用法的例子。</p><p>考虑上一节中的<span style="font-family:courier">Order</span>类。除了使用<span style="font-family:courier">@Configurable之外</span> ，还可以让它实现特定于域的<span style="font-family:courier">MailSenderClient</span>接口，该接口表示它使用<span style="font-family:courier">MailSender</span> 。</p>
-<pre><code class="prettyprint java"><br>public class Order implements MailSenderClient {
+&lt;/bean&gt;
+</code></pre><p>有关此域对象DI选项的更多详细信息，请参见<a href="http://static.springframework.org/spring/docs/2.5.x/reference/aop.html#aop-atconfigurable">使用AspectJ通过Spring依赖注入域对象</a> 。</p><p><a name="AbstractInterfaceDrivenDependencyInjectionAspect"></a><br></p><h2>可能的复杂事情：AbstractInterfaceDrivenDependencyInjectionAspect</h2><br><span style="font-family:courier">AnnotationBeanConfigurerAspect</span>的基本方面<span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span>使用接口而非注释来标记可配置类。尽管看起来像是一个肤浅的变化，但它提供了一些有趣的选项，例如使用域接口和注释来指定依赖项注入，通过绕过反射来提高注入性能以及利用多个方面来配置对象。<p></p><p>在设计级别，此方面将配置其类型实现<span style="font-family:courier">ConfigurableObject</span>接口的任何域对象。虽然直接使用类型来实现<span style="font-family:courier">ConfigurableObject</span>接口无疑是一个有效的选择，但一种不错的选择是在另一个方面使用<span style="font-family:courier">声明父</span>声明（ <span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect的</span>一个子方面将是一个逻辑选择）。该语句将声明一个可配置类，以实现<span style="font-family:courier">ConfigurableObject</span>接口。这使您的域类免受特定于Spring的构件的影响，同时受益于DI机制。让我们看一个这样用法的例子。</p><p>考虑上一节中的<span style="font-family:courier">Order</span>类。除了使用<span style="font-family:courier">@Configurable之外</span> ，还可以让它实现特定于域的<span style="font-family:courier">MailSenderClient</span>接口，该接口表示它使用<span style="font-family:courier">MailSender</span> 。</p>
+<pre><code class="prettyprint java"><br />public class Order implements MailSenderClient {
     private transient MailSender mailSender;
             
     public void setMailSender(MailSender mailSender) {
@@ -241,8 +247,8 @@ public class Order {
         ...
     }
 }
-</code></pre><p>接下来，您将编写一个<span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect的子方面，</span>以将依赖项注入到任何<span style="font-family:courier">MailSenderClient</span>对象中。</p>
-<pre><code class="prettyprint java"><br>public aspect MailClientDependencyInjectionAspect extends 
+</code></pre><p>接下来，编写一个<span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect的子方面，</span>以将依赖项注入到任何<span style="font-family:courier">MailSenderClient</span>对象中。</p>
+<pre><code class="prettyprint java"><br />public aspect MailClientDependencyInjectionAspect extends 
     AbstractInterfaceDrivenDependencyInjectionAspect {
     private MailSender mailSender;
     
@@ -258,19 +264,20 @@ public class Order {
         this.mailSender = mailSender;
     }
 }
-</code></pre><p>在方面中使用了两种AspectJ构造：<br></p><ol><br><li><span style="font-family:courier">声明父母</span>声明使<span style="font-family:courier">MailSenderClient</span>实现<span style="font-family:courier">ConfigurableObject</span>接口，使其可以通过<span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span>获得DI。</li><br><li><span style="font-family:courier">inConfigurableBean（）</span>仅在<span style="font-family:courier">MailSenderClient</span>的子类型中选择连接点，因此将<span style="font-family:courier">Aspect</span>的适用性限制为仅匹配类型。</li><br></ol><p></p><p><span style="font-family:courier">configureBean（）</span>方法通过直接调用适当的设置器来执行注入Bean的操作。当然，适合于bean配置的任何其他逻辑（例如，调用多参数方法或调用任何初始化方法）都可以正常工作。请注意，以这种方式使用的直接调用可以避免反射，并且如果域对象创建的速度很高，则可以显着提高性能。</p><p>您需要配置<span style="font-family:courier">MailClientDependencyInjectionAspect</span>方面实例本身以注入其依赖项– <span style="font-family:courier">mailSender</span>属性。Spring的方式是为方面创建一个bean，并在应用程序上下文中对其进行配置：</p>
-<pre><code class="prettyprint xml"><br><bean class="example.MailClientDependencyInjectionAspect" 
-        factory-method="aspectOf">
-    <property name="mailSender" ref="externalMailSender"/>
-</bean>
+</code></pre><p>在方面中使用了两种AspectJ构造：<br></p><ol><br><li><span style="font-family:courier">声明父母</span>声明使<span style="font-family:courier">MailSenderClient</span>实现<span style="font-family:courier">ConfigurableObject</span>接口，使其可以通过<span style="font-family:courier">AbstractInterfaceDrivenDependencyInjectionAspect</span>获得DI。</li><br><li><span style="font-family:courier">inConfigurableBean（）</span>仅在<span style="font-family:courier">MailSenderClient</span>的子类型中选择连接点，因此将<span style="font-family:courier">Aspect</span>的适用性限制为仅匹配类型。</li><br></ol><p></p><p><span style="font-family:courier">configureBean（）</span>方法通过直接调用适当的设置器来执行注入到Bean中的操作。当然，适合于bean配置的任何其他逻辑（例如，调用多参数方法或调用任何初始化方法）都可以正常工作。请注意，以这种方式使用的直接调用可以避免反射，并且如果域对象创建的速度很高，则可以显着提高性能。</p><p>您需要配置<span style="font-family:courier">MailClientDependencyInjectionAspect</span>方面实例本身以注入其依赖项– <span style="font-family:courier">mailSender</span>属性。Spring的方式是为方面创建一个bean，并在应用程序上下文中对其进行配置：</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;example.MailClientDependencyInjectionAspect&quot; 
+        factory-method=&quot;aspectOf&quot;&gt;
+    &lt;property name=&quot;mailSender&quot; ref=&quot;externalMailSender&quot;/&gt;
+&lt;/bean&gt;
     
-<bean id="externalMailSender" ...>
+&lt;bean id=&quot;externalMailSender&quot; ...&gt;
     ...
-</bean>
-</code></pre><p>关于这方面还有一些其他模式：<br></p><ul><br><li>使用多个方面来配置一个对象（例如，每个“客户端”接口一个）。</li><br><li>使用域annotation而不是域接口或<span style="font-family:courier">@Configurable</span>annotation来指定可配置的类型。</li><br><li>使用基于<span style="font-family:courier">hasmethod（）</span>的类型模式（当前是AspectJ 5中的实验性功能，在AspectJ 6中将成为<a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=86818">常规功能</a> ），以避免使用DI相关的类型或注释。</li><br><li>使用基于AspectJ的mixins为客户端接口提供默认实现，并避免重复的设置程序。</li><br></ul><p></p><p>但是，让我们将这些想法保存到另一个博客条目中。</p><p><a name="AbstractDependencyInjectionAspect"></a><br></p><h2>需要时的灵活性：AbstractDependencyInjectionAspect</h2><br>最后，这是最灵活的基本方面。这方面要求您对AspectJ切入点语言有深入的了解。但是，除了极端自定义方案（例如自定义反序列化事件）以外，您不会直接创建此基本方面的子方面。相反，您将使用我们前面讨论的子方面之一。<p></p><p>该方面声明了一个子方面可以定义的六个切入点：<br></p><ol><br><li><span style="font-family:courier">beanConstruction（Object bean）</span> ：选择bean结构。典型的实现将选择对象初始化连接点。</li><br><li><span style="font-family:courier">beanDeserialization（Object bean）</span> ：选择bean反序列化。典型的实现将选择必须存在于注入对象中的<span style="font-family:courier">readResolve（）</span>方法。如果使用的是非标准反序列化（不调用<span style="font-family:courier">readResolve（）</span> ），则可以使用此切入点选择适当的替代方法。</li><br><li><span style="font-family:courier">inConfigurableBean（）</span> ：选择可通过定义方面配置的bean中的连接点。典型的实现将使用具有适当类型模式的inside <span style="font-family:courier">（）</span>切入点。</li><br><li><span style="font-family:courier">preConstructionConfiguration（）</span> ：为需要在构造之前注入依赖项的bean选择连接点。该切入点的默认实现不选择任何连接点（在构造函数运行后，bean将注入依赖项）。</li><br><li><span style="font-family:courier">mostSpecificSubTypeConstruction（）</span> ：选择与最具体的子类型相对应的连接点。缺省实现使用连接点签名来确定构造函数是否表示要注入的Bean的类型层次结构中最具体的一个。然后，此信息与<span style="font-family:courier">preConstructionConfiguration（）</span>切入点结合使用，以在注入依赖项之前或之后使用建议。</li><br><li><span style="font-family:courier">minimumSpecificSuperTypeConstruction（）</span> ：选择与最小特定超类型相对应的连接点。</li><br></ol><p></p><p>这方面还定义了一个抽象方法<span style="font-family:courier">configureBean（Object bean）</span> ，其实现应指定与依赖项注入相对应的逻辑。</p><p>因此，您有所有选项可以在应用程序中启用域对象DI。如果您对DDD感兴趣，或者需要将DI扩展到域对象，则必须查看这些新方面。根据您的特定需求和AspectJ知识，您会发现其中之一有助于创建优雅的解决方案。</p></div>
+&lt;/bean&gt;
+</code></pre><p>关于这方面还有一些其他模式：<br></p><ul><br><li>使用多个方面来配置一个对象（例如，每个“客户端”接口一个）。</li><br><li>使用域批注而不是域接口或<span style="font-family:courier">@Configurable</span>批注来指定可配置的类型。</li><br><li>使用基于<span style="font-family:courier">hasmethod（）</span>的类型模式（当前是AspectJ 5中的实验性功能，在AspectJ 6中将成为<a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=86818">常规功能</a> ），以避免使用DI相关的类型或注释。</li><br><li>使用基于AspectJ的mixins为客户端接口提供默认实现，并避免重复的设置程序。</li><br></ul><p></p><p>但是，让我们将这些想法保存到另一个博客条目中。</p><p><a name="AbstractDependencyInjectionAspect"></a><br></p><h2>需要时的灵活性：AbstractDependencyInjectionAspect</h2><br>最后，这是最灵活的基本方面。这方面要求您对AspectJ切入点语言有深入的了解。但是，除了极端自定义方案（例如自定义反序列化事件）以外，您不会直接创建此基本方面的子方面。相反，您将使用我们前面讨论的子方面之一。<p></p><p>该方面声明了一个子方面可以定义的六个切入点：<br></p><ol><br><li><span style="font-family:courier">beanConstruction（Object bean）</span> ：选择bean结构。典型的实现将选择对象初始化连接点。</li><br><li><span style="font-family:courier">beanDeserialization（Object bean）</span> ：选择bean反序列化。典型的实现将选择必须存在于注入对象中的<span style="font-family:courier">readResolve（）</span>方法。如果使用的是非标准反序列化（不调用<span style="font-family:courier">readResolve（）</span> ），则可以使用此切入点选择适当的替代方法。</li><br><li><span style="font-family:courier">inConfigurableBean（）</span> ：选择可通过定义方面配置的bean中的连接点。典型的实现将使用具有适当类型模式的inside <span style="font-family:courier">（）</span>切入点。</li><br><li><span style="font-family:courier">preConstructionConfiguration（）</span> ：为需要在构造之前注入依赖项的bean选择连接点。该切入点的默认实现不选择任何连接点（在构造函数运行后，bean将注入依赖项）。</li><br><li><span style="font-family:courier">mostSpecificSubTypeConstruction（）</span> ：选择与最具体的子类型相对应的连接点。缺省实现使用连接点签名来确定构造函数是否表示要注入的Bean的类型层次结构中最具体的一个。然后，此信息与<span style="font-family:courier">preConstructionConfiguration（）</span>切入点结合使用，以在注入依赖项之前或之后使用建议。</li><br><li><span style="font-family:courier">minimumSpecificSuperTypeConstruction（）</span> ：选择与最小特定超类型相对应的连接点。</li><br></ol><p></p><p>这方面还定义了一个抽象方法<span style="font-family:courier">configureBean（Object bean）</span> ，其实现应指定与依赖项注入相对应的逻辑。</p><p>因此，您有所有选项可以在应用程序中启用域对象DI。如果您对DDD感兴趣，或者需要将DI扩展到域对象，则必须查看这些新方面。根据您的特定需求和AspectJ知识，您会发现其中之一有助于创建优雅的解决方案。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 130;
 
       (function(disqus_shortname, document) {
@@ -284,7 +291,8 @@ public class Order {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -322,12 +330,14 @@ public class Order {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

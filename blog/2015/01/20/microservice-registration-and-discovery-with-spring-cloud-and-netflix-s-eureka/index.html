@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Spring Cloud和Netflix的Eureka进行微服务注册和发现</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -33,14 +37,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2015-01-20 09:00:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,7 +172,7 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>微服务体系结构的风格与其说是构建单个服务，不如说是使服务<em>之间</em>的<em>交互</em>可靠且容错。尽管对这些交互的关注是新的，但对这种关注的需求却并非如此。我们早就知道，服务不能在真空中运行。甚至在进行云计算经济学之前，我们就已经知道-在现实世界中-客户应被设计为不受服务中断影响。云使人们容易将容量视为短暂的，易变的。客户要负担这种固有的复杂性。</p><p>在本文中，我们将研究<a href="https://cloud.spring.io">Spring Cloud</a>如何通过Eureka和Consul等服务注册表以及客户端负载平衡来帮助您管理这种复杂性。</p><h2><a href="#the-cloud-rsquo-s-phone-book" class="anchor" name="the-cloud-rsquo-s-phone-book"></a>云的电话簿</h2><p>服务注册表是您的微服务的电话簿。每个服务都会在服务注册表中注册自己，并告诉注册表它的位置（主机，端口，节点名称）以及其他特定于服务的元数据-其他服务可以使用这些信息做出明智的决定。客户可以询问有关服务拓扑的问题（“是否有可用的“履行服务”，如果可以，在哪里？”）和服务功能（“您可以处理X，Y和Z吗？”）。您可能已经使用了具有群集概念的技术（Cassandra，Memcached等），并且该信息理想情况下存储在服务注册表中。</p><p><a href="http://jasonwilder.com/blog/2014/02/04/service-discovery-in-the-cloud/">服务注册中心有几种流行的选择</a> 。Netflix建立并开放了自己的服务注册表<a href="https://github.com/netflix/eureka">Eureka</a> 。另一个新的但越来越流行的选择是<a href="https://consul.io">领事</a> 。我们将主要研究Spring Cloud和Netflix的Eureka服务注册表之间的一些集成。</p><p><a href="https://projects.spring.io/spring-cloud/">在Spring Cloud项目页面上</a> ：“ Spring Cloud为开发人员提供了工具，以快速构建分布式系统中的一些常见模式（例如，配置管理，服务发现，断路器，智能路由，微代理，控制总线，一次性令牌，全局锁定，领导者选举，分布式会话，集群状态）。分布式系统的协调导致样板式样，并且使用Spring Cloud开发人员可以快速站起来实现这些样板的服务和应用程序。它们将在任何分布式环境中都能很好地工作，包括开发人员自己的笔记本电脑，裸机数据中心以及Cloud Foundry等托管平台。”</p><p>Spring Cloud已经支持Eureka和Consul，尽管在本文中我将重点介绍Eureka，因为它可以在Spring Cloud的自动配置之一中自动引导。Eureka在JVM上实现，而Consul在Go中实现。</p><h2><a href="#installing-eureka" class="anchor" name="installing-eureka"></a>安装尤里卡</h2><p>如果您在类路径中具有<code>org.springframework.boot:spring-cloud-starter-eureka-server</code> ，则站立Eureka服务注册表实例非常容易。</p>
+<div class="blog--post"><p>微服务体系结构的风格与其说是构建单个服务，不如说是使服务<em>之间</em>的<em>交互</em>可靠且容错。尽管对这些交互的关注是新的，但对这种关注的需求却并非如此。我们早就知道，服务不能在真空中运行。甚至在进行云经济学之前，我们都知道-在现实世界中-客户应设计为不受服务中断的影响。云使人们容易将容量视为短暂的，易变的。客户要负担这种固有的复杂性。</p><p>在本文中，我们将研究<a href="https://cloud.spring.io">Spring Cloud</a>如何通过Eureka和Consul等服务注册表以及客户端负载平衡来帮助您管理这种复杂性。</p><h2><a href="#the-cloud-rsquo-s-phone-book" class="anchor" name="the-cloud-rsquo-s-phone-book"></a>云的电话簿</h2><p>服务注册表是您的微服务的电话簿。每个服务都会在服务注册表中注册自己，并告诉注册表它的位置（主机，端口，节点名称）以及其他特定于服务的元数据-其他服务可以使用这些信息做出明智的决定。客户可以询问有关服务拓扑的问题（“是否有可用的“履行服务”，如果可以，在哪里？”）和服务功能（“您可以处理X，Y和Z吗？”）。您可能已经使用了具有群集概念的技术（Cassandra，Memcached等），并且该信息理想情况下存储在服务注册表中。</p><p><a href="http://jasonwilder.com/blog/2014/02/04/service-discovery-in-the-cloud/">服务注册中心有几种流行的选择</a> 。Netflix建立并开放了自己的服务注册表<a href="https://github.com/netflix/eureka">Eureka</a> 。另一个新的但越来越流行的选择是<a href="https://consul.io">领事</a> 。我们将主要研究Spring Cloud和Netflix的Eureka服务注册表之间的一些集成。</p><p><a href="https://projects.spring.io/spring-cloud/">在Spring Cloud项目页面上</a> ：“ Spring Cloud为开发人员提供了工具，以快速构建分布式系统中的一些常见模式（例如，配置管理，服务发现，断路器，智能路由，微代理，控制总线，一次性令牌，全局锁定，领导者选举，分布式会话，集群状态）。分布式系统的协调导致样板式样，并且使用Spring Cloud开发人员可以快速站起来实现这些样板的服务和应用程序。它们将在任何分布式环境中都能很好地工作，包括开发人员自己的笔记本电脑，裸机数据中心以及Cloud Foundry等托管平台。”</p><p>Spring Cloud已经支持Eureka和Consul，尽管在本文中我将重点介绍Eureka，因为它可以在Spring Cloud的自动配置之一中自动引导。Eureka在JVM上实现，而Consul在Go中实现。</p><h2><a href="#installing-eureka" class="anchor" name="installing-eureka"></a>安装尤里卡</h2><p>如果有的话，站起来建立Eureka服务注册表实例很容易<code>org.springframework.boot:spring-cloud-starter-eureka-server</code>在您的课程路径上。</p>
 <pre><code class="prettyprint java">package registry;
 
 import org.springframework.boot.SpringApplication;
@@ -182,7 +188,7 @@ public class Application {
   }
 }
 
-</code></pre><p>这些天我的名义<code>src/main/resources/application.yml</code>看起来像这样。</p>
+</code></pre><p>我的名义<code>src/main/resources/application.yml</code>这些天看起来像这样。</p>
 <pre><code class="prettyprint yml">server:
   port: ${PORT:8761}
 
@@ -193,14 +199,14 @@ eureka:
     server:
       waitTimeInMsWhenSyncEmpty: 0
 
-</code></pre><p>如果<a href="http://cloudfoundry.org/index.html">Cloud Foundry</a>的<code>VCAP_APPLICATION_PORT</code>环境变量不可用，则该服务的端口默认为著名的8761。配置的其余部分只是告诉该实例不要向其找到的Eureka实例注册自己，因为该实例本身就是..。如果在本地运行，则可以将浏览器指向<code>http://localhost:8761</code>并从那里监视注册表。</p><h2><a href="#deploying-eureka" class="anchor" name="deploying-eureka"></a>部署尤里卡</h2><p>Spring Cloud将<a href="https://projects.spring.io/spring-cloud/spring-cloud.html#spring-cloud-eureka-server">使用其Spring Boot自动配置</a>启动<a href="https://projects.spring.io/spring-cloud/spring-cloud.html#spring-cloud-eureka-server">Eureka实例</a> 。部署Eureka时需要考虑两点。首先，您应该<em>始终</em>在生产中使用高可用性配置。<a href="https://github.com/spring-cloud-samples/eureka">Spring Cloud Eureka样本</a>展示了如何在高可用性配置中进行部署。</p><p>客户需要知道在哪里可以找到Eureka实例。如果您有DNS，那么如果您不污染太大的全局名称空间，那可能是一个选择。如果您<a href="http://12factor.net/">在“平台即服务”中运行并且使用12要素应用程序样式的应用程序，</a>则支持服务凭据是配置的，并且驻留在应用程序外部，通常作为环境变量公开。但是，通过使用Cloud Foundry的<code>cf</code> CLI <a href="https://docs.pivotal.io/pivotalcf/devguide/services/user-provided.html">创建<em>用户提供的服务</em></a> ，您可以立即获得Eureka <a href="https://docs.pivotal.io/pivotalcf/devguide/services/user-provided.html"><em>服务</em></a> 。</p>
-<pre><code class="prettyprint">cf cups eureka-service -p '{"uri":"http://host-of-your-eureka-setup"}'
-</code></pre><p><code>host-of-your-eureka-setup</code>指向您的高可用性尤里卡设置的知名主机。我怀疑我们很快就会看到一种将Eureka创建为支持服务的方法，就像在<a href="https://www.pivotal.io/platform-as-a-service/pivotal-cf">Pivotal Cloud Foundry</a>上使用PostgreSQL或ElasticSearch实例一样。</p><p>现在，Eureka已启动并正在运行，让我们使用它来将某些服务相互连接！</p><h2><a href="#speak-for-yourself" class="anchor" name="speak-for-yourself"></a>为自己说话</h2><p>基于Spring Cloud的服务具有<code>spring.application.name</code>属性。它用于从配置服务器中提取配置，以标识Eureka的服务，并且在构建基于Spring Cloud的应用程序时在许多其他上下文中都可以引用。该值通常位于<code>src/main/resources/bootstrap.(yml,properties)</code> ，该值在初始化时比正常的<code>src/main/resources/application.(yml,properties)</code>早。在类路径上具有<code>org.springframework.cloud:spring-cloud-starter-eureka</code>的服务将通过Eureka注册表的<code>spring.application.name</code> 。</p><p>我的每个服务的<code>src/main/resources/boostrap.yml</code>文件如下所示，其中<code>my-service</code>是随服务而<code>my-service</code>的服务名称：</p>
+</code></pre><p>如果<a href="http://cloudfoundry.org/index.html">Cloud Foundry</a>的服务端口默认为著名的8761 <code>VCAP_APPLICATION_PORT</code>环境变量不可用。配置的其余部分只是告诉该实例不要向其找到的Eureka实例注册自己，因为该实例本身就是..。如果在本地运行，则可以将浏览器指向<code>http://localhost:8761</code>并从那里监视注册表。</p><h2><a href="#deploying-eureka" class="anchor" name="deploying-eureka"></a>部署尤里卡</h2><p>Spring Cloud将<a href="https://projects.spring.io/spring-cloud/spring-cloud.html#spring-cloud-eureka-server">使用其Spring Boot自动配置</a>启动一个<a href="https://projects.spring.io/spring-cloud/spring-cloud.html#spring-cloud-eureka-server">Eureka实例</a> 。部署Eureka时需要考虑两点。首先，您应该<em>始终</em>在生产中使用高可用性配置。<a href="https://github.com/spring-cloud-samples/eureka">Spring Cloud Eureka样本</a>显示了如何在高可用性配置中进行部署。</p><p>客户需要知道在哪里可以找到Eureka实例。如果您有DNS，那么如果您不污染太大的全局名称空间，那可能是一个选择。如果您<a href="http://12factor.net/">在“平台即服务”中运行并且使用12要素应用程序样式的应用程序，</a>则支持服务凭据是配置的，并且驻留在应用程序外部，通常作为环境变量公开。不过，您可以使用Cloud Foundry的服务来立即获得Eureka服务<code>cf</code> CLI <a href="https://docs.pivotal.io/pivotalcf/devguide/services/user-provided.html">创建<em>用户提供的服务</em></a> 。</p>
+<pre><code class="prettyprint">cf cups eureka-service -p &#39;{&quot;uri&quot;:&quot;http://host-of-your-eureka-setup&quot;}&#39;
+</code></pre><p>点<code>host-of-your-eureka-setup</code>将您的Eureka设置转换为知名主机。我怀疑我们很快就会看到一种将Eureka创建为支持服务的方法，就像在<a href="https://www.pivotal.io/platform-as-a-service/pivotal-cf">Pivotal Cloud Foundry</a>上使用PostgreSQL或ElasticSearch实例一样。</p><p>现在，Eureka已启动并正在运行，让我们使用它来将某些服务相互连接！</p><h2><a href="#speak-for-yourself" class="anchor" name="speak-for-yourself"></a>为自己说话</h2><p>基于Spring Cloud的服务具有<code>spring.application.name</code>属性。它用于从配置服务器中提取配置，以标识Eureka的服务，并且在构建基于Spring Cloud的应用程序时可在许多其他上下文中引用。此值通常存在于<code>src/main/resources/bootstrap.(yml,properties)</code> ，它在初始化中比正常情况更早被拾取<code>src/main/resources/application.(yml,properties)</code> 。一项服务<code>org.springframework.cloud:spring-cloud-starter-eureka</code>类路径上的内容将通过其在Eureka注册中心进行注册<code>spring.application.name</code> 。</p><p>的<code>src/main/resources/boostrap.yml</code>我的每项服务的文件如下所示<code>my-service</code>是随服务而异的服务名称：</p>
 <pre><code class="prettyprint yaml">spring:
   application:
     name: my-service
-</code></pre><p>Spring Cloud在服务启动时使用<code>bootstrap.yml</code>中的信息来发现Eureka服务注册表并注册该服务及其<code>spring.application.name</code> ，主机，端口等。您可能会对此感到好奇。Spring Cloud尝试在一个知名地址（ <code>http://127.0.0.1:</code>上查找它，但是您可以更改它。这是我的名义上的Spring Cloud微服务的<code>src/main/resources/application.yml</code> ，尽管<a href="https://spring.io/blog/2015/01/13/configuring-it-all-out-or-12-factor-app-style-configuration-with-spring">没有理由这不能存在于Spring Cloud配置服务器中</a> 。可能有很多实例将自己标识为<code>my-service</code> ； Eureka会将过程信息附加到具有相同ID的注册列表中。</p>
-<pre><code class="prettyprint yml"><br><br>eureka:
+</code></pre><p>Spring Cloud使用以下信息<code>bootstrap.yml</code>在服务启动时发现Eureka服务注册表并注册服务及其<code>spring.application.name</code> ，主机，端口等。您可能会对此感到好奇。Spring Cloud尝试在一个知名地址查找它（ <code>http://127.0.0.1:</code> ），但您可以更改它。这是我的<code>src/main/resources/application.yml</code>对于名义上的Spring Cloud微服务，尽管<a href="https://spring.io/blog/2015/01/13/configuring-it-all-out-or-12-factor-app-style-configuration-with-spring">没有理由这不能存在于Spring Cloud配置服务器中</a> 。可能有很多实例将自己标识为<code>my-service</code> ; Eureka会将过程信息附加到具有相同ID的注册列表中。</p>
+<pre><code class="prettyprint yml"><br /><br />eureka:
   client:
     serviceUrl:
       defaultZone: ${vcap.services.eureka-service.credentials.uri:http://127.0.0.1:8761}/eureka/
@@ -213,7 +219,7 @@ eureka:
     hostname: ${APPLICATION_DOMAIN}
     nonSecurePort: 80
 
-</code></pre><p>在这种配置中， <em>如果</em> Cloud Foundry的<code>VCAP_SERVICES</code>环境变量不存在或包含有效的凭证，则Spring Cloud Eureka客户端会知道连接到在本地主机上运行的Eureka实例。</p><p><code>---</code>分隔符下的配置位用于在<a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html"><code>cloud</code> Spring配置文件下运行</a>应用程序时。使用<code>SPRING_PROFILES_ACTIVE</code>环境变量来设置概要文件很容易。您可以在<code>manifest.yml</code>或<a href="https://github.com/pivotal-cf-experimental/lattice">在Cloud Foundry Lattice上</a>的<a href="https://docs.docker.com/reference/builder/">Docker文件中</a>配置Cloud Foundry环境变量。</p><p>特定于<code>cloud</code>配置文件的配置专门告诉Eureka客户端如何在发现的Eureka注册表中注册服务。我这样做是因为我的服务不使用固定DNS。 <code>APPLICATION_DOMAIN</code>是我在部署脚本中设置的环境变量，它告诉服务其外部可引用的URI是什么。</p><p>30秒后（在撰写本文时），在Eureka Web UI上单击“刷新”，您将看到Web服务已注册。</p><h2><a href="#client-side-load-balancing-with-ribbon" class="anchor" name="client-side-load-balancing-with-ribbon"></a>使用功能区进行客户端负载平衡</h2><p>Spring Cloud通过其引用的其他服务<code>spring.application.name</code>值。在构建基于Spring Cloud的服务时，在很多情况下了解此值都非常方便。</p><p>您会记得，目标是让<em>客户端</em>根据上下文信息（可能会因客户端而异）决定连接到哪个服务实例。Netflix公司有一个叫做尤里卡感知客户端负载平衡客户端<a href="https://github.com/Netflix/ribbon">功能区</a>是春季云集成广泛。Ribbon是带有内置软件负载平衡器的客户端库。让我们看一个直接使用Eureka，然后通过Ribbon和Spring Cloud集成使用它的示例。</p>
+</code></pre><p>在这种配置中， <em>如果</em> Cloud Foundry的<code>VCAP_SERVICES</code>环境变量不存在或包含有效的凭证。</p><p>下的配置位<code>---</code>定界符用于在以下情况<a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html">下运行</a>应用程序<a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html"><code>cloud</code>弹簧轮廓</a> 。使用<code>SPRING_PROFILES_ACTIVE</code>环境变量。您可以在自己的计算机中配置Cloud Foundry环境变量<code>manifest.yml</code>或者， <a href="https://github.com/pivotal-cf-experimental/lattice">在Cloud Foundry Lattice上</a> ，您的<a href="https://docs.docker.com/reference/builder/">Docker文件</a> 。</p><p>的<code>cloud</code>配置文件特定的配置专门告诉Eureka客户端如何在发现的Eureka注册表中注册服务。我这样做是因为我的服务不使用固定DNS。 <code>APPLICATION_DOMAIN</code>是我在部署脚本中设置的环境变量，它告诉服务其外部可引用的URI是什么。</p><p>30秒后（在撰写本文时），在Eureka Web UI上单击“刷新”，您将看到您的Web服务已注册。</p><h2><a href="#client-side-load-balancing-with-ribbon" class="anchor" name="client-side-load-balancing-with-ribbon"></a>使用功能区进行客户端负载平衡</h2><p>Spring Cloud通过它们的引用其他服务<code>spring.application.name</code>值。在构建基于Spring Cloud的服务时，在很多情况下了解此值都非常方便。</p><p>您会记得，目标是让<em>客户端</em>根据上下文信息（可能会因客户端而异）决定连接到哪个服务实例。Netflix有一个名为<a href="https://github.com/Netflix/ribbon">Ribbon</a>的Eureka感知客户端负载平衡客户端，Spring Cloud进行了广泛集成。Ribbon是带有内置软件负载平衡器的客户端库。让我们看一个直接使用Eureka，然后通过Ribbon和Spring Cloud集成使用它的示例。</p>
 <pre><code class="prettyprint java">package passport;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -257,10 +263,10 @@ class DiscoveryClientExample implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        discoveryClient.getInstances("photo-service").forEach((ServiceInstance s) -> {
+        discoveryClient.getInstances(&quot;photo-service&quot;).forEach((ServiceInstance s) -&gt; {
             System.out.println(ToStringBuilder.reflectionToString(s));
         });
-        discoveryClient.getInstances("bookmark-service").forEach((ServiceInstance s) -> {
+        discoveryClient.getInstances(&quot;bookmark-service&quot;).forEach((ServiceInstance s) -&gt; {
             System.out.println(ToStringBuilder.reflectionToString(s));
         });
     }
@@ -274,15 +280,15 @@ class RestTemplateExample implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        // use the "smart" Eureka-aware RestTemplate
-        ResponseEntity<List<Bookmark>> exchange =
+        // use the &quot;smart&quot; Eureka-aware RestTemplate
+        ResponseEntity&lt;List&lt;Bookmark&gt;&gt; exchange =
                 this.restTemplate.exchange(
-                        "http://bookmark-service/{userId}/bookmarks",
+                        &quot;http://bookmark-service/{userId}/bookmarks&quot;,
                         HttpMethod.GET,
                         null,
-                        new ParameterizedTypeReference<List<Bookmark>>() {
+                        new ParameterizedTypeReference&lt;List&lt;Bookmark&gt;&gt;() {
                         },
-                        (Object) "mstine");
+                        (Object) &quot;mstine&quot;);
 
         exchange.getBody().forEach(System.out::println);
     }
@@ -297,15 +303,15 @@ class FeignExample implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        this.bookmarkClient.getBookmarks("jlong").forEach(System.out::println);
+        this.bookmarkClient.getBookmarks(&quot;jlong&quot;).forEach(System.out::println);
     }
 }
 
-@FeignClient("bookmark-service")
+@FeignClient(&quot;bookmark-service&quot;)
 interface BookmarkClient {
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{userId}/bookmarks")
-    List<Bookmark> getBookmarks(@PathVariable("userId") String userId);
+    @RequestMapping(method = RequestMethod.GET, value = &quot;/{userId}/bookmarks&quot;)
+    List&lt;Bookmark&gt; getBookmarks(@PathVariable(&quot;userId&quot;) String userId);
 }
 
 class Bookmark {
@@ -314,13 +320,13 @@ class Bookmark {
 
     @Override
     public String toString() {
-        return "Bookmark{" +
-                "id=" + id +
-                ", href='" + href + '\'' +
-                ", label='" + label + '\'' +
-                ", description='" + description + '\'' +
-                ", userId='" + userId + '\'' +
-                '}';
+        return &quot;Bookmark{&quot; +
+                &quot;id=&quot; + id +
+                &quot;, href=&#39;&quot; + href + &#39;\&#39;&#39; +
+                &quot;, label=&#39;&quot; + label + &#39;\&#39;&#39; +
+                &quot;, description=&#39;&quot; + description + &#39;\&#39;&#39; +
+                &quot;, userId=&#39;&quot; + userId + &#39;\&#39;&#39; +
+                &#39;}&#39;;
     }
 
     public Bookmark() {
@@ -346,23 +352,24 @@ class Bookmark {
         return userId;
     }
 }
-</code></pre><p><code>DiscoveryClientExample</code> bean演示了如何使用Spring Cloud公共的<code>DiscoveryClient</code>查询服务。结果包含每个服务的主机名和端口之类的信息。</p><p><code>RestTemplateExample</code> bean演示了自动配置的功能区感知<code>RestTemplate</code>实例。请注意，URI使用服务ID，而不是实际的主机名。从URI中提取服务ID，并将其提供给Ribbon，然后Ribbon使用负载均衡器从Eureka中已注册的实例中进行选择，最后，对实际的服务实例进行HTTP调用。</p><p><code>FeignExample</code> bean演示了如何使用Spring Cloud Feign集成。<a href="https://github.com/Netflix/feign">Feign</a>是Netflix的一个便捷项目，可让您以声明方式在界面上注解描述REST API客户端。在这种情况下，我们希望将HTTP调用结果从对<code>bookmark-service</code>调用映射到<code>BookmarkClient</code> Java接口。此映射是在<code>Application</code>类中朝代码页顶部配置的：</p>
+</code></pre><p>的<code>DiscoveryClientExample</code> bean演示使用Spring Cloud通用<code>DiscoveryClient</code>询问服务。结果包含每个服务的主机名和端口之类的信息。</p><p>的<code>RestTemplateExample</code> bean演示自动配置的功能区感知<code>RestTemplate</code>实例。请注意，URI使用服务ID，而不是实际的主机名。从URI中提取服务ID，并将其提供给Ribbon，然后Ribbon使用负载均衡器从Eureka中已注册的实例中进行选择，最后，对实际的服务实例进行HTTP调用。</p><p>的<code>FeignExample</code> bean演示了如何使用Spring Cloud Feign集成。<a href="https://github.com/Netflix/feign">Feign</a>是Netflix的一个便捷项目，可让您在接口上通过注释性地描述REST API客户端。在这种情况下，我们要将HTTP结果从调用映射到<code>bookmark-service</code>到<code>BookmarkClient</code> Java接口。此映射是在<code>Application</code>类位于代码页的顶部：</p>
 <pre><code class="prettyprint java">  @Bean
   BookmarkClient bookmarkClient() {
-    return loadBalance(BookmarkClient.class, "http://bookmark-service");
+    return loadBalance(BookmarkClient.class, &quot;http://bookmark-service&quot;);
   }
 
-</code></pre><p>URI是服务引用，而不是实际的主机名。它经过与上一个示例中提供给<code>RestTemplate</code>的URI相同的处理。</p><p>很酷吧？您可以使用更基本的<code>DiscoveryClient</code> API进行调用，也可以使用功能区和支持Eureka的<code>RestTemplate</code>或Feign集成的客户端。</p><h2><a href="#review" class="anchor" name="review"></a>评论</h2>
+</code></pre><p>URI是服务引用，而不是实际的主机名。它通过了与给URI相同的处理<code>RestTemplate</code>在最后一个示例中。</p><p>很酷吧？您可以使用更基本的<code>DiscoveryClient</code> API并进行调用，或使用功能区和Eureka感知<code>RestTemplate</code>或假装集成客户。</p><h2><a href="#review" class="anchor" name="review"></a>评论</h2>
 <ul>
 <li>Spring Cloud同时支持Eureka和Consul服务注册中心（也许还有更多！）</li>
-<li>给定服务ID， <code>DiscoveryClient</code> API可用于交互式查询Eureka。</li>
+<li>的<code>DiscoveryClient</code> API可用于以给定服务ID交互式查询Eureka。</li>
 <li>功能区是客户端负载平衡器</li>
-<li><code>RestTemplate</code>可以用服务ID代替URI中的主机名，并且可以<code>RestTemplate</code>功能区选择服务。</li>
+<li>的<code>RestTemplate</code>可以用服务ID代替URI中的主机名，并且可以服从功能区选择服务。</li>
 <li>Netflix Spring Cloud Feign集成使创建Eureka感知的智能REST客户端变得简单，该客户端使用Ribbon进行客户端负载平衡以选择可用的服务实例。</li>
-</ul><h2><a href="#where-to-go-from-here" class="anchor" name="where-to-go-from-here"></a>从这往哪儿走</h2><p>我们仅使用Eureka研究了服务发现和解决方案。我们在这里谈论的大多数内容也适用于Consul，实际上Consul具有Netflix没有的一些功能。</p><p>循环负载平衡只是一种选择。相反，您可能需要一些领导者节点和领导者选举的概念。Spring Cloud的目标也为这种协调提供支持。</p><p>服务注册和客户端负载均衡是春季云确实推进更有弹性的服务到服务调用的事情只有<em>一个</em> 。我们还<em>没有</em>研究它的支持单点登录和安全性，分布式锁和领导者选举，断路器等可靠性模式，还有更多内容。</p><p><a href="https://github.com/joshlong/service-registration-and-discovery">该示例代码都可以在线获得，</a>因此请不要犹豫，在本地计算机上签出该示例，也可以使用<a href="https://github.com/joshlong/service-registration-and-discovery/blob/master/cf.sh">提供的<code>cf.sh</code>脚本</a>和各种<code>manifest.yml</code>文件将其推送到Cloud Foundry。</p></div>
+</ul><h2><a href="#where-to-go-from-here" class="anchor" name="where-to-go-from-here"></a>从这往哪儿走</h2><p>我们仅使用Eureka研究了服务发现和解决方案。我们在这里谈论的大多数内容也适用于Consul，实际上Consul具有Netflix没有的一些功能。</p><p>循环负载平衡只是一种选择。您可能需要一些领导者节点和领导者选举的概念。Spring Cloud的目标也为这种协调提供支持。</p><p>服务注册和客户端负载均衡是春季云确实推进更有弹性的服务到服务调用的事情只有<em>一个</em> 。我们还<em>没有</em>研究它的支持单点登录和安全性，分布式锁和领导者选举，断路器等可靠性模式，还有更多内容。</p><p><a href="https://github.com/joshlong/service-registration-and-discovery">该示例代码均在线提供，</a>因此请不要犹豫，在本地计算机上签出该示例，或使用<a href="https://github.com/joshlong/service-registration-and-discovery/blob/master/cf.sh">提供的代码</a>将其推送到Cloud Foundry <a href="https://github.com/joshlong/service-registration-and-discovery/blob/master/cf.sh"><code>cf.sh</code>脚本</a>和各种<code>manifest.yml</code>文件。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1934;
 
       (function(disqus_shortname, document) {
@@ -376,7 +383,8 @@ class Bookmark {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -414,12 +422,14 @@ class Bookmark {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

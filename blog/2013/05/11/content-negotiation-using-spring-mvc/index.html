@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Spring MVC进行内容协商</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -23,7 +27,7 @@
 <meta name="twitter:title" content="Content Negotiation using Spring MVC">
 <meta name="twitter:description" content="<p>There are two ways to generate output using Spring MVC:</p>
 <ul> 
- <li> You can use the RESTful <code style=" font-size:="" 100%;="" color:="" black="="></head><body dir="ltr">@ResponseBody approach and HTTP message converters, typically to return data-formats like JSON or XML. Programmatic clients, mobile apps and AJAX enabled browsers are the usual clients. 
+ <li> You can use the RESTful <code style=" font-size:="" 100%;="" color:="" black="="></head><body >@ResponseBody approach and HTTP message converters, typically to return data-formats like JSON or XML. Programmatic clients, mobile apps and AJAX enabled browsers are the usual clients. 
  <li>Alternatively you may use <em>view resolution</em>. Although views are perfectly capable of generating JSON and XML if you wish (more on that in my next post), views are normally used to generate presentation formats like HTML for a traditional web-application. </li>
  <li>Actually there is a third possibility - some applications require both, and Spring MVC supports such combinations easily. We will come back to that right at the end. </li>
 
@@ -46,10 +50,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -185,15 +191,15 @@
 <li><strong>HttpMessageConverters：</strong>确定要使用的正确转换器。</li>
 <li><strong>请求映射：</strong>将传入的HTTP请求<strong>映射</strong>到返回不同格式的不同方法。</li>
 <li><strong>视图分辨率：</strong>选择要使用的正确视图。</li>
-</ul><p>确定用户请求的格式取决于<code style="font-size:100%;color:black">ContentNegotationStrategy</code> 。开箱即用有默认实现，但是您也可以根据需要实现自己的实现。</p><p>在这篇文章中，我想讨论如何使用Spring配置和使用内容协商，主要是关于使用HTTP消息转换器的RESTful控制器。在以后的<a href="http://blog.springsource.org/2013/06/03/content-negotiation-using-views/">文章中，</a>我将展示如何使用Spring的<code style="font-size:100%;color:black">ContentNegotiatingViewResolver</code>专门设置与视图一起使用的内容协商。</p>
-<h2>内容协商如何工作？</h2><p><strong>[标题ID =“ attachment_13288” align =“ alignleft” width =“ 200” caption =“获取正确的内容”] <img src="http://blog.springsource.org/wp-content/uploads/2013/05/Handshake_03.png" alt="谈判" title="内容协商" width="200" class="size-full wp-image-13288"> [/字幕]</strong></p><p>通过HTTP发出请求时，可以通过设置<code style="font-size:100%;color:black">Accept</code>标头属性来指定所需的响应类型。Web浏览器具有此预设以请求HTML（除其他外）。实际上，如果您看一下，就会发现浏览器实际上发送了非常混乱的Accept标头，这使得依赖它们变得不切实际。看到<a href="http://www.gethifi.com/blog/browser-rest-http-accept-headers"></a> <a href="http://www.gethifi.com/blog/browser-rest-http-accept-headers">http://www.gethifi.com/blog/browser-rest-http-accept-headers</a>对该问题进行了很好的讨论。底线： <code style="font-size:100%;color:black">Accept</code>标头被弄乱了，您通常也不能更改它们（除非您使用JavaScript和AJAX）。</p><p>因此，对于那些不希望使用<code style="font-size:100%;color:black">Accept</code>标头属性的情况，Spring提供了一些约定来代替。（这是Spring 3.2的一项不错的更改，它使灵活的内容选择策略不仅可以在使用视图时在所有Spring MVC上使用）。您可以集中配置一次内容协商策略，该策略将在需要确定不同格式（媒体类型）的任何地方应用。</p>
-<h2>在Spring MVC中启用内容协商</h2><p>Spring支持几种用于选择所需格式的约定：URL后缀和/或URL参数。这些与使用<code style="font-size:100%;color:black">Accept</code>标头一起工作。结果，可以以三种方式中的任何一种来请求内容类型。默认情况下，将按以下顺序检查它们：</p>
+</ul><p>确定用户请求的格式取决于<code style="font-size:100%;color:black">ContentNegotationStrategy</code> 。开箱即用有默认实现，但是您也可以根据需要实现自己的实现。</p><p>在这篇文章中，我想讨论如何使用Spring配置和使用内容协商，主要是关于使用HTTP消息转换器的RESTful控制器。在以后的<a href="http://blog.springsource.org/2013/06/03/content-negotiation-using-views/">文章中，</a>我将展示如何设置内容协商，以专门用于使用Spring的视图<code style="font-size:100%;color:black">ContentNegotiatingViewResolver</code> 。</p>
+<h2>内容协商如何工作？</h2><p><strong>[标题ID =“ attachment_13288” align =“ alignleft” width =“ 200” caption =“获取正确的内容”] <img src="http://blog.springsource.org/wp-content/uploads/2013/05/Handshake_03.png" alt="谈判" title="内容协商" width="200" class="size-full wp-image-13288"> [/字幕]</strong></p><p>通过HTTP发出请求时，可以通过设置请求类型来指定所需的响应类型<code style="font-size:100%;color:black">Accept</code>标头属性。Web浏览器具有此预设以请求HTML（除其他外）。实际上，如果您看一下，就会发现浏览器实际上发送了非常混乱的Accept标头，这使得依赖它们变得不切实际。看到<a href="http://www.gethifi.com/blog/browser-rest-http-accept-headers"></a> <a href="http://www.gethifi.com/blog/browser-rest-http-accept-headers">http://www.gethifi.com/blog/browser-rest-http-accept-headers</a>对该问题进行了很好的讨论。底线： <code style="font-size:100%;color:black">Accept</code>标头被弄乱了，您通常也不能更改标头（除非您使用JavaScript和AJAX）。</p><p>因此，对于那些<code style="font-size:100%;color:black">Accept</code> header属性是不可取的，Spring提供了一些约定来代替。（这是Spring 3.2的一项不错的更改，它使灵活的内容选择策略不仅可以在使用视图时在所有Spring MVC上使用）。您可以集中配置一次内容协商策略，该策略将在需要确定不同格式（媒体类型）的任何地方应用。</p>
+<h2>在Spring MVC中启用内容协商</h2><p>Spring支持几种用于选择所需格式的约定：URL后缀和/或URL参数。这些工作与使用<code style="font-size:100%;color:black">Accept</code>标头。结果，可以以三种方式中的任何一种来请求内容类型。默认情况下，将按以下顺序检查它们：</p>
 <ul>
-<li>在URL中添加路径扩展名（后缀）。因此，如果传入的URL是<code style="font-size:100%;color:navy">http://myserver/myapp/accounts/list.html</code>则需要HTML。对于电子表格，URL应该为<code style="font-size:100%;color:navy">http://myserver/myapp/accounts/list.xls</code> 。后缀到媒体类型的映射是通过<em>JavaBeans Activation Framework</em>或JAF自动定义的（因此， <code style="font-size:100%;color:black">activation.jar</code>必须在类路径上）。</li>
-<li>像这样的URL参数： <code style="font-size:100%;color:navy">http://myserver/myapp/accounts/list?format=xls</code> 。参数的名称默认为<code style="font-size:100%;color:black">format</code> ，但是可以更改。默认情况下，禁用参数使用，但启用后将对其进行第二次检查。</li>
-<li>最后，检查“ <code style="font-size:100%;color:black">Accept</code> HTTP标头”属性。这实际上是定义HTTP工作的方式，但是，如前所述，使用它可能会出现问题。</li>
-</ul><p>进行此设置的Java配置如下所示。只需通过其配置器自定义预定义的内容协商管理器即可。请注意， <code style="font-size:100%;color:black">MediaType</code>帮助程序类具有用于大多数知名媒体类型的预定义常量。</p>
-<pre><code class="prettyprint java"><br>@Configuration
+<li>在URL中添加路径扩展名（后缀）。因此，如果传入的URL是类似<code style="font-size:100%;color:navy">http://myserver/myapp/accounts/list.html</code>那么就需要HTML。对于电子表格，URL应为<code style="font-size:100%;color:navy">http://myserver/myapp/accounts/list.xls</code> 。后缀到媒体类型的映射是通过<em>JavaBeans Activation Framework</em>或JAF自动定义的（因此<code style="font-size:100%;color:black">activation.jar</code>必须在课程路径上）。</li>
+<li>像这样的URL参数： <code style="font-size:100%;color:navy">http://myserver/myapp/accounts/list?format=xls</code> 。参数的名称是<code style="font-size:100%;color:black">format</code>默认情况下，但这可能会更改。默认情况下，禁用参数使用，但启用后将对其进行第二次检查。</li>
+<li>最后<code style="font-size:100%;color:black">Accept</code> HTTP标头属性已检查。这实际上是定义HTTP工作的方式，但是，如前所述，使用它可能会出现问题。</li>
+</ul><p>进行此设置的Java配置如下所示。只需通过其配置器自定义预定义的内容协商管理器即可。注意<code style="font-size:100%;color:black">MediaType</code> helper类具有针对大多数知名媒体类型的预定义常量。</p>
+<pre><code class="prettyprint java"><br />@Configuration
 @EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
 
@@ -205,22 +211,22 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     configurer.defaultContentType(MediaType.APPLICATION_XML);
   }
 }
-</code></pre><p>使用XML配置时，最容易通过<code style="font-size:100%;color:black">ContentNegotiationManagerFactoryBean</code>设置内容协商策略：</p>
-<pre><code class="prettyprint xml"><br>   <!--
+</code></pre><p>使用XML配置时，最容易通过<code style="font-size:100%;color:black">ContentNegotiationManagerFactoryBean</code> ：</p>
+<pre><code class="prettyprint xml"><br />   &lt;!--
         Setup a simple strategy: 
            1. Take all the defaults.
            2. Return XML by default when not sure. 
-       -->
-  <bean id="contentNegotiationManager"
-             class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-       <property name="defaultContentType" value="application/xml" />
-  </bean>
+       --&gt;
+  &lt;bean id=&quot;contentNegotiationManager&quot;
+             class=&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;&gt;
+       &lt;property name=&quot;defaultContentType&quot; value=&quot;application/xml&quot; /&gt;
+  &lt;/bean&gt;
 
- <!-- Make this available across all of Spring MVC -->
- <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" />
-</code></pre><p>通过任一设置创建的<code style="font-size:100%;color:black">ContentNegotiationManager</code>是<code style="font-size:100%;color:black">ContentNegotationStrategy</code>的实现，该实现实现了上述的<em>PPA策略</em> （路径扩展，然后是参数，然后是接受标头）。</p>
-<h2>其他配置选项</h2><p>在Java配置中，可以使用配置器上的方法对策略进行完全自定义：</p>
-<pre><code class="prettyprint java"><br>@Configuration
+ &lt;!-- Make this available across all of Spring MVC --&gt;
+ &lt;mvc:annotation-driven content-negotiation-manager=&quot;contentNegotiationManager&quot; /&gt;
+</code></pre><p>的<code style="font-size:100%;color:black">ContentNegotiationManager</code>由任一设置创建的是以下内容的实现<code style="font-size:100%;color:black">ContentNegotationStrategy</code>实现上述的<em>PPA策略</em> （路径扩展，然后是参数，然后是接受标头）。</p>
+<h2>其他配置选项</h2><p>在Java配置中，可以使用配置器上的方法完全定制该策略：</p>
+<pre><code class="prettyprint java"><br />@Configuration
 @EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
 
@@ -231,70 +237,70 @@ public class WebConfig extends WebMvcConfigurerAdapter {
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer.favorPathExtension(false).
             favorParameter(true).
-            parameterName("mediaType").
+            parameterName(&quot;mediaType&quot;).
             ignoreAcceptHeader(true).
             useJaf(false).
             defaultContentType(MediaType.APPLICATION_JSON).
-            mediaType("xml", MediaType.APPLICATION_XML).
-            mediaType("json", MediaType.APPLICATION_JSON);
+            mediaType(&quot;xml&quot;, MediaType.APPLICATION_XML).
+            mediaType(&quot;json&quot;, MediaType.APPLICATION_JSON);
   }
 }
 </code></pre><p>在XML中，可以使用工厂bean上的方法配置策略：</p>
-<pre><code class="prettyprint xml"><br><br>  <!-- Total customization - see below for explanation. -->
-  <bean id="contentNegotiationManager"
-             class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-    <property name="favorPathExtension" value="false" />
-    <property name="favorParameter" value="true" />
-    <property name="parameterName" value="mediaType" />
-    <property name="ignoreAcceptHeader" value="true"/>
-    <property name="useJaf" value="false"/>
-    <property name="defaultContentType" value="application/json" />
+<pre><code class="prettyprint xml"><br /><br />  &lt;!-- Total customization - see below for explanation. --&gt;
+  &lt;bean id=&quot;contentNegotiationManager&quot;
+             class=&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;&gt;
+    &lt;property name=&quot;favorPathExtension&quot; value=&quot;false&quot; /&gt;
+    &lt;property name=&quot;favorParameter&quot; value=&quot;true&quot; /&gt;
+    &lt;property name=&quot;parameterName&quot; value=&quot;mediaType&quot; /&gt;
+    &lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;useJaf&quot; value=&quot;false&quot;/&gt;
+    &lt;property name=&quot;defaultContentType&quot; value=&quot;application/json&quot; /&gt;
  
-    <property name="mediaTypes">
-        <map>
-            <entry key="json" value="application/json" />
-            <entry key="xml" value="application/xml" />
-       </map>
-    </property>
-</bean>
+    &lt;property name=&quot;mediaTypes&quot;&gt;
+        &lt;map&gt;
+            &lt;entry key=&quot;json&quot; value=&quot;application/json&quot; /&gt;
+            &lt;entry key=&quot;xml&quot; value=&quot;application/xml&quot; /&gt;
+       &lt;/map&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
 </code></pre><p>在两种情况下，我们所做的工作：</p>
 <ul>
-<li>禁用路径扩展。请注意，偏爱并不意味着优先使用一种方法而不是另一种方法，它只是启用或禁用了它。检查的顺序始终是路径扩展，参数，Accept标头。</li>
-<li>启用URL参数的使用，但是我们将使用<code style="font-size:100%;color:black">mediaType</code>而不是默认参数<code style="font-size:100%;color:black">format</code> 。
+<li>禁用路径扩展。注意，偏爱并不意味着优先使用一种方法，而只是启用或禁用它。检查的顺序始终是路径扩展，参数，Accept标头。</li>
+<li>启用URL参数，但不使用默认参数， <code style="font-size:100%;color:black">format</code> ，我们将使用<code style="font-size:100%;color:black">mediaType</code>代替。
 </li>
-<li>完全忽略<code style="font-size:100%;color:black">Accept</code>标头。如果大多数客户实际上是网络浏览器（通常是通过AJAX进行REST调用），则这通常是最佳方法。
+<li>忽略<code style="font-size:100%;color:black">Accept</code>标头完全。如果大多数客户实际上是网络浏览器（通常是通过AJAX进行REST调用），则这通常是最好的方法。
 </li><li>不要使用JAF，而是手动指定媒体类型映射-我们只希望支持JSON和XML。</li></ul><p><br></p>
-<h2>列出用户帐户示例</h2><p><a href="http://blog.springsource.org/wp-content/uploads/2013/05/account-list-1.png"><img class="alignright size-full wp-image-13159" title="帐户列表为HTML" src="http://blog.springsource.org/wp-content/uploads/2013/05/account-list-1.png" alt="" width="380"></a></p><p>为了进行演示，我将一个简单的帐户列表应用程序作为我们的工作示例-屏幕截图显示了HTML中的典型帐户列表。完整的代码可以在Github上找到： <a href="https://github.com/paulc4/mvc-content-neg"></a> <a href="https://github.com/paulc4/mvc-content-neg">https://github.com/paulc4/mvc-content-neg</a> 。</p><p>要以JSON或XML返回帐户列表，我需要一个类似Controller的控制器。现在，我们将忽略HTML生成方法。</p>
+<h2>列出用户帐户示例</h2><p><a href="http://blog.springsource.org/wp-content/uploads/2013/05/account-list-1.png"><img class="alignright size-full wp-image-13159" title="帐户列表为HTML" src="http://blog.springsource.org/wp-content/uploads/2013/05/account-list-1.png" alt="" width="380"></a></p><p>为了演示，我将一个简单的帐户列表应用程序作为我们的工作示例-屏幕截图显示了一个典型的HTML帐户列表。完整的代码可以在Github上找到： <a href="https://github.com/paulc4/mvc-content-neg"></a> <a href="https://github.com/paulc4/mvc-content-neg">https://github.com/paulc4/mvc-content-neg</a> 。</p><p>要返回JSON或XML帐户列表，我需要一个类似Controller的控制器。现在，我们将忽略HTML生成方法。</p>
 <p> </p>
-<pre><code class="prettyprint java"><br>@Controller
+<pre><code class="prettyprint java"><br />@Controller
 class AccountController {
-    @RequestMapping(value="/accounts", method=RequestMethod.GET)
+    @RequestMapping(value=&quot;/accounts&quot;, method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public @ResponseBody List<Account> list(Model model, Principal principal) {
+    public @ResponseBody List&lt;Account&gt; list(Model model, Principal principal) {
         return accountManager.getAccounts(principal) );
     }
 
     // Other methods ...
 }
 </code></pre><p>这是内容协商策略的设置：</p>
-<pre><code class="prettyprint xml"><br>	<!-- Simple strategy: only path extension is taken into account -->
-	<bean id="cnManager"
-		class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-		<property name="favorPathExtension" value="true"/>
-		<property name="ignoreAcceptHeader" value="true" />
-		<property name="defaultContentType" value="text/html" />
-		<property name="useJaf" value="false"/>
+<pre><code class="prettyprint xml"><br />	&lt;!-- Simple strategy: only path extension is taken into account --&gt;
+	&lt;bean id=&quot;cnManager&quot;
+		class=&quot;org.springframework.web.accept.ContentNegotiationManagerFactoryBean&quot;&gt;
+		&lt;property name=&quot;favorPathExtension&quot; value=&quot;true&quot;/&gt;
+		&lt;property name=&quot;ignoreAcceptHeader&quot; value=&quot;true&quot; /&gt;
+		&lt;property name=&quot;defaultContentType&quot; value=&quot;text/html&quot; /&gt;
+		&lt;property name=&quot;useJaf&quot; value=&quot;false&quot;/&gt;
 
-		<property name="mediaTypes">
-			<map>
-				<entry key="html" value="text/html" />
-				<entry key="json" value="application/json" />
-				<entry key="xml" value="application/xml" />
-			</map>
-		</property>
-	</bean>
+		&lt;property name=&quot;mediaTypes&quot;&gt;
+			&lt;map&gt;
+				&lt;entry key=&quot;html&quot; value=&quot;text/html&quot; /&gt;
+				&lt;entry key=&quot;json&quot; value=&quot;application/json&quot; /&gt;
+				&lt;entry key=&quot;xml&quot; value=&quot;application/xml&quot; /&gt;
+			&lt;/map&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
 </code></pre><p>或者，使用Java配置，代码如下所示：</p>
-<pre><code class="prettyprint java"><br>	@Override
+<pre><code class="prettyprint java"><br />	@Override
 	public void configureContentNegotiation(
 			ContentNegotiationConfigurer configurer) {
 		// Simple strategy: only path extension is taken into account
@@ -302,23 +308,23 @@ class AccountController {
 			ignoreAcceptHeader(true).
 			useJaf(false).
 			defaultContentType(MediaType.TEXT_HTML).
-			mediaType("html", MediaType.TEXT_HTML).
-			mediaType("xml", MediaType.APPLICATION_XML).
-			mediaType("json", MediaType.APPLICATION_JSON);
+			mediaType(&quot;html&quot;, MediaType.TEXT_HTML).
+			mediaType(&quot;xml&quot;, MediaType.APPLICATION_XML).
+			mediaType(&quot;json&quot;, MediaType.APPLICATION_JSON);
 	}
-</code></pre><p>如果我的类路径上有JAXB2和Jackson，Spring MVC将自动设置必要的<code style="font-size:100%;color:black">HttpMessageConverters</code> 。我的域类也必须使用JAXB2和Jacksonannotation进行标记才能启用转换（否则消息转换器不知道该怎么做）。为了回应评论（如下），带注释的<code style="font-size:100%;color:black">Account</code>类如下<a href="#annotated-account-class">所示</a> 。</p><p>这是我们的“帐户”应用程序的JSON输出（请注意URL中的path-extension）。</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png"><img class="alignright size-full wp-image-13160" title="account-list-json" src="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png" alt="" width="580"></a></p><p>系统如何知道要转换为XML还是JSON？由于进行了内容协商，因此将根据<code style="font-size:100%;color:black">ContentNegotiationManager</code>的配置方式使用上面讨论的三个（ <em>PPA策略</em> ）选项中的任何一个。在这种情况下，URL结尾于<code style="font-size:100%;color:navy">accounts.json</code>因为路径扩展是唯一启用的策略。</p><p>在示例代码中，可以通过在<code style="font-size:100%;color:black">web.xml</code>设置活动配置文件在XML或MVC的Java配置之间切换。配置文件分别是“ xml”和“ javaconfig”。</p>
+</code></pre><p>如果我在类路径中有JAXB2和Jackson，Spring MVC将自动设置必要的<code style="font-size:100%;color:black">HttpMessageConverters</code> 。我的域类也必须使用JAXB2和Jackson批注进行标记才能启用转换（否则消息转换器不知道该怎么做）。为了回应评论（如下），带注释的<code style="font-size:100%;color:black">Account</code>类显示<a href="#annotated-account-class">如下</a> 。</p><p>这是我们的“帐户”应用程序的JSON输出（请注意URL中的path-extension）。</p><p><a href="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png"><img class="alignright size-full wp-image-13160" title="account-list-json" src="http://blog.springsource.org/wp-content/uploads/2013/04/account-list-json.png" alt="" width="580"></a></p><p>系统如何知道要转换为XML还是JSON？由于进行了内容协商，因此，根据所采用的方式，以上讨论的三个（ <em>PPA策略</em> ）选项中的任何一个都将被使用。 <code style="font-size:100%;color:black">ContentNegotiationManager</code>已配置。在这种情况下，URL以<code style="font-size:100%;color:navy">accounts.json</code>因为路径扩展是唯一启用的策略。</p><p>在示例代码中，您可以通过以下方式在MVC的XML或Java配置之间进行切换： <code style="font-size:100%;color:black">web.xml</code> 。配置文件分别是“ xml”和“ javaconfig”。</p>
 <h2 id="combined-controller">结合数据和演示格式</h2><p>Spring MVC的REST支持基于现有的MVC Controller框架。因此，可以使相同的Web应用程序既以原始数据（如JSON）作为返回信息，又以表示形式（如HTML）作为返回信息。</p><p>两种技术都可以在同一控制器中轻松并排使用，如下所示：</p>
-<pre><code class="prettyprint java"><br>@Controller
+<pre><code class="prettyprint java"><br />@Controller
 class AccountController {
     // RESTful method
-    @RequestMapping(value="/accounts", produces={"application/xml", "application/json"})
+    @RequestMapping(value=&quot;/accounts&quot;, produces={&quot;application/xml&quot;, &quot;application/json&quot;})
     @ResponseStatus(HttpStatus.OK)
-    public @ResponseBody List<Account> listWithMarshalling(Principal principal) {
+    public @ResponseBody List&lt;Account&gt; listWithMarshalling(Principal principal) {
         return accountManager.getAccounts(principal);
     }
 
     // View-based method
-    @RequestMapping("/accounts")
+    @RequestMapping(&quot;/accounts&quot;)
     public String listWithView(Model model, Principal principal) {
         // Call RESTful method to avoid repeating account lookup logic
         model.addAttribute( listWithMarshalling(principal) );
@@ -327,16 +333,16 @@ class AccountController {
         return ¨accounts/list¨;
     }
 }
-</code></pre><p>这里有一个简单的模式： <code style="font-size:100%;color:black">@ResponseBody</code>方法处理所有数据访问以及与基础服务层（ <code style="font-size:100%;color:black">AccountManager</code> ）的集成。第二种方法调用第一种方法，并在Model中设置响应以供View使用。这避免了重复的逻辑。</p><p>为了确定选择两种<code style="font-size:100%;color:black">@RequestMapping</code>方法中的哪一种，我们再次使用我们的PPA内容协商策略。它允许<code style="font-size:100%;color:black">produces</code>选项起作用。以<code style="font-size:100%;color:navy">accounts.xml</code>或<code style="font-size:100%;color:navy">accounts.json</code>结尾的URL映射到第一种方法，以<code style="font-size:100%;color:navy">accounts.anything</code>结尾的任何其他URL映射到第二种方法。</p>
-<h2>另一种方法</h2><p>另外，如果我们使用视图来生成所有可能的内容类型，则仅用一种方法就可以完成全部操作。这是<code style="font-size:100%;color:black">ContentNegotiatingViewResolver</code>出现的地方，这将是我下一篇<a href="http://blog.springsource.org/2013/06/03/content-negotiation-using-views/">文章</a>的主题。</p>
+</code></pre><p>这里有一个简单的模式： <code style="font-size:100%;color:black">@ResponseBody</code>方法处理所有数据访问以及与基础服务层的集成（ <code style="font-size:100%;color:black">AccountManager</code> ）。第二种方法调用第一种方法，并在Model中设置响应以供View使用。这避免了重复的逻辑。</p><p>确定两者中的哪一个<code style="font-size:100%;color:black">@RequestMapping</code>选择方法之后，我们将再次使用PPA内容协商策略。它允许<code style="font-size:100%;color:black">produces</code>选择工作。以结尾的网址<code style="font-size:100%;color:navy">accounts.xml</code>要么<code style="font-size:100%;color:navy">accounts.json</code>映射到第一个方法，其他任何以结尾的URL <code style="font-size:100%;color:navy">accounts.anything</code>映射到第二个。</p>
+<h2>另一种方法</h2><p>另外，如果我们使用视图来生成所有可能的内容类型，则仅用一种方法就可以完成全部操作。这是<code style="font-size:100%;color:black">ContentNegotiatingViewResolver</code>进来了，这将是我下一个<a href="http://blog.springsource.org/2013/06/03/content-negotiation-using-views/">帖子</a>的主题。</p>
 <h2>致谢</h2><p>我要感谢<a href="/author/rstoyanchev/">Rossen Stoyanchev</a>在撰写本文中所提供的帮助。任何错误都是我自己的。</p>
 <h2 id="annotated-account-class">附录：带注释的帐户类</h2><p><b>添加2013年6月2日</b> 。</p><p>由于存在一些有关如何为JAXB注释类的问题，因此这是Account类的一部分。为简洁起见，我省略了数据成员以及除带注释的getter之外的所有方法。如果愿意，我可以直接为数据成员添加注释（实际上就像JPA注释一样）。请记住，Jackson可以使用这些相同的注释将对象编组为JSON。</p>
-<pre><code class="prettyprint java"><br>/**
+<pre><code class="prettyprint java"><br />/**
  * Represents an account for a member of a financial institution. An account has
  * zero or more {@link Transaction}s and belongs to a {@link Customer}. An aggregate entity.
  */
 @Entity
-@Table(name = "T_ACCOUNT")
+@Table(name = &quot;T_ACCOUNT&quot;)
 @XmlRootElement
 public class Account {
 
@@ -359,7 +365,7 @@ public class Account {
 	/**
 	 * Get the account type.
 	 * 
-	 * @return One of "CREDIT", "SAVINGS", "CHECK".
+	 * @return One of &quot;CREDIT&quot;, &quot;SAVINGS&quot;, &quot;CHECK&quot;.
 	 */
 	@XmlAttribute
 	public String getType() {
@@ -369,7 +375,7 @@ public class Account {
 	/**
 	 * Get the credit-card, if any, associated with this account.
 	 * 
-	 * @return The credit-card number or null if there isn't one.
+	 * @return The credit-card number or null if there isn&#39;t one.
 	 */
 	@XmlAttribute
 	public String getCreditCardNumber() {
@@ -393,11 +399,11 @@ public class Account {
 	 * transitively; for example, called to facilitate reporting or testing.
 	 * 
 	 * @param name
-	 *            the name of the transaction account e.g "Fred Smith"
+	 *            the name of the transaction account e.g &quot;Fred Smith&quot;
 	 * @return the beneficiary object
 	 */
-	@XmlElement   // Make these a nested <transactions> element
-	public Set<Transaction> getTransactions() {
+	@XmlElement   // Make these a nested &lt;transactions&gt; element
+	public Set&lt;Transaction&gt; getTransactions() {
 		return transactions;
 	}
 
@@ -407,7 +413,8 @@ public class Account {
 </code></pre></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 517;
 
       (function(disqus_shortname, document) {
@@ -421,7 +428,8 @@ public class Account {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -459,12 +467,14 @@ public class Account {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

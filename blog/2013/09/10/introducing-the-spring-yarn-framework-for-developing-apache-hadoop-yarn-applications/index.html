@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>引入用于开发Apache Hadoop YARN应用程序的Spring YARN框架</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Introducing the Spring YARN framework for developing Apache Hadoop YARN applications">
-<meta name="twitter:description" content="<p>We’re super excited to let the cat out of the bag and release support for writing YARN based applications as part of the <a href=" http:="" ="" www.springsource.org="" node="" 2268="="></head><body dir="ltr">Spring for Apache Hadoop 2.0 M1 release. In this blog post I’ll introduce you to <a href="http://hadoop.apache.org/docs/r2.0.6-alpha/hadoop-yarn/hadoop-yarn-site/YARN.html">YARN</a>, what you can do with it, and how Spring simplifies the development of YARN based applications. 
+<meta name="twitter:description" content="<p>We’re super excited to let the cat out of the bag and release support for writing YARN based applications as part of the <a href=" http:="" ="" www.springsource.org="" node="" 2268="="></head><body >Spring for Apache Hadoop 2.0 M1 release. In this blog post I’ll introduce you to <a href="http://hadoop.apache.org/docs/r2.0.6-alpha/hadoop-yarn/hadoop-yarn-site/YARN.html">YARN</a>, what you can do with it, and how Spring simplifies the development of YARN based applications. 
 <p>If you have been following the Hadoop community over the past year or two, you’ve probably seen a lot of discussions around YARN and the next version of Hadoop’s MapReduce called MapReduce v2. YARN (Yet Another Resource Negotiator) is a component of the MapReduce project created to overcome some performance issues in Hadoop’s original design. The fundamental idea of MapReduce v2 is to split the functionalities of the JobTracker, Resource Management and Job Scheduling/Monitoring, into separate daemons. The idea is to have a global Resource Manager (RM) and a per-application Application Master (AM). A generic diagram for YARN component dependencies can be found from <a href="http://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/yarn_architecture.gif">YARN architecture</a>.</p>
 ">
 <meta name="twitter:creator" content="@tunebluez">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,65 +174,66 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>我们非常高兴地摆脱困境，并在<a href="http://www.springsource.org/node/22687">Spring的Apache Hadoop 2.0 M1版本中释放了</a>对编写基于YARN的应用程序的支持。在这篇博客文章中，我将向您介绍<a href="https://hadoop.apache.org/docs/r2.0.6-alpha/hadoop-yarn/hadoop-yarn-site/YARN.html">YARN</a> ，您可以使用它做什么，以及Spring如何简化基于YARN的应用程序的开发。</p><p>如果过去一两年来一直在关注Hadoop社区，那么您可能已经看到了很多有关YARN和Hadoop的下一版本MapReduce（称为MapReduce v2）的讨论。YARN（另一个资源协商者）是MapReduce项目的一个组件，旨在克服Hadoop原始设计中的某些性能问题。MapReduce v2的基本思想是将JobTracker，资源管理和Job Scheduling / Monitoring的功能拆分为单独的守护程序。这个想法是拥有一个全局资源管理器（RM）和一个按应用程序的应用程序主机（AM）。可以从<a href="https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/yarn_architecture.gif">YARN体系结构中</a>找到有关YARN组件依赖关系的通用图。</p><p>MapReduce版本2是在YARN之上运行的应用程序。也可以制作与MapReduce无关的类似的基于YARN的自定义应用程序，它只是在运行YARN应用程序。但是，编写基于YARN的自定义应用程序很困难。YARN API是低级基础结构API，而不是开发人员API。查看有关编写YARN应用程序的<a href="http://static.springsource.org/spring-hadoop/docs/2.0.0.M1/reference/html/yarn.html">文档</a> ，以了解所涉及的内容。</p><p>从2.0版本开始，Spring for Apache Hadoop引入了Spring YARN子项目，以提供对构建基于Spring的YARN应用程序的支持。对YARN的支持通过尝试使开发更容易而介入。“ Spring处理基础结构，因此您可以专注于<a href="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html">应用程序</a> ”适用于编写Hadoop应用程序以及其他类型的Java应用程序。Spring的YARN支持还使测试YARN应用程序更加容易。</p><p>有了Spring的YARN支持，您将使用Spring Framework本身的所有熟悉概念，包括配置以及通常来说您可以在应用程序中执行的操作。在较高的层次上，Spring YARN提供了三个不同的组件， <em>YarnClient</em> ， <em>YarnAppmaster</em>和<em>YarnContainer</em> ，它们可以一起称为Spring YARN应用程序。我们为所有组件提供默认的实现，同时仍然为最终用户提供了根据需要进行自定义的选项。让我们快速看一下一个非常简单的Spring YARN应用程序，该应用程序在Hadoop集群中运行一些自定义代码。</p><p><em>YarnClient</em>用于与YARN的资源管理器进行通信。这提供了管理操作，例如提交新的应用程序实例，列出应用程序和终止正在运行的应用程序。从<em>YarnClient</em>提交应用程序时，主要关注的问题是如何配置和启动Application Master。<em>YarnAppmaster</em>和<em>YarnContainer</em>共享相同的通用启动上下文配置逻辑，因此您将在YarnClient和YarnAppmaster配置中看到很多相似之处。类似于<em>YarnClient</em>将如何定义背景下推出的<em>YarnAppmaster</em>的<em>YarnAppmaster</em>定义了<em>YarnContainer</em>推出上下文。启动上下文定义了用于启动容器的命令，本地化文件，命令行参数，环境变量和资源限制（内存，cpu）。</p><p><em>YarnContainer</em>是一名工作人员，负责执行YARN应用程序的实际工作。YarnAppmaster正在与YARN资源管理器通信，并相应地启动和停止YarnContainers。</p><p>您可以使用YARN XML命名空间创建一个Spring应用程序来启动ApplicationMaster，以定义Spring Application Context。YarnClient的上下文配置定义了YarnAppmaster的启动上下文。这包括YarnAppmaster及其环境设置所需的资源和库。下面是一个示例。</p>
-<pre><code class="prettyprint xml"><yarn:configuration />
+<div class="blog--post"><p>我们非常高兴地摆脱困境，并<a href="http://www.springsource.org/node/22687">在Apache Hadoop 2.0 M1发行版Spring的</a>一部分中释放支持编写基于YARN的应用程序。在这篇博客文章中，我将向您介绍<a href="https://hadoop.apache.org/docs/r2.0.6-alpha/hadoop-yarn/hadoop-yarn-site/YARN.html">YARN</a> ，您可以使用它做什么，以及Spring如何简化基于YARN的应用程序的开发。</p><p>如果过去一两年来一直在关注Hadoop社区，那么您可能已经看到了很多有关YARN和Hadoop的下一版本MapReduce（称为MapReduce v2）的讨论。YARN（另一个资源协商者）是MapReduce项目的一个组件，旨在克服Hadoop原始设计中的某些性能问题。MapReduce v2的基本思想是将JobTracker，资源管理和Job Scheduling / Monitoring的功能拆分为单独的守护程序。这个想法是拥有一个全局资源管理器（RM）和一个按应用程序的应用程序主机（AM）。可以从<a href="https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/yarn_architecture.gif">YARN体系结构中</a>找到有关YARN组件依赖关系的通用图。</p><p>MapReduce版本2是在YARN之上运行的应用程序。也可以制作与MapReduce无关的类似的基于YARN的自定义应用程序，它只是在运行YARN应用程序。但是，编写基于YARN的自定义应用程序很困难。YARN API是低级基础结构API，而不是开发人员API。查看有关编写YARN应用程序的<a href="http://static.springsource.org/spring-hadoop/docs/2.0.0.M1/reference/html/yarn.html">文档</a> ，以了解所涉及的内容。</p><p>从2.0版本开始，Spring for Apache Hadoop引入了Spring YARN子项目，以提供对构建基于Spring的YARN应用程序的支持。对YARN的支持通过尝试使开发更容易而介入。“ Spring处理基础结构，因此您可以专注于<a href="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html">应用程序</a> ”适用于编写Hadoop应用程序以及其他类型的Java应用程序。Spring的YARN支持也使测试YARN应用程序更加容易。</p><p>有了Spring的YARN支持，您将使用Spring Framework本身的所有熟悉概念，包括配置以及通常来说您可以在应用程序中执行的操作。在较高的层次上，Spring YARN提供了三个不同的组件， <em>YarnClient</em> ， <em>YarnAppmaster</em>和<em>YarnContainer</em> ，它们可以一起称为Spring YARN应用程序。我们为所有组件提供默认的实现，同时仍然为最终用户提供了根据需要进行自定义的选项。让我们快速看一下一个非常简单的Spring YARN应用程序，该应用程序在Hadoop集群中运行一些自定义代码。</p><p><em>YarnClient</em>用于与YARN的资源管理器进行通信。这提供了管理操作，例如提交新的应用程序实例，列出应用程序和终止正在运行的应用程序。从<em>YarnClient</em>提交应用程序时，主要关注的问题是如何配置和启动Application Master。<em>YarnAppmaster</em>和<em>YarnContainer</em>共享相同的通用启动上下文配置逻辑，因此您将在YarnClient和YarnAppmaster配置中看到很多相似之处。类似于<em>YarnClient</em>将如何定义背景下推出的<em>YarnAppmaster</em>的<em>YarnAppmaster</em>定义了<em>YarnContainer</em>推出上下文。启动上下文定义了用于启动容器的命令，本地化文件，命令行参数，环境变量和资源限制（内存，cpu）。</p><p><em>YarnContainer</em>是一名工作人员，负责执行YARN应用程序的实际工作。YarnAppmaster正在与YARN资源管理器通信，并相应地启动和停止YarnContainers。</p><p>您可以使用YARN XML命名空间创建一个Spring应用程序来启动ApplicationMaster，以定义Spring Application Context。YarnClient的上下文配置定义了YarnAppmaster的启动上下文。这包括YarnAppmaster及其环境设置所需的资源和库。下面是一个示例。</p>
+<pre><code class="prettyprint xml">&lt;yarn:configuration /&gt;
 
-<yarn:localresources>
-  <yarn:hdfs path="/path/to/my/libs/*.jar"/>
-</yarn:localresources>
+&lt;yarn:localresources&gt;
+  &lt;yarn:hdfs path=&quot;/path/to/my/libs/*.jar&quot;/&gt;
+&lt;/yarn:localresources&gt;
 
-<yarn:environment>
-  <yarn:classpath/>
-</yarn:environment>
+&lt;yarn:environment&gt;
+  &lt;yarn:classpath/&gt;
+&lt;/yarn:environment&gt;
 
-<yarn:client app-name="my-yarn-app">
-  <yarn:master-runner />
-</yarn:client>
+&lt;yarn:client app-name=&quot;my-yarn-app&quot;&gt;
+  &lt;yarn:master-runner /&gt;
+&lt;/yarn:client&gt;
 </code></pre><p>注意：将来的发行版将提供基于Java的API进行配置， <a href="http://blog.springsource.org/2013/07/02/spring-security-java-config-preview-introduction/">类似于Spring Security 3.2中的配置</a> 。</p><p><em>YarnAppmaster</em>的目的是控制正在运行的应用程序的实例。<em>YarnAppmaster</em>负责控制其所有<em>YarnContainers</em> ，应用程序提交后的整个运行应用程序及其<em>自身</em>的生命周期。</p>
-<pre><code class="prettyprint xml"><yarn:configuration />
+<pre><code class="prettyprint xml">&lt;yarn:configuration /&gt;
 
-<yarn:localresources>
-  <yarn:hdfs path="/path/to/my/libs/*.jar"/>
-</yarn:localresources>
+&lt;yarn:localresources&gt;
+  &lt;yarn:hdfs path=&quot;/path/to/my/libs/*.jar&quot;/&gt;
+&lt;/yarn:localresources&gt;
 
-<yarn:environment>
-  <yarn:classpath/>
-</yarn:environment>
+&lt;yarn:environment&gt;
+  &lt;yarn:classpath/&gt;
+&lt;/yarn:environment&gt;
 
-<yarn:master>
-  <yarn:container-allocator/>
-  <yarn:container-runner/>
-</yarn:master>
+&lt;yarn:master&gt;
+  &lt;yarn:container-allocator/&gt;
+  &lt;yarn:container-runner/&gt;
+&lt;/yarn:master&gt;
 </code></pre><p>上面的示例为<em>YarnAppmaster</em>定义了上下文配置。与在<em>YarnClient</em>配置中看到的类似，我们为<em>YarnContainer</em>及其环境定义本地资源。classpath设置在默认位置拾取hadoop jar以及您自己的应用程序jar，如果要使用非默认目录，请更改设置。同样在<em>YarnAppmaster中，</em>我们定义了处理容器分配和引导的组件。分配器组件正在与YARN资源管理器进行交互，以处理资源调度。Runner组件负责引导分配的容器。</p>
-<pre><code class="prettyprint xml"><yarn:container container-class="org.example.MyCustomYarnContainer"/>
-</code></pre><p>上面的示例定义了一个简单的<em>YarnContainer</em>上下文配置。</p><p>要实现容器的功能，请实现YarnContainer接口。YarnContainer接口类似于Java的Runnable接口，它具有run（）方法以及与获取环境和命令行信息有关的两个附加方法。</p><p>下面是一个简单的hello world应用程序，它将在YARN容器中运行：</p>
+<pre><code class="prettyprint xml">&lt;yarn:container container-class=&quot;org.example.MyCustomYarnContainer&quot;/&gt;
+</code></pre><p>上面的示例定义了一个简单的<em>YarnContainer</em>上下文配置。</p><p>要实现容器的功能，请实现YarnContainer接口。YarnContainer接口类似于Java的Runnable接口，它具有run（）方法，以及与获取环境和命令行信息有关的两个附加方法。</p><p>下面是一个简单的hello world应用程序，它将在YARN容器中运行：</p>
 <pre><code class="prettyprint java">public class MyCustomYarnContainer implements YarnContainer {
 
   private static final Log log = LogFactory.getLog(MyCustomYarnContainer.class);
 
   @Override
   public void run() {
-    log.info("Hello from MyCustomYarnContainer");
+    log.info(&quot;Hello from MyCustomYarnContainer&quot;);
   }
 
   @Override
-  public void setEnvironment(Map<String, String> environment) {}
+  public void setEnvironment(Map&lt;String, String&gt; environment) {}
 
   @Override
   public void setParameters(Properties parameters) {}
 
 }
-</code></pre><p>我们只是展示了Spring YARN应用程序的配置和核心应用程序逻辑，因此剩下的就是如何引导应用程序在Hadoop集群中运行。实用程序类CommandLineClientRunner提供了此功能。</p><p>您可以从命令行手动使用CommandLineClientRunner，也可以从自己的代码使用CommandLineClientRunner。</p>
-<pre><code class="prettyprint"># java -cp <mile long classpath> org.springframework.yarn.client.CommandLineClientRunner application-context.xml yarnClient -submit
-</code></pre><p>Spring YARN应用程序打包到一个jar文件中，然后可以将其与其余依赖项一起传输到HDFS中。YarnClient可以在应用程序提交过程中将所有需要的库都转移到HDFS中，但是一般来说，最好这样做是手动操作，以避免不必要的网络I / O。在创建新版本之前，您的应用程序不会更改，因此可以在首次提交应用程序之前将其复制到HDFS中。您可以使用Hadoop的<em>hdfs dfs -copyFromLocal</em>命令。</p><p>您可以在下面看到典型项目设置的示例。</p>
+</code></pre><p>我们仅展示了Spring YARN应用程序的配置和核心应用程序逻辑，因此剩下的就是如何引导应用程序在Hadoop集群中运行。实用程序类CommandLineClientRunner提供了此功能。</p><p>您可以从命令行手动使用CommandLineClientRunner，也可以从自己的代码使用CommandLineClientRunner。</p>
+<pre><code class="prettyprint"># java -cp &lt;mile long classpath&gt; org.springframework.yarn.client.CommandLineClientRunner application-context.xml yarnClient -submit
+</code></pre><p>Spring YARN应用程序打包到一个jar文件中，然后可以将其与其余依赖项一起传输到HDFS中。YarnClient可以在应用程序提交过程中将所有需要的库都转移到HDFS中，但是一般来说，最好手动执行此操作，以避免不必要的网络I / O。在创建新版本之前，您的应用程序不会更改，因此可以在首次提交应用程序之前将其复制到HDFS中。您可以使用Hadoop的<em>hdfs dfs -copyFromLocal</em>命令。</p><p>您可以在下面看到典型项目设置的示例。</p>
 <pre><code class="prettyprint">src/main/java/org/example/MyCustomYarnContainer.java
 src/main/resources/application-context.xml
 src/main/resources/appmaster-context.xml
 src/main/resources/container-context.xml
-</code></pre><p>作为一个疯狂的猜测，我们敢打赌，您现在已经发现您实际上并没有配置YARN，而是为所有三个组件<em>YarnClient</em> ， <em>YarnAppmaster</em>和<em>YarnContainer</em>配置Spring Application Contexts。</p><p>我们刚刚介绍了Spring YARN可以做的事情。当我们准备更多博客文章时，请继续并检查<a href="https://github.com/SpringSource/spring-hadoop-samples/tree/master/yarn">GitHub中的</a>现有示例。基本上，要反映我们在此博客文章中描述的概念，请参阅示例存储库中的<a href="https://github.com/SpringSource/spring-hadoop-samples/tree/master/yarn/yarn/multi-context">多上下文</a>示例。</p><p>将来的博客文章将涵盖<a href="http://static.springsource.org/spring-hadoop/docs/2.0.0.M1/reference/html/yarn.html#yarn:testing">单元测试</a>和更高级的YARN应用程序开发等主题。</p></div>
+</code></pre><p>作为一个疯狂的猜测，我们敢打赌，您现在已经发现您实际上并没有配置YARN，而是为所有三个组件<em>YarnClient</em> ， <em>YarnAppmaster</em>和<em>YarnContainer</em>配置Spring Application Contexts。</p><p>我们刚刚介绍了Spring YARN可以做的事情。当我们准备更多博客文章时，请继续并检查<a href="https://github.com/SpringSource/spring-hadoop-samples/tree/master/yarn">GitHub中的</a>现有示例。基本上，要反映我们在此博客文章中描述的概念，请参阅示例存储库中的<a href="https://github.com/SpringSource/spring-hadoop-samples/tree/master/yarn/yarn/multi-context">多上下文</a>示例。</p><p>未来的博客文章将涵盖<a href="http://static.springsource.org/spring-hadoop/docs/2.0.0.M1/reference/html/yarn.html#yarn:testing">单元测试</a>和更高级的YARN应用程序开发等主题。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1154;
 
       (function(disqus_shortname, document) {
@@ -240,7 +247,8 @@ src/main/resources/container-context.xml
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -278,12 +286,14 @@ src/main/resources/container-context.xml
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Sagan项目：零停机时间部署</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Project Sagan: zero-downtime deployments">
-<meta name="twitter:description" content="<p>Last week, I <a href=" http:="" ="" spring.io="" blog="" 2014="" 03="" 27="" project-sagan-open-sourcing-spring-i="="></head><body dir="ltr">began this series by announcing that the <a href="http://github.com/spring-io/sagan">Sagan</a> reference app is now open source and <a href="https://vimeo.com/90126708">showed</a> how to get up and running with it on your own machine.
+<meta name="twitter:description" content="<p>Last week, I <a href=" http:="" ="" spring.io="" blog="" 2014="" 03="" 27="" project-sagan-open-sourcing-spring-i="="></head><body >began this series by announcing that the <a href="http://github.com/spring-io/sagan">Sagan</a> reference app is now open source and <a href="https://vimeo.com/90126708">showed</a> how to get up and running with it on your own machine.
 <p>In this post, I want to walk through how we push Sagan into production at spring.io multiple times a day with zero downtime using <em>blue-green deployments</em>. You may have heard of this technique before; <a href="http://martinfowler.com/bliki/BlueGreenDeployment.html">Martin Fowler gave it a write-up</a> a few years ago, and there is a section on it in the highly-recommended book <a href="http://www.amazon.com/gp/product/0321601912">Continuous Delivery</a>. In a nutshell, it goes like this:</p>
 ">
 <meta name="twitter:creator" content="@cbeams">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,13 +174,13 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>上周，我通过宣布<a href="https://github.com/spring-io/sagan">Sagan</a>参考应用程序现已开放源代码<a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">开始了本系列文章</a> ，并<a href="https://vimeo.com/90126708">演示了</a>如何在自己的计算机上启动并运行它。</p><p>在这篇文章中，我想逐步介绍如何使用<em>blue-green部署</em>每天多次在无停机的情况下在spring.io上将Sagan投入生产。您可能以前已经听说过这种技术。几年前， <a href="http://martinfowler.com/bliki/BlueGreenDeployment.html">马丁·福勒（Martin Fowler）撰写了</a>一篇文章，在高度推荐的《 <a href="https://www.amazon.com/gp/product/0321601912">持续交付</a> 》（ <a href="https://www.amazon.com/gp/product/0321601912">Continuous Delivery）</a>一书中对此进行了介绍。简而言之，它是这样的：</p>
+<div class="blog--post"><p>上周，我通过宣布<a href="https://github.com/spring-io/sagan">Sagan</a>参考应用程序现已开放源代码<a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">开始了本系列文章</a> ，并<a href="https://vimeo.com/90126708">演示了</a>如何在自己的计算机上启动并运行它。</p><p>在这篇文章中，我想逐步介绍如何使用<em>blue-green部署</em>每天多次将Sagan投入spring.io并实现零停机。您可能以前已经听说过这种技术。几年前， <a href="http://martinfowler.com/bliki/BlueGreenDeployment.html">马丁·福勒（Martin Fowler）撰写了</a>一篇文章，在高度推荐的《 <a href="https://www.amazon.com/gp/product/0321601912">持续交付</a> 》（ <a href="https://www.amazon.com/gp/product/0321601912">Continuous Delivery）</a>一书中对此进行了介绍。简而言之，它是这样的：</p>
 <ol>
 <li>维护您的生产环境的两个副本（“蓝色”和“绿色”）；</li>
 <li>通过将生产URL映射到蓝色环境，将所有流量路由到蓝色环境；</li>
 <li>在绿色环境中部署和测试对应用程序的任何更改；</li>
 <li>通过将URL映射到绿色并将其从蓝色取消映射来“翻转开关”。</li>
-</ol><p>从概念上讲，蓝绿色的部署很简单，而且收益也很可观（经常部署，永不失败，轻松回滚）。但是，如果没有正确的基础架构，实施起来可能会很棘手。例如，要完成关键的第四步“翻转开关”，您需要一种快速，可靠和自动化的方法来在蓝色和绿色环境之间映射和取消映射生产URL。基于DNS的方法无法满足大多数或所有这些条件；您想要的是一个考虑了这种用例的平台。</p><p>幸运的是，Cloud Foundry就是这样一个平台。<a href="http://docs.gopivotal.com/pivotalcf/devguide/deploy-apps/blue-green.html">关于蓝绿色部署</a>的Pivotal Web服务<a href="http://docs.gopivotal.com/pivotalcf/devguide/deploy-apps/blue-green.html">文档在</a>解释CF <em>Router</em>如何使这种映射和取消映射成为可能方面做得很好。</p><p>以Sagan项目为例，虽然与CF的路由基础架构确实确实为我们提供了我们所需的<em>快速</em>而<em>可靠的</em>映射，但<em>自动化</em>部门仍需要一点点。我们最初围绕Ruby <code>cf</code>客户端<a href="https://github.com/spring-io/sagan/blob/0eb19856b7da7fa2e5aea9aeeb5da60185ac1fa6/sagan-site/scripts/deploy.sh">编写了shell脚本</a> ，然后<a href="https://github.com/spring-io/sagan/commit/14df068c28c69b8f29a0ceda25e501a33e5ed448">将它们迁移</a>到新的基于Go的<code>gcf</code>客户端上。这行得通，但是我们真正想要的是一个解决方案，该解决方案（a）我们不必编写和维护自己，并且（b）可以在JVM上100％运行，这是由Sagan的Gradle构建本机驱动的。</p><p>为了实现这一目标，我们与Cloud Foundry团队的Scott Frederick合作，他们出色地增强了<a href="https://github.com/cloudfoundry/cf-java-client/tree/master/cloudfoundry-gradle-plugin">Cloud Foundry Gradle插件的功能，</a>以支持蓝绿色部署作为一流的功能。这意味着<a href="https://github.com/spring-io/sagan/commit/44f70ef915ccedf48742b0b9d1d4cdda60e9993b">不再需要任何shell脚本</a> ， <a href="https://github.com/spring-io/sagan/blob/master/gradle/deploy.gradle">声明性配置</a> ，并且开箱即用的零停机时间现在变得非常简单：</p>
+</ol><p>从概念上讲，蓝绿色的部署很简单，而且收益也很可观（经常部署，永不失败，轻松回滚）。但是，如果没有正确的基础架构，实施起来可能会很棘手。例如，要完成关键的第四步“翻转开关”，您需要一种快速，可靠和自动化的方法来在蓝色和绿色环境之间映射和取消映射生产URL。基于DNS的方法无法满足大多数或所有这些条件；您想要的是一个考虑了这种用例的平台。</p><p>幸运的是，Cloud Foundry就是这样一个平台。<a href="http://docs.gopivotal.com/pivotalcf/devguide/deploy-apps/blue-green.html">关于蓝绿色部署</a>的Pivotal Web服务<a href="http://docs.gopivotal.com/pivotalcf/devguide/deploy-apps/blue-green.html">文档在</a>解释CF <em>Router</em>如何使这种映射和取消映射成为可能方面做得很好。</p><p>以Sagan项目为例，虽然与CF的路由基础架构确实确实为我们提供了我们所需的<em>快速</em>而<em>可靠的</em>映射，但<em>自动化</em>部门仍需要一点点。我们最初围绕Ruby <a href="https://github.com/spring-io/sagan/blob/0eb19856b7da7fa2e5aea9aeeb5da60185ac1fa6/sagan-site/scripts/deploy.sh">编写了shell脚本</a> <code>cf</code>客户，然后<a href="https://github.com/spring-io/sagan/commit/14df068c28c69b8f29a0ceda25e501a33e5ed448">将它们迁移</a>到新的基于Go的<code>gcf</code>客户出来的时候。这行得通，但是我们真正想要的是一个解决方案，该解决方案（a）我们不必编写和维护自己，并且（b）可以在JVM上100％运行，这是由Sagan的Gradle构建本机驱动的。</p><p>为了实现这一目标，我们与Cloud Foundry团队的Scott Frederick合作，他们出色地增强了<a href="https://github.com/cloudfoundry/cf-java-client/tree/master/cloudfoundry-gradle-plugin">Cloud Foundry Gradle插件的功能，</a>以支持蓝绿色部署作为一流的功能。这意味着<a href="https://github.com/spring-io/sagan/commit/44f70ef915ccedf48742b0b9d1d4cdda60e9993b">不再需要任何shell脚本</a> ， <a href="https://github.com/spring-io/sagan/blob/master/gradle/deploy.gradle">声明性配置</a> ，并且开箱即用的零停机时间现在变得非常简单：</p>
 <pre><code class="prettyprint">./gradlew deploy -Pspace=production
 </code></pre><p>但这比描述的要好得多。在此截屏视频中，我将逐步介绍从Spring Boot 1.0.0升级Sagan的过程。M5到<a href="https://spring.io/blog/2014/04/01/spring-boot-1-0-ga-released">了新发布的1.0 GA</a> ，并推动了变更的进行，蓝绿色风格。</p>
 <iframe src="//player.vimeo.com/video/90956088" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen></iframe>
@@ -182,7 +188,8 @@
 </blockquote><p>在Sagan wiki <a href="https://github.com/spring-io/sagan/wiki/Run-the-site-on-Cloud-Foundry">上</a>查看<a href="https://github.com/spring-io/sagan/wiki/Run-the-site-on-Cloud-Foundry">如何在Cloud Foundry</a>上<a href="https://github.com/spring-io/sagan/wiki/Run-the-site-on-Cloud-Foundry">运行该网站</a>以开始使用，并记住您可以使用邀请代码“ <strong>sagan</strong> ”立即获得<a href="https://console.run.pivotal.io/register">Pivotal Web Services</a>帐户的批准。</p><p>下周我们将在这个系列的另一个条目中。我们仍在为此计划内容，很高兴听到您希望探索Sagan应用程序的哪些方面。直到那时！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1485;
 
       (function(disqus_shortname, document) {
@@ -196,7 +203,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -234,12 +242,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

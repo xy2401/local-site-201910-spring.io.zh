@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Security定制（第2部分-实时调整安全会话）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,14 +36,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2009-01-03 04:37:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,10 +171,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>假设您处于安全会话中（您已登录并有权访问特定资源），但是您的安全基础结构团队已更新了您的权利和特权。也许您被授予了更多的权利和特权，或者您的权利被完全撤销了……问题是您的安全会话已在会话注册表中注册，并且直到您注销/登录代表您在此安全会话中的Principal为止重新创建。如果情况更加严重（毕竟我们在这里谈论安全问题）……您是一个心怀不满的员工，您的直属管理层发现您的“错误行为”，但需要公司5次会议和10次批准表格才能获得做一些事情，直到那件事发生，你才有可能造成更大的伤害？？？</p><p>显然，有许多业务场景可能会提示用户进行会话时调整用户的权限。而且在Spring Security中，显然还有一种以上的方法可以完成此任务。一种方法是使用会话注册表（实际上旨在进行并发会话控制）将人们赶出系统。构建一个支持此功能的GUI或JMX，可以使用户从注册的会话列表中“过期”。他们提出的下一个请求将被拒绝，会话将无效，从而强制进行身份验证过程。<br>但是，为了使其更加有趣并演示实现类似目标的另一种方法，让我们稍微更改一下方案，并说我们不想完全使用户的安全会话无效，而只是想暂时中止它。</p><p>现在，在安全性上下文中的“ <em>暂停</em> ”一词可能意味着很多不同的事情。这可能意味着暂时中止，也可能意味着权利的完全撤销。我将由您决定在任何上下文中定义该词的含义……我想向您展示如何使用Spring Security组件（如<em>AccessDecisionVoter</em>和<em>AccessDesisionManager）</em>实时调整安全会话。同样在以下示例中，我们将通过暂时中止用户的权限而不使他/她的会话无效来调整当前的安全会话。</p><p>为此，我们需要遵循以下步骤。</p><p><em>1。在Spring Security配置中定义AccessDecisionManager<br>1.1定义基本投票者，例如RoleVoter和AuthenticatedVoter<br>2。定义并实现AccessDecisionVoter。该投票者必须维护已撤销其权利的用户列表，并且每次用户执行安全操作时都必须投票ACCESS_DENIED。<br>3。将此选民添加到已在AccessDecisionManager中注册的选民堆栈中。</em></p><p>另外，为了能够在应用程序运行时与该投票器进行交互，我们还通过使用Spring JMX将其动态导出为JMX bean来使JMX启用该投票器。</p><p>就是这样。</p><p>因此，首先我们需要定义<em>AccessDecisionManager</em> （ADM）。由于我们在尽可能使用Spring Security命名空间（例如： <strong>security：http</strong> ）的配置元素，因此Spring Security将为我们注册默认的<em>AccessDecisionManager</em> ，它恰好是<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/vote/AffirmativeBased.html">AffirmativeBased</a> ADM。这对我们不利，因为我们试图在这里变得更加保守。因此，我们要做的是定义<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/vote/UnanimousBased.html">UnanimousBased</a> ADM并使用指向<em>UninimousBased</em> ADM的<em>access-decision-manager-ref</em>属性覆盖<strong>“ security：http”</strong>元素的<em>默认</em> ADM（请参见下文）</p><p><code><br><!– Define custom Voter –><br><bean id=“suspendVoter” class=“org.springframework.security.sample.SuspendRealTimeVoter”/></code></p><p><code><br><!– Define AccessDesisionManager as UnanimousBased –><br><bean id=“accessDecisionManager” class=“org.springframework.security.vote.UnanimousBased”><br>  <property name=“decisionVoters”><br>    <list><br><strong>      <ref bean=“suspendVoter” /></strong><br>      <bean class=“org.springframework.security.vote.RoleVoter” /><br>      <bean class=“org.springframework.security.vote.AuthenticatedVoter” /><br>    </list><br>  </property><br></bean></code></p><p>我们也将把我们的自定义选民放在选民的先后顺序，知道在基于一致决定的决策过程中，第一个否定意味着<em>不应该执行进一步的评估</em> 。意识到其他投票决定可能是耗时的或性能密集的，因此首先在投票者堆栈中注册自定义投票者将确保仅在特权未暂停的情况下执行此类投票操作。</p><p><code><!– Define http security configuration –><br><security:http <strong>access-decision-manager-ref=“accessDecisionManager”</strong> … . .><br>… .<br></security:http><br></code></p><p>剩下要做的就是让JMX启用“ suspendVoter”。使用<a href="http://static.springframework.org/spring/docs/2.5.x/reference/jmx.html">Spring JMX</a>可以很容易地做到这一点。<br><code><br><!– JMX enable custom Voter –><br><bean class=“org.springframework.jmx.export.MBeanExporter”><br>  <property name=“beans”><br>    <map><br>      <entry <strong>key=“org.springframework.security:name=SuspendRealTimeVoter” value-ref=“suspendVoter”</strong> /><br>    </map><br>  </property><br></bean></code></p><p>现在， <strong>“ suspendVoter”</strong>将以名称<strong>org.springframework.security:name=SuspendRealTimeVoter</strong>导出到JMX服务器。</p><p>从代码角度来看，我们唯一需要实现的自定义组件是<strong>SuspendRealTimeVoter</strong>类。在其中，我们将维护一组权限被暂时撤销的用户。在<em>表决（..）</em>方法内部，我们的逻辑非常简单。如果用户在列表中，请投票ACCESS_DENIED，否则请投票ACCESS_GRANTED。</p><p><code><br>public int vote(Authentication authentication, Object object,<br>ConfigAttributeDefinition config) {<br>    String userName = authentication.getName();<br>    return revokedUsers.contains(userName) ? ACCESS_DENIED : ACCESS_GRANTED;<br>}<br></code></p><p>在这里您还将看到<em>suspend（String userName）</em>和<em>grant（String userName）</em>方法，我们将通过这些方法测试此功能。</p><p>注意：要通过JMX与我们的选民互动，我们将使用JDK（1.5+）提供的JConsole工具，因此需要JMX启用我们的应用程序服务器。对于此示例，我使用的是Tomcat，因此，如果您使用的是Tomcat，则将以下VM参数添加到其启动脚本中</p><p><code><br>-Dcom.sun.management.jmxremote<br></code></p><p>启动服务器，部署应用程序并访问其URL： <em><a href="http://localhost:8080/spring-security-sample-suspendUser">http://localhost:8080/spring-security-sample-suspendUser</a></em></p><p>成功登录后，单击<em>刷新</em>几次，以查看您的会话是否正常运行并且运行良好。然后导航到JDK的<em>bin</em>目录，打开命令提示符并键入<em>jconsole</em> （请参见下文）</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-7.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-7.png" alt="" title="图片7" width="275" height="91" class="alignnone size-medium wp-image-911"></a></p><p>当JConsole打开时，单击MBeans选项卡。浏览树并访问SuspendRealTimeVoter。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-8.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-8.png" alt="" title="图片8" width="500" height="381" class="alignnone size-full wp-image-912"></a></p><p>你会看到， <em>暂停（..）</em>和<em>格兰特（..）</em>方法<em>操作</em>选项卡下可用。暂停您以其身份登录的用户的权限，并刷新您所在的HTML页面。您将看到拒绝页面。通过调用该用户的<em>grant（..）</em>方法来取消该用户的暂停，您将重新营业。<br>现在，如果确实要进行5次会议和10个批准表，则可以暂时撤消用户的权限，从而给您的经理足够的时间来做出此类决定。</p><p><strong>结论</strong></p><p>这只是一个示例，展示了如何使用Voters临时暂停安全会话。但我希望您能清楚地看到如何使用相同的方法来实现其他目标。这样的目标可以自动重新认证用户，也可以简单地更新他/她的GrantedAuority列表等等。</p><p>可以从这里下载本文的示例源代码： <a href="http://blog.springsource.com/wp-content/uploads/2009/01/spring-security-sample-suspenduser.zip">spring-security-sample-suspenduser</a></p></div>
+<div class="blog--post"><p>假设您处于安全会话中（您已登录并有权访问特定资源），但是您的安全基础结构团队已更新了您的权利和特权。也许您被授予了更多的权利和特权，或者您的权利被完全撤销了……问题是您的安全会话已在会话注册表中注册，并且直到您注销/登录代表您在此安全会话中的Principal为止重新创建。如果情况更加严重（毕竟我们在这里谈论安全问题）……您是一个心怀不满的员工，您的直属管理层发现您的“错误行为”，但需要公司5次会议和10次批准表格才能获得做一些事情，直到那件事发生，你才有可能造成更大的伤害？？？</p><p>显然，有很多业务场景可能会提示用户在会话期间调整用户的权限。而且在Spring Security中，显然还有一种以上的方法可以完成此任务。一种方法是使用会话注册表（实际上旨在进行并发会话控制）将人们赶出系统。构建一个支持此功能的GUI或JMX，可以使用户从注册的会话列表中“过期”。他们提出的下一个请求将被拒绝，会话将无效，从而强制进行身份验证过程。<br>但是，为了使其更加有趣并演示实现类似目标的另一种方法，让我们稍微更改一下方案，并说我们不想完全使用户的安全会话无效，而只是想暂时中止它。</p><p>现在，在安全性上下文中的“ <em>暂停</em> ”一词可能意味着很多不同的事情。这可能意味着暂时中止，也可能意味着权利的完全撤销。我将由您决定在任何上下文中定义该词的含义……我想向您展示如何使用Spring Security组件（如<em>AccessDecisionVoter</em>和<em>AccessDesisionManager）</em>实时调整安全会话。同样在以下示例中，我们将通过暂时中止用户的权限而不使他/她的会话无效来调整当前的安全会话。</p><p>为此，我们需要遵循以下步骤。</p><p><em>1。在Spring Security配置中定义AccessDecisionManager<br>1.1定义基本投票者，例如RoleVoter和AuthenticatedVoter<br>2。定义并实现AccessDecisionVoter。该投票者必须维护已撤销其权利的用户列表，并且每次用户执行安全操作时都必须投票ACCESS_DENIED。<br>3。将此选民添加到已在AccessDecisionManager中注册的选民堆栈中。</em></p><p>另外，为了能够在应用程序运行时与该投票器进行交互，我们还通过使用Spring JMX将其动态导出为JMX bean来使JMX启用该投票器。</p><p>就是这样。</p><p>因此，首先我们需要定义<em>AccessDecisionManager</em> （ADM）。由于我们在尽可能使用Spring Security命名空间（例如： <strong>security：http</strong> ）的配置元素，因此Spring Security将为我们注册默认的<em>AccessDecisionManager</em> ，它恰好是<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/vote/AffirmativeBased.html">AffirmativeBased</a> ADM。这对我们不利，因为我们试图在这里变得更加保守。因此，我们要做的是定义<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/vote/UnanimousBased.html">UnanimousBased</a> ADM并使用指向<em>UninimousBased</em> ADM的<em>access-decision-manager-ref</em>属性覆盖<strong>“ security：http”</strong>元素的<em>默认</em> ADM（请参见下文）</p><p><code><br><!– Define custom Voter –><br><bean id=“suspendVoter” class=“org.springframework.security.sample.SuspendRealTimeVoter”/></code></p><p><code><br><!– Define AccessDesisionManager as UnanimousBased –><br><bean id=“accessDecisionManager” class=“org.springframework.security.vote.UnanimousBased”><br>  <property name=“decisionVoters”><br>    <list><br><strong>      <ref bean=“suspendVoter” /></strong><br>      <bean class=“org.springframework.security.vote.RoleVoter” /><br>      <bean class=“org.springframework.security.vote.AuthenticatedVoter” /><br>    </list><br>  </property><br></bean></code></p><p>我们也将把我们的自定义选民放在选民的先后顺序，知道在基于一致决定的决策过程中，第一个否定意味着<em>不应该执行进一步的评估</em> 。意识到其他投票决定可能是耗时的或性能密集的，因此首先在投票者堆栈中注册自定义投票者将确保仅在特权未暂停的情况下执行此类投票操作。</p><p><code><!– Define http security configuration –><br><security:http <strong>access-decision-manager-ref=“accessDecisionManager”</strong> … . .><br>… .<br></security:http><br></code></p><p>剩下要做的就是让JMX启用“ suspendVoter”。使用<a href="http://static.springframework.org/spring/docs/2.5.x/reference/jmx.html">Spring JMX</a>可以很容易地做到这一点。<br><code><br><!– JMX enable custom Voter –><br><bean class=“org.springframework.jmx.export.MBeanExporter”><br>  <property name=“beans”><br>    <map><br>      <entry <strong>key=“org.springframework.security:name=SuspendRealTimeVoter” value-ref=“suspendVoter”</strong> /><br>    </map><br>  </property><br></bean></code></p><p>现在， <strong>“ suspendVoter”</strong>将以名称<strong>org.springframework.security:name=SuspendRealTimeVoter</strong>导出到JMX服务器。</p><p>从代码角度来看，我们唯一需要实现的自定义组件是<strong>SuspendRealTimeVoter</strong>类。在其中，我们将维护一组权限被暂时撤销的用户。在<em>表决（..）</em>方法内部，我们的逻辑非常简单。如果用户在列表中，请投票ACCESS_DENIED，否则请投票ACCESS_GRANTED。</p><p><code><br>public int vote(Authentication authentication, Object object,<br>ConfigAttributeDefinition config) {<br>    String userName = authentication.getName();<br>    return revokedUsers.contains(userName) ? ACCESS_DENIED : ACCESS_GRANTED;<br>}<br></code></p><p>在这里，您还将看到<em>suspend（String userName）</em>和<em>grant（String userName）</em>方法，我们将通过这些方法测试此功能。</p><p>注意：要通过JMX与我们的选民互动，我们将使用JDK（1.5+）提供的JConsole工具，因此需要JMX启用我们的应用程序服务器。对于此示例，我使用的是Tomcat，因此，如果您使用的是Tomcat，则将以下VM参数添加到其启动脚本中</p><p><code><br>-Dcom.sun.management.jmxremote<br></code></p><p>启动服务器，部署应用程序并访问其URL： <em><a href="http://localhost:8080/spring-security-sample-suspendUser">http：// localhost：8080 / spring-security-sample-suspendUser</a></em></p><p>成功登录后，单击<em>刷新</em>几次，以查看您的会话是否正常运行并且运行良好。然后导航到JDK的<em>bin</em>目录，打开命令提示符并键入<em>jconsole</em> （请参见下文）</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-7.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-7.png" alt="" title="图片7" width="275" height="91" class="alignnone size-medium wp-image-911"></a></p><p>当JConsole打开时，单击MBeans选项卡。浏览树并访问SuspendRealTimeVoter。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-8.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-8.png" alt="" title="图片8" width="500" height="381" class="alignnone size-full wp-image-912"></a></p><p>您将在“ <em>操作”</em>选项卡下看到<em>suspend（..）</em>和<em>grant（..）</em>方法可用。暂停您以其身份登录的用户的权限，并刷新您所在的HTML页面。您将看到拒绝页面。通过调用该用户的<em>grant（..）</em>方法来取消该用户的暂停，您将重新营业。<br>现在，如果确实要进行5次会议和10个批准表，则可以暂时撤消用户的权限，从而为经理提供足够的时间来做出此类决定。</p><p><strong>结论</strong></p><p>这只是一个示例，展示了如何使用Voters临时暂停安全会话。但我希望您能清楚地看到如何使用相同的方法来实现其他目标。这样的目标可以是自动重新认证用户，也可以只是更新他/她的GrantedAuority列表，等等。</p><p>可以从这里下载本文的示例源代码： <a href="http://blog.springsource.com/wp-content/uploads/2009/01/spring-security-sample-suspenduser.zip">spring-security-sample-suspenduser</a></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 198;
 
       (function(disqus_shortname, document) {
@@ -182,7 +189,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -220,12 +228,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

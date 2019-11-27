@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring 3.1 M2：配置增强</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring 3.1 M2: Configuration Enhancements">
-<meta name="twitter:description" content="<p>As Juergen mentioned in his post yesterday, and as I’ve mentioned in <a href=" http:="" ="" bit.ly="" ehuif="="></head><body dir="ltr">my <a href="http://bit.ly/lquUts">previous</a> <a href="http://bit.ly/kvkApq">posts</a> on 3.1 M1, one of the major themes of Spring 3.1 is completing our vision for code-based configuration in Spring. We think a modern enterprise Java application should have a choice between Java and XML as first class options for its configuration. In this post we’ll see how Spring 3.1 M2 helps make this a reality.
+<meta name="twitter:description" content="<p>As Juergen mentioned in his post yesterday, and as I’ve mentioned in <a href=" http:="" ="" bit.ly="" ehuif="="></head><body >my <a href="http://bit.ly/lquUts">previous</a> <a href="http://bit.ly/kvkApq">posts</a> on 3.1 M1, one of the major themes of Spring 3.1 is completing our vision for code-based configuration in Spring. We think a modern enterprise Java application should have a choice between Java and XML as first class options for its configuration. In this post we’ll see how Spring 3.1 M2 helps make this a reality.
 <p>Note that although Java-based configuration has been available since Spring 3.0, with this release it is now on par with many more of the XML-based features that have been developed over the years. We think the result is very appealing, and in some cases even offering clear advantages over XML-based configuration. In short: if you didn’t consider it in 3.0 you really should look at it closely this time around.<br><br></p>
 ">
 <meta name="twitter:creator" content="@cbeams">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -169,32 +175,32 @@
 </div>
 </header>
 <div class="blog--post"><p>正如克林斯曼在他的帖子昨天提到，和我提到过<a href="https://bit.ly/eHuiFi">我</a> <a href="https://bit.ly/lquUts">以前</a> <a href="https://bit.ly/kvkApq">的帖子</a>在3.1 M1，春3.1的主题之一是完成在春天我们对基于代码的配置视野。我们认为现代企业Java应用程序应该在Java和XML之间进行选择，并将其作为配置的一流选择。在这篇文章中，我们将看到Spring 3.1 M2如何帮助实现这一目标。</p><p>请注意，尽管从Spring 3.0开始就可以使用基于Java的配置，但是在此发行版中，它与多年来开发的许多基于XML的功能相当。我们认为结果非常吸引人，在某些情况下甚至比基于XML的配置具有明显的优势。简而言之：如果您没有在3.0中考虑它，那么这次确实应该仔细研究它。<br><br></p>
-<h2>Spring XML名称空间的代码等效项</h2><p>如果您一直在仔细观察，您会记得我们在3.1 M1中引入了<code><a href="https://bit.ly/lT3bcV">FeatureSpecification</a></code>类和<code>@Feature</code>方法的想法。事实证明，我们决定用3.1 M2中的其他机制替换它。为什么？因为尽管<code>FeatureSpecification</code>类提供了一种方便的机制来配置Spring容器的功能，例如注释驱动的事务管理和组件扫描，所以这种方便有两个缺点：缺乏可扩展性和缺乏实现透明性。我们考虑得越多，就越意识到我们可以做得更好。尽管<code>FeatureSpecification</code>类通过流利的API紧密地反映了XML名称空间，但新解决方案却采用了不同的形式-一种专门设计用于利用Java自身优势的解决方案。</p><p>简而言之，我们将新机制称为“ <code>@Enable</code> ”注释。这些注释在<code>@Configuration</code>类的类型级别上应用。让我们以<code>@EnableTransactionManagement</code>为例。大多数用户将熟悉以下Spring XML代码段：</p>
-<pre><code class="prettyprint xml"><br><beans>
-  <tx:annotation-driven/>
-</beans>
-</code></pre><p>当然，这可以使用<code>@Transactional</code>annotation启用Spring对事务管理的支持。现在，让我们看一下代码中的等效配置：</p>
-<pre><code class="prettyprint java"><br>@Configuration
+<h2>Spring XML名称空间的代码等效项</h2><p>如果您一直在仔细观察事物，您会记得我们引入了<code><a href="https://bit.ly/lT3bcV">FeatureSpecification</a></code>类和<code>@Feature</code> 3.1 M1中的方法。事实证明，我们决定用3.1 M2中的其他机制替换它。为什么？因为虽然<code>FeatureSpecification</code>类提供了一种方便的机制，用于配置Spring容器的功能，例如注释驱动的事务管理和组件扫描，该便利具有两个缺点：缺乏可扩展性和缺乏实现透明性。我们考虑得越多，就越意识到我们可以做得更好。而<code>FeatureSpecification</code>类通过流畅的API紧密地反映了XML名称空间，新解决方案采用了不同的形式-一种专门设计为利用Java本身的优势的解决方案。</p><p>简而言之，我们称新机制为“ <code>@Enable</code> ”注释。这些批注在类型级别上应用<code>@Configuration</code>类。让我们来<code>@EnableTransactionManagement</code>举个例子大多数用户将熟悉以下Spring XML代码段：</p>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
+  &lt;tx:annotation-driven/&gt;
+&lt;/beans&gt;
+</code></pre><p>当然，这可以使用以下方式使Spring支持事务管理： <code>@Transactional</code>注解。现在，让我们看一下代码中的等效配置：</p>
+<pre><code class="prettyprint java"><br />@Configuration
 @EnableTransactionManagement
 public class AppConfig {
      // ...
 }
-</code></pre><p>很简单吧？当然，还有更多的话要说，我鼓励大家看看我们在此版本中提供的<code>@Enable</code>annotation的Javadoc。您会发现它们包含大量上下文，示例和对重要相关类型的引用。它应该是您入门所需的一切。当然，我们还将在3.1 GA之前更新参考文档，但由于Javadoc受到了很多热爱，我们跳过了M2。</p>
+</code></pre><p>很简单吧？当然还有更多的话要说，我鼓励大家看看Javadoc中的<code>@Enable</code>我们在此版本中提供的注释。您会发现它们包含大量上下文，示例和对重要相关类型的引用。它应该是您入门所需的一切。当然，我们还将在3.1 GA之前更新参考文档，但由于Javadoc受到了很多热爱，我们跳过了M2。</p>
 <ul>
 <li><code><a href="https://bit.ly/l2Ousb">@EnableTransactionManagement</a></code></li>
 <li><code><a href="https://bit.ly/jEWWdR">@EnableAsync</a></code></li>
 <li><code><a href="https://bit.ly/lYjXl9">@EnableScheduling</a></code></li>
 <li><code><a href="https://bit.ly/jubz1k">@EnableLoadTimeWeaving</a></code></li>
 <li><code><a href="https://bit.ly/ilwUGz">@EnableWebMvc</a></code></li>
-</ul><p>还可以查看<a href="https://bit.ly/j2T00Y"><code>@Configuration</code></a>的Javadoc，该<a href="https://bit.ly/j2T00Y"><code>@Configuration</code></a>在M2中已进行了相当大的修改，以展示与其他注释和机制（如新的<a href="https://bit.ly/mSc3c8"><code>Environment</code></a>抽象）的主要集成。</p><p>关于<code>@EnableWebMvc</code>annotation，这是一个很好的例子，其中基于Java的配置被证明比XML命名空间替代方案具有真正的好处。Rossen将在本系列的后面部分详细发布有关此主题的内容，请继续关注。</p><p><br></p>
-<h2>Hibernate SessionFactory构建器API</h2><p>Spring对Hibernate的支持一直是该框架最受欢迎的功能之一，并且始终通过XML进行配置。在M2中，我们引入了<code>SessionFactoryBuilder</code>和<code>AnnotationSessionFactoryBuilder</code> API，这些API使Hibernate <code>SessionFactory</code>的基于代码的配置变得<code>SessionFactory</code> 。看看这个：</p>
-<pre><code class="prettyprint java"><br>@Configuration
+</ul><p>也可以看看Javadoc for <a href="https://bit.ly/j2T00Y"><code>@Configuration</code></a> ，在M2中已进行了相当大的修改，以展示与其他注释和机制（如新版本）的主要集成<a href="https://bit.ly/mSc3c8"><code>Environment</code></a>抽象。</p><p>关于<code>@EnableWebMvc</code>注释，这是一个很好的例子，其中基于Java的配置被证明比XML命名空间替代方案具有真正的好处。Rossen将在本系列的后面部分详细发布有关此主题的内容，请继续关注。</p><p><br></p>
+<h2>Hibernate SessionFactory构建器API</h2><p>Spring对Hibernate的支持一直是该框架最受欢迎的功能之一，并且始终通过XML进行配置。在M2中，我们介绍了<code>SessionFactoryBuilder</code>和<code>AnnotationSessionFactoryBuilder</code>进行基于代码的Hibernate配置的API <code>SessionFactory</code>瞬间。看看这个：</p>
+<pre><code class="prettyprint java"><br />@Configuration
 public class DataConfig {
      @Bean
      public SessionFactory sessionFactory() {
          return new AnnotationSessionFactoryBuilder()
              .setDataSource(dataSource())
-             .setPackagesToScan("com.myco")
+             .setPackagesToScan(&quot;com.myco&quot;)
              .buildSessionFactory();
      }
 }
@@ -203,15 +209,15 @@ public class DataConfig {
 <li><code><a href="https://bit.ly/jrzl0v">SessionFactoryBuilder</a></code></li>
 <li><code><a href="https://bit.ly/mAX3PS">AnnotationSessionFactoryBuilder</a></code></li>
 </ul><p><br></p>
-<h2>无XML的JPA配置</h2><p>使用JPA的Spring用户将熟悉我们的<code>LocalContainerEntityManagerFactoryBean</code> 。我们添加了一个“ <code>packagesToScan</code> ”属性，使您可以完全删除persistence.xml！顺便说一下，这与Spring的Hibernate <code>AnnotationSessionFactoryBean</code>上的同名属性非常相似。这是一个例子：</p>
-<pre><code class="prettyprint java"><br>@Configuration
+<h2>无XML的JPA配置</h2><p>使用JPA的Spring用户将熟悉我们的<code>LocalContainerEntityManagerFactoryBean</code> 。我们添加了一个“ <code>packagesToScan</code> '属性，可让您完全删除persistence.xml！顺便说一下，这与Spring的Hibernate中同名的属性非常相似<code>AnnotationSessionFactoryBean</code> 。这是一个例子：</p>
+<pre><code class="prettyprint java"><br />@Configuration
 public class DataConfig {
      @Bean
      public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
          LocalContainerEntityManagerFactoryBean emf =
              new LocalContainerEntityManagerFactoryBean();
          emf.setDataSource(dataSource())
-         emf.setPackagesToScan("com.myco")
+         emf.setPackagesToScan(&quot;com.myco&quot;)
          return emf;   
      }
 }
@@ -219,35 +225,35 @@ public class DataConfig {
 <ul>
 <li><code><a href="https://bit.ly/lZmNRj">LocalContainerEntityManagerFactoryBean#setPackagesToScan</a></code></li>
 </ul><p><br></p>
-<h2>将web.xml留在后面</h2><p>Servlet 3.0引入了一些非常有趣的新功能，用于基于代码的Servlet容器配置。本质上， <code>ServletContext</code> API已得到增强，以允许用户以基于类或基于实例的方式注册servlet，过滤器和侦听器。看一看：</p>
+<h2>将web.xml留在后面</h2><p>Servlet 3.0为基于Servlet容器的代码配置引入了一些非常有趣的新功能。本质上， <code>ServletContext</code> API已得到增强，允许用户以基于类或基于实例的方式注册servlet，过滤器和侦听器。看一看：</p>
 <ul>
 <li><a href="https://bit.ly/kWcyHR"><code>ServletContext#addServlet(String, Servlet)</code></a></li>
 <li><a href="https://bit.ly/jMCZDG"><code>ServletContext#addFilter(String, Filter)</code></a></li>
-</ul><p>这意味着现在可以以编程方式而不是通过web.xml声明式注册诸如Spring的<code>DispatcherServlet</code>和<code>ContextLoaderListener</code>之类的面向Servlet的组件。</p><p>缺少的只是一个引导机制-在servlet容器生命周期的明确定义的位置执行这些注册的位置。幸运的是，Servlet 3.0也使用<code>ServletContainerInitializer</code>解决了这一问题。</p><p><code>ServletContainerInitializer</code>是一个低级SPI，主要供Spring之类的框架使用。我将把细节留给Javadoc（下面的链接），但是简而言之，Spring 3.1 M2现在提供了一个非常方便的<code>WebApplicationInitializer</code>接口，该接口与<code>ServletContainerInitializer</code> SPI协同工作，允许您以编程方式引导Servlet容器。这是一个简单的示例：</p>
-<pre><code class="prettyprint java"><br>public class MyWebAppInitializer implements WebApplicationInitializer {
+</ul><p>这意味着现在可以注册诸如Spring的面向Servlet的组件<code>DispatcherServlet</code>和<code>ContextLoaderListener</code>以编程方式，而不是通过web.xml进行声明式。</p><p>缺少的只是一个引导机制-在servlet容器生命周期的明确定义的位置执行这些注册的位置。幸运的是，Servlet 3.0也通过<code>ServletContainerInitializer</code> 。</p><p><code>ServletContainerInitializer</code>是主要用于Spring之类的框架的低级SPI。我将把细节留给Javadoc（下面的链接），但是总之，Spring 3.1 M2现在提供了一个非常方便的方法。 <code>WebApplicationInitializer</code>界面与<code>ServletContainerInitializer</code> SPI允许您以编程方式引导servlet容器。这是一个简单的示例：</p>
+<pre><code class="prettyprint java"><br />public class MyWebAppInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext container) {
       XmlWebApplicationContext appContext = new XmlWebApplicationContext()
-      appContext.setConfigLocation("/WEB-INF/spring/dispatcher-config.xml");
+      appContext.setConfigLocation(&quot;/WEB-INF/spring/dispatcher-config.xml&quot;);
 
       ServletRegistration.Dynamic dispatcher =
-        container.addServlet("dispatcher", new DispatcherServlet(appContext));
+        container.addServlet(&quot;dispatcher&quot;, new DispatcherServlet(appContext));
       dispatcher.setLoadOnStartup(1);
-      dispatcher.addMapping("/");
+      dispatcher.addMapping(&quot;/&quot;);
     }
 
 }
-</code></pre><p>如您所见， <code>DispatcherServlet</code>现在具有接受<code>WebApplicationContext</code>的构造函数。这是Javadoc：<br></p><ul><br><li><code><a href="https://bit.ly/l3XXjs">DispatcherServlet#DispatcherServlet(WebApplicationContext)</a></code></li><br></ul><br>而且，尽管我们在上面使用了<code>XmlWebApplicationContext</code> ，但是您当然可以选择<code>AnnotationConfigWebApplicationContext</code>并通过<code>@Configuration</code>类完全引导。<p></p>
+</code></pre><p>如你看到的， <code>DispatcherServlet</code>现在运动一个接受<code>WebApplicationContext</code> 。这是Javadoc：<br></p><ul><br><li><code><a href="https://bit.ly/l3XXjs">DispatcherServlet#DispatcherServlet(WebApplicationContext)</a></code></li><br></ul><br>虽然我们使用了<code>XmlWebApplicationContext</code>以上，您当然可以选择<code>AnnotationConfigWebApplicationContext</code>而是通过完全引导<code>@Configuration</code>类。<p></p>
 <ul>
 <li><code><a href="https://bit.ly/lZmNRj">AnnotationConfigWebApplicationContext</a></code></li>
-</ul><p>当类路径中存在<code>spring-web</code>模块JAR时，Spring结合<code>ServletContainerInitializer</code>机制自动检测并处理<code>WebApplicationInitializer</code>实现。这意味着您可以按照自己认为适合应用程序的方式打包它们（再见，WEB-INF！）我们已经在Glassfish 3.1和Tomcat 7.0.15上成功测试了所有这些功能，因此现在是使用Spring 3.1和Servlet 3.0的最佳时机。</p><p>有关完整的用法说明，请查看<code>WebApplicationInitializer</code>本身的Javadoc：<br></p><ul><br><li><code><a href="https://bit.ly/iviLkm">WebApplicationInitializer</a></code></li><br></ul><p></p><p>对于从web.xml <code>WebApplicationInitializer</code>进行迁移的完整（简洁）示例，请从Spring温室参考应用程序的'servlet3'分支中查看此提交：</p>
+</ul><p>当。。。的时候<code>spring-web</code>模块JAR存在于您的类路径中<code>WebApplicationInitializer</code> Spring会结合使用自动检测并处理实现<code>ServletContainerInitializer</code>机制。这意味着您可以按照自己认为适合应用程序的方式打包它们（再见，WEB-INF！）我们已经在Glassfish 3.1和Tomcat 7.0.15上成功地测试了所有这些功能，因此现在正是使用Spring 3.1和Servlet 3.0的好时机。</p><p>有关完整的用法说明，请参阅Javadoc for <code>WebApplicationInitializer</code>本身：<br></p><ul><br><li><code><a href="https://bit.ly/iviLkm">WebApplicationInitializer</a></code></li><br></ul><p></p><p>对于从web.xml进行迁移的完整（简洁）示例<code>WebApplicationInitializer</code> ，请从Spring温室参考应用程序的'servlet3'分支中检查此提交：</p>
 <ul>
 <li>温室<code><a href="https://bit.ly/lrDHja">web.xml -> WebApplicationInitializer</a></code></li>
 </ul><p><br></p>
-<h2>改进了对外部化价值的支持</h2><p>M1引入了<code>Environment</code>抽象和统一的<code><a href=" http://bit.ly/kvkApq">PropertySource</a></code> API。在M2中，我们的目标是使这些组件尽可能易于配置和使用。新的<code>@PropertySource</code>annotation允许您从<code>@Configuration</code>类中为环境贡献属性源：</p>
-<pre><code class="prettyprint java"><br> @Configuration
- @PropertySource("classpath:/com/myco/app.properties")
+<h2>改进了对外部化价值的支持</h2><p>M1介绍了<code>Environment</code>抽象和统一<code><a href=" http://bit.ly/kvkApq">PropertySource</a></code> API。在M2中，我们的目标是使这些组件尽可能易于配置和使用。新的<code>@PropertySource</code>批注允许您从内部将属性源贡献给环境<code>@Configuration</code>类：</p>
+<pre><code class="prettyprint java"><br /> @Configuration
+ @PropertySource(&quot;classpath:/com/myco/app.properties&quot;)
  public class AppConfig {
      @Autowired
      Environment env;
@@ -255,21 +261,22 @@ public class DataConfig {
      @Bean
      public TestBean testBean() {
          TestBean testBean = new TestBean();
-         testBean.setName(env.getProperty("testbean.name"));
+         testBean.setName(env.getProperty(&quot;testbean.name&quot;));
          return testBean;
      }
  }
 
-</code></pre><p>这与传统的<code>PropertyPlaceholderConfigurer</code> （ <code><context:property-placeholder></code> ）方法。在这里，我们为环境贡献了一个属性源，将环境注入到我们的<code>@Configuration</code>类中，然后使用环境的<code>#getProperty</code>系列方法查找所需的属性。请查看<code>@PropertySource</code>和<code>Environment</code>的Javadoc，以获取全部详细信息。</p>
+</code></pre><p>这是与传统方法不同的方法<code>PropertyPlaceholderConfigurer</code> （ <code><context:property-placeholder></code> ）方法。在这里，我们正在为环境贡献财产来源，将环境注入我们的<code>@Configuration</code>类，然后使用环境的<code>#getProperty</code>方法族。查看Javadoc以获取<code>@PropertySource</code>和<code>Environment</code>有关详细信息。</p>
 <ul>
 <li><a href="https://bit.ly/kOQQ6g">@PropertySource</a></li>
 <li><a href="https://bit.ly/mSc3c8">环境</a></li>
 <li><a href="https://bit.ly/m2vMUQ">PropertyResolver</a> （环境超级接口）</li>
 </ul><p><br></p>
-<h2>摘要</h2><p>如您所见，我们确实在这里有一个主要主题。从基于Java的替代品到Spring的XML名称空间和<code>FactoryBeans</code> ，甚至甚至消除了非Spring XML（如web.xml和persistence.xml），我们现在都可以自豪地说，Spring的基于代码的配置在整个框架中都是一流的。唯一剩下的就是您的反馈！</p><p>正如Juergen所说，现在是时候尝试3.1（如果您还没有开始的话）。我们现在进入候选发布阶段，这是根据实际使用情况进行改进的最佳时机。请让我们知道情况如何！</p><p>哦，还有一件事……如果您还没有注意到，Spring现在在Twitter上！关注<a href="https://bit.ly/kWf6xm">@springframework</a>以了解最新版本，并从框架本身深入了解Spring。希望在那里见到您，并感谢您的阅读！<br><br></p></div>
+<h2>摘要</h2><p>如您所见，我们确实在这里有一个主要主题。从基于Java的替代品到Spring的XML名称空间，以及<code>FactoryBeans</code>为了消除甚至像web.xml和persistence.xml这样的非Spring XML，我们现在可以自豪地说，Spring的基于代码的配置在整个框架中都是一流的。唯一剩下的就是您的反馈！</p><p>正如Juergen所说，现在是时候尝试3.1（如果您还没有开始的话）。我们现在进入候选发布阶段，这是根据实际使用情况进行改进的最佳时机。请让我们知道情况如何！</p><p>哦，还有一件事……如果您还没有注意到，Spring现在在Twitter上！关注<a href="https://bit.ly/kWf6xm">@springframework</a>以了解最新版本，并从框架本身深入了解Spring。希望在那里见到您，并感谢您的阅读！<br><br></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 420;
 
       (function(disqus_shortname, document) {
@@ -283,7 +290,8 @@ public class DataConfig {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -321,12 +329,14 @@ public class DataConfig {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

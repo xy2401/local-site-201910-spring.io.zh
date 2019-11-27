@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring YARN应用模型</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring YARN Application Model">
-<meta name="twitter:description" content="<p>Now that Thomas has just <a href=" https:="" ="" spring.io="" blog="" 2014="" 02="" 06="" spring-for-apache-hadoop-2-0-m5-release="="></head><body dir="ltr">released a fifth milestone for Spring for Apache Hadoop, I’d like to use this opportunity to talk about recent development in its new feature, Spring YARN.
+<meta name="twitter:description" content="<p>Now that Thomas has just <a href=" https:="" ="" spring.io="" blog="" 2014="" 02="" 06="" spring-for-apache-hadoop-2-0-m5-release="="></head><body >released a fifth milestone for Spring for Apache Hadoop, I’d like to use this opportunity to talk about recent development in its new feature, Spring YARN.
 <p>One strength in our <a href="https://spring.io/platform">Spring IO Platform</a> is interoperability of its technologies. Great example of this is how Spring Boot and Spring YARN are able work together to create a better model for Hadoop YARN application development. In this blog post I’d like to show an example of a new Spring Yarn Application model which is heavily based on <a href="http://projects.spring.io/spring-boot">Spring Boot</a>.</p>
 ">
 <meta name="twitter:creator" content="@tunebluez">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -174,7 +180,7 @@
 <li>项目是如何构建和打包的</li>
 <li>打包的应用程序如何配置</li>
 <li>如何执行申请</li>
-</ul><p>我们认为，Spring YARN和Spring Boot提供了一个简单的编程模型来开发应用程序，而不是可以轻松地作为YARN应用程序或传统应用程序进行测试和部署。</p><p>在较高的层次上，Spring YARN提供了三个组件， <code>YarnClient</code> ， <code>YarnAppmaster</code>和<code>YarnContainer</code> ，它们反映了YARN体系结构中的关键过程。总之，这三个组件提供了Spring YARN应用程序模型的基础。</p><p>在Hadoop集群上打包和执行自己的代码一直是一个繁琐的过程。需要将已编译的程序包放入Hadoop的类路径中，或者让Hadoop的工具在作业提交期间将您的程序包复制到Hadoop中。一旦超过了WordCount，您的代码将依赖于Hadoop默认类路径中不存在的第三方库。您应该如何打包依赖库？此外，如果您的依赖项与已经属于Hadoop默认类路径一部分的库发生冲突该怎么办。</p><p>Spring Boot可以为这些构建和打包问题提供一个优雅的解决方案。您可以创建一个可执行的jar（有时称为uber或fat jar），它将您的应用程序代码及其所有依赖项捆绑到一个.jar文件中，或者创建一个zip文件，可以在执行代码之前将其分解。两种打包格式之间的主要区别在于，后者允许您重新使用Hadoop的默认类路径中已经可用的jar。</p><p>在本指南中，我们将展示如何使用Spring Boot将这三个组件<code>YarnClient</code> ， <code>YarnAppmaster</code>和<code>YarnContainer</code>打包到可执行jar中。在内部，Spring Boot严重依赖于应用程序自动配置，Spring YARN添加了自己的自动配置魔术。然后，用户可以专注于自己的代码和应用程序配置，而不必花费大量时间尝试了解所有组件应如何相互集成。</p><p>现在，我们将向您展示创建自定义应用程序并将其部署到Hadoop集群有多么简单。注意，没有必要使用XML。</p><h1><a href="#create-a-yarn-container" class="anchor" name="create-a-yarn-container"></a>创建一个纱线容器</h1><p>在这里创建<code>ContainerApplication</code>和<code>HelloPojo</code>类。</p>
+</ul><p>我们认为，Spring YARN和Spring Boot提供了一个简单的编程模型来开发应用程序，而不是可以轻松地作为YARN应用程序或传统应用程序进行测试和部署。</p><p>在较高的层次上，Spring YARN提供了三个组件， <code>YarnClient</code> ， <code>YarnAppmaster</code>和<code>YarnContainer</code>反映了YARN体系结构中的关键过程。总之，这三个组件提供了Spring YARN应用程序模型的基础。</p><p>在Hadoop集群上打包和执行自己的代码一直是一个繁琐的过程。需要将已编译的程序包放在Hadoop的类路径中，或者让Hadoop的工具在作业提交期间将您的程序包复制到Hadoop中。一旦超过了WordCount，您的代码将依赖于Hadoop默认类路径中不存在的第三方库。您应该如何打包依赖库？此外，如果您的依赖项与已经属于Hadoop默认类路径一部分的库发生冲突该怎么办。</p><p>Spring Boot可以为这些构建和打包问题提供一个优雅的解决方案。您可以创建一个可执行的jar（有时称为uber或fat jar），将您的应用程序代码及其所有依赖项捆绑到一个.jar文件中，或者创建一个zip文件，可以在执行代码之前将其分解。两种打包格式之间的主要区别在于，后者允许您重新使用Hadoop的默认类路径中已经可用的jar。</p><p>在本指南中，我们将展示这三个组件<code>YarnClient</code> ， <code>YarnAppmaster</code>和<code>YarnContainer</code>使用Spring Boot将它们打包到可执行jar中。在内部，Spring Boot严重依赖于应用程序自动配置，Spring YARN添加了自己的自动配置魔术。然后，用户可以专注于自己的代码和应用程序配置，而不必花费大量时间尝试了解所有组件应如何相互集成。</p><p>现在，我们将向您展示创建自定义应用程序并将其部署到Hadoop集群有多么简单。注意，没有必要使用XML。</p><h1><a href="#create-a-yarn-container" class="anchor" name="create-a-yarn-container"></a>创建一个纱线容器</h1><p>在这里创建<code>ContainerApplication</code>和<code>HelloPojo</code>类。</p>
 <pre><code class="prettyprint java">@Configuration
 @EnableAutoConfiguration
 public class ContainerApplication {
@@ -189,7 +195,7 @@ public class ContainerApplication {
 	}
 
 }
-</code></pre><p>在上面的<code>ContainerApplication</code> ，请注意我们如何在类级别本身中添加<code>@Configuration</code>以及<code>@Bean</code>为<code>helloPojo()</code>方法添加<code>helloPojo()</code> 。我们之前提到过<code>YarnContainer</code>组件，它是您要在容器中执行的接口。您可以定义自定义的<code>YarnContainer</code>来实现此接口，并将所有逻辑包装在该实现内。</p><p>但是，如果未定义，则Spring YARN默认为<code>DefaultYarnContainer</code> ，并且此默认实现期望找到一个具有实际逻辑的特定bean，该容器应该执行什么操作。这有效地创建了一个简单的模型，该模型至少需要一个简单的<code>POJO</code> 。</p>
+</code></pre><p>在上面<code>ContainerApplication</code> ，请注意我们如何添加<code>@Configuration</code>在课堂上<code>@Bean</code>为一个<code>helloPojo()</code>方法。我们之前提到<code>YarnContainer</code>组件，它是您要在容器中执行的操作的接口。您可以定义自己的习惯<code>YarnContainer</code>实现此接口并将所有逻辑包装在该实现中。</p><p>但是，Spring YARN默认为<code>DefaultYarnContainer</code>如果未定义任何容器，并且此默认实现期望找到一个具有实际逻辑的特定bean，那么该容器应该执行什么操作。这有效地创建了一个简单的模型，其中至少只有一个简单的模型<code>POJO</code>是必需的。</p>
 <pre><code class="prettyprint java">@YarnContainer
 public class HelloPojo {
 
@@ -200,21 +206,21 @@ public class HelloPojo {
 
 	@OnYarnContainerStart
 	public void publicVoidNoArgsMethod() {
-		log.info("Hello from HelloPojo");
-		log.info("About to list from hdfs root content");
+		log.info(&quot;Hello from HelloPojo&quot;);
+		log.info(&quot;About to list from hdfs root content&quot;);
 		FsShell shell = new FsShell(configuration);
-		for (FileStatus s : shell.ls(false, "/")) {
+		for (FileStatus s : shell.ls(false, &quot;/&quot;)) {
 			log.info(s);
 		}
 	}
 
 }
-</code></pre><p><code>HelloPojo</code>某种意义上说， <code>HelloPojo</code>类是一个简单的<code>POJO</code> ，它没有扩展任何Spring YARN基类。我们在这堂课上做了什么：</p>
+</code></pre><p><code>HelloPojo</code>上课很简单<code>POJO</code>从某种意义上说，它没有扩展任何Spring YARN基类。我们在这堂课上做了什么：</p>
 <ul>
-<li>我们添加了一个类级别的<code>@YarnContainer</code>annotation。</li>
-<li>我们添加了方法级别<code>@OnYarnContainerStart</code>annotation</li>
-<li>我们已经<code>@Autowired</code>了Hadoop的<code>Configuration</code>类</li>
-</ul><p><code>@YarnContainer</code>是<code>@YarnContainer</code>型注释本身，其中定义了Spring的<code>@Component</code> 。这会自动将一个类标记为具有<code>@YarnContainer</code>功能的候选<code>@YarnContainer</code> 。</p><p>在此类中，我们可以使用<code>@OnYarnContainerStart</code>annotation来标记没有返回类型或参数的公共方法，这是需要在Hadoop上执行的事情。</p><p>为了证明我们实际上在此类中具有某些实际功能，我们仅使用Spring Hadoop的<code>@FsShell</code>列出<code>HDFS</code>文件系统根目录中的条目。为此，我们需要访问为您准备的Hadoop的<code>Configuration</code> ，以便您可以对其进行自动装配。</p><h1><a href="#create-a-yarn-client" class="anchor" name="create-a-yarn-client"></a>创建一个纱线客户端</h1><p>在这里创建一个<code>ClientApplication</code>类。</p>
+<li>我们增加了一个班级<code>@YarnContainer</code>注解。</li>
+<li>我们添加了一个方法级别<code>@OnYarnContainerStart</code>注解</li>
+<li>我们已经<code>@Autowired</code> Hadoop的<code>Configuration</code>类</li>
+</ul><p><code>@YarnContainer</code>是具有Spring的构造型注释本身<code>@Component</code>在其中定义。这会自动将一个班级标记为具有<code>@YarnContainer</code>功能。</p><p>在本课程中，我们可以使用<code>@OnYarnContainerStart</code>注释，用于标记没有返回类型或参数的公共方法，这是需要在Hadoop上执行的操作。</p><p>为了证明我们实际上在此类中具有某些实际功能，我们仅使用Spring Hadoop的<code>@FsShell</code>从列表的根目录列出条目<code>HDFS</code>文件系统。为此，我们需要访问Hadoop的<code>Configuration</code>为您准备好了，以便您可以自动为其布线。</p><h1><a href="#create-a-yarn-client" class="anchor" name="create-a-yarn-client"></a>创建一个纱线客户端</h1><p>在这里创建一个<code>ClientApplication</code>类。</p>
 <pre><code class="prettyprint java">@EnableAutoConfiguration
 public class ClientApplication {
 
@@ -228,8 +234,8 @@ public class ClientApplication {
 </code></pre>
 <ul>
 <li><code>@EnableAutoConfiguration</code>告诉Spring Boot根据类路径设置，其他bean和各种属性设置开始添加bean。</li>
-<li>由于Spring YARN在类路径上，因此发生了针对Spring YARN组件的特定自动配置。</li>
-</ul><p><code>main()</code>方法使用Spring Boot的<code>SpringApplication.run()</code>方法启动应用程序。从那里，我们简单地请求一个<code>YarnClient</code>类型的bean并执行其<code>submitApplication()</code>方法。接下来会发生什么取决于应用程序配置，我们将在本指南的后面部分进行介绍。</p><h1><a href="#create-a-yarn-appmaster" class="anchor" name="create-a-yarn-appmaster"></a>创建一个纱线Appmaster</h1><p>在这里，您将创建一个<code>AppmasterApplication</code>类。</p>
+<li>由于Spring YARN在类路径上，因此会针对Spring YARN组件进行特定的自动配置。</li>
+</ul><p>的<code>main()</code>方法使用Spring Boot的<code>SpringApplication.run()</code>启动应用程序的方法。从那里我们只需要一个类型为的bean <code>YarnClient</code>并执行它<code>submitApplication()</code>方法。接下来会发生什么取决于应用程序配置，我们将在本指南的后面部分进行介绍。</p><h1><a href="#create-a-yarn-appmaster" class="anchor" name="create-a-yarn-appmaster"></a>创建一个纱线Appmaster</h1><p>在这里您创建一个<code>AppmasterApplication</code>类。</p>
 <pre><code class="prettyprint java">@EnableAutoConfiguration
 public class AppmasterApplication {
 
@@ -238,7 +244,7 @@ public class AppmasterApplication {
 	}
 
 }
-</code></pre><p><code>YarnAppmaster</code>应用程序类看起来比我们之前对<code>ClientApplication</code>所做的简单。同样， <code>main()</code>方法使用Spring Boot的<code>SpringApplication.run()</code>方法来启动应用程序。</p><p>有人可能会争辩说，如果您使用这种虚拟类来基本上启动您的应用程序，我们是否可以为此使用通用类？好答案很简单，是的，我们甚至为此有一个通用的<code>SpringYarnBootApplication</code>类。您将其定义为可执行jar的主类，并在gradle构建期间完成此操作。</p><p>但是，在现实生活中，您很可能需要开始向应用程序组件中添加更多的自定义功能，而您可以通过开始添加更多的bean来做到这一点。为此，您需要定义一个Spring <code>@Configuration</code>或<code>@ComponentScan</code> 。然后， <code>AppmasterApplication</code>将作为您定义更多自定义功能的主要起点。</p><h1><a href="#create-an-application-configuration" class="anchor" name="create-an-application-configuration"></a>创建应用程序配置</h1><p>创建一个新的<code>yaml</code>配置文件。</p>
+</code></pre><p>申请类别<code>YarnAppmaster</code>看起来比我们刚刚做的还要简单<code>ClientApplication</code> 。再次<code>main()</code>方法使用Spring Boot的<code>SpringApplication.run()</code>启动应用程序的方法。</p><p>有人可能会争辩说，如果您使用这种虚拟类来基本上启动您的应用程序，我们是否可以为此使用通用类？好简单的答案是，我们甚至有一个通用的<code>SpringYarnBootApplication</code>为此目的而上课。您将其定义为可执行jar的主类，并在gradle构建期间完成此操作。</p><p>但是，在现实生活中，您很可能需要开始向应用程序组件中添加更多的自定义功能，而您可以通过开始添加更多的bean来做到这一点。为此，您需要定义一个Spring <code>@Configuration</code>要么<code>@ComponentScan</code> 。 <code>AppmasterApplication</code>然后将作为您定义更多自定义功能的主要起点。</p><h1><a href="#create-an-application-configuration" class="anchor" name="create-an-application-configuration"></a>创建应用程序配置</h1><p>创建一个新的<code>yaml</code>配置文件。</p>
 <pre><code class="prettyprint yaml">spring:
   yarn:
     appName: yarn-boot-simple
@@ -249,12 +255,12 @@ public class AppmasterApplication {
     client:
       appmasterFile: yarn-boot-simple-appmaster-0.1.0.jar
       files:
-       - "file:build/libs/yarn-boot-simple-container-0.1.0.jar"
-       - "file:build/libs/yarn-boot-simple-appmaster-0.1.0.jar"
+       - &quot;file:build/libs/yarn-boot-simple-container-0.1.0.jar&quot;
+       - &quot;file:build/libs/yarn-boot-simple-appmaster-0.1.0.jar&quot;
     appmaster:
       containerCount: 1
       containerFile: yarn-boot-simple-container-0.1.0.jar
-</code></pre><p>应用程序的最后一部分是其运行时配置，该配置将所有组件粘合在一起，然后可以将其称为Spring YARN应用程序。这种配置充当源春启动的<code>@ConfigurationProperties</code>并包含不能被自动发现或以其他方式需要有一个选项，由最终用户将被覆盖相关的配置属性。</p><p>然后，您可以为自己的环境编写自己的默认值。由于这些<code>@ConfigurationProperties</code>通过Spring Boot在运行时解析，因此您甚至可以使用命令行选项或提供其他配置属性文件来覆盖这些属性。</p><h1><a href="#build-the-application" class="anchor" name="build-the-application"></a>编译应用</h1><p>该博客中使用的示例代码可从我们在GitHub上的<a href="https://github.com/spring-projects/spring-hadoop-samples">spring-hadoop-samples</a>回购中找到。</p><p>签出示例后，请从<code>boot/yarn-boot-simple</code>目录发出gradle build命令。</p>
+</code></pre><p>应用程序的最后一部分是其运行时配置，该配置将所有组件粘合在一起，然后可以将其称为Spring YARN应用程序。该配置充当Spring Boot的源<code>@ConfigurationProperties</code>并包含相关的配置属性，这些属性无法自动发现，或者需要由最终用户覆盖的选项。</p><p>然后，您可以为自己的环境编写自己的默认值。因为这些<code>@ConfigurationProperties</code>在运行时由Spring Boot解决的情况下，您甚至可以使用命令行选项或提供其他配置属性文件来覆盖这些属性。</p><h1><a href="#build-the-application" class="anchor" name="build-the-application"></a>编译应用</h1><p>该博客中使用的示例代码可以从我们在GitHub上的<a href="https://github.com/spring-projects/spring-hadoop-samples">spring-hadoop-samples</a>回购中找到。</p><p>签出示例后，请从以下位置发出gradle build命令<code>boot/yarn-boot-simple</code>目录。</p>
 <pre><code class="prettyprint text">$ cd boot/yarn-boot-simple
 $ ./gradlew clean build
 </code></pre><p>对于此样本，我们希望保持项目结构简单。我们不在此博客中介绍gradle构建文件，但有个故事就是，我们将从一个项目中创建三个不同的jar文件。实际上，人们可能会使用多项目模型，其中每个子项目都将创建自己的jar文件。</p><h1><a href="#run-the-application" class="anchor" name="run-the-application"></a>运行应用程序</h1><p>既然您已经成功地编译和打包了应用程序，是时候做一些有趣的事情并在Hadoop YARN上执行它了。</p><p>下面的清单显示了在成功构建gradle之后的文件。</p>
@@ -270,7 +276,7 @@ hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001
 hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000002/Container.stderr
 hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000001/Appmaster.stdout
 hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000001/Appmaster.stderr
-</code></pre><p><code>HelloPojo</code>类记录的Grep输出。</p>
+</code></pre><p>Grep输出记录<code>HelloPojo</code>类。</p>
 <pre><code class="prettyprint text">$ grep HelloPojo hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001_01_000002/Container.stdout
 [2014-02-02 17:40:38,314] boot - 11944  INFO [main] --- HelloPojo: Hello from HelloPojo
 [2014-02-02 17:40:38,315] boot - 11944  INFO [main] --- HelloPojo: About to list from hdfs root content
@@ -279,7 +285,8 @@ hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001
 </code></pre><p>恭喜你！您刚刚开发了Spring YARN应用程序！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1378;
 
       (function(disqus_shortname, document) {
@@ -293,7 +300,8 @@ hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -331,12 +339,14 @@ hadoop/logs/userlogs/application_1391348442831_0001/container_1391348442831_0001
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

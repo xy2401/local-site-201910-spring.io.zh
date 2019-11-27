@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring的Java配置选项</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,14 +36,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2006-11-28 17:24:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,56 +171,57 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>归功于我们的可插入性理念和实施过程中的许多艰苦工作，Spring IoC容器（与大部分Spring其余部分一样）非常灵活。</p><p>经常遗漏的一点是，尽管XML格式是迄今为止最常用的格式，但Spring不需要使用XML配置。Spring具有其自己的内部元数据格式，以BeanDefinition接口和子接口的形式。代表IoC容器实例的BeanFactory和ApplicationContext实现由此Java元数据提供动力，并且与通常由BeanDefinitionReader实现执行的元数据解析完全不同。</p><p>BeanDefinition元数据最初并不是为最终开发人员设计的。在Spring 2.0中，NamespaceHandlers（处理XML扩展名称空间的类）生成BeanDefinition元数据，并且我们引入了BeanDefinitionBuilder，并使用了流畅的API来简化这一过程。但是，尽管如此，生成BeanDefinition元数据仍然保留在基础结构编码领域，而不是在编写业务逻辑和定义常规Spring Bean时每天要做的事情。</p><p>今天，我想描述一个用于在Java代码中定义bean的新选项，该选项针对的<em>是</em>最终用户（开发人员），而不是基础结构提供程序。当前，这是Spring核心的里程碑发行版<a href="http://blog.interface21.com/main/2006/11/28/a-java-configuration-option-for-spring/">附加组件</a> ，但可能会适当地进入Spring。</p><p>让我们从一个例子开始：</p>
+<div class="blog--post"><p>归功于我们的可插入性理念和实施过程中的许多艰苦工作，Spring IoC容器（与Spring的其余大部分一样）非常灵活。</p><p>经常遗漏的一点是，尽管XML格式是迄今为止最常用的格式，但Spring不必使用XML。Spring具有其自己的内部元数据格式，以BeanDefinition接口和子接口的形式出现。代表IoC容器实例的BeanFactory和ApplicationContext实现由此Java元数据提供动力，并且与通常由BeanDefinitionReader实现执行的元数据解析完全不同。</p><p>BeanDefinition元数据最初并不是为最终开发人员设计的。在Spring 2.0中，NamespaceHandlers（处理XML扩展名称空间的类）生成BeanDefinition元数据，并且我们引入了BeanDefinitionBuilder，并使用流畅的API使其更容易。但是生成BeanDefinition元数据仍然保留在基础结构编码领域，而不是在编写业务逻辑和定义常规Spring Bean时每天要做的事情。</p><p>今天，我想描述一个用于在Java代码中定义bean的新选项，该选项针对的<em>是</em>最终用户（开发人员），而不是基础结构提供程序。当前，这是Spring核心的里程碑发行版<a href="http://blog.interface21.com/main/2006/11/28/a-java-configuration-option-for-spring/">附加组件</a> ，但可能会适当地进入Spring。</p><p>让我们从一个例子开始：</p>
 <pre><code class="prettyprint java">@Configuration
 public class MyConfig {
    @Bean
    public Person rod() {
-      return new Person("Rod Johnson");
+      return new Person(&quot;Rod Johnson&quot;);
    }
 
    @Bean(scope = Scope.PROTOTYPE)
    public Book book() {
-      Book book = new Book("Expert One-on-One J2EE Design and Development");
+      Book book = new Book(&quot;Expert One-on-One J2EE Design and Development&quot;);
       book.setAuthor(rod());  // rod() method is actually a bean reference !
       return book;
    }
 }
-</code></pre><p>@Configurationannotation将此对象标识为特殊配置类。每个@Bean方法都定义一个bean。Bean的名称就是方法的名称。可以使用注释定义其他别名，但是最好从方法而不是注释中选择名称，因为这意味着编译器可以确保确保模棱两可。</p><p>使用构造函数，属性或任意方法调用以Java代码配置Bean。注意，对另一个bean方法的调用建立了从“ book” bean到“ rod” bean的依赖关系。但是，在没有框架支持的情况下，在Java中实例化对象具有关键优势：例如：<br></p><ul><br><li>每个@Bean都是Spring组件，可以利用所有Spring服务，例如声明式事务管理。</li><br><li>每个公共@Bean方法都会添加到Spring容器中，因此可以将其注入其他对象，JMX导出和其他好处。</li><br><li>它可以顺利地适应现有的Spring环境。</li><br></ul><p></p><p>通过将其与XML定义进行比较以实现相同的结果，可能更容易了解发生的情况，如下所示：</p>
-<pre><code class="prettyprint xml"><bean id="rod" class="Person" scope="singleton">
-   <constructor-arg>Rod Johnson</constructor-arg>
-</bean>
+</code></pre><p>@Configuration批注将此对象标识为特殊配置类。每个@Bean方法都定义一个bean。Bean的名称就是方法的名称。可以使用注释定义其他别名，但是最好从方法而不是注释中选择名称，因为这意味着编译器可以确保确保模棱两可。</p><p>使用构造函数，属性或任意方法调用以Java代码配置Bean。注意，对另一个bean方法的调用建立了从“ book” bean到“ rod” bean的依赖关系。但是，在没有框架支持的情况下，在Java中实例化对象具有关键优势：例如：<br></p><ul><br><li>每个@Bean都是Spring组件，可以利用所有Spring服务，例如声明式事务管理。</li><br><li>每个公共@Bean方法都会添加到Spring容器中，因此可以将其注入其他对象，JMX导出和其他好处。</li><br><li>它可以顺利地适应现有的Spring环境。</li><br></ul><p></p><p>通过将其与XML定义进行比较以实现相同的结果，可能更容易了解发生的情况，如下所示：</p>
+<pre><code class="prettyprint xml">&lt;bean id=&quot;rod&quot; class=&quot;Person&quot; scope=&quot;singleton&quot;&gt;
+   &lt;constructor-arg&gt;Rod Johnson&lt;/constructor-arg&gt;
+&lt;/bean&gt;
 
-<bean id="book" class="Book" scope="prototype">
-   <constructor-arg>Expert One-on-One J2EE Design and Development</constructor-arg>
-   <property name="author" ref="rod"/>
-</bean>
-</code></pre><p>尽管它基于注释，但是这种Java配置机制在注释的使用中是唯一的。我已经看到注释不包含在核心业务逻辑中，而是包含在单独的配置类中。实际上，它是用于配置的DSL。因此，它保留了Spring的非侵入性承诺：您无需更改Java代码即可使用它。</p><p>配置类类似于XML bean定义文件，因此@Configurationannotation包含与<beans>元素类似的一些选项<beans>，例如默认自动装配或惰性初始化。例如：</beans></beans></p>
-<pre><code class="prettyprint java"><br>@Configuration(defaultAutowire = Autowire.BY_TYPE, defaultLazy = Lazy.FALSE)
+&lt;bean id=&quot;book&quot; class=&quot;Book&quot; scope=&quot;prototype&quot;&gt;
+   &lt;constructor-arg&gt;Expert One-on-One J2EE Design and Development&lt;/constructor-arg&gt;
+   &lt;property name=&quot;author&quot; ref=&quot;rod&quot;/&gt;
+&lt;/bean&gt;
+</code></pre><p>尽管它基于注释，但是这种Java配置机制在注释的使用中是唯一的。我已经看到注释不包含在核心业务逻辑中，而是包含在单独的配置类中。实际上，它是用于配置的DSL。因此，它保留了Spring的非侵入性承诺：您无需更改Java代码即可使用它。</p><p>配置类类似于XML bean定义文件，因此@Configuration批注包含与<beans>元素类似的一些选项<beans>，例如默认自动装配或惰性初始化。例如：</beans></beans></p>
+<pre><code class="prettyprint java"><br />@Configuration(defaultAutowire = Autowire.BY_TYPE, defaultLazy = Lazy.FALSE)
 public class DataSourceConfiguration  extends ConfigurationSupport {
 }
 </code></pre><p>@Bean注释允许像<bean>元素一样在本地设置范围和延迟初始化之类的选项<bean>。与XML一样，默认范围是Singleton。</bean></bean></p><p>这种Java配置样式具有一些有趣的特征。例如：<br></p><ul><br> <li>引用（例如，示例中对“ rod” bean的引用）可以重构。任何好的IDE都可以提供强大的工具支持。</li><p></p>
-<pre><code class="prettyprint"><li>Because configurations are Java classes, they can participate in inheritance relationships. For example, you could define a superclass that demands some abstract @Beans to be implemented in subclasses.</li>
-<li>It creates a new visibility option. An @Bean method can be protected, it which case it benefits from the usual characteristics of the Spring component, but is not visible externally--that is it not injectable and cannot be obtained by calling getBean() on the IoC context.</li>
-</code></pre><p></p></ul><p></p><p>我向人们展示此内容的经验（超过一年）是他们有时花一点时间来理解它，但通常最终会非常热情。</p><p>这<em>并不是</em>要作为Spring XML格式的替代品。像Spring 2.0扩展名称空间一样，以及自Spring 1.0开始就可以使用属性文件，它是一个附加选项。复杂的应用程序需要多种类型的配置，Spring旨在为配置提供最佳的整体解决方案。我们将继续探索其他形式的配置。</p><p>通常，您将混合使用Java和XML配置。您可以在同一应用程序上下文中使用任意数量的Java配置类。</p><p>下面的示例使用XML bean定义来定义MyConfig bean，如上所示，可以像任何普通bean一样注入它。ConfigurationPostProcessor使用@Configurationannotation处理所有bean，生成必要的bean定义。</p>
-<pre><code class="prettyprint xml"><beans>
+<pre><code class="prettyprint">&lt;li&gt;Because configurations are Java classes, they can participate in inheritance relationships. For example, you could define a superclass that demands some abstract @Beans to be implemented in subclasses.&lt;/li&gt;
+&lt;li&gt;It creates a new visibility option. An @Bean method can be protected, it which case it benefits from the usual characteristics of the Spring component, but is not visible externally--that is it not injectable and cannot be obtained by calling getBean() on the IoC context.&lt;/li&gt;
+</code></pre><p></p></ul><p></p><p>我向人们展示此内容的经验（超过一年）是他们有时花一点时间来理解它，但通常最终会非常热情。</p><p>这<em>并不是</em>要作为Spring XML格式的替代品。像Spring 2.0扩展名称空间一样，以及自Spring 1.0开始就可以使用属性文件，它是一个附加选项。复杂的应用程序需要多种类型的配置，Spring旨在为配置提供最佳的整体解决方案。我们将继续探索其他形式的配置。</p><p>通常，您将混合使用Java和XML配置。您可以在同一应用程序上下文中使用任意数量的Java配置类。</p><p>下面的示例使用XML bean定义来定义MyConfig bean，如上所示，可以像任何普通bean一样注入它。ConfigurationPostProcessor使用@Configuration批注处理所有bean，生成必要的bean定义。</p>
+<pre><code class="prettyprint xml">&lt;beans&gt;
 
- <bean class="..MyConfig"/>
+ &lt;bean class=&quot;..MyConfig&quot;/&gt;
 
 
- <bean class="org.springframework.beans.factory.java.ConfigurationPostProcessor"/>
+ &lt;bean class=&quot;org.springframework.beans.factory.java.ConfigurationPostProcessor&quot;/&gt;
  
- <bean class="SomeRandomBean">
- 	<property...
- </bean>
-</beans>
+ &lt;bean class=&quot;SomeRandomBean&quot;&gt;
+ 	&lt;property...
+ &lt;/bean&gt;
+&lt;/beans&gt;
 </code></pre><p>您当然可以在相同的XML中具有简单的旧bean定义，例如本示例中的“ SomeRandomBean”。您可以根据Java配置和现有XML配置构建上下文。</p><p>Costin还实现了一个方便的应用程序上下文，该上下文使用通配符从类路径中加载类，如下所示：</p>
 <pre><code class="prettyprint java">ApplicationContext oneConfig = new  AnnotationApplicationContext(SimpleConfiguration.class.getName());
-ApplicationContext aBunchOfConfigs = new AnnotationApplicationContext("**/configuration/*Configuration.class");
-</code></pre><p>使用ASM检查类，而不加载它们。在将来的版本中，我们可能会提供其他自动检测方案。</p><p>版本在<a href="https://sourceforge.net/project/showfiles.php?group_id=73357&package_id=213222">这里</a> 。Costin Leau现在是项目负责人。该代码应视为alpha质量。我们提供了一个修改后的Spring Pet Store的示例，但是毫无疑问将从实际项目中的使用中吸取教训。</p><p>Costin和我很高兴收到您对此功能的反馈。</p><p>这段代码会发生什么？好吧，这取决于你。当然，它需要反馈（欢迎提出建议），并且通过使用任何技术而愤怒地出现各种可能性（以及实现的改进）。它目前尚未在路线图上，但如果引起足够的兴趣，它可以进入Spring核心的未来版本。</p><p>另外，它需要一个活泼的名称。建议欢迎！<br></p><hr><br>尽管今天是第一个（alpha）版本，但此功能的历史却令人惊讶地悠久-超过一年。当我与Spring.NET项目的Mark Pollack和Aleks Seovic一起参加2005年8月在科罗拉多州Crested Butte举行的软件峰会时，我的编码非常疯狂。我记得在Aleks从大沙丘行驶到丹佛的时候，在Jaguar XJ8的背面编写了很多代码。我可能需要编写代码来摆脱这种危险。我认为这个想法的起源实际上可以追溯到在JavaOne 2005上与Howard Lewis Ship的一次对话中……<p></p><p>遗憾的是，自那时以来，我没有时间做更多的工作，因此还没有到可以发布的地步。幸运的是，自从今年初加入Interface21以来，Spring Modules负责人和一般Spring专家Costin Leau已经有更多的时间在进行Spring编码。</p><p>该实现不需要对Spring核心进行任何修改。正如我所说，IoC容器具有高度的灵活性。如果您感兴趣，它将配置对象视为工厂bean，并且每个bean定义都由该对象上的实例工厂方法支持：自Spring 1.1开始提供的一种机制。它使用当前的CGLIB在配置实例上进行一些字节码操作，以确保对单例作用域@Bean方法的重复调用始终返回同一对象。</p></div>
+ApplicationContext aBunchOfConfigs = new AnnotationApplicationContext(&quot;**/configuration/*Configuration.class&quot;);
+</code></pre><p>使用ASM检查类，而不加载它们。在将来的版本中，我们可能会提供其他自动检测方案。</p><p>版本在<a href="https://sourceforge.net/project/showfiles.php?group_id=73357&package_id=213222">这里</a> 。Costin Leau现在是项目负责人。该代码应视为alpha质量。我们提供了一个修改后的Spring Pet Store的示例，但是毫无疑问将从实际项目中的使用中吸取教训。</p><p>Costin和我很高兴收到您对此功能的反馈。</p><p>这段代码会发生什么？好吧，这取决于你。当然，它需要反馈（欢迎提出建议），并且通过使用任何技术而愤怒地出现各种可能性（以及实现的改进）。它目前尚未在路线图上，但是如果引起足够的兴趣，它可以进入Spring核心的未来版本。</p><p>另外，它需要一个活泼的名称。建议欢迎！<br></p><hr><br>尽管今天是第一个（alpha）版本，但此功能的历史却令人惊讶地悠久-超过一年。当我与Spring.NET项目的Mark Pollack和Aleks Seovic一起参加2005年8月在科罗拉多州Crested Butte举行的软件峰会时，我的编码非常疯狂。我记得在Aleks从大沙丘行驶到丹佛的时候，在Jaguar XJ8的背面编写了很多代码。我可能需要编写代码来摆脱这种危险。我认为这个想法的起源实际上可以追溯到在JavaOne 2005上与Howard Lewis Ship的一次对话中……<p></p><p>遗憾的是，自那时以来，我没有时间做更多的工作，因此还没有到可以发布的地步。幸运的是，自从今年初加入Interface21以来，Spring Modules负责人和一般Spring专家Costin Leau已经有更多的时间在进行Spring编码。</p><p>该实现不需要对Spring核心进行任何修改。正如我所说，IoC容器具有高度的灵活性。如果您感兴趣，它将配置对象视为工厂bean，并且每个bean定义都由该对象上的实例工厂方法支持：自Spring 1.1开始提供的一种机制。它使用当前的CGLIB在配置实例上进行一些字节码操作，以确保对单例作用域@Bean方法的重复调用始终返回相同的对象。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 40;
 
       (function(disqus_shortname, document) {
@@ -228,7 +235,8 @@ ApplicationContext aBunchOfConfigs = new AnnotationApplicationContext("**/config
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -266,12 +274,14 @@ ApplicationContext aBunchOfConfigs = new AnnotationApplicationContext("**/config
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

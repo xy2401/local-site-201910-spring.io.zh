@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>从Amazon S3查询和下载</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Querying and Downloading from Amazon S3">
-<meta name="twitter:description" content="<p>In a <a href=" http:="" ="" blog.interface21.com="" main="" 2007="" 04="" 25="" uploading-to-amazon-s3-using-a-custom-ant-tas="="></head><body dir="ltr">previous post, I described how we use a custom ANT task to upload nightly snapshots from the ANT based projects in the Spring portfolio. In this post I’ll describe how we use Amazon S3 to generate pages for the snapshots from each project and allow users to download the snapshots.
+<meta name="twitter:description" content="<p>In a <a href=" http:="" ="" blog.interface21.com="" main="" 2007="" 04="" 25="" uploading-to-amazon-s3-using-a-custom-ant-tas="="></head><body >previous post, I described how we use a custom ANT task to upload nightly snapshots from the ANT based projects in the Spring portfolio. In this post I’ll describe how we use Amazon S3 to generate pages for the snapshots from each project and allow users to download the snapshots.
 <p>As I mentioned in the previous post, S3 is primarily used as a REST-ful service. This means that while I used Java for the upload portion, I was free to use other languages for the download portion. I chose to use PHP in this case because it was already available on the server I was working with, and was the path of least resistance.</p>
 ">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200">
@@ -38,10 +42,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,105 +174,106 @@
 </div>
 </header>
 <div class="blog--post"><p>在上一篇<a href="http://blog.interface21.com/main/2007/04/25/uploading-to-amazon-s3-using-a-custom-ant-task">文章中</a> ，我描述了如何使用自定义ANT任务从Spring产品组合中基于ANT的项目上传夜间快照。在这篇文章中，我将描述我们如何使用Amazon S3为每个项目的快照生成页面并允许用户下载快照。</p><p>正如我在上一篇文章中提到的，S3主要用作REST-ful服务。这意味着当我将Java用于上传部分时，可以自由地将其他语言用于下载部分。在这种情况下，我选择使用PHP，因为它在我正在使用的服务器上已经可用，并且阻力最小。</p><p>这项工作分为两个部分。首先是我需要查询Amazon S3服务以获取给定Spring项目的快照列表。为此，您可以创建一个带前缀参数的REST查询：</p>
-<pre><code class="prettyprint html"><br>http://s3.amazonaws.com/static.springframework.org/?prefix=$prefix
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=$prefix
 </code></pre><p>既然您已经了解了查询的基本方法，那么我想回到上一个示例，并指出上载定义的一些重要部分：</p>
-<pre><code class="prettyprint xml"><br><aws:s3 accessKey="${s3.accessKey}" secretKey="${s3.secretKey}">
-	<upload bucketName="static.springframework.org"
-		file="${target.release.dir}/${release-with-dependencies.zip}"
-		toFile="SPR/spring-framework-${spring-version}-with-dependencies-${tstamp}-${build.number}.zip"
-		publicRead="true"/>
-	<upload bucketName="static.springframework.org"
-		file="${target.release.dir}/${release.zip}"
-		toFile="SPR/spring-framework-${spring-version}-${tstamp}-${build.number}.zip"
-		publicRead="true"/>
-</aws:s3>
+<pre><code class="prettyprint xml"><br />&lt;aws:s3 accessKey=&quot;${s3.accessKey}&quot; secretKey=&quot;${s3.secretKey}&quot;&gt;
+	&lt;upload bucketName=&quot;static.springframework.org&quot;
+		file=&quot;${target.release.dir}/${release-with-dependencies.zip}&quot;
+		toFile=&quot;SPR/spring-framework-${spring-version}-with-dependencies-${tstamp}-${build.number}.zip&quot;
+		publicRead=&quot;true&quot;/&gt;
+	&lt;upload bucketName=&quot;static.springframework.org&quot;
+		file=&quot;${target.release.dir}/${release.zip}&quot;
+		toFile=&quot;SPR/spring-framework-${spring-version}-${tstamp}-${build.number}.zip&quot;
+		publicRead=&quot;true&quot;/&gt;
+&lt;/aws:s3&gt;
 </code></pre><p>您会注意到的第一件事是，对于Spring构件，我选择了为它们加上<span style="font-family:courier">SPR</span>前缀。该文件的名称本质上是自由格式，因此可以使用斜杠来创建要查询的虚拟目录结构。如果您查看Spring Web Flow的构建，您会看到其工件带有<span style="font-family:courier">SWF</span>前缀，Spring LDAP的工件获得<span style="font-family:courier">LDAP</span> ，而Spring Modules的工件获得<span style="font-family:courier">MOD</span> 。因此，现在通过自定义查询参数，我们可以专门选择一个项目。</p>
-<pre><code class="prettyprint html"><br>http://s3.amazonaws.com/static.springframework.org/?prefix=SPR
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=SPR
 </code></pre>
-<pre><code class="prettyprint html"><br>http://s3.amazonaws.com/static.springframework.org/?prefix=SWF
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=SWF
 </code></pre>
-<pre><code class="prettyprint html"><br>http://s3.amazonaws.com/static.springframework.org/?prefix=LDAP
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=LDAP
 </code></pre>
-<pre><code class="prettyprint html"><br>http://s3.amazonaws.com/static.springframework.org/?prefix=MOD
+<pre><code class="prettyprint html"><br />http://s3.amazonaws.com/static.springframework.org/?prefix=MOD
 </code></pre><p>注意的第二件事是<span style="font-family:courier">publicRead = true</span>声明。默认情况下，S3不允许任何人从您的存储桶中查看或下载。您可以使用您的秘密和访问密钥来授予他们许可，以创建允许下载的令牌。但是，对于这种努力，我认为没有必要。快照可公开访问，因此我放宽了安全性，并允许无需令牌就可以下载快照。</p><p>现在，您可以调用S3 REST服务，并在存储桶中获得经过正确过滤的项目列表，但响应以原始XML表示。即使我是Spring开发人员，在Web浏览器中浏览原始XML也不会让我兴奋。;）因此，该过程的下一步是将XML转换为有用的HTML页面。在这一点上，我有两个选择。我可以在服务器上执行转换以生成HTML，然后将其返回给用户，或者可以将XML与XSLT文件一起返回给用户，并让用户浏览器为我完成转换。现在，我说实话，后者减轻了服务器的负载，实际上允许用户的浏览器缓存转换以提高性能。但是现实是，我只是无法访问XSLT PHP库，因此如果愿意，我无法进行服务器端转换。我意识到有些较旧的浏览器会在此设置上遇到麻烦，但是当我们到达它时，我们将跨越那座桥梁。</p><p>因此，我需要使用返回的XML：</p>
-<pre><code class="prettyprint xml"><br><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-	<Name>static.springframework.org</Name>
-	<Prefix>SPR</Prefix>
-	<Marker/>
-	<MaxKeys>1000</MaxKeys>
-	<IsTruncated>false</IsTruncated>
-	<Contents>
-		<Key>SPR/spring-framework-2.0.5-20070411-50.zip</Key>
-		<LastModified>2007-04-11T13:27:34.000Z</LastModified>
-		<ETag>"1ab20ad18ca0edb4a360279f27409d54"</ETag>
-		<Size>10725241</Size>
-		<StorageClass>STANDARD</StorageClass>
-	</Contents>
-	<Contents>
-		<Key>SPR/spring-framework-2.0.5-20070411-51.zip</Key>
-		<LastModified>2007-04-12T01:25:58.000Z</LastModified>
-		<ETag>"de2e5833ae8fe4cc06987935bea06e57"</ETag>
-		<Size>10727049</Size>
-		<StorageClass>STANDARD</StorageClass>
-	</Contents>
-	<Contents>
-		<Key>SPR/spring-framework-2.0.5-20070412-52.zip</Key>
-		<LastModified>2007-04-13T01:22:23.000Z</LastModified>
-		<ETag>"414b947226fc4e08bd118e0f16a6be67"</ETag>
-		<Size>10736732</Size>
-		<StorageClass>STANDARD</StorageClass>
-	</Contents>
+<pre><code class="prettyprint xml"><br />&lt;ListBucketResult xmlns=&quot;http://s3.amazonaws.com/doc/2006-03-01/&quot;&gt;
+	&lt;Name&gt;static.springframework.org&lt;/Name&gt;
+	&lt;Prefix&gt;SPR&lt;/Prefix&gt;
+	&lt;Marker/&gt;
+	&lt;MaxKeys&gt;1000&lt;/MaxKeys&gt;
+	&lt;IsTruncated&gt;false&lt;/IsTruncated&gt;
+	&lt;Contents&gt;
+		&lt;Key&gt;SPR/spring-framework-2.0.5-20070411-50.zip&lt;/Key&gt;
+		&lt;LastModified&gt;2007-04-11T13:27:34.000Z&lt;/LastModified&gt;
+		&lt;ETag&gt;&quot;1ab20ad18ca0edb4a360279f27409d54&quot;&lt;/ETag&gt;
+		&lt;Size&gt;10725241&lt;/Size&gt;
+		&lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
+	&lt;/Contents&gt;
+	&lt;Contents&gt;
+		&lt;Key&gt;SPR/spring-framework-2.0.5-20070411-51.zip&lt;/Key&gt;
+		&lt;LastModified&gt;2007-04-12T01:25:58.000Z&lt;/LastModified&gt;
+		&lt;ETag&gt;&quot;de2e5833ae8fe4cc06987935bea06e57&quot;&lt;/ETag&gt;
+		&lt;Size&gt;10727049&lt;/Size&gt;
+		&lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
+	&lt;/Contents&gt;
+	&lt;Contents&gt;
+		&lt;Key&gt;SPR/spring-framework-2.0.5-20070412-52.zip&lt;/Key&gt;
+		&lt;LastModified&gt;2007-04-13T01:22:23.000Z&lt;/LastModified&gt;
+		&lt;ETag&gt;&quot;414b947226fc4e08bd118e0f16a6be67&quot;&lt;/ETag&gt;
+		&lt;Size&gt;10736732&lt;/Size&gt;
+		&lt;StorageClass&gt;STANDARD&lt;/StorageClass&gt;
+	&lt;/Contents&gt;
 ...
 </code></pre><p>并将其转换为HTML：</p><p><img id="image157" src="http://blog.interface21.com/main/wp-content/uploads/2007/04/snapshot-download.png" alt="snapshot-download.png"></p><p>从服务返回的大多数内容对该工作没有用，因此XSLT变得非常简单：</p>
-<pre><code class="prettyprint xml"><br><xsl:template match="/">
-	<head>
-		<style type="text/css" media="all">@import "./snapshot-download.css";</style>
-	</head>
-	<body>
-		<xsl:apply-templates select="s3:ListBucketResult"/>
-	</body>
-</xsl:template>
+<pre><code class="prettyprint xml"><br />&lt;xsl:template match=&quot;/&quot;&gt;
+	&lt;head&gt;
+		&lt;style type=&quot;text/css&quot; media=&quot;all&quot;&gt;@import &quot;./snapshot-download.css&quot;;&lt;/style&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;xsl:apply-templates select=&quot;s3:ListBucketResult&quot;/&gt;
+	&lt;/body&gt;
+&lt;/xsl:template&gt;
 
-<xsl:template match="s3:ListBucketResult">
-	<xsl:variable name="bucket-name" select="s3:Name"/>
-	<table>
-		<tr>
-			<th class="name"><xsl:value-of select="s3:Prefix"/> Project Snapshots</th>
-			<th class="size">Size</th>
-		</tr>
-		<xsl:for-each select="s3:Contents">
-			<tr>
-				<td class="name">
-					<a class="name" href="http://s3.amazonaws.com/{$bucket-name}/{s3:Key}">
-						<xsl:value-of select="substring-after(s3:Key, '/')"/>
-					</a>
-				</td>
-				<td class="size"><xsl:value-of select="format-number(s3:Size div 1048576, '###,###.0')"/> MB</td>
-			</tr>
-		</xsl:for-each>
-	</table>
-</xsl:template>
+&lt;xsl:template match=&quot;s3:ListBucketResult&quot;&gt;
+	&lt;xsl:variable name=&quot;bucket-name&quot; select=&quot;s3:Name&quot;/&gt;
+	&lt;table&gt;
+		&lt;tr&gt;
+			&lt;th class=&quot;name&quot;&gt;&lt;xsl:value-of select=&quot;s3:Prefix&quot;/&gt; Project Snapshots&lt;/th&gt;
+			&lt;th class=&quot;size&quot;&gt;Size&lt;/th&gt;
+		&lt;/tr&gt;
+		&lt;xsl:for-each select=&quot;s3:Contents&quot;&gt;
+			&lt;tr&gt;
+				&lt;td class=&quot;name&quot;&gt;
+					&lt;a class=&quot;name&quot; href=&quot;http://s3.amazonaws.com/{$bucket-name}/{s3:Key}&quot;&gt;
+						&lt;xsl:value-of select=&quot;substring-after(s3:Key, &#39;/&#39;)&quot;/&gt;
+					&lt;/a&gt;
+				&lt;/td&gt;
+				&lt;td class=&quot;size&quot;&gt;&lt;xsl:value-of select=&quot;format-number(s3:Size div 1048576, &#39;###,###.0&#39;)&quot;/&gt; MB&lt;/td&gt;
+			&lt;/tr&gt;
+		&lt;/xsl:for-each&gt;
+	&lt;/table&gt;
+&lt;/xsl:template&gt;
 </code></pre><p>转换从一些HTML声明开始，然后遍历存储桶的每个项目。然后，它使用对象标识符在S3服务器上创建到文件的链接。而已。PHP页面为XML调用S3，然后将其与XSLT声明一起传递给用户的浏览器：</p>
-<pre><code class="prettyprint php"><br><?php
-$prefix = $HTTP_GET_VARS["project"];
-$url = "http://s3.amazonaws.com/static.springframework.org/?prefix=$prefix";
+<pre><code class="prettyprint php"><br />&lt;?php
+$prefix = $HTTP_GET_VARS[&quot;project&quot;];
+$url = &quot;http://s3.amazonaws.com/static.springframework.org/?prefix=$prefix&quot;;
 $xml = file_get_contents($url);
 
-header('Content-Type: text/xml; charset=UTF-8');
-echo '<?xml version="1.0" encoding="UTF-8"?>';
-echo '<?xml-stylesheet type="text/xsl" href="./snapshot-download.xsl"?>';
+header(&#39;Content-Type: text/xml; charset=UTF-8&#39;);
+echo &#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#39;;
+echo &#39;&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;./snapshot-download.xsl&quot;?&gt;&#39;;
 echo substr($xml, 39);
-?>
+?&gt;
 </code></pre><p>使用请求参数为每个项目添加一些自定义，您将获得每个项目的单独下载页面：</p>
 <ul>
 <li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SPR</a></li>
 <li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SWF">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=SWF</a></li>
 <li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=LDAP">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=LDAP</a></li>
 <li><a href="http://static.springframework.org/downloads/nightly/snapshot-download.php?project=MOD">http://static.springframework.org/downloads/nightly/snapshot-download.php?project=MOD</a></li>
-</ul><p>这就完成了我对Amazon S3服务的探索。从现在的经验来看，如果您有大量的数据和大量的带宽需求，那么没有什么地方可以为您提供更高的价格。借助REST风格的界面，它足够灵活，可以与您喜欢的语言一起使用。谢谢您有我，我现在就提任何问题。 :)</p></div>
+</ul><p>这就完成了我对Amazon S3服务的探索。从现在的经验来看，如果您有大量的数据和大量的带宽需求，那么没有什么地方可以为您提供更高的价格。借助REST-ful接口，它足够灵活，可以与您喜欢的语言一起使用。谢谢您有我，我现在就提任何问题。 :)</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 70;
 
       (function(disqus_shortname, document) {
@@ -280,7 +287,8 @@ echo substr($xml, 39);
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -318,12 +326,14 @@ echo substr($xml, 39);
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

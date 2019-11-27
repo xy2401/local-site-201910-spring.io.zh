@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>在没有完整的Java EE的情况下配置Spring和JTA</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,15 +36,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2011-08-15 06:00:00.0">
-</head>
-<body dir="ltr">
+
+
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,52 +172,52 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Spring通过其<code>PlatformTransactionManager</code>接口和实现的层次结构对事务管理提供了丰富的支持。Spring的事务支持为众多API的事务语义提供了一个一致的接口。大体上，交易可以分为两类：本地交易和全球交易。本地事务是仅影响一种事务资源的事务。大多数情况下，即使未明确显示交易的概念，这些资源也有其自己的交易API。它通常作为会话的概念浮出水面，这是带有标定API的工作单元，用于告知资源何时应提交缓冲的工作。全局事务是指跨越一个或多个事务资源并将其全部纳入单个事务的事务。</p><p>JMS和JDBC API中有一些本地事务的常见示例。在JMS中，用户可以创建事务处理的Session，发送和接收消息，并且在完成对消息的工作后，调用<code>Session.commit()</code>告知服务器它可以完成工作。在数据库世界中，默认情况下JDBC <code>Connection</code>的自动提交查询。对于一次性语句，这很好，但是通常最好将几个相关的语句收集到批处理中，然后全部或不提交。在JDBC中，您首先要将<code>Connection</code>的<code>setAutoCommit()</code>方法设置为false，然后在批处理末尾显式调用<code>Connection.commit()</code>来执行此操作。这两个API以及许多其他API都提供了交易性工作单元的概念，可以由客户自行决定是否落实，定稿，刷新或永久性地进行。这些API千差万别，但概念相同。</p><p>全球交易完全是另一回事。您要在要让多个资源参与事务的任何时间使用它们。有时这是一个要求：也许您想发送JMS消息并写入数据库？或者，也许您想在JPA中使用两个不同的持久性上下文？在全局事务设置中，第三方事务监控器将一个事务中的多个事务资源注册为提交准备它们（在此阶段，该资源通常等效于空运行提交），然后最后提交每个资源。这些步骤是大多数全局事务实现的基础，被称为两阶段提交（2PC）。如果一个提交失败（由于在准备提交时没有原因，例如网络中断），则事务监视器将要求每个资源撤消或回滚最后一个事务。</p><p>全局事务明显比常规的本地事务复杂，因为根据定义，全局事务必须包含第三方代理，该第三方代理的唯一功能是仲裁多个事务资源之间的事务状态。事务监视器还必须知道如何与每个事务资源进行通信。因为该代理还必须保持状态-毕竟，不能信任各个事务资源知道其他资源在做什么，所以它具有持久性要求和同步成本，以保持一致的事务日志，就像数据库一样。当发生灾难性事件并且关闭事务监视器时，它必须能够启动并重播进行中的事务，以确保所有资源相对于任何中断的事务都处于一致的状态。要与事务资源进行通信，事务监视器必须使用事务资源说出通用协议。通常，此协议是称为XA的规范。</p><p>在企业Java世界中，向应用程序添加XA的典型方法是使用JTA。 Java事务API（JTA）是一种规范，它为用户描述了标准的全局事务监视器API。您可以使用JTA API以标准方式针对支持它的资源类型来处理全局事务，通常是JDBC和JMS。 Java EE应用程序服务器开箱即用地支持JTA，并且可以使用第三方的JTA独立实现来避免陷入Java EE应用程序服务器中。</p><p>要使用JTA，您需要做出一个非常具体的选择以将其用于事务代码中，因为该API与JDBC公开的事务API有很大的不同，而JDBC与JDBC所提供的API有很大的不同。</p><p>即使只涉及一个资源，也经常看到针对JTA API编写的较旧代码，因为如果以后需要XA，则至少不必完全重写即可利用XA。这通常是一个令人遗憾但可以理解的决定。不幸的是，以这种方式编写的代码也经常与容器绑定在一起。除非JNDI和所有服务器都在运行以引导事务监视器和JNDI服务器，否则它将无法工作。</p><p><strong>幸运的是，使用Spring可以很好地避免这种复杂性。</strong></p>
-<h2>Spring的交易支持</h2><p>解决这种令人遗憾的问题的任何方法的第一部分是Spring <code>PlatformTransactionManager</code> API和Spring框架中的关联事务管理API。Spring框架和周围的项目提供了广泛的<code>PlatformTransactionManager</code>实现选择，支持JDBC，JMS，Gemfire，AMQP，Hibernate，JPA，JDO，iBatis等许多本地事务。</p>
-<div align="center"><img src="http://blog.springsource.com/wp-content/uploads/2011/08/TransactionClassHierarchy.png" alt="春季交易类层次结构" title="TransactionClassHierarchy" width="499" height="357"></div><p>Spring框架还提供了<code>TransactionTemplate</code> ，该模板可与<code>PlatformTransactionManager</code>实现一起使用，并可用于自动将工作单元封装在事务中，这样您甚至无需了解<code>PlatformTransactionManager</code> API本身，也就无需使用合同满足<code>PlatformTransactionManager</code>的要求：将正确启动，执行，准备和提交事务，并且-如果在处理过程中引发异常，则将回滚事务。</p>
-<pre><code class="prettyprint java"><br>@Inject private PlatformTransactionManager txManager; 
+<div class="blog--post"><p>Spring通过其Spring对事务管理提供了丰富的支持<code>PlatformTransactionManager</code>接口和实现的层次结构。Spring的事务支持为众多API的事务语义提供了一个一致的接口。大体上，交易可以分为两类：本地交易和全球交易。本地事务是仅影响一种事务资源的事务。大多数情况下，即使未明确显示交易的概念，这些资源也有其自己的交易API。它通常作为会话的概念浮出水面，这是带有标定API的工作单元，用于告知资源何时应提交缓冲的工作。全局事务是指跨越一个或多个事务资源并将其全部纳入单个事务的事务。</p><p>JMS和JDBC API中有一些本地事务的常见示例。在JMS中，用户可以创建事务处理的会话，发送和接收消息，并在完成消息工作后调用<code>Session.commit()</code>告诉服务器它可以完成工作。在数据库世界中，JDBC <code>Connection</code>默认情况下的自动提交查询。对于一次性语句，这很好，但是通常最好将几个相关的语句收集到批处理中，然后全部或不提交。在JDBC中，您首先要设置<code>Connection</code>的<code>setAutoCommit()</code>方法为false，然后显式调用<code>Connection.commit()</code>在批处理结束时。这两个API以及许多其他API都提供了交易性工作单元的概念，可以由客户自行决定是否落实，定稿，刷新或永久性地进行。这些API千差万别，但概念相同。</p><p>全球交易完全是另一回事。您要在要让多个资源参与事务的任何时间使用它们。有时这是一个要求：也许您想发送JMS消息并写入数据库？或者，也许您想在JPA中使用两个不同的持久性上下文？在全局事务设置中，第三方事务监控器将一个事务中的多个事务资源注册为提交准备它们（在此阶段，该资源通常等效于空运行提交），然后最后提交每个资源。这些步骤是大多数全局事务实现的基础，被称为两阶段提交（2PC）。如果一个提交失败（由于在准备提交时没有原因，例如网络中断），则事务监视器将要求每个资源撤消或回滚最后一个事务。</p><p>全局事务明显比常规的本地事务复杂，因为根据定义，全局事务必须包含第三方代理，该第三方代理的唯一功能是仲裁多个事务资源之间的事务状态。事务监视器还必须知道如何与每个事务资源进行通信。因为该代理还必须保持状态-毕竟，不能信任各个事务资源知道其他资源在做什么，所以它具有持久性要求和同步成本，以保持一致的事务日志，就像数据库一样。当发生灾难性事件并且关闭事务监视器时，它必须能够启动并重播进行中的事务，以确保所有资源相对于任何中断的事务都处于一致的状态。要与事务资源进行通信，事务监视器必须使用事务资源说出通用协议。通常，此协议是称为XA的规范。</p><p>在企业Java世界中，向应用程序添加XA的典型方法是使用JTA。 Java事务API（JTA）是一种规范，它为用户描述了标准的全局事务监视器API。您可以使用JTA API以标准方式针对支持它的资源类型来处理全局事务，通常是JDBC和JMS。 Java EE应用程序服务器开箱即用地支持JTA，并且可以使用第三方的JTA独立实现来避免陷入Java EE应用程序服务器中。</p><p>要使用JTA，您需要做出一个非常具体的选择以将其用于事务代码中，因为该API与JDBC公开的事务API有很大的不同，而JDBC与JDBC所提供的API有很大的不同。</p><p>即使只涉及一个资源，也经常看到针对JTA API编写的较旧代码，因为如果以后需要XA，则至少不必完全重写即可利用XA。这通常是一个令人遗憾但可以理解的决定。不幸的是，以这种方式编写的代码也经常与容器绑定在一起。除非JNDI和所有服务器都在运行以引导事务监视器和JNDI服务器，否则它将无法工作。</p><p><strong>幸运的是，使用Spring可以很好地避免这种复杂性。</strong></p>
+<h2>Spring的交易支持</h2><p>解决这一令人遗憾的现状的任何方法的第一部分就是春季<code>PlatformTransactionManager</code> Spring框架中的API和关联的事务管理API。Spring框架和周围的项目提供了丰富的选择<code>PlatformTransactionManager</code>实现，支持JDBC，JMS，Gemfire，AMQP，Hibernate，JPA，JDO，iBatis等许多本地事务。</p>
+<div align="center"><img src="http://blog.springsource.com/wp-content/uploads/2011/08/TransactionClassHierarchy.png" alt="春季交易类层次结构" title="TransactionClassHierarchy" width="499" height="357"></div><p>Spring框架还提供了<code>TransactionTemplate</code> ，可与<code>PlatformTransactionManager</code>实现，可用于自动将工作单元封装在事务中，这样您甚至无需了解<code>PlatformTransactionManager</code> API本身，因此<code>PlatformTransactionManager</code>满足：将正确启动，执行，准备和提交事务，并且-如果在处理期间引发异常，则将回滚事务。</p>
+<pre><code class="prettyprint java"><br />@Inject private PlatformTransactionManager txManager; 
 
 TransactionTemplate template  = new TransactionTemplate(this.txManager); 
-template.execute( new TransactionCallback<Object>(){ 
+template.execute( new TransactionCallback&lt;Object&gt;(){ 
   public void doInTransaction(TransactionStatus status){ 
    // work done here will be wrapped by a transaction and committed. 
    // the transaction will be rolled back if 
    // status.setRollbackOnly(true) is called or an exception is thrown 
   } 
 });
-</code></pre><p>更进一步，Spring框架通过简单地启用对事务的方法调用的支持，从而提供了基于AOP的可靠支持。有了此支持，您不再需要<code>TransactionTemplate</code>对于启用了声明式事务管理的所有注释方法，事务管理都会自动进行。如果您使用的是Spring的XML配置，请使用以下命令：</p>
-<pre><code class="prettyprint xml"><tx:annotation-driven transaction-manager = “platformTransactionManagerReference” />
+</code></pre><p>更进一步，Spring框架通过简单地启用对事务的方法调用提供了基于AOP的可靠支持。有了这项支持，您不再需要<code>TransactionTemplate</code> -对于启用了声明式事务管理的任何方法，事务管理都会自动进行。如果您使用的是Spring的XML配置，请使用以下命令：</p>
+<pre><code class="prettyprint xml">&lt;tx:annotation-driven transaction-manager = “platformTransactionManagerReference” /&gt;
 </code></pre><p>如果您使用的是Spring 3.1，则可以简单地注释Java配置类，如下所示：</p>
-<pre><code class="prettyprint java"><br>@EnableTransactionManagement
+<pre><code class="prettyprint java"><br />@EnableTransactionManagement
 @Configuration 
 public class MyConfiguration { 
   ... 
 
-</code></pre><p>此annotation将自动扫描您的bean，并查找将使用的<code>PlatformTransactionManager</code>类型的bean。然后，在Java Bean中，只需通过对方法进行注释就可以将它们声明为事务性的。</p>
-<pre><code class="prettyprint java"><br>@Transactional
+</code></pre><p>此注释将自动扫描您的bean，并查找类型为的bean <code>PlatformTransactionManager</code> ，它将使用。然后，在Java Bean中，只需通过对方法进行注释就可以将它们声明为事务性的。</p>
+<pre><code class="prettyprint java"><br />@Transactional
 public void work() { 
   // the transaction will be rolled back if the 
   // method throws an Exception, otherwise committed
 }
-</code></pre><p></p><h2>日本旅游协会</h2><br>现在，如果仍然需要使用JTA，则至少要由您决定。有两种常见的方案：在重量级的应用程序服务器中使用JTA（具有绑定到JavaEE服务器的所有弊端），或使用独立的JTA实现。<p></p><p>Spring通过称为<code>JtaTransactionManager</code>的<code>PlatformTransactionManager</code>实现为基于JTA的全局事务实现提供支持。如果在JavaEE应用程序服务器上使用它，它将自动找到正确的<code>javax.transaction.UserTransaction</code>参考。此外，它将尝试查找特定于容器的<code>javax.transaction.TransactionManager</code>引用了更高级的用例，例如事务挂起。在后台，Spring加载了不同的<code>JtaTransactionManager</code>子类，以利用可用的不同服务器中特定的额外功能，例如： <code>WebLogicJtaTransactionManager</code> ， <code>WebSphereUowTransactionManager</code>和<code>OC4JJtaTransactionManager</code> 。</p><p>因此，如果您位于Java EE应用程序服务器中，并且无法逃脱，但想使用Spring的JTA支持，则很有可能可以使用以下名称空间配置支持来正确地（并自动地） <code>JtaTransactionManager</code> ：</p>
-<pre><code class="prettyprint xml"><tx:jta-transaction-manager  />
-</code></pre><p>另外，您可以适当地注册一个<code>JtaTransactionManager</code> bean实例，而无需构造函数参数，如下所示：</p>
-<pre><code class="prettyprint java"><br>@Bean
+</code></pre><p></p><h2>日本旅游协会</h2><br>现在，如果仍然需要使用JTA，则至少要由您决定。有两种常见的方案：在重量级的应用程序服务器中使用JTA（具有绑定到JavaEE服务器的所有弊端），或使用独立的JTA实现。<p></p><p>Spring通过以下方式为基于JTA的全局事务实现提供支持： <code>PlatformTransactionManager</code>实现称为<code>JtaTransactionManager</code> 。如果在JavaEE应用程序服务器上使用它，它将自动找到正确的<code>javax.transaction.UserTransaction</code>来自JNDI的参考。此外，它将尝试查找特定于容器的<code>javax.transaction.TransactionManager</code>在9种不同的应用程序服务器中提供了参考，以获取更高级的用例，例如事务暂停。在幕后，Spring加载了不同的内容<code>JtaTransactionManager</code>子类以在可用时利用不同服务器中特定的额外功能，例如： <code>WebLogicJtaTransactionManager</code> ， <code>WebSphereUowTransactionManager</code>和<code>OC4JJtaTransactionManager</code> 。</p><p>因此，如果您位于Java EE应用程序服务器中，并且无法逃脱，但想使用Spring的JTA支持，则很有可能可以使用以下名称空间配置支持来实现<code>JtaTransactionManager</code>正确（自动）：</p>
+<pre><code class="prettyprint xml">&lt;tx:jta-transaction-manager  /&gt;
+</code></pre><p>或者，您可以注册一个<code>JtaTransactionManager</code>适当的bean实例，没有构造函数参数，例如：</p>
+<pre><code class="prettyprint java"><br />@Bean
  public PlatformTransactionManager platformTransactionManager(){ 
     return new JtaTransactionManager();
 }
-</code></pre><p>无论哪种方式，JavaEE应用程序服务器的最终结果都在于，借助Spring，您现在可以使用JTA以统一的方式管理事务。</p>
-<h2>使用嵌入式事务管理器</h2><p>许多人出于明显的原因而选择在Java EE应用服务器之外使用JTA：Tomcat或Jetty更轻，更快，更便宜，可以进行测试（并且更容易进行），业务逻辑通常不存在于应用服务器中，等等。这些原因在云中，今天比以往任何时候都更加重要，因为轻量级，可组合的资源已成为常态，而繁重的单块式应用程序服务器根本无法扩展。</p><p>有许多开源的和商业的，独立的JTA事务管理器。在开源社区中，您可以选择多个选项，例如<a href="http://jotm.ow2.org/xwiki/bin/view/Main/WebHome">Java Open Transaction Manager（JOTM）</a> ， <a href="http://www.jboss.org/jbosstm">JBoss TS</a> ， <a href="http://docs.codehaus.org/display/BTM/Home">Bitronix Transaction Manager（BTM）</a>和<a href="http://www.atomikos.com/">Atomikos</a> 。</p><p>在本文中，我们将介绍一种使用全局事务的简单方法。我们将专注于特定于Atomikos的配置，但还有一个示例在源代码中使用Bitronix演示了相同的配置。</p><p>在这种情况下，事务处理方法是基于JPA的简单服务，必须同时提交JMS消息。该代码是典型的在线零售商的购物车的假定结帐方法。代码如下：</p>
-<pre><code class="prettyprint java"><br><br>	@Transactional
+</code></pre><p>无论哪种方式，JavaEE应用程序服务器的最终结果都是借助Spring，您现在可以使用JTA以统一的方式管理事务。</p>
+<h2>使用嵌入式事务管理器</h2><p>许多人出于明显的原因而选择在Java EE应用服务器之外使用JTA：Tomcat或Jetty更轻，更快，更便宜，可以进行测试（并且更容易进行），业务逻辑通常不存在于应用服务器中，等等。这些原因在云中，今天比以往任何时候都更加重要，在那里，轻量级，可组合的资源已成为常态，而负担最重的整体应用服务器根本无法扩展。</p><p>有许多开源的和商业的，独立的JTA事务管理器。在开源社区中，您可以选择多个选项，例如<a href="http://jotm.ow2.org/xwiki/bin/view/Main/WebHome">Java Open Transaction Manager（JOTM）</a> ， <a href="http://www.jboss.org/jbosstm">JBoss TS</a> ， <a href="http://docs.codehaus.org/display/BTM/Home">Bitronix Transaction Manager（BTM）</a>和<a href="http://www.atomikos.com/">Atomikos</a> 。</p><p>在本文中，我们将介绍一种使用全局事务的简单方法。我们将专注于Atomikos特定的配置，但还有一个示例在源代码中使用Bitronix演示了相同的配置。</p><p>在这种情况下，事务处理方法是基于JPA的简单服务，必须同时提交JMS消息。该代码是典型的在线零售商的购物车的假定结帐方法。代码如下：</p>
+<pre><code class="prettyprint java"><br /><br />	@Transactional
 	public void checkout(long purchaseId) {
 		Purchase purchase = getPurchaseById(purchaseId);
 
 		if (purchase.isFrozen()) 
 		  throw new RuntimeException(
-			 "you can't check out Purchase(#" + purchase.getId() + ") that's already been checked out!");
+			 &quot;you can&#39;t check out Purchase(#&quot; + purchase.getId() + &quot;) that&#39;s already been checked out!&quot;);
 
 		Date purchasedDate = new Date();
-		Set<LineItem> lis = purchase.getLineItems();
+		Set&lt;LineItem&gt; lis = purchase.getLineItems();
 		for (LineItem lineItem : lis) {
 			lineItem.setPurchasedDate(purchasedDate);
 			entityManager.merge(lineItem);
@@ -219,15 +225,15 @@ public void work() {
 		purchase.setFrozen(true);
 
 		this.entityManager.merge(purchase);
-		log.debug("saved purchase updates");
+		log.debug(&quot;saved purchase updates&quot;);
 		
 		this.jmsTemplate.convertAndSend(this.ordersDestinationName, purchase);
-		log.debug("sent partner notification");
+		log.debug(&quot;sent partner notification&quot;);
 	}
-</code></pre><p>该方法使用<code>@Transactional</code>annotation来告诉Spring将其调用包装在事务中。该方法同时使用了JPA（用于合并实体的更改状态）和JMS。因此，工作跨越了两个事务资源，并且必须使两者之间保持一致：数据库更新操作和JMS发送操作都成功，或者它们都回滚。毕竟，您不希望用JMS消息触发尚未付款的产品的履行周期！</p><p>为了测试JTA配置的工作原理，您可以在最后一行简单地抛出<code>RuntimeException</code> ，如下所示：</p>
-<pre><code class="prettyprint java"><br> if (true) throw new RuntimeException("Monkey wrench!");
-</code></pre><p>到那时，在正常操作下的数据库中的购买实体应该已经变为冻结状态，并且应该已经发送了JMS消息，从而触发了履行。最后一行引发的异常将回滚这两个更改。Spring的声明式事务管理将拦截该异常，并使用配置的<code>JtaTransactionManager</code>自动回滚事务。然后，您可以验证这两个事件从未发生过，并且没有反映在相应的资源中：不会将JMS消息排队，并且不会更改JPA实体的数据库记录。我用于此的测试用例是：</p>
-<pre><code class="prettyprint java"><br><br><br>package org.springsource.jta.etailer.store.services;
+</code></pre><p>该方法使用<code>@Transactional</code>注释，告诉Spring将其调用包装在事务中。该方法同时使用了JPA（用于合并实体的更改状态）和JMS。因此，工作跨越了两个事务资源，并且必须使两者之间保持一致：数据库更新操作和JMS发送操作都成功，或者它们都回滚。毕竟，您不希望用JMS消息触发尚未付款的产品的履行周期！</p><p>为了测试JTA配置的工作原理，您可以简单地抛出一个<code>RuntimeException</code>在最后一行，像这样：</p>
+<pre><code class="prettyprint java"><br /> if (true) throw new RuntimeException(&quot;Monkey wrench!&quot;);
+</code></pre><p>届时，在正常操作下的数据库中的购买实体应已更改为冻结状态，并且应该已发送JMS消息，从而触发履行。最后一行引发的异常将回滚这两个更改。Spring的声明式事务管理将拦截异常，并使用已配置的配置自动回滚事务<code>JtaTransactionManager</code> 。然后，您可以验证这两个事件从未发生过，并且没有反映在相应的资源中：没有JMS消息入队，并且JPA实体的数据库记录也没有更改。我用于此的测试用例是：</p>
+<pre><code class="prettyprint java"><br /><br /><br />package org.springsource.jta.etailer.store.services;
 
 import org.apache.commons.logging.*;
 import org.junit.*;
@@ -254,12 +260,12 @@ public class JpaDatabaseCustomerOrderServiceTest {
 
 	@Test
 	public void testAddingProductsToCart() throws Exception {
-		Customer customer = customerService.createCustomer("A", "Customer");
+		Customer customer = customerService.createCustomer(&quot;A&quot;, &quot;Customer&quot;);
 		Purchase purchase = customerOrderService.createPurchase(customer.getId());
 		Product product1 = productService.createProduct(
-                 "Widget1", "a widget that slices (but not dices)", 12.0);
+                 &quot;Widget1&quot;, &quot;a widget that slices (but not dices)&quot;, 12.0);
 		Product product2 = productService.createProduct(
-                 "Widget2", "a widget that dices (but not slices)", 7.5);
+                 &quot;Widget2&quot;, &quot;a widget that dices (but not slices)&quot;, 7.5);
 		LineItem one = customerOrderService.addProductToPurchase(
                  purchase.getId(), product1.getId());
 		LineItem two = customerOrderService.addProductToPurchase(
@@ -273,9 +279,9 @@ public class JpaDatabaseCustomerOrderServiceTest {
 	}
 }
 
-</code></pre><p>测试是一个简单的交易脚本：购物者创建一个帐户，找到她喜欢的东西，将它们作为订单项添加到购物车，然后签出。checkout方法将购物车的更改状态保存到数据库中，然后发送触发JMS消息以通知其他系统新订单。正是在这种结帐方法中，JTA是必不可少的。</p>
-<h2>配置基本服务</h2><p>我们有两个配置类-特定于JTA提供程序的代码（用于正确构造Spring的<code>JtaTransactionManager</code>的实例）-和其余配置，无论选择哪种<code>PlatformTransactionManager</code>策略，其余配置都应保持静态。</p><p>我已使用Spring的模块化Java配置从其余的配置中拆分出特定于JTA提供者的配置类，因此您可以轻松地在特定于Atomikos的JTA配置和特定于Bitronix的JTA配置之间进行切换。</p><p>让我们看一下<code>StoreConfiguration</code>类-无论使用哪种事务管理器实现，它都是相同的。我仅摘录了重要部分，以便您可以看到哪些部分与JTA提供程序特定的配置交互。</p>
-<pre><code class="prettyprint java"><br><br>package org.springsource.jta.etailer.store.config;
+</code></pre><p>测试是一个简单的交易脚本：购物者创建一个帐户，找到她喜欢的东西，将它们作为订单项添加到购物车，然后签出。结帐方法将购物车的更改状态保存到数据库，然后发送触发JMS消息以通知其他系统新订单。正是在这种结帐方法中，JTA是必不可少的。</p>
+<h2>配置基本服务</h2><p>我们有两个配置类-JTA提供程序特定的代码，用于正确构造Spring实例的设置<code>JtaTransactionManager</code> -以及其余的配置，无论<code>PlatformTransactionManager</code>选择的策略。</p><p>我已使用Spring的模块化Java配置从其余的配置中拆分出特定于JTA提供者的配置类，因此您可以轻松地在特定于Atomikos的JTA配置和特定于Bitronix的JTA配置之间进行切换。</p><p>让我们看一下<code>StoreConfiguration</code>类-无论您使用哪种事务管理器实现，都将是相同的。我仅摘录了重要部分，以便您可以看到哪些部分与JTA提供程序特定的配置交互。</p>
+<pre><code class="prettyprint java"><br /><br />package org.springsource.jta.etailer.store.config;
 
 import org.hibernate.cfg.ImprovedNamingStrategy;
 import org.hibernate.dialect.MySQL5Dialect;
@@ -298,7 +304,7 @@ import java.util.Properties;
 
 @EnableTransactionManagement
 @Configuration
-@ComponentScan(value = "org.springsource.jta.etailer.store.services")
+@ComponentScan(value = &quot;org.springsource.jta.etailer.store.services&quot;)
 public class StoreConfiguration {
 
 	// ... 	
@@ -330,7 +336,7 @@ public class StoreConfiguration {
                          jtaConfiguration.userTransaction(), jtaConfiguration.transactionManager());
 	}
 }
-</code></pre><p>该配置非常简单-仅是您可以为任何JPA或JMS应用程序配置的普通对象。为了完成其工作，配置类需要访问<code>javax.jms.ConnectionFactory</code> ，一个<code>javax.sql.DataSource</code> ，一个<code>javax.transaction.UserTransaction</code>和一个<code>javax.transaction.TransactionManager</code> 。因为满足这些接口的对象的构造特定于每个事务管理器实现，所以这些bean的定义存在于一个单独的Java配置类中，该类我们使用<code>StoreConfiguration</code>类顶部的字段注入（ <code>@Inject private AtomikosJtaConfiguration jtaConfiguration</code> ）导入。</p><p>我们的<code>StoreConfiguration</code>使用<code>@EnableTransactionManagement</code>annotation打开自动事务处理。</p><p>我们使用Spring 3.1的<code>@PropertySource</code>annotation-与环境抽象相关联-访问services.properties中的键和值。该属性文件如下所示：</p>
+</code></pre><p>该配置非常简单-仅是您可以为任何JPA或JMS应用程序配置的普通对象。为了完成其工作，配置类需要访问<code>javax.jms.ConnectionFactory</code> ， 一种<code>javax.sql.DataSource</code> ， 一种<code>javax.transaction.UserTransaction</code>和一个<code>javax.transaction.TransactionManager</code> 。因为满足这些接口的对象的构造特定于每个事务管理器实现，所以这些Bean的定义位于单独的Java配置类中，我们使用字段注入（ <code>@Inject private AtomikosJtaConfiguration jtaConfiguration</code> ）在顶部<code>StoreConfiguration</code>类。</p><p>我们的<code>StoreConfiguration</code>使用开启自动交易处理<code>@EnableTransactionManagement</code>注解。</p><p>我们使用Spring 3.1 <code>@PropertySource</code>批注-与环境抽象相关联-访问services.properties中的键和值。该属性文件如下所示：</p>
 <pre><code class="prettyprint code">dataSource.url=jdbc:mysql://127.0.0.1/crm
 dataSource.driverClassName=com.mysql.jdbc.Driver
 dataSource.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
@@ -339,8 +345,8 @@ dataSource.password=crm
 
 jms.partnernotifications.destination=orders
 jms.broker.url=tcp://localhost:61616
-</code></pre><p>任何JTA配置最终要做的最重要的事情是提供对提供程序特定的<code>UserTransaction</code>的引用，以及对提供程序特定的<code>TransactionManager</code>的引用，该引用用于创建<code>PlatformTransactionManager</code>实例，如下所示：</p>
-<pre><code class="prettyprint java"><br>	@Bean	
+</code></pre><p>任何JTA配置最终要做的最重要的事情是提供特定于提供程序的引用<code>UserTransaction</code> ，以及对提供商特定的引用<code>TransactionManager</code> ，用于创建<code>PlatformTransactionManager</code>实例，像这样：</p>
+<pre><code class="prettyprint java"><br />	@Bean	
 	public PlatformTransactionManager platformTransactionManager() throws Throwable {
 	  UserTransaction userTransaction = jtaConfiguration.userTransaction() ;
 	  TransactionManager transactionManager = jtaConfiguration.transactionManager() ;
@@ -348,7 +354,7 @@ jms.broker.url=tcp://localhost:61616
 	}
 </code></pre>
 <h2>配置Atomikos</h2><p>我们不会只看一下Bitronix和Atomikos实现的细节，因为<a href="http://git.springsource.org/spring-samples/spring-samples/blobs/master/showcases/spring-and-jta/src/main/java/org/springsource/jta/etailer/store/config/AtomikosJtaConfiguration.java">这里</a>提供了<a href="http://git.springsource.org/spring-samples/spring-samples/blobs/master/showcases/spring-and-jta/src/main/java/org/springsource/jta/etailer/store/config/BitronixJtaConfiguration.java">Atomikos配置</a>的源代码，而<a href="http://git.springsource.org/spring-samples/spring-samples/blobs/master/showcases/spring-and-jta/src/main/java/org/springsource/jta/etailer/store/config/AtomikosJtaConfiguration.java">这里</a>提供了<a href="http://git.springsource.org/spring-samples/spring-samples/blobs/master/showcases/spring-and-jta/src/main/java/org/springsource/jta/etailer/store/config/BitronixJtaConfiguration.java">Bitronix配置</a>的源代码。让我们剖析Atomikos的实现，以便我们可以分解重要的参与者。一旦您知道播放器是什么，那么了解任何第三方JTA提供程序的配置就很简单。在运行代码时交换使用哪种配置非常简单。</p>
-<pre><code class="prettyprint java"><br>package org.springsource.jta.etailer.store.config;
+<pre><code class="prettyprint java"><br />package org.springsource.jta.etailer.store.config;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
@@ -376,7 +382,7 @@ public class AtomikosJtaConfiguration {
 	@Inject private Environment environment ;
 
 	public void tailorProperties(Properties properties) {
-		properties.setProperty( "hibernate.transaction.manager_lookup_class", 
+		properties.setProperty( &quot;hibernate.transaction.manager_lookup_class&quot;, 
 				 TransactionManagerLookup.class.getName());
 	}
 
@@ -387,36 +393,130 @@ public class AtomikosJtaConfiguration {
 		return userTransactionImp;
 	}
 
-	@Bean(initMethod = "init", destroyMethod = "close")
+	@Bean(initMethod = &quot;init&quot;, destroyMethod = &quot;close&quot;)
 	public TransactionManager transactionManager() throws Throwable {
 		UserTransactionManager userTransactionManager = new UserTransactionManager();
 		userTransactionManager.setForceShutdown(false);
 		return userTransactionManager;
 	}
 
-	@Bean(initMethod = "init", destroyMethod = "close")
+	@Bean(initMethod = &quot;init&quot;, destroyMethod = &quot;close&quot;)
 	public DataSource dataSource() {
 		MysqlXADataSource mysqlXaDataSource = new MysqlXADataSource();
-		mysqlXaDataSource.setUrl(this.environment.getProperty("dataSource.url"));
+		mysqlXaDataSource.setUrl(this.environment.getProperty(&quot;dataSource.url&quot;));
 		mysqlXaDataSource.setPinGlobalTxToPhysicalConnection(true);
-		mysqlXaDataSource.setPassword(this.environment.getProperty("dataSource.password"));
-		mysqlXaDataSource.setUser(this.environment.getProperty ("dataSource.password"));
+		mysqlXaDataSource.setPassword(this.environment.getProperty(&quot;dataSource.password&quot;));
+		mysqlXaDataSource.setUser(this.environment.getProperty (&quot;dataSource.password&quot;));
 
 		AtomikosDataSourceBean xaDataSource = new AtomikosDataSourceBean();
 		xaDataSource.setXaDataSource(mysqlXaDataSource);
-		xaDataSource.setUniqueResourceName("xads");
+		xaDataSource.setUniqueResourceName(&quot;xads&quot;);
 		return xaDataSource;
 	}
 
-	@Bean(initMethod = "init", destroyMethod = "close")
+	@Bean(initMethod = &quot;init&quot;, destroyMethod = &quot;close&quot;)
 	public ConnectionFactory connectionFactory() {
 		ActiveMQXAConnectionFactory activeMQXAConnectionFactory = new ActiveMQXAConnectionFactory();
-		activeMQXAConnectionFactory.setBrokerURL(this.environment.getProperty( "jms.broker.url")  );
+		activeMQXAConnectionFactory.setBrokerURL(this.environment.getProperty( &quot;jms.broker.url&quot;)  );
 		AtomikosConnectionFactoryBean atomikosConnectionFactoryBean = new AtomikosConnectionFactoryBean();
-		atomikosConnectionFactoryBean.setUniqueResourceName("xamq");
+		atomikosConnectionFactoryBean.setUniqueResourceName(&quot;xamq&quot;);
 		atomikosConnectionFactoryBean.setLocalTransactionMode(false);
 		atomikosConnectionFactoryBean.setXaConnectionFactory(activeMQXAConnectionFactory);
 		return atomikosConnectionFactoryBean;
 	}
 } 
-</code></pre><p>Atomikos提供了自己的<code>java.sql.DataSource</code>和<code>javax.jms.ConnectionFactory</code>于任何本机<code>java.sql.DataSource</code>包装器<code>java.sql.DataSource</code>或<code>javax.jms.ConnectionFactory</code>可以识别JTA（和XA）。</p><p>教Hibernate怎样参与Atomikos公司的交易，必须设置属性- <code>hibernate.transaction.manager_lookup_class</code> -在这种情况下，一个叫做类<code>TransactionManagerLookup</code> 。对于任何JTA实施，您都需要这样做。</p><p>最后，我们需要提供一个<code>javax.transaction.TransactionManager</code>的实施和<code>javax.transaction.UserTransaction</code>实现。类顶部的两个bean是Atomikos对这两个接口的实现，用于构造Spring的<code>JtaTransactionManager</code>实现，该实现是<code>PlatformTransactionManager</code>的实现。</p><p>反过来，我们的配置类上的<code>@EnableTransactionManagement</code>annotation会自动拾取<code>PlatformTransactionManager</code>实例，并在调用带有<code>@Transactional</code>任何方法时用于执行事务。</p><p><code>javax.transaction.UserTransaction</code></p><p><code>javax.transaction.UserTransaction</code></p><p><code>javax.transaction.UserTransaction</code></p><p><code>javax.transaction.UserTransaction</code></p><p><code>javax.transaction.UserTransaction</code></p><code>javax.transaction.UserTransaction</code></div><code>javax.transaction.UserTransaction</code></div><code>javax.transaction.UserTransaction</code></article><code>javax.transaction.UserTransaction</code></div><code>javax.transaction.UserTransaction</code></div><code>javax.transaction.UserTransaction</code></div><code>javax.transaction.UserTransaction</code></div><code>javax.transaction.UserTransaction</code></body></html>
+</code></pre><p>Atomikos提供了自己的<code>java.sql.DataSource</code>和<code>javax.jms.ConnectionFactory</code>适用于任何本机的包装器<code>java.sql.DataSource</code>要么<code>javax.jms.ConnectionFactory</code>到一个了解JTA（和XA）的人。</p><p>要教Hibernate如何参与Atomikos交易，我们必须设置一个属性- <code>hibernate.transaction.manager_lookup_class</code> -在这种情况下，称为<code>TransactionManagerLookup</code> 。对于任何JTA实施，您都需要这样做。</p><p>最后，我们需要提供<code>javax.transaction.TransactionManager</code>实施，以及<code>javax.transaction.UserTransaction</code>实施。类顶部的两个bean是Atomikos对这两个接口的实现，用于构造Spring的接口。 <code>JtaTransactionManager</code>实现，这是一个实现<code>PlatformTransactionManager</code> 。</p><p>的<code>PlatformTransactionManager</code>实例依次由<code>@EnableTransactionManagement</code>在我们的配置类上的注释，用于在任何具有<code>@Transactional</code>被调用。</p><p>一个的职责<code>javax.transaction.UserTransaction</code>实施和<code>javax.transaction.TransactionManager</code>实现方式相似：UserTransaction是面向用户的API，而<code>TransactionManager</code>是面向服务器的API。所有JTA实现都指定一个<code>UserTransaction</code> 0实现，因为它是JavaEE要求的最低要求。的<code>TransactionManager</code>不是必需的，并且并非在每个服务器或JTA实现中都始终可用。</p><p>对于熟悉JTA的人，请使用<code>UserTransaction</code>就像您在JavaEE中以编程方式控制事务时所做的那样，存在很大的差距，考虑到十年前J2EE最初构想的现在的过时假设，即没有EJB，没人愿意进行事务管理，这也许是可以理解的。</p><p>问题在于，某些操作（例如暂停事务（例如，获取“需要新的”语义））仅在<code>TransactionManager</code> 。此接口在JTA规范中已标准化，但与<code>UserTransaction</code>它没有提供众所周知的JNDI位置或其他获取它的方法。使用JTA根本无法控制隔离级别或特定于服务器的“事务命名”（用于监视或其他目的）。</p><p>TransactionManager提供了诸如事务挂起和恢复之类的高级功能，因此大多数提供程序也支持它。其实很多<code>javax.transaction.TransactionManager</code>可以在运行时将实现强制转换为<code>javax.transaction.UserTransaction</code>实施。Spring知道这一点，并且对此非常聪明。如果您定义Spring的实例<code>JtaTransactionManager</code>仅引用javax.transaction的实现。TransactionManager，它将尝试强制<code>javax.transaction.UserTransaction</code>在运行时也将其实例化。但是，Atomikos不会这样做，因此我们明确定义了<code>javax.transaction.UserTransaction</code>实例-更好地利用<code>javax.transaction.TransactionManager</code> - 独立<code>javax.transaction.TransactionManager</code>实例。</p><p>而且，就是这样！您可以吃蛋糕，也可以在Spring中吃。Bitronix配置看起来很相似，因为它可以满足类似的职责。您不必经常调整此代码。您很可能可以简单地重用此处介绍的配置，并适当调整连接字符串和驱动程序。</p>
+<h2>摘要</h2><p>在本文中，我们介绍了Spring框架中对事务的丰富支持，并介绍了Spring的独特功能，可以在嵌入式配置中以及通过现有的应用程序服务器与所有类型的JTA无缝工作。如果您被迫使用功能完备的Java EE Server，则JTA的Spring抽象很容易，并且如果您选择移动到轻量级容器（如Apache Tomcat或vFabric tc Server），则可以提高代码的可移植性。使用可嵌入事务管理器的完整示例代码使您可以通过简单的配置更改在Spring Bean中使用相同的业务逻辑。这篇文章没有介绍有关Spring中常规事务管理支持的细节。有关使用Spring的基于XA的分布式事务管理的最佳视图之一，包括关于如何以及何时避免所有这些的很好的见解，请参阅Dave Syer博士的文章“ <a href="http://www.javaworld.com/javaworld/jw-01-2009/jw-01-spring-transactions.html">带有和不带有XA的Spring的分布式事务</a> ” <a href="http://www.javaworld.com/javaworld/jw-01-2009/jw-01-spring-transactions.html">。</a> ”</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 429;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>助焊剂的飞行2-调试警告</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Flight of the Flux 2 - Debugging Caveats">
-<meta name="twitter:description" content="<p>This blog post is the second in a series of posts that aim at providing a deeper look into <a href=" https:="" ="" github.com="" reactor="" reactor-cor="="></head><body dir="ltr">Reactor’s more advanced concepts and inner workings.
+<meta name="twitter:description" content="<p>This blog post is the second in a series of posts that aim at providing a deeper look into <a href=" https:="" ="" github.com="" reactor="" reactor-cor="="></head><body >Reactor’s more advanced concepts and inner workings.
 <p>It is derived from my <code>Flight of the Flux</code> talk, which content I found to be more adapted to a blog post format.</p>
 <p>I’ll update the table below with links when the other posts are published, but here is the planned content:</p>
 <ol> 
@@ -57,10 +61,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -187,27 +193,27 @@
 </div>
 </header>
 <div class="blog--post"><p>该博客文章是一系列文章中的第二篇，旨在深入了解<a href="https://github.com/reactor/reactor-core">Reactor</a>的更高级概念和内部工作原理。</p>
-<p>它源自我的《 <code>Flight of the Flux</code>演讲，我发现该内容更适合于博客文章格式。</p>
+<p>它是从我的<code>Flight of the Flux</code>对话，我发现哪些内容更适合博客文章格式。</p>
 <p>发布其他帖子时，我将使用链接更新下表，但这是计划的内容：</p>
 <ol>
 <li><a href="https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription">组装与订阅</a></li>
 <li>调试警告（本文）</li>
 <li>并发不可知论</li>
-<li>调度和<code>publishOn</code> VS <code>subscribeOn</code></li>
+<li>调度程序和<code>publishOn</code>与<code>subscribeOn</code></li>
 <li>内部工作：偷工作</li>
 <li>内部工作原理：操作员融合</li>
 </ol>
-<p>如果你错过了介绍<em>无流</em>和电抗器的基本概念，伸头网站的<a href="https://projectreactor.io/learn">学习部分</a>和<a href="https://projectreactor.io/docs/core/release/reference">参考指南</a> 。</p>
+<p>如果您缺少对<em>反应式流</em>的介绍和Reactor的基本概念，请访问该站点的<a href="https://projectreactor.io/learn">学习部分</a>和<a href="https://projectreactor.io/docs/core/release/reference">参考指南</a> 。</p>
 <p>事不宜迟，让我们进入：</p><h2><a href="#debugging-in-a-reactive-world" class="anchor" name="debugging-in-a-reactive-world"></a>在反应世界中进行调试</h2>
 <p>从命令式，阻塞性模式切换到反应性，非阻塞性模式带来了好处，但同时也带来了一些警告。其中之一就是调试经验。这是为什么？</p>
 <p>主要是因为您已经学会了依靠良好的旧<em>stacktrace</em> ，但是突然之间，由于反应式编程的<strong>异步</strong>方面，此无价之宝的价值变得远远不如之前。但是，这并不特定于反应式编程：一旦引入异步代码，便会在程序中<em>计划调度</em>的代码与<em>异步执行</em>的代码之间创建边界。</p><h3><a href="#demonstrating-the-issue-with-vanilla-async-code" class="anchor" name="demonstrating-the-issue-with-vanilla-async-code"></a>用香草异步代码演示问题</h3>
-<p>让我们以<code>ExecutorService</code>和<code>Future</code> （这里没有Reactor代码）为例：</p>
+<p>让我们举一个例子<code>ExecutorService</code>和一个<code>Future</code> （此处没有Reactor代码）：</p>
 <pre><code class="prettyprint java">	private static void imperative() throws ExecutionException, InterruptedException {
 		final ScheduledExecutorService executor =
 				Executors.newSingleThreadScheduledExecutor();
 
 		int seconds = LocalTime.now().getSecond();
-		List<Integer> source;
+		List&lt;Integer&gt; source;
 		if (seconds % 2 == 0) {
 			source = IntStream.range(1, 11).boxed().collect(Collectors.toList());
 		}
@@ -218,11 +224,11 @@
 			source = Arrays.asList(1, 2, 3, 4);
 		}
 
-		executor.submit(() -> source.get(5))  //line 76
+		executor.submit(() -&gt; source.get(5))  //line 76
 		        .get();
 	}
 </code></pre>
-<p>这个示例有些人为，但是让我们想象一下，代码中的这三个路径中有这两个路径会导致异步任务抛出<code>IndexOutOfBoundsException</code> ……stacktrace对您有多大帮助？</p>
+<p>这个示例有些虚构，但让我们想象一下，代码中的这三个路径中有这两个路径会导致异步任务抛出<code>IndexOutOfBoundsException</code> …stacktrace对您有多大帮助？</p>
 <pre><code class="prettyprint">java.util.concurrent.ExecutionException: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 4
 	at java.base/java.util.concurrent.FutureTask.report(FutureTask.java:122)
 	at java.base/java.util.concurrent.FutureTask.get(FutureTask.java:191)
@@ -240,17 +246,17 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 </code></pre>
 <p>我们看到：</p>
 <ul>
-<li><code>Future</code>的<code>get()</code>方法引发了<code>ExecutionException</code></li>
+<li>的<code>Future</code>的<code>get()</code>方法扔了<code>ExecutionException</code></li>
 <li>原因是<code>IndexOutOfBoundsException</code></li>
-<li>代码抛出在<code>submit(() -> source.get(5))</code> <strong>lambda</strong>第76行中</li>
-<li>它是在<code>FutureTask</code>中从<code>ThreadPoolExecutor</code> ，它本身在<code>Thread</code>运行...</li>
-<li>我们有两个可能的原因可能导致这种情况，但不知道是谁（在调用<code>submit()</code>之前在测试中采用了哪条路径）。</li>
+<li>代码抛出在<code>submit(() -> source.get(5))</code> <strong>拉姆达</strong>线76</li>
+<li>它在一个<code>FutureTask</code> ，从一个叫做<code>ThreadPoolExecutor</code> ，其本身运行在<code>Thread</code> …</li>
+<li>我们有两种可能的原因可能导致这种情况，但不知道是哪一个罪魁祸首（在调用之前在测试中采用了哪条路径<code>submit()</code> ）。</li>
 </ul>
-<p>不是很有用的:-(</p><h3><a href="#demonstrating-the-issue-in-reactor" class="anchor" name="demonstrating-the-issue-in-reactor"></a>在Reactor中演示问题</h3>
+<p>不是很有用：-（</p><h3><a href="#demonstrating-the-issue-in-reactor" class="anchor" name="demonstrating-the-issue-in-reactor"></a>在Reactor中演示问题</h3>
 <p>如果我们寻找与上述代码等效的Reactor，我们可以提出以下内容：</p>
 <pre><code class="prettyprint java">	private static void reactive() {
 		int seconds = LocalTime.now().getSecond();
-		Mono<Integer> source;
+		Mono&lt;Integer&gt; source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5);
@@ -268,7 +274,7 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 		      .block(); //line 97
 	}
 </code></pre>
-<p>触发以下堆栈跟踪：</p>
+<p>这会触发以下堆栈跟踪：</p>
 <pre><code class="prettyprint">java.lang.IndexOutOfBoundsException
 	at reactor.core.publisher.MonoElementAt$ElementAtSubscriber.onComplete(MonoElementAt.java:153)
 	at reactor.core.publisher.FluxArray$ArraySubscription.fastPath(FluxArray.java:176)
@@ -296,16 +302,16 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 		at Scratch.main(Scratch.java:51)
 </code></pre>
 <ul>
-<li>我们再次看到<code>ArrayIndexOutOfBoundsException</code> ，暗示源对于<code>MonoElementAt</code>运算符来说太短了</li>
-<li>我们看到，它从传来<code>onComplete</code> ，本身引发的<code>request</code> ......和一堆其他步骤<code>reactor.core.publisher</code></li>
-<li>对这些反应器方法有所了解后，我们<em>可以</em>推断出管道是由<code>range</code> （ <code>FluxRange.subscribe</code> ）， <code>elementAt</code>和<code>subscribeOn</code> 。</li>
-<li>似乎抛出代码是从<code>ThreadPoolExecutor</code>的工作<code>Thread</code>执行的</li>
+<li>我们看到了<code>ArrayIndexOutOfBoundsException</code>再次暗示来源对于<code>MonoElementAt</code>算子</li>
+<li>我们看到它来自<code>onComplete</code> ，本身由<code>request</code> …以及其他一系列步骤<code>reactor.core.publisher</code></li>
+<li>对这些反应堆方法有所了解后，我们<em>可以</em>推断出管道是由<code>range</code> （ <code>FluxRange.subscribe</code> ）， <code>elementAt</code>和<code>subscribeOn</code> …</li>
+<li>似乎抛出的代码是由工作人员执行的<code>Thread</code>的<code>ThreadPoolExecutor</code></li>
 <li>这里的路很冷…</li>
 </ul>
 <p>更糟糕的是，即使我们确实摆脱了<code>subscribeOn</code>我们仍然不会发现触发了两个可能的错误路径中的哪一个：</p>
 <pre><code class="prettyprint java">	private static void reactiveNoSubscribeOn() {
 		int seconds = LocalTime.now().getSecond();
-		Mono<Integer> source;
+		Mono&lt;Integer&gt; source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5);
@@ -341,59 +347,59 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for l
 		at reactor.core.publisher.Mono.block(Mono.java:1495)
 		... 2 more
 </code></pre>
-<p>如前所述，这是因为在<em>汇编</em>和<em>订阅</em>之间，代码中还有一个附加的“边界”。跟踪仅返回到<strong>订阅</strong>点（此处为<code>block()</code> ）：-(</p>
-<p>因此，在异步环境中，将堆栈跟踪用于分析和调试目的变得更加困难，而在Reactor中则更加困难（因为它是异步的，并且具有汇编vs订阅的默认延迟方法）。但是幸运的是，库中有一些工具可以尝试缓解这一情况。</p><h2><a href="#making-things-better" class="anchor" name="making-things-better"></a>使事情变得更好</h2><h3><a href="#back-to-classics-code-log-code" class="anchor" name="back-to-classics-code-log-code"></a>返回经典： <code>log</code></h3>
-<p>还记得您在命令式代码中添加了<code>print</code>语句吗？它可能不像启动步进调试器那样酷，但是有时它是您需要的快速而肮脏的解决方案。</p>
-<p>在Reactor中，您具有<code>log()</code>运算符：</p>
+<p>如前所述，这是因为在<em>汇编</em>和<em>订阅</em>之间，代码中还有一个附加的“边界”。跟踪仅返回到<strong>订阅</strong>点（此处是<code>block()</code> ）:-(</p>
+<p>因此，在异步环境中，将堆栈跟踪用于分析和调试目的更加困难，在Reactor中甚至更难（因为它是异步的，并且具有汇编与订阅的默认延迟方法）。但是幸运的是，库中有一些工具可以尝试缓解这一情况。</p><h2><a href="#making-things-better" class="anchor" name="making-things-better"></a>使事情变得更好</h2><h3><a href="#back-to-classics-code-log-code" class="anchor" name="back-to-classics-code-log-code"></a>回到经典：<code>log</code></h3>
+<p>请记住，当您将命令性代码与<code>print</code>陈述？它可能不像启动步进调试器那样酷，但是有时它是您需要的快速而肮脏的解决方案。</p>
+<p>在Reactor中，您拥有<code>log()</code>操作员：</p>
 <ul>
-<li>它记录无流信号： <code>onNext</code> ， <code>onComplete</code> ， <code>onError</code> （ <strong>甚至</strong> <code>onSubscribe</code> ， <code>cancel</code>和<code>request</code> ！）</li>
+<li>它记录反应流信号： <code>onNext</code> ， <code>onComplete</code> ， <code>onError</code> （ <strong>甚至</strong> <code>onSubscribe</code> ， <code>cancel</code>和<code>request</code> ！）</li>
 <li>您可以将其调整为仅将这些信号的一部分列入白名单</li>
-<li>您也可以选择一个特定的<code>Logger</code></li>
+<li>您可以选择一个特定的<code>Logger</code>以及</li>
 </ul>
-<p>简而言之， <code>log</code>是一种快速而又肮脏的解决方案，可让您轻松概览一下序列中正在发生的事情。在开发期间可以自由使用它，并可以为每个<code>log</code>调用指定一个“名称”以区分它们。</p>
-<p>可以改用<code>log(String)</code>来获取导致错误的原因的提示：</p>
+<p>简而言之， <code>log</code>是一种快速而肮脏的解决方案，可让您轻松概览一下序列中正在发生的事情。在开发过程中自由使用它，并且可以为每个名称指定一个“名称” <code>log</code>呼吁区别对待。</p>
+<p>使用<code>log(String)</code>可以转移到提示导致错误的来源：</p>
 <pre><code class="prettyprint java">	private static void log() {
 		int seconds = LocalTime.now().getSecond();
-		Mono<Integer> source;
+		Mono&lt;Integer&gt; source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5)
-			             .log("source A");
+			             .log(&quot;source A&quot;);
 		}
 		else if (seconds % 3 == 0) {
 			source = Flux.range(0, 4)
 			             .elementAt(5)
-			             .log("source B");
+			             .log(&quot;source B&quot;);
 		}
 		else {
 			source = Flux.just(1, 2, 3, 4)
 			             .elementAt(5)
-			             .log("source C");
+			             .log(&quot;source C&quot;);
 		}
 
 		source.block(); //line 138
 	}
 </code></pre>
-<p>stacktrace本身并没有那么有趣（除了提到<code>MonoLogFuseable</code>类，但是日志本身包含了这个有趣的花絮：</p>
+<p>stacktrace本身并不有趣（除了提到<code>MonoLogFuseable</code>类，但日志本身包含以下有趣的花絮：</p>
 <pre><code class="prettyprint">17:01:23.711 [main] INFO  source C - | onSubscribe([Fuseable] MonoElementAt.ElementAtSubscriber)
 17:01:23.716 [main] INFO  source C - | request(unbounded)
 17:01:23.717 [main] ERROR source C - | onError(java.lang.IndexOutOfBoundsException)
 17:01:23.721 [main] ERROR source C - 
 java.lang.IndexOutOfBoundsException: null
 </code></pre>
-<p>至少我们得到了硬编码的<code>source C</code>标签…</p><h3><a href="#enriching-stacktraces-with-debug-mode" class="anchor" name="enriching-stacktraces-with-debug-mode"></a>使用调试模式丰富堆栈跟踪</h3>
+<p>至少我们得到了硬编码<code>source C</code>标签…</p><h3><a href="#enriching-stacktraces-with-debug-mode" class="anchor" name="enriching-stacktraces-with-debug-mode"></a>使用调试模式丰富堆栈跟踪</h3>
 <p>Reactor中可用的另一种方法是尝试获取运行时堆栈跟踪中的程序集信息。</p>
-<p>这可以通过<code>Hooks</code>类激活所谓的“调试模式”来完成：</p>
+<p>这可以通过以下方式激活所谓的“调试模式”来完成： <code>Hooks</code>类：</p>
 <pre><code class="prettyprint java">Hooks.onOperatorDebug();
 </code></pre>
 <p>它有什么作用？它使每个运算符实例化（又称程序集）捕获堆栈跟踪并保留以备后用。</p>
-<p>如果<code>onError</code>到达一个运算符，它将将该程序集堆栈跟踪附加到<code>onError</code>的<code>Throwable</code> （作为<strong>抑制的<code>Exception</code></strong> ）。结果，当您看到stacktrace时，您将获得运行时和程序集的更完整的图片。</p>
+<p>如果<code>onError</code>到达一个运算符，它将将该程序集堆栈跟踪附加到<code>onError</code>的<code>Throwable</code> （作为<strong>抑制<code>Exception</code></strong> ）。结果，当您看到stacktrace时，您将获得运行时和程序集的更完整的图片。</p>
 <p>启用调试模式后，在我们之前的示例中，我们将能够看到采用了哪个汇编路径以及实际处理了哪个源：</p>
 <pre><code class="prettyprint java">	private static void hook() {
 		Hooks.onOperatorDebug();
 		try {
 			int seconds = LocalTime.now().getSecond();
-			Mono<Integer> source;
+			Mono&lt;Integer&gt; source;
 			if (seconds % 2 == 0) {
 				source = Flux.range(1, 10)
 				             .elementAt(5); //line 149
@@ -428,27 +434,27 @@ Assembly trace from producer [reactor.core.publisher.MonoElementAt] :
 Error has been observed by the following operator(s):
 	|_	Flux.elementAt ⇢ Scratch.hook(Scratch.java:157)
 </code></pre>
-<p>注意最后一行吗？耶:-D</p><h3><a href="#bringing-the-cost-down-with-code-checkpoint-code" class="anchor" name="bringing-the-cost-down-with-code-checkpoint-code"></a>通过<code>checkpoint</code>降低成本</h3>
-<p>使用<code>Hooks.onOperatorDebug()</code>一个缺点是，它会<strong>为应用程序中使用的每个单个运算符进行程序</strong>集<code>Hooks.onOperatorDebug()</code>捕获。填充单个stacktrace是一项昂贵的操作，因此，不用说这会对性能产生重大影响。因此，仅在开发环境中建议这样做。</p>
+<p>注意最后一行吗？耶:-D</p><h3><a href="#bringing-the-cost-down-with-code-checkpoint-code" class="anchor" name="bringing-the-cost-down-with-code-checkpoint-code"></a>降低成本<code>checkpoint</code></h3>
+<p>使用的一个缺点<code>Hooks.onOperatorDebug()</code>是它对<strong>应用程序中使用的每个运算符进行</strong>汇编stacktrace捕获。填充单个stacktrace是一项昂贵的操作，因此，不用说这会对性能产生重大影响。因此，仅在开发环境中建议这样做。</p>
 <p>幸运的是，如果您确定代码库中容易产生这种源歧义的部分，则可以降低成本。</p>
-<p>通过使用<code>checkpoint()</code>运算符，可以仅在代码库中的特定点处激活程序集跟踪捕获。如果使用<code>checkpoint(String)</code>为检查点赋予唯一且有意义的名称，您甚至可以完全不用填充堆栈跟踪来完成操作：</p>
+<p>通过使用<code>checkpoint()</code>操作员可以仅在代码库中的特定点激活程序集跟踪捕获。如果使用以下命令给检查点一个唯一且有意义的名称，您甚至可以完全不用填充堆栈跟踪信息<code>checkpoint(String)</code> ：</p>
 <pre><code class="prettyprint java">	private static void checkpoint() {
 		int seconds = LocalTime.now().getSecond();
-		Mono<Integer> source;
+		Mono&lt;Integer&gt; source;
 		if (seconds % 2 == 0) {
 			source = Flux.range(1, 10)
 			             .elementAt(5)
-			             .checkpoint("source range(1,10)");
+			             .checkpoint(&quot;source range(1,10)&quot;);
 		}
 		else if (seconds % 3 == 0) {
 			source = Flux.range(0, 4)
 			             .elementAt(5)
-			             .checkpoint("source range(0,4)");
+			             .checkpoint(&quot;source range(0,4)&quot;);
 		}
 		else {
 			source = Flux.just(1, 2, 3, 4)
 			             .elementAt(5)
-			             .checkpoint("source just(1,2,3,4)");
+			             .checkpoint(&quot;source just(1,2,3,4)&quot;);
 		}
 
 		source.block(); //line 186
@@ -474,15 +480,16 @@ Error has been observed by the following operator(s):
 	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
 Assembly site of producer [reactor.core.publisher.MonoElementAt] is identified by light checkpoint [source just(1,2,3,4)].
 </code></pre>
-<p>请注意，它<code>is identified by light checkpoint [source just(1,2,3,4)].</code> ，这是我们的罪魁祸首（因为我们对检查点使用了有意义的描述）。</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h2>
+<p>注意<code>is identified by light checkpoint [source just(1,2,3,4)].</code> ，这是我们的罪魁祸首（因为我们对检查点使用了有意义的描述）。</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h2>
 <p>在本文中，我们了解到在异步编程中，堆栈跟踪可能没有那么有用。懒惰的方式Reactor让您构建反应性序列，进一步加剧了这种效果。</p>
-<p>我们已经研究了可能遇到的最坏情况，并以多种方式减轻了此问题。</p>
+<p>我们已经研究了可能遇到的最坏情况，并以多种方式减轻了这一问题。</p>
 <p>整个代码可以在<a href="https://gist.github.com/simonbasle/a4c6cfe79071610e1fe3bd27984d4381">这里</a>找到要点。</p>
 <p>在下一期中，我们将了解为什么有时会说Reactor是“并发不可知的”。</p>
 <p>同时，快乐的反应式编码！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3647;
 
       (function(disqus_shortname, document) {
@@ -496,7 +503,8 @@ Assembly site of producer [reactor.core.publisher.MonoElementAt] is identified b
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -534,12 +542,14 @@ Assembly site of producer [reactor.core.publisher.MonoElementAt] is identified b
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

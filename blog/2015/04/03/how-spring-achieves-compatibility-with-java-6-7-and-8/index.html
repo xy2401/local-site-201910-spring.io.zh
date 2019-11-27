@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring如何实现与Java 6、7和8的兼容性</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="How Spring achieves compatibility with Java 6, 7 and 8">
 <meta name="twitter:description" class="anchor" content="<p>As of Spring Framework 4.0, Java 8 is supported as a first-class citizen and we’ve seen some confusion in the Spring community since then. How do we manage to support Java 8 and remain compatible with Java 6 and Java 7 after all? This blog post provides some insight into how we’re handling this within the framework codebase.</p>
-<h2><a href=" #java-8-language-features-vs-java-8-api="="></head><body dir="ltr">Java 8 language features vs. Java 8 APIs
+<h2><a href=" #java-8-language-features-vs-java-8-api="="></head><body >Java 8 language features vs. Java 8 APIs
 <p>First, a distinction must be made between using new language features and new APIs in a given Java generation such as Java 8. If a class uses a Java 8 language feature such as a lambda expression, it has to be compiled with <code>-source 1.8 -target 1.8</code> and therefore the whole compilation unit will only work on Java 8+. However, if a particular class in a library optionally uses a new Java 8 interface such as <code>java.util.stream.Stream</code>, the library can still run on a previous Java generation as long as it is being compiled with e.g. <code>-source 1.6 -target 1.6</code> - and as long as the use of that particular <code>Stream</code>-based class is guarded to only kick in when actually running on Java 8+. As you may have guessed, we’re making extensive use of such arrangements within the Spring Framework codebase!</p>
 ">
 <meta name="twitter:creator" content="@snicoll">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -170,13 +176,136 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>从Spring Framework 4.0开始，Java 8被作为一等公民而受支持，从那时起，我们就在Spring社区中看到了一些困惑。毕竟，我们如何设法支持Java 8并保持与Java 6和Java 7的兼容性？这篇博客文章提供了一些有关我们如何在框架代码库中进行处理的见解。</p><h2><a href="#java-8-language-features-vs-java-8-apis" class="anchor" name="java-8-language-features-vs-java-8-apis"></a> Java 8语言功能与Java 8 API</h2><p>首先，必须在给定的Java一代（如Java 8）中使用新语言功能和新API之间进行区分。如果类使用lambda表达式之类的Java 8语言功能，则必须使用<code>-source 1.8 -target 1.8</code>进行编译，因此整个编译单元仅适用于Java 8+。但是，如果库中的特定类可以选择使用新的Java 8接口，例如<code>java.util.stream.Stream</code> ，图书馆仍然可以在以前的Java运行一代，只要它正在与如编译<code>-source 1.6 -target 1.6</code> -只要使用特定的<code>Stream</code>实际运行时基础的类把守，只踢在Java 8+上。您可能已经猜到了，我们在Spring Framework代码库中广泛使用了这种安排！</p><p>我们已经宣传了Spring Framework 4.0如何自然地适合Java 8 lambda。例如，使用<a href="https://github.com/spring-projects/spring-framework/blob/8472a2b2/spring-jdbc/src/main/java/org/springframework/jdbc/core/ConnectionCallback.java"><code>ConnectionCallback</code></a>检索给定JDBC连接的目录可以编写如下：</p>
-<pre><code class="prettyprint java">jdbcTemplate.execute(connection -> connection.getCatalog())
+<div class="blog--post"><p>从Spring Framework 4.0开始，Java 8被作为一等公民而受支持，从那时起，我们就在Spring社区中看到了一些困惑。毕竟，我们如何设法支持Java 8并保持与Java 6和Java 7的兼容性？这篇博客文章提供了一些有关我们如何在框架代码库中进行处理的见解。</p><h2><a href="#java-8-language-features-vs-java-8-apis" class="anchor" name="java-8-language-features-vs-java-8-apis"></a> Java 8语言功能与Java 8 API</h2><p>首先，必须在给定的Java代（例如Java 8）中使用新语言功能和新API之间进行区分。如果类使用Java 8语言功能（例如lambda表达式），则必须使用<code>-source 1.8 -target 1.8</code>因此整个编译单元只能在Java 8+上运行。但是，如果库中的特定类选择使用新的Java 8接口，例如<code>java.util.stream.Stream</code> ，该库仍可以在上一代Java上运行，只要使用例如<code>-source 1.6 -target 1.6</code> -并且只要使用该特定<code>Stream</code>基于类的类仅在实际在Java 8+上运行时才启动。您可能已经猜到了，我们在Spring Framework代码库中广泛使用了这种安排！</p><p>我们已经宣传了Spring Framework 4.0如何自然地适合Java 8 lambda。例如，使用检索给定JDBC连接的目录<a href="https://github.com/spring-projects/spring-framework/blob/8472a2b2/spring-jdbc/src/main/java/org/springframework/jdbc/core/ConnectionCallback.java"><code>ConnectionCallback</code></a>可以写成如下：</p>
+<pre><code class="prettyprint java">jdbcTemplate.execute(connection -&gt; connection.getCatalog())
 </code></pre><p>实际上，Spring Framework多年来一直具有所谓的功能接口，我们不必更改任何这些API即可符合Java 8的功能接口编译器规则。调用Spring API的上述基于Lambda的代码可以在任何Spring应用程序中使用-显然，这需要Java 8运行时。但是，如果您选择使用传统的内部类方法编写此类代码，并且针对完全相同的Spring版本中的完全相同的Spring API，则也可以使用Java 6+运行时来这样做：</p>
-<pre><code class="prettyprint">jdbcTemplate.execute(new ConnectionCallback<String>() {
+<pre><code class="prettyprint">jdbcTemplate.execute(new ConnectionCallback&lt;String&gt;() {
     @Override
     public String doInConnection(Connection con) throws SQLException {
         return con.getCatalog();
     }
 });
-</code></pre><p>底线是您的选择：我们精心设计了Spring Framework 4.x，使其自然地与Java 6、7和8兼容，并且具有相同的Spring jar，并且没有特殊的设置步骤。我们在自己的代码中没有使用任何Java 8语言功能，因此我们可以使用<code>-source 1.6 -target 1.6</code>来编译框架代码库，并在该代码库中自动检测并自动激活许多Java 8 API功能（如果在运行时可用）。安排。然后，您的应用程序代码可以选择使用Java 6、7或8语言级别本身，与我们的框架安排进行交互，并自然地从您碰巧使用的JDK中获得最大的收益-无需任何额外的设置，只需将Spring与您的代码结合即可运行时使用JDK。</p><h2><a href="#which-java-8-api-features-do-we-support" class="anchor" name="which-java-8-api-features-do-we-support"></a>我们支持哪些Java 8 API功能？</h2><p>我们对许多Java 8特定的API功能（例如<code>java.util.Optional</code></p><p><code>java.util.Optional</code></p><code>java.util.Optional</code></div><code>java.util.Optional</code></div><code>java.util.Optional</code></article><code>java.util.Optional</code></div><code>java.util.Optional</code></div><code>java.util.Optional</code></div><code>java.util.Optional</code></div><code>java.util.Optional</code></body></html>
+</code></pre><p>底线是您的选择：我们精心设计了Spring Framework 4.x，使其自然地与Java 6、7和8兼容，并且具有相同的Spring jar，并且没有特殊的设置步骤。我们在自己的代码中没有使用任何Java 8语言功能，因此我们可以使用以下代码编译框架代码库<code>-source 1.6 -target 1.6</code> ，我们会自动检测并自动激活该代码库安排中的许多Java 8 API功能（如果在运行时可用）。然后，您的应用程序代码可以选择使用Java 6、7或8语言级别本身，与我们的框架安排进行交互，并自然地从您碰巧使用的JDK中获得最大的收益-无需任何额外的设置，只需将Spring与您的代码组合即可运行时使用JDK。</p><h2><a href="#which-java-8-api-features-do-we-support" class="anchor" name="which-java-8-api-features-do-we-support"></a>我们支持哪些Java 8 API功能？</h2><p>我们对许多Java 8特定的API功能提供了专门的支持，例如<code>java.util.Optional</code> ， <code>java.util.stream.Stream</code> ， <code>java.time</code> （JSR-310），可重复的批注，方法/构造函数参数名称，甚至<code>java.util.Base64</code>实用程序类。当您选择在自己的应用程序类中使用它们时，就会反射性地检测到这些功能，而Spring Framework会有条件地激活其对那些Java 8功能的支持，例如，为这些功能注册默认转换器。 <code>Optional</code>和<code>Stream</code>当运行时存在Java 8时。</p><p>让我们看一个例子。在即将发布的Spring Framework 4.2中，如果您定义类型的值<code>Collection</code>或数组，您可以将其作为<code>Stream</code>我们将为您转换。您可以找到的完整代码<a href="https://github.com/spring-projects/spring-framework/blob/228d9db4/spring-core/src/main/java/org/springframework/core/convert/support/StreamConverter.java"><code>StreamConverter</code>在github上，</a>但摘录如下：</p>
+<pre><code class="prettyprint java">import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.core.convert.*;
+import org.springframework.lang.UsesJava8;
+
+@UsesJava8
+public class StreamConverter implements ConditionalGenericConverter {
+    ....
+}
+</code></pre><p><code>StreamConverter</code>是一个使用Java 8特定API的隔离类，所以我们现在需要做的是有条件地添加<code>StreamConverter</code>至<a href="https://github.com/spring-projects/spring-framework/blob/018adb04/spring-core/src/main/java/org/springframework/core/convert/support/DefaultConversionService.java"><code>DefaultConverterService</code></a>运行时是否存在Java 8。</p>
+<pre><code class="prettyprint java">public class DefaultConversionService extends GenericConversionService {
+
+    /** Java 8&#39;s java.util.stream.Stream class available? */
+    private static final boolean streamAvailable = ClassUtils.isPresent(
+            &quot;java.util.stream.Stream&quot;, 
+            DefaultConversionService.class.getClassLoader());
+
+    private static void addCollectionConverters(
+            ConverterRegistry converterRegistry) {
+        ...
+
+        if (streamAvailable) {
+            converterRegistry.addConverter(
+                    new StreamConverter(conversionService));
+        }
+    }
+}
+</code></pre><p>我们会有条件地检查API是否在运行时存在，并基于此做出决定，您作为用户，会在默认情况下简单地经历完全适应Java 8的设置。这有点类似于Spring Boot中的<a href="https://github.com/spring-projects/spring-boot/tree/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/condition">条件基础架构</a> ，但它更底层且内部。</p><h2><a href="#checking-java-6-compatibility" class="anchor" name="checking-java-6-compatibility"></a>检查Java 6兼容性</h2><p>由于我们在几个孤立的地方使用Java 8特定的API，因此我们需要JDK 8来整体编译框架代码库。结果，存在在我们需要保持Java 6兼容的地方意外引入Java 8特定API调用的风险。</p><p>幸运的是，我们的CI构建计划已配置为在每次构建时都执行<a href="http://mojo.codehaus.org/animal-sniffer/">Animal Sniffer</a> 。这将根据给定的Java API <em>签名</em> （在我们的示例中为Java 6更新18）检查我们的代码，如果发现某些不正确的用法，则构建失败。那么，当我们需要调用Java 7或8 API时，合法的用例又如何呢？您可以将嗅探器配置为排除类列表，或者更好的是，提供一组<em>标记</em>来<em>标记</em>此类异常情况。</p><p>那正是<a href="https://github.com/spring-projects/spring-framework/blob/f7b46539/spring-core/src/main/java/org/springframework/lang/UsesJava8.java"><code>@UsesJava8</code></a>上的注释<code>StreamConverter</code> （请参见上文）指示：它将整个类划分为Java 6 API兼容性规则的例外。您可以用类似的方式标记内部类甚至方法。通过查看该注释的用法，我们知道在代码库中使用Java 7/8特定API的所有位置。</p><p>Animal Sniffer配置非常简单：查看<a href="https://github.com/spring-projects/spring-framework/blob/f926f6cb3e95affdd87ed5c06ac0450d0ada2aec/build.gradle#L143">我们的构建</a>或<a href="http://mojo.codehaus.org/animal-sniffer/">官方文档</a>以了解更多详细信息。</p><h2><a href="#wrapping-up" class="anchor" name="wrapping-up"></a>包起来</h2><p>我们选择在我们自己的代码库中不使用任何Java 7或Java 8语言功能，以使您能够灵活地为Java 6、7或8编写Spring 4应用程序。同时，如果您决定使用Java 8，我们会让您体验一种非常自然的方法，在这种情况下，Spring Framework本质上将以Java 8的形式出现。</p><p>幸运的是，Java 8的功能接口约定对我们来说并不是新事物。许多现有的Spring API可以自然地遵循相同的约定，因此可以与Java 8 lambda无缝使用。新的Java 8 API，例如<code>java.time</code> （JSR-310）， <code>Optional</code>和<code>Stream</code>如果您选择在自己的代码中使用它们，则框架会自动为其提供支持。</p><p>从前瞻性角度来看，从4.2版本开始，我们的代码库甚至已经在早期的JDK 9版本中进行了检查！明年JDK 9全面上市后，这将在框架中产生一种独特的情况：在同一发行版中支持<em>四个</em> Java代-您可以选择JDK 6、7、8或9与同一个Spring Framework结合使用！</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2063;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

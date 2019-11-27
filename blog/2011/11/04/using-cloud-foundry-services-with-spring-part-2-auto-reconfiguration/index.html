@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>在Spring中使用Cloud Foundry Services：第2部分-自动重新配置</title>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>将Cloud Foundry Services与Spring结合使用：第2部分-自动重新配置</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Using Cloud Foundry Services with Spring: Part 2 - Auto-reconfiguration">
-<meta name="twitter:description" content="<p>If you watched the video for the <a href=" http:="" ="" www.youtube.com="" watch?v="o2iXuUkVJ9Q""></head><body dir="ltr">Cloud Foundry launch event, you saw that we deployed the Spring Travel application downloaded from Spring Web Flow samples, bound a MySQL service to it, and dragged and dropped the application to the Cloud Foundry server in STS, <b>without making a single line of change</b> in the application itself. How’s that possible since the application is configured to use a local database? That’s when auto-reconfiguration comes into play.
+<meta name="twitter:description" content="<p>If you watched the video for the <a href=" http:="" ="" www.youtube.com="" watch?v="o2iXuUkVJ9Q""></head><body >Cloud Foundry launch event, you saw that we deployed the Spring Travel application downloaded from Spring Web Flow samples, bound a MySQL service to it, and dragged and dropped the application to the Cloud Foundry server in STS, <b>without making a single line of change</b> in the application itself. How’s that possible since the application is configured to use a local database? That’s when auto-reconfiguration comes into play.
 <p>Cloud Foundry strives to keep your initial investment low. Beyond dollars and cents, a real investment comes from the time that a developer spends in getting started. Auto-reconfiguration is one mechanism that reduces initial investment when you want to get started with Cloud Foundry. In this blog, we explore how it works with Spring applications (grails applications use the same underlying mechanism and thus behave identically). </p>
 ">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/8fa7e069d3807412499606915fddc108?s=200">
@@ -38,10 +42,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -148,7 +154,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">在Spring中使用Cloud Foundry Services：第2部分-自动重新配置</h1>
+<h1 class="blog--title">将Cloud Foundry Services与Spring结合使用：第2部分-自动重新配置</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -169,18 +175,18 @@
 </header>
 <div class="blog--post"><p>如果您观看了有关<a href="https://www.youtube.com/watch?v=o2iXuUkVJ9Q">Cloud Foundry启动事件</a>的视频，则会看到我们部署了从Spring Web Flow示例下载的Spring Travel应用程序，将MySQL服务绑定到该应用程序，并将该应用程序拖放到STS中的Cloud Foundry服务器上， <b>而没有</b>在应用程序本身中<b>进行单行更改</b> 。由于将应用程序配置为使用本地数据库，这怎么可能？这就是自动重新配置起作用的时候。</p><p>Cloud Foundry努力使您的初始投资降低。除了美元和美分以外，真正的投资还来自开发人员开始投入的时间。当您要开始使用Cloud Foundry时，自动重新配置是一种减少初始投资的机制。在此博客中，我们探讨了它如何与Spring应用程序一起使用（grails应用程序使用相同的底层机制，因此行为相同）。</p>
 <h2>利用依赖注入进行自动重新配置</h2><p>您的应用程序由业务逻辑以及与数据库和消息传递等服务的交互组成。在典型的Spring应用程序中，您可以利用依赖项注入（DI）为使用的每个服务创建bean，并将这些bean注入需要访问这些服务的其他bean中。</p><p>让我们看一个典型的使用关系数据库的Spring应用程序，该数据库将数据源bean定义为：</p>
-<pre><code class="prettyprint xml"><br><bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-    <property name="url" value="jdbc:mysql://localhost:3306/inventory-db"/>
-    <property name="username" value="myuser"/>
-    <property name="password" value="mypass"/>
-</bean>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.apache.commons.dbcp.BasicDataSource&quot; id=&quot;dataSource&quot;&gt;
+    &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;/&gt;
+    &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://localhost:3306/inventory-db&quot;/&gt;
+    &lt;property name=&quot;username&quot; value=&quot;myuser&quot;/&gt;
+    &lt;property name=&quot;password&quot; value=&quot;mypass&quot;/&gt;
+&lt;/bean&gt;
 </code></pre><p>我们可以将诸如用户名和密码之类的属性外部化到一个单独的文件中，但是我们嵌入值以关注于自动重新配置机制。</p><p>然后可以将此bean注入其他bean（在这种情况下，注入JPA实体管理器）：</p>
-<pre><code class="prettyprint xml"><br><bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactory">
-    <property name="persistenceUnitName" value="persistenceUnit"/>
-    <property name="dataSource" ref="dataSource"/>
-</bean>
-</code></pre><p>我们可以很容易地观察到：数据库URL指向localhost上的数据库，用户名设置为“ myuser”，密码设置为“ mypass”。当您将此应用程序推送到Cloud Foundry并绑定MySQL或Postgres服务时，该服务的URL不会是<code>jdbc:<a href="mysql://localhost:3306/inventory-db">mysql://localhost:3306/inventory-db</a></code>且用户名或密码不会是这么简单！因此，如果没有其他机制，此类应用程序将在启动时失败。这是自动重新配置机制起作用的地方。自动重新配置机制利用DI来检查Spring应用程序上下文，查找与服务相对应的bean，并使用基于绑定到应用程序的服务创建的bean替换每个服务。结果是用户应用程序可以在本地部署和Cloud Foundry中运行，而无需进行任何更改。</p><p>下表显示了自动重新配置要寻找的Bean类型。</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean&quot; id=&quot;entityManagerFactory&quot;&gt;
+    &lt;property name=&quot;persistenceUnitName&quot; value=&quot;persistenceUnit&quot;/&gt;
+    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+&lt;/bean&gt;
+</code></pre><p>我们可以很容易地观察到：数据库URL指向localhost上的数据库，用户名设置为“ myuser”，密码设置为“ mypass”。当您将此应用程序推送到Cloud Foundry并绑定MySQL或Postgres服务时，该服务的URL不会是<code>jdbc:<a href="mysql://localhost:3306/inventory-db">mysql://localhost:3306/inventory-db</a></code>用户名或密码就不会那么容易了！因此，如果没有其他机制，此类应用程序将在启动时失败。这是自动重新配置机制起作用的地方。自动重新配置机制利用DI来检查Spring应用程序上下文，查找与服务相对应的bean，并使用基于绑定到应用程序的服务创建的bean替换每个服务。结果是用户应用程序可以在本地部署和Cloud Foundry中运行，而无需进行任何更改。</p><p>下表显示了自动重新配置要寻找的Bean类型。</p>
 <table border="1" margin="1em">
 <tbody>
 <tr><th>服务类型</th><th>替换豆类型</th></tr>
@@ -189,13 +195,14 @@
 <tr><td>MongoDB</td><td><code>org.springframework.data.document.mongodb.MongoDbFactory</code></td></tr>
 <tr><td>兔子MQ</td><td><code>org.springframework.amqp.rabbit.connection.ConnectionFactory</code></td></tr>
 </tbody><tbody>
-</tbody></table><p>自动重新配置背后的基本机制使用<code>BeanFactoryPostProcessor</code> ，该<code>BeanFactoryPostProcessor</code>在创建bean之前检查应用程序上下文，并根据绑定到应用程序的服务将匹配类型的现有bean与等效bean交换。对于关系数据库，它还会重新配置JPA实体管理器工厂或Hibernate会话工厂，以调整所使用的方言。</p><p>在部署过程中暂存您的应用程序时，Cloud Foundry将进行两项修改：<br></p><ol><br><li>它将向您的应用程序添加一个额外的jar，其中包含<code>BeanFactoryPostProcessor</code>和附带的资源。请注意，用于自动重新配置的jar也附带了cloudfoundry-runtime的版本。但是，这些类通过阴影机制重定位到其他程序包。这使您的应用程序可以使用不同版本的cloudfoundry-runtime，而不会发生任何冲突。</li><br><li>它将修改web.xml以更新构成Spring应用程序上下文的文件，从而向其中添加<code>BeanFactoryPostProcessor</code> 。</li><br></ol><p></p>
-<h2>局限性</h2><p>服务的自动重新配置仅在以下情况下起作用：<br></p><ol><br><li>给定服务类型可能恰好只有一个服务。例如，您可以仅将一个关系数据库服务（MySQL或Postgres）绑定到应用程序。</li><br><li>可能恰好只有一个匹配类型的bean。例如，在应用程序上下文中可能只有一个<code>DataSource</code> bean。</li><br></ol><p></p><p>如果应用程序没有遵循这些限制，则自动重配置机制将不会发生。在这种情况下，您将需要使用<code><cloud></code>具有或不具有Spring 3.1配置文件支持的下一个博客中描述的名称空间。</p><p>自动重配置机制需要典型的Spring应用程序。如果您的应用程序上下文很复杂，则可能无法正常工作。在这种情况下，您可以选择不进行自动重新配置，如下所述。</p>
-<h2>选择退出自动重新配置</h2><p>在某些情况下，您可能希望退出自动重配置。例如，您可能有一个内存中的关系数据库，该数据库不应绑定到Cloud Foundry服务。Cloud Foundry提供了几种选择退出自动重新配置机制的方法。<br></p><ol><br><li>部署应用程序时，将框架选择为“ JavaWeb”。这会将您的应用程序视为不是Spring应用程序。这是一个很难的选择，因为您的应用程序将保持不变（不会将jar添加到您的应用程序中，而web.xml将保持不变）。这也意味着本博客系列后面讨论的配置文件功能将不适用于此类应用程序。</li><br><li>使用任何<code><cloud></code>创建代表服务的bean的元素。目前包括<code><cloud:data-source></code> ， <code><cloud:mongo-db-factory></code> ， <code><cloud:rabbit-connection-factory></code> ， <code><cloud:redis-connection-factory></code>和<code><cloud:service-scan></code> 。如果应用程序直接包含基于这些命名空间元素（例如<code>CloudMongoDbFactoryBean</code> ）的基础类型的Bean，则选择退出将生效。Cloud Foundry使用此机制选择退出，因为应用程序要么希望具有自动重新配置行为，要么简单地完全控制服务创建。我们没有看到自动重新配置某些服务并手动执行其他服务的价值。</li><br></ol><p></p>
+</tbody></table><p>自动重新配置背后的基本机制使用<code>BeanFactoryPostProcessor</code>在创建bean之前检查应用程序上下文，并根据绑定到应用程序的服务将匹配类型的现有bean与等效bean交换。对于关系数据库，它还会重新配置JPA实体管理器工厂或Hibernate会话工厂，以调整所使用的方言。</p><p>在部署过程中暂存您的应用程序时，Cloud Foundry将进行两项修改：<br></p><ol><br><li>它将向您的应用程序添加一个附加jar，其中包含<code>BeanFactoryPostProcessor</code>和相关资源。请注意，用于自动重新配置的jar也附带了cloudfoundry-runtime的版本。但是，这些类通过阴影机制重定位到其他程序包。这使您的应用程序可以使用不同版本的cloudfoundry-runtime，而不会发生任何冲突。</li><br><li>它将修改web.xml以更新构成Spring应用程序上下文的文件，以添加<code>BeanFactoryPostProcessor</code>对此。</li><br></ol><p></p>
+<h2>局限性</h2><p>服务的自动重新配置仅在以下情况下起作用：<br></p><ol><br><li>给定服务类型可能恰好只有一个服务。例如，您可以仅将一个关系数据库服务（MySQL或Postgres）绑定到应用程序。</li><br><li>可能恰好只有一个匹配类型的bean。例如，您可能只有一个<code>DataSource</code> bean在应用程序上下文中。</li><br></ol><p></p><p>如果应用程序没有遵循这些限制，则自动重配置机制将不会发生。在这种情况下，您将需要使用<code><cloud></code>具有或不具有Spring 3.1配置文件支持的下一个博客中描述的名称空间。</p><p>自动重配置机制需要典型的Spring应用程序。如果您的应用程序上下文很复杂，则可能无法正常工作。在这种情况下，您可以选择不进行自动重新配置，如下所述。</p>
+<h2>选择退出自动重新配置</h2><p>在某些情况下，您可能希望退出自动重配置。例如，您可能有一个内存中的关系数据库，该数据库不应绑定到Cloud Foundry服务。Cloud Foundry提供了几种选择退出自动重新配置机制的方法。<br></p><ol><br><li>部署应用程序时，将框架选择为“ JavaWeb”。这会将您的应用程序视为不是Spring应用程序。这是一个很难的选择，因为您的应用程序将保持不变（不会将jar添加到您的应用程序中，而web.xml将保持不变）。这也意味着本博客系列后面讨论的配置文件功能将不适用于此类应用程序。</li><br><li>使用任何<code><cloud></code>创建代表服务的bean的元素。目前包括<code><cloud:data-source></code> ， <code><cloud:mongo-db-factory></code> ， <code><cloud:rabbit-connection-factory></code> ， <code><cloud:redis-connection-factory></code>和<code><cloud:service-scan></code> 。如果应用程序直接基于这些命名空间元素（例如， <code>CloudMongoDbFactoryBean</code> ），则选择退出将生效。Cloud Foundry使用此机制选择退出，因为应用程序要么希望具有自动重新配置行为，要么干脆完全控制服务创建。我们没有看到自动重新配置某些服务并手动执行其他服务的价值。</li><br></ol><p></p>
 <h2>结论</h2><p>Cloud Foundry中的自动重新配置功能是入门的绝佳方法。随着应用程序的成熟或需要绑定到多个服务，您可能需要更好地控制服务连接对象。这是<code><cloud></code>支持命名空间。在本系列的下一个博客中，Thomas Risberg将解释如何使用它。托马斯拿走。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 446;
 
       (function(disqus_shortname, document) {
@@ -209,7 +216,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -247,12 +255,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

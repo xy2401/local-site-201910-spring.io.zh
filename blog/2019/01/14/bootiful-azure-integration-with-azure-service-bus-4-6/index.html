@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Bootiful Azure：与Azure Service Bus集成（4/6）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Bootiful Azure: Integration with Azure Service Bus (4/6)">
 <meta name="twitter:description" content="<blockquote> 
- <p>This is part 4 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series <a href=" https:="" ="" github.com="" joshlong="" bootiful-azure-articl="="></head><body dir="ltr">on Github. Hit me up on <a href="http://twitter.com/Starbuxman">Twitter (@starbuxman)</a> as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my <a href="http://twitter.com/SpringTipsLive">Spring Tips (@SpringTipsLive)</a> installment, <a href="https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure"><em>Bootiful Azure</em></a> 
+ <p>This is part 4 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series <a href=" https:="" ="" github.com="" joshlong="" bootiful-azure-articl="="></head><body >on Github. Hit me up on <a href="http://twitter.com/Starbuxman">Twitter (@starbuxman)</a> as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my <a href="http://twitter.com/SpringTipsLive">Spring Tips (@SpringTipsLive)</a> installment, <a href="https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure"><em>Bootiful Azure</em></a> 
 
 ">
 <meta name="twitter:creator" content="@starbuxman">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -183,10 +189,10 @@
 <li><a href="https://spring.io/blog/2019/01/21/bootiful-azure-to-production-6-6">Bootiful Azure：投产！</a></li>
 </ul>
 <p>Azure Service Bus是一种作为服务和集成技术的云消息传递。就像CosmosDB一样，它尽可能地灵活。它<a href="https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-jms-api-amqp">支持AMQP 1.0协议</a> ，例如RabbitMQ。 AMQP是一种灵活的有线协议。该协议本身包括管理代理的说明，而不仅仅是与之交互。AMQP代理是集成的理想选择，因为它们与语言和平台无关。在AMQP代理中，生产者将消息发送到<em>交易所</em> ，然后<em>交易所</em>将消息路由到<em>队列</em> ，然后消费者从<em>队列中</em>读取消息。交换负责确定将消息发送到哪个队列。它以多种方式执行此操作，但通常涉及查看消息标头中的一个称为<em>路由密钥的密钥</em> 。</p>
-<p>exhcange和队列之间的这种间接性使AMQP比基于JMS的代理更加灵活，在基于JMS的代理中，生产者将消息直接发送到<code>Destination</code>对象，然后由消费者从中读取。这意味着生产者和消费者通过选择<code>Destination</code>而耦合在一起。另外，JMS是JVM的API，不是有线协议。因此，生产者和消费者依赖于他们使用的正确库的版本。也就是说， <a href="https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-jms-api-amqp">您还可以通过JMS API使用Azure Service Bus</a> 。</p>
-<p>就像我说的那样，Azure服务总线即使不灵活，也算不上什么！</p>
-<p>AMQP模型是说明性的，因为从根本上来说，Azure Service Bus的本机模型看起来像AMQP。在Azure Service Bus中，您具有向其发送消息的主题或队列。然后，消息将连接到订阅，供消费者阅读。让我们构建一个简单的示例，该示例发送并使用消息。我们不会使用AMQP或JMS，而只会使用常规的Microsoft Azure ServiceBus API。</p><h2><a href="#configuring-azure-service-bus-on-microsoft-azure" class="anchor" name="configuring-azure-service-bus-on-microsoft-azure"></a>在Microsoft Azure上配置Azure Service Bus</h2>
-<p>您将需要提供一个servicebus名称空间，一个主题（我们在该主题上发送消息，并且多个使用者可以从中监听）和一个订阅（一个使用者到一个主题或队列）以连接到该主题。这是一个执行此操作的示例脚本。</p>
+<p>exhcange和队列之间的这种间接性使AMQP比基于JMS的代理更加灵活，在基于JMS的代理中，生产者将消息直接发送到<code>Destination</code>消费者随后读取的对象。这意味着生产者和消费者通过他们选择<code>Destination</code> 。另外，JMS是JVM的API，不是有线协议。因此，生产者和消费者依赖于他们使用的正确库的版本。也就是说， <a href="https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-java-how-to-use-jms-api-amqp">您还可以通过JMS API使用Azure Service Bus</a> 。</p>
+<p>就像我说的那样，Azure服务总线即使不灵活也算不上什么！</p>
+<p>AMQP模型是说明性的，因为基本上，Azure Service Bus的本机模型看起来像AMQP。在Azure Service Bus中，您具有向其发送消息的主题或队列。然后，消息将连接到订阅，供消费者阅读。让我们构建一个简单的示例，该示例发送并使用消息。我们不会使用AMQP或JMS，而只会使用常规的Microsoft Azure ServiceBus API。</p><h2><a href="#configuring-azure-service-bus-on-microsoft-azure" class="anchor" name="configuring-azure-service-bus-on-microsoft-azure"></a>在Microsoft Azure上配置Azure Service Bus</h2>
+<p>您将需要提供一个servicebus名称空间，一个主题（我们在该主题上发送消息，并且多个使用者可以从中侦听）和一个订阅（主题或队列的使用者）以连接到该主题。这是一个执行此操作的示例脚本。</p>
 <pre><code class="prettyprint shell">#!/usr/bin/env bash
 
 destination=messages
@@ -206,11 +212,11 @@ az servicebus topic subscription create --resource-group $rg  \
     --namespace-name ${namespace} --topic-name ${topic} \
     --name ${subscription}
 </code></pre>
-<p>您需要一个连接字符串才能将您的Spring应用程序连接到servicebus。运行此命令，并记下<code>primaryConnectionString</code>属性值以备后用。</p>
+<p>您需要一个连接字符串才能将您的Spring应用程序连接到servicebus。运行此命令并注意<code>primaryConnectionString</code>属性值以备后用。</p>
 <pre><code class="prettyprint shell">az servicebus namespace authorization-rule keys list --resource-group bootiful --namespace-name bootiful --name RootManageSharedAccessKey
 </code></pre><h2><a href="#introducing-azure-service-bus-into-your-spring-application" class="anchor" name="introducing-azure-service-bus-into-your-spring-application"></a>将Azure Service Bus引入Spring应用程序</h2>
 <p>将以下依赖项添加到您的构建中： <code>com.microsoft.azure</code> ： <code>azure-servicebus-spring-boot-starter</code> 。</p>
-<p>我们将编写两个组件：一个是生产者，另一个是消费者。在<em>实际的</em>应用程序中，这些事物自然会存在于单独的应用程序和单独的进程中。毕竟，消息传递用于支持不同应用程序的集成。我们先来看消费者。使用者需要先注册一个订户， <em>然后</em>其他东西才产生消息，所以我们将这些bean <em>排序</em> -Spring容器将根据给定的<code>Ordered</code>值先对其初始化进行<code>Ordered</code> 。</p>
+<p>我们将编写两个组件：一个是生产者，另一个是消费者。在<em>实际的</em>应用程序中，这些事物自然会存在于单独的应用程序和单独的进程中。毕竟，消息传递用于支持不同应用程序的集成。我们先来看消费者。使用者需要先注册一个订户， <em>然后</em>其他东西才产生消息，所以我们将这些bean <em>排序</em> -Spring容器将根据对容器的初始化先于对它们的初始化。 <code>Ordered</code>我们给予它的价值。</p>
 <pre><code class="prettyprint java">package com.example.bootifulazure;
 
 import com.microsoft.azure.servicebus.ExceptionPhase;
@@ -241,14 +247,14 @@ class ServiceBusConsumer implements Ordered {
         this.iSubscriptionClient.registerMessageHandler(new IMessageHandler() {
 
             @Override
-            public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                log.info("received message " + new String(message.getBody()) + " with body ID " + message.getMessageId());
+            public CompletableFuture&lt;Void&gt; onMessageAsync(IMessage message) {
+                log.info(&quot;received message &quot; + new String(message.getBody()) + &quot; with body ID &quot; + message.getMessageId());
                 return CompletableFuture.completedFuture(null);
             }
 
             @Override
             public void notifyException(Throwable exception, ExceptionPhase phase) {
-                log.error("eeks!", exception);
+                log.error(&quot;eeks!&quot;, exception);
             }
         });
 
@@ -260,7 +266,7 @@ class ServiceBusConsumer implements Ordered {
     }
 }
 </code></pre>
-<p>当消息到达时，我们记录其<code>body</code>和<code>messageId</code> 。</p>
+<p>当消息到达时，我们记录它<code>body</code>和<code>messageId</code> 。</p>
 <p>现在，让我们看一下制作人。</p>
 <pre><code class="prettyprint java">package com.example.bootifulazure;
 
@@ -286,7 +292,7 @@ class ServiceBusProducer implements Ordered {
 
     @EventListener(ApplicationReadyEvent.class)
     public void produce() throws Exception {
-        this.iTopicClient.send(new Message("Hello @ " + Instant.now().toString()));
+        this.iTopicClient.send(new Message(&quot;Hello @ &quot; + Instant.now().toString()));
     }
 
     @Override
@@ -295,10 +301,11 @@ class ServiceBusProducer implements Ordered {
     }
 }
 </code></pre>
-<p>很简单吧？这些类的内容在<code>consume()</code>和<code>produce()</code>方法中。消费者首先运行，然后是生产者。如果您曾经使用过消息技术，那么您可能会发现没有提及任何类型的<em>目的地</em> （主题或队列），这有点令人费解。该配置全部存在于属性中（例如<code>application.properties</code>文件中的属性），并在自动配置<code>ITopicClient</code>和<code>ISubscriptionClient</code> 。如果要发送消息或使用来自多个目标的消息，只需自己定义相关的Bean，并确保<em>不要</em>在应用程序的属性中指定<code>azure.service-bus.connection-string</code> ，否则默认的Spring Boot自动配置将启动并尝试为您创建这些bean。</p></div>
+<p>很简单吧？阶级的肉在<code>consume()</code>和<code>produce()</code>方法。消费者首先运行，然后是生产者。如果您曾经使用过消息技术，那么您可能会发现没有提及任何类型的<em>目的地</em> （主题或队列），这有点令人费解。该配置全部存在于属性中（例如您的<code>application.properties</code>文件），并在自动配置<code>ITopicClient</code>和<code>ISubscriptionClient</code> 。如果要发送消息或使用来自多个目标的消息，只需自己定义相关的Bean，并确保<em>不</em>指定<code>azure.service-bus.connection-string</code>在应用程序的属性中，否则默认的Spring Boot自动配置将启动并尝试为您创建这些bean。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3518;
 
       (function(disqus_shortname, document) {
@@ -312,7 +319,8 @@ class ServiceBusProducer implements Ordered {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -350,12 +358,14 @@ class ServiceBusProducer implements Ordered {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

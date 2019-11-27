@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>反应堆调试经验</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Reactor Debugging Experience">
-<meta name="twitter:description" content="<p>In the <a href=" https:="" ="" projectreactor.i="="></head><body dir="ltr">Project Reactor team, we believe that the debugging experience of the libraries you rely upon is as important as, let’s say, the feature set or performance.
+<meta name="twitter:description" content="<p>In the <a href=" https:="" ="" projectreactor.i="="></head><body >Project Reactor team, we believe that the debugging experience of the libraries you rely upon is as important as, let’s say, the feature set or performance.
 <p>Today, we’re excited to announce two new experimental projects in the Reactor family!</p>
 <h2><a href="#blockhound-a-new-kid-on-the-block" class="anchor" name="blockhound-a-new-kid-on-the-block"></a>BlockHound - a new kid on the block</h2>
 <p>One of the most common rookie mistakes is to block Java threads that are supposed to run only non-blocking code (e.g., <code>Schedulers.parallel()</code>).<br>It is one of the most harmful issues because you may block unrelated processing or even create a deadlock!</p>
@@ -43,10 +47,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -174,15 +180,15 @@
 </header>
 <div class="blog--post"><p>在<a href="https://projectreactor.io">Project Reactor</a>团队中，我们认为您所依赖的库的调试经验与功能集或性能一样重要。</p>
 <p>今天，我们很高兴宣布Reactor系列中的两个新实验项目！</p><h2><a href="#blockhound-a-new-kid-on-the-block" class="anchor" name="blockhound-a-new-kid-on-the-block"></a> BlockHound-一个新孩子</h2>
-<p>最常见的菜鸟错误之一是阻塞了应该只运行非阻塞代码的Java线程（例如<code>Schedulers.parallel()</code> ）。<br>这是最有害的问题之一，因为您可能阻止不相关的处理，甚至造成死锁！</p>
+<p>新手最常见的错误之一是阻止应该只运行非阻塞代码的Java线程（例如， <code>Schedulers.parallel()</code> ）。<br>这是最有害的问题之一，因为您可能阻止不相关的处理，甚至造成死锁！</p>
 <p>考虑以下代码：</p>
 <pre><code class="prettyprint java">Flux.range(0, Runtime.getRuntime().availableProcessors() * 2)
         .subscribeOn(Schedulers.parallel())
-        .map(i -> {
+        .map(i -&gt; {
             CountDownLatch latch = new CountDownLatch(1);
 
             Mono.delay(Duration.ofMillis(i * 100))
-                .subscribe(it -> latch.countDown());
+                .subscribe(it -&gt; latch.countDown());
 
             try {
                 latch.await();
@@ -196,15 +202,15 @@
 </code></pre>
 <p>运行此代码需要多长时间？1秒？10秒？<br>如果我告诉您它将永远不会退出并造成死锁怎么办？原因如下：</p>
 <ol>
-<li>我们创建<code>N * 2</code>信号，其中<code>N</code>是JVM可以使用的CPU数量。</li>
-<li>我们使用<code>Schedulers.parallel</code>订阅-仅限<code>N</code>线程的有界池。</li>
+<li>我们创造<code>N * 2</code>信号，在哪里<code>N</code>是我们的JVM可以使用的CPU数量。</li>
+<li>我们订阅使用<code>Schedulers.parallel</code> -仅限于<code>N</code>线程。</li>
 <li>对于每个信号，我们为并行调度程序调度另一个任务（ <code>Mono.delay</code>隐式使用<code>Schedulers.parallel</code> ）。</li>
 <li>我们的逻辑假设延迟将很快得到处理，并且锁存器最终将解除阻塞。</li>
 <li>但是，所有N个线程将等待它们的闩锁，并且延迟任务将永远不会执行！</li>
 </ol>
-<p>即使您没有阻止所有线程而仅阻止某些线程，也阻止了其他不相关的任务的进行。最可能的结果是性能将下降。</p>
+<p>即使您没有阻塞所有线程而仅阻塞某些线程，也阻止了其他不相关的任务的进行。最可能的结果是性能将下降。</p>
 <p>当您将<a href="https://projectreactor.io/docs/core/release/reference/#faq.wrap-blocking">旧的阻塞代码迁移到反应性方法</a>时，该问题尤其明显。当您的<a href="http://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/">函数具有相同的颜色</a>时，即使是最有经验的代码审查员也可能不会发现阻塞调用！</p>
-<p>这就是为什么我们创建<a href="https://github.com/reactor/BlockHound">BlockHound的</a>原因-Java代理可以检测来自非阻塞线程的阻塞调用。<br>与其他解决方案不同，它会检测原始方法（甚至是本机方法！）而且即使反射也没有办法调用阻塞方法！</p>
+<p>这就是为什么我们创建<a href="https://github.com/reactor/BlockHound">BlockHound的</a>原因-Java代理可以检测来自非阻塞线程的阻塞调用。<br>与其他解决方案不同，它会检测原始方法（甚至是本机方法！）而且即使反射也无法调用阻塞方法！</p>
 <p>现在，如果我们<a href="https://github.com/reactor/BlockHound/tree/master/docs/quick_start.md">按照docs中的说明</a>将其添加到我们的应用<a href="https://github.com/reactor/BlockHound/tree/master/docs/quick_start.md">中</a> ，我们将得到以下异常：</p>
 <pre><code class="prettyprint">java.lang.Error: Blocking call! sun.misc.Unsafe#park
   at reactor.BlockHound$Builder.lambda$new$0(BlockHound.java:154)
@@ -218,16 +224,16 @@
   at java.util.concurrent.CountDownLatch.await(CountDownLatch.java:231)
   at com.example.demo.BlockingCode.lambda$main$1(BlockingCode.java:24)
 </code></pre>
-<p>请注意， <code>await</code>内部为等待逻辑调用<code>Unsafe#park</code> 。我们不希望我们的线程被停放或阻塞，而BlockHound可以保护我们免受此伤害！</p>
+<p>注意<code>await</code>来电<code>Unsafe#park</code>在内部等待逻辑。我们不希望我们的线程被停放或阻塞，而BlockHound可以保护我们免受此伤害！</p>
 <p>如果您想了解实施细节，请阅读<a href="https://github.com/reactor/BlockHound/blob/master/docs/how_it_works.md">其工作原理</a>页面。<br>TL; DR：它包装原始方法，并仅向它们添加两个方法调用。</p>
 <p>您可以在测试中或在质量检查/过渡环境中运行它，而不会损失性能。Holy Atom，鉴于开销很低，您甚至可以尝试在生产环境中运行它！ :)</p>
 <p>BlockHound可与Project Reactor和RxJava 2一起使用，您可以<a href="https://github.com/reactor/BlockHound/blob/master/docs/custom_integrations.md">编写自己的集成</a> 。</p><h2><a href="#reactor-debug-agent-production-ready-assembly-back-tracing" class="anchor" name="reactor-debug-agent-production-ready-assembly-back-tracing"></a> Reactor Debug Agent-生产就绪的组件回溯</h2>
-<p>由于响应式代码的功能性编程方面的原因，有时它有时可能具有挑战性：您无需<em>声明</em>要对数据执行什么操作，而是<em>声明</em>数据应如何在系统中流动。这意味着声明和执行在不同的时间发生。</p>
+<p>由于功能性编程方面的原因，调试反应性代码有时可能具有挑战性：您无需<em>声明</em>要对数据执行什么操作，而是<em>声明</em>数据应如何在系统中流动。这意味着声明和执行在不同的时间发生。</p>
 <blockquote>
 <p>您可以在Simon的精彩文章中阅读有关它的更多信息：<br><a href="https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription">https://spring.io/blog/2019/03/06/flight-of-the-flux-1-assembly-vs-subscription</a></p>
 </blockquote>
-<p>在Reactor中，我们将其称为“组装时间”和“执行时间”。在组装期间，您可以通过调用<code>myFlux.map(i -> i * 2).filter(5 % i == 1).single()</code>和其他运算符来“设计”管道。稍后，此“管道定义”将用于处理<code>myFlux</code>发布的信号。但是，发生错误时会发生什么？</p>
-<p>你们中有些人可能已经知道<code>Hooks.onOperatorDebug()</code> 。这对<code>reactor-core</code>非常有用。它从此转换堆栈跟踪：</p>
+<p>在Reactor中，我们将其称为“组装时间”和“执行时间”。在组装期间，您可以通过调用“设计”管道<code>myFlux.map(i -> i * 2).filter(5 % i == 1).single()</code>和其他运营商。稍后，此“管道定义”将用于处理由<code>myFlux</code> 。但是，发生错误时会发生什么？</p>
+<p>你们中有些人可能已经知道<code>Hooks.onOperatorDebug()</code> 。这是一个非常有用的挂钩<code>reactor-core</code> 。它从此转换堆栈跟踪：</p>
 <pre><code class="prettyprint">java.lang.IndexOutOfBoundsException: Source emitted more than one item
   at reactor.core.publisher.MonoSingle$SingleSubscriber.onNext(MonoSingle.java:129)
   at reactor.core.publisher.FluxRange$RangeSubscription.fastPath(FluxRange.java:129)
@@ -267,16 +273,16 @@ Error has been observed by the following operator(s):
 10:
 11:     public static void run() {
 12:        Flux.range(0, 5)
-13:            .single() // <-- Aha!
+13:            .single() // &lt;-- Aha!
 14:            .subscribeOn(Schedulers.parallel())
 15:            .block();
 16:     }
 17: }
 </code></pre>
 <p>如您所见，启用调试模式后，我们可以清楚地识别发生错误的组装操作。它就像一个堆栈跟踪，但是（因为执行与程序集分离）是一个反向跟踪。</p>
-<p>您可能会想：“太好了，现在我要在生产中使用它！”-我们也是如此。但是，当您使用<code>Hooks.onOperatorDebug()</code> ，每次您调用<code>.map(...)</code>类的运算符时，我们都必须在组装时进行重量级堆栈遍历以捕获调用位置，即使您的代码永远不会抛出一个错误！这是由于Java中缺少呼叫站点跟踪，唯一的替代方法是<code>new Exception().getStackTrace()</code>或<code>StackWalker</code> （在Java 9+中）。</p>
+<p>您可能会想：“太好了，现在我要在生产中使用它！”-我们也是如此。但是当你使用<code>Hooks.onOperatorDebug()</code> ，我们必须在组装时进行重量级堆栈遍历，才能在每次致电运营商时捕获呼叫站点，例如<code>.map(...)</code> ，即使您的代码永远不会抛出错误！这是由于Java中缺少呼叫站点跟踪，因此唯一的替代方法是<code>new Exception().getStackTrace()</code>要么<code>StackWalker</code> （在Java 9+中）。</p>
 <p>显然，我们不能在生产中使用这种方法，因此我们为此做了一个工具！</p>
-<p><code>ReactorDebugAgent</code> <a href="https://github.com/reactor/reactor-tools">-tools项目</a>中的<code>ReactorDebugAgent</code>是一个Java代理，可帮助您调试应用程序中的异常而无需支付运行时成本（与<code>Hooks.onOperatorDebug()</code>不同）。</p>
+<p><code>ReactorDebugAgent</code>来自<a href="https://github.com/reactor/reactor-tools">Reactor-Tools项目</a>的Java代理可以帮助您调试应用程序中的异常而无需支付运行时成本（与<code>Hooks.onOperatorDebug()</code> ）。</p>
 <blockquote>
 <p>⚠️该项目处于孵化阶段，将来可能会或可能不会成为独立项目或<a href="https://github.com/reactor/reactor-core">https://github.com/reactor/reactor-core</a>的模块。</p>
 </blockquote>
@@ -286,14 +292,14 @@ Error has been observed by the following operator(s):
 </code></pre>
 <p>至：</p>
 <pre><code class="prettyprint java">Flux flux = Flux.range(0, 5);
-flux = Hooks.addCallSiteInfo(flux, "Flux.range\n foo.Bar.baz(Bar.java:21)"));
+flux = Hooks.addCallSiteInfo(flux, &quot;Flux.range\n foo.Bar.baz(Bar.java:21)&quot;));
 flux = flux.single();
-flux = Hooks.addCallSiteInfo(flux, "Flux.single\n foo.Bar.baz(Bar.java:22)"));
+flux = Hooks.addCallSiteInfo(flux, &quot;Flux.single\n foo.Bar.baz(Bar.java:22)&quot;));
 </code></pre>
 <p>要启用它，您需要首先初始化代理：</p>
 <pre><code class="prettyprint java">ReactorDebugAgent.init();
 </code></pre>
-<p>Since️因为实现将在加载类时对它们进行检测，所以放置它的最佳位置是在<code>main(String[])</code>方法中的所有其他内容之前：</p>
+<p>Since️由于实现将在加载类时对您的类进行检测，因此放置它的最佳位置是在您的所有其他内容之前<code>main(String[])</code>方法：</p>
 <pre><code class="prettyprint java">public static void main(String[] args) {
     ReactorDebugAgent.init();
     SpringApplication.run(Application.class, args);
@@ -307,7 +313,8 @@ flux = Hooks.addCallSiteInfo(flux, "Flux.single\n foo.Bar.baz(Bar.java:22)"));
 </ul></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3616;
 
       (function(disqus_shortname, document) {
@@ -321,7 +328,8 @@ flux = Hooks.addCallSiteInfo(flux, "Flux.single\n foo.Bar.baz(Bar.java:22)"));
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -359,12 +367,14 @@ flux = Hooks.addCallSiteInfo(flux, "Flux.single\n foo.Bar.baz(Bar.java:22)"));
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

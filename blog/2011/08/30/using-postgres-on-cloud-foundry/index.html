@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>在Cloud Foundry上使用Postgres</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Using Postgres on Cloud Foundry">
-<meta name="twitter:description" href="http://cloudfoundry.com" content="<p>When the new open source Platform-as-a-Service (PaaS) offering <a title=" cloud="" foundr="=">Cloud Foundry from VMware launched earlier this year, it included a relational database service powered by MySQL along with the NOSQL options of MongoDB and Redis. One of the promises of the Open PaaS is to provide choice both in languages and frameworks you can develop with and in the database services that are available to use. We now have a new relational database service using <a title="PostgreSQL的" href="http://postgresql.org">PostgreSQL</a> available. This is great since we can now choose between the two most popular open source relational databases. PostgreSQL is is a very robust and reliable database that has been around for a long time so it definitely has been battle tested.
+<meta name="twitter:description" href="http://cloudfoundry.com" content="<p>When the new open source Platform-as-a-Service (PaaS) offering <a title=" cloud="" foundr="="></head><body >Cloud Foundry from VMware launched earlier this year, it included a relational database service powered by MySQL along with the NOSQL options of MongoDB and Redis. One of the promises of the Open PaaS is to provide choice both in languages and frameworks you can develop with and in the database services that are available to use. We now have a new relational database service using <a title="PostgreSQL的" href="http://postgresql.org">PostgreSQL</a> available. This is great since we can now choose between the two most popular open source relational databases. PostgreSQL is is a very robust and reliable database that has been around for a long time so it definitely has been battle tested.
 ">
 <meta name="twitter:creator" content="@trisberg">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/c2ce75a3d51fc3a2d86a3643d2e90033?s=200">
@@ -37,10 +41,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,26 +172,26 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>当VMware于今年早些时候推出提供<a title="云铸造" href="http://cloudfoundry.com">Cloud Foundry</a>的新的开源平台即服务（PaaS）时，它包括由MySQL支持的关系数据库服务以及MongoDB和Redis的NOSQL选项。Open PaaS的承诺之一是提供可用于开发的语言和框架以及可用的数据库服务中的选择。现在，我们有了使用<a title="PostgreSQL的" href="https://postgresql.org">PostgreSQL</a>的新的关系数据库服务。很好，因为我们现在可以在两个最受欢迎的开源关系数据库之间进行选择。PostgreSQL是一个非常健壮和可靠的数据库，已经存在了很长时间，因此它肯定已经过了战斗测试。</p>
+<div class="blog--post"><p>当VMware于今年早些时候推出提供<a title="云铸造" href="http://cloudfoundry.com">Cloud Foundry</a>的新的开源平台即服务（PaaS）时，它包括由MySQL支持的关系数据库服务以及MongoDB和Redis的NOSQL选项。Open PaaS的承诺之一是提供可用于开发的语言和框架以及可用的数据库服务中的选择。现在，我们有了使用<a title="PostgreSQL的" href="https://postgresql.org">PostgreSQL</a>的新关系数据库服务。很好，因为我们现在可以在两个最受欢迎的开源关系数据库之间进行选择。PostgreSQL是一个非常健壮和可靠的数据库，已经存在了很长时间，因此它肯定已经过了战斗测试。</p>
 <h3>Cloud Foundry上的vFabric Postgres</h3><p>新的PostgreSQL服务是满足我们关系数据库需求的绝佳选择。PostgreSQL最初是经过开发和优化的，可以在物理计算机上运行。现在我们正在云中运行数据库，因此有必要针对该环境优化数据库。这正是VMware通过创建针对虚拟化云环境优化的版本为Postgres所做的工作。为了在<a href="http://cloudfoundry.com/">cloudfoundry.com</a>上支持PostgreSQL服务，Cloud Foundry团队使用vFabric Postgres 9.0（vSphere优化的Postgres版本）。vFabric Postgres产品是<a href="https://finance.yahoo.com/news/VMware-Introduces-New-iw-1888124214.html?x=0">最近发布的</a> <a href="https://www.vmware.com/products/datacenter-virtualization/vfabric-data-director/">vFabric Data Director的</a>一部分， <a href="https://www.vmware.com/products/datacenter-virtualization/vfabric-data-director/">vFabric Data Director</a>是一种新的数据库供应和运营解决方案，旨在为企业提供数据库即服务模型。Data Director支持的第一个数据库是vFabric Postgres。</p><p>那么，从开发人员的角度来看，vFabric Postgres和常规PostgreSQL之间有什么区别吗？不，它们在功能上是相同的。您使用相同的JDBC驱动程序和SQL语法。所做的更改是内部的，与交付云所需的弹性和性能有关。</p>
 <h3>使用Roo构建书架样例应用程序</h3><p>要开始在Cloud Foundry上使用PostgreSQL，您首先需要在Cloud Foundry上拥有一个帐户。处理完之后，我们就可以开始开发第一个数据库应用程序了。编写Spring应用程序最快的方法是使用<a title="Spring Roo" href="http://www.springsource.org/roo">Spring Roo</a> ，这是Spring针对Java开发人员的快速应用程序开发工具。当然，这意味着您需要<a href="http://www.springsource.org/roo/guide?w=intro#intro-installation">安装Roo</a>和<a href="http://www.springsource.org/roo/guide?w=base-cloud-foundry">Cloud Foundry附加组件</a> 。</p><p>现在我们已经具备了所有前提条件，可以开始了。首先为应用程序创建一个目录，然后打开Roo shell。打开后，我们可以创建我们的项目。</p>
-<pre><code class="prettyprint text"><br>roo> project --topLevelPackage org.springsource.data.demo.bookshelf
+<pre><code class="prettyprint text"><br />roo&gt; project --topLevelPackage org.springsource.data.demo.bookshelf
 </code></pre><p>现在，我们准备为Roo应用程序配置持久性选项。我将选择Hibernate作为JPA提供程序，并选择Postgres作为数据库。由于我们将在Cloud Foundry中运行此应用程序，因此无需提供任何自定义连接属性。连接详细信息将自动为我们管理。</p>
-<pre><code class="prettyprint text"><br>org.springsource.data.demo.bookshelf roo> persistence setup --provider HIBERNATE --database POSTGRES
+<pre><code class="prettyprint text"><br />org.springsource.data.demo.bookshelf roo&gt; persistence setup --provider HIBERNATE --database POSTGRES
 </code></pre><p>接下来，我们需要为这个简短的示例创建Entity类。我将创建一个Book类，它将成为新的BookShelf应用程序的一部分。我现在将立即创建Book类，并在将来的某个时间添加Author和其他任何类。</p>
-<pre><code class="prettyprint text"><br>org.springsource.data.demo.bookshelf roo> entity --class ~.domain.Book
-~.domain.Book roo> field string --fieldName title --sizeMax 200
-~.domain.Book roo> field string --fieldName isbn --sizeMax 20
-~.domain.Book roo> field date --fieldName published --type java.util.Date
-~.domain.Book roo> field number --fieldName price --type java.math.BigDecimal
+<pre><code class="prettyprint text"><br />org.springsource.data.demo.bookshelf roo&gt; entity --class ~.domain.Book
+~.domain.Book roo&gt; field string --fieldName title --sizeMax 200
+~.domain.Book roo&gt; field string --fieldName isbn --sizeMax 20
+~.domain.Book roo&gt; field date --fieldName published --type java.util.Date
+~.domain.Book roo&gt; field number --fieldName price --type java.math.BigDecimal
 </code></pre><p>处理完之后，我们准备为Book类的控制器创建Web应用程序。</p>
-<pre><code class="prettyprint text"><br>~.domain.Book roo> controller all --package ~.web
+<pre><code class="prettyprint text"><br />~.domain.Book roo&gt; controller all --package ~.web
 </code></pre><p>我们已经完成了，如果您问我，那会很轻松。现在，我们需要打包所有内容，连接到Cloud Foundry并部署应用程序。</p>
-<pre><code class="prettyprint text"><br>~.web roo> perform package
-~.web roo> cloud foundry login
-~.web roo> cloud foundry deploy --appName bookshelf --path /target/bookshelf-0.1.0.BUILD-SNAPSHOT.war
+<pre><code class="prettyprint text"><br />~.web roo&gt; perform package
+~.web roo&gt; cloud foundry login
+~.web roo&gt; cloud foundry deploy --appName bookshelf --path /target/bookshelf-0.1.0.BUILD-SNAPSHOT.war
 </code></pre><p>部署完成后，我们应该能够列出当前的应用程序集</p>
-<pre><code class="prettyprint text"><br>~.web roo> cloud foundry list apps
+<pre><code class="prettyprint text"><br />~.web roo&gt; cloud foundry list apps
 
 ================================================ Applications ================================================
 
@@ -194,7 +200,7 @@ Name                      Status      Instances     Services             URLs
 bookshelf                 STOPPED     1                                  bookshelf.cloudfoundry.com
 </code></pre>
 <h3>将应用程序连接到Cloud Foundry上的PostgreSQL</h3><p>现在我们进入有趣的部分。如上所示，该应用程序处于停止状态。由于我们尚未创建数据库并将其绑定到应用程序，因此我们现在无法启动它。因此，让我们现在开始做，但是首先让我们看看可用的数据服务。</p>
-<pre><code class="prettyprint text"><br>~.web roo> cloud foundry list services
+<pre><code class="prettyprint text"><br />~.web roo&gt; cloud foundry list services
 
 =================== System Services ====================
 
@@ -206,14 +212,14 @@ redis          2.2         Redis key-value store service
 postgresql     9.0         PostgreSQL database service (vFabric)
 mysql          5.1         MySQL database service
 </code></pre><p>太好了，我们确实可以选择PostgreSQL。因此，让我们创建一个数据库服务实例，将其绑定到应用程序并启动该应用程序。</p>
-<pre><code class="prettyprint text"><br>~.web roo> cloud foundry create service --serviceName books --serviceType postgresql
-~.web roo> cloud foundry bind service --serviceName books --appName bookshelf
-~.web roo> cloud foundry start app --appName bookshelf
+<pre><code class="prettyprint text"><br />~.web roo&gt; cloud foundry create service --serviceName books --serviceType postgresql
+~.web roo&gt; cloud foundry bind service --serviceName books --appName bookshelf
+~.web roo&gt; cloud foundry start app --appName bookshelf
 </code></pre><p>让我们看看访问时得到的<a href="http://bookshelf.cloudfoundry.com"></a> <a href="http://bookshelf.cloudfoundry.com">http://bookshelf.cloudfoundry.com</a></p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf.png"><img class="alignnone size-full wp-image-9598" title="书架" src="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf.png" alt="书架屏幕" width="95%" style="border:1px solid black"></a></p><p>因此该应用程序已启动并正在运行，我们可以在书架上添加和查看书籍。</p>
-<h3>有关Cloud Foundry上PostgreSQL的更多信息</h3><p>在上面的示例中，我们可以将应用程序连接到PostgreSQL。但是如何知道我们是针对常规的PostgreSQL安装还是vFabric Postgres运行的呢？一种确定方法是检查version（）函数的输出。通常会说类似“ x86_64-pc-linux-gnu上的PostgreSQL 9.0.4，由GCC gcc-4.4.real（Ubuntu 4.4.3-4ubuntu5）4.4.3，64位编译”。由于上运行的Postgres数据库<a href="http://cloudfoundry.com/">cloudfoundry.com</a>是基于Postgres的的vFabric 9.0，我们实际看到的返回值说：“[PostgreSQL的9.0.4] vPostgres 1.0版本-V的构建”。让我们看看是否可以轻松地将页面添加到Web应用程序以显示一些数据库信息。我将创建一个可以修改的DatabaseInfo控制器。</p>
-<pre><code class="prettyprint text"><br>~.web roo> controller class ~.web.DatabaseInfoController
+<h3>有关Cloud Foundry上PostgreSQL的更多信息</h3><p>在上面的示例中，我们可以将应用程序连接到PostgreSQL。但是如何知道我们是针对常规的PostgreSQL安装还是vFabric Postgres运行的呢？一种确定方法是检查version（）函数的输出。通常会说类似“ x86_64-pc-linux-gnu上的PostgreSQL 9.0.4，由GCC gcc-4.4.real（Ubuntu 4.4.3-4ubuntu5）4.4.3，64位编译”。由于<a href="http://cloudfoundry.com/">cloudfoundry.com</a>上运行的Postgres数据库基于vFabric Postgres 9.0，因此我们实际上看到的返回值是“ [PostgreSQL 9.0.4] vPostgres 1.0 release-v build”。让我们看看是否可以轻松地将页面添加到Web应用程序以显示一些数据库信息。我将创建一个可以修改的DatabaseInfo控制器。</p>
+<pre><code class="prettyprint text"><br />~.web roo&gt; controller class ~.web.DatabaseInfoController
 </code></pre><p>这将创建一个控制器<em>（bookshelf / src / main / java / org / springsource / data / demo / bookshelf / web / DatabaseInfoController.java）</em> ，该控制器在index方法中添加了DataSource和一些数据库信息检索代码。</p>
-<pre><code class="prettyprint java"><br>@RequestMapping("/databaseinfo/**")
+<pre><code class="prettyprint java"><br />@RequestMapping(&quot;/databaseinfo/**&quot;)
 @Controller
 public class DatabaseInfoController {
 
@@ -224,49 +230,50 @@ public class DatabaseInfoController {
     public void get(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{id}")
+    @RequestMapping(method = RequestMethod.POST, value = &quot;{id}&quot;)
     public void post(@PathVariable Long id, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
     }
 
     @RequestMapping
     public String index(ModelMap modelMap) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-    	String userInfo = jdbcTemplate.queryForObject("select user", String.class);
-    	String urlInfo = "?";
+    	String userInfo = jdbcTemplate.queryForObject(&quot;select user&quot;, String.class);
+    	String urlInfo = &quot;?&quot;;
     	if (dataSource instanceof BasicDataSource) {
     	    urlInfo = ((BasicDataSource) dataSource).getUrl();
 	}
-	String versionInfo = jdbcTemplate.queryForObject("select version()", String.class);
-        modelMap.put("userInfo", userInfo);
-        modelMap.put("urlInfo", urlInfo);
-        modelMap.put("versionInfo", versionInfo);
-        return "databaseinfo/index";
+	String versionInfo = jdbcTemplate.queryForObject(&quot;select version()&quot;, String.class);
+        modelMap.put(&quot;userInfo&quot;, userInfo);
+        modelMap.put(&quot;urlInfo&quot;, urlInfo);
+        modelMap.put(&quot;versionInfo&quot;, versionInfo);
+        return &quot;databaseinfo/index&quot;;
     }
 }
 </code></pre><p>该控制器还使用了一个JSP文件<em>（bookshelf / src / main / webapp / WEB-INF / views / databaseinfo / index.jspx）</em> ，并且需要添加一些代码。</p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
-  <jsp:directive.page contentType="text/html;charset=UTF-8"/>
-  <jsp:output omit-xml-declaration="yes"/>
-  <spring:message code="label_databaseinfo_index" htmlEscape="false" var="title"/>
-  <util:panel id="title" title="${title}">
-    <spring:message code="application_name" htmlEscape="false" var="app_name"/>
-    <h3>
-      <spring:message arguments="${app_name}" code="welcome_titlepane"/>
-    </h3>
-    <p>  The database user is ${userInfo}. </p>
-    <p>  The dataSource URL is ${urlInfo}. </p>
-    <p>  The database version is ${versionInfo}. </p>
-  </util:panel>
-</div>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;div xmlns:jsp=&quot;http://java.sun.com/JSP/Page&quot; xmlns:spring=&quot;http://www.springframework.org/tags&quot; xmlns:util=&quot;urn:jsptagdir:/WEB-INF/tags/util&quot; version=&quot;2.0&quot;&gt;
+  &lt;jsp:directive.page contentType=&quot;text/html;charset=UTF-8&quot;/&gt;
+  &lt;jsp:output omit-xml-declaration=&quot;yes&quot;/&gt;
+  &lt;spring:message code=&quot;label_databaseinfo_index&quot; htmlEscape=&quot;false&quot; var=&quot;title&quot;/&gt;
+  &lt;util:panel id=&quot;title&quot; title=&quot;${title}&quot;&gt;
+    &lt;spring:message code=&quot;application_name&quot; htmlEscape=&quot;false&quot; var=&quot;app_name&quot;/&gt;
+    &lt;h3&gt;
+      &lt;spring:message arguments=&quot;${app_name}&quot; code=&quot;welcome_titlepane&quot;/&gt;
+    &lt;/h3&gt;
+    &lt;p&gt;  The database user is ${userInfo}. &lt;/p&gt;
+    &lt;p&gt;  The dataSource URL is ${urlInfo}. &lt;/p&gt;
+    &lt;p&gt;  The database version is ${versionInfo}. &lt;/p&gt;
+  &lt;/util:panel&gt;
+&lt;/div&gt;
 </code></pre><p>现在，我们可以构建修改后的应用程序并将其部署到云中。</p>
-<pre><code class="prettyprint text"><br>~.web roo> perform package
-~.web roo> cloud foundry deploy --appName bookshelf --path /target/bookshelf-0.1.0.BUILD-SNAPSHOT.war
+<pre><code class="prettyprint text"><br />~.web roo&gt; perform package
+~.web roo&gt; cloud foundry deploy --appName bookshelf --path /target/bookshelf-0.1.0.BUILD-SNAPSHOT.war
 </code></pre><p>访问该应用程序，我们可以看到指向<a href="http://bookshelf.cloudfoundry.com/databaseinfo/index">数据库信息控制器视图</a>的新链接，该链接返回以下页面：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf-dbinfo1.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/08/bookshelf-dbinfo1.png" alt="书架数据库信息" title="书架数据库信息" width="95%" class="alignnone size-full wp-image-9639"></a></p><p>如您所见，我们正在云部署的应用程序中使用vFabric Postgres。<br></p><h3>我可以在自己的服务器或私有云中运行vFabric Postgres吗？</h3><br>是的，您可以获取vFabric Postgres进行开发或生产。您还将需要配套产品<a href="https://www.vmware.com/products/datacenter-virtualization/vfabric-data-director/">vFabric Data Director</a>来管理数据库实例。 vFabric Data Director是一种软件解决方案，使您能够为云提供数据库即服务（DBaaS）。它专为云环境而设计，能够管理数千个数据库，同时为应用程序开发人员提供自助式数据库管理。<p></p><p>有关此新产品的更多信息，请参见<a href="https://jkshah.blogspot.com/2011/08/vmware-vfabric-data-director-vfabric.html">Jignesh Shah的博客</a> 。</p>
 <p> </p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 438;
 
       (function(disqus_shortname, document) {
@@ -280,7 +287,8 @@ public class DatabaseInfoController {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -318,12 +326,14 @@ public class DatabaseInfoController {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,4 +1,4 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>JavaScript模块化（没有流行语）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
@@ -21,7 +21,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="JavaScript modularity (without the buzzwords)">
-<meta name="twitter:description" content="<p>Almost ten years ago <a href=" https:="" ="" spring.io="" team="" acolye="="></head><body dir="ltr">Adrian Colyer wrote a <a href="http://aspectprogrammer.org/blogs/adrian/2004/05/the_ted_neward.html">memorable blog post</a>, giving the best explanation on aspect oriented programming (AOP) out there: clear and simple style, accurate content, no buzzwords. If you’ve taken a look at the the earlier <a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">two</a> <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">posts</a> in this series, you may have noticed some of our architecture choices in the <a href="https://github.com/spring-io/sagan/tree/master/sagan-client">client module</a> of the Sagan application, including the <strong>use of JavaScript modules</strong>.
+<meta name="twitter:description" content="<p>Almost ten years ago <a href=" https:="" ="" spring.io="" team="" acolye="="></head><body >Adrian Colyer wrote a <a href="http://aspectprogrammer.org/blogs/adrian/2004/05/the_ted_neward.html">memorable blog post</a>, giving the best explanation on aspect oriented programming (AOP) out there: clear and simple style, accurate content, no buzzwords. If you’ve taken a look at the the earlier <a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">two</a> <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">posts</a> in this series, you may have noticed some of our architecture choices in the <a href="https://github.com/spring-io/sagan/tree/master/sagan-client">client module</a> of the Sagan application, including the <strong>use of JavaScript modules</strong>.
 <p>In this post, I want to walk you through the basics of JavaScript modules in the style of Adrian’s post: clear, simple, accurate, no buzzwords!</p>
 ">
 <meta name="twitter:creator" content="@bclozel">
@@ -168,30 +168,30 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>大约十年前， <a href="https://spring.io/team/acolyer">Adrian Colyer</a>撰写了一篇<a href="http://aspectprogrammer.org/blogs/adrian/2004/05/the_ted_neward.html">令人难忘的博客文章</a> ，其中给出了有关面向方面编程（AOP）的最佳解释：简洁明了的样式，准确的内容，没有流行语。如果您已经看过本系列的前<a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">两篇</a> <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">文章</a> ，您可能已经注意到Sagan应用程序的<a href="https://github.com/spring-io/sagan/tree/master/sagan-client">客户端模块</a>中的一些体系结构选择，包括<strong>JavaScript模块</strong>的<strong>使用</strong> 。</p><p>在这篇文章中，我想向您介绍Adrian帖子风格的JavaScript模块基础知识：清晰，简单，准确，没有流行语！</p><h2><a href="#why-javascript-needs-modularity-too" class="anchor" name="why-javascript-needs-modularity-too"></a>为什么JavaScript也需要模块化</h2><p>如果像我一样，您具有Java背景，那么某些JavaScript语言功能对您来说可能会有些奇怪：</p>
+<div class="blog--post"><p>大约十年前， <a href="https://spring.io/team/acolyer">Adrian Colyer</a>撰写了一篇<a href="http://aspectprogrammer.org/blogs/adrian/2004/05/the_ted_neward.html">令人难忘的博客文章</a> ，其中给出了有关面向方面编程（AOP）的最佳解释：简洁明了的样式，准确的内容，没有流行语。如果您已经看过本系列的前<a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">两篇</a> <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">文章</a> ，您可能已经注意到Sagan应用程序的<a href="https://github.com/spring-io/sagan/tree/master/sagan-client">客户端模块</a>中的一些体系结构选择，包括<strong>JavaScript模块</strong>的<strong>使用</strong> 。</p><p>在这篇文章中，我想向您介绍Adrian帖子风格的JavaScript模块基础知识：清晰，简单，准确，没有流行语！</p><h2><a href="#why-javascript-needs-modularity-too" class="anchor" name="why-javascript-needs-modularity-too"></a>为什么JavaScript也需要模块化</h2><p>如果像我一样具有Java背景，那么某些JavaScript语言功能对您来说可能会有些奇怪：</p>
 <ul>
 <li>其强大的<a href="http://javascript.crockford.com/prototypal.html">原型性质</a></li>
 <li>没有软件组件单元：没有使用该语言构建的软件包或模块</li>
 <li>浏览器应用程序和服务器应用程序之间的编程风格差异</li>
 </ul><p>简单的Web应用程序通常如下所示：</p>
-<pre><code class="prettyprint html"><html>
-<head>
-	<!-- scripts are loaded **sequentially** -->
-	<script src="jquery.js"></script>
-	<script src="widget.js"></script>
-	<!-- all objects are in the global namespace, 
-			 no way to isolate the code completely! -->
-	<script>
+<pre><code class="prettyprint html">&lt;html&gt;
+&lt;head&gt;
+	&lt;!-- scripts are loaded **sequentially** --&gt;
+	&lt;script src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+	&lt;script src=&quot;widget.js&quot;&gt;&lt;/script&gt;
+	&lt;!-- all objects are in the global namespace, 
+			 no way to isolate the code completely! --&gt;
+	&lt;script&gt;
 		window.$; // this is jquery
-	</script>
-</head>
-</html>
+	&lt;/script&gt;
+&lt;/head&gt;
+&lt;/html&gt;
 </code></pre><p>开发人员经常尝试重用功能块并管理它们之间的依赖关系。在前一种情况下，这确实很难实现：您必须以正确的顺序声明脚本，并避免名称冲突， <strong>而无需任何依赖项的元数据</strong> 。随着应用程序的增长，这项任务成为噩梦：想象一下在没有软件包或依赖项管理基础结构的情况下管理Java应用程序！</p><h2><a href="#understanding-javascript-authoring-formats-commonjs-and-amd" class="anchor" name="understanding-javascript-authoring-formats-commonjs-and-amd"></a>了解JavaScript创作格式：commonJS和AMD</h2><p>幸运的是，JS社区非常了解模块化的必要性，并且在最近几年中，出现了两种广泛采用的解决此问题的方法：</p><p><a href="https://github.com/amdjs/amdjs-api/blob/master/AMD.md">AMD（异步模块定义）</a>是其中之一：</p>
-<pre><code class="prettyprint javascript">// defining a module that depends on "graphmodule",
+<pre><code class="prettyprint javascript">// defining a module that depends on &quot;graphmodule&quot;,
 // injected in the function definition as an argument
-define(["graphmodule"],
+define([&quot;graphmodule&quot;],
   function (graph) {
-    // this module exports a "draw" function
+    // this module exports a &quot;draw&quot; function
     return function draw(data) {
       return graph.piechart(data);
     }
@@ -203,11 +203,11 @@ define(["graphmodule"],
 <li>依赖项可能无法同步使用，例如，它们需要通过异步网络请求来获取</li>
 <li>模块在回调中定义，然后在所有依赖项加载后运行</li>
 </ul><p><a href="http://wiki.commonjs.org/wiki/Modules/1.1.1">CommonJS</a>是另一种<em>创作格式</em> ，通常用在服务器端的Node.js应用程序中，也用在浏览器应用程序中。</p>
-<pre><code class="prettyprint javascript"><br>/**
- * Our module's dependencies and API 
+<pre><code class="prettyprint javascript"><br />/**
+ * Our module&#39;s dependencies and API 
  **/
 // we fetch the graph module as a dependency
-var graph = require('graphmodule');
+var graph = require(&#39;graphmodule&#39;);
 
 // we decorate the `exports` variable to export our function
 exports.draw = drawFunc;
@@ -222,8 +222,8 @@ function drawFunc(data) {
 <ul>
 <li>此创作格式可以在浏览器<strong>和</strong>服务器上使用！</li>
 <li>因此，您可以在无头浏览器<strong>和</strong> Node.js单元测试中测试模块！</li>
-<li>模块定义不包含在<code>define</code></li>
-</ul><h2><a href="#what-rsquo-s-next" class="anchor" name="what-rsquo-s-next"></a>下一步是什么？</h2><p>下一版本的JavaScript（技术上称为ECMAScript 6）将<a href="https://spring.io/understanding/javascript-modules#user-content-es6-modules">标准化JavaScript模块化</a> ，尽管所使用的语法与我们上面看到的AMD或commonJS格式略有不同。<br>此外，EcmaScript 6将解决该领域的许多问题，但还将提供语法糖来定义类似OO的类。</p><p>无论您是在客户端还是服务器上使用JavaScript的任何地方，都应考虑采用模块化方法-出于我们在Java中所做的所有相同原因。要精通JS模块技术，学习曲线很小，但结果值得。</p><p>如果您不<a href="http://know.cujojs.com/tutorials/modules/authoring-cjs-modules">熟悉</a> JavaScript模块化，建议您阅读<a href="http://know.cujojs.com/tutorials/modules/authoring-cjs-modules">“编写CommonJS模块”教程</a>以及我们在Sagan中使用的模块加载器： <a href="https://github.com/cujojs/curl">curl</a> 。<br>并且一旦您感到熟悉，就可以<a href="https://github.com/spring-io/sagan/tree/master/sagan-client/src/feature">在Sagan应用程序中</a>查看我们的<a href="https://github.com/spring-io/sagan/tree/master/sagan-client/src/feature">模块定义</a> 。</p></div>
+<li>模块定义没有包装在<code>define</code></li>
+</ul><h2><a href="#what-rsquo-s-next" class="anchor" name="what-rsquo-s-next"></a>下一步是什么？</h2><p>下一版本的JavaScript（技术上称为ECMAScript 6）将<a href="https://spring.io/understanding/javascript-modules#user-content-es6-modules">标准化JavaScript模块化</a> ，尽管所使用的语法与我们上面看到的AMD或commonJS格式略有不同。<br>此外，EcmaScript 6将解决该领域的许多问题，但还将提供语法糖来定义类似OO的类。</p><p>无论您是在客户端还是服务器上使用JavaScript的任何地方，都应考虑采用模块化方法-出于我们在Java中所做的所有相同原因。要精通JS模块技术，学习曲线很小，但是结果值得。</p><p>如果您不<a href="http://know.cujojs.com/tutorials/modules/authoring-cjs-modules">熟悉</a> JavaScript模块化，建议您阅读<a href="http://know.cujojs.com/tutorials/modules/authoring-cjs-modules">“编写CommonJS模块”教程</a>以及我们在Sagan中使用的模块加载器： <a href="https://github.com/cujojs/curl">curl</a> 。<br>并且一旦您感到熟悉，就可以<a href="https://github.com/spring-io/sagan/tree/master/sagan-client/src/feature">在Sagan应用程序中</a>查看我们的<a href="https://github.com/spring-io/sagan/tree/master/sagan-client/src/feature">模块定义</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>
 <script type="text/javascript">var disqus_shortname = 'spring-io';

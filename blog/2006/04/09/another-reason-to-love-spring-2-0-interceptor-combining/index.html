@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>喜欢Spring 2.0的另一个原因：拦截器组合</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Another Reason to Love Spring 2.0: Interceptor Combining">
-<meta name="twitter:description" content="<p>Recently I was working on a project that had a Swing client communicating via RMI to a service layer. The service layer was marked with transactions and everything seemed to work fine. However everytime we’d get an exception at the Hibernate DAO layer, Spring would turn the exception into a runtime exception and it would get propagated all the way up the stack and across the RMI connection as a <span style=" font-family:="" courie="="></head><body dir="ltr">RemoteException. Whenever the exception was deserialized there would be an exception on the client (separate from the <span style="font-family:courier">RemoteException</span>.The decision was taken to simply introduce an aspect. Any exception that subclassed <span style="font-family:courier">ServiceAccessException</span> would be let through to the client while anything else would be converted to a <span style="font-family:courier">FilteredServiceAccessException</span> (a subclass of <span style="font-family:courier">ServiceAccessException</span>) and then be thrown. This led to some loss in content, so we made sure to log the original exception on the server where it could be useful and let the client show a generic dialog so the user knew generally what had happened.
+<meta name="twitter:description" content="<p>Recently I was working on a project that had a Swing client communicating via RMI to a service layer. The service layer was marked with transactions and everything seemed to work fine. However everytime we’d get an exception at the Hibernate DAO layer, Spring would turn the exception into a runtime exception and it would get propagated all the way up the stack and across the RMI connection as a <span style=" font-family:="" courie="="></head><body >RemoteException. Whenever the exception was deserialized there would be an exception on the client (separate from the <span style="font-family:courier">RemoteException</span>.The decision was taken to simply introduce an aspect. Any exception that subclassed <span style="font-family:courier">ServiceAccessException</span> would be let through to the client while anything else would be converted to a <span style="font-family:courier">FilteredServiceAccessException</span> (a subclass of <span style="font-family:courier">ServiceAccessException</span>) and then be thrown. This led to some loss in content, so we made sure to log the original exception on the server where it could be useful and let the client show a generic dialog so the user knew generally what had happened.
 ">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200">
 
@@ -36,10 +40,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,8 +171,8 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>最近，我正在一个项目中，该项目的Swing客户端通过RMI与服务层进行通信。服务层标记有事务，一切似乎都正常。但是，每当我们在Hibernate DAO层上遇到一个异常时，Spring都会将该异常转换为运行时异常，并将其作为<span style="font-family:courier">RemoteException</span>一直传播到整个堆栈并贯穿RMI连接。无论何时反序列化异常，客户端上都会有一个异常（与<span style="font-family:courier">RemoteException</span>分开）。决定仅介绍一个方面。子类化<span style="font-family:courier">ServiceAccessException的</span>任何异常将被传递给客户端，而其他任何异常将被转换为<span style="font-family:courier">FilteredServiceAccessException</span> （ <span style="font-family:courier">ServiceAccessException</span>的子类），然后引发该异常。这导致内容丢失，因此我们确保将原始异常记录在可能有用的服务器上，并让客户端显示一个通用对话框，以便用户大致了解发生了什么。</p><p>现在，这是一个相当不错的计划，并且在我们尝试实施之前，它似乎可以正常运行。我们正在使用一种自动代理任何具有<span style="font-family:courier">@Transactional的</span> bean的魔术方法来获取我们的事务代理。我们可能已经更新了该自动代理的定义，以确保添加了有关此异常过滤的建议（请考虑<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html" style="font-family:courier">TransactionProxyFactoryBean中的</a> <a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html#setPreInterceptors(java.lang.Object[])" style="font-family:courier">setPreInterceptor</a> ），但是自动<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html#setPreInterceptors(java.lang.Object[])" style="font-family:courier">代理</a>所捕获的不仅仅是服务层。</p><p>那那把我们留在哪里呢？我们可以A）显式声明对<span style="font-family:courier">TransactionProxyFactoryBean的</span>每次使用，B）进行两组不同的自动代理，并使它们彼此互斥，或者C）暂时忽略此要求，并希望发生一些神奇的事情。由于产品距离消费者还有六个月的时间，我尝试遵循杰里米·米勒（Jeremy Miller）向我介绍的“ <a href="http://codebetter.com/blogs/jeremy.miller/archive/2006/01/18/136648.aspx">最后一个负责任时刻</a> ”的原则，因此我决定以选项A作为我的备份计划来解决这个问题（最好别无选择，魔法的两倍）。</p><p>瞧，Spring 2.0解决了我的问题。我一生无法找到阅读的地方，但是从2.0的里程碑之一开始，当代理一个bean时，代理工厂现在可以检测到该bean已经具有代理，而只需将预期的拦截器添加为另一个拦截器即可。 （如果您知道它在哪里，请在评论中保留链接）。这意味着我可以使用新的魔术（ <span style="font-family:courier"><tx:annotation-driven></tx:annotation-driven></span> ），只需添加一个具有所需切入点的方面，就不必担心事务代理和AOP代理会交叉使用。不太清楚这是怎么回事？举个例子。首先是接口和实现。</p>
-<pre><code class="prettyprint java"><br>package interceptorcombiningexample;
+<div class="blog--post"><p>最近，我正在一个项目中，该项目的Swing客户端通过RMI与服务层进行通信。服务层标记有事务，一切似乎都正常。但是，每当我们在Hibernate DAO层上遇到一个异常时，Spring都会将该异常转换为运行时异常，并将其作为<span style="font-family:courier">RemoteException</span>一直传播到整个堆栈并贯穿RMI连接。每当反序列化异常时，客户端上都会有一个异常（与<span style="font-family:courier">RemoteException</span>分开）。决定仅介绍一个方面。子类化<span style="font-family:courier">ServiceAccessException的</span>任何异常将被传递给客户端，而其他任何异常将被转换为<span style="font-family:courier">FilteredServiceAccessException</span> （ <span style="font-family:courier">ServiceAccessException</span>的子类），然后引发该异常。这导致内容丢失，因此我们确保将原始异常记录在可能有用的服务器上，并让客户端显示一个通用对话框，以便用户大致了解发生了什么。</p><p>现在，这是一个相当不错的计划，并且在我们尝试实施之前，它似乎可以正常运行。我们正在使用一种自动代理任何具有<span style="font-family:courier">@Transactional的</span> bean的魔术方法来获取我们的事务代理。我们可能已经更新了该自动代理的定义，以确保添加了有关此异常过滤的建议（请考虑<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html" style="font-family:courier">TransactionProxyFactoryBean中的</a> <a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html#setPreInterceptors(java.lang.Object[])" style="font-family:courier">setPreInterceptor</a> ），但是自动<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionProxyFactoryBean.html#setPreInterceptors(java.lang.Object[])" style="font-family:courier">代理</a>所捕获的不仅仅是服务层。</p><p>那那把我们留在哪里呢？我们可以A）显式声明对<span style="font-family:courier">TransactionProxyFactoryBean的</span>每次使用，B）进行两组不同的自动代理，并使它们彼此互斥，或者C）现在忽略此要求，并希望发生一些神奇的事情。由于产品距离消费者还有六个月的时间，我尝试遵循杰里米·米勒（Jeremy Miller）向我介绍的“ <a href="http://codebetter.com/blogs/jeremy.miller/archive/2006/01/18/136648.aspx">最后一个负责任时刻</a> ”的原则，因此我决定以选项A作为我的备份计划来解决这个问题（最好别无选择，魔法的两倍）。</p><p>瞧，Spring 2.0解决了我的问题。我一生无法找到阅读的地方，但是从2.0的里程碑之一开始，当代理一个bean时，代理工厂现在可以检测到该bean已经具有代理，而只需将预期的拦截器添加为另一个拦截器即可。 （如果您知道它在哪里，请在评论中保留链接）。这意味着我可以使用新的魔术（ <span style="font-family:courier"><tx:annotation-driven></tx:annotation-driven></span> ），只需添加一个具有所需切入点的方面，就不必担心事务代理和AOP代理会交叉使用。不太清楚这是怎么回事？举个例子。首先是接口和实现。</p>
+<pre><code class="prettyprint java"><br />package interceptorcombiningexample;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -177,7 +183,7 @@ public interface ExampleTarget {
 
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package interceptorcombiningexample;
+<pre><code class="prettyprint java"><br />package interceptorcombiningexample;
 
 public class DefaultExampleTarget implements ExampleTarget {
 
@@ -185,39 +191,39 @@ public class DefaultExampleTarget implements ExampleTarget {
 	}
 }
 </code></pre><p>注意，该接口被标记为<span style="font-family:courier">@Transactional</span> 。稍后，我们将使用它来进行一些神奇的自动代理。接下来，我们将看一下bean的定义。</p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/aop 
        http://www.springframework.org/schema/aop/spring-aop.xsd
        http://www.springframework.org/schema/tx
-       http://www.springframework.org/schema/tx/spring-tx.xsd">
+       http://www.springframework.org/schema/tx/spring-tx.xsd&quot;&gt;
 
-	<tx:annotation-driven />
+	&lt;tx:annotation-driven /&gt;
 
-	<aop:config>
-		<aop:aspect id="exampleAspect" ref="exampleAdvice">
-			<aop:before method="exampleAdvice"
-				pointcut="execution(* interceptorcombiningexample.ExampleTarget.exampleMethod())" />
-		</aop:aspect>
-	</aop:config>
+	&lt;aop:config&gt;
+		&lt;aop:aspect id=&quot;exampleAspect&quot; ref=&quot;exampleAdvice&quot;&gt;
+			&lt;aop:before method=&quot;exampleAdvice&quot;
+				pointcut=&quot;execution(* interceptorcombiningexample.ExampleTarget.exampleMethod())&quot; /&gt;
+		&lt;/aop:aspect&gt;
+	&lt;/aop:config&gt;
 
-	<bean id="exampleAdvice"
-		class="interceptorcombiningexample.ExampleAdvice" />
+	&lt;bean id=&quot;exampleAdvice&quot;
+		class=&quot;interceptorcombiningexample.ExampleAdvice&quot; /&gt;
 
-	<bean id="exampleTarget"
-		class="interceptorcombiningexample.DefaultExampleTarget" />
+	&lt;bean id=&quot;exampleTarget&quot;
+		class=&quot;interceptorcombiningexample.DefaultExampleTarget&quot; /&gt;
 
-	<bean id="transactionManager"
-		class="interceptorcombiningexample.DummyTransactionManager" />
+	&lt;bean id=&quot;transactionManager&quot;
+		class=&quot;interceptorcombiningexample.DummyTransactionManager&quot; /&gt;
 
-</beans>
+&lt;/beans&gt;
 </code></pre><p>您会注意到，我们设置了注释驱动的事务，该事务将自动围绕<span style="font-family:courier">DefaultExampleTarget</span>建立一个代理。此外，我们定义了另一个方面，该方面需要代理同一个<span style="font-family:courier">DefaultExampleTarget</span> bean。最后，让我们看一下我们的可执行类。</p>
-<pre><code class="prettyprint java"><br>package interceptorcombiningexample;
+<pre><code class="prettyprint java"><br />package interceptorcombiningexample;
 
 import org.springframework.aop.Advisor;
 import org.springframework.aop.framework.Advised;
@@ -228,30 +234,31 @@ public class InterceptorCombiningExample {
 
 	public static void main(String[] args) {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"classpath:interceptorcombiningexample/applicationContext.xml");
+				&quot;classpath:interceptorcombiningexample/applicationContext.xml&quot;);
 
-		ExampleTarget target = (ExampleTarget) ctx.getBean("exampleTarget");
+		ExampleTarget target = (ExampleTarget) ctx.getBean(&quot;exampleTarget&quot;);
 		if (target instanceof Advised) {
 			Advised advised = (Advised) target;
 			System.out
-					.println("Advisor count: " + advised.getAdvisors().length);
+					.println(&quot;Advisor count: &quot; + advised.getAdvisors().length);
 			for (Advisor advisor : advised.getAdvisors()) {
-				System.out.println("Advisor type: "
+				System.out.println(&quot;Advisor type: &quot;
 						+ advisor.getAdvice().getClass().getName());
 			}
 		}
 	}
 
 }
-</code></pre><p>该类利用了Spring代理机制的一个很好的小功能。任何弹簧创建的代理可以投给<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/aop/framework/Advised.html" style="font-family:courier">劝</a>接口。该界面将使您能够访问代理中的所有拦截器。当我们继续运行此类时，输出显示：</p>
+</code></pre><p>该类利用了Spring代理机制的一个很好的小功能。任何由Spring创建的代理都可以转换为<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/aop/framework/Advised.html" style="font-family:courier">Advised</a>接口。该界面将使您能够访问代理中的所有拦截器。当我们继续运行此类时，输出显示：</p>
 <pre><code class="prettyprint code">Advisor count: 3
 Advisor type: org.springframework.aop.interceptor.ExposeInvocationInterceptor
 Advisor type: org.springframework.transaction.interceptor.TransactionInterceptor
 Advisor type: org.springframework.aop.aspectj.AspectJMethodBeforeAdvice
-</code></pre><p>由此可见，代理中不仅包含<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionInterceptor.html" style="font-family:courier">TransactionInterceptor</a> ，还包含<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/aop/aspectj/AspectJMethodBeforeAdvice.html" style="font-family:courier">AspectJMethodBeforeAdvice</a> 。</p><p>重要的是要知道，这不应影响已经尝试执行相同操作的任何实现。这应该使所有一直在等待“最后一个负责任时刻”解决该问题的人们的生活更加轻松。 :)</p><p>PS与上一篇文章一样，我在此示例中包括<a id="p8" href="http://blog.springframework.com/benh/wp-content/uploads/2006/04/InterceptorCombiningExample.zip">了项目</a>的<a id="p8" href="http://blog.springframework.com/benh/wp-content/uploads/2006/04/InterceptorCombiningExample.zip">存档，</a>因此您可以在需要时查看其余的代码。</p></div>
+</code></pre><p>由此可见，代理中不仅包含<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/transaction/interceptor/TransactionInterceptor.html" style="font-family:courier">TransactionInterceptor</a> ，还包含<a href="http://static.springframework.org/spring/docs/2.0-m3/api/org/springframework/aop/aspectj/AspectJMethodBeforeAdvice.html" style="font-family:courier">AspectJMethodBeforeAdvice</a> 。</p><p>重要的是要知道，这不应影响已经尝试执行相同操作的任何实现。这应该使所有一直在等待“最后一个负责任时刻”解决该问题的人的生活更加轻松。 :)</p><p>PS与上一篇文章一样，我在此示例中包括<a id="p8" href="http://blog.springframework.com/benh/wp-content/uploads/2006/04/InterceptorCombiningExample.zip">了项目</a>的<a id="p8" href="http://blog.springframework.com/benh/wp-content/uploads/2006/04/InterceptorCombiningExample.zip">存档，</a>因此您可以在需要时查看其余的代码。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2;
 
       (function(disqus_shortname, document) {
@@ -265,7 +272,8 @@ Advisor type: org.springframework.aop.aspectj.AspectJMethodBeforeAdvice
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -303,12 +311,14 @@ Advisor type: org.springframework.aop.aspectj.AspectJMethodBeforeAdvice
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

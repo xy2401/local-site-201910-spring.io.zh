@@ -1,14 +1,18 @@
-<!doctype html><html data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>Securing Services with Spring Cloud Gateway</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport">
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>使用Spring Cloud Gateway保护服务安全</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification">
+<script>
+      System.import('app/main.js')
+  </script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -18,10 +22,10 @@
 
 <link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card">
-<meta content="@springcentral" name="twitter:site">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Securing Services with Spring Cloud Gateway">
-<meta name="twitter:description" content="<p>So far in this series, we’ve covered <a href=" https: benwilcock.github.io spring-cloud-gateway-demo getting_started.html"></head><body>Getting Started and <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">Hiding Services</a> with <a href="https://spring.io/projects/spring-cloud-gateway">Spring Cloud Gateway</a>. However, when we set about hiding our services, we didn’t secure them. In this article, we’ll correct this.<p></p>
+<meta name="twitter:description" content="<p>So far in this series, we’ve covered <a href=" https:="" ="" benwilcock.github.io="" spring-cloud-gateway-demo="" getting_started.htm="="></head><body >Getting Started and <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">Hiding Services</a> with <a href="https://spring.io/projects/spring-cloud-gateway">Spring Cloud Gateway</a>. However, when we set about hiding our services, we didn’t secure them. In this article, we’ll correct this.
 <p>To secure our services, we’ll use the Token Relay pattern supported by OAuth 2.0 and the Javascript Object Signing & Encryption (JOSE) and JSON Web Tokens standards. This will give our users a means to identify themselves, authorize applications to view their profile and access the secured resources behind the gateway.</p>
 ">
 <meta name="twitter:creator" content="@benbravo73">
@@ -29,7 +33,7 @@
 
 <meta property="og:title" content="Securing Services with Spring Cloud Gateway">
 <meta property="og:image" content="https://gravatar.com/avatar/15aba3f666761f09945e8efc6384006b?s=200">
-<meta property="og:description" content="<p>So far in this series, we’ve covered <a href=" https: benwilcock.github.io spring-cloud-gateway-demo getting_started.html">Getting Started and <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">Hiding Services</a> with <a href="https://spring.io/projects/spring-cloud-gateway">Spring Cloud Gateway</a>. However, when we set about hiding our services, we didn’t secure them. In this article, we’ll correct this.<p></p>
+<meta property="og:description" content="<p>So far in this series, we’ve covered <a href=" https:="" ="" benwilcock.github.io="" spring-cloud-gateway-demo="" getting_started.htm="=">Getting Started and <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">Hiding Services</a> with <a href="https://spring.io/projects/spring-cloud-gateway">Spring Cloud Gateway</a>. However, when we set about hiding our services, we didn’t secure them. In this article, we’ll correct this.
 <p>To secure our services, we’ll use the Token Relay pattern supported by OAuth 2.0 and the Javascript Object Signing & Encryption (JOSE) and JSON Web Tokens standards. This will give our users a means to identify themselves, authorize applications to view their profile and access the secured resources behind the gateway.</p>
 ">
 <meta content="article" property="og:type">
@@ -37,12 +41,14 @@
 
 
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -52,16 +58,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -77,9 +83,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -89,40 +95,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
- <button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="">
+<form class="form-inline form-search" action="/search" method="get">
+ <button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -148,57 +144,56 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Securing Services with Spring Cloud Gateway</h1>
+<h1 class="blog--title">使用Spring Cloud Gateway保护服务安全</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/15aba3f666761f09945e8efc6384006b?s=20&d=mm">
-<a class="author" rel="author" href="/team/benwilcock">Ben Wilcock</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/15aba3f666761f09945e8efc6384006b?s=20&d=mm"> <a class="author" rel="author" href="/team/benwilcock">本威尔科克</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2019-08-16 16:00:00.0">August 16, 2019</time>
+<time class="date" pubdate="" datetime="2019-08-16 16:00:00.0">2019年8月16日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="3775" href="/blog/2019/08/16/securing-services-with-spring-cloud-gateway#disqus_thread">
+<a class="comments" href="/blog/2019/08/16/securing-services-with-spring-cloud-gateway#disqus_thread" data-disqus-identifier="3775">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>So far in this series, we’ve covered <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/getting_started.html">Getting Started</a> and <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">Hiding Services</a> with <a href="https://spring.io/projects/spring-cloud-gateway">Spring Cloud Gateway</a>. However, when we set about hiding our services, we didn’t secure them. In this article, we’ll correct this.</p>
-<p>To secure our services, we’ll use the Token Relay pattern supported by OAuth 2.0 and the Javascript Object Signing & Encryption (JOSE) and JSON Web Tokens standards. This will give our users a means to identify themselves, authorize applications to view their profile and access the secured resources behind the gateway.</p>
+<div class="blog--post"><p>到目前为止，在本系列中，我们已经介绍了<a href="https://spring.io/projects/spring-cloud-gateway">Spring Cloud Gateway的</a> <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/getting_started.html">入门</a>和<a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">隐藏服务</a> 。但是，当我们开始隐藏服务时，我们并没有保护它们。在本文中，我们将对此进行更正。</p>
+<p>为了保护我们的服务，我们将使用OAuth 2.0支持的令牌中继模式以及Javascript对象签名和加密（JOSE）和JSON Web令牌标准。这将为我们的用户提供一种标识自己，授权应用程序查看其个人资料以及访问网关后面的安全资源的方法。</p>
 <blockquote>
-<p>All the code for this demo is published online <a href="https://github.com/benwilcock/spring-cloud-gateway-demo/tree/master/security-gateway">in GitHub</a> in the <code>secured-gateway</code> folder. If you just want to run it without understanding how it was built, skip ahead to the section entitled “Running The Demo”.</p>
+<p>该演示的所有代码均在线发布<a href="https://github.com/benwilcock/spring-cloud-gateway-demo/tree/master/security-gateway">在GitHub的GitHub</a> <code>secured-gateway</code>夹。如果您只想运行它而不了解它是如何构建的，请跳到标题为“运行演示”的部分。</p>
 </blockquote>
-<p>Before we run the demo, I want to draw your attention to the major components within it and how they were created. The diagram below shows the overall system design. It consists of a network of three services: a Single Sign-On Server, an API Gateway Server, and a Resource Server.</p>
-<p><img src="https://static.spring.io/blog/bwilcock/20190801/demo.png" alt="Diagram illustrating the overarching architecture of the demo" title="Diagram illustrating the overarching architecture of the demo"></p>
-<p>The Resource Server is a regular Spring Boot application hidden behind the API Gateway. The API Gateway is built with Spring Cloud Gateway and delegates the management of user accounts and authorization to the Single Sign-On server. In order to create these three components, there are a number of small but important things to take into account. Let’s take a look at what these were next.</p><h2><a href="#creating-a-user" class="anchor" name="creating-a-user"></a>Creating A User</h2>
-<p>In order to authenticate our users, we need two things: user account records and an OAuth2 compatible Authentication Provider (or server). There are many commercial OAuth2 authentication providers out there, but in our demo, we’re going to stick with open-source software and use Cloud Foundry’s User Account & Authentication Server, more commonly referred to as the UAA.</p>
-<p>The UAA is a Web Archive (WAR) that can be deployed onto any server that supports this format. In our case, we’ve chosen the open-source Apache Tomcat server. When running in Tomcat, the UAA provides OAuth and OpenId Connect authentication against its internal user account database.</p>
-<p>For this demo, we’ve built the UAA and Tomcat into a container image using a <code>Dockerfile</code> (which you can examine in the <code>uaa</code> folder). The other item to draw your attention to is the <code>uaa.yml</code> file. This YAML file will configure our UAA with the user and password to use later when we’re trying to access the Resource Server. It also contains the OAuth2 applications to register, and the keys required to perform JWT token encryption.</p>
-<p>In the <code>uaa.yml</code> we tell the UAA to add <code>user1</code> to its account database and to grant this user the <code>resource.read</code> scope. This is the scope the Resource Server will require to allow access.</p>
+<p>在运行演示之前，我想提醒您注意其中的主要组件以及它们的创建方式。下图显示了整个系统设计。它由三项服务组成的网络：单点登录服务器，API网关服务器和资源服务器。</p>
+<p><img src="https://static.spring.io/blog/bwilcock/20190801/demo.png" alt="该图说明了该演示的总体架构" title="该图说明了该演示的总体架构"></p>
+<p>资源服务器是隐藏在API网关后面的常规Spring Boot应用程序。API网关是使用Spring Cloud Gateway构建的，将用户帐户的管理和授权委托给Single Sign-On服务器。为了创建这三个组件，需要考虑许多小而重要的事情。让我们看一下这些是什么。</p><h2><a href="#creating-a-user" class="anchor" name="creating-a-user"></a>创建一个用户</h2>
+<p>为了对我们的用户进行身份验证，我们需要两件事：用户帐户记录和OAuth2兼容的身份验证提供程序（或服务器）。那里有许多商业OAuth2身份验证提供程序，但是在我们的演示中，我们将继续使用开源软件，并使用Cloud Foundry的用户帐户和身份验证服务器（通常称为UAA）。</p>
+<p>UAA是一个Web存档（WAR），可以部署到任何支持此格式的服务器上。在本例中，我们选择了开源Apache Tomcat服务器。在Tomcat中运行时，UAA对其内部用户帐户数据库提供OAuth和OpenId Connect身份验证。</p>
+<p>在本演示中，我们使用了UAA和Tomcat将其构建为容器映像<code>Dockerfile</code> （您可以在<code>uaa</code>夹）。另一个引起您注意的项目是<code>uaa.yml</code>文件。这个YAML文件将使用用户名和密码来配置我们的UAA，以便稍后在我们尝试访问资源服务器时使用。它还包含要注册的OAuth2应用程序以及执行JWT令牌加密所需的密钥。</p>
+<p>在里面<code>uaa.yml</code>我们告诉UAA添加<code>user1</code>到其帐户数据库并授予该用户<code>resource.read</code>范围。这是资源服务器允许访问的范围。</p>
 <pre><code class="prettyprint yaml">scim:
   groups:
     email: Access your email address
-    resource.read: Allow access with 'resource.read'
+    resource.read: Allow access with &#39;resource.read&#39;
   users:
-    - user1|password|<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a4d1d7c1d695e4d4d6cbd2cdc0c1d68ac7cbc9">[email protected]</a>|first1|last1|uaa.user,profile,email,resource.read
+    - user1|password|<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a4d1d7c1d695e4d4d6cbd2cdc0c1d68ac7cbc9">[email&#160;protected]</a>|first1|last1|uaa.user,profile,email,resource.read
 </code></pre>
-<p>In the <code>uaa.yml</code> we also register our OAuth2 ‘client’ application. This registration tells the UAA that it should expect an application to identify itself as the <code>gateway</code> and that this application will use the <code>authorization_code</code> scheme. The gateway will expect to access various scopes including <code>resource.read</code>.</p>
+<p>在里面<code>uaa.yml</code>我们还注册了我们的OAuth2“客户端”应用程序。该注册告诉UAA，它应该期望应用程序将自己标识为<code>gateway</code>并且该应用程序将使用<code>authorization_code</code>方案。网关将期望访问各种范围，包括<code>resource.read</code> 。</p>
 <pre><code class="prettyprint yaml">oauth:
 ...
   clients:
@@ -209,10 +204,10 @@ Training & Certification
       scope: openid,profile,email,resource.read
       authorities: uaa.resource
       redirect-uri: http://localhost:8080/login/oauth2/code/gateway
-</code></pre><h2><a href="#integrating-the-uaa-with-spring-cloud-gateway" class="anchor" name="integrating-the-uaa-with-spring-cloud-gateway"></a>Integrating The UAA with Spring Cloud Gateway</h2>
-<p>As you can see in the <a href="https://cloud.spring.io/spring-cloud-static/spring-cloud-security/2.1.3.RELEASE/single/spring-cloud-security.html#_token_relay">Spring Cloud Security, OAuth2 Token Relay docs</a>: “Spring Cloud Gateway can forward OAuth2 access tokens to the services it is proxying. In addition to logging in the user and grabbing a token, a filter extracts the access token for the authenticated user and puts it into a request header for downstream requests.”</p>
-<p>This effectively means that there is very little work involved when integrating our Spring Cloud Gateway server with our chosen security mechanism when using Spring Cloud Security. The gateway will coordinate authentication with the single sign-on server on our behalf and ensure that downstream applications get a copy of the users access token when they need it.</p>
-<p>In order to configure this feature, the first thing of note is the OAuth2 configuration in our gateway’s <code>application.yml</code> file.</p>
+</code></pre><h2><a href="#integrating-the-uaa-with-spring-cloud-gateway" class="anchor" name="integrating-the-uaa-with-spring-cloud-gateway"></a>将UAA与Spring Cloud Gateway集成</h2>
+<p>正如您在<a href="https://cloud.spring.io/spring-cloud-static/spring-cloud-security/2.1.3.RELEASE/single/spring-cloud-security.html#_token_relay">Spring Cloud Security中</a>看到的那样<a href="https://cloud.spring.io/spring-cloud-static/spring-cloud-security/2.1.3.RELEASE/single/spring-cloud-security.html#_token_relay">，OAuth2令牌中继文档</a> ：“ Spring Cloud Gateway可以将OAuth2访问令牌转发到它正在代理的服务。除了登录用户并获取令牌外，过滤器还为经过身份验证的用户提取访问令牌，并将其放入下游请求的请求标头中。”</p>
+<p>这实际上意味着在使用Spring Cloud Security时，将我们的Spring Cloud Gateway服务器与我们选择的安全性机制集成在一起时，几乎不需要进行任何工作。网关将代表我们与单点登录服务器协调身份验证，并确保下游应用程序在需要时获得用户访问令牌的副本。</p>
+<p>为了配置此功能，首先要注意的是我们网关的OAuth2配置<code>application.yml</code>文件。</p>
 <pre><code class="prettyprint yaml">security:
     oauth2:
       client:
@@ -222,7 +217,7 @@ Training & Certification
             client-id: gateway
             client-secret: secret
             authorization-grant-type: authorization_code
-            redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri-template: &quot;{baseUrl}/login/oauth2/code/{registrationId}&quot;
             scope: openid,profile,email,resource.read
         provider:
           uaa:
@@ -232,23 +227,23 @@ Training & Certification
             user-name-attribute: sub
             jwk-set-uri: http://uaa:8090/uaa/token_keys
 </code></pre>
-<p>This configuration is doing two things. It’s specifying our OAuth client registration information (which matches the <code>gateway</code> application that we registered in the UAA earlier), and it is detailing where the OAuth authentication provider’s services can be found (along with some other attributes such as the <code>jwk-set-uri</code> which the gateway will use to verify the authenticity of the token). This config is essentially enabling our gateway to communicate effectively with the UAA.</p>
-<p>The next item of interest here is the <code>GatewayApplication.java</code> class. In this class, we have two things to take note of. The first is the inclusion of an autowired <code>TokenRelayGatewayFilterFactory</code> and the second is the use of this class as a filter in the route configuration for our Resource Server:</p>
+<p>此配置在做两件事。指定我们的OAuth客户端注册信息（与<code>gateway</code>应用程序（我们之前在UAA中注册的应用程序），并详细说明了可以在哪里找到OAuth身份验证提供程序的服务（以及其他一些属性，例如<code>jwk-set-uri</code>网关将使用它来验证令牌的真实性）。此配置实质上使我们的网关能够与UAA有效通信。</p>
+<p>下一个有趣的项目是<code>GatewayApplication.java</code>类。在本课程中，我们需要注意两件事。首先是包括自动接线<code>TokenRelayGatewayFilterFactory</code>第二个是在资源服务器的路由配置中使用此类作为过滤器：</p>
 <pre><code class="prettyprint java">@Autowired
 private TokenRelayGatewayFilterFactory filterFactory;
 
 @Bean
 public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
     return builder.routes()
-            .route("resource", r -> r.path("/resource")
-              .filters(f -> f.filters(filterFactory.apply())
-                .removeRequestHeader("Cookie"))
-            .uri("http://resource:9000")) 
+            .route(&quot;resource&quot;, r -&gt; r.path(&quot;/resource&quot;)
+              .filters(f -&gt; f.filters(filterFactory.apply())
+                .removeRequestHeader(&quot;Cookie&quot;))
+            .uri(&quot;http://resource:9000&quot;)) 
             .build();
 }
 </code></pre>
-<p>The second is the configuration of the route. As discussed in the <a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">Hiding Services</a>, we must expose the Resource Server as a route, otherwise it will remain hidden inside our network. The <code>filterFactory.apply()</code> method in the route declaration ensures that any exchanges intended for the Resource Server contain a JWT access token. The <code>removeRequestHeader(“Cookie”)</code> tells the gateway to remove the users “Cookie” header from the request during the routing operation (because downstream services don’t need this, all they need is the JWT <code>access_token</code>).</p>
-<p>The YAML configuration below achieves the same thing, but without the need for Java code:</p>
+<p>第二个是路由的配置。如<a href="https://benwilcock.github.io/spring-cloud-gateway-demo/runtime-discovery-and-service-hiding.html">隐藏服务</a>中所述，我们必须将资源服务器公开为路由，否则它将隐藏在我们的网络中。的<code>filterFactory.apply()</code>路由声明中的方法确保所有针对资源服务器的交换都包含JWT访问令牌。的<code>removeRequestHeader(“Cookie”)</code>告诉网关在路由操作期间从请求中删除用户“ Cookie”标头（因为下游服务不需要它，他们只需要JWT <code>access_token</code> ）。</p>
+<p>下面的YAML配置实现了相同的目的，但是不需要Java代码：</p>
 <pre><code class="prettyprint yaml">spring:
   cloud:
     gateway:
@@ -261,25 +256,25 @@ public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
             - TokenRelay=
             - RemoveRequestHeader=Cookie
 </code></pre>
-<p>With our gateway configured this way (using either Java or YAML), any user request heading to the Resource Server on the <code>/resource</code> route will need a security <code>access_token</code> in JWT format.</p><h2><a href="#creating-a-resource-server-and-securing-a-resource" class="anchor" name="creating-a-resource-server-and-securing-a-resource"></a>Creating a Resource Server and Securing a Resource</h2>
-<p>The Resource Server now requires only two things. The first is a <code>/resource</code> endpoint that expects an authentication principal in the form of a JWT token. The second is some configuration to prevent access to the <code>/resource</code> endpoint unless you have such a token.</p>
-<p>The <code>@RestController</code> endpoint for <code>/resource</code> expects a Jwt object as a method parameter. This parameter is decorated as the <code>@AuthenticationPrincipal</code>. The method returns a simple string containing a message. This message confirms the resource was accessed and contains some basic details about the user.</p>
-<pre><code class="prettyprint java">@GetMapping("/resource")
+<p>使用这种方式配置的网关（使用Java或YAML）后，任何用户请求都将转到服务器上的资源服务器<code>/resource</code>路线将需要安全<code>access_token</code> JWT格式。</p><h2><a href="#creating-a-resource-server-and-securing-a-resource" class="anchor" name="creating-a-resource-server-and-securing-a-resource"></a>创建资源服务器并保护资源</h2>
+<p>资源服务器现在只需要两件事。首先是<code>/resource</code>需要JWT令牌形式的身份验证主体的终结点。第二是一些配置，以防止访问<code>/resource</code>端点，除非您有这样的令牌。</p>
+<p>的<code>@RestController</code>端点<code>/resource</code>期望将Jwt对象用作方法参数。此参数装饰为<code>@AuthenticationPrincipal</code> 。该方法返回一个包含消息的简单字符串。此消息确认资源已被访问，并包含有关用户的一些基本详细信息。</p>
+<pre><code class="prettyprint java">@GetMapping(&quot;/resource&quot;)
 public String resource(@AuthenticationPrincipal Jwt jwt) {
-    return String.format("Resource accessed by: %s (with subjectId: %s)" ,
-            jwt.getClaims().get("user_name"),
+    return String.format(&quot;Resource accessed by: %s (with subjectId: %s)&quot; ,
+            jwt.getClaims().get(&quot;user_name&quot;),
             jwt.getSubject());
 }
 </code></pre>
-<p>The security configuration is handled by the <code>SecurityConfig</code> class. This class contains a bean method that configures the <code>ServerHttpSecurity</code> object passed as a parameter in the <code>springSecurityFilterChain</code> method signature. </p>
-<p>This configuration declares that users asking to access the path <code>/resource</code> must be authenticated and must have the OAuth2 scope <code>resource.read</code> in their profile. The line <code>.oauth2ResourceServer().jwt()</code> is telling the application that it must use the OAuth2 JWT specification as the security scheme.</p>
+<p>安全配置由<code>SecurityConfig</code>类。此类包含可配置<code>ServerHttpSecurity</code>在参数中作为参数传递的对象<code>springSecurityFilterChain</code>方法签名。</p>
+<p>此配置声明要求访问路径的用户<code>/resource</code>必须经过验证并且必须具有OAuth2范围<code>resource.read</code>在他们的个人资料中。线<code>.oauth2ResourceServer().jwt()</code>告诉应用程序它必须使用OAuth2 JWT规范作为安全性方案。</p>
 <pre><code class="prettyprint java">public class SecurityConfig {
 
   @Bean
   SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) throws Exception {
     http
             .authorizeExchange()
-             .pathMatchers("/resource").hasAuthority("SCOPE_resource.read")
+             .pathMatchers(&quot;/resource&quot;).hasAuthority(&quot;SCOPE_resource.read&quot;)
               .anyExchange().authenticated()
               .and()
             .oauth2ResourceServer()
@@ -288,7 +283,7 @@ public String resource(@AuthenticationPrincipal Jwt jwt) {
   }
 }
 </code></pre>
-<p>Finally, the Resource Server needs to know where it can find the public keys to validate the authenticity of the access token which it has been given. The UAA provides an endpoint which both the Resource Server and the Gateway rely upon at runtime to do this check. The endpoint is configured in the <code>application.yml</code> for each application:</p>
+<p>最后，资源服务器需要知道在哪里可以找到公钥，以验证已授予它的访问令牌的真实性。UAA提供了一个端点，资源服务器和网关在运行时都依赖该端点来执行此检查。端点在<code>application.yml</code>对于每个应用程序：</p>
 <pre><code class="prettyprint yaml">spring:
   security:
     oauth2:
@@ -296,42 +291,43 @@ public String resource(@AuthenticationPrincipal Jwt jwt) {
         jwt:
           jwk-set-uri: http://uaa:8090/uaa/token_keys
 </code></pre>
-<p>You don’t have to use an endpoint to grab these keys, you can bundle them into your application directly, but we’ve chosen not to here. If you follow the <code>jwk-set-uri</code> link in a browser when the demo is running, you’ll see something like this:</p>
-<p><img src="https://static.spring.io/blog/bwilcock/20190801/keys.png" alt="An example of the token keys endpoint data showing a JSON object containing public keys" title="An example of the token keys endpoint data showing a JSON object containing public keys"></p><h2><a href="#running-the-demo" class="anchor" name="running-the-demo"></a>Running The Demo</h2>
-<p>As before, we’ll use Docker Compose to keep things simple and emulate a real network. With the code checked out and Docker already running in the background, in the <code>security-gateway</code> folder, execute the <code>build.sh</code> script to compile the Resource Server and the Gateway applications into JAR’s and then package these and the UAA into containers.</p>
-<pre><code class="prettyprint bash">$> cd security-gateway
-$> ./build.sh
+<p>您不必使用端点来获取这些密钥，您可以将它们直接捆绑到您的应用程序中，但是我们选择不在此处。如果您遵循<code>jwk-set-uri</code>演示运行时在浏览器中单击链接，您将看到以下内容：</p>
+<p><img src="https://static.spring.io/blog/bwilcock/20190801/keys.png" alt="令牌密钥端点数据的示例显示了包含公共密钥的JSON对象" title="令牌密钥端点数据的示例显示了包含公共密钥的JSON对象"></p><h2><a href="#running-the-demo" class="anchor" name="running-the-demo"></a>运行演示</h2>
+<p>和以前一样，我们将使用Docker Compose使事情变得简单并模拟一个真实的网络。签出代码，并且Docker已经在后台运行， <code>security-gateway</code>文件夹，执行<code>build.sh</code>脚本将资源服务器和网关应用程序编译为JAR，然后将它们和UAA打包到容器中。</p>
+<pre><code class="prettyprint bash">$&gt; cd security-gateway
+$&gt; ./build.sh
 </code></pre>
-<p>Once this process has finished successfully, we can start the demo using <code>docker-compose up</code>:</p>
-<pre><code class="prettyprint bash">$> docker-compose up
+<p>成功完成此过程后，我们可以使用<code>docker-compose up</code> ：</p>
+<pre><code class="prettyprint bash">$&gt; docker-compose up
 </code></pre>
-<p>When you do this, you will see a lot of output on your screen while all three servers start up, but after a couple of minutes, it should settle down.</p>
-<p>Now, open a ‘private’ or ‘incognito’ browser window and navigate to <a href="http://localhost:8080/resource">http://localhost:8080/resource</a>. Immediately, the gateway will forward your browser to the UAA server and ask you to login using your username and password (in this case <code>user1</code> and <code>password</code>). The UAA will then ask you to ‘Authorize’ the gateway to read user1’s profile. You’ll be presented with the following screen to do this:</p>
-<p><img src="https://static.spring.io/blog/bwilcock/20190801/authorize.png" alt="An image showing the UAA autherisation screen used to autherise the application’s access to the read dot resource scope" title="An image showing the UAA authorisation screen used to autherise the application's access to the read dot resource scope"></p>
-<p>Notice in particular the checkbox entitled “Allow access with ‘resource.read’”. It’s this scope that the Resource Server will check before allowing you access to the resource. </p>
-<p>Once you click ‘Authorize’ you’ll be forwarded to the <code>[/resource][7]</code> endpoint which will show you some basic details about your user. You’ll see a message similar to this, although your <code>subjectId</code> will be different:</p>
+<p>当您执行此操作时，在所有三台服务器启动时，您会在屏幕上看到很多输出，但是几分钟后，它应该稳定下来。</p>
+<p>现在，打开“专用”或“隐身”浏览器窗口，然后浏览至<a href="http://localhost:8080/resource">http：// localhost：8080 / resource</a> 。网关将立即将您的浏览器转发到UAA服务器，并要求您使用用户名和密码登录（在这种情况下， <code>user1</code>和<code>password</code> ）。然后，UAA会要求您“授权”网关以读取user1的配置文件。将显示以下屏幕以执行此操作：</p>
+<p><img src="https://static.spring.io/blog/bwilcock/20190801/authorize.png" alt="该图显示了用于对应用程序对读取点资源范围的访问进行身份验证的UAA身份验证屏幕" title="该图显示了用于授权应用程序对读取点资源范围的访问权的UAA授权屏幕"></p>
+<p>请特别注意标题为“允许使用'resource.read'进行访问”的复选框。资源服务器将在允许您访问资源之前检查此范围。</p>
+<p>点击“授权”后，您将被转发到<code>[/resource][7]</code>端点，它将向您显示有关用户的一些基本详细信息。尽管您的<code>subjectId</code>会有所不同：</p>
 <p><code>Resource accessed by: user1 (with subjectId: 43c7681a-6762-451e-8435-d503fd7a0c4d)</code></p>
-<p>This is the resource server confirming you could access the resource, and showing that you used user1’s identity.</p>
-<p>If you want to see some additional information about user1, navigate to <a href="http://localhost:8080">http://localhost:8080</a> where a more complete user detail screen has been provided. It looks something like this:</p>
-<p><img src="https://static.spring.io/blog/bwilcock/20190801/user.png" alt="An image showing the full user details screen available once logged in and authorized" title="An image showing the full user details screen available once logged in and authorized"></p>
-<p>Finally, in the logs, we’ve printed out the JWT token passed to the Resource Server so that you can inspect it. We wouldn’t ever do this in production, but for demo purposes, we felt it would be helpful to see it. It looks something like this:</p>
+<p>这是资源服务器，确认您可以访问资源，并显示您使用了user1的身份。</p>
+<p>如果要查看有关user1的其他信息，请导航至<a href="http://localhost:8080">http：// localhost：8080</a> ，其中提供了更完整的用户详细信息屏幕。看起来像这样：</p>
+<p><img src="https://static.spring.io/blog/bwilcock/20190801/user.png" alt="登录并获得授权后，显示完整的用户详细信息屏幕的图像" title="登录并获得授权后，显示完整的用户详细信息屏幕的图像"></p>
+<p>最后，在日志中，我们已打印出传递给资源服务器的JWT令牌，以便您可以检查它。我们永远不会在生产中执行此操作，但是出于演示目的，我们认为对此很有帮助。看起来像这样：</p>
 <pre><code class="prettyprint bash">resource | TRACE --- SecuredServiceApplication: ***** JWT Token: eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAvdWFhL3Rva2VuX2tleXMiLCJraWQiOiJrZXktaWQtMSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJm (truncated...)
 </code></pre>
-<p>You can copy this token in its entirety from the log and paste it into the JWT Debugger at <a href="https://jwt.io/">jwt.io</a>. This utility can parse the token and show you the contents. In the output, you’ll find the username and the scopes associated with the user’s profile.</p>
-<p><img src="https://static.spring.io/blog/bwilcock/20190801/jwt.png" alt="An image showing the jwt.org screen after parsing the JWT token generated by the UAA and used by our user to access reasources" title="An image showing the jwt.org screen after parsing the JWT token generated by the UAA and used by our user to access reasources"></p>
-<p>The logs themselves are also quite revealing (although the order is not guaranteed). They show much of what’s going on as these three servers interact with each other. To see some edited log highlights with some additional notes, <a href="secured-gateway-access-log.md">look here</a>.</p><h2><a href="#finishing-up" class="anchor" name="finishing-up"></a>Finishing Up</h2>
-<p>When you’re done, use <code>Ctrl-C</code> to shut down the Docker services. If for any reason this fails to work, you can also use <code>docker-compose down</code> from the <code>security-gateway</code> folder. With either technique, you should see output similar to this:</p>
-<pre><code class="prettyprint bash">$> docker-compose down 
+<p>您可以从日志中完整复制此令牌，然后将其粘贴到<a href="https://jwt.io/">jwt.io</a>的JWT调试器中。该实用程序可以解析令牌并向您显示内容。在输出中，您将找到用户名和与用户个人资料关联的范围。</p>
+<p><img src="https://static.spring.io/blog/bwilcock/20190801/jwt.png" alt="该图片显示了解析由UAA生成并由我们的用户用来访问资源的JWT令牌后的jwt.org屏幕" title="解析由UAA生成并由我们的用户用来访问资源的JWT令牌后，显示jwt.org屏幕的图像"></p>
+<p>日志本身也很有启发性（尽管不能保证顺序）。它们显示了这三台服务器相互交互时发生的大部分情况。要查看带有一些其他注释的一些经过编辑的日志突出显示，请参见<a href="secured-gateway-access-log.md">此处</a> 。</p><h2><a href="#finishing-up" class="anchor" name="finishing-up"></a>整理起来</h2>
+<p>完成后，使用<code>Ctrl-C</code>关闭Docker服务。如果由于某种原因无法正常工作，您也可以使用<code>docker-compose down</code>来自<code>security-gateway</code>夹。无论使用哪种技术，您都应该看到类似于以下的输出：</p>
+<pre><code class="prettyprint bash">$&gt; docker-compose down 
 Stopping gateway  ... done
 Stopping service  ... done
 Stopping registry ... done
 </code></pre>
-<p>Further clean-up of Docker can be achieved using <code>docker-compose rm -f</code>.</p><h2><a href="#and-finally-hellip" class="anchor" name="and-finally-hellip"></a>And Finally…</h2>
-<p>Why not have your developer dreams come true this year by signing up for <a href="https://springoneplatform.io">SpringOne Platform</a>? It’s the premier conference for building scalable applications with Spring. Join thousands of other developers to learn, share, and have fun in Austin, TX from October 7th to 10th. Use the discount code S1P_Save200 when registering to save money on your ticket. If you need help convincing your manager try <a href="https://springoneplatform.io/2019/convince-your-manager">these tips</a>.</p>
+<p>可以使用以下方法进一步清理Docker <code>docker-compose rm -f</code> 。</p><h2><a href="#and-finally-hellip" class="anchor" name="and-finally-hellip"></a>最后...</h2>
+<p>通过注册<a href="https://springoneplatform.io">SpringOne平台，</a>为什么今年开发者的梦想没有实现？这是使用Spring构建可扩展应用程序的主要会议。10月7日至10日，与成千上万的其他开发人员一起在德克萨斯州奥斯汀学习，共享并享受乐趣。注册时使用折扣码S1P_Save200可以省钱。如果需要说服经理的帮助，请尝试<a href="https://springoneplatform.io/2019/convince-your-manager">以下技巧</a> 。</p>
 </div>
 </div>
 <section id="disqus_thread"></section>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">var disqus_shortname = 'spring-io';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3775;
 
       (function(disqus_shortname, document) {
@@ -345,14 +341,13 @@ Stopping registry ... done
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -360,23 +355,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -386,15 +377,17 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>
@@ -408,18 +401,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> •
-<a href="https://pivotal.io/privacy-policy">Privacy</a> •
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

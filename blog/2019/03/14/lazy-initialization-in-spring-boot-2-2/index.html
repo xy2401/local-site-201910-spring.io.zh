@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Boot 2.2中的延迟初始化</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Lazy Initialization in Spring Boot 2.2">
-<meta name="twitter:description" content="<p>The <a href=" https:="" ="" spring.io="" blog="" 2019="" 03="" 08="" spring-boot-2-2-m="="></head><body dir="ltr">recently announced first milestone of Spring Boot 2.2 introduces support for lazy initialization. This post describes the new functionality and explains how and when to enable it.
+<meta name="twitter:description" content="<p>The <a href=" https:="" ="" spring.io="" blog="" 2019="" 03="" 08="" spring-boot-2-2-m="="></head><body >recently announced first milestone of Spring Boot 2.2 introduces support for lazy initialization. This post describes the new functionality and explains how and when to enable it.
 <h2><a href="#what-does-it-mean-to-be-lazy" class="anchor" name="what-does-it-mean-to-be-lazy"></a>What Does it Mean to be Lazy?</h2>
 <p>Spring Framework has had support for lazy bean initialization since before its source code moved to Git 11 years ago. By default, when an application context is being refreshed, every bean in the context is created and its dependencies are injected. By contrast, when a bean definition is configured to be initialized lazily it will not be created and its dependencies will not be injected until it’s needed.</p>
 ">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -172,20 +178,21 @@
 </header>
 <div class="blog--post"><p><a href="https://spring.io/blog/2019/03/08/spring-boot-2-2-m1">最近宣布</a>的Spring Boot 2.2的第一个里程碑引入了对延迟初始化的支持。这篇文章描述了新功能，并说明了如何以及何时启用它。</p><h2><a href="#what-does-it-mean-to-be-lazy" class="anchor" name="what-does-it-mean-to-be-lazy"></a>懒惰意味着什么？</h2>
 <p>自从11年前将其源代码移至Git以来，Spring框架就一直支持延迟bean初始化。缺省情况下，刷新应用程序上下文时，将创建上下文中的每个bean并注入其依赖项。相比之下，当将bean定义配置为延迟初始化时，将不会创建它，并且直到需要时才注入其依赖项。</p><h2><a href="#enabling-lazy-initialization" class="anchor" name="enabling-lazy-initialization"></a>启用延迟初始化</h2>
-<p>如果您愿意动手并编写<code>BeanFactoryPostProcessor</code>则可以在任何版本的Spring Boot中启用延迟初始化。通过引入新属性<code>spring.main.lazy-initialization</code> （在<code>SpringApplication</code>和<code>SpringApplicationBuilder</code>上也有等效的方法），Spring Boot 2.2使其变得更加容易。当设置为<code>true</code> ，应用程序中的bean定义将配置为使用延迟初始化。</p><h2><a href="#benefits-of-lazy-initialization" class="anchor" name="benefits-of-lazy-initialization"></a>延迟初始化的好处</h2>
+<p>如果您希望自己动手并编写代码，可以在任何版本的Spring Boot中启用延迟初始化。 <code>BeanFactoryPostProcessor</code> 。Spring Boot 2.2通过引入新属性使其变得更加容易， <code>spring.main.lazy-initialization</code> （两种方法也都有相同的方法<code>SpringApplication</code>和<code>SpringApplicationBuilder</code> ）。设置为<code>true</code> ，应用程序中的bean定义将配置为使用延迟初始化。</p><h2><a href="#benefits-of-lazy-initialization" class="anchor" name="benefits-of-lazy-initialization"></a>延迟初始化的好处</h2>
 <p>延迟初始化可以大大减少启动时间，因为在应用程序启动期间加载了更少的类并创建了更少的bean。例如，使用Actuator和Spring Security的小型Web应用程序通常在2500毫秒内启动，而在启用延迟初始化的情况下，它将在2000毫秒内启动。确切的改进会因应用程序的不同而有所不同，具体取决于它们的bean依赖关系图的结构。</p><h3><a href="#what-about-devtools" class="anchor" name="what-about-devtools"></a>那么DevTools呢？</h3>
-<p>Spring Boot的DevTools已经大大提高了开发人员的生产力。DevTools无需在每次尝试进行更改时都重新启动JVM和应用程序，而是可以在同一JVM中热启动应用程序。热重启的一个重要好处是，它为JIT提供了更多机会来优化启动应用程序所涉及的代码。重启几次后，原来的2500ms时间减少了近80％，接近500ms。通过延迟初始化，我们可以做得更好。设置<code>spring.main.lazy-initialization</code>可以看到我们的应用程序直接在IDE中在<code>spring.main.lazy-initialization</code>重新启动。</p><h2><a href="#downsides-of-lazy-initialization" class="anchor" name="downsides-of-lazy-initialization"></a>延迟初始化的缺点</h2>
-<p>如上所述，启用延迟初始化可以大大减少启动时间。您可能一直想启用它，或者想知道为什么我们没有决定默认启用它。延迟初始化有一些弊端，这意味着我们认为，一旦您决定这样做就更好地选择加入。</p>
+<p>Spring Boot的DevTools已经大大提高了开发人员的生产力。DevTools无需在每次尝试进行更改时都重新启动JVM和应用程序，而是可以在同一JVM中热启动应用程序。热重启的一个重要好处是，它为JIT提供了更多机会来优化启动应用程序所涉及的代码。重启几次后，原来的2500ms时间减少了近80％，接近500ms。通过延迟初始化，我们可以做得更好。设置<code>spring.main.lazy-initialization</code>看到我们的应用程序直接在IDE中在400毫秒内重新启动。</p><h2><a href="#downsides-of-lazy-initialization" class="anchor" name="downsides-of-lazy-initialization"></a>延迟初始化的缺点</h2>
+<p>如上所述，启用延迟初始化可以大大减少启动时间。您可能一直想启用它，或者想知道为什么我们没有决定默认启用它。延迟初始化有一些弊端，这意味着我们认为，一旦您决定这样做就更好，那就选择加入。</p>
 <p>由于不再需要加载类并且不再需要创建bean，因此延迟初始化有可能掩盖以前在启动时已经确定的问题。此类问题可能包括未发现类定义错误，内存不足错误以及由于配置错误而导致的故障。</p>
 <p>在Web应用程序中，延迟初始化可能导致触发bean初始化的HTTP请求的延迟增加。通常这只是第一个请求，但可能会对负载平衡和自动缩放产生不利影响。</p><h2><a href="#is-this-thing-switched-on" class="anchor" name="is-this-thing-switched-on"></a>这是打开的吗？</h2>
-<p>如果您不确定延迟初始化对您的应用程序有什么影响，或者您想验证另一个框架的行为是否满足您的需求并匹配其声明，那么使用调试器可能会有所帮助。通过在您的一个bean的构造函数中放置一个断点，您可以看到何时对其进行初始化。例如，在启用了延迟初始化的Spring Boot Web应用程序中，您将看到在对Spring MVC的<code>DispatcherServlet</code>或Spring WebFlux的<code>DispatcherHandler</code>发出第一个请求之前，不会创建<code>@Controller</code> bean。</p><h2><a href="#when-to-enable-lazy-initialization" class="anchor" name="when-to-enable-lazy-initialization"></a>何时启用延迟初始化</h2>
+<p>如果您不确定延迟初始化对您的应用程序有什么影响，或者您想验证另一个框架的行为是否满足您的需求并匹配其声明，那么使用调试器可能会有所帮助。通过在您的一个bean的构造函数中放置一个断点，您可以看到何时对其进行初始化。例如，在启用了延迟初始化的Spring Boot Web应用程序中，您将看到<code>@Controller</code>直到对Spring MVC的第一个请求才创建bean <code>DispatcherServlet</code>或Spring WebFlux的<code>DispatcherHandler</code> 。</p><h2><a href="#when-to-enable-lazy-initialization" class="anchor" name="when-to-enable-lazy-initialization"></a>何时启用延迟初始化</h2>
 <p>正如我们在上面看到的，延迟初始化可以显着改善启动时间，但是也存在一些显着的缺点，因此务必谨慎进行。</p>
-<p>在开发过程中，懒惰初始化可以带来极大好处而几乎没有缺点的一个领域。当您在应用程序上进行迭代时，惰性初始化和DevTools的热重启可减少启动时间，从而可以显着提高生产率。</p>
-<p>可以从延迟初始化中受益的另一个领域是应用程序的集成测试。您可能已经在使用Spring Boot的测试片，通过限制在某些类型的测试中初始化的bean的数量来减少测试执行时间。延迟初始化提供了一种实现类似最终结果的替代机制。如果您无法对应用程序进行结构化以使其能够进行测试切片，或者如果没有切片可用于特定类型的测试，则启用延迟初始化会将初始化的bean限制为测试需要的。这将减少测试执行时间，尤其是在开发过程中独立运行测试时。</p>
-<p>最后，您可能要考虑在生产中启用延迟初始化。如果这样做，则应格外小心。对于Web应用程序，容器业务流程可能受益于<code>/health</code>端点能够更迅速地做出反应，但你也需要知道潜在的增加延迟，当第一个请求到应用程序本身的一个端点作出。您还应注意在禁用延迟初始化的情况下调整应用程序JVM的大小，以免在使用完所有组件后避免出现不必要的内存不足错误。</p></div>
+<p>在开发过程中，懒惰初始化可以带来极大好处而几乎没有缺点的一个领域。当您在应用程序上进行迭代时，惰性初始化和DevTools的热重启可减少启动时间，从而可以大大提高您的生产率。</p>
+<p>延迟初始化的另一个好处是应用程序的集成测试。您可能已经在使用Spring Boot的测试片，通过限制在某些类型的测试中初始化的bean的数量来减少测试执行时间。延迟初始化提供了一种实现类似最终结果的替代机制。如果您无法对应用程序进行结构化以使其能够进行测试切片，或者如果没有切片可用于特定类型的测试，则启用延迟初始化将把初始化的Bean限制为测试所需。这将减少测试执行时间，尤其是在开发过程中独立运行测试时。</p>
+<p>最后，您可能要考虑在生产中启用延迟初始化。如果这样做，则应格外小心。对于Web应用程序，容器编排可能会受益于<code>/health</code>能够更快响应的端点，但是您还需要意识到对应用程序自己的一个端点发出第一个请求时可能会增加延迟。您还应注意在禁用延迟初始化的情况下调整应用程序JVM的大小，以免在使用完所有组件后避免出现不必要的内存不足错误。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3601;
 
       (function(disqus_shortname, document) {
@@ -199,7 +206,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -237,12 +245,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

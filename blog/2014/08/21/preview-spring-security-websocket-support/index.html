@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>预览Spring Security WebSocket支持</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -23,7 +27,7 @@
 <meta name="twitter:title" content="Preview Spring Security WebSocket Support">
 <meta name="twitter:description" content="<p></p>
 <div class=" callou="="> 
- </head><body dir="ltr"><div class="callout-title">
+ </head><body ><div class="callout-title">
   Updated Dec 11 2014
  </div> Although originally about Spring Security 4.0.0.M2, the blog has been updated to reflect improvements found in Spring Security 4.0 RC1. 
 
@@ -55,10 +59,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -186,37 +192,38 @@
 </header>
 <div class="blog--post"><p></p><div class="callout">
 <div class="callout-title">2014年12月11日更新</div>虽然最初是关于Spring Security 4.0.0的。M2，博客已更新，以反映Spring Security 4.0 RC1中的改进。
-</div><p></p><h2><a href="#introduction" class="anchor" name="introduction"></a>介绍</h2><p>以前，应用程序可以使用Spring Security在WebSocket应用程序中执行身份验证。之所以<code>Principal</code> ，是因为<code>HttpServletRequest</code>的<code>Principal</code>将传播到WebSocket会话。</p><p>问题是授权仅限于握手。这意味着一旦建立连接，就无法为WebSocket应用程序的授权提供任何粒度。</p><h2><a href="#using-spring-security-rsquo-s-messaging-support" class="anchor" name="using-spring-security-rsquo-s-messaging-support"></a>使用Spring Security的消息支持</h2><p>Spring Security 4.0.0。RC2通过Spring Messaging抽象引入了对WebSocket的授权支持。要提供授权，只需扩展<code>AbstractSecurityWebSocketMessageBrokerConfigurer</code>并配置<code>MessageSecurityMetadataSourceRegistry</code> 。例如：</p>
+</div><p></p><h2><a href="#introduction" class="anchor" name="introduction"></a>介绍</h2><p>以前，应用程序可以使用Spring Security在WebSocket应用程序中执行身份验证。之所以有效，是因为<code>Principal</code>的<code>HttpServletRequest</code>将传播到WebSocket会话。</p><p>问题是授权仅限于握手。这意味着一旦建立连接，就无法为WebSocket应用程序的授权提供任何粒度。</p><h2><a href="#using-spring-security-rsquo-s-messaging-support" class="anchor" name="using-spring-security-rsquo-s-messaging-support"></a>使用Spring Security的消息支持</h2><p>Spring Security 4.0.0。RC2通过Spring Messaging抽象引入了对WebSocket的授权支持。要提供授权，只需扩展<code>AbstractSecurityWebSocketMessageBrokerConfigurer</code>并配置<code>MessageSecurityMetadataSourceRegistry</code> 。例如：</p>
 <pre><code class="prettyprint java">public class WebSocketSecurityConfig extends
           AbstractSecurityWebSocketMessageBrokerConfigurer {
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
       messages
-        . simpDestMatchers("/user/queue/errors").permitAll()
-        . simpDestMatchers("/**").hasRole("ADMIN");
+        . simpDestMatchers(&quot;/user/queue/errors&quot;).permitAll()
+        . simpDestMatchers(&quot;/**&quot;).hasRole(&quot;ADMIN&quot;);
       }
   }
 </code></pre><p></p><div class="callout">
-<div class="callout-title">直接JSR-356支持</div>我们已经与JSR-356直接集成在一起。但是，这时非常困难，因为JSR-356的级别很低，并且目前没有提供必要的抽象。
+<div class="callout-title">直接JSR-356支持</div>我们已经实现了与JSR-356的直接集成。但是，这时非常困难，因为JSR-356的级别很低，目前没有提供必要的抽象。
 </div><p></p><p>这将确保：</p>
 <ul>
-<li>任何用户都可以访问<code>/user/queue/errors</code>目标</li>
-<li>包含目标标头的任何其他消息只能由具有<code>ROLE_ADMIN</code>角色的用户访问</li>
+<li>的<code>/user/queue/errors</code>任何用户都可以访问目的地</li>
+<li>包含目标标头的任何其他消息只能由具有以下角色的用户访问<code>ROLE_ADMIN</code></li>
 </ul><h2><a href="#xml-namespace-support" class="anchor" name="xml-namespace-support"></a> XML命名空间支持</h2><p>同样，我们可以使用Spring Security XML命名空间支持定义上述配置。等效配置为：</p>
-<pre><code class="prettyprint xml"><websocket-message-broker>
-    <!-- pattern matches on the destination header -->
-    <intercept-message pattern="/user/queue/errors" access="permitAll" />
-    <intercept-message pattern="/**" access="hasRole('ROLE_ADMIN')" />
-</websocket-message-broker>
-</code></pre><h2><a href="#method-security-and-websockets" class="anchor" name="method-security-and-websockets"></a>方法安全性和WebSockets</h2><p>我们还可以在WebSockets中使用方法安全性。例如，以下方法只能由具有<code>ROLE_ADMIN</code>角色的用户调用：</p>
-<pre><code class="prettyprint java">	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	@MessageMapping("/trade")
+<pre><code class="prettyprint xml">&lt;websocket-message-broker&gt;
+    &lt;!-- pattern matches on the destination header --&gt;
+    &lt;intercept-message pattern=&quot;/user/queue/errors&quot; access=&quot;permitAll&quot; /&gt;
+    &lt;intercept-message pattern=&quot;/**&quot; access=&quot;hasRole(&#39;ROLE_ADMIN&#39;)&quot; /&gt;
+&lt;/websocket-message-broker&gt;
+</code></pre><h2><a href="#method-security-and-websockets" class="anchor" name="method-security-and-websockets"></a>方法安全性和WebSockets</h2><p>我们还可以在WebSockets中使用方法安全性。例如，以下方法只能由具有以下角色的用户调用<code>ROLE_ADMIN</code> ：</p>
+<pre><code class="prettyprint java">	@PreAuthorize(&quot;hasRole(&#39;ROLE_ADMIN&#39;)&quot;)
+	@MessageMapping(&quot;/trade&quot;)
 	public void executeTrade(Trade trade, Principal principal) {
-</code></pre><h2><a href="#sample-application" class="anchor" name="sample-application"></a>样品申请</h2><p>您可以在<a href="https://github.com/rwinch/spring-websocket-portfolio/tree/security">rwinch / spring-websocket-portfolio</a>的安全分支中找到授权的完整示例。</p><h2><a href="#what-next" class="anchor" name="what-next"></a>接下来是什么？</h2><p>尽管这解决了授权问题，但在通过WebSockets发送消息时，我们仍然缺少一种使<code>HttpSession</code>保持活动状态的良好机制。在下一篇文章中，我将更详细地讨论这些问题是什么以及Spring Session如何缓解这些问题。</p><p></p><div class="callout">
+</code></pre><h2><a href="#sample-application" class="anchor" name="sample-application"></a>样品申请</h2><p>您可以在<a href="https://github.com/rwinch/spring-websocket-portfolio/tree/security">rwinch / spring-websocket-portfolio</a>的安全分支中找到授权的完整示例。</p><h2><a href="#what-next" class="anchor" name="what-next"></a>接下来是什么？</h2><p>尽管这解决了我们的授权问题，但我们仍然缺少一个很好的机制来保持我们的授权<code>HttpSession</code>通过WebSocket发送消息时仍然有效。在下一篇文章中，我将更详细地讨论这些问题是什么以及Spring Session如何缓解这些问题。</p><p></p><div class="callout">
 <div class="callout-title">SpringOne 2GX 2014指日可待</div>即将于9月8日至11日在德克萨斯州达拉斯的<a href="https://2014.event.springone2gx.com/register">SpringOne</a>预订您的位置。这是发现第一手一切并提供直接反馈的最佳机会。<a href="https://2014.event.springone2gx.com/schedule/sessions/from_0_to_spring_security_4_0.html">从0到Spring Security 4.0</a>会话将包含有关如何开始使用Spring Security的详细信息，并提供对Spring Security 4中新功能的深入了解。当然，还有很多其他<a href="https://2014.event.springone2gx.com/schedule/2014-09-09">与Spring相关的令人兴奋的话题</a> ！
 </div><p></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1733;
 
       (function(disqus_shortname, document) {
@@ -230,7 +237,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -268,12 +276,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

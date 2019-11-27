@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>在多战Spring应用程序中使用共享的父应用程序上下文</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -30,14 +34,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2007-06-11 21:26:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -164,23 +170,24 @@
 </div>
 </header>
 <div class="blog--post"><p>上个月，我在土耳其接受了Core Spring培训。在课程结束时，我讨论了一些参与者在完成课程后将要构建的应用程序的体系结构。该应用程序将由一个包含多个war文件的ear文件组成，如果可以定义一个ApplicationContext用作所有war文件的WebApplicationContexts的共享父对象，就会出现问题。该上下文将包含服务，DAO和其他特定于单个Web模块的bean的bean定义。</p><p>实际上，Spring使执行此操作变得非常容易，但是课程和参考手册都没有详细说明如何从Web应用程序中使用此功能。因此，我写了一个简短的示例应用程序来说明其工作原理，我将在我的第一个博客文章中对此进行讨论。</p>
-<h4>ContextLoader和SingletonBeanFactoryLocator类</h4><p>在典型的Spring Web应用程序中，可以使用ContextLoaderListener（或者，如果使用Servlet 2.2 / 2.3容器，则使用ContextLoaderServlet）来引导WebApplicationContext。您可以通过web.xml中的上下文参数来配置此类使用的ContextLoader。如果使用了此功能，则可能熟悉<tt>contextConfigLocation</tt>参数，该参数可让您指定构成要构建的WebApplicationContext的文件。</p><p>事实证明，还有另一个参数可用于以声明方式获得所需的功能： <b><tt>parentContextKey</tt></b> 。用这种方法，您指示的ContextLoader使用名为ContextSingletonBeanFactoryLocator的另一个类来搜索通过<tt>parentContextKey</tt>的值，在配置文件中，其名称匹配特定模式中定义的bean。默认情况下，此模式为'classpath *：beanRefContext.xml'，表示在类路径上所有名为beanRefContext的文件。（对于普通的SingletonBeanFactoryLocator，它是“ classpath *：beanRefFactory.xml”）<br>此bean必须本身是ApplicationContext，并且此上下文将成为ContextLoader创建的WebApplicationContext的父上下文。但是，如果此上下文已经存在，则将使用该上下文，并且不会创建新的上下文（因此名称为<b>Singleton</b> BeanFactoryLocator）。</p><p>让我们看看这是什么意思：首先，我们需要在耳朵里放一个单独的jar，用于存放服务，DAO等的代码。在此jar中，我们放置了一个beanRefContext.xml文件，该文件为ApplicationContext提供了单个bean定义。通常，这将是ClassPathXmlApplicationContext。然后，该bean定义将引用一个或多个“常规” bean配置文件，其中包含服务bean和war文件中的代码将使用的其他内容；像这样的东西：</p>
-<pre><code class="prettyprint xml"><br><!-- contents of beanRefContext.xml: 
-       notice that the bean id is the value specified by the parentContextKey param -->
-<bean id="ear.context" class="org.springframework.context.support.ClassPathXmlApplicationContext">
-    <constructor-arg>
-        <list>
-            <value>services-context.xml</value>
-        </list>
-    </constructor-arg>
-</bean>
+<h4>ContextLoader和SingletonBeanFactoryLocator类</h4><p>在典型的Spring Web应用程序中，可以使用ContextLoaderListener（或者，如果使用Servlet 2.2 / 2.3容器，则使用ContextLoaderServlet）来引导WebApplicationContext。您可以通过web.xml中的上下文参数来配置此类使用的ContextLoader。如果使用了此功能，则可能熟悉<tt>contextConfigLocation</tt>参数，该参数让您指定构成要构造的WebApplicationContext的文件。</p><p>事实证明，还有另一个参数可用于以声明方式获得所需的功能： <b><tt>parentContextKey</tt></b> 。使用此方法，您可以指示ContextLoader使用另一个名为ContextSingletonBeanFactoryLocator的类来搜索以<tt>parentContextKey</tt>的值命名的bean，该bean在名称与特定模式匹配的配置文件中定义。默认情况下，此模式为'classpath *：beanRefContext.xml'，表示在类路径上所有名为beanRefContext的文件。（对于普通的SingletonBeanFactoryLocator，它是“ classpath *：beanRefFactory.xml”）<br>此bean必须本身是ApplicationContext，并且此上下文将成为ContextLoader创建的WebApplicationContext的父上下文。但是，如果此上下文已经存在，则将使用该上下文，并且不会创建新的上下文（因此名称为<b>Singleton</b> BeanFactoryLocator）。</p><p>让我们看看这是什么意思：首先，我们需要在耳朵里放一个单独的jar，用于存放服务，DAO等的代码。在此jar中，我们放置了一个beanRefContext.xml文件，该文件为ApplicationContext提供了单个bean定义。通常，这将是ClassPathXmlApplicationContext。然后，该bean定义将引用一个或多个“常规” bean配置文件，其中包含服务bean和war文件中的代码将使用的其他内容；像这样的东西：</p>
+<pre><code class="prettyprint xml"><br />&lt;!-- contents of beanRefContext.xml: 
+       notice that the bean id is the value specified by the parentContextKey param --&gt;
+&lt;bean id=&quot;ear.context&quot; class=&quot;org.springframework.context.support.ClassPathXmlApplicationContext&quot;&gt;
+    &lt;constructor-arg&gt;
+        &lt;list&gt;
+            &lt;value&gt;services-context.xml&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/constructor-arg&gt;
+&lt;/bean&gt;
 </code></pre><p>最后，我们需要使用每个战争的MANIFEST.MF文件中的<tt>Class-Path</tt>条目使该jar在战争文件的<tt>类</tt>路径中可用。</p>
 <h4>你为什么要使用这个？</h4><p>一个简单的解决方案是跳过<tt>parentContextKey</tt>并使用<tt>contextConfigLocation</tt>参数从每次war中加载共享的bean定义文件。这样，每个战争都会对每个共享bean拥有自己的实例。对于简单的无状态Bean（例如典型服务），这实际上是一个很好的解决方案。</p><p>但是，为每个战争实例化每个共享bean的新实例可能有几个缺点：一个常见的示例是创建一个Hibernate SessionFactory。这通常是一个昂贵的过程，因此为防止启动时间失控，上述解决方案将确保仅执行一次。使用SessionFactory的单个实例的另一个优点是它可以安全地充当二级缓存：您不希望在单个应用程序中散布该实例的多个副本！<br>通常，如果您有状态的Bean应该真正用作单例（在Spring的意义上，即每个应用程序一个实例，而不是每个JVM一个实例），则应在其他上下文访问的单个上下文中定义它们。</p>
-<h4>这个样本</h4><p>我已经将示例包括为<a href="http://assets.spring.io.s3.amazonaws.com/wp/wp-content/uploads/2007/06/multiple-contexts-sample.zip">耳文件</a>和<a href="http://assets.spring.io.s3.amazonaws.com/wp/wp-content/uploads/2007/06/multiple-contexts-sample-src.zip">来源</a> 。为了上传耳朵，我必须给它添加一个.zip扩展名：请在部署它之前将文件重命名为.ear。该源实际上是一个Eclipse工作区，因此您可以轻松地导入和查看它（它需要WTP并已为<a href="http://www.springide.org">Spring IDE</a>配置）。包括所有需要的弹簧罐。部署应用程序后，请转到URL / web1和/ web2以在第一个和第二个war文件中查看servlet的输出。服务的<tt>toString（）</tt>将证明战争确实使用了共享服务的相同实例。</p>
+<h4>这个样本</h4><p>我已经将示例包括为<a href="http://assets.spring.io.s3.amazonaws.com/wp/wp-content/uploads/2007/06/multiple-contexts-sample.zip">耳文件</a>和<a href="http://assets.spring.io.s3.amazonaws.com/wp/wp-content/uploads/2007/06/multiple-contexts-sample-src.zip">来源</a> 。为了上传耳朵，我必须给它添加一个.zip扩展名：请在部署它之前将文件重命名为.ear。该源实际上是一个Eclipse工作区，因此您可以轻松地导入和查看它（它需要WTP并已为<a href="http://www.springide.org">Spring IDE</a>配置）。包括所有需要的弹簧罐。部署应用程序后，转到URL / web1和/ web2在第一个和第二个war文件中查看servlet的输出。服务的<tt>toString（）</tt>将证明战争确实使用了共享服务的相同实例。</p>
 <h4>更多信息</h4><p>有关此功能的最佳信息，请参见Spring的出色API文档：查看<a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/web/context/ContextLoader.html#loadParentContext(javax.servlet.ServletContext)">ContextLoader.loadParentContext</a>方法和<a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/beans/factory/access/SingletonBeanFactoryLocator.html">SingletonBeanFactoryLocator</a>类的JavaDoc。这些文档包含有关如何配置web.xml以及如何编写beanRefFactory.xml的更多信息。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 86;
 
       (function(disqus_shortname, document) {
@@ -194,7 +201,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -232,12 +240,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

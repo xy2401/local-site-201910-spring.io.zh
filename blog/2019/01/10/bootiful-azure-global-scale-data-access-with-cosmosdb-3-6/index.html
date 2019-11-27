@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Bootiful Azure：使用CosmosDB进行全球规模的数据访问（3/6）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Bootiful Azure: Global Scale Data Access with CosmosDB (3/6)">
 <meta name="twitter:description" content="<blockquote> 
- <p>This is part 3 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series <a href=" https:="" ="" github.com="" joshlong="" bootiful-azure-articl="="></head><body dir="ltr">on Github. Hit me up on <a href="http://twitter.com/Starbuxman">Twitter (@starbuxman)</a> as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my <a href="http://twitter.com/SpringTipsLive">Spring Tips (@SpringTipsLive)</a> installment, <a href="https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure"><em>Bootiful Azure</em></a> 
+ <p>This is part 3 of a 6 part series, with new posts Mondays and Thursdays, introducing Microsoft Azure for Spring developers. I couldn’t have put this together without input from Microsoft’s Asir Vedamuthu Selvasingh, Yitao Dong, Bruno Borges, Brian Benz and Theresa Nguyen. You can find the code for this series <a href=" https:="" ="" github.com="" joshlong="" bootiful-azure-articl="="></head><body >on Github. Hit me up on <a href="http://twitter.com/Starbuxman">Twitter (@starbuxman)</a> as you’re reading the installments with any feedback or questions. You can also learn more about Microsoft Azure in my <a href="http://twitter.com/SpringTipsLive">Spring Tips (@SpringTipsLive)</a> installment, <a href="https://spring.io/blog/2018/12/05/spring-tips-bootiful-microsoft-azure"><em>Bootiful Azure</em></a> 
 
 ">
 <meta name="twitter:creator" content="@starbuxman">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -185,15 +191,15 @@
 <p>我能听到您的想法-是的，即使您的最微弱的想法也无法逃脱我！ -尽管您像下一个开发人员一样喜欢Microsoft SQL Server，但是您可以自己在任何平台（云或其他平台）上运行它。您<em>不需要</em> Microsoft为您运行它。我对它说：“是的！”（但是微软为我们运行它确实很好，不是吗？）</p>
 <p>我承认这一点。Azure可以为您做什么？您只需要看Microsoft Azure CosmosDB即可。 CosmosDB是指一组技术。它描述了可以以多种方式使用的单个产品。它是一个单一的，多模型，多模式的数据库，支持文档数据，SQL查询，图形数据访问等。</p>
 <p>根据<a href="https://azure.microsoft.com/en-us/services/cosmos-db/">产品网页</a> ：CosmosDB是从头开始构建的，其核心是全球分布和水平规模。保证在第99个百分位数处具有毫秒级的读写延迟，并在全球任何地方通过多宿主实现99.999的高可用性，所有这些均以行业领先的全面服务水平协议（SLA）为后盾。</p><h2><a href="#items-and-containers" class="anchor" name="items-and-containers"></a>物品和容器</h2>
-<p>在内部，CosmosDB将“项目”存储在“容器”中。但是，您不一定要处理项目或容器，因为概念会以您用来消费数据的数据模型的语言浮出水面。例如，如果将其用作文档存储（如MongoDB），则项目将映射到集合中的文档。</p>
+<p>在内部，CosmosDB将“项目”存储在“容器”中。但是，您不一定要处理项目或容器，因为概念会以您用来消费数据的数据模型的语言浮出水面。例如，如果将其用作文档存储（例如MongoDB），则项目将映射到集合中的文档。</p>
 <p>容器被分组到数据库中，数据库是容器上方的一种命名空间。容器强制执行唯一的键约束，以确保数据的完整性。但是容器要做的更多。您可以要求每个容器提供更改的提要。您可以使用此供稿来支持更改数据捕获（CDC）方案。您可以将提要用于事件源。供稿本身是持久的，因此您可以根据需要<em>重放</em>更改。</p>
 <p>您还可以为容器指定生存时间（TTL）值，让CosmosDB在特定时间段后自动删除现有记录。您也可以为特定项目覆盖TTL。</p><h2><a href="#a-mutli-model-multi-paradigm-datastore" class="anchor" name="a-mutli-model-multi-paradigm-datastore"></a>多模型，多天堂数据存储</h2>
 <p>首先，CosmosDB是无模式的。使用时请牢记-如果您不准备使用它，可能会有一些重要的后果。</p>
 <p>CosmosDB支持构建应用程序的多模型，多范例方法。客户端可以与HTTP REST API对话，并使用类似于SQL的语言来驱动它进行查询。您也可以使用SQL API创建，更新和删除容器。</p>
-<p>您可以使用MongoDB API与CosmosDB进行对话，支持将集合作为容器，将文档作为项目。</p>
+<p>您可以使用MongoDB API与CosmosDB对话，支持将集合作为容器，将文档作为项目。</p>
 <p>您可以使用支持图形和容器以及节点和边线作为项目的Gremlin API与之对话。根据Gremlin网站的说法，“ Gremlin是Apache TinkerPop的图形遍历语言。Gremlin是一种功能性的数据流语言，它使用户能够在其应用程序的属性图上（或对其应用程序的查询）简洁地表达复杂的遍历。”因此，它基本上是遍历图形中数据的一种方式。</p>
 <p>您可以使用Cassandra API与CosmosDB进行对话，该API支持将表作为容器，将行作为项目。Cassandra API甚至支持Cassandra查询语言（CQL）。</p>
-<p>您<em>还</em>可以使用Azure Table Storage API与它进行对话，该API支持将表作为容器和项目，以及.. <em>items</em> 。</p>
+<p>您<em>还</em>可以使用Azure Table Storage API与它进行对话，该API支持将表作为容器和项目以及…… <em>项目</em> 。</p>
 <p>CosmosDB还嵌入了JavaScript引擎，因此您可以使用JavaScript定义触发器，可以从SQL查询语言调用或扩展SQL查询语言和存储过程的用户定义函数。存储过程可以在一个符合ACID的事务中管理许多操作。</p><h2><a href="#configuring-cosmosdb-on-microsoft-azure" class="anchor" name="configuring-cosmosdb-on-microsoft-azure"></a>在Microsoft Azure上配置CosmosDB</h2>
 <p>您需要首先创建一个CosmosDB（可能在地理上分散）的实例，然后在其中创建一个数据库实例。然后，您需要创建一个集合来存储记录。这是一个脚本。唯一值得注意的是，我们不必像在SQL Server示例中那样指定防火墙豁免。它只是工作（TM）。</p>
 <pre><code class="prettyprint shell">#!/bin/bash
@@ -202,7 +208,7 @@
 export rg=$1
 export adminlogin=${rg}-cosmosdb
 
-location='southcentralus'
+location=&#39;southcentralus&#39;
 accountname=${adminlogin}
 databasename=bootiful
 containername=reservations
@@ -212,7 +218,7 @@ az cosmosdb create \
     --resource-group $rg \
     --name $adminlogin \
     --kind GlobalDocumentDB \
-    --default-consistency-level "Session" 
+    --default-consistency-level &quot;Session&quot; 
 
 # Create a database
 az cosmosdb database create \
@@ -230,23 +236,23 @@ az cosmosdb collection create \
     --throughput 1000
 </code></pre>
 <p>在此脚本中，我们可以指定希望新数据库可用的区域。您还可以通过便捷的地图从Azure门户方便地执行此操作。只需单击一个区域，剩下的就可以解决！</p>
-<p>另外，请注意生成的<code>$adminlogin</code>值，以备后用。</p>
+<p>另外，请注意结果<code>$adminlogin</code>以后的价值。</p>
 <p>现在，您将需要使用必需的配置字符串来将应用程序连接到新数据库及其数据。您可以在前面的命令的输出中进行筛选，但是下面的命令非常容易。</p>
 <pre><code class="prettyprint shell">az cosmosdb list-keys --resource-group bootiful --name bootiful-cosmosdb
 </code></pre>
-<p>您需要注意上一条命令生成的<code>primaryMasterKey</code>属性的值，以便以后连接到CosmosDB。</p><h2><a href="#introducing-cosmosdb-into-your-spring-application" class="anchor" name="introducing-cosmosdb-into-your-spring-application"></a>将CosmosDB引入您的Spring应用程序</h2>
+<p>您需要注意结果的价值<code>primaryMasterKey</code>来自上一个命令的属性，以便以后连接到CosmosDB。</p><h2><a href="#introducing-cosmosdb-into-your-spring-application" class="anchor" name="introducing-cosmosdb-into-your-spring-application"></a>将CosmosDB引入您的Spring应用程序</h2>
 <p>让我们看看CosmosDB在Spring应用程序中的用法。从理论上讲，您<em>可以</em>通过对上述技术的适当抽象（例如MongoDB和Cassandra）与CosmosDB进行交谈。我更喜欢使用Spring Data CosmosDB抽象，您需要将其依赖于启动器的内容添加到构建文件中。</p>
-<p>CosmosDB在历史上曾被称为DocumentDB。如果看到这些名称，它们几乎可以互换。由于历史的原因，你需要添加Maven的启动依赖引用了旧的项目名称， <code>com.microsoft.azure</code> ： <code>azure-documentdb-spring-boot-starter</code> ，以构建文件。</p>
-<p>然后，您必须配置相关的连接信息。您可以将以下内容添加到应用程序的<code>application.properties</code>文件中。</p>
+<p>CosmosDB在历史上曾被称为DocumentDB。如果看到这些名称，它们几乎可以互换。由于历史原因，您需要添加引用该旧项目名称的Maven启动程序依赖项， <code>com.microsoft.azure</code> ： <code>azure-documentdb-spring-boot-starter</code> ，生成文件。</p>
+<p>然后，您必须配置相关的连接信息。您可以将以下内容添加到应用程序的<code>application.properties</code>文件。</p>
 <pre><code class="prettyprint java">azure.documentdb.database=bootiful
 azure.documentdb.key=THIS_IS_THE_KEY_FROM_BEFORE
 azure.documentdb.uri=https://ADMINLOGIN.documents.azure.com:443/
 </code></pre>
-<p><code>database</code>属性引用逻辑CosmosDB实例（ <code>bootiful-cosmosdb</code> ，这是我们在脚本中用<code>$adminlogin</code>指定的）内的数据库（ <code>bootiful</code> ，因为我们使用资源组名称作为数据库名称）。该键引用<code>az cosmosdb list-keys</code>命令中的<code>primaryMasterKey</code>值。用相关且适当的字符串值替换属性值。</p>
-<p>我在基于macOS的系统上运行了该项目，但在基于Ubuntu 18.10的系统上运行该项目时遇到了一个奇怪的问题。CosmosDB的Spring客户端库收集导致NPE的遥测的方式有些奇怪。如果遇到这种情况，请将以下内容添加到<code>src/main/resources/application.properties</code>以禁用遥测。</p>
+<p>的<code>database</code>属性是指数据库（ <code>bootiful</code> ，因为我们在逻辑CosmosDB实例中使用了资源组名称作为数据库名称（ <code>bootiful-cosmosdb</code> ，这是我们指定的<code>$adminlogin</code>在我们的脚本中）。关键是指<code>primaryMasterKey</code>来自的价值<code>az cosmosdb list-keys</code>命令。用相关和适当的字符串值替换属性值。</p>
+<p>我在基于macOS的系统上运行了该项目，但在基于Ubuntu 18.10的系统上运行该项目时遇到了一个奇怪的问题。用于CosmosDB的Spring客户端库收集导致NPE的遥测的方式有些奇怪。如果遇到这种情况，请将以下内容添加到<code>src/main/resources/application.properties</code>禁用遥测。</p>
 <pre><code class="prettyprint properties">cosmosdb.telemetryAllowed=false 
 </code></pre>
-<p>接下来，你应该定义一个Spring数据实体映射到记录的CosmosDB收集， <code>reservations</code> 。</p>
+<p>接下来，您应该定义一个Spring Data实体以映射到CosmosDB集合中的记录， <code>reservations</code> 。</p>
 <pre><code class="prettyprint java">package com.example.bootifulazure;
 
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
@@ -258,7 +264,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "reservations")
+@Document(collection = &quot;reservations&quot;)
 class Reservation {
 
         @PartitionKey
@@ -266,16 +272,16 @@ class Reservation {
         private String name;
 }
 </code></pre>
-<p>通常，这看起来像您所见过的任何其他带有Lombok注释的POJO。特别要注意的是，该实体使用Spring Data CosmosDB模块中的<code>@Document</code>来指定此实体映射到的<code>reservations</code>集合。实体使用特定于CosmosDB的注释<code>@PartitionKey</code> ，向数据库发出信号，以决定在逻辑上或物理上对容器中可能相关的数据进行分区时要使用哪个字段。最好将<code>String</code>用作分区键。在行星级分布式系统中，单调递增主键并不是一个好主意！</p>
-<p>现在，确定在春节数据仓库建设<code>DocumentDbRepository</code> 。</p>
+<p>通常，这看起来像您所见过的任何其他带有Lombok注释的POJO。特别要注意的是，实体使用<code>@Document</code>从Spring Data CosmosDB模块中指定<code>reservations</code>该实体映射到的collection。实体使用CosmosDB特定的注释， <code>@PartitionKey</code> ，以便在决定对容器中可能相关的数据进行分区（逻辑或物理）时向数据库发送信号通知哪个字段。好的做法是使用<code>String</code>分区键。在行星级分布式系统中，单调递增主键并不是一个好主意！</p>
+<p>现在，在<code>DocumentDbRepository</code> 。</p>
 <pre><code class="prettyprint java  ">package com.example.bootifulazure;
 
 import com.microsoft.azure.spring.data.cosmosdb.repository.DocumentDbRepository;
 
-interface ReservationRepository extends DocumentDbRepository<Reservation, String> {
+interface ReservationRepository extends DocumentDbRepository&lt;Reservation, String&gt; {
 }
 </code></pre>
-<p><code>DocumentDbRepository</code>可能是新的，但是在其他方面应该很简单。</p>
+<p>的<code>DocumentDbRepository</code>可能是新的，但是否则应该很简单。</p>
 <pre><code class="prettyprint java">package com.example.bootifulazure;
 
 import lombok.extern.log4j.Log4j2;
@@ -301,8 +307,8 @@ class CosmosDbDemo {
 
         this.rr.deleteAll();
 
-        Stream.of("A", "B", "C")
-            .map(name -> new Reservation(UUID.randomUUID().toString(), name))
+        Stream.of(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;)
+            .map(name -&gt; new Reservation(UUID.randomUUID().toString(), name))
             .map(this.rr::save)
             .forEach(log::info);
 
@@ -311,7 +317,8 @@ class CosmosDbDemo {
 </code></pre></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3519;
 
       (function(disqus_shortname, document) {
@@ -325,7 +332,8 @@ class CosmosDbDemo {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -363,12 +371,14 @@ class CosmosDbDemo {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

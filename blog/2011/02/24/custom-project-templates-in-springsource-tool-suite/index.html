@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>SpringSource工具套件中的自定义项目模板</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -41,14 +45,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2011-02-24 11:06:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -174,75 +180,76 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>SpringSource Tool Suite（STS）提供了“新建Spring模板项目”向导。使用此向导，用户可以看到许多项目模板，选择其中一个，然后让该向导根据该模板描述创建一个完整的项目。尽管这为您提供了创建新项目的简便方法，但您可能想为团队或组织定义自己的自定义项目模板。接下来，我们将向您展示如何执行此操作。<br></p><h3>1。步骤：为STS贡献新的资源扩展</h3><br>STS通过下载和读取资源XML文件来创建可用项目模板的列表。为了让STS知道这些资源文件位于何处，您需要通过扩展将它们贡献给STS。<p></p><p>因此，第一步是创建一个新的空插件项目。您在那里不需要Java代码，因此不要将其创建为Java项目。只需创建一个新的插件项目，然后在向导中取消选择Java选项即可。</p><p>现在在该插件项目中定义扩展名。打开清单编辑器后，通过选择扩展选项卡来创建<code>plugin.xml</code> （双击<code>META-INF/MANIFEST.MF</code> ）。您可以通过修改<code>plugin.xml</code>来定义扩展名，如下所示：</p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.4"?>
+<div class="blog--post"><p>SpringSource Tool Suite（STS）提供了“新建Spring模板项目”向导。使用此向导，用户可以看到许多项目模板，选择其中一个，然后让该向导根据该模板描述创建一个完整的项目。尽管这为您提供了创建新项目的简便方法，但您可能想为团队或组织定义自己的自定义项目模板。接下来，我们将向您展示如何执行此操作。<br></p><h3>1。步骤：为STS贡献新的资源扩展</h3><br>STS通过下载和读取资源XML文件来创建可用项目模板的列表。为了让STS知道这些资源文件位于何处，您需要通过扩展将它们贡献给STS。<p></p><p>因此，第一步是创建一个新的空插件项目。您在那里不需要Java代码，因此不要将其创建为Java项目。只需创建一个新的插件项目，然后在向导中取消选择Java选项即可。</p><p>现在在该插件项目中定义扩展名。创建一个<code>plugin.xml</code>通过选择扩展标签，在您打开清单编辑器后（双击<code>META-INF/MANIFEST.MF</code> ）。您可以通过修改扩展名来定义扩展名<code>plugin.xml</code>看起来像这样：</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;?eclipse version=&quot;3.4&quot;?&gt;
 
-<plugin>
-   <extension point="com.springsource.sts.core.resources">
-      <url
-         id="content.descriptors"
-         value="%content.descriptor.urls">
-      </url>
-   </extension>
+&lt;plugin&gt;
+   &lt;extension point=&quot;com.springsource.sts.core.resources&quot;&gt;
+      &lt;url
+         id=&quot;content.descriptors&quot;
+         value=&quot;%content.descriptor.urls&quot;&gt;
+      &lt;/url&gt;
+   &lt;/extension&gt;
 
-</plugin>
-</code></pre><p>这定义了对STS扩展点<code>com.springsource.sts.core.resources</code>的贡献，并用新值覆盖<code>content.descriptors</code> id的默认值。这个新值应包含您希望在STS向导中看到的所有模板中的所有URL。在这种情况下，我们不会将URL直接放在此处，而是将它们外部化到单独的属性文件中。如您所见， <em>这需要</em>多个URL。</p><p>下一步是在插件内部创建一个名为<code>bundle.properties</code>的属性文件，您应该将其放入一个名为<code>OSGI-INF/I10n/</code>的目录中。该属性文件应如下所示：</p>
-<pre><code class="prettyprint xml"><br>content.descriptor.urls = http://dist.springsource.com/release...riptors.xml\n\
+&lt;/plugin&gt;
+</code></pre><p>这定义了对STS扩展点的贡献<code>com.springsource.sts.core.resources</code>并覆盖默认值<code>content.descriptors</code> id与您的新值。这个新值应包含您希望在STS向导中看到的所有模板的所有URL。在这种情况下，我们不会将URL直接放在此处，而是将它们外部化到单独的属性文件中。如您所见， <em>这需要</em>多个URL。</p><p>下一步是创建一个名为<code>bundle.properties</code>在您的插件中，您应该将其放入一个名为<code>OSGI-INF/I10n/</code> 。该属性文件应如下所示：</p>
+<pre><code class="prettyprint xml"><br />content.descriptor.urls = http://dist.springsource.com/release...riptors.xml\n\
 file:///Users/mlippert/template-contribution/descriptor.xml
-</code></pre><p>正如你所看到的，我把原来的STS值在那里保留STS默认模板可用，加入我自己的网址，以我（在这种情况下，本地） <code>descriptor.xml</code>文件。因此，如果您只想使用本地文件，则可以继续使用此方法。在你想在公司中发布您的新模板，具有案件<code>descriptor.xml</code>文件被充当HTTP资源将是有意义的。请注意，网址是由分离<code>\n</code> 。</p><p>现在，您已经完成了用于STS的新插件的工作。您可以导出，把生成的JAR文件到<code>dropins</code>你STS的安装目录。请注意，在build.properties中已选中要包含在二进制构建中的META-INF，OSGI-INF和<code>plugin.xml</code> 。</p><p>（我为此附上了一个示例插件项目： <a href="http://blog.springsource.com/wp-content/uploads/2011/02/template-contribution-plugin.zip">template-contribution-plugin.zip</a> ）<br></p><h3>2。步骤：构建<code>descriptor.xml</code>文件</h3><br>在上一步中添加到STS扩展名的URL指向描述符.xml文件。该文件应如下所示：<p></p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+</code></pre><p>如您所见，我在其中放置了原始STS值以保持STS默认模板可用，并在我的本地URL中添加了自己的URL。 <code>descriptor.xml</code>文件。因此，如果您只想使用本地文件，则可以继续使用此方法。如果您想在整个公司中分配新模板， <code>descriptor.xml</code>文件用作http资源将很有意义。请注意，网址之间用逗号分隔<code>\n</code> 。</p><p>现在，您已经完成了用于STS的新插件的工作。您可以将其导出，然后将生成的JAR文件放入<code>dropins</code> STS安装目录。请注意，build.properties具有META-INF，OSGI-INF和<code>plugin.xml</code>检查是否包含在二进制版本中。</p><p>（我为此附上了一个示例插件项目： <a href="http://blog.springsource.com/wp-content/uploads/2011/02/template-contribution-plugin.zip">template-contribution-plugin.zip</a> ）<br></p><h3>2。步骤：建立<code>descriptor.xml</code>文件</h3><br>在上一步中添加到STS扩展名的URL指向描述符.xml文件。该文件应如下所示：<p></p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 
-<descriptors>
-   <descriptor id="org.test.mynewtemplate" kind="template" local="false" name="Mein neues Template" size="998877" url="file:///Users/mlippert/template-contribution/test-template-1.0.0.zip" version="1.0.0">
-      <description>My brand new template contribution for this hacky stuff etc.</description>
-   </descriptor>
-</descriptors>
-</code></pre><p>如您所见，我在其中放置了一些随机的愚蠢示例，您应该将其替换为自己的ID。请选择：<br></p><ul><br> <li>您自己的模板ID（ <code>org.test.mynewtemplate</code>中为<code>org.test.mynewtemplate</code> ）</li><br> <li>您自己的模板名称（“ Mein neues模板”），它将显示在向导列表中</li><br> <li>您自己的URL指向模板的ZIP文件</li><br> <li>不要忘记在<code>side</code>属性中设置ZIP文件的正确大小</li><br> <li>描述：更多文本告诉用户您的模板是关于什么的</li><br></ul><br><h3>3。步骤：构建实际模板</h3><br>现在，你需要创建ZIP文件，我们从引用<code>descriptor.xml</code>文件。此ZIP文件的根目录中应包含三个文件：<br><code></code><br><ul><code><br> <li>template.xml</li><br> <li>template.zip</li><br> <li>wizard.json</li><br></code></ul><br><code></code><p></p><p>让我们看一下第一个<code>template.xml</code> ： <code>template.xml</code> ：</p>
-<pre><code class="prettyprint xml"><br><template>
-   <descriptor id="org.test.mynewtemplate"
-             name="Mein neues Template"
-             kind="template"
-             version="1.0.0">
-      <description>My brand new template contribution for this hacky stuff</description>
-   </descriptor>
-   <project path="template.zip"/>
-   <json path="wizard.json"/>
-</template>
-</code></pre><p>它包含了相同的<code>id</code> ， <code>name</code>和<code>description</code>为模板比<code>descriptor.xml</code> ，也同样<code>version</code>和一种<code>template</code> 。除此之外，它还包含对template.zip文件和Wizard.json文件的引用。因此，这是您定义其他两个文件的地方。</p><p>该wizard.json文件包含专门用于创建和处理此模板的向导UI的描述。在我的示例中，wizard.json文件如下所示：</p>
-<pre><code class="prettyprint javascript"><br>{
-   "info" : {
-      "elements" : {
-         "element" : [
+&lt;descriptors&gt;
+   &lt;descriptor id=&quot;org.test.mynewtemplate&quot; kind=&quot;template&quot; local=&quot;false&quot; name=&quot;Mein neues Template&quot; size=&quot;998877&quot; url=&quot;file:///Users/mlippert/template-contribution/test-template-1.0.0.zip&quot; version=&quot;1.0.0&quot;&gt;
+      &lt;description&gt;My brand new template contribution for this hacky stuff etc.&lt;/description&gt;
+   &lt;/descriptor&gt;
+&lt;/descriptors&gt;
+</code></pre><p>如您所见，我在其中放置了一些随机的愚蠢示例，您应该将其替换为自己的ID。请选择：<br></p><ul><br> <li>您自己的模板ID（ <code>org.test.mynewtemplate</code>在示例中）</li><br> <li>您自己的模板名称（“ Mein neues模板”），它将显示在向导列表中</li><br> <li>您自己的URL指向模板的ZIP文件</li><br> <li>别忘了在中设置ZIP文件的正确大小<code>side</code>属性</li><br> <li>描述：更多文本告诉用户您的模板是关于什么的</li><br></ul><br><h3>3。步骤：构建实际模板</h3><br>现在，您需要创建我们从<code>descriptor.xml</code>文件。此ZIP文件的根目录中应包含三个文件：<br><code></code><br><ul><code><br> <li>template.xml</li><br> <li>template.zip</li><br> <li>wizard.json</li><br></code></ul><br><code></code><p></p><p>让我们来看看第一个， <code>template.xml</code> ：</p>
+<pre><code class="prettyprint xml"><br />&lt;template&gt;
+   &lt;descriptor id=&quot;org.test.mynewtemplate&quot;
+             name=&quot;Mein neues Template&quot;
+             kind=&quot;template&quot;
+             version=&quot;1.0.0&quot;&gt;
+      &lt;description&gt;My brand new template contribution for this hacky stuff&lt;/description&gt;
+   &lt;/descriptor&gt;
+   &lt;project path=&quot;template.zip&quot;/&gt;
+   &lt;json path=&quot;wizard.json&quot;/&gt;
+&lt;/template&gt;
+</code></pre><p>它包含相同的<code>id</code> ， <code>name</code>和<code>description</code>模板比<code>descriptor.xml</code> ，也一样<code>version</code>和那种<code>template</code> 。除此之外，它还包含对template.zip文件和Wizard.json文件的引用。因此，这是您定义其他两个文件的地方。</p><p>该wizard.json文件包含专门用于创建和处理此模板的向导UI的描述。在我的示例中，wizard.json文件如下所示：</p>
+<pre><code class="prettyprint javascript"><br />{
+   &quot;info&quot; : {
+      &quot;elements&quot; : {
+         &quot;element&quot; : [
          {
-            "name" : "topLevelPackage",
-            "description" : "Please specify the top-level package e.g. com.mycompany.myapp",
-            "type" : "java.lang.String",
-            "page" : 0,
-            "required" : true,
-            "pattern" : "\\w+\\.\\w+(\\.\\w+)+",
-            "replaceKind" : "topLevelPackage"
+            &quot;name&quot; : &quot;topLevelPackage&quot;,
+            &quot;description&quot; : &quot;Please specify the top-level package e.g. com.mycompany.myapp&quot;,
+            &quot;type&quot; : &quot;java.lang.String&quot;,
+            &quot;page&quot; : 0,
+            &quot;required&quot; : true,
+            &quot;pattern&quot; : &quot;\\w+\\.\\w+(\\.\\w+)+&quot;,
+            &quot;replaceKind&quot; : &quot;topLevelPackage&quot;
          }
          ]
       },
 
-      "topLevelPackage" : "mytld.mycompany.myapp.mysubsystem",
-      "projectName" : "projectName",
+      &quot;topLevelPackage&quot; : &quot;mytld.mycompany.myapp.mysubsystem&quot;,
+      &quot;projectName&quot; : &quot;projectName&quot;,
 
-      "pages" : {
-         "page" : [
+      &quot;pages&quot; : {
+         &quot;page&quot; : [
          {
-            "order" : 0,
-            "description" : "Project Settings"
+            &quot;order&quot; : 0,
+            &quot;description&quot; : &quot;Project Settings&quot;
          }
          ]
       }
    }
 }
-</code></pre><p>我不在这里详细介绍，但这基本上是向导UI的信息。它包含用户可以在向导中键入的元素，这些元素用于创建实际项目（例如顶层程序包）。</p><p>最后一部分是用户选择模板时要实例化的实际项目。您要做的只是自己创建项目，并按您在Wizard.json中定义的顶级程序包命名（在本例中为<code>mytld.mycompany.myapp.mysubsystem</code> ）。在我所附的示例中，模板项目位于名为<code>template</code>的根目录中，并且包含：<br></p><ul><br> <li>.classpath</li><br> <li>。项目</li><br> <li>。设置</li><br> <li>.springBeans</li><br> <li>pom.xml</li><br> <li>src目录，其中包含项目布局和一些预定义的源代码</li><br></ul><br>这是一个示例： <a href="http://blog.springsource.com/wp-content/uploads/2011/02/template-contribution.zip">template-contribution.zip</a> 。<p></p><p><strong>而已！</strong></p><p><strong>请注意：</strong>将新模板的zip文件下载到STS中（从列表中选择并按回车键后，此操作会自动完成），STS下次将再次使用下载的文件。因此，如果您有机会使用模板，请注意为其设置一个新的版本号。否则，STS不会接您更改的东西。</p></div>
+</code></pre><p>我不在这里详细介绍，但这基本上是向导UI的信息。它包含用户可以在向导中键入的元素，这些元素用于创建实际项目（例如顶层程序包）。</p><p>最后一部分是用户选择模板时要实例化的实际项目。您要做的就是自行创建项目，并按照您在wizard.json中定义的方式命名顶级包（在这种情况下， <code>mytld.mycompany.myapp.mysubsystem</code> ）。在我所附的示例中，模板项目驻留在名为<code>template</code>并包含：<br></p><ul><br> <li>.classpath</li><br> <li>。项目</li><br> <li>。设置</li><br> <li>.springBeans</li><br> <li>pom.xml</li><br> <li>src目录，其中包含项目布局和一些预定义的源代码</li><br></ul><br>这是一个示例： <a href="http://blog.springsource.com/wp-content/uploads/2011/02/template-contribution.zip">template-contribution.zip</a> 。<p></p><p><strong>而已！</strong></p><p><strong>请注意：</strong>将新模板的zip文件下载到STS中（从列表中选择并按回车键后，此操作会自动完成），STS下次将再次使用下载的文件。因此，如果您有机会使用模板，请注意为其设置一个新的版本号。否则，STS不会接您更改的东西。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 392;
 
       (function(disqus_shortname, document) {
@@ -256,7 +263,8 @@ file:///Users/mlippert/template-contribution/descriptor.xml
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -294,12 +302,14 @@ file:///Users/mlippert/template-contribution/descriptor.xml
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

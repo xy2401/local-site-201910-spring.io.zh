@@ -1,14 +1,18 @@
-<!doctype html><html data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>How to test Spring Cloud Stream applications (Part I)</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport">
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>如何测试Spring Cloud Stream应用程序（第一部分）</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification">
+<script>
+      System.import('app/main.js')
+  </script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -18,11 +22,11 @@
 
 <link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card">
-<meta content="@springcentral" name="twitter:site">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="How to test Spring Cloud Stream applications (Part I)">
-<meta name="twitter:description" content="<div class=" paragraph"> 
- </head><body><p>Dear Spring Community!</p> 
+<meta name="twitter:description" content="<div class=" paragrap="="> 
+ </head><body ><p>Dear Spring Community!</p> 
 
 <div class="paragraph"> 
  <p>As an event-driven microservices framework, Spring Cloud Stream dramatically simplifies the complexity while developing event-driven applications. The feature capabilities and its benefits are not the focus of this article (to learn more, please review the <a href="https://docs.spring.io/spring-cloud-stream/docs/Ditmars.RELEASE/reference/htmlsingle">Reference Guide</a>), but instead, my goal is to show you what the framework has to offer from the testing standpoint, the tools, and techniques. This article is intended to encourage the community to share feedback on the existing testing infrastructure, so any thoughts, comments, or feature requests are welcome! We strive to adapt to the inputs to provide a better development and testing experience in the future.</p> 
@@ -33,7 +37,7 @@
 
 <meta property="og:title" content="How to test Spring Cloud Stream applications (Part I)">
 <meta property="og:image" content="https://gravatar.com/avatar/2158ce6e7c048277890eb64458864c1c?s=200">
-<meta property="og:description" content="<div class=" paragraph"> 
+<meta property="og:description" content="<div class=" paragrap="="> 
  <p>Dear Spring Community!</p> 
 
 <div class="paragraph"> 
@@ -45,12 +49,14 @@
 
 
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -60,16 +66,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -85,9 +91,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -97,40 +103,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="">
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -156,75 +152,69 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">How to test Spring Cloud Stream applications (Part I)</h1>
+<h1 class="blog--title">如何测试Spring Cloud Stream应用程序（第一部分）</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/2158ce6e7c048277890eb64458864c1c?s=20&d=mm">
-<a class="author" rel="author" href="/team/artembilan">Artem Bilan</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/2158ce6e7c048277890eb64458864c1c?s=20&d=mm"> <a class="author" rel="author" href="/team/artembilan">阿尔特姆·比兰（Artem Bilan）</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2017-10-24 12:57:00.132">October 24, 2017</time>
+<time class="date" pubdate="" datetime="2017-10-24 12:57:00.132">十月24，2017</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="3069" href="/blog/2017/10/24/how-to-test-spring-cloud-stream-applications-part-i#disqus_thread">
+<a class="comments" href="/blog/2017/10/24/how-to-test-spring-cloud-stream-applications-part-i#disqus_thread" data-disqus-identifier="3069">
 </a></div>
 </div>
 </header>
 <div class="blog--post"><div class="paragraph">
-<p>Dear Spring Community!</p>
+<p>亲爱的春季社区！</p>
 </div>
 <div class="paragraph">
-<p>As an event-driven microservices framework, Spring Cloud Stream dramatically simplifies the complexity while developing event-driven applications. The feature capabilities and its benefits are not the focus of this article (to learn more, please review the <a href="https://docs.spring.io/spring-cloud-stream/docs/Ditmars.RELEASE/reference/htmlsingle">Reference Guide</a>), but instead, my goal is to show you what the framework has to offer from the testing standpoint, the tools, and techniques. This article is intended to encourage the community to share feedback on the existing testing infrastructure, so any thoughts, comments, or feature requests are welcome! We strive to adapt to the inputs to provide a better development and testing experience in the future.</p>
+<p>作为事件驱动的微服务框架，Spring Cloud Stream在开发事件驱动的应用程序时极大地简化了复杂性。功能的功能及其优点并不是本文的重点（要了解更多信息，请参阅<a href="https://docs.spring.io/spring-cloud-stream/docs/Ditmars.RELEASE/reference/htmlsingle">参考指南</a> ），但我的目标是从测试的角度，工具和技术向您展示框架所提供的功能。本文旨在鼓励社区分享有关现有测试基础结构的反馈，因此欢迎任何想法，评论或功能要求！我们努力适应输入，以在将来提供更好的开发和测试体验。</p>
 </div>
 <div class="paragraph">
-<p>Well, let me start with the quote:</p>
+<p>好吧，让我从报价开始：</p>
 </div>
 <div class="quoteblock text-right">
 <blockquote>
 <div class="paragraph">
-<p><em>"It is surprising then that so many integration solutions are deployed
-with little or no testing. Testing, if any, is usually done manually
-and sporadically. One of the reasons integration solutions
-are not tested thoroughly is the fact that testing asynchronous,
-message-based middleware solutions is challenging."</em></p>
+<p><em>“令人惊讶的是，如此之多的集成解决方案几乎不需要测试就可以部署。测试（如果有）通常是手动进行的，也可能是偶尔进行的。集成解决方案未得到全面测试的原因之一是测试基于消息的异步中间件解决方案具有挑战性这一事实。”</em></p>
 </div>
 </blockquote>
 </div>
 <div class="paragraph text-right">
-<p><em>- Gregor Hohpe,<br>
-Test-Driver Development in Enterprise Integration Projects</em></p>
+<p><em>-Gregor Hohpe，<br>企业集成项目中的测试驱动程序开发</em></p>
 </div>
 <div class="paragraph">
-<p>That’s right, while we are marching towards modernizing the legacy monolith workload to a cloud-native style microservices architecture, any form of testing plays a very critical role in it. More specifically, having the automated CI pipelines to run the test-suites on every single commit, iteratively, is highly recommended and in fact widely accepted as adopted practice.</p>
+<p>没错，尽管我们正朝着将传统的整体工作负载现代化为云原生风格的微服务架构迈进，但任何形式的测试都在其中扮演着至关重要的角色。更具体地说，强烈建议让自动化CI管道在每个提交上迭代地运行测试套件，并且实际上已被广泛采用。</p>
 </div>
 <div class="paragraph">
-<p>While using Spring Cloud Stream, it may not be obvious to test the simple (“micro”) business-logic, and we might overlook the integration tests between the microservices, because there is nothing more than a middleware binding is expected from the end-user - the framework automates all other boilerplate semantics! Or even if we would like to do that, there are no useful tools to quickly spin-up and tear it down. And that’s why we are here - to break the myth about the simplicity of microservices and complexity of testing them!</p>
+<p>在使用Spring Cloud Stream时，测试简单的（“微”）业务逻辑可能并不明显，并且我们可能会忽略微服务之间的集成测试，因为最终只希望获得中间件绑定。用户-框架自动执行所有其他样板语义！甚至即使我们愿意这样做，也没有有用的工具来快速启动和删除它。这就是我们在这里的原因-打破关于微服务的简单性和测试它们的复杂性的神话！</p>
 </div>
 <div class="sect1">
-<h2 id="what-is-spring-cloud-stream-application"><a class="anchor" href="#what-is-spring-cloud-stream-application"></a>What is Spring Cloud Stream application?</h2>
+<h2 id="what-is-spring-cloud-stream-application"><a class="anchor" href="#what-is-spring-cloud-stream-application"></a>什么是Spring Cloud Stream应用程序？</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Spring Cloud Stream application is an event-driven, Spring Boot microservice based on well-known Enterprise Integration Patterns implemented by Spring Integration. Their testing tools and utilities (<code>SpringRunner</code> from <a href="https://docs.spring.io/spring/docs/5.0.0.RELEASE/spring-framework-reference/testing.html#testing">Spring Testing Framework</a>, the Spring Boot <a href="https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-testing">auto-configuration</a> for test environment, mocks from Spring Integration etc.) bring for us an interesting combination that our unit and integration tests are not so challenging any more. Only what we need to know what, when and how to use!</p>
+<p>Spring Cloud Stream应用程序是事件驱动的Spring Boot微服务，基于Spring Integration实现的知名企业集成模式。他们的测试工具和实用程序（ <code>SpringRunner</code>来自<a href="https://docs.spring.io/spring/docs/5.0.0.RELEASE/spring-framework-reference/testing.html#testing">Spring Testing Framework的</a> ，用于测试环境的Spring Boot <a href="https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-testing">自动配置</a> ，来自Spring Integration的<a href="https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#boot-features-testing">模拟</a>等）为我们带来了一个有趣的组合，即我们的单元测试和集成测试不再那么具有挑战性。只有我们需要知道什么，何时以及如何使用！</p>
 </div>
 <div class="paragraph">
-<p>For example, the following simple Spring Cloud Stream application, a source, generates “foo” or “bar” string periodically according the semaphore state:</p>
+<p>例如，以下简单的Spring Cloud Stream应用程序（源）根据信号量状态定期生成“ foo”或“ bar”字符串：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -237,16 +227,16 @@ public class FooBarSource {
   @Bean
   @InboundChannelAdapter(channel = Source.OUTPUT,
                       poller = @Poller(fixedDelay = "100"))
-  public MessageSource<String> fooBarStrings() {
-     return () ->
-          new GenericMessage<>(
+  public MessageSource&lt;String&gt; fooBarStrings() {
+     return () -&gt;
+          new GenericMessage&lt;&gt;(
                 this.semaphore.getAndSet(!this.semaphore.get()) ? "foo" : "bar");
   }
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Or this processor to convert the incoming strings to upper case:</p>
+<p>或此处理器将输入的字符串转换为大写：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -263,7 +253,7 @@ public class ToUpperCaseProcessor {
 </div>
 </div>
 <div class="paragraph">
-<p>Or finally this sink to save the incoming payload to a database:</p>
+<p>或最后，使用此接收器将传入的有效负载保存到数据库：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -281,7 +271,7 @@ public class JdbcSink {
 </div>
 </div>
 <div class="paragraph">
-<p>Of course the most obvious unit test, for example, for the processor code would be:</p>
+<p>当然，例如，处理器代码最明显的单元测试将是：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -292,31 +282,30 @@ public void testUpperCase() {
 </div>
 </div>
 <div class="paragraph">
-<p>But our goal is really to test all those Spring Boot, Cloud and Integration goodies. Let’s see how to do that.</p>
+<p>但是我们的目标实际上是测试所有这些Spring Boot，Cloud和Integration的好东西。让我们看看如何做到这一点。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="unit-tests"><a class="anchor" href="#unit-tests"></a>Unit Tests</h2>
+<h2 id="unit-tests"><a class="anchor" href="#unit-tests"></a>单元测试</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Since Spring Cloud Stream is fully based on Spring Boot, it is obvious that our tests should be marked with <code>@SpringBootTest</code> and all its features and utilities (including mocking and spying) are available for us. See <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html">Testing Spring Boot applications</a> for more information. On the other hand Spring Cloud Stream is Spring Integration application as well. So, all the Spring Integration testing tools and utilities from <a href="https://docs.spring.io/spring-integration/docs/5.0.0.M7/reference/html/testing.html">Spring Integration Test</a> module can be used in Spring Cloud Stream application tests, too.</p>
+<p>由于Spring Cloud Stream完全基于Spring Boot，因此显然我们的测试应标记为<code>@SpringBootTest</code>以及它的所有功能和实用程序（包括模拟和间谍）均可供我们使用。有关更多信息，请参见<a href="https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html">测试Spring Boot应用程序</a> 。另一方面，Spring Cloud Stream也是Spring Integration应用程序。因此， <a href="https://docs.spring.io/spring-integration/docs/5.0.0.M7/reference/html/testing.html">Spring Integration Test</a>模块中的所有Spring Integration测试工具和实用程序也可以在Spring Cloud Stream应用程序测试中使用。</p>
 </div>
 <div class="paragraph">
-<p>In addition, Spring Cloud Stream provides support for testing your microservice applications without connecting to a messaging system. You can do that by using the <code>TestSupportBinder</code> provided by the <code>spring-cloud-stream-test-support</code> library, which can be added as a test dependency to the application:</p>
+<p>另外，Spring Cloud Stream提供了无需连接消息系统即可测试您的微服务应用程序的支持。您可以使用<code>TestSupportBinder</code>由...提供<code>spring-cloud-stream-test-support</code>库，可以作为测试依赖项添加到应用程序中：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml"><dependency>
-  <groupId>org.springframework.cloud</groupId>
-  <artifactId>spring-cloud-stream-test-support</artifactId>
-  <scope>test</scope>
-</dependency></code></pre>
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-cloud-stream-test-support&lt;/artifactId&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>TestSupportBinder</code> allows users to interact with the bound channels and inspect what messages are sent and/or received by the application. For outbound message channels, the <code>TestSupportBinder</code> registers a single subscriber and retains the messages emitted by the application in a <code>MessageCollector</code>. They can be retrieved during tests and assertions can be made against them.
-The user can also send messages to inbound message channels, so that the consumer application can consume the messages:</p>
+<p>的<code>TestSupportBinder</code>允许用户与绑定的通道进行交互，并检查应用程序发送和/或接收了哪些消息。对于出站邮件渠道， <code>TestSupportBinder</code>注册一个订户，并将应用程序发出的消息保留在<code>MessageCollector</code> 。在测试期间可以检索它们，并可以针对它们进行断言。用户还可以将消息发送到入站消息通道，以便使用者应用程序可以使用消息：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -328,7 +317,7 @@ private MessageCollector collector;
 
 @Test
 public void testMessages() {
-  BlockingQueue<Message<?>> messages = collector.forChannel(channels.output());
+  BlockingQueue&lt;Message&lt;?&gt;&gt; messages = collector.forChannel(channels.output());
 
   assertThat(messages, receivesPayloadThat(is("foo")));
   assertThat(messages, receivesPayloadThat(is("bar")));
@@ -338,10 +327,10 @@ public void testMessages() {
 </div>
 </div>
 <div class="paragraph">
-<p>Pay attention to the <code>receivesPayloadThat()</code>, it is a static utility. This comes from the <code>MessageQueueMatcher</code> and together with the <code>receivesMessageThat()</code>, we can use it to assert with any appropriate <code>Matcher</code> implementation from the incoming messages in the output channel of a source or processor application.</p>
+<p>注意<code>receivesPayloadThat()</code> ，它是一个静态实用程序。这来自<code>MessageQueueMatcher</code>并与<code>receivesMessageThat()</code> ，我们可以使用它与任何适当的断言<code>Matcher</code>从源或处理器应用程序的输出通道中的传入消息实现。</p>
 </div>
 <div class="paragraph">
-<p>The <code>@MockBean</code> and <code>@SpyBean</code> from Spring Boot can be useful to verify an interaction with our stream listeners:</p>
+<p>的<code>@MockBean</code>和<code>@SpyBean</code>来自Spring Boot的验证对验证与我们的流侦听器的交互很有用：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -350,9 +339,9 @@ private ToUpperCaseProcessor toUpperCaseProcessor;
 
 @Test
 public void testMessages() {
-  this.channels.input().send(new GenericMessage<>("foo"));
+  this.channels.input().send(new GenericMessage&lt;&gt;("foo"));
 
-  BlockingQueue<Message<?>> messages = collector.forChannel(channels.output());
+  BlockingQueue&lt;Message&lt;?&gt;&gt; messages = collector.forChannel(channels.output());
 
   assertThat(messages, receivesPayloadThat(is("FOO")));
 
@@ -361,23 +350,220 @@ public void testMessages() {
 </div>
 </div>
 <div class="paragraph">
-<p>Right, to send test data, there is just enough to get an <code>input</code> <code>MessageChannel</code> for the processor and build <code>Message</code> object. To send some headers for testing together with the <code>payload</code>, you can use <code>org.springframework.integration.support.MessageBuilder</code>:</p>
+<p>是的，发送测试数据就足够了<code>input</code><code>MessageChannel</code>用于处理器和构建<code>Message</code>宾语。发送一些标头与<code>payload</code> ， 您可以使用<code>org.springframework.integration.support.MessageBuilder</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Message<String> testMessage =
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Message&lt;String&gt; testMessage =
      MessageBuilder.withPayload("headers")
            .setHeader("foo", "bar")
            .build();
 
 input.send(testMessage);
 
-Message<String> expected =
+Message&lt;String&gt; expected =
      MessageBuilder.withPayload("HEADERS")
            .copyHeaders(testMessage.getHeaders())
            .build();
 
-Matcher<Message<Object>> sameExceptIgnorableHeaders =
-     (Matcher<Message<Object>>) (Matcher<?>) sameExceptIgnorableHeaders(expected);
+Matcher&lt;Message&lt;Object&gt;&gt; sameExceptIgnorableHeaders =
+     (Matcher&lt;Message&lt;Object&gt;&gt;) (Matcher&lt;?&gt;) sameExceptIgnorableHeaders(expected);
 
-assertThat(messages, receivesMessageThat(sameExceptIgnorableHeaders));</code></pre></div></div></div></div></div></div></article></div></div></div></div></body></html>
+assertThat(messages, receivesMessageThat(sameExceptIgnorableHeaders));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>测试接收器应用程序有些棘手，因为这通常是数据管道解决方案中的最后一步。在这里，我们仅依赖于特定协议的通道适配器将数据发送到目标系统。例如我们的<code>JdbcSink</code>应用程序用途<code>JdbcMessageHandler</code>从Spring Integration将插入消息的有效负载插入数据库。因此，要测试<code>JdbcSink</code>运作良好，我们需要查询数据库。幸运的是，Spring Boot为<code>DataSource</code> -只需确保目标数据库供应商的驱动程序依赖项在类路径上即可，例如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.hsqldb&lt;/groupId&gt;
+  &lt;artifactId&gt;hsqldb&lt;/artifactId&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>通过Spring Boot的注意，与数据库交互的集成测试变得很简单。我们只是注入<code>JdbcTemplate</code>由Spring Boot自动配置：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Autowired
+private Sink channels;
+
+@Autowired
+private JdbcTemplate jdbcTemplate;
+
+@Test
+public void testMessages() {
+  this.channels.input().send(new GenericMessage&lt;&gt;("foo"));
+  this.channels.input().send(new GenericMessage&lt;&gt;("bar"));
+
+  List&lt;Map&lt;String, Object&gt;&gt; data =
+                    this.jdbcTemplate.queryForList("SELECT * FROM foobar");
+
+  assertThat(data.size()).isEqualTo(2);
+  assertThat(data.get(0).get("value")).isEqualTo("foo");
+  assertThat(data.get(1).get("value")).isEqualTo("bar");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>这种基于Spring Boot Testing Framework的方法非常适合JDBC和JPA配置。我们可以将类似的方法应用于许多其他协议，包括ActiveMQ，MongoDB，Cassandra，Gemfire，Hazelcast等。如果我们无法为我们的目的提供嵌入式测试范围服务，则可以选择<strong>模拟</strong> <code>MessageHandler</code>目标协议并声明与之的交互：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@MockBean(name = "jdbcHandler")
+private MessageHandler jdbcMessageHandler;
+…
+ArgumentCaptor&lt;Message&lt;?&gt;&gt; messageArgumentCaptor =
+     (ArgumentCaptor&lt;Message&lt;?&gt;&gt;) (ArgumentCaptor&lt;?&gt;)
+                                          ArgumentCaptor.forClass(Message.class);
+
+verify(this.jdbcMessageHandler, times(2))
+                          .handleMessage(messageArgumentCaptor.capture());
+
+Message&lt;?&gt; message = messageArgumentCaptor.getValue();
+assertThat(message).hasFieldOrPropertyWithValue("payload", "bar");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>验证发送到接收器（或处理器外）的消息的另一种方法可以用作<code>ChannelInterceptor</code>注入消息通道：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">AbstractMessageChannel input = (AbstractMessageChannel) this.channels.input();
+
+final AtomicReference&lt;Message&lt;?&gt;&gt; messageAtomicReference =
+                                   new AtomicReference&lt;&gt;();
+
+ChannelInterceptor assertionInterceptor = new ChannelInterceptorAdapter() {
+
+  @Override
+  public void afterSendCompletion(Message&lt;?&gt; message, MessageChannel channel,
+                                          boolean sent, Exception ex) {
+     messageAtomicReference.set(message);
+     super.afterSendCompletion(message, channel, sent, ex);
+  }
+
+};
+
+input.addInterceptor(assertionInterceptor);
+input.send(new GenericMessage&lt;&gt;("foo"));
+
+…
+Message&lt;?&gt; message1 = messageAtomicReference.get();
+assertThat(message1).isNotNull();
+assertThat(message1).hasFieldOrPropertyWithValue("payload", "foo");</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="summary"><a class="anchor" href="#summary"></a>摘要</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>在<a href="https://github.com/spring-cloud/spring-cloud-stream-samples/tree/master/testing">测试</a>模块的“ Spring Cloud Stream Samples”项目中，可以找到提到的应用程序的全部代码，当然还有针对它们的<a href="https://github.com/spring-cloud/spring-cloud-stream-samples/tree/master/testing">测试</a> 。试用Spring Boot，Spring Integration和Spring Cloud Stream提供的各种测试工具和技术。请不要犹豫，将这些工具结合起来以进行更全面的测试。</p>
+</div>
+<div class="paragraph">
+<p>本文的第二部分将重点介绍针对Spring Cloud Stream应用程序和事件驱动的交互的集成测试。</p>
+</div>
+<div class="paragraph">
+<p>最后，请参加我在12月的<a href="https://springoneplatform.io/sessions/spring-integration-5-0-whats-new">Spring One Platform</a>会议上的会议，在我的演讲中，我将提供一些有关Spring Integration中新测试功能的见解。 <code>5.0</code> 。</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3069;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

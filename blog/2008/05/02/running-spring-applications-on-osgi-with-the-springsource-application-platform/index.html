@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用SpringSource应用程序平台在OSGi上运行Spring应用程序</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -43,15 +47,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2008-05-02 14:34:00.0">
-
-
+</head>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -184,21 +190,22 @@
 <li>类路径扫描</li>
 <li>线程上下文类加载器管理</li>
 </ul>
-<p>其余但不太有趣的问题包括：JSP支持，TLD扫描，注释匹配和资源查找。总体而言，要使应用程序顺利部署，需要解决一系列相当大的问题。</p>
+<p>其余但不太有趣的问题包括：JSP支持，TLD扫描，注释匹配和资源查找。总体而言，为了使应用程序顺利部署，需要解决一系列相当大的问题。</p>
 <h2 id="load_time_weaving">加载时间编织</h2>
-<p>加载时编织是要以可靠的方式支持的最成问题的功能之一。在基本级别上，它需要连接到Equinox <span style="font-family:courier">ClassLoader，</span>以便可以在<span style="font-family:courier">defineClass</span>调用期间附加和使用标准<span style="font-family:courier">ClassFileTransformers</span> 。最重要的是，LTW的许多用途都需要访问一个废弃的<span style="font-family:courier">ClassLoader</span> ， <span style="font-family:courier">该类</span>可以用来检查类型以确定在编织过程中需要进行的操作，而不影响真正的<span style="font-family:courier">ClassLoader</span> 。</p>
+<p>加载时编织是要以可靠的方式支持的最成问题的功能之一。在基本级别上，它需要连接到Equinox <span style="font-family:courier">ClassLoader，</span>以便可以在<span style="font-family:courier">defineClass</span>调用期间附加和使用标准<span style="font-family:courier">ClassFileTransformers</span> 。最重要的是，LTW的许多用途都需要访问一个废弃的<span style="font-family:courier">ClassLoader</span> ， <span style="font-family:courier">该类</span>可以用来检查类型以确定在编织过程中需要发生什么，而不会影响真正的<span style="font-family:courier">ClassLoader</span> 。</p>
 <p>基本的支持水平实际上相当容易实现。当编织是由一个束中的类驱动，但是要编织另一束中的类时，就会遇到困难。这在企业应用程序中非常普遍，其中一个捆绑包包含域实体，另一个捆绑包包含使用JPA <span style="font-family:courier">EntityManager的</span>类型。平台通过确保可以使用适当的<span style="font-family:courier">ClassFileTransformers</span>编织应用程序中的所有捆绑包来解决这种复杂性。</p>
 <p>当您开始将编织扩展到其他束时，您确实需要知道何时停止。如果仅将编织应用于所有捆绑，那么应用程序将相互干扰。平台通过显式确定编织范围来防止这种情况的发生，因此它仅适用于应用程序中的模块。</p>
 <p>LTW的另一个问题是它使刷新变得复杂。刷新捆绑软件时，OSGi会刷新依赖于它的所有捆绑软件。这意味着，在我上面给出的示例中，刷新域捆绑包将导致<span style="font-family:courier">EntityManager</span>捆绑包被刷新。但是，刷新<span style="font-family:courier">EntityManager</span> <strong>不会</strong>刷新域绑定，这意味着编织可能不同步。平台通过将刷新传播到受编织影响的其他束来解决此问题。</p>
 <h2 id="classpath_scanning">类路径扫描</h2>
 <p>使用类路径扫描时，主要问题是Equinox不公开标准的<span style="font-family:courier">jar：</span>和<span style="font-family:courier">file：</span>资源。平台在中间放置了一个适配器，以便库可以看到它们期望的资源协议。使<strong>许多</strong>第三方库正常工作具有很好的副作用-不仅是对类路径扫描的修复。</p>
 <h2 id="thread_context_classloader_management">线程上下文类加载器管理</h2>
-<p>许多第三方库使用线程上下文<span style="font-family:courier">ClassLoader</span>访问应用程序类型和资源。OSGi中的每个捆绑软件都有其自己的<span style="font-family:courier">ClassLoader</span> ，因此，任何时候都只能将一个捆绑软件公开为线程上下文<span style="font-family:courier">ClassLoader</span> 。这意味着，如果第三方库需要查看分布在多个捆绑软件中的类型，则它将无法按预期工作。</p>
+<p>许多第三方库使用线程上下文<span style="font-family:courier">ClassLoader</span>访问应用程序类型和资源。OSGi中的每个捆绑软件都有其自己的<span style="font-family:courier">ClassLoader</span> ，因此，任何时候都只能将一个捆绑软件公开为线程上下文<span style="font-family:courier">ClassLoader</span> 。这意味着，如果第三方库需要查看分布在多个捆绑软件中的类型，则它将无法正常工作。</p>
 <p>平台通过创建<span style="font-family:courier">ClassLoader</span>来解决此问题，该<span style="font-family:courier">ClassLoader</span>导入应用程序中每个模块的所有导出软件包。然后，此<span style="font-family:courier">ClassLoader</span>作为线程上下文<span style="font-family:courier">ClassLoader</span>公开，使第三方库可以查看应用程序中所有导出的类型。</p>
 <p>这只是平台要解决的问题的一小部分，但希望它可以使您了解平台对Spring Framework用户的意义。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 156;
 
       (function(disqus_shortname, document) {
@@ -212,7 +219,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -250,12 +258,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

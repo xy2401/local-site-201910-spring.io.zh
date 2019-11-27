@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>诊断OSGi使用冲突</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,22 +25,24 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Diagnosing OSGi uses conflicts">
-<meta name="twitter:description" content="Diagnosing OSGi uses conflicts" http:="" ="" blog.springsource.com="" 2008="" 10="" 20="" understanding-the-osgi-uses-directive="" ="="></meta>recent blog entry, Glyn provided an introduction to the OSGi “uses” directive. In this blog, I want to dig a little deeper into the causes of uses constraint violations and present some tips for diagnosing uses problems in your applications.
+<meta name="twitter:description" content="Diagnosing OSGi uses conflicts" http:="" ="" blog.springsource.com="" 2008="" 10="" 20="" understanding-the-osgi-uses-directive="" ="=">recent blog entry, Glyn provided an introduction to the OSGi “uses” directive. In this blog, I want to dig a little deeper into the causes of uses constraint violations and present some tips for diagnosing uses problems in your applications.
 <p>For most of the examples I’m going to be using raw Equinox and not dm Server. The reason for this is that uses constraints are not specific to dm Server but are relevant to all OSGi users. At the end of this blog, I’ll demonstrate some of the smart constraint failure diagnostics built into dm Server.</p>
 " > <meta property="og:title">
-<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2008="" 10="" 20="" understanding-the-osgi-uses-directive="" ="="></meta>recent blog entry, Glyn provided an introduction to the OSGi “uses” directive. In this blog, I want to dig a little deeper into the causes of uses constraint violations and present some tips for diagnosing uses problems in your applications.
+<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2008="" 10="" 20="" understanding-the-osgi-uses-directive="" ="=">recent blog entry, Glyn provided an introduction to the OSGi “uses” directive. In this blog, I want to dig a little deeper into the causes of uses constraint violations and present some tips for diagnosing uses problems in your applications.
 <p>For most of the examples I’m going to be using raw Equinox and not dm Server. The reason for this is that uses constraints are not specific to dm Server but are relevant to all OSGi users. At the end of this blog, I’ll demonstrate some of the smart constraint failure diagnostics built into dm Server.</p>
 " > <meta>
 <meta property="og:article:published_time" content="2008-11-22 21:47:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -162,7 +168,7 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在<a href="http://blog.springsource.com/2008/10/20/understanding-the-osgi-uses-directive/">最近的博客文章中</a> ，Glyn对OSGi“使用”指令进行了介绍。在本博客中，我想更深入地研究使用约束违规的原因，并提供一些诊断应用程序中使用问题的技巧。</p>
+<div class="blog--post"><p>在<a href="http://blog.springsource.com/2008/10/20/understanding-the-osgi-uses-directive/">最近的博客文章中</a> ，Glyn对OSGi“使用”指令进行了介绍。在这个博客中，我想更深入地研究使用约束违规的原因，并提供一些诊断应用程序中使用问题的技巧。</p>
 <p>对于大多数示例，我将使用原始Equinox而不是dm Server。这是因为使用限制并非特定于dm Server，而是与所有OSGi用户有关。在此博客的结尾，我将演示dm Server中内置的一些智能约束故障诊断。</p>
 <h2 id="dependent_constraint_mismatch">相依约束不匹配</h2>
 <p>违反使用的最常见原因是一个或多个相关约束之间的不匹配。例如，考虑以下三个清单：</p>
@@ -212,19 +218,19 @@ Import-Package: spring.orm.hibernate,eclipselink;version="[2.0, 2.0]"
 5       ACTIVE      app1_1.0.0
 6       INSTALLED   app2_1.0.0
 </code></pre>
-<p>在这里，我们可以看到<span style="font-family:courier">spring</span>和<span style="font-family:courier">eclipselink</span>捆绑包都已解决。<span style="font-family:courier">app1</span>捆绑包已启动，但<span style="font-family:courier">app2</span>捆绑包无法启动。要找出为什么我们可以使用<span style="font-family:courier">diag</span>命令：</p>
-<pre><code>osgi> diag app2
+<p>在这里我们可以看到<span style="font-family:courier">spring</span>和<span style="font-family:courier">eclipselink</span>捆绑包都已解决。<span style="font-family:courier">app1</span>捆绑包已启动，但<span style="font-family:courier">app2</span>捆绑包无法启动。要找出为什么我们可以使用<span style="font-family:courier">diag</span>命令：</p>
+<pre><code>osgi&gt; diag app2
 file:/Users/robharrop/dev/resdiag/uses/app2/bin [6]
   Package uses conflict: Import-Package: spring.orm.hibernate; version="0.0.0"
 </code></pre>
-<p>在这里我们可以看到<span style="font-family:courier">app2</span>捆绑包无法解析，因为有一个软件包在导入<span style="font-family:courier">spring.orm.hibernate时</span>使用了冲突。这意味着无法满足<span style="font-family:courier">app2</span>中<span style="font-family:courier">spring.orm.hibernate</span>的导入，因为它的其他导入之一与<em>可以</em>提供<span style="font-family:courier">spring.orm.hibernate</span>的捆绑<span style="font-family:courier">软件</span> （在本例中为<span style="font-family:courier">spring</span>捆绑软件）的使用约束冲突。</p>
+<p>在这里我们可以看到<span style="font-family:courier">app2</span>捆绑包无法解析，因为有一个软件包在导入<span style="font-family:courier">spring.orm.hibernate时</span>使用了冲突。这意味着无法满足<span style="font-family:courier">app2</span>中<span style="font-family:courier">spring.orm.hibernate</span>的导入，因为它的其他导入之一与<em>可能</em>提供<span style="font-family:courier">spring.orm.hibernate的分发</span>包（在本例中为<span style="font-family:courier">spring</span>捆绑包）的使用限制冲突。</p>
 <p>诊断此问题的第一步是找出<span style="font-family:courier">spring.orm.hibernate</span>软件包的可能供应商。从用例中我们知道，唯一可能的供应商是<span style="font-family:courier">弹簧</span>束，但是如果您不知道供应商，则可以使用packages命令找到它们：</p>
-<pre><code>osgi> packages spring.orm.hibernate
-spring.orm.hibernate; version="2.5.5"<file:/Users/robharrop/dev/resdiag/uses/spring/bin [2]>
+<pre><code>osgi&gt; packages spring.orm.hibernate
+spring.orm.hibernate; version="2.5.5"&lt;file:/Users/robharrop/dev/resdiag/uses/spring/bin [2]&gt;
   file:/Users/robharrop/dev/resdiag/uses/app1/bin [5] imports
 </code></pre>
-<p>这向我们显示<span style="font-family:courier">spring.orm.hibernate</span>包是由bundle <span style="font-family:courier">2</span>导出的。有了这些知识，我们可以找出在包<span style="font-family:courier">2中</span> <span style="font-family:courier">spring.orm.hibernate</span>包的<span style="font-family:courier">uses</span>指令中列出了哪些包：</p>
-<pre><code>osgi> headers 2
+<p>这向我们展示了<span style="font-family:courier">spring.orm.hibernate</span>包是由bundle <span style="font-family:courier">2</span>导出的。有了这些知识，我们可以找出在包<span style="font-family:courier">2中</span> <span style="font-family:courier">spring.orm.hibernate</span>包的<span style="font-family:courier">uses</span>指令中列出了哪些包：</p>
+<pre><code>osgi&gt; headers 2
 Bundle headers:
  Bundle-ManifestVersion = 2
  Bundle-Name = Spring Bundle
@@ -280,31 +286,31 @@ Import-Package: spring.orm.hibernate,eclipselink;version="1.0"
 5       INSTALLED   app2_1.0.0
 </code></pre>
 <p><span style="font-family:courier">app2</span>捆绑包无法启动。<span style="font-family:courier">diag</span>的输出告诉我们原因：</p>
-<pre><code>osgi> diag app2
+<pre><code>osgi&gt; diag app2
 file:/Users/robharrop/dev/resdiag/uses/app2/bin [5]
   Package uses conflict: Import-Package: spring.orm.hibernate; version="0.0.0"
 </code></pre>
 <p><span style="font-family:courier">使用</span>约束又回来了。由于没有依赖性约束不匹配，因此无法执行上一部分中确定的诊断步骤-我们知道，因为围绕这些捆绑包的第一次解决就很好。</p>
 <p>这里的问题是解决顺序之一。捆绑软件分为两个不同的块进行安装和解析。第一个块包括<span style="font-family:courier">spring</span> ， <span style="font-family:courier">eclipselink_1</span>和<span style="font-family:courier">app1</span> ，第二个<span style="font-family:courier">eclipselink_2</span>和<span style="font-family:courier">app2</span> 。解析第一个块时（由于启动了<span style="font-family:courier">app1</span>捆绑包）， <span style="font-family:courier">spring</span>捆绑包将连接到<span style="font-family:courier">eclipselink_1</span>捆绑包，以导入<span style="font-family:courier">eclipselink</span>软件包。可以使用控制台确认：</p>
-<pre><code>osgi> bundle app1
+<pre><code>osgi&gt; bundle app1
 file:/Users/robharrop/dev/resdiag/uses/app1/bin [3]
   Id=3, Status=ACTIVE      Data Root=/opt/springsource-dm-server-1.0.0.RELEASE/lib/configuration/org.eclipse.osgi/bundles/3/data
   No registered services.
   No services in use.
   No exported packages
   Imported packages
-    spring.orm.hibernate; version="2.5.5"<file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]>
-    eclipselink; version="1.0.0"<file:/Users/robharrop/dev/resdiag/uses/eclipselink1/bin [2]>
+    spring.orm.hibernate; version="2.5.5"&lt;file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]&gt;
+    eclipselink; version="1.0.0"&lt;file:/Users/robharrop/dev/resdiag/uses/eclipselink1/bin [2]&gt;
   No fragment bundles
   Named class space
     app1; bundle-version="1.0.0"[provided]
   No required bundles
 </code></pre>
-<p>注意，导入的包部分显示<span style="font-family:courier">的EclipseLink</span>版本<span style="font-family:courier">1.0.0</span>从<span style="font-family:courier">eclipselink_1</span>束导入。当安装第二块时<span style="font-family:courier">，APP2</span>捆绑解决不了，因为它需要<span style="font-family:courier">的EclipseLink</span>在<span style="font-family:courier">2.0.0</span>版本，但<span style="font-family:courier">春天</span>已经在有线<span style="font-family:courier">1.0.0</span>版本<span style="font-family:courier">的EclipseLink。</span>当所有软件包捆绑安装并分解为一个块时，OSGi解析器将尝试满足<em>所有</em>约束，包括确保<span style="font-family:courier">可以满足spring.orm.hibernate</span>的<span style="font-family:courier">使用</span>约束。</p>
+<p>请注意，“导入的软件包”部分显示了<span style="font-family:courier">eclipselink</span> <span style="font-family:courier">1.0.0</span>版是从<span style="font-family:courier">eclipselink_1</span>捆绑包中导入的。当安装第二块时<span style="font-family:courier">，APP2</span>捆绑解决不了，因为它需要<span style="font-family:courier">的EclipseLink</span>在<span style="font-family:courier">2.0.0</span>版本，但<span style="font-family:courier">春天</span>已经在有线<span style="font-family:courier">1.0.0</span>版本<span style="font-family:courier">的EclipseLink。</span>当所有软件包捆绑安装并分解为一个块时，OSGi解析器将尝试满足<em>所有</em>约束，包括确保<span style="font-family:courier">可以满足spring.orm.hibernate</span>的<span style="font-family:courier">使用</span>约束。</p>
 <p>要解决此问题，我们不需要更改捆绑包。取而代之的是，我们可以将捆绑软件重新安装为一个块，也可以触发针对<span style="font-family:courier">Spring</span>捆绑软件的刷新-有效地要求OSGi重新运行解析过程。现在已经安装了<span style="font-family:courier">eclipselink_2</span>捆绑包，我们可以预期会有不同的结果：</p>
-<pre><code>osgi> refresh spring
+<pre><code>osgi&gt; refresh spring
 
-osgi> ss
+osgi&gt; ss
 
 Framework is launched.
 
@@ -316,7 +322,7 @@ id      State       Bundle
 4       RESOLVED    eclipselink_2.0.0
 5       ACTIVE      app2_1.0.0
 
-osgi> bundle spring
+osgi&gt; bundle spring
 file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]
   Id=1, Status=RESOLVED    Data Root=/opt/springsource-dm-server-1.0.0.RELEASE/lib/configuration/org.eclipse.osgi/bundles/1/data
   No registered services.
@@ -324,7 +330,7 @@ file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]
   Exported packages
     spring.orm.hibernate; version="2.5.5"[exported]
   Imported packages
-    eclipselink; version="2.0.0"<file:/Users/robharrop/dev/resdiag/uses/eclipselink2/bin [4]>
+    eclipselink; version="2.0.0"&lt;file:/Users/robharrop/dev/resdiag/uses/eclipselink2/bin [4]&gt;
   No fragment bundles
   Named class space
     spring; bundle-version="2.5.5"[provided]
@@ -332,7 +338,7 @@ file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]
 </code></pre>
 <p>请注意，刷新的<span style="font-family:courier">弹簧</span>导致<span style="font-family:courier">app2</span>捆绑包解析。<span style="font-family:courier">春季</span> <span style="font-family:courier">eclipselink</span>软件包的接线已更改，以通过<span style="font-family:courier">eclipselink_2</span>捆绑包中的<span style="font-family:courier">2.0.0</span>版导出来满足。</p>
 <h2 id="uses_constraints_in_dm_server">在dm服务器中使用约束</h2>
-<p>当您在dm Server中遇到违反<span style="font-family:courier">使用</span>约束的情况时，我们已经尝试为您执行一些分析步骤，特别是确定可能不匹配的可能的依赖约束：</p>
+<p>当您在dm Server中遇到违反<span style="font-family:courier">使用</span>约束的情况时，我们已经尝试为您执行一些分析步骤，尤其是确定可能不匹配的可能的依赖约束：</p>
 <pre><code>Could not satisfy constraints for bundle 'app2' at version '1.0.0'.
  Cannot resolve: app2
   Resolver report:
@@ -340,11 +346,12 @@ file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]
       Possible Supplier: spring_2.5.5 - Export-Package: spring.orm.hibernate; version="2.5.5"
         Possible Conflicts: eclipselink
 </code></pre>
-<p>使用约束在企业库中很常见，而手动诊断故障可能是一场噩梦。特别是，当导出的包的<span style="font-family:courier">uses</span>子句中列出了10个或更多包时，确定可能的冲突将非常耗时。因此，自动诊断是必须的，我希望一直在dm Server中改进诊断代码，以使处理常见错误变得微不足道。</p>
-<p>在下一个版本中，我们计划将诊断工具直接构建到dm Server Eclipse工具中，以便dm Server自动诊断大多数这些问题。</p></div>
+<p>使用约束在企业库中很常见，而手动诊断故障可能是一场噩梦。特别是，当导出的包的<span style="font-family:courier">uses</span>子句中列出了10个或更多包时，确定可能的冲突会非常耗时。因此，自动诊断是必须的，我希望一直在dm Server中改进诊断代码，以使处理常见错误变得微不足道。</p>
+<p>在下一个发行版中，我们计划将诊断工具直接内置到dm Server Eclipse工具中，以便dm Server自动诊断大多数这些问题。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 189;
 
       (function(disqus_shortname, document) {
@@ -358,7 +365,8 @@ file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -396,12 +404,14 @@ file:/Users/robharrop/dev/resdiag/uses/spring/bin [1]
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

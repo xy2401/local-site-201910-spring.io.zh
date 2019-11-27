@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring 3类型转换和验证</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -29,15 +33,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2009-11-17 08:41:00.0">
-
-
+</head>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -163,27 +169,27 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Spring 3最终版本<em>指日可待</em> ，它将是一个不错的版本。在此博客文章中，我将带您了解Spring 3的一些类型转换和验证增强功能。无论您是开发传统的Web应用程序，桌面应用程序还是“下一代” RIA，数据绑定，类型转换和验证都是重要的领域。正如您将在本条目中看到的那样，Spring 3为您在上述每个方面进行了重大升级，同时保留了与先前版本的向后兼容性。</p>
-<h3>新系统目标</h3><p>在介绍功能之前，我首先要强调一下我们着手改进Spring 3的数据绑定系统时所达到的目标：<br></p><ol><br><li>提供替代JavaBean PropertyEditor的无状态，强类型的Type Converter SPI</li><br><li>提供统一的Type Conversion API，以在需要进行转换的任何地方使用，包括Spring的DataBinder和Expression Language<br></li><li>允许类型转换由Java注释元数据驱动</li><br><li>通过注册合理的默认值并应用约定优于配置来简化</li><br></ol><br>随着春季3的最后阶段临近，我相信我们已经实现了每个目标。继续阅读，您将对此做出判断。<p></p>
+<div class="blog--post"><p>Spring 3最终版本<em>指日可待</em> ，它将是一个不错的版本。在此博客文章中，我将带您了解Spring 3的一些类型转换和验证增强功能。无论您是开发传统的Web应用程序，桌面应用程序还是“下一代” RIA，数据绑定，类型转换和验证都是重要的领域。正如您将在此条目中看到的那样，Spring 3在这些区域的每个方面都进行了重大升级，同时保留了与先前版本的向后兼容性。</p>
+<h3>新系统目标</h3><p>在介绍功能之前，我首先要强调一下我们着手改善Spring 3的数据绑定系统时所达到的目标：<br></p><ol><br><li>提供一个取代JavaBean PropertyEditor的无状态，强类型的Type Converter SPI</li><br><li>提供统一的Type Conversion API，以在需要进行转换的任何地方使用，包括Spring的DataBinder和Expression Language<br></li><li>允许类型转换由Java注释元数据驱动</li><br><li>通过注册合理的默认值并应用约定优于配置来简化</li><br></ol><br>随着春季3的最后阶段临近，我相信我们已经实现了每个目标。继续阅读，您将对此做出判断。<p></p>
 <h3>特征</h3><p>充分利用新类型转换系统的第一个环境是Spring MVC，我将借鉴它来演示新功能。这从新的Spring MVC 3配置名称空间开始：</p>
-<pre><code class="prettyprint xml"><br><beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:mvc="http://www.springframework.org/schema/mvc"
-        xsi:schemaLocation="
+<pre><code class="prettyprint xml"><br />&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+        xsi:schemaLocation=&quot;
             http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
             http://www.springframework.org/schema/mvc
-            http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+            http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd&quot;&gt;
 
-    <mvc:annotation-driven />
+    &lt;mvc:annotation-driven /&gt;
 
-</beans>
-</code></pre><p>前面的最小配置使Spring自动安装用于对Number和Date字段进行本地化的默认类型转换器，包括对流行的Joda Time库的全面支持（如果类路径中存在的话）。此外，如果您的类路径中存在JSR-303提供程序，例如Hibernate Validator，Spring会自动启用注释驱动的声明式验证。</p><p>现在，当您绑定到一个字段时，将使用明智的默认格式打印并解析该字段以适应用户的语言环境。为了说明，请考虑以下模型：</p>
-<pre><code class="prettyprint java"><br>public class Account {
+&lt;/beans&gt;
+</code></pre><p>前面的最小配置使Spring自动安装用于对Number和Date字段进行本地化的默认类型转换器，包括对流行的Joda Time库的完全支持（如果类路径中存在的话）。另外，如果您的类路径中存在JSR-303提供程序，例如Hibernate Validator，Spring会自动启用注释驱动的声明式验证。</p><p>现在，当您绑定到一个字段时，将使用明智的默认格式打印并解析该字段以适应用户的语言环境。为了说明，请考虑以下模型：</p>
+<pre><code class="prettyprint java"><br />public class Account {
 
     private Date activationDate = new Date(1258466400);
 
-    private BigDecimal balance = new BigDecimal("3000.25");
+    private BigDecimal balance = new BigDecimal(&quot;3000.25&quot;);
 }
 </code></pre><p>…打印在美国和DE语言环境用户的表格上：</p>
 <table>
@@ -198,19 +204,19 @@
 </form>
 </td>
 <td>
-<form>启用日期：<input type="text" value="2009年11月17日9:00" readonly>平衡：<input type="text" value="3.000,25" readonly>
+<form>启用日期：<input type="text" value="17.11.2009 9:00" readonly>平衡：<input type="text" value="3.000,25" readonly>
 </form>
 </td>
 </tr>
 </tbody></table>
 <h3>用注释覆盖默认值</h3><p>通常，您需要以不同于默认格式的方式来格式化字段。在上一个示例中，您可能希望使用短日期格式来设置<b>ActivationDate</b>字段，并使用货币格式来设置<b>余额</b>字段。在Spring的早期版本中，您将在Controller中注册一个自定义的PropertyEditor以实现此目的。在春季3中，您只需注释字段：</p>
-<pre><code class="prettyprint java"><br>private class Account {
+<pre><code class="prettyprint java"><br />private class Account {
 
-    @DateTimeFormat(style="S-")
+    @DateTimeFormat(style=&quot;S-&quot;)
     private Date activationDate = new Date(1258466400);
 
     @NumberFormat(style=Style.CURRENCY)
-    private BigDecimal balance = new BigDecimal("3000.25");
+    private BigDecimal balance = new BigDecimal(&quot;3000.25&quot;);
 }
 </code></pre><p>使用注释替代，将为美国和DE语言环境打印以下内容：</p>
 <table>
@@ -231,13 +237,13 @@
 </tr>
 </tbody></table>
 <h4>参数注释</h4><p>注释驱动的替代也可以应用于方法参数。考虑下面的Controller方法，该方法获取特定日期的即将到来的约会，其中day是以ISO日期格式编码的URL路径变量：</p>
-<pre><code class="prettyprint java"><br>    @RequestMapping(value = "/appointments/{day}", method = RequestMethod.GET)
+<pre><code class="prettyprint java"><br />    @RequestMapping(value = &quot;/appointments/{day}&quot;, method = RequestMethod.GET)
     public String getAppointmentsForDay(@PathVariable @DateTimeFormat(iso=ISO.DATE) Date day) {
         ...
     }
 </code></pre><p>向/ appointments / 2009-11-17发送GET请求会在2009年11月17日获取所有约会。将@DateTimeFormat <b>iso</b>属性设置为<b>ISO.DATE</b>指示Spring将传入的日期字符串解析为ISO日期（yyyy-mm-dd）。</p>
 <h3>验证方式</h3><p>在将用户输入绑定到模型之后，通常需要对其进行验证。Spring 3支持使用JSR-303进行声明式验证。如果您的类路径中存在JSR-303提供程序（例如Hibernate Validator），则会自动启用此支持。启用后，您可以简单地通过使用@Valid注释对Controller方法参数进行注释来触发验证：</p>
-<pre><code class="prettyprint java"><br>    @RequestMapping(value = "/appointments", method = RequestMethod.POST)
+<pre><code class="prettyprint java"><br />    @RequestMapping(value = &quot;/appointments&quot;, method = RequestMethod.POST)
     public String add(@Valid AppointmentForm form, BindingResult result) {
         ....
     }
@@ -249,10 +255,10 @@
     }
 </code></pre><p>绑定传入的POST参数后，将验证AppointmentForm；在这种情况下，要验证日期字段值不为null并在将来发生。</p>
 <h3>约定优于配置</h3><p>最后，考虑如何将<i>约定优于配置</i>的原理应用于类型转换。在业务应用程序中，您通常会定义自己的自定义字段类型。在Spring的早期版本中，要格式化此类类型，您将创建一个自定义的PropertyEditor实现，并将其注册到Controller中。在大多数情况下，使用Spring 3，您可以遵循以下约定：<br></p><ol><br><li>定义一个静态valueOf（String）方法或Constructor（String）以从其String表示形式解析您的值<br></li><li>实现toString（）以打印您的值以供显示<br></li></ol><p></p><p>考虑遵循以下约定的SocialSecurityNumber类型：</p>
-<pre><code class="prettyprint java"><br>    public class SocialSecurityNumber {
+<pre><code class="prettyprint java"><br />    public class SocialSecurityNumber {
 
         @Size(9)
-        @Mask("###-##-####")
+        @Mask(&quot;###-##-####&quot;)
         private String value;
 
         public SocialSecurityNumber(String value) {
@@ -267,7 +273,8 @@
 <h3>摘要</h3><p>此项涵盖了一些新的Spring 3类型转换和验证功能。要了解更多信息，包括如何实现自己的类型转换器，请查阅<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/validation.html#core-convert">Spring 3 Reference Guide</a> 。另外，请注意未来几周修订后的Petclinic 3示例应用程序的发布（此示例应用程序演示了此处突出显示的所有功能，目前可在<a href="https://src.springframework.org/svn/spring-samples/petclinic/trunk/">此处</a>的SVN存储库中进行早期访问）。</p><p>这些新功能为我们的前进奠定了基础，我感到很兴奋！请让我知道您应用和扩展这些功能的经验，并在<a href="http://jira.springframework.org">jira.springframework.org中</a>保留反馈和想法。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 285;
 
       (function(disqus_shortname, document) {
@@ -281,7 +288,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -319,12 +327,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用AspectJ和JMX进行消息流跟踪</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,14 +38,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2006-04-25 23:55:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -167,8 +173,8 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在我以前从事的一个项目中，我们有一个系统，该系统将从设备接收消息，并决定是否将该信息传递给用户。有多个决策级别，我们经常发现自己要问的问题之一是在通过系统的途中是否丢失了一条消息。</p><p>在我们搬到Spring之前，几乎不可能说出该问题的答案。尝试使用日志记录，但是做出决定的消息量充其量仅是繁琐的。使用调试器进行了其他尝试，但是音量和时间更改的组合仅导致间歇性的成功。</p><p>不幸的是，在我可以实施一个更合适的解决方案之前，我离开了，但是如果有的话，这可能就是本来的样子。最后，我将讨论在这种工作中可能有用的一些扩展。</p><p>首先，我们有一组接口及其实现：</p>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<div class="blog--post"><p>在我以前工作的项目中，我们有一个系统，该系统将从设备接收消息，并决定是否将该信息传递给用户。有多个决策级别，我们经常发现自己要问的问题之一是在通过系统的途中是否丢失了一条消息。</p><p>在我们搬到Spring之前，几乎不可能说出这个问题的答案。尝试使用日志记录，但是做出决定的消息量充其量仅是繁琐的。使用调试器进行了其他尝试，但是音量和时间更改的组合仅导致间歇性的成功。</p><p>不幸的是，在我可以实施一个更合适的解决方案之前，我离开了，但是如果有的话，这可能就是本来的样子。最后，我将讨论在这种工作中可能有用的一些扩展。</p><p>首先，我们有一组接口及其实现：</p>
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 public interface Component1 {
 
@@ -176,7 +182,7 @@ public interface Component1 {
 
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 import java.util.Random;
 
@@ -198,7 +204,7 @@ public class DefaultComponent1 implements Component1 {
 
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 public interface Component2 {
 
@@ -206,7 +212,7 @@ public interface Component2 {
 
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 import java.util.Random;
 
@@ -228,7 +234,7 @@ public class DefaultComponent2 implements Component2 {
 
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 public interface Component3 {
 
@@ -236,7 +242,7 @@ public interface Component3 {
 
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 public class DefaultComponent3 implements Component3 {
 
@@ -245,7 +251,7 @@ public class DefaultComponent3 implements Component3 {
 
 }
 </code></pre><p>这是一个非常简单的示例，但要点是，使用<span style="font-family:courier">fowardCall（）</span>方法，消息将在50％的时间内传递给下一个子组件（在这种情况下，按升序排列）。注意，在这些POJO中没有涉及跟踪的逻辑。</p><p>为了实现我们的跟踪行为，我们希望有一组计数器。每个组件一个。此外，我们还希望重置计数器，启动和停止监视以及确定监视是否正在发生的方法。为此，我们使用计数器实现一个类。</p>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -335,70 +341,70 @@ public class FlowTracer {
 </code></pre><p>该类的方法及其内容非常简单。对您来说，新的内容可能是该类的注释。当每个bean部署到JMX MBeanServer时，Spring的JMX支持使用这些注释自动建立MBean管理接口。</p>
 <ul>
 <li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jmx/export/annotation/ManagedResource.html" style="font-family:courier">ManagedResource</a> ：声明该类应作为JMX MBean公开。</li><li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jmx/export/annotation/ManagedAttribute.html" style="font-family:courier">ManagedAttribute</a> ：声明此getter / setter表示的JavaBean属性应该是MBean属性。如果要对该属性进行读写访问，则需要对getter和setter进行注释。
-</li><li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jmx/export/annotation/ManagedOperation.html" style="font-family:courier">ManagedOperation</a> ：声明此方法应作为MBean操作公开。</li></ul><p>最后，这是将整个事物连接在一起的问题。首先，我们将组成流程的组件连接在一起。接下来，我们声明将跟踪器放置在每个组件上的方面。在这种情况下，我们使用非常甜美的AspectJ切入点语言。最后，我们将JMX导出器设置为自动检测带有<span style="font-family:courier">@ManagedResource</span>annotation的类的实例。</p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+</li><li><a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jmx/export/annotation/ManagedOperation.html" style="font-family:courier">ManagedOperation</a> ：声明此方法应作为MBean操作公开。</li></ul><p>最后，这是将整个事物连接在一起的问题。首先，我们将组成流程的组件连接在一起。接下来，我们声明将跟踪器放置在每个组件上的方面。在这种情况下，我们将使用非常可爱的AspectJ切入点语言。最后，我们将JMX导出器设置为自动检测带有<span style="font-family:courier">@ManagedResource</span>批注的类的实例。</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/aop 
-       http://www.springframework.org/schema/aop/spring-aop.xsd">
+       http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;
 
-	<!-- Components -->
-	<bean id="component3" class="flowtracingexample.DefaultComponent3" />
+	&lt;!-- Components --&gt;
+	&lt;bean id=&quot;component3&quot; class=&quot;flowtracingexample.DefaultComponent3&quot; /&gt;
 
-	<bean id="component2"
-		class="flowtracingexample.DefaultComponent2">
-		<constructor-arg ref="component3" />
-	</bean>
+	&lt;bean id=&quot;component2&quot;
+		class=&quot;flowtracingexample.DefaultComponent2&quot;&gt;
+		&lt;constructor-arg ref=&quot;component3&quot; /&gt;
+	&lt;/bean&gt;
 
-	<bean id="component1"
-		class="flowtracingexample.DefaultComponent1">
-		<constructor-arg ref="component2" />
-	</bean>
+	&lt;bean id=&quot;component1&quot;
+		class=&quot;flowtracingexample.DefaultComponent1&quot;&gt;
+		&lt;constructor-arg ref=&quot;component2&quot; /&gt;
+	&lt;/bean&gt;
 
-	<!-- Aspect -->
-	<bean id="flowTracer" class="flowtracingexample.FlowTracer" />
+	&lt;!-- Aspect --&gt;
+	&lt;bean id=&quot;flowTracer&quot; class=&quot;flowtracingexample.FlowTracer&quot; /&gt;
 
-	<aop:config>
-		<aop:aspect id="component1Aspect" ref="flowTracer">
-			<aop:before method="incrementComponent1Count"
-				pointcut="execution(public void flowtracingexample.Component1.forwardCall())" />
-		</aop:aspect>
+	&lt;aop:config&gt;
+		&lt;aop:aspect id=&quot;component1Aspect&quot; ref=&quot;flowTracer&quot;&gt;
+			&lt;aop:before method=&quot;incrementComponent1Count&quot;
+				pointcut=&quot;execution(public void flowtracingexample.Component1.forwardCall())&quot; /&gt;
+		&lt;/aop:aspect&gt;
 
-		<aop:aspect id="component2Aspect" ref="flowTracer">
-			<aop:before method="incrementComponent2Count"
-				pointcut="execution(public void flowtracingexample.Component2.forwardCall())" />
-		</aop:aspect>
+		&lt;aop:aspect id=&quot;component2Aspect&quot; ref=&quot;flowTracer&quot;&gt;
+			&lt;aop:before method=&quot;incrementComponent2Count&quot;
+				pointcut=&quot;execution(public void flowtracingexample.Component2.forwardCall())&quot; /&gt;
+		&lt;/aop:aspect&gt;
 
-		<aop:aspect id="component3Aspect" ref="flowTracer">
-			<aop:before method="incrementComponent3Count"
-				pointcut="execution(public void flowtracingexample.Component3.forwardCall())" />
-		</aop:aspect>
-	</aop:config>
+		&lt;aop:aspect id=&quot;component3Aspect&quot; ref=&quot;flowTracer&quot;&gt;
+			&lt;aop:before method=&quot;incrementComponent3Count&quot;
+				pointcut=&quot;execution(public void flowtracingexample.Component3.forwardCall())&quot; /&gt;
+		&lt;/aop:aspect&gt;
+	&lt;/aop:config&gt;
 
-	<!-- JMX -->
-	<bean class="org.springframework.jmx.export.MBeanExporter">
-		<property name="autodetectModeName" value="AUTODETECT_ALL" />
-		<property name="assembler">
-			<bean
-				class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
-				<property name="attributeSource">
-					<bean
-						class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource" />
-				</property>
-			</bean>
-		</property>
-		<property name="namingStrategy">
-			<bean
-				class="org.springframework.jmx.export.naming.IdentityNamingStrategy" />
-		</property>
-	</bean>
+	&lt;!-- JMX --&gt;
+	&lt;bean class=&quot;org.springframework.jmx.export.MBeanExporter&quot;&gt;
+		&lt;property name=&quot;autodetectModeName&quot; value=&quot;AUTODETECT_ALL&quot; /&gt;
+		&lt;property name=&quot;assembler&quot;&gt;
+			&lt;bean
+				class=&quot;org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler&quot;&gt;
+				&lt;property name=&quot;attributeSource&quot;&gt;
+					&lt;bean
+						class=&quot;org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource&quot; /&gt;
+				&lt;/property&gt;
+			&lt;/bean&gt;
+		&lt;/property&gt;
+		&lt;property name=&quot;namingStrategy&quot;&gt;
+			&lt;bean
+				class=&quot;org.springframework.jmx.export.naming.IdentityNamingStrategy&quot; /&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
 
-</beans>
+&lt;/beans&gt;
 </code></pre><p>我们需要做的下一步是创建一个驱动程序类。在这种情况下，驱动程序类仅在750ms以下的随机延迟下发送消息。</p>
-<pre><code class="prettyprint java"><br>package flowtracingexample;
+<pre><code class="prettyprint java"><br />package flowtracingexample;
 
 import java.io.IOException;
 import java.util.Random;
@@ -411,12 +417,12 @@ public class FlowTracingExample {
 	public static void main(String[] args) throws InterruptedException,
 			IOException {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"classpath:flowtracingexample/applicationContext.xml");
+				&quot;classpath:flowtracingexample/applicationContext.xml&quot;);
 
-		Component1 comp = (Component1) ctx.getBean("component1");
+		Component1 comp = (Component1) ctx.getBean(&quot;component1&quot;);
 		Random r = new Random();
 
-		System.out.print("Ready...");
+		System.out.print(&quot;Ready...&quot;);
 		 System.in.read();
 
 		for (;;) {
@@ -425,10 +431,11 @@ public class FlowTracingExample {
 		}
 	}
 }
-</code></pre><p>就我而言，我将在运行Java VM Management的情况下运行该应用程序，因为它为我提供了免费的MBean服务器（而且我喜欢漂亮的内存图）。如果您还没有听说过，这<a href="http://java.sun.com/developer/technicalArticles/J2SE/jconsole.html">是Java 5 VM</a>中<a href="http://java.sun.com/developer/technicalArticles/J2SE/jconsole.html">的系统属性，</a>可导致VM使用JMX进行自我管理。它具有用于内存消耗，线程和一百万其他内容的bean。您只需将<span style="font-family:courier">-Dcom.sun.management.jmxremote</span>放在正在运行的应用程序的命令行中即可启动它。在Java 5的另一个不错的补充中，我将使用<span style="font-family:courier">jconsole</span>来显示我的结果。</p><p>从长期来看，基于我生锈的数学技能，我希望看到组件1的时间为100％，组件2的时间为50％，组件3的时间为25％。让我们来看看：</p><p><img id="image13" src="http://blog.interface21.com/main/wp-content/uploads/2006/04/tracing.png" alt="跟踪屏幕截图"></p><p>很高兴看到我没记错。最好的部分是，这仍然符合良好的设计原则。例如，所有组件都不了解跟踪，因为这不是它们的工作。同样，此子系统的所有跟踪要求都包含在一个类中，并且有一个实现满足AOP实现目标1：1要求的实现。最终，由于具有关闭跟踪的功能，任何性能影响或多或少都会被抵消。我知道，我知道递增一个整数并不昂贵，但是如果您要进行跟踪操作却要付出昂贵的代价，那么拥有它会很好，并且您不必担心将其发送到生产环境中。您可以简单地禁用监视，直到客户致电寻求支持为止。</p><p>因此，这些图肯定很漂亮，并且如果您知道期望的百分比，甚至可以告诉您一些信息，但是您还能做什么？最后的100条消息及其决定如何？如何记录一条消息被丢弃的原因？丢弃决定和管道末端是否没有消息之间的相关性如何？知道一条消息已经丢失（也许是由于线程问题所致）是因为您从未故意将其丢失，但在进入消息后500毫秒之内没有到达终点，这不是很好吗？同样，如果从管道一端到另一端的时间超过250毫秒，给管理员发送电子邮件又如何呢？</p><p>跟踪/监视的可能性是无限的（可插入！）。您将如何处理？</p><p>当然还有<a id="p12" href="http://blog.interface21.com/main/wp-content/uploads/2006/04/flowtracingexample.zip" title="FlowTracingExample">源代码</a> 。</p></div>
+</code></pre><p>就我而言，我将在运行Java VM Management的情况下运行该应用程序，因为它为我提供了免费的MBean服务器（而且我喜欢漂亮的内存图）。如果您还没有听说过，这<a href="http://java.sun.com/developer/technicalArticles/J2SE/jconsole.html">是Java 5 VM</a>中<a href="http://java.sun.com/developer/technicalArticles/J2SE/jconsole.html">的系统属性，</a>可导致VM使用JMX进行自我管理。它具有用于内存消耗，线程和一百万其他内容的bean。您只需将<span style="font-family:courier">-Dcom.sun.management.jmxremote</span>放在正在运行的应用程序的命令行中即可启动它。在Java 5的另一个不错的补充中，我将使用<span style="font-family:courier">jconsole</span>来显示我的结果。</p><p>从长期来看，基于我生锈的数学技能，我希望看到组件1的时间为100％，组件2的时间为50％，组件3的时间为25％。让我们来看看：</p><p><img id="image13" src="http://blog.interface21.com/main/wp-content/uploads/2006/04/tracing.png" alt="跟踪屏幕截图"></p><p>很高兴看到我没记错。最好的部分是，这仍然符合良好的设计原则。例如，所有组件都不了解跟踪，因为这不是它们的工作。同样，此子系统的所有跟踪要求都包含在一个类中，并且有一个实现满足AOP实现目标1：1要求的实现。最后，具有关闭跟踪的功能，或多或少会抵消任何性能影响。我知道，我知道递增一个整数并不昂贵，但是如果您要进行跟踪操作却要付出昂贵的代价，那么拥有它会很好，并且您不必担心将其发送到生产环境中。您可以简单地禁用监视，直到客户致电寻求支持。</p><p>因此，这些图肯定很漂亮，并且如果您知道期望的百分比，甚至可以告诉您一些信息，但是您还能做什么？最后的100条消息及其决定如何？如何记录一条消息被丢弃的原因？丢弃决定和管道末端是否没有消息之间的相关性如何？知道一条消息已经丢失（也许是由于线程问题所致）是因为您从未故意将其丢失，但在进入消息后500毫秒之内没有到达终点，这不是很好吗？同样，如果从管道一端到另一端的时间超过250毫秒，给管理员的电子邮件怎么样？</p><p>跟踪/监视的可能性是无限的（可插入！）。您将如何处理？</p><p>当然还有<a id="p12" href="http://blog.interface21.com/main/wp-content/uploads/2006/04/flowtracingexample.zip" title="FlowTracingExample">源代码</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3;
 
       (function(disqus_shortname, document) {
@@ -442,7 +449,8 @@ public class FlowTracingExample {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -480,12 +488,14 @@ public class FlowTracingExample {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

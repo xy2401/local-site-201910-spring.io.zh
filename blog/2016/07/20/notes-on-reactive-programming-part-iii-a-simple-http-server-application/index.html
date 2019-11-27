@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>关于反应式编程的说明第三部分：简单的HTTP Server应用程序</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Notes on Reactive Programming Part III: A Simple HTTP Server Application">
 <meta name="twitter:description" content="<div class=" paragrap="="> 
- </head><body dir="ltr"><p>In this article we continue the series on <a href="https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code">Reactive Programming</a>, and the focus is less on learning the basic APIs and more on more concrete use cases and writing code that actually does something useful. We will see how Reactive is a useful abstraction for concurrent programming, but also that it has some very low level features that we should learn to treat with respect and caution. If we start to use these features to their full potential we can take control of layers in our application that previously were invisible, hidden by containers, platforms and frameworks.</p> 
+ <p>In this article we continue the series on <a href="https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code">Reactive Programming</a>, and the focus is less on learning the basic APIs and more on more concrete use cases and writing code that actually does something useful. We will see how Reactive is a useful abstraction for concurrent programming, but also that it has some very low level features that we should learn to treat with respect and caution. If we start to use these features to their full potential we can take control of layers in our application that previously were invisible, hidden by containers, platforms and frameworks.</p> 
 
 ">
 <meta name="twitter:creator" content="@david_syer">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -171,16 +177,16 @@
 </div>
 </header>
 <div class="blog--post"><div class="paragraph">
-<p>在本文中，我们继续进行有关<a href="https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code">响应式编程</a>的系列文章，而重点不在学习基本的API上，而是集中在更具体的用例和编写实际上可以做些有用的代码上。我们将看到Reactive对于并发编程是如何有用的抽象，但是它具有一些非常低级的功能，我们应该学会谨慎和谨慎地对待它们。如果我们开始充分利用这些功能，我们可以控制应用程序中以前不可见的层，这些层以前被容器，平台和框架隐藏。</p>
+<p>在本文中，我们继续进行有关<a href="https://spring.io/blog/2016/06/13/notes-on-reactive-programming-part-ii-writing-some-code">响应式编程</a>的系列文章，而重点不在学习基本的API上，而是集中在更具体的用例和编写实际上可以做些有用的事情的代码上。我们将看到Reactive对于并发编程是如何有用的抽象，但是它具有一些非常低级的功能，我们应该学会谨慎和谨慎地对待它们。如果我们开始充分利用这些功能，我们可以控制应用程序中以前不可见的层，这些层以前被容器，平台和框架隐藏。</p>
 </div>
 <div class="sect1">
 <h2 id="bridging-from-blocking-to-reactive-with-spring-mvc"><a class="anchor" href="#bridging-from-blocking-to-reactive-with-spring-mvc"></a>使用Spring MVC从阻塞过渡到反应</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>积极参与迫使您以不同的眼光看待世界。无需索要任何东西（或不获取它），而是将所有内容按序列（ <code>Publisher</code> ）交付，而您必须订阅它。不必等待答案，而必须注册一个回调。习惯了它并不难，但是除非整个世界突然动起来并变得反应灵敏，否则您将发现需要与老式的阻塞API进行交互</p>
+<p>积极参与迫使您以不同的眼光看待世界。而不是索要某些东西（或不获取它），而是将所有内容按顺序交付（ <code>Publisher</code> ），您必须订阅它。不必等待答案，而必须注册一个回调。习惯了它并不难，但是除非整个世界突然动起来并变得反应灵敏，否则您将发现需要与老式的阻塞API进行交互</p>
 </div>
 <div class="paragraph">
-<p>假设我们有一个返回<code>HttpStatus</code>的阻塞方法：</p>
+<p>假设我们有一个阻塞方法返回一个<code>HttpStatus</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -193,7 +199,7 @@ private HttpStatus block(int value) {
 </div>
 </div>
 <div class="paragraph">
-<p>我们想用不同的参数重复调用它并汇总结果。这是一个经典的“分散收集”用例，例如，如果您需要一个分页的后端来汇总多个页面中的“前N个”项，则将获得该用例。由于非反应（阻塞）操作的细节与散布/聚集模式无关，因此我们可以将其压入一个名为<code>block()</code>的方法中，并在以后实现。这是一个（不好的）示例，该示例调用后端并将其聚合为<code>Result</code>类型的对象：</p>
+<p>我们想用不同的参数重复调用它并汇总结果。这是一个经典的“分散收集”用例，例如，如果您需要一个分页的后端来汇总多个页面中的“前N个”项，则将获得该用例。由于非反应（阻塞）操作的详细信息与散布聚集模式无关，因此我们可以将其压入一种称为<code>block()</code> ，稍后再实施。这是一个（不好的）示例，它调用后端并聚合为一个类型的对象<code>Result</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -221,12 +227,12 @@ private HttpStatus block(int value) {
 </ol>
 </div>
 <div class="paragraph">
-<p>不要在家做。这是一个“糟糕”的示例，因为尽管在技术上正确使用了API，但我们知道它会阻塞调用线程。此代码或多或少地等同于for循环，并在循环体中调用<code>block()</code> 。更好的实现是将对<code>block()</code>的调用推到后台线程上。我们可以通过将其包装在返回<code>Mono<HttpStatus></code>的方法中来实现<code>Mono<HttpStatus></code> ：</p>
+<p>不要在家做。这是一个“糟糕”的示例，因为在技术上正确使用了API的同时，我们知道它将阻塞调用线程。此代码或多或少等效于for循环，其中包含<code>block()</code>在循环体内。更好的实施方式可以将通话推向<code>block()</code>到后台线程上。我们可以通过将其包装在返回一个<code>Mono<HttpStatus></code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private Mono<HttpStatus> fetch(int value) {
-    return Mono.fromCallable(() -> block(value)) // <b class="conum">(1)</b>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">private Mono&lt;HttpStatus&gt; fetch(int value) {
+    return Mono.fromCallable(() -&gt; block(value)) // <b class="conum">(1)</b>
         .subscribeOn(this.scheduler);            // <b class="conum">(2)</b>
 }</code></pre>
 </div>
@@ -242,7 +248,7 @@ private HttpStatus block(int value) {
 </ol>
 </div>
 <div class="paragraph">
-<p><code>scheduler</code>被单独声明为共享字段： <code>Scheduler scheduler = Schedulers.parallel()</code> 。然后，我们可以声明要对序列进行<code>flatMap()</code>而不是使用<code>map()</code> ：</p>
+<p>的<code>scheduler</code>分别声明为共享字段： <code>Scheduler scheduler = Schedulers.parallel()</code> 。然后我们可以声明我们要<code>flatMap()</code>序列而不是使用<code>map()</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -267,12 +273,12 @@ private HttpStatus block(int value) {
 <div class="sect2">
 <h3 id="embedding-in-a-non-reactive-server"><a class="anchor" href="#embedding-in-a-non-reactive-server"></a>嵌入非反应式服务器</h3>
 <div class="paragraph">
-<p>如果我们想在诸如servlet容器之类的非反应服务器中运行上面的分散收集代码，则可以使用Spring MVC，如下所示：</p>
+<p>如果我们想在诸如servlet容器之类的非反应性服务器中运行上面的分散收集代码，则可以使用Spring MVC，如下所示：</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RequestMapping("/parallel")
-public CompletableFuture<Result> parallel() {
+public CompletableFuture&lt;Result&gt; parallel() {
     return Flux.range(1, 10)
       ...
       .doOnSuccess(Result::stop)
@@ -281,13 +287,13 @@ public CompletableFuture<Result> parallel() {
 </div>
 </div>
 <div class="paragraph">
-<p>如果阅读<code>@RequestMapping</code>的Javadocs，您会发现一个方法可以返回<code>CompletableFuture</code> “应用程序使用该方法在自己选择的单独线程中产生返回值”。在这种情况下，单独的线程由“ scheduler”提供，它是一个线程池，因此由于调用<code>flatMap()</code>的方式，一次在多个线程上进行处理，一次处理4个。</p>
+<p>如果您阅读Javadocs的<code>@RequestMapping</code>您会发现一个方法可以返回一个<code>CompletableFuture</code> “应用程序使用它在自己选择的单独线程中产生返回值”。在这种情况下，单独的线程是由“ scheduler”提供的，它是一个线程池，因此处理是在多个线程上进行的，一次处理4个<code>flatMap()</code>叫做。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="no-such-thing-as-a-free-lunch"><a class="anchor" href="#no-such-thing-as-a-free-lunch"></a>没有免费的午餐</h3>
 <div class="paragraph">
-<p>具有后台线程的分散聚集是一种有用的模式，但是它不是完美的-它没有阻止调用者，但是它阻止了某些事情，因此只是在解决问题。有一些实际含义。我们有一台带有（可能）无阻塞IO处理程序的HTTP服务器，将工作传递回线程池，每个线程一个HTTP请求-所有这些都发生在servlet容器（例如Tomcat）中。该请求是异步处理的，因此不会阻止Tomcat中的工作线程，并且我们在“调度程序”中创建的线程池最多可处理4个并发线程。我们正在处理10个后端请求（对<code>block()</code>调用），因此使用调度程序将延迟降低4倍具有最大的理论优势。换句话说，如果在单个线程中一个接一个地处理所有10个请求需要1000毫秒，则我们的HTTP服务可能会看到单个传入请求的处理时间为250毫秒。但是，我们应该强调“力量”：只有在处理线程（在两个阶段，即Tomcat工作者和应用程序调度程序）中没有争用时，它才能如此之快。如果您的服务器具有大量内核，并发性非常低，即连接到您的应用程序的客户端数量很少，并且几乎没有两个客户端同时发出请求的机会，那么您可能会看到接近理论上的改进。一旦有多个客户端尝试连接，它们都将争夺相同的4个线程，并且延迟会逐渐增加，甚至可能比没有后台处理的单个客户端所经历的还要糟糕。我们可以通过创建具有更大线程池的调度程序来改善并发客户端的延迟，例如</p>
+<p>具有后台线程的分散聚集是一种有用的模式，但它不是完美的-它没有阻塞调用方，但是它阻塞了某些内容，因此只是在解决问题。有一些实际意义。我们有一台带有（可能）无阻塞IO处理程序的HTTP服务器，将工作传递回线程池，每个线程一个HTTP请求-所有这些都在servlet容器（例如Tomcat）内发生。该请求是异步处理的，因此不会阻止Tomcat中的工作线程，并且我们在“调度程序”中创建的线程池最多可处理4个并发线程。我们正在处理10个后端请求（ <code>block()</code> ），因此使用调度程序将延迟降低4倍具有最大的理论优势。换句话说，如果在单个线程中一个接一个地处理所有10个请求需要1000毫秒，则我们的HTTP服务可能会看到单个传入请求的处理时间为250毫秒。但是，我们应该强调“力量”：只有在处理线程（在两个阶段，即Tomcat工作者和应用程序调度程序）中没有争用时，它才能如此之快。如果您的服务器具有大量内核，并发性很低，即连接到您的应用程序的客户端数量很少，并且几乎没有两个客户端同时发出请求的机会，那么您可能会看到理论上的改进。一旦有多个客户端尝试连接，它们都将争夺相同的4个线程，并且延迟会逐渐增加，甚至可能比没有后台处理的单个客户端所经历的还要糟糕。我们可以通过创建具有更大线程池的调度程序来提高并发客户端的延迟，例如</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -295,7 +301,7 @@ public CompletableFuture<Result> parallel() {
 </div>
 </div>
 <div class="paragraph">
-<p>（16个线程。）现在，我们正在为线程及其堆栈使用更多的内存，并且可以期望看到较低的延迟以实现低并发性，但是如果我们的硬件少于16个内核，则不一定需要高并发性。我们也不会期望在负载下有更高的吞吐量：如果存在线程争用，则管理这些资源的成本很高，因此必须在重要的度量标准中反映出来。如果您对这种折衷的更详细分析感兴趣，可以在<a href="https://robharrop.github.io/">Rob Harrop</a>的博客系列中找到有关负载下性能指标如何扩展的一些详细分析。</p>
+<p>（16个线程。）现在，我们正在为线程及其堆栈使用更多的内存，并且可以期望看到较低的延迟以实现低并发性，但是如果我们的硬件少于16个内核，则不一定需要高并发性。我们也不希望在负载下有更高的吞吐量：如果存在线程争用，则管理这些资源的成本很高，因此必须在重要的度量标准中反映出来。如果您对这种折衷的更详细分析感兴趣，可以在<a href="https://robharrop.github.io/">Rob Harrop</a>的博客系列中找到有关负载下性能指标如何扩展的一些详细分析。</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -303,13 +309,13 @@ public CompletableFuture<Result> parallel() {
 <td class="icon">
 <div class="title">小费</div>
 </td>
-<td class="content">Tomcat默认分配100个线程来处理HTTP请求。如果我们知道所有处理都将在调度程序线程池中进行，那就太过分了。阻抗不匹配：调度程序线程池可能是瓶颈，因为它的线程数少于上游Tomcat线程池。这凸显了这样一个事实，即性能调整可能非常困难，并且尽管您可以控制所有配置，但这是一个微妙的平衡。
+<td class="content">Tomcat默认分配100个线程来处理HTTP请求。如果我们知道所有处理都将在调度程序线程池中进行，那就太过分了。阻抗不匹配：调度程序线程池可能是瓶颈，因为它的线程数少于上游Tomcat线程池。这凸显了这样一个事实，即性能调整可能非常困难，并且尽管您可以控制所有配置，但它是一个微妙的平衡。
 </td>
 </tr>
 </tbody></table>
 </div>
 <div class="paragraph">
-<p>如果我们使用根据需要调整其容量的调度程序，则与固定线程池相比，我们可以做得更好。Reactor为此提供了一个便利，因此，如果您使用<code>Schedulers.elastic()</code>尝试相同的代码（您可以在任何地方调用它；只有一个实例），您将看到在负载下创建了更多线程。</p>
+<p>如果我们使用根据需要调整其容量的调度程序，则与固定线程池相比，我们可以做得更好。Reactor为此提供了便利，因此如果您尝试使用相同的代码<code>Schedulers.elastic()</code> （您可以在任何地方调用它；只有一个实例），您会看到在负载下创建了更多线程。</p>
 </div>
 </div>
 </div>
@@ -326,21 +332,21 @@ public CompletableFuture<Result> parallel() {
 <td class="icon">
 <div class="title">注意</div>
 </td>
-<td class="content">Spring Reactive最初是一个独立的项目，但是在版本5.0（2016年6月的第一个里程碑）中被并入了Spring Framework。
+<td class="content">Spring Reactive最初是一个独立的项目，但是在5.0版（2016年6月的第一个里程碑）中被并入了Spring Framework。
 </td>
 </tr>
 </tbody></table>
 </div>
 <div class="paragraph">
-<p>在我们的分散收集示例中，要完全<code>spring-boot-starter-webflux</code>是将classpath上的<code>spring-boot-starter-web</code>替换为<code>spring-boot-starter-webflux</code> 。在Maven中：</p>
+<p>在我们的分散收集示例中，完全反应的第一步是替换<code>spring-boot-starter-web</code>与<code>spring-boot-starter-webflux</code>在类路径上。在Maven中：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml"><dependencies>
-  <dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter-webflux</artifactId>
-  </dependency></code></pre>
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependencies&gt;
+  &lt;dependency&gt;
+	&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+	&lt;artifactId&gt;spring-boot-starter-webflux&lt;/artifactId&gt;
+  &lt;/dependency&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -355,12 +361,12 @@ public CompletableFuture<Result> parallel() {
 </div>
 </div>
 <div class="paragraph">
-<p>然后在控制器中，我们可以简单地<code>CompletableFuture</code>与<code>CompletableFuture</code>的连接，并返回<code>Mono</code>类型的对象：</p>
+<p>然后在控制器中，我们可以简单地断开与<code>CompletableFuture</code>并返回一个类型的对象<code>Mono</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RequestMapping("/parallel")
-public Mono<Result> parallel() {
+public Mono&lt;Result&gt; parallel() {
     return Flux.range(1, 10)
             .log()
             .flatMap(this::fetch, 4)
@@ -370,24 +376,24 @@ public Mono<Result> parallel() {
 </div>
 </div>
 <div class="paragraph">
-<p>将此代码放入Spring Boot应用程序中，并将在Tomcat，Jetty或Netty中运行，具体取决于在类路径上找到的内容。Tomcat是该启动器中的默认服务器，因此如果要切换，则必须将其排除在外并提供其他服务器。在启动时间，内存使用率和运行时资源使用率方面，这三个特性都非常相似。</p>
+<p>将此代码放入Spring Boot应用程序中，然后将在Tomcat，Jetty或Netty中运行，具体取决于在类路径上找到的内容。Tomcat是该启动器中的默认服务器，因此如果要切换，则必须将其排除在外并提供其他服务器。在启动时间，内存使用率和运行时资源使用率方面，这三个特性都非常相似。</p>
 </div>
 <div class="paragraph">
-<p>我们仍然在<code>block()</code>有阻塞的后端调用，所以我们仍然必须订阅线程池以避免阻塞调用者。我们可以更改为，如果我们有一个非阻塞客户端，例如，不使用<code>RestTemplate</code>而是使用新的<code>WebClient</code>那么我们可以这样做以使用一个非阻塞客户端：</p>
+<p>我们仍然有阻塞的后端调用<code>block()</code> ，因此我们仍然必须订阅线程池，以避免阻塞调用者。如果我们有一个非阻塞客户端，我们可以更改它，例如，代替使用<code>RestTemplate</code>我们使用新的<code>WebClient</code>那么我们可以改为使用非阻塞客户端：</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">private WebClient client = new WebClient(new ReactorHttpClientRequestFactory());
 
-private Mono<HttpStatus> fetch(int value) {
+private Mono&lt;HttpStatus&gt; fetch(int value) {
     return this.client.perform(HttpRequestBuilders.get("http://example.com"))
             .extract(WebResponseExtractors.response(String.class))
-            .map(response -> response.getStatusCode());
+            .map(response -&gt; response.getStatusCode());
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>请注意， <code>WebClient.perform()</code> （或精确的<code>WebResponseExtractor</code> ）具有Reactive返回类型，我们将其转换为<code>Mono<HttpStatus></code> ，但我们尚未订阅。我们希望框架进行所有订阅，因此现在我们一直处于Reactive状态。</p>
+<p>请注意<code>WebClient.perform()</code> （或者<code>WebResponseExtractor</code>确切地说）具有Reactive返回类型，我们将其转换为<code>Mono<HttpStatus></code> ，但我们尚未订阅。我们希望框架能够完成所有的订阅，所以现在我们一直处于Reactive状态。</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -395,7 +401,7 @@ private Mono<HttpStatus> fetch(int value) {
 <td class="icon">
 <div class="title">警告</div>
 </td>
-<td class="content">Spring Reactive中返回<code>Publisher</code> <strong>者</strong>的方法是非阻塞的，但是通常来说，返回<code>Publisher</code>的方法（或<code>Flux</code> ， <code>Mono</code>或<code>Observable</code> ）只是暗示它可能是非阻塞的。如果您正在编写此类方法，则必须分析（最好测试）它们是否阻塞，并让调用者明确知道它们可能会阻塞，这一点很重要。
+<td class="content">Spring Reactive中的方法返回一个<code>Publisher</code> <strong>是</strong>非阻塞的，但通常返回一个<code>Publisher</code> （要么<code>Flux</code> ， <code>Mono</code>要么<code>Observable</code> ）只是暗示它可能是非阻塞的。如果您正在编写此类方法，则必须分析（最好测试）它们是否阻塞，并让调用者明确知道它们可能会阻塞，这一点很重要。
 </td>
 </tr>
 </tbody></table>
@@ -406,7 +412,7 @@ private Mono<HttpStatus> fetch(int value) {
 <td class="icon">
 <div class="title">注意</div>
 </td>
-<td class="content">我们刚才使用非阻塞客户端简化HTTP堆栈的技巧在常规Spring MVC中也适用。上面<code>fetch()</code>方法的结果可以转换为<code>CompletableFuture</code> ，并从常规<code>@RequestMapping</code>方法中传递出去（例如，在Spring Boot 1.3中）。
+<td class="content">我们刚才使用非阻塞客户端简化HTTP堆栈的技巧在常规Spring MVC中也适用。结果<code>fetch()</code>上面的方法可以转换为<code>CompletableFuture</code>并通过了常规<code>@RequestMapping</code>方法（例如在Spring Boot 1.3中）。
 </td>
 </tr>
 </tbody></table>
@@ -414,12 +420,12 @@ private Mono<HttpStatus> fetch(int value) {
 <div class="sect2">
 <h3 id="inversion-of-control"><a class="anchor" href="#inversion-of-control"></a>控制反转</h3>
 <div class="paragraph">
-<p>现在，我们可以在HTTP请求处理程序中调用<code>fetch()</code>之后删除并发提示：</p>
+<p>现在，我们可以在调用之后删除并发提示<code>fetch()</code>在HTTP请求处理程序中：</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RequestMapping("/netty")
-public Mono<Result> netty() {
+public Mono&lt;Result&gt; netty() {
     return Flux.range(1, 10) // <b class="conum">(1)</b>
         .log() //
         .flatMap(this::fetch) // <b class="conum">(2)</b>
@@ -439,7 +445,7 @@ public Mono<Result> netty() {
 </ol>
 </div>
 <div class="paragraph">
-<p>考虑到我们根本不需要额外的可调用线程和订阅者线程，因此此代码比我们必须桥接到阻塞客户端的时候要干净得多，这可以归因于代码始终是响应式的下。Reactive <code>WebClient</code>返回一个<code>Mono</code> ，它立即驱使我们在转换链中选择<code>flatMap()</code> ，而我们需要的代码就落空了。编写它是一种更好的体验，而且可读性更好，因此更易于维护。另外，由于没有线程池和并发提示，因此没有任何神奇的因素4可以插入我们的性能预期。某个地方有一个限制，但是它不再受我们在应用程序层中的选择所限制，也不受服务器“容器”中任何内容的限制。这不是魔术，仍然存在物理定律，因此每个后端调用仍将花费100毫秒左右的时间，但是在争用率较低的情况下，我们甚至可以看到所有10个请求在大约一个请求的同一时间完成。随着服务器上负载的增加，延迟和吞吐量自然会降低，但其方式由缓冲区争用和内核网络控制，而不是由应用程序线程管理控制。这是控制权的倒置，可以降低应用程序代码下方的堆栈级别。</p>
+<p>考虑到我们根本不需要额外的可调用线程和订阅者线程，因此此代码比我们必须桥接到阻塞客户端的时候要干净得多，这可以归因于代码始终是响应式的下。反应性<code>WebClient</code>返回一个<code>Mono</code> ，这促使我们立即选择<code>flatMap()</code>在转换链中，我们所需的代码就落空了。编写它是一种更好的体验，而且可读性更好，因此更易于维护。另外，由于没有线程池和并发提示，因此没有任何神奇的因素4可以插入我们的性能预期。某个地方有一个限制，但是它不再受我们在应用程序层中的选择所限制，也不受服务器“容器”中任何内容的限制。这不是魔术，仍然存在物理定律，因此每个后端调用仍将花费100毫秒左右的时间，但是在争用率较低的情况下，我们甚至可以看到所有10个请求在大约一个请求的同一时间完成。随着服务器上负载的增加，延迟和吞吐量自然会降低，但其方式由缓冲区争用和内核网络控制，而不是由应用程序线程管理控制。这是控制权的倒置，可以降低应用程序代码下方的堆栈级别。</p>
 </div>
 <div class="paragraph">
 <p>请记住，相同的应用程序代码可以在Tomcat，Jetty或Netty上运行。当前，在Servlet 3.1异步处理之上提供了Tomcat和Jetty支持，因此不再限于每个线程一个请求。它建立在将Servlet 3.1概念适应于反应式范式的反应式桥之上。对于Reactor Netty，内置了反压和反应支持。根据您对HTTP客户端库的选择，服务器和客户端可能会共享相同的HTTP资源并进行更多优化。在本系列的另一篇文章中，我们将回到后面。</p>
@@ -473,7 +479,7 @@ public Mono<Result> netty() {
 <p>我们缩减了基本的分散收集用例，直到代码非常干净，并对运行它的硬件非常同情。我们编写了一些简单的代码，并使用Spring将其堆叠并很好地编排为可以正常工作的HTTP服务。在阳光明媚的日子里，每个人都对结果感到满意。但是一旦出现错误，例如行为不正常的网络连接，或者后端服务的延迟时间很短，我们就会遭受损失。</p>
 </div>
 <div class="paragraph">
-<p>第一种最明显的折磨方法是我们编写的代码是声明性的，因此很难调试。发生错误时，诊断可能非常不透明。使用原始的低级API，例如不带Spring的Reactor，甚至降低到不带Reactor的Netty级别，可能会使情况变得更糟，因为那样的话，我们将不得不自己处理很多错误，每次都要重复样板我们与网络互动的时间。至少在混合使用Spring和Reactor的情况下，我们可以期望看到记录的堆栈跟踪是否有杂散未捕获的异常。但是，它们可能不容易理解，因为它们发生在我们无法控制的线程上，并且有时由于栈的不熟悉部分而显示为相当低级的问题。</p>
+<p>第一种最明显的折磨方法是我们编写的代码是声明性的，因此很难调试。发生错误时，诊断可能非常不透明。使用原始的低级API，例如不带Spring的Reactor，甚至降低到不带Reactor的Netty级别，可能会使情况变得更糟，因为那样的话，我们将不得不自己处理很多错误，每次都要重复样板我们与网络互动的时间。至少在混合使用Spring和Reactor的情况下，我们可以期望看到记录的堆栈跟踪是否有未捕获的异常。但是，它们可能不容易理解，因为它们发生在我们无法控制的线程上，并且有时由于栈的不熟悉部分而显示为相当低级的问题。</p>
 </div>
 <div class="paragraph">
 <p>另一个痛苦的原因是，如果我们犯了一个错误并阻塞了我们的一个Reactive回调，我们将在同一个线程中保留<strong>所有</strong>请求。使用基于servlet的容器，每个请求都被隔离到一个线程中，阻塞不会阻止其他请求，因为它们是在不同线程上处理的。阻止所有请求仍然是解决问题的良方，但是它只会表现为延迟增加，每个请求的系数大致恒定。在响应式世界中，阻止单个请求可能导致所有请求的延迟增加，并且阻止所有请求会使服务器屈服，因为缓冲区和线程的额外层不在那里占用空闲时间。</p>
@@ -485,7 +491,7 @@ public Mono<Result> netty() {
 <h2 id="conclusion"><a class="anchor" href="#conclusion"></a>结论</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>能够控制异步处理中的所有活动部件非常好：每一层都有一个线程池大小和一个队列。我们可以使其中一些层具有弹性，然后尝试根据它们的工作量进行调整。但是到了某个时候，这已经成为一种负担，我们开始寻找更简单或更精简的东西。对可伸缩性的分析得出的结论是，通常最好放弃额外的线程，并使用物理硬件施加的约束。这是“机械同情”的一个例子，这是LMAX著名地在<a href="https://lmax-exchange.github.io/disruptor/">Disruptor Pattern中</a>发挥了巨大作用。</p>
+<p>能够控制异步处理中的所有活动部件非常好：每一层都有一个线程池大小和一个队列。我们可以使其中一些层具有弹性，然后尝试根据它们的工作量进行调整。但是到了某个时候，这已经成为一种负担，我们开始寻找更简单或更精简的东西。对可伸缩性的分析得出这样的结论：通常最好放弃额外的线程，并使用物理硬件施加的约束。这是“机械同情”的一个例子，这是LMAX著名地在<a href="https://lmax-exchange.github.io/disruptor/">Disruptor Pattern中产生的</a> 。</p>
 </div>
 <div class="paragraph">
 <p>我们已经开始看到反应式方法的力量，但请记住，责任伴随着力量。它是根本的，是根本的。这是“撕碎它并重新开始”的领域。因此，您也希望对Reactive不能解决所有问题感到赞赏。实际上，这不是解决任何问题的方法，它只是促进解决特定类别的问题。使用它所获得的收益可能会被学习成本，将API修改为始终处于响应状态以及随后维护代码的成本所抵消，因此请谨慎行事。</p>
@@ -495,7 +501,8 @@ public Mono<Result> netty() {
 </div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2562;
 
       (function(disqus_shortname, document) {
@@ -509,7 +516,8 @@ public Mono<Result> netty() {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -547,12 +555,14 @@ public Mono<Result> netty() {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

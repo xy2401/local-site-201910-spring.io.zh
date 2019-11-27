@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>了解AMQP，RabbitMQ使用的协议</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,14 +36,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2010-06-14 12:37:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,7 +171,8 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><style>table {
+<div class="blog--post"><style>
+table {
     margin-bottom: 1em;
 }
 table, tr, th, td {
@@ -174,9 +181,10 @@ table, tr, th, td {
 }
 th, td {
     padding: 5px 10px;
-}</style>
+}
+</style>
 <p><b>更新</b>我更改了第一段，以阐明RabbitMQ和JMS之间的关系。</p>
-<p>RabbitMQ是一个轻量级，可靠，可伸缩和可移植的消息代理。但是，与Java开发人员熟悉的许多消息代理不同，它不是基于JMS。而是，您的应用程序通过与平台无关的有线级别协议与其通信：高级消息队列协议（AMQP）。幸运的是，已经有一个Java客户端库，并且SpringSource正在进行一流的Spring和Grails集成-因此不必担心必须做一些底层工作才能使用RabbitMQ。您甚至可以找到公开JMS接口的AMQP客户端库。但是AMQP在操作上与JMS完全不同，这可能会使习惯于JMS模型的Java开发人员感到头疼。</p>
+<p>RabbitMQ是一个轻量级，可靠，可伸缩和可移植的消息代理。但是，与Java开发人员熟悉的许多消息代理不同，它不是基于JMS。而是，您的应用程序通过平台无关的有线级别协议与其通信：高级消息队列协议（AMQP）。幸运的是，已经有一个Java客户端库，并且SpringSource正在进行一流的Spring和Grails集成-因此，不必担心必须做一些底层工作才能使用RabbitMQ。您甚至可以找到公开JMS接口的AMQP客户端库。但是AMQP在操作上与JMS完全不同，这可能会使习惯于JMS模型的Java开发人员感到头疼。</p>
 <p>为了简化过渡，我将在这篇文章中介绍支撑AMQP的基本概念以及三种常见的使用场景。到最后，您将希望有足够的了解来配置RabbitMQ并通过Spring和Grails提供的API使用它。</p>
 <h2>交换，队列和绑定</h2>
 <p>与任何消息传递系统一样，AMQP是一种与发布者和使用者打交道的消息协议。发布者产生消息，消费者选择它们并进行处理。消息代理（例如RabbitMQ）的工作是确保来自发布者的消息传递给正确的使用者。为了做到这一点，代理使用两个关键组件：交换和队列。下图显示了他们如何将发布者连接到使用者：</p>
@@ -266,14 +274,15 @@ th, td {
 <p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/rabbit-pub-sub.png" alt="兔子酒吧" title="兔子酒吧" width="341" height="402" class="aligncenter size-full wp-image-4939"></p>
 <p>更好的是，队列可以过滤通过绑定密钥接收到的消息。如果消费者希望接收所有消息，则可以指定绑定键“＃”-“匹配任意数量的单词”通配符。对于您的普通开发人员而言，“ *”与前面提到的零或一（点分隔）字匹配，而不是令人困惑。</p>
 <h2>工作分配</h2>
-<p>假设您有一个应用程序，其中包含许多需要执行的作业。借助AMQP，您可以吸引多个消费者，从而使每个工作分配给这些消费者中的一个，并且只有一个。发布者并不在乎哪个消费者在做这项工作，而只是在乎工作已经完成。这是工作分配。</p>
+<p>假设您有一个应用程序，其中包含许多需要执行的作业。借助AMQP，您可以连接多个消费者，从而使每个工作分配给这些消费者中的一个，并且只有一个。发布者并不在乎哪个消费者在做这项工作，而只是在乎工作已经完成。这是工作分配。</p>
 <p>如下图所示，对其进行配置非常简单：</p>
 <p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/rabbit-work.png" alt="辛勤工作" title="辛勤工作" width="341" height="432" class="aligncenter size-full wp-image-4940"></p>
 <p>因此，您有一个队列绑定到与共享该队列的多个使用者的交换。这种设置可以确保只有一个使用者处理给定的消息，而不管有多少使用者。</p>
-<p>这些是AMQP经纪人的三种主要使用模式。尽管我已经分别描述了它们，但是将它们组合在一起是相当普遍的。例如，您可能有多个服务在RPC模式中共享相同的队列（工作分配）。真正由您决定如何配置交换和队列，现在您应该具有足够的了解，可以为您的情况制定适当的设置。</p><p></p><p>如果您想进一步研究AMQP，请查看<a href="http://www.amqp.org/confluence/download/attachments/720900/amqp0-8.pdf">规范本身</a> ，特别是有关通用体系结构的部分。要开始使用RabbitMQ，只需访问<a href="https://www.rabbitmq.com/">其网站</a> 。</p></div>
+<p>这些是AMQP经纪人的三种主要使用模式。尽管我已经分别描述了它们，但是将它们组合在一起是相当普遍的。例如，您可能有多个服务在RPC模式中共享相同的队列（工作分配）。真正由您决定如何配置交换和队列，现在您应该已经足够了解，可以根据情况制定适当的设置。</p><p></p><p>如果您想进一步研究AMQP，请查看<a href="http://www.amqp.org/confluence/download/attachments/720900/amqp0-8.pdf">规范本身</a> ，特别是有关通用体系结构的部分。要开始使用RabbitMQ，只需访问<a href="https://www.rabbitmq.com/">其网站</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 330;
 
       (function(disqus_shortname, document) {
@@ -287,7 +296,8 @@ th, td {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -325,12 +335,14 @@ th, td {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Integration 2.2中的新增功能（第2部分-事务同步）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -24,7 +28,7 @@
 <meta name="twitter:description" content="<p></p>
 <h3>Introduction</h3>
 <br>
-<a href=" http:="" ="" www.springsource.org="" node="" 366="="></head><body dir="ltr">Release Candidate 1
+<a href=" http:="" ="" www.springsource.org="" node="" 366="="></head><body >Release Candidate 1
 <a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">first part</a>
 <p></p>
 <p>Spring Integration 2.2 introduces extended support for synchronizing non-transactional resources with transactions.</p>
@@ -65,10 +69,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -194,21 +200,22 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p></p><h3>介绍</h3><br>这是一系列博客文章的第二部分，重点介绍了在最近发布的<a href="http://www.springsource.org/node/3665">Release Candidate 1</a>之后，Spring Integration 2.2中提供的一些新功能。<a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">第一部分</a>讨论MongoDB适配器。<p></p><p>Spring Integration 2.2引入了扩展支持，用于将非事务性资源与事务同步。</p><p></p><h3>背景</h3><br>多年来，Spring <a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/transaction.html#tx-resource-synchronization">为同步资源和事务</a>提供了<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/transaction.html#tx-resource-synchronization">一流的支持</a> 。在许多情况下，此工具用于同步由多个事务管理器管理的事务，以实现Dave Syer出色的<a href="http://www.javaworld.com/javaworld/jw-01-2009/jw-01-spring-transactions.html">JavaWorld文章中</a>描述的“最大努力1PC”模式。<p></p><p>例如，它通常用于将JMS提交与JDBC提交同步。</p><p>长期以来，Spring Integration通过定义一个<code><transactional/></code>元素上的一个轮询。通过允许非事务性资源与事务同步，此版本使此功能更进一步。</p><p>例如，考虑一个<code><file:inbound-channel-adapter/></code>集成应用程序，该应用程序在文件出现在目录中时读取文件并更新数据库。此功能使我们可以配置事务提交或回滚时要采取的不同操作。</p><p>我们还将展示如何配置这些“后处理”动作，即使不涉及真正的交易资源也是如此。</p><p></p><h3>警告</h3><p></p><p>该功能不会使固有的非事务性资源（例如简单文件系统）成为事务性的；相反，它仅允许我们将文件系统（或其他）活动与事务同步。</p><p></p><h3>内部构造</h3><p></p><p>Spring事务同步功能的基本组件是一个实现<code>TransactionSynchronization</code>的对象。这样的对象具有框架在同步期间调用的许多回调（示例包括<code>afterCommit</code>和<code>afterRollback</code> ）。</p><p>Spring Integration 2.2引入了<code>TransactionSynchronizationFactory</code>的概念。该工厂负责为每个消息创建一个<code>TransactionSynchronization</code>对象。提供了默认实现，该实现允许作为事务同步的一部分针对消息执行SpEL表达式。</p><p></p><h3>组态</h3><p></p><p>让我们继续文件系统示例。为了启用交易同步，我们只需在<code>TransactionSynchronizationFactory</code>上添加对<code>TransactionSynchronizationFactory</code>的引用即可<code><transactional/></code>元素，并定义工厂以及我们希望在事务同步期间评估的SpEL表达式。</p>
-<pre><code class="prettyprint xml"><int-file:inbound-channel-adaper ...>
-    <poller fixed-rate="1000">
-        <transactional synchronization-factory="syncFactory"/>
-    </poller>
-</int-file:inbound-channel-adapter>
+<div class="blog--post"><p></p><h3>介绍</h3><br>这是一系列博客文章的第二部分，重点介绍了在最近发布的<a href="http://www.springsource.org/node/3665">Release Candidate 1</a>之后，Spring Integration 2.2中提供的一些新功能。<a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">第一部分</a>讨论MongoDB适配器。<p></p><p>Spring Integration 2.2引入了扩展支持，用于将非事务性资源与事务同步。</p><p></p><h3>背景</h3><br>多年来，Spring <a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/transaction.html#tx-resource-synchronization">为同步资源和事务</a>提供了<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/transaction.html#tx-resource-synchronization">一流的支持</a> 。在许多情况下，此工具用于同步由多个事务管理器管理的事务，以实现Dave Syer出色的<a href="http://www.javaworld.com/javaworld/jw-01-2009/jw-01-spring-transactions.html">JavaWorld文章中</a>描述的“最大努力1PC”模式。<p></p><p>例如，它通常用于将JMS提交与JDBC提交同步。</p><p>长期以来，Spring Integration通过定义一个<code><transactional/></code>元素上的一个轮询。此版本通过允许非事务性资源与事务同步，使此功能更进一步。</p><p>例如，考虑一个<code><file:inbound-channel-adapter/></code>集成应用程序，该应用程序在文件出现在目录中时读取文件，并更新数据库。此功能使我们可以配置事务提交或回滚时要采取的不同操作。</p><p>我们还将展示即使没有真正的交易资源，如何可以配置这些“后处理”操作。</p><p></p><h3>警告</h3><p></p><p>该功能不会使固有的非事务性资源（例如简单文件系统）成为事务性的；相反，它仅允许我们将文件系统（或其他）活动与事务同步。</p><p></p><h3>内部构造</h3><p></p><p>Spring事务同步功能的基本组件是一个实现对象<code>TransactionSynchronization</code> 。这样的对象具有框架在同步期间调用的许多回调（示例包括<code>afterCommit</code> ， <code>afterRollback</code> ）。</p><p>Spring Integration 2.2引入了<code>TransactionSynchronizationFactory</code> 。该工厂负责创建一个<code>TransactionSynchronization</code>每个邮件的对象。提供了默认实现，该实现允许作为事务同步的一部分针对消息执行SpEL表达式。</p><p></p><h3>组态</h3><p></p><p>让我们继续文件系统示例。为了启用事务同步，我们只需添加对<code>TransactionSynchronizationFactory</code>在<code><transactional/></code>元素，并定义工厂以及我们希望在事务同步期间评估的SpEL表达式。</p>
+<pre><code class="prettyprint xml">&lt;int-file:inbound-channel-adaper ...&gt;
+    &lt;poller fixed-rate=&quot;1000&quot;&gt;
+        &lt;transactional synchronization-factory=&quot;syncFactory&quot;/&gt;
+    &lt;/poller&gt;
+&lt;/int-file:inbound-channel-adapter&gt;
 
-<int:transaction-synchronization-factory id="syncFactory">
-	<int:after-commit expression="payload.renameTo('/successful/' + payload.name" />
-	<int:after-rollback expression="payload.renameTo('/failed'/ + payload.name" />
-</int:transaction-synchronization-factory>
-</code></pre><p>如您所见，我们将重命名原始入站文件，并将该文件放入不同的目录中，具体取决于关联的事务是提交还是回滚。任选地，评估结果可以被发送到一个<code>channel</code>采用交易同步工厂的子元素的“通道”属性来定义。</p><p>（注意：“ before-commit”元素也可用，也可以用来影响提交是否实际完成）。</p><p></p><h3>伪交易</h3><p></p><p>从上面可以看出，我们现在有了一个方便的机制，可以在事务提交之前或之后或回滚之后执行一些操作。但是，如果我们的流程根本不涉及事务资源，该怎么办？例如： <code>file:inbound-adapter<-poller->transformer->ftp:outbound adapter</code> 。</p><p>假设要根据转换文件的ftp文件传输的成功或失败来重命名输入文件。为了适应这种用例，我们引入了<code>PseudoTransactionManager</code> 。此类实现<code>PlatformTransactionManager</code>的唯一目的是允许使用上述同步技术，即使其中不涉及实际事务也是如此。只需添加<code><transactional/></code>元素，就像以前一样，为它提供了对<code>PseudoTransactionManager</code>的引用（或使用默认的bean <code>PseudoTransactionManager</code> '）。</p><p></p><h3>结论</h3><p></p><p>使用Spring Integration 2.2，用户现在可以在流程完成后（成功或不成功）执行适当的操作，通常会影响原始输入源。这可以与某些其他事务资源上的事务同步，甚至在不涉及实际事务的情况下也可以同步。</p><p><a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/tx-synch">这里</a>提供<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/tx-synch">了</a>探索这些功能的示例应用程序。</p></div>
+&lt;int:transaction-synchronization-factory id=&quot;syncFactory&quot;&gt;
+	&lt;int:after-commit expression=&quot;payload.renameTo(&#39;/successful/&#39; + payload.name&quot; /&gt;
+	&lt;int:after-rollback expression=&quot;payload.renameTo(&#39;/failed&#39;/ + payload.name&quot; /&gt;
+&lt;/int:transaction-synchronization-factory&gt;
+</code></pre><p>如您所见，我们将重命名原始入站文件，并将该文件放到另一个目录中，具体取决于关联事务是提交还是回滚。可以选择将评估结果发送到<code>channel</code>使用transaction-synchronization-factory的子元素上的'channel'属性定义。</p><p>（注意：“ before-commit”元素也可用，也可以用来影响提交是否实际完成）。</p><p></p><h3>伪交易</h3><p></p><p>从上面可以看出，我们现在有了一个方便的机制，可以在事务提交之前或之后或回滚之后执行一些操作。但是，如果我们的流程根本不涉及交易资源，该怎么办？例如： <code>file:inbound-adapter<-poller->transformer->ftp:outbound adapter</code> 。</p><p>假设我们要根据转换文件的ftp文件传输的成功或失败来重命名输入文件。为了适应这种用例，我们引入了<code>PseudoTransactionManager</code> 。该类实现<code>PlatformTransactionManager</code>仅出于允许使用上述同步技术的目的，即使不涉及实际交易也是如此。只需添加<code><transactional/></code>元素与以前一样，为它提供了对<code>PseudoTransactionManager</code> （或使用默认的bean id'transactionManager'）。</p><p></p><h3>结论</h3><p></p><p>使用Spring Integration 2.2，用户现在可以在流程完成后（成功或不成功）执行适当的操作，通常会影响原始输入源。这可以与某些其他事务资源上的事务同步，甚至在不涉及实际事务的情况下也可以同步。</p><p><a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/tx-synch">这里</a>提供<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/tx-synch">了</a>探索这些功能的示例应用程序。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 486;
 
       (function(disqus_shortname, document) {
@@ -222,7 +229,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -260,12 +268,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

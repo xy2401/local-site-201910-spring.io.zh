@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring MVC 3.2预览版：引入Servlet 3，异步支持</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -24,7 +28,7 @@
 <meta name="twitter:description" content="<p><strong><em>Last updated on November 5th, 2012 (Spring MVC 3.2 RC1)</em></strong></p>
 <p><strong>Overview</strong></p>
 <p>Spring MVC 3.2 introduces Servlet 3 based asynchronous request processing. This is the first of several blog posts covering this new capability and providing context in which to understand how and why you would use it.</p>
-<p>The main purpose of early releases is to seek feedback. We've received plenty of it both here and in <a href=" http:="" ="" jira.springsource.org="" browse="" sp="="></head><body dir="ltr">JIRA since this was first posted after the 3.2 M1 release. Thanks to everyone who gave it a try and commented! There have been numerous changes and there is still time for more feedback!
+<p>The main purpose of early releases is to seek feedback. We've received plenty of it both here and in <a href=" http:="" ="" jira.springsource.org="" browse="" sp="="></head><body >JIRA since this was first posted after the 3.2 M1 release. Thanks to everyone who gave it a try and commented! There have been numerous changes and there is still time for more feedback!
 ">
 <meta name="twitter:creator" content="@rstoya05">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/4b12b9c0c665bc0345467c1a218ed0f7?s=200">
@@ -43,10 +47,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -173,33 +179,33 @@
 </div>
 </header>
 <div class="blog--post"><p><strong><em>最后更新时间为2012年11月5日（Spring MVC 3.2 RC1）</em></strong></p><p><strong>总览</strong></p>
-<p>Spring MVC 3.2引入了基于Servlet 3的异步请求处理。这是涵盖此新功能的几篇博客文章的第一篇，并提供了上下文，以了解您将如何以及为何使用它。</p>
+<p>Spring MVC 3.2引入了基于Servlet 3的异步请求处理。这是涵盖此新功能的几篇博客文章中的第一篇，并提供了上下文，以了解您将如何以及为何使用它。</p>
 <p>早期版本的主要目的是寻求反馈。自从3.2 M1版本发布以来，我们在这里和<a href="http://jira.springsource.org/browse/SPR">JIRA中</a>都收到了很多。感谢所有尝试并发表评论的人！发生了许多变化，仍然有时间获得更多反馈！</p><p><strong>乍看上去</strong></p>
-<p>从编程模型的角度来看，新功能看似简单。控制器方法现在可以返回<code>java.util.concurrent.Callable</code>用以异步完成处理。然后，Spring MVC将在<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/scheduling.html"><code>TaskExecutor</code></a>的帮助下在单独的线程中调用<code>Callable</code> 。这是之前的代码段：</p>
-<pre><code class="prettyprint java"><br>// Before
+<p>从编程模型的角度来看，新功能看似简单。控制器方法现在可以返回一个<code>java.util.concurrent.Callable</code>异步完成处理。然后，Spring MVC将调用<code>Callable</code>在一个单独的线程的帮助下<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/scheduling.html"><code>TaskExecutor</code></a> 。这是之前的代码段：</p>
+<pre><code class="prettyprint java"><br />// Before
 @RequestMapping(method=RequestMethod.POST)
 public String processUpload(final MultipartFile file) {
     // ...
-    return "someView";
+    return &quot;someView&quot;;
 }
 
 // After
 @RequestMapping(method=RequestMethod.POST)
-public Callable<String> processUpload(final MultipartFile file) {
+public Callable&lt;String&gt; processUpload(final MultipartFile file) {
 
-  return new Callable<String>() {
+  return new Callable&lt;String&gt;() {
     public Object call() throws Exception {
       // ...
-      return "someView";
+      return &quot;someView&quot;;
     }
   };
 }
 </code></pre>
-<p>控制器方法还可以返回<code>DeferredResult</code> （Spring MVC 3.2中的新类型）以在Spring MVC未知的线程中完成处理。例如，对JMS或AMQP消息，Redis通知等做出反应。这是另一个代码片段：</p>
-<pre><code class="prettyprint java"><br>@RequestMapping("/quotes")
+<p>控制器方法也可以返回<code>DeferredResult</code> （Spring MVC 3.2中的新类型）以完成Spring MVC未知的线程中的处理。例如，对JMS或AMQP消息，Redis通知等做出反应。这是另一个代码片段：</p>
+<pre><code class="prettyprint java"><br />@RequestMapping(&quot;/quotes&quot;)
 @ResponseBody
-public DeferredResult<String> quotes() {
-  DeferredResult<String> deferredResult = new DeferredResult<String>();
+public DeferredResult&lt;String&gt; quotes() {
+  DeferredResult&lt;String&gt; deferredResult = new DeferredResult&lt;String&gt;();
   // Add deferredResult to a Queue or a Map...
   return deferredResult;
 }
@@ -213,14 +219,15 @@ deferredResult.setResult(data);
 <p>上述示例引发了许多问题，我们将在后续文章中详细介绍。现在，我将围绕这些功能提供一些背景信息。</p><p><strong>Web应用程序中异步性的动机</strong></p>
 <p>Web应用程序中异步性的最基本动机是处理需要较长时间才能完成的请求。可能是缓慢的数据库查询，对外部REST API的调用或其他一些受I / O约束的操作。这样长的请求可能很快耗尽Servlet容器线程池并影响可伸缩性。</p>
 <p>在某些情况下，您可以在后台作业完成处理后立即返回客户端。例如，发送电子邮件，启动数据库工作等，其他都代表<em>了</em>即发即<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/scheduling.html#scheduling-annotation-support-async">弃的</a>情况，可以通过Spring的<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/scheduling.html#scheduling-annotation-support-async">@Async</a>支持来处理，或者通过将事件发布到<a href="http://www.springsource.org/spring-integration">Spring Integration</a>通道中，然后返回客户可以使用的确认ID查询结果。</p>
-<p>在其他情况下，如果需要结果，则需要将处理与Servlet容器线程解耦，否则我们将耗尽其线程池。Servlet 3提供了这样的支持，其中Servlet（或Spring MVC控制器）可以指示在退出Servlet容器线程之后应将响应保持打开状态。</p>
-<p>为了实现这一点，Servlet 3 Web应用程序可以调用<code>request.startAsync()</code>并使用返回的<em><code>AsyncContext</code></em>继续从其他某个单独的线程写入响应。同时，从客户端的角度来看，请求仍然看起来像任何其他HTTP请求-响应交互。它只需要更长的时间就可以完成。以下是事件的顺序：</p>
+<p>在其他情况下，如果需要结果，则需要将处理与Servlet容器线程解耦，否则我们将耗尽其线程池。Servlet 3提供了这样的支持，其中Servlet（或Spring MVC控制器）可以指示响应应在退出Servlet容器线程后保持打开状态。</p>
+<p>为此，Servlet 3 Web应用程序可以调用<code>request.startAsync()</code>并使用返回的<em><code>AsyncContext</code></em>继续从其他一些单独的线程写入响应。同时，从客户端的角度来看，请求仍然看起来像任何其他HTTP请求-响应交互。它只需要更长的时间就可以完成。以下是事件的顺序：</p>
 <ol>
-<li>客户发送请求</li><li>Servlet容器分配一个线程并在其中调用一个Servlet。</li><li>Servlet调用<code>request.startAsync()</code> ，保存<code>AsyncContext</code>并返回</li><li>容器线程一直退出，但响应保持打开状态</li><li>其他一些线程使用保存的<code>AsyncContext</code>完成响应</li><li>客户收到回复</li></ol>
+<li>客户发送请求</li><li>Servlet容器分配一个线程并在其中调用一个Servlet。</li><li>servlet调用<code>request.startAsync()</code> ，保存<code>AsyncContext</code> ，并返回</li><li>容器线程一直退出，但响应保持打开状态</li><li>其他线程使用保存的<code>AsyncContext</code>完成回应</li><li>客户收到回复</li></ol>
 <p>Servlet异步支持当然还有很多。您可以找到<a href="http://www.javaworld.com/javaworld/jw-02-2009/jw-02-servlet3.html">各种</a> <a href="http://codingjunkie.net/jee-6-and-spring-mvc/">示例</a>和<a href="https://nurkiewicz.blogspot.com/2011/03/tenfold-increase-in-server-throughput.html">文章</a> ，但以上内容总结了您需要了解的基本的最低概念。<a href="http://blog.springsource.org/2012/05/08/spring-mvc-3-2-preview-techniques-for-real-time-updates/">下一篇文章</a>介绍了异步请求处理的第二个动机-浏览器需要实时接收信息更新。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 468;
 
       (function(disqus_shortname, document) {
@@ -234,7 +241,8 @@ deferredResult.setResult(data);
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -272,12 +280,14 @@ deferredResult.setResult(data);
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

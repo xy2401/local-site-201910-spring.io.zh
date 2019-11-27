@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>介绍Spring Cloud断路器</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Introducing Spring Cloud Circuit Breaker">
-<meta name="twitter:description" class="anchor" content="<h1><a href=" #backgroun="="></head><body dir="ltr">Background
+<meta name="twitter:description" class="anchor" content="<h1><a href=" #backgroun="="></head><body >Background
 <p>When using a microservices architecture to build our applications, it is very common to end up with a pretty complex dependency tree amongst services. If the service down the dependency tree encounters an issue that causes it to start to respond slowly, it ends up causing a set of issues that cascade up the dependency tree. As more and more requests come in to the application, more and more resources may be consumed by waiting for the slow service to respond. Even worse, the additional load being put on the slow service may exacerbate the problem. To help alleviate the effect of these types of cascading failures, it is common practice to use <a href="https://microservices.io/patterns/reliability/circuit-breaker.html">circuit breakers</a> as part of microservice applications.</p>
 ">
 <meta name="twitter:creator" content="@ryanjbaxter">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -180,32 +186,32 @@
 </ul>
 <p>要使用给定的实现，请将适当的<a href="https://github.com/spring-cloud-incubator/spring-cloud-circuitbreaker/tree/master/spring-cloud-starter-circuitbreaker">启动器</a>添加到应用程序的类路径中。</p><h1><a href="#using-spring-cloud-circuit-breaker" class="anchor" name="using-spring-cloud-circuit-breaker"></a>使用Spring Cloud断路器</h1>
 <p>目前，Spring Cloud Circuit Breaker不属于Spring Cloud BOM的一部分，仅发布到我们的<a href="https://repo.spring.io/snapshot/org/springframework/cloud/spring-cloud-circuitbreaker/">快照仓库中</a> 。您需要将我们的快照存储库添加到您的Maven或Gradle文件中。以下示例使用Maven：</p>
-<pre><code class="prettyprint"><repositories>
-    <repository>
-        <id>spring-snapshots</id>
-        <name>Spring Snapshots</name>
-        <url>https://repo.spring.io/libs-snapshot-local</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-        <releases>
-            <enabled>false</enabled>
-        </releases>
-    </repository>
-</repositories>
+<pre><code class="prettyprint">&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;spring-snapshots&lt;/id&gt;
+        &lt;name&gt;Spring Snapshots&lt;/name&gt;
+        &lt;url&gt;https://repo.spring.io/libs-snapshot-local&lt;/url&gt;
+        &lt;snapshots&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+        &lt;releases&gt;
+            &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/releases&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;
 </code></pre>
 <p>接下来，您需要将Spring Cloud Circuit Breaker依赖项添加到您的应用程序中。同样，以下示例使用Maven：</p>
-<pre><code class="prettyprint"><dependencies>
-    <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>
+<pre><code class="prettyprint">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+        &lt;artifactId&gt;
             spring-cloud-starter-circuitbreaker-resilience4j
-       </artifactId>
-        <version>0.0.1.BUILD-SNAPSHOT</version>
-    </dependency>
-</dependencies>
+       &lt;/artifactId&gt;
+        &lt;version&gt;0.0.1.BUILD-SNAPSHOT&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
 </code></pre>
-<p>Spring Cloud Circuit Breaker基于应用程序类路径上的启动器，自动配置<code>CircuitBreakerFactory</code>的实现。然后，您可以将此接口注入到所需的任何类中。以下示例显示了如何执行此操作：</p>
+<p>Spring Cloud Circuit Breaker自动配置以下实现<code>CircuitBreakerFactory</code> ，基于应用程序的类路径上的启动器。然后，您可以将此接口注入到所需的任何类中。以下示例显示了如何执行此操作：</p>
 <pre><code class="prettyprint">@Service
 public static class DemoControllerService {
 	private RestTemplate rest;
@@ -218,9 +224,9 @@ public static class DemoControllerService {
 	}
 
 	public String slow() {
-		return cbFactory.create("slow").run(() -> 
-                rest.getForObject("/slow", String.class),
-                throwable -> "fallback");
+		return cbFactory.create(&quot;slow&quot;).run(() -&gt; 
+                rest.getForObject(&quot;/slow&quot;, String.class),
+                throwable -&gt; &quot;fallback&quot;);
 	}
 }
 </code></pre>
@@ -237,43 +243,44 @@ public static class DemoControllerService {
 		this.cbFactory = cbFactory;
 	}
 
-	public Mono<String> slow() {
-		return webClient.get().uri("/slow").retrieve()
-                .bodyToMono(String.class).transform(it -> {
-			CircuitBreaker cb = cbFactory.create("slow");
-			return cb.run(it, throwable -> 
-                            Mono.just("fallback"));
+	public Mono&lt;String&gt; slow() {
+		return webClient.get().uri(&quot;/slow&quot;).retrieve()
+                .bodyToMono(String.class).transform(it -&gt; {
+			CircuitBreaker cb = cbFactory.create(&quot;slow&quot;);
+			return cb.run(it, throwable -&gt; 
+                            Mono.just(&quot;fallback&quot;));
                 });
 	}
 }
 </code></pre><h1><a href="#configuring-circuit-breakers" class="anchor" name="configuring-circuit-breakers"></a>配置断路器</h1>
-<p>在大多数情况下，您将需要配置断路器的行为。为此，您可以创建<code>Customizer</code>类型的bean。Spring Cloud断路器提供了所有断路器的默认配置以及特定断路器的配置。例如，要在使用Resilience4J时为所有断路器提供默认配置，可以将以下bean添加到配置类中：</p>
+<p>在大多数情况下，您将需要配置断路器的行为。为此，您可以创建类型为的bean <code>Customizer</code> 。使用Spring Cloud Circuit Breaker，您可以为所有断路器提供默认配置，也可以为特定断路器提供配置。例如，要在使用Resilience4J时为所有断路器提供默认配置，可以将以下bean添加到配置类中：</p>
 <pre><code class="prettyprint">@Bean
-public Customizer<Resilience4JCircuitBreakerFactory> defaultCustomizer() {
-	return factory -> factory.configureDefault(
-            id -> new Resilience4JConfigBuilder(id)
+public Customizer&lt;Resilience4JCircuitBreakerFactory&gt; defaultCustomizer() {
+	return factory -&gt; factory.configureDefault(
+            id -&gt; new Resilience4JConfigBuilder(id)
             .timeLimiterConfig(TimeLimiterConfig.custom()
                 .timeoutDuration(Duration.ofSeconds(4)).build())
             .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
             .build());
 }
 </code></pre>
-<p>配置单个断路器的代码看起来非常相似，不同的是，您需要在<code>Customizer</code>提供断路器ID，如下所示：</p>
+<p>配置单个断路器的代码看起来非常相似，不同之处在于，您需要在自己的设备中提供断路器ID <code>Customizer</code> ， 如下：</p>
 <pre><code class="prettyprint">@Bean
-public Customizer<Resilience4JCircuitBreakerFactory> slowCustomizer() {
-	return factory -> factory.configure(builder -> {
+public Customizer&lt;Resilience4JCircuitBreakerFactory&gt; slowCustomizer() {
+	return factory -&gt; factory.configure(builder -&gt; {
 		return builder
 			.timeLimiterConfig(TimeLimiterConfig.custom()
                             .timeoutDuration(Duration.ofSeconds(2)).build())
 			.circuitBreakerConfig(
                             CircuitBreakerConfig.ofDefaults());
-	}, "slow");
+	}, &quot;slow&quot;);
 }
 </code></pre><h1><a href="#feedback" class="anchor" name="feedback"></a>反馈</h1>
 <p>我们期待听到您对这个新项目的看法。查看<a href="https://github.com/spring-cloud-incubator/spring-cloud-circuitbreaker">GitHub项目</a>以及<a href="https://spring-cloud-incubator.github.io/spring-cloud-circuitbreaker/spring-cloud-circuitbreaker.html">文档</a>以获取更多信息。与往常一样，您可以通过<a href="https://stackoverflow.com/questions/tagged/spring-cloud">Stack Overflow</a>和<a href="https://gitter.im/spring-cloud/spring-cloud">Gitter</a>或通过创建<a href="https://github.com/spring-cloud-incubator/spring-cloud-circuitbreaker/issues">GitHub issue与我们联系</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3643;
 
       (function(disqus_shortname, document) {
@@ -287,7 +294,8 @@ public Customizer<Resilience4JCircuitBreakerFactory> slowCustomizer() {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -325,12 +333,14 @@ public Customizer<Resilience4JCircuitBreakerFactory> slowCustomizer() {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

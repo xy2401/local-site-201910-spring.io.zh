@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Security 5.0.0 M1</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -23,7 +27,7 @@
 <meta name="twitter:title" content="Spring Security 5.0.0 M1">
 <meta name="twitter:description" content="<p>On behalf of the community, I’m pleased to announce the release of Spring Security 5.0.0 M1. This release includes bug fixes, new features, and is based off of Spring Framework 5.0.0 RC1. The highlights of the release include:</p>
 <ul> 
- <li><a href=" #initial-support-for-reactive-web-application="="></head><body dir="ltr">Initial Support for Reactive Web Applications 
+ <li><a href=" #initial-support-for-reactive-web-application="="></head><body >Initial Support for Reactive Web Applications 
  <li><a href="#new-support-for-oauth-2-0-and-openid-connect-1-0">New Support for OAuth 2.0 and OpenID Connect 1.0</a></li> 
 
 <h1><a href="#initial-support-for-reactive-web-applications" class="anchor" name="initial-support-for-reactive-web-applications"></a>Initial Support for Reactive Web Applications</h1>
@@ -49,10 +53,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -193,19 +199,19 @@ WebFilter springSecurityFilterChain(ReactiveAuthenticationManager manager) {
   http.httpBasic();
 
   AuthorizeExchangeBuilder authorize = http.authorizeExchange();
-  authorize.antMatchers("/admin/**").hasRole("ADMIN");
-  authorize.antMatchers("/users/{user}/**").access(this::currentUserMatchesPath);
+  authorize.antMatchers(&quot;/admin/**&quot;).hasRole(&quot;ADMIN&quot;);
+  authorize.antMatchers(&quot;/users/{user}/**&quot;).access(this::currentUserMatchesPath);
   authorize.anyExchange().authenticated();
   return http.build();
 }
 </code></pre>
 <p>如果您使用过Spring Security的基于Web的授权支持，则代码看起来应该很熟悉。</p>
-<p>需要注意的重要一件事是，在反应性应用程序中， <code>access</code>允许注入接口而不是<code>String</code> 。这允许将lambda或方法引用用于自定义授权逻辑。例如， <code>currentUserMatchesPath</code>如下所示：</p>
-<pre><code class="prettyprint java">Mono<AuthorizationDecision> currentUserMatchesPath(
-    Mono<Authentication> authentication, AuthorizationContext context) {
+<p>要注意的一件事是在反应性应用中<code>access</code>允许注入接口，而不是<code>String</code> 。这允许将lambda或方法引用用于自定义授权逻辑。例如， <code>currentUserMatchesPath</code>看起来像这样：</p>
+<pre><code class="prettyprint java">Mono&lt;AuthorizationDecision&gt; currentUserMatchesPath(
+    Mono&lt;Authentication&gt; authentication, AuthorizationContext context) {
   return authentication
-    .map( a -> context.getVariables().get("user").equals(a.getName()))
-    .map( granted -> new AuthorizationDecision(granted));
+    .map( a -&gt; context.getVariables().get(&quot;user&quot;).equals(a.getName()))
+    .map( granted -&gt; new AuthorizationDecision(granted));
 }
 </code></pre>
 <p>显然，我们可以只使用lambda而不是方法引用，但这更易于阅读（尤其是当可能有更多规则时）。</p><h1><a href="#new-support-for-oauth-2-0-and-openid-connect-1-0" class="anchor" name="new-support-for-oauth-2-0-and-openid-connect-1-0"></a>对OAuth 2.0和OpenID Connect 1.0的新支持</h1>
@@ -220,13 +226,14 @@ WebFilter springSecurityFilterChain(ReactiveAuthenticationManager manager) {
 <li><a href="https://docs.spring.io/spring-boot/docs/1.5.3.RELEASE/reference/htmlsingle/#boot-features-security-oauth2-single-sign-on">Spring Boot的OAuth2 SSO支持</a></li>
 </ul>
 <p>借助Spring Security 5，未来的主要方向是建立对<br><a href="https://tools.ietf.org/html/rfc6749">OAuth 2.0授权框架</a> ， <a href="https://openid.net/connect/">OpenID Connect 1.0</a> ， <a href="https://tools.ietf.org/search/rfc7519">JWT</a>和JOSE（ <a href="https://tools.ietf.org/html/rfc7515">JWS</a> / <a href="https://tools.ietf.org/html/rfc7516">JWE</a> / <a href="https://tools.ietf.org/html/rfc7517">JWK</a> ） <a href="https://tools.ietf.org/html/rfc7516">均已安装</a>到Spring Security中。我们的目标是让Spring Security <em>“容纳”</em>较低层协议流的核心逻辑，例如<em>“授权代码授予”</em>流，然后由需要它的各个Spring项目重用，例如Spring Social。 。Spring Security OAuth中已经实现了许多协议流逻辑，但是，由于我们将其合并到Spring Security中，因此决定进行重写。话虽如此，Spring Security OAuth项目处于维护模式，因为我们正在限制新功能，并且只关注错误修复和较小的增强。我们今后的工作将集中于在Spring Security内建立支持。</p>
-<p>对OAuth 2.0和OpenID Connect 1.0的新支持的最终目标是在固有复杂的低级协议流之上提供易于使用的抽象。为了快速行动并保持最新状态，我们将<a href="https://connect2id.com/products/nimbus-oauth-openid-connect-sdk">Nimbus OAuth 2.0和OIDC SDK</a>用于我们的内部实现。作为进行重写之前的关键的初步准备，我们研究并评估了开放源代码社区中可用的现有OAuth 2.0和OpenID Connect 1.0 Java库，并<a href="https://github.com/spring-projects/spring-security/issues/3907#issuecomment-257600002">在此处</a>记录了我们的发现。经过这一评估阶段，我们发现Nimbus OAuth 2.0和OIDC SDK是当今可用的最成熟，最全面的Java库，因为它为所有相关<a href="https://connect2id.com/products/nimbus-oauth-openid-connect-sdk#related-specifications">规范</a>提供了广泛的支持。</p>
+<p>对OAuth 2.0和OpenID Connect 1.0的新支持的最终目标是在固有复杂的低级协议流之上提供易于使用的抽象。为了快速行动并保持最新状态，我们将<a href="https://connect2id.com/products/nimbus-oauth-openid-connect-sdk">Nimbus OAuth 2.0和OIDC SDK</a>用于我们的内部实现。作为进行重写之前的关键的初步准备，我们研究并评估了开放源代码社区中可用的现有OAuth 2.0和OpenID Connect 1.0 Java库，并<a href="https://github.com/spring-projects/spring-security/issues/3907#issuecomment-257600002">在此处</a>记录了我们的发现。经过此评估阶段，我们发现Nimbus OAuth 2.0和OIDC SDK是当今可用的最成熟，最全面的Java库，因为它为所有相关<a href="https://connect2id.com/products/nimbus-oauth-openid-connect-sdk#related-specifications">规范</a>提供了广泛的支持。</p>
 <hr>
 <p>在即将发布的5.0.0 M2版本中，我们计划进一步支持基于响应的安全性以及OAuth 2.0和OpenID Connect 1.0。对于这些新功能的任何反馈，我们将不胜感激。如果您有任何优先事项，请提出<a href="https://github.com/spring-projects/spring-security/issues">问题</a> 。</p>
 <p><a href="https://projects.spring.io/spring-security/">项目现场</a> <a href="https://docs.spring.io/spring-security/site/docs/5.0.0.M1/reference/htmlsingle/">参考</a> | <a href="https://docs.spring.io/spring-security/site/docs/current/guides/html5/">指南</a> | <a href="https://stackoverflow.com/questions/tagged/spring-security">救命</a></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2921;
 
       (function(disqus_shortname, document) {
@@ -240,7 +247,8 @@ WebFilter springSecurityFilterChain(ReactiveAuthenticationManager manager) {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -278,12 +286,14 @@ WebFilter springSecurityFilterChain(ReactiveAuthenticationManager manager) {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

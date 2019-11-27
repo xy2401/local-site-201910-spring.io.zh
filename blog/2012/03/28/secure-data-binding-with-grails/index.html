@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Grails进行安全的数据绑定</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -38,15 +42,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2012-03-28 16:43:00.0">
-
-
+</head>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -207,7 +213,7 @@
         employee.save()
     }
 }
-</code></pre><p>这些示例均假设存在名为firstName和lastName的请求参数。在第一个示例中，对于需要更新的每个属性都有一行代码，但是在第二个示例中，仅一行代码说明了所有需要更新的属性。</p><p>在此特定示例中，我们仅消除了一行代码，但是如果Employee对象中有很多要更新的属性，则第一个示例将变得更长且更乏味，而第二个示例将保持完全相同。</p>
+</code></pre><p>每个示例均假设存在名为firstName和lastName的请求参数。在第一个示例中，对于需要更新的每个属性都有一行代码，但是在第二个示例中，仅一行代码说明了所有需要更新的属性。</p><p>在此特定示例中，我们仅消除了一行代码，但是如果Employee对象中有很多要更新的属性，则第一个示例将变得更长且更乏味，而第二个示例将保持完全相同。</p>
 <h2>一个潜在的问题</h2><p>代码清单3比代码清单2更干净，并且需要的维护更少，但是对于任何特定用例而言，它可能是最好的事情，也可能不是最好的事情。</p><p>更简单的方法的一个问题是它可能允许用户更新应用程序开发人员不打算允许的属性。</p><p>例如，如果有一个名为薪水的请求参数，代码清单2中的代码将忽略该请求参数，但代码清单3中的代码将使用该参数的值来更新Employee对象中的salary属性，这可能是有问题的。</p><p>应用程序代码可以使用多种技术来防御类似的情况。一种是使用代码清单2中所示的方法。另一种是在要求完成数据绑定时向Grails提供属性名称的白名单或黑名单。</p><p>提供白名单的一种方法如下所示：</p>
 <h4>代码清单4</h4>
 <pre><code class="prettyprint groovy">class EmployeeController {
@@ -216,7 +222,7 @@
         def employee = Employee.get(params.id)
 
         // update the firstName and lastName properties in the employee
-        employee.properties['firstName', 'lastName'] = params
+        employee.properties[&#39;firstName&#39;, &#39;lastName&#39;] = params
 
         // update the database
         employee.save()
@@ -230,9 +236,9 @@
         def employee = Employee.get(params.id)
 
         // update the firstName and lastName properties in the employee
-        bindData(employee, params, [include: ['firstName', 'lastName']])
+        bindData(employee, params, [include: [&#39;firstName&#39;, &#39;lastName&#39;]])
 
-        // or... bindData(employee, params, [exclude: ['salary']])
+        // or... bindData(employee, params, [exclude: [&#39;salary&#39;]])
 
         // update the database
         employee.save()
@@ -292,16 +298,16 @@ class InvoiceHelper {
         // create a new Vendor
         def vendor = new Vendor()
 
-        vendor.properties['vendorName'] = params
+        vendor.properties[&#39;vendorName&#39;] = params
 
-        // or... bindData(vendor, params, [include: ['vendorName']])
-        // or... bindData(vendor, params, [exclude: ['invoiceHelper']])
+        // or... bindData(vendor, params, [include: [&#39;vendorName&#39;]])
+        // or... bindData(vendor, params, [exclude: [&#39;invoiceHelper&#39;]])
 
         // save to the database
         vendor.save()
     }
 }
-</code></pre><p>这对于每个域类都不是问题，但对于将Spring bean自动连接到其中的域类则可能存在问题。顺便说一句，同一组问题适用于Grails命令对象，这些对象也受数据绑定和自动依赖项注入的影响。</p>
+</code></pre><p>这对于每个域类都不是问题，但是对于将Spring bean自动连接到其中的域类则可能存在问题。顺便说一句，同一组问题适用于Grails命令对象，这些对象也受数据绑定和自动依赖项注入的影响。</p>
 <h2>Grails 2.0.2数据绑定改进</h2><p>这些技术在很长一段时间内一直受到Grails的支持。Grails 2.0.2将为管理数据绑定提供更大的灵活性。在Grails 2.0.2中，代码清单4和5中的代码将与以前的版本完全相同。提供白名单或黑名单时，将受到尊重。</p><p>但是，当未提供白名单或黑名单时，例如“ employee.properties = params”，Grails 2.0.2的行为可能有所不同，具体取决于<br>Employee类。</p><p>在Grails 2.0.2中，数据绑定机制默认情况下将排除所有静态，瞬态或动态类型的属性。为了更精细地控制默认情况下可绑定的内容和不可绑定的内容，Grails 2.0.2支持新的可绑定约束：<br></p><h4>代码清单11</h4><p></p>
 <pre><code class="prettyprint groovy">class Employee {
     String firstName
@@ -316,7 +322,8 @@ class InvoiceHelper {
 <h2>结论</h2><p>Grails提供的数据绑定机制允许编写干净的表达代码，而不会被很多繁琐的数据绑定相关细节所困扰。对于应用程序开发人员而言，重要的是要了解使用这些技术的含义，以便可以针对任何特定用例实现最佳方法。<br></p><h3>参考文献</h3><br><ul><br> <li><a href="http://grails.org/doc/2.0.2/">Grails 2.0.2用户指南</a></li><br> <li><a href="http://grails.org/doc/2.0.2/guide/theWebLayer.html#dataBinding">数据绑定文件</a></li><br> <li><a href="http://grails.org/doc/2.0.2/ref/Constraints/bindable.html">可绑定约束文档</a></li><br></ul><p></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 466;
 
       (function(disqus_shortname, document) {
@@ -330,7 +337,8 @@ class InvoiceHelper {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -368,12 +376,14 @@ class InvoiceHelper {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

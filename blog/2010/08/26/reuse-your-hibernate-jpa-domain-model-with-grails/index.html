@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>与Grails重用Hibernate / JPA域模型</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,14 +36,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2010-08-26 13:09:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,47 +171,48 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>这是一个普通的故事。您有一个现有数据库，现在想以最少的麻烦为其添加一个Web应用程序。Grails完成任务了吗？当然是这样！更好的是，如果您已经具有基于JPA或Hibernate配置文件的域模型，则可以重用它，并且仍然可以从惯用的强大GORM功能中受益。</p><p>重用现有域模型的第一步是在应用程序的类路径上获取类文件。您可以通过将它们打包到一个JAR文件中并将其包含在应用程序中（通常是通过将其放置在“ lib”目录中）或将源文件放在“ src / java”目录中来实现。在应用程序之间共享模型时，JAR文件是更好的方法，但是您需要一个多项目构建系统，以确保所有项目的JAR始终是最新的。可能值得付出额外的努力，并且Gradle和Maven都具有用于构建Grails项目的插件。或者，如果您的Grails应用程序是唯一使用该模型的项目，则应将源代码保留在“ src / java”中。</p><p>一旦决定了如何合并域模型，就需要告诉Grails。具体操作方式取决于您使用的是Hibernate配置文件还是JPAannotation。</p>
-<h4>XML配置文件</h4><p>Hibernate XML映射文件是老派的，但是它们具有将所有映射信息保存在一个地方的优点。若要从Grails应用程序中使用它们，只需创建该文件<tt>的grails-app / conf目录/休眠/ hibernate.cfg.xml文件</tt>与内容：</p>
-<pre><code class="prettyprint xml"><?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE hibernate-configuration PUBLIC
-        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
-<hibernate-configuration>
-    <session-factory>
-        <mapping resource="org.example.Book.hbm.xml"/>
-        <mapping resource="org.example.Author.hbm.xml"/>
+<div class="blog--post"><p>这是一个普通的故事。您已经有一个数据库，现在想以最少的麻烦为其添加一个Web应用程序。Grails完成任务了吗？当然是这样！更好的是，如果您已经具有基于JPA或Hibernate配置文件的域模型，则可以重用它，并且仍然可以从惯用的强大GORM功能中受益。</p><p>重用现有域模型的第一步是在应用程序的类路径上获取类文件。您可以通过将它们打包到一个JAR文件中并将其包含在应用程序中（通常通过将其放在“ lib”目录中）或将源文件放在“ src / java”目录中来实现。在应用程序之间共享模型时，JAR文件是更好的方法，但是您需要一个多项目构建系统，以确保所有项目的JAR始终是最新的。可能值得付出额外的努力，并且Gradle和Maven都具有用于构建Grails项目的插件。或者，如果您的Grails应用程序是唯一使用该模型的项目，则应将源代码保留在“ src / java”中。</p><p>一旦决定了如何合并域模型，就需要告诉Grails。具体操作方式取决于您使用的是Hibernate配置文件还是JPA批注。</p>
+<h4>XML配置文件</h4><p>Hibernate XML映射文件是老派的，但是它们具有将所有映射信息保存在一个地方的优点。要从您的Grails应用程序中使用它们，只需创建文件<tt>grails-app / conf / hibernate / hibernate.cfg.xml</tt> ，内容如下：</p>
+<pre><code class="prettyprint xml">&lt;?xml version=&#39;1.0&#39; encoding=&#39;UTF-8&#39;?&gt;
+&lt;!DOCTYPE hibernate-configuration PUBLIC
+        &quot;-//Hibernate/Hibernate Configuration DTD 3.0//EN&quot;
+        &quot;http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd&quot;&gt;
+&lt;hibernate-configuration&gt;
+    &lt;session-factory&gt;
+        &lt;mapping resource=&quot;org.example.Book.hbm.xml&quot;/&gt;
+        &lt;mapping resource=&quot;org.example.Author.hbm.xml&quot;/&gt;
         ...
-    </session-factory>
-</hibernate-configuration>
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;
 </code></pre><p>确保添加一个<tt><mapping></mapping></tt>每个Hibernate映射文件的元素，然后将这些映射文件放入<tt>grails-app / conf / hibernate中</tt> 。令人惊讶的是，这就是您要做的！那么带注释的模型呢？</p>
-<h4>JPAannotation</h4><p>与Hibernate映射文件一样，您必须创建<tt>grails-app / conf / hibernate / hibernate.cfg.xml</tt>文件。这次，您需要做更多的工作，因为您必须添加一个<tt><mapping></mapping></tt>每个域类的条目：</p>
-<pre><code class="prettyprint xml"><?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE hibernate-configuration PUBLIC
-        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
-<hibernate-configuration>
-    <session-factory>
-        <mapping class="org.example.Book"/>
-        <mapping class="org.example.Author"/>
+<h4>JPA批注</h4><p>与Hibernate映射文件一样，您必须创建<tt>grails-app / conf / hibernate / hibernate.cfg.xml</tt>文件。这次，您需要做更多的工作，因为您必须添加一个<tt><mapping></mapping></tt>每个域类的条目：</p>
+<pre><code class="prettyprint xml">&lt;?xml version=&#39;1.0&#39; encoding=&#39;UTF-8&#39;?&gt;
+&lt;!DOCTYPE hibernate-configuration PUBLIC
+        &quot;-//Hibernate/Hibernate Configuration DTD 3.0//EN&quot;
+        &quot;http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd&quot;&gt;
+&lt;hibernate-configuration&gt;
+    &lt;session-factory&gt;
+        &lt;mapping class=&quot;org.example.Book&quot;/&gt;
+        &lt;mapping class=&quot;org.example.Author&quot;/&gt;
         ...
-    </session-factory>
-</hibernate-configuration>
+    &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;
 </code></pre><p>我给你的乐趣并不多，但至少你只需要做一次。</p><p>如果您使用的是Grails 1.1.x或更早版本，则还有另一项任务要执行：您必须通过将以下内容添加到<tt>grails-app / conf / DataSource.groovy</tt>来告知Grails这是基于注释的模型：</p>
 <pre><code class="prettyprint groovy">dataSource {
-    configClass = "org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsAnnotationConfiguration"
+    configClass = &quot;org.codehaus.groovy.grails.orm.hibernate.cfg.GrailsAnnotationConfiguration&quot;
     ...
 }
-</code></pre><p>您不必在Grails 1.2+上执行此操作，因为<tt>GrailsAnnotationConfiguration</tt>是这些版本中的默认设置。下次运行Grails应用程序时，您将有权访问所有带注释的域类。</p><p><b>注意</b>从1.3.2版开始，您已经可以使用Grails命令<tt>create-hibernate-cfg-xml</tt>为您生成Hibernate配置文件。节省键入/复制粘贴！</p><p>从GORM的角度来看，领域模型中仍然存在一个明显的空白：约束。您无法在Java类中定义它们，但是如果没有它们，GORM验证将毫无用处。幸运的是，您可以通过添加<tt><em>包将约束元数据附加到类<tt><em>。DomainClass</em> Constraints.groovy</tt>脚本转换为“ src / java”。例如，如果您有一个域类<tt>org.example。LibraryBook，</tt>就应该添加文件<tt>src / JAVA /组织/例子/ LibraryBookConstraints.groovy。</tt>在此脚本内，您可以定义约束块，如下所示：</em></tt></p><tt><em>
+</code></pre><p>您不必在Grails 1.2+上执行此操作，因为<tt>GrailsAnnotationConfiguration</tt>是这些版本中的默认设置。下次运行Grails应用程序时，您将有权访问所有带注释的域类。</p><p><b>注意</b>从1.3.2版开始，您已经可以使用Grails命令<tt>create-hibernate-cfg-xml</tt>为您生成Hibernate配置文件。节省键入/复制粘贴！</p><p>从GORM的角度来看，领域模型中仍然存在一个明显的空白：约束。您无法在Java类中定义它们，但是如果没有它们，GORM验证将毫无用处。幸运的是，您可以通过添加<tt><em>包将约束元数据附加到类<tt><em>。DomainClass</em> Constraints.groovy</tt>脚本转换为“ src / java”。例如，如果您有一个域类<tt>org.example。LibraryBook</tt> ，那么您应该添加文件<tt>src / java / org / example / LibraryBookConstraints.groovy</tt> 。在此脚本内，您可以定义约束块，如下所示：</em></tt></p><tt><em>
 <pre><code class="prettyprint groovy">constraints = {
     name(blank: false)
     age(min: 0, max: 120)
     ...
 }
-</code></pre><p>您可能想知道为什么脚本进入“ src / java”目录。这是个好问题。Grails要求源代码形式的约束脚本，因此您需要将其放置在导致Grails在WAR中包括<tt>.groovy</tt>文件（而非编译类）的位置。 src / java目录是唯一满足此要求的位置。</p><p>在您的Grails应用程序中合并Java域模型确实非常简单。您可能会失去标准GORM域类的优雅和自定义映射，但是仍然可以使用动态查找器，条件查询，验证等。脚手架又如何？Grails将竭尽全力支持您的域模型，但这并不能保证。只要模型简单明了，脚手架就可以正常工作。重用域模型也是尝试Grails的一种好方法，因为您不必从头开始创建模型。</p><p>请注意，如果您只是想访问旧数据库而没有现有的域模型，那么几乎可以肯定的是，将标准GORM域类与自定义映射一起使用会更好。用户指南中记录了这两种方法： <a href="http://grails.org/doc/latest/guide/15. Grails and Hibernate.html">休眠映射</a>和<a href="http://grails.org/doc/latest/guide/5. Object Relational Mapping (GORM).html#5.5.2 Custom ORM Mapping">定制映射DSL</a> 。</p><p>最后一件事：如果您在自己的Grails项目中使用过Java域模型，那么我很想听听您的经验。任何可以帮助其他想要走这条路的用户的事情，将不胜感激！</p></em></tt></div><tt><em>
+</code></pre><p>您可能想知道为什么脚本进入“ src / java”目录。这是个好问题。Grails要求源代码形式的约束脚本，因此您需要将其放置在导致Grails在WAR中包括<tt>.groovy</tt>文件（而非已编译的类）的位置。 src / java目录是唯一满足此要求的位置。</p><p>在您的Grails应用程序中合并Java域模型确实非常简单。您可能会失去标准GORM域类的优雅和自定义映射，但是仍然可以使用动态查找器，条件查询，验证等。脚手架又如何？Grails将竭尽全力支持您的域模型，但这并不能保证。只要模型简单明了，脚手架就可以正常工作。重用域模型也是尝试Grails的一种好方法，因为您不必从头开始创建模型。</p><p>请注意，如果您只是想访问旧数据库而没有现有的域模型，那么几乎可以肯定的是，将标准GORM域类与自定义映射一起使用会更好。用户指南中记录了这两种方法： <a href="http://grails.org/doc/latest/guide/15. Grails and Hibernate.html">休眠映射</a>和<a href="http://grails.org/doc/latest/guide/5. Object Relational Mapping (GORM).html#5.5.2 Custom ORM Mapping">定制映射DSL</a> 。</p><p>最后一件事：如果您在自己的Grails项目中使用过Java域模型，那么我很想听听您的经验。任何可以帮助其他想要走这条路的用户的事情，将不胜感激！</p></em></tt></div><tt><em>
 </em></tt></div><tt><em>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 353;
 
       (function(disqus_shortname, document) {
@@ -219,7 +226,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -257,12 +265,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

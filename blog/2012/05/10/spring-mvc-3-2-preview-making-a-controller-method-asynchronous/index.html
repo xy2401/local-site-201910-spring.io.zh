@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring MVC 3.2预览版：使控制器方法异步</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring MVC 3.2 Preview: Making a Controller Method Asynchronous">
 <meta name="twitter:description" content="<p><strong><em>Last updated on November 5th, 2012 (Spring MVC 3.2 RC1)</em></strong></p>
-<p>In <a href=" http: ="" blog.springsource.org 2012 05 06="" spring-mvc-3-2-preview-introducing-servlet-3-async-support="" ="="></meta>previous <a href=" 08 spring-mvc-3-2-preview-techniques-for-real-time-updates ">posts I introduced the Servlet 3 based async capability in Spring MVC 3.2 and discussed techniques for real-time updates. In this post I'll go into more technical details and discuss how asynchronous processing fits into the Spring MVC request lifecycle.
+<p>In <a href=" http: ="" blog.springsource.org 2012 05 06="" spring-mvc-3-2-preview-introducing-servlet-3-async-support="" ="=">previous <a href=" 08 spring-mvc-3-2-preview-techniques-for-real-time-updates "></head><body >posts I introduced the Servlet 3 based async capability in Spring MVC 3.2 and discussed techniques for real-time updates. In this post I'll go into more technical details and discuss how asynchronous processing fits into the Spring MVC request lifecycle.
 <p>As a quick reminder, you can make <em>any</em> existing controller method asynchronous by changing it to return a <a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">Callable</a>. For example a controller method that returns a view name, can return <code>Callable<String></code> instead. An <code>@ResponseBody</code> that returns an object called <code>Person</code> can return <code>Callable<Person></code> instead. And the same is true for <em>any</em> other controller return value type.</p>
 ">
 <meta name="twitter:creator" content="@rstoya05">
@@ -31,7 +35,7 @@
 <meta property="og:title" content="Spring MVC 3.2 Preview: Making a Controller Method Asynchronous">
 <meta property="og:image" content="https://gravatar.com/avatar/4b12b9c0c665bc0345467c1a218ed0f7?s=200">
 <meta property="og:description" content="<p><strong><em>Last updated on November 5th, 2012 (Spring MVC 3.2 RC1)</em></strong></p>
-<p>In <a href=" http: ="" blog.springsource.org 2012 05 06="" spring-mvc-3-2-preview-introducing-servlet-3-async-support="" ="="></meta>previous <a href=" 08 spring-mvc-3-2-preview-techniques-for-real-time-updates ">posts I introduced the Servlet 3 based async capability in Spring MVC 3.2 and discussed techniques for real-time updates. In this post I'll go into more technical details and discuss how asynchronous processing fits into the Spring MVC request lifecycle.
+<p>In <a href=" http: ="" blog.springsource.org 2012 05 06="" spring-mvc-3-2-preview-introducing-servlet-3-async-support="" ="=">previous <a href=" 08 spring-mvc-3-2-preview-techniques-for-real-time-updates ">posts I introduced the Servlet 3 based async capability in Spring MVC 3.2 and discussed techniques for real-time updates. In this post I'll go into more technical details and discuss how asynchronous processing fits into the Spring MVC request lifecycle.
 <p>As a quick reminder, you can make <em>any</em> existing controller method asynchronous by changing it to return a <a href="http://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">Callable</a>. For example a controller method that returns a view name, can return <code>Callable<String></code> instead. An <code>@ResponseBody</code> that returns an object called <code>Person</code> can return <code>Callable<Person></code> instead. And the same is true for <em>any</em> other controller return value type.</p>
 ">
 <meta content="article" property="og:type">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -171,46 +177,47 @@
 </div>
 </header>
 <div class="blog--post"><p><strong><em>最后更新时间为2012年11月5日（Spring MVC 3.2 RC1）</em></strong></p>
-<p>在<a href="http://blog.springsource.org/2012/05/06/spring-mvc-3-2-preview-introducing-servlet-3-async-support/">以前的</a> <a href="http://blog.springsource.org/2012/05/08/spring-mvc-3-2-preview-techniques-for-real-time-updates/">帖子</a>我在Spring MVC 3.2中引入了Servlet 3异步基础能力和讨论了实时更新的技术。在本文中，我将介绍更多技术细节，并讨论异步处理如何适应Spring MVC请求生命周期。</p>
-<p>作为一个快速的提醒，你可以通过改变它返回一个作<em>任何</em>现有控制器方法异步<a href="https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">赎回</a> 。例如，返回视图名称的控制器方法可以返回<code>Callable<String></code>代替。返回一个名为<code>Person</code>的对象的<code>@ResponseBody</code>可以返回<code>Callable<Person></code>代替。对于<em>任何</em>其他控制器返回值类型也是如此。</p>
+<p>在<a href="http://blog.springsource.org/2012/05/06/spring-mvc-3-2-preview-introducing-servlet-3-async-support/">以前的</a> <a href="http://blog.springsource.org/2012/05/08/spring-mvc-3-2-preview-techniques-for-real-time-updates/">文章中，</a>我介绍了Spring MVC 3.2中基于Servlet 3的异步功能，并讨论了实时更新的技术。在本文中，我将介绍更多技术细节，并讨论异步处理如何适应Spring MVC请求生命周期。</p>
+<p>快速提醒一下，您可以通过将<em>任何</em>现有的控制器方法更改为返回<a href="https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">Callable的</a>方式来使其异步。例如，返回视图名称的控制器方法可以返回<code>Callable<String></code>代替。一个<code>@ResponseBody</code>返回一个称为<code>Person</code>可以返回<code>Callable<Person></code>代替。对于<em>任何</em>其他控制器返回值类型也是如此。</p>
 <p>一个中心思想是，关于控制器方法如何工作的所有已知知识将尽可能保持不变，除了剩余的处理将在另一个线程中进行。当涉及异步执行时，使事情保持简单很重要。正如您将看到的那样，即使看似简单的编程模型更改也有很多需要考虑的地方。</p>
-<p>该<a href="https://github.com/SpringSource/spring-mvc-showcase">弹簧MVC-展示</a>已经更新了Spring MVC的3.2。看看<a href="https://github.com/SpringSource/spring-mvc-showcase/blob/master/src/main/java/org/springframework/samples/mvc/async/CallableController.java#L13">CallableController</a> 。如您所<code>@ResponseBody</code> ， <code>@ResponseStatus</code> <code>@ResponseBody</code>和<code>@ResponseStatus</code>类的方法注释<code>@ResponseStatus</code>适用于<code>Callable</code>的返回值。从<code>Callable</code>引发的异常就像由控制器引发一样，在这种情况下，使用<code>@ExceptionHandler</code>方法处理。等等。</p>
-<p>如果通过浏览器中的“异步请求”选项卡执行<code>CallableController</code>方法之一，则应看到类似于以下内容的输出：</p>
-<pre><code class="prettyprint code">08:25:15 [http-bio-8080-exec-10] DispatcherServlet - DispatcherServlet with name 'appServlet' processing GET request for [...]
+<p><a href="https://github.com/SpringSource/spring-mvc-showcase">spring-mvc-showcase</a>已针对Spring MVC 3.2更新。看看<a href="https://github.com/SpringSource/spring-mvc-showcase/blob/master/src/main/java/org/springframework/samples/mvc/async/CallableController.java#L13">CallableController</a> 。方法注释，例如<code>@ResponseBody</code>和<code>@ResponseStatus</code>适用于的返回值<code>Callable</code>以及您所期望的。从一个异常引发<code>Callable</code>就像由控制器举起一样处理，在这种情况下， <code>@ExceptionHandler</code>方法。等等。</p>
+<p>如果执行其中一项<code>CallableController</code>通过浏览器中“异步请求”选项卡的方法，您应该看到类似于以下内容的输出：</p>
+<pre><code class="prettyprint code">08:25:15 [http-bio-8080-exec-10] DispatcherServlet - DispatcherServlet with name &#39;appServlet&#39; processing GET request for [...]
 08:25:15 [http-bio-8080-exec-10] RequestMappingHandlerMapping - Looking up handler method for path /async/callable/view
 08:25:15 [http-bio-8080-exec-10] RequestMappingHandlerMapping - Returning handler method [...]
 08:25:15 [http-bio-8080-exec-10] WebAsyncManager - Concurrent handling starting for GET [...]
 08:25:15 [http-bio-8080-exec-10] DispatcherServlet - Leaving response open for concurrent processing
 08:25:17 [MvcAsync1] WebAsyncManager - Concurrent result value [views/html]
 08:25:17 [MvcAsync1] WebAsyncManager - Dispatching request to resume processing
-08:25:17 [http-bio-8080-exec-6] DispatcherServlet - DispatcherServlet with name 'appServlet' resumed processing GET request for [...]
+08:25:17 [http-bio-8080-exec-6] DispatcherServlet - DispatcherServlet with name &#39;appServlet&#39; resumed processing GET request for [...]
 08:25:17 [http-bio-8080-exec-6] RequestMappingHandlerMapping - Looking up handler method for path /async/callable/view
 08:25:17 [http-bio-8080-exec-6] RequestMappingHandlerMapping - Returning handler method [...]
 08:25:17 [http-bio-8080-exec-6] RequestMappingHandlerAdapter - Found concurrent result value [views/html]
-08:25:17 [http-bio-8080-exec-6] DispatcherServlet - Rendering view [...] in DispatcherServlet with name 'appServlet'
-08:25:17 [http-bio-8080-exec-6] JstlView - Added model object 'fruit' of type [java.lang.String]
-08:25:17 [http-bio-8080-exec-6] JstlView - Added model object 'foo' of type [java.lang.String]
+08:25:17 [http-bio-8080-exec-6] DispatcherServlet - Rendering view [...] in DispatcherServlet with name &#39;appServlet&#39;
+08:25:17 [http-bio-8080-exec-6] JstlView - Added model object &#39;fruit&#39; of type [java.lang.String]
+08:25:17 [http-bio-8080-exec-6] JstlView - Added model object &#39;foo&#39; of type [java.lang.String]
 08:25:17 [http-bio-8080-exec-6] JstlView - Forwarding to resource [/WEB-INF/views/views/html.jsp]
 08:25:17 [http-bio-8080-exec-6] DispatcherServlet - Successfully completed request
 </code></pre>
-<p>请注意，在记录并发处理已开始的消息后，初始Servlet容器线程如何快速退出。那是因为controller方法返回了<code>Callable</code> 。由Spring MVC通过<code>AsyncTaskExecutor</code>管理的第二个线程调用<code>Callable</code>产生一个值（在本例中为基于String的视图名称），然后将请求<a href="https://docs.oracle.com/javaee/6/api/javax/servlet/AsyncContext.html#dispatch()">分派回</a> Servlet容器。最后，在第三个Servlet容器线程（分派）中，通过呈现选定的视图来完成处理。如果查看时间戳，您会注意到在初始线程退出和<code>Callable</code>准备就绪之间有2秒的模拟延迟。</p>
+<p>请注意，在记录并发处理已开始的消息后，初始Servlet容器线程如何快速退出。这是因为controller方法返回了一个<code>Callable</code> 。第二个线程-由Spring MVC通过<code>AsyncTaskExecutor</code> -调用<code>Callable</code>生成一个值，在这种情况下为基于字符串的视图名称，然后将请求<a href="https://docs.oracle.com/javaee/6/api/javax/servlet/AsyncContext.html#dispatch()">分派回</a> Servlet容器。最后，在第三个Servlet容器线程（分派）中，通过呈现选定的视图来完成处理。如果您查看时间戳，您会注意到从初始线程退出到线程退出之间有2秒的模拟延迟。 <code>Callable</code>准备好了。</p>
 <p><em>注意：</em>如果您不熟悉Servlet 3异步API，则异步调度与转发类似，不同之处在于，转发是在同一线程中发生的，而从应用程序线程使用调度来恢复Servlet容器线程中的处理。</p><p><strong>TaskExecutor配置</strong></p>
-<p>默认情况下，Spring MVC使用<a href="http://static.springsource.org/spring/docs/3.1.x/javadoc-api/org/springframework/core/task/SimpleAsyncTaskExecutor.html">SimpleAsyncTaskExecutor</a>执行控制器方法返回的<code>Callable</code>实例。对于生产，您必须将其替换为为您的环境适当配置的<code>AsyncTaskExecutor</code>实现。通常，MVC Java配置和MVC命名空间都提供了配置<code>AsyncTaskExecutor</code>和异步请求处理的选项。您也可以直接配置<code>RequestMappingHandlerAdapter</code> 。</p><p><strong>超时值</strong></p>
-<p>如果异步请求在一定时间内未完成处理，则Servlet容器引发超时事件，如果未处理，则响应完成。您可以通过MVC Java配置和MVC名称空间或直接在<code>RequestMappingHandlerAdapter</code>上配置超时值。如果未配置，则超时值将取决于基础Servlet容器。在Tomcat上，此时间为10秒，它在初始Servlet容器线程完全退出后开始。</p><p><strong>MvcAsyncTask</strong></p>
-<p>如果要为特定的控制器方法自定义超时值或任务执行器怎么办？对于这样的情况下，您可以<a href="https://github.com/SpringSource/spring-mvc-showcase/blob/master/src/main/java/org/springframework/samples/mvc/async/CallableController.java#L64">包裹在赎回的MvcAsyncTask一个实例</a> 。<code>MvcAsyncTask</code>的构造<code>MvcAsyncTask</code>接受超时值和任务执行程序。此外，它提供了<code>onTimeout</code>和<code>onCompletion</code>方法，使您可以注册“超时”和“完成”回调。就像try-catch块中的“ finally”一样，异步请求完成时总是发生“ completion”。“超时”回调发生在“完成”之前，并且可以选择替代值以用于完成处理以及通知<code>Callable</code>停止处理。</p>
+<p>默认情况下，Spring MVC使用<a href="http://static.springsource.org/spring/docs/3.1.x/javadoc-api/org/springframework/core/task/SimpleAsyncTaskExecutor.html">SimpleAsyncTaskExecutor</a>执行<code>Callable</code>控制器方法返回的实例。对于生产，您必须将其替换为<code>AsyncTaskExecutor</code>为您的环境配置适当的实施。MVC Java配置和MVC命名空间都提供了用于配置<code>AsyncTaskExecutor</code>和一般的异步请求处理。您还可以配置<code>RequestMappingHandlerAdapter</code>直。</p><p><strong>超时值</strong></p>
+<p>如果异步请求在一定时间内未完成处理，则Servlet容器引发超时事件，如果未处理，则响应完成。您可以通过MVC Java配置和MVC名称空间配置超时值，也可以直接在<code>RequestMappingHandlerAdapter</code> 。如果未配置，则超时值将取决于基础Servlet容器。在Tomcat上，此时间为10秒，它在初始Servlet容器线程完全退出后开始。</p><p><strong>MvcAsyncTask</strong></p>
+<p>如果要为特定的控制器方法自定义超时值或任务执行器怎么办？在这种情况下，可以<a href="https://github.com/SpringSource/spring-mvc-showcase/blob/master/src/main/java/org/springframework/samples/mvc/async/CallableController.java#L64">将Callable包装在MvcAsyncTask的实例中</a> 。的构造函数<code>MvcAsyncTask</code>接受一个超时值和一个任务执行器。此外，它还提供<code>onTimeout</code>和<code>onCompletion</code>允许您注册“超时”和“完成”回调的方法。就像try-catch块中的“ finally”一样，异步请求完成时总是发生“ completion”。“超时”回调发生在“完成”之前，可以选择一个替代值以用于完成处理并通知<code>Callable</code>停止处理。</p>
 <p>以下是超时情况下的事件顺序：</p>
 <ol>
-<li>控制器方法返回包装在<code>MvcAsyncTask</code>的<code>Callable</code>
-</li><li>Spring MVC的开始执行<code>Callable</code>在一个单独的线程</li><li>Servlet容器线程退出（并且超时时间段开始）</li><li><code>MvcAsyncTask</code>收到回调通知</li><li>回调代码选择一个替代值，并通知<code>Callable</code>取消处理</li><li>该请求被分派回容器以使用备用值完成处理</li></ol>
-<p>为了完全理解以上场景，请考虑涉及的线程-初始Servlet容器线程（其中请求处理开始），Spring MVC托管线程（其中<code>Callable</code>执行），引发超时事件的Servlet容器线程以及Servlet容器线程处理最终的异步调度。</p><p><strong>例外情况</strong></p>
-<p>当<code>Callable</code>引发异常时，它通过<code>HandlerExceptionResolver</code>机制进行处理，就像其他任何控制器方法引发的异常一样。更详细的解释是捕获并保存了异常，并将请求分派到Servlet容器，在该容器中恢复处理并调用<code>HandlerExceptionResolver</code>链。这也意味着将像往常一样调用<code>@ExceptionHandler</code>方法。</p><p><strong>处理程序拦截</strong></p>
-<p>像通常一样，从初始Servlet容器线程中调用<code>HandlerInterceptor</code>的<code>preHandle</code>方法。如果控制器返回<code>Callable</code>并开始异步处理，则既没有结果，也没有完成请求。因此，在初始Servlet容器线程中不会调用<code>postHandle</code>和<code>afterCompletion</code> 。相反，拦截器可以实现<code>AsyncHandlerInterceptor</code> ，子接口和<code>afterConcurrentHandlingStarted</code>方法。在完成<code>Callable</code>并将请求分派到Servlet容器之后，在分派的线程中调用<code>HandlerInterceptor</code>所有方法。</p><p><strong>Servlet过滤器</strong></p>
-<p>所有Spring Framework Servlet过滤器实现已根据需要进行了修改，以在异步请求处理中工作。至于其他任何过滤器，有些将起作用-通常是那些进行预处理的过滤器，而另一些则需要修改-通常是那些在请求结束时进行后处理的过滤器。此类过滤器将需要识别何时退出了初始Servlet容器线程，为另一个线程继续处理以及何时将它们作为异步调度的一部分调用以完成处理提供了条件。</p>
-<p><code>OpenSessionInViewFilter</code>和<code>OpenEntityManagerInViewFilter</code>已更新，可以在整个异步请求范围内透明地工作。但是，如果直接在控制器方法上使用<code>@Transactional</code> ，则事务将在控制器方法返回后立即完成，并且不会扩展到<code>Callable</code>的执行。如果<code>Callable</code>需要进行事务性工作，则应使用<code>@Transactional</code>方法将其委派给Bean。</p>
-<p><a href="https://spring.io/blog/2012/05/14/spring-mvc-3-2-preview-adding-long-polling-to-an-existing-web-application">下一篇文章</a>探讨了如何通过修改Spring AMQP项目中的现有示例来对<code>DeferredResult</code>用于异步处理，该示例对AMQP消息做出反应并将更新发送到浏览器。</p></div>
+<li>控制器方法返回一个<code>Callable</code>包裹在<code>MvcAsyncTask</code>
+</li><li>Spring MVC开始执行<code>Callable</code>在单独的线程中</li><li>Servlet容器线程退出（并且超时时间段开始）</li><li><code>MvcAsyncTask</code>收到回调通知</li><li>回调代码选择一个替代值并通知<code>Callable</code>取消处理</li><li>该请求被分派回容器以使用备用值完成处理</li></ol>
+<p>为了全面了解上述情况，请考虑涉及的线程-初始Servlet容器线程（请求处理开始于此），Spring MVC托管线程（其中<code>Callable</code>执行，在其中引发超时事件的Servlet容器线程，以及Servlet容器线程处理最终的异步调度。</p><p><strong>例外情况</strong></p>
+<p>当一个异常引发<code>Callable</code> ，它是通过<code>HandlerExceptionResolver</code>就像其他任何控制器方法引发的异常一样。更详细的解释是捕获并保存了异常，并将请求分派到Servlet容器，在该容器中继续处理，并且<code>HandlerExceptionResolver</code>链调用。这也意味着<code>@ExceptionHandler</code>方法将照常调用。</p><p><strong>处理程序拦截</strong></p>
+<p>的<code>preHandle</code>方法<code>HandlerInterceptor</code>通常会从初始Servlet容器线程中调用。如果控制器返回一个<code>Callable</code>并且开始异步处理后，既没有结果，也没有完成请求。因此<code>postHandle</code>和<code>afterCompletion</code>不会在初始Servlet容器线程中调用。相反，拦截器可以实现<code>AsyncHandlerInterceptor</code> ，子界面和<code>afterConcurrentHandlingStarted</code>方法。之后<code>Callable</code>完成并将请求分派到Servlet容器， <code>HandlerInterceptor</code>在调度线程中被调用。</p><p><strong>Servlet过滤器</strong></p>
+<p>所有Spring Framework Servlet过滤器实现已根据需要进行了修改，以在异步请求处理中工作。至于其他任何过滤器，有些将起作用-通常是那些进行预处理的过滤器，而另一些则需要修改-通常是那些在请求结束时进行后处理的过滤器。此类过滤器将需要识别何时退出初始Servlet容器线程，为另一个线程继续处理以及何时将它们作为异步调度的一部分调用以完成处理提供了条件。</p>
+<p>的<code>OpenSessionInViewFilter</code>和<code>OpenEntityManagerInViewFilter</code>已更新，可以在整个异步请求范围内透明地工作。但是，如果使用<code>@Transactional</code>直接在控制器方法上执行，事务将在控制器方法返回后立即完成，并且不会扩展到执行<code>Callable</code> 。如果<code>Callable</code>需要做事务性的工作，它应该委托给一个bean <code>@Transactional</code>方法。</p>
+<p><a href="https://spring.io/blog/2012/05/14/spring-mvc-3-2-preview-adding-long-polling-to-an-existing-web-application">下一篇文章</a>探讨了<code>DeferredResult</code>通过修改Spring AMQP项目中的现有示例来进行异步处理，该示例对AMQP消息做出反应并将更新发送到浏览器。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 470;
 
       (function(disqus_shortname, document) {
@@ -224,7 +231,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -262,12 +270,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

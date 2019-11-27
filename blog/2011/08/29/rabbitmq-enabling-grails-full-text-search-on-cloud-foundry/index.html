@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>RabbitMQ：在Cloud Foundry上启用Grails全文搜索</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,12 +25,12 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="RabbitMQ: Enabling Grails full text search on Cloud Foundry">
-<meta name="twitter:description" content="<p>In my <a href=" http:="" ="" blog.springsource.com="" 2011="" 04="" 21="" deeper-into-grails-cloud-foundry="" ="="></meta>second blog about Grails and Cloud Foundry I introduced a variant of the <a href=" https: github.com SpringSource cloudfoundry-samples tree master grailstwitter"></head><body dir="ltr">Grails Twitter example that could be hosted on <a href="http://www..cloudfoundry.com/">CloudFoundry.com</a> At the time I mentioned that full text search using the Searchable plugin would limit you to a single application instance because the search indices would be unique to each instance. In other words, you might very easily get different search results depending on which application instance your browser is routed to.
+<meta name="twitter:description" content="<p>In my <a href=" http:="" ="" blog.springsource.com="" 2011="" 04="" 21="" deeper-into-grails-cloud-foundry="" ="=">second blog about Grails and Cloud Foundry I introduced a variant of the <a href=" https: github.com SpringSource cloudfoundry-samples tree master grailstwitter"></head><body >Grails Twitter example that could be hosted on <a href="http://www..cloudfoundry.com/">CloudFoundry.com</a> At the time I mentioned that full text search using the Searchable plugin would limit you to a single application instance because the search indices would be unique to each instance. In other words, you might very easily get different search results depending on which application instance your browser is routed to.
 <p>I also said that one option for fixing this problem would be to synchronise the search indices across the instances. But that doesn’t sound particularly easy, does it? As it happens, the introduction of the RabbitMQ service into Cloud Foundry means that the required code changes are far smaller than you might expect. So let’s see how I added full text search for the Grails Twitter status messages.</p>
 ">
 
 <meta property="og:title" content="RabbitMQ: Enabling Grails full text search on Cloud Foundry">
-<meta property="og:description" content="<p>In my <a href=" http:="" ="" blog.springsource.com="" 2011="" 04="" 21="" deeper-into-grails-cloud-foundry="" ="="></meta>second blog about Grails and Cloud Foundry I introduced a variant of the <a href=" https: github.com SpringSource cloudfoundry-samples tree master grailstwitter">Grails Twitter example that could be hosted on <a href="http://www..cloudfoundry.com/">CloudFoundry.com</a> At the time I mentioned that full text search using the Searchable plugin would limit you to a single application instance because the search indices would be unique to each instance. In other words, you might very easily get different search results depending on which application instance your browser is routed to.
+<meta property="og:description" content="<p>In my <a href=" http:="" ="" blog.springsource.com="" 2011="" 04="" 21="" deeper-into-grails-cloud-foundry="" ="=">second blog about Grails and Cloud Foundry I introduced a variant of the <a href=" https: github.com SpringSource cloudfoundry-samples tree master grailstwitter">Grails Twitter example that could be hosted on <a href="http://www..cloudfoundry.com/">CloudFoundry.com</a> At the time I mentioned that full text search using the Searchable plugin would limit you to a single application instance because the search indices would be unique to each instance. In other words, you might very easily get different search results depending on which application instance your browser is routed to.
 <p>I also said that one option for fixing this problem would be to synchronise the search indices across the instances. But that doesn’t sound particularly easy, does it? As it happens, the introduction of the RabbitMQ service into Cloud Foundry means that the required code changes are far smaller than you might expect. So let’s see how I added full text search for the Grails Twitter status messages.</p>
 ">
 <meta content="article" property="og:type">
@@ -36,10 +40,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -172,17 +178,17 @@
 import org.grails.twitter.auth.Person
 
 class Status {
-    static mapWith = "mongo"
-    static transients = ["author"]
+    static mapWith = &quot;mongo&quot;
+    static transients = [&quot;author&quot;]
 
     static searchable = {
-        only = ["message", "dateCreated"]
-        authorId index: "no", store: "yes"
+        only = [&quot;message&quot;, &quot;dateCreated&quot;]
+        authorId index: &quot;no&quot;, store: &quot;yes&quot;
     }
 	
     String message
     Long authorId
-    List<String> tags = []
+    List&lt;String&gt; tags = []
     Date dateCreated
 	
     Person getAuthor() {
@@ -206,30 +212,30 @@ class BootStrap {
     def searchableService
     def springSecurityService
 
-    def init = { servletContext ->
+    def init = { servletContext -&gt;
         ...
         // Index all Hibernate mapped domain classes.
         searchableService.reindex()
 
         // Index all status messages.
         def statusMessages = Status.list()
-        log.info "Indexing ${statusMessages.size()} status messages"
+        log.info &quot;Indexing ${statusMessages.size()} status messages&quot;
         Status.reindex(statusMessages)
-        log.info "Finished indexing"
+        log.info &quot;Finished indexing&quot;
     }
     ...
 }
 </code></pre><p>那不是很多的代码，但是足以使状态消息可搜索。剩下要做的就是确保为新消息建立索引，并确保在应用程序实例之间同步搜索索引。</p>
-<h2>与RabbitMQ同步</h2><p>保持搜索索引同步的基本模型非常简单：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2011/08/grailstwitter-search-sync.png" alt="" title="使用RabbitMQ同步搜索索引" width="430" height="252" class="aligncenter size-full wp-image-9490"></p><p>每次保存状态消息时，都会将一条消息发送到RabbitMQ代理，然后将其转发到所有应用程序实例。然后，每个实例都会为该消息标识的<tt>Status</tt>实例编制索引。</p><p>在实现此功能之前，我们需要安装RabbitMQ插件：<br></p><pre><br> grails install-plugin rabbitmq<br></pre><p></p><p>下一个工作是为代理配置适当的交换和队列。之前我已经写过关于<a href="http://blog.springsource.com/2010/06/14/understanding-amqp-the-protocol-used-by-rabbitmq/">AMQP协议</a>和<a href="http://blog.springsource.com/2010/08/23/rabbitmq-plugin-for-grails-early-access/">RabbitMQ插件的</a>博客，所以在这里我不会详细讨论交换和队列。可以说，我们所需要的只是一个扇出交换（所有消息都路由到所有侦听器）和一个订阅该交换的Grails服务。所以在<tt>Config.groovy中</tt>我添加：</p>
+<h2>与RabbitMQ同步</h2><p>保持搜索索引同步的基本模型非常简单：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2011/08/grailstwitter-search-sync.png" alt="" title="使用RabbitMQ同步搜索索引" width="430" height="252" class="aligncenter size-full wp-image-9490"></p><p>每次保存状态消息时，都会将一条消息发送到RabbitMQ代理，然后将其转发到所有应用程序实例。然后，每个实例都会为该消息标识的<tt>Status</tt>实例编制索引。</p><p>在实现此功能之前，我们需要安装RabbitMQ插件：<br></p><pre><br /> grails install-plugin rabbitmq<br /></pre><p></p><p>下一个工作是为代理配置适当的交换和队列。之前我已经写过关于<a href="http://blog.springsource.com/2010/06/14/understanding-amqp-the-protocol-used-by-rabbitmq/">AMQP协议</a>和<a href="http://blog.springsource.com/2010/08/23/rabbitmq-plugin-for-grails-early-access/">RabbitMQ插件的</a>博客，所以在这里我不会详细讨论交换和队列。可以说，我们所需要的只是一个扇出交换（所有消息都路由到所有侦听器）和一个订阅该交换的Grails服务。所以在<tt>Config.groovy中</tt>我添加：</p>
 <pre><code class="prettyprint groovy">rabbitmq {
     connectionfactory {
-        username = 'guest'
-        password = 'guest'
-        hostname = 'localhost'
+        username = &#39;guest&#39;
+        password = &#39;guest&#39;
+        hostname = &#39;localhost&#39;
     }
 
     queues = {
-        exchange name: 'search.sync', type: fanout, durable: false
+        exchange name: &#39;search.sync&#39;, type: fanout, durable: false
     }
 }
 </code></pre><p>重要的一点是交换声明：将应用程序部署到Cloud Foundry时，将忽略连接工厂设置，因为RabbitMQ服务在运行时绑定到了应用程序。</p><p>发送消息是一种方式：</p>
@@ -240,7 +246,7 @@ class StatusService {
     
     void updateStatus(long userId, String message) {
         def status = new Status(message: message, authorId: userId).save(flush: true, failOnError: true)
-        rabbitSend 'search.sync', '', "${status.id}:${status.class.name}"
+        rabbitSend &#39;search.sync&#39;, &#39;&#39;, &quot;${status.id}:${status.class.name}&quot;
         
         runAsync {
             tagService.extractTagsFromMessage(status)
@@ -252,7 +258,7 @@ class StatusService {
 <pre><code class="prettyprint groovy">package org.grails.twitter
 
 class SyncService {
-    static rabbitSubscribe = "search.sync"
+    static rabbitSubscribe = &quot;search.sync&quot;
     static transactional = false
 
     def grailsApplication
@@ -261,17 +267,17 @@ class SyncService {
     void handleMessage(String message) {
         def parts = message.split(/:/)
         if (parts.size() != 2) {
-            log.error "Invalid message: $message"
+            log.error &quot;Invalid message: $message&quot;
             return
         }
 
         def domainClass = grailsApplication.getDomainClass(parts[1])
-        log.debug "Reindexing instance ${parts[0]} of ${parts[1]}"
+        log.debug &quot;Reindexing instance ${parts[0]} of ${parts[1]}&quot;
         try {
             searchableService.reindex(domainClass.clazz.get(parts[0]))
         }
         catch (Exception ex) {
-            log.error "Failed to index instance ${parts[0]} of ${parts[1]}", ex
+            log.error &quot;Failed to index instance ${parts[0]} of ${parts[1]}&quot;, ex
         }
     }
 }
@@ -279,7 +285,8 @@ class SyncService {
 <h2>包起来</h2><p>我不得不说，我很惊讶自己几乎不需要多少代码就可以使搜索索引同步。不仅如此，而且由于编码非常简单，因此我能够集中精力于如何解决问题而不是对其进行编码。最重要的是，使用Cloud Foundry意味着部署包括创建和绑定RabbitMQ服务，然后运行<tt>grails prod cf-update</tt>命令将更改推送到服务器。简单的东西。</p><p>如您所见，RabbitMQ可以为与云有关的问题提供创新的解决方案，而Grails插件通过其约定的强大功能使其易于使用。您可以在同一应用程序的不同实例，不同的Grails应用程序甚至使用不同语言和框架编写的应用程序之间进行通信。例如，我们可以部署一个简单的Node.js或Sinatra应用程序，该应用程序会记录并显示“ search.sync”消息，以便您可以跟踪它们。基本上，RabbitMQ是您的云工具箱中的必不可少的项目。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 435;
 
       (function(disqus_shortname, document) {
@@ -293,7 +300,8 @@ class SyncService {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -331,12 +339,14 @@ class SyncService {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

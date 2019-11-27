@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>Bootiful GCP：使用Spanner（3/8）进行全球一致的数据访问</title>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>Bootiful GCP：使用Spanner（3/8）实现全球一致的数据访问</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Bootiful GCP: Globally Consistent Data Access with Spanner (3/8)">
 <meta name="twitter:description" content="<blockquote> 
- <p>Hi Spring fans! In this brief 8 part series we’re going to look at the Spring Cloud integration for Google Cloud Platform, called Spring Cloud GCP. <a href=" https: ="" cloud.spring.io="" spring-cloud-gcp="" ="="></meta>Spring Cloud GCP represents a joint effort between Google and Pivotal that endeavors to provide a first class experience for Spring Cloud developers when using the Google Cloud Platform. Pivotal Cloud Foundry users will enjoy an even <a href=" docs.pivotal.io partners gcp-sb index.html"></head><body dir="ltr">easier integration with the GCP service broker. I wrote these installments with input from Google Cloud Developer Advocate, and my buddy, <a href="http://twitter.com/saturnism">Ray Tsang</a>. You can also catch a walkthrough of Spring Cloud GCP in our Google Next 2018 session, <a href="https://www.youtube.com/watch?v=2Jo3vy7iQf8">Bootiful Google Cloud Platform</a>. Thanks buddy! As always, <a href="http://twitter.com/starbuxman">I’d love to hear from you if you have feedback</a>. 
+ <p>Hi Spring fans! In this brief 8 part series we’re going to look at the Spring Cloud integration for Google Cloud Platform, called Spring Cloud GCP. <a href=" https: ="" cloud.spring.io="" spring-cloud-gcp="" ="=">Spring Cloud GCP represents a joint effort between Google and Pivotal that endeavors to provide a first class experience for Spring Cloud developers when using the Google Cloud Platform. Pivotal Cloud Foundry users will enjoy an even <a href=" docs.pivotal.io partners gcp-sb index.html"></head><body >easier integration with the GCP service broker. I wrote these installments with input from Google Cloud Developer Advocate, and my buddy, <a href="http://twitter.com/saturnism">Ray Tsang</a>. You can also catch a walkthrough of Spring Cloud GCP in our Google Next 2018 session, <a href="https://www.youtube.com/watch?v=2Jo3vy7iQf8">Bootiful Google Cloud Platform</a>. Thanks buddy! As always, <a href="http://twitter.com/starbuxman">I’d love to hear from you if you have feedback</a>. 
 
 ">
 <meta name="twitter:creator" content="@starbuxman">
@@ -31,7 +35,7 @@
 <meta property="og:title" content="Bootiful GCP: Globally Consistent Data Access with Spanner (3/8)">
 <meta property="og:image" content="https://gravatar.com/avatar/fb22593caf24e4bb4c98d467cdd247e6?s=200">
 <meta property="og:description" content="<blockquote> 
- <p>Hi Spring fans! In this brief 8 part series we’re going to look at the Spring Cloud integration for Google Cloud Platform, called Spring Cloud GCP. <a href=" https: ="" cloud.spring.io="" spring-cloud-gcp="" ="="></meta>Spring Cloud GCP represents a joint effort between Google and Pivotal that endeavors to provide a first class experience for Spring Cloud developers when using the Google Cloud Platform. Pivotal Cloud Foundry users will enjoy an even <a href=" docs.pivotal.io partners gcp-sb index.html">easier integration with the GCP service broker. I wrote these installments with input from Google Cloud Developer Advocate, and my buddy, <a href="http://twitter.com/saturnism">Ray Tsang</a>. You can also catch a walkthrough of Spring Cloud GCP in our Google Next 2018 session, <a href="https://www.youtube.com/watch?v=2Jo3vy7iQf8">Bootiful Google Cloud Platform</a>. Thanks buddy! As always, <a href="http://twitter.com/starbuxman">I’d love to hear from you if you have feedback</a>. 
+ <p>Hi Spring fans! In this brief 8 part series we’re going to look at the Spring Cloud integration for Google Cloud Platform, called Spring Cloud GCP. <a href=" https: ="" cloud.spring.io="" spring-cloud-gcp="" ="=">Spring Cloud GCP represents a joint effort between Google and Pivotal that endeavors to provide a first class experience for Spring Cloud developers when using the Google Cloud Platform. Pivotal Cloud Foundry users will enjoy an even <a href=" docs.pivotal.io partners gcp-sb index.html">easier integration with the GCP service broker. I wrote these installments with input from Google Cloud Developer Advocate, and my buddy, <a href="http://twitter.com/saturnism">Ray Tsang</a>. You can also catch a walkthrough of Spring Cloud GCP in our Google Next 2018 session, <a href="https://www.youtube.com/watch?v=2Jo3vy7iQf8">Bootiful Google Cloud Platform</a>. Thanks buddy! As always, <a href="http://twitter.com/starbuxman">I’d love to hear from you if you have feedback</a>. 
 
 ">
 <meta content="article" property="og:type">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -151,7 +157,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Bootiful GCP：使用Spanner（3/8）进行全球一致的数据访问</h1>
+<h1 class="blog--title">Bootiful GCP：使用Spanner（3/8）实现全球一致的数据访问</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -171,13 +177,13 @@
 </div>
 </header>
 <div class="blog--post"><blockquote>
-<p>嗨，春季粉丝！在这个简短的8部分系列文章中，我们将介绍Google Cloud Platform的Spring Cloud集成，称为Spring Cloud GCP。 <a href="https://cloud.spring.io/spring-cloud-gcp/">Spring Cloud GCP</a>代表了Google和Pivotal的共同努力，致力于在使用Google Cloud Platform时为Spring Cloud开发人员提供一流的体验。Pivotal Cloud Foundry用户将可以更<a href="https://docs.pivotal.io/partners/gcp-sb/index.html">轻松地与GCP服务代理集成</a> 。我用Google Cloud Developer Advocate和我的好友<a href="https://twitter.com/saturnism">Ray Tsang的</a>投入编写了这些文章。您还可以在我们的Google Next 2018会话<a href="https://www.youtube.com/watch?v=2Jo3vy7iQf8">Bootiful Google Cloud Platform中观看</a> Spring Cloud GCP的演练。谢谢哥们儿！与往常一样， <a href="https://twitter.com/starbuxman">如果您有任何反馈意见</a> ， <a href="https://twitter.com/starbuxman">我希望能收到您的来信</a> 。</p>
+<p>嗨，春季粉丝！在这个简短的8部分系列文章中，我们将研究Google Cloud Platform的Spring Cloud集成，称为Spring Cloud GCP。 <a href="https://cloud.spring.io/spring-cloud-gcp/">Spring Cloud GCP</a>代表了Google与Pivotal的共同努力，致力于在使用Google Cloud Platform时为Spring Cloud开发人员提供一流的体验。Pivotal Cloud Foundry用户将可以更<a href="https://docs.pivotal.io/partners/gcp-sb/index.html">轻松地与GCP服务代理集成</a> 。我用Google Cloud Developer Advocate和我的好友<a href="https://twitter.com/saturnism">Ray Tsang的</a>投入编写了这些文章。您还可以在我们的Google Next 2018会话<a href="https://www.youtube.com/watch?v=2Jo3vy7iQf8">Bootiful Google Cloud Platform中观看</a> Spring Cloud GCP的演练。谢谢哥们儿！与往常一样， <a href="https://twitter.com/starbuxman">如果您有任何反馈意见</a> ， <a href="https://twitter.com/starbuxman">我希望能收到您的来信</a> 。</p>
 </blockquote>
 <p>该系列有八个职位。这些都是：</p>
 <ul>
 <li><a href="https://spring.io/blog/2018/08/20/bootiful-gcp-getting-started-with-spring-cloud-for-google-cloud-platform-1-8">Bootiful GCP：针对Google Cloud Platform的Spring Cloud入门（1/8）</a></li>
 <li><a href="https://spring.io/blog/2018/08/23/bootiful-gcp-relational-data-access-with-spring-cloud-gcp-2-8">Bootiful GCP：使用Spring Cloud GCP进行关系数据访问（2/8）</a></li>
-<li><a href="https://spring.io/blog/2018/08/27/bootiful-gcp-globally-consistent-data-access-with-spanner-3-8">Bootiful GCP：使用Spanner（3/8）进行全球一致的数据访问</a></li>
+<li><a href="https://spring.io/blog/2018/08/27/bootiful-gcp-globally-consistent-data-access-with-spanner-3-8">Bootiful GCP：使用Spanner（3/8）实现全球一致的数据访问</a></li>
 <li><a href="https://spring.io/blog/2018/08/30/bootiful-gcp-integration-with-google-cloud-pub-sub-4-8">Bootiful GCP：与Google Cloud Pub / Sub（4/8）集成</a></li>
 <li><a href="https://spring.io/blog/2018/09/03/bootiful-gcp-runtime-configuration-with-spring-cloud-gcp-runtime-config-5-8">Bootiful GCP：使用Spring Cloud GCP Runtime Config（5/8）进行运行时配置</a></li>
 <li><a href="https://spring.io/blog/2018/09/06/bootiful-gcp-supporting-observability-with-spring-cloud-gcp-stackdriver-trace-6-8">引导性GCP：通过Spring Cloud GCP Stackdriver Trace（6/8）支持可观察性<br></a></li>
@@ -188,17 +194,17 @@
 <p>谷歌首次透露扳手，当他们推出F1，SQL数据库引擎，AdWords团队从MySQL迁来， <em>离开</em> （“但乔希！”我听到你惊呼，“我们不是刚部署到MySQL？”），在2012。Spanner在全局范围内提供低延迟读取，并在较小程度上提供写入。Google <a href="https://static.googleusercontent.com/media/research.google.com/en//archive/spanner-osdi2012.pdf">于2012年在一份研究论文</a>中宣布了它的称号，它称Spanner为“第一个在全球范围内分发数据并支持外部一致的分布式交易的系统。”</p>
 <p>“ Spanner在最棘手的分布式系统问题上做出了令人印象深刻的工作-一个全球复制的数据库，该数据库在合理的延迟范围内支持外部一致的事务，” Basho的首席架构师<a href="https://www.zdnet.com/article/google-reveals-spanner-the-database-tech-that-can-span-the-planet/">Andy Gross说</a> 。</p>
 <p>Spanner能够提供如此广泛的地理冗余，这要归功于Google开发的一种方法，该方法能够为应用程序提供准确的时间，使他们能够写，读和复制数据而不会出错。Spanner的“ TrueTime” API依赖于已安装在Google数据中心中的GPS接收器和原子钟，以使应用程序能够在本地获取准确的时间读数，而不必全局同步。</p>
-<p>Google有许多数据库技术，例如<a href="https://ai.google/research/pubs/pub27898">Bigtable</a> （列数据库，非常适合高吞吐量写入）和[Megastore]（ <a href="https://ai.google/research/pubs/pub36971">https://ai.google/research/pubs/pub36971</a> ）（NoSQL数据库）。Bigtable仅支持跨数据中心的最终一致复制。据该论文称：“ Google中至少有300个应用程序使用Megastore（尽管其性能相对较低），因为它的数据模型比Bigtable的管理更简单，并且因为它支持跨数据中心的同步复制。”当时，GMail，Picasa，日历，Android Market和AppEngine等应用程序都依赖Megastore。</p>
-<p>Spanner被设计为“可扩展，多版本，全局分布和同步复制的数据库”。事务是Spanner中的一流概念，部分原因是它们不在Bigtable中。</p>
-<p>“ Bigtable中缺乏跨行交易导致了频繁的投诉； Percolator的部分构建旨在解决此失败问题。一些作者声称，一般的两阶段提交成本太高而无法支持，因为它带来了性能或可用性问题。我们认为最好是让应用程序程序员处理由于出现瓶颈而过度使用事务引起的性能问题，而不是总是围绕缺乏事务进行编码。在Paxos上运行两阶段提交可以缓解可用性问题。”</p>
+<p>Google有很多数据库技术，例如<a href="https://ai.google/research/pubs/pub27898">Bigtable</a> （列数据库，非常适合高吞吐量写入）和[Megastore]（ <a href="https://ai.google/research/pubs/pub36971">https://ai.google/research/pubs/pub36971</a> ）（NoSQL数据库）。Bigtable仅支持跨数据中心的最终一致复制。据该论文称：“ Google中至少有300个应用程序使用Megastore（尽管其性能相对较低），因为它的数据模型比Bigtable的管理更简单，并且它支持跨数据中心的同步复制。”当时，GMail，Picasa，日历，Android Market和AppEngine等应用程序都依赖Megastore。</p>
+<p>Spanner设计为“可扩展，多版本，全局分布和同步复制的数据库”。事务是Spanner中的一流概念，部分原因是它们在Bigtable中的缺失。</p>
+<p>“ Bigtable中缺乏跨行交易导致了频繁的投诉；渗滤器的部分构建旨在解决此故障。一些作者声称，一般的两阶段提交成本太高而无法支持，因为它带来了性能或可用性问题。我们认为最好是让应用程序程序员处理由于出现瓶颈而过度使用事务引起的性能问题，而不是总是围绕缺乏事务进行编码。在Paxos上运行两阶段提交可以缓解可用性问题。”</p>
 <p>每个数据库都有其用例。Bigtable（在GCP上称为<a href="https://cloud.google.com/bigtable/">Cloud Bigtable</a> ）非常适用于一致的低延迟和高吞吐量工作负载。而Megastore（在GCP上作为<a href="https://cloud.google.com/datastore/">Cloud Datastore</a>可以用作具有ACID事务的托管NoSQL数据存储。Spanner（在GCP上为<a href="https://cloud.google.com/spanner/">Cloud Spanner</a> ）旨在用于水平可伸缩，高可用性和高度一致的RDBM工作负载。</p>
-<p>好吧！我既感兴趣又被吓到了！我<em>想要</em> Spanner，但我<em>不需要</em>机架和堆叠服务器， <em>也不</em>需要同步GPS接收器和原子钟。但是， <em>有些事情</em>告诉我Google很乐意为我做到这一点，所以让我们尝试一下。</p>
+<p>好吧！我既感兴趣又被吓到了！我<em>想要</em> Spanner，但我<em>不需要</em>机架和堆叠服务器并同步GPS接收器和原子钟。但是， <em>有些事情</em>告诉我Google很乐意为我做到这一点，所以让我们尝试一下。</p>
 <p>和以前一样，您需要先启用Google Cloud GCP Spanner的API，然后才能使用它：</p>
 <pre><code class="prettyprint shell">gcloud services enable spanner.googleapis.com
 </code></pre>
 <p>然后，创建一个新的Google Cloud Spanner实例：</p>
 <pre><code class="prettyprint shell">gcloud spanner instances create reservations --config=regional-us-central1 \
-  --nodes=1 --description="Reservations for everybody"
+  --nodes=1 --description=&quot;Reservations for everybody&quot;
 </code></pre>
 <p>然后，创建数据库实例：</p>
 <pre><code class="prettyprint shell">gcloud spanner databases create reservations --instance=reservations
@@ -206,7 +212,7 @@
 <p>确认Spanner实例可用：</p>
 <pre><code class="prettyprint shell">gcloud spanner databases list --instance=reservations
 </code></pre>
-<p>一旦实例为<code>READY</code> ，就可以创建表了。这是Spanner DDL。如果这看起来像SQL，那太好了！这应该。将此DDL放入单独的文件中。我称它为<code>schema.ddl</code> 。</p>
+<p>一旦实例是<code>READY</code> ，该创建表了。这是Spanner DDL。如果这看起来像SQL，那太好了！这应该。将此DDL放入单独的文件中。我叫它<code>schema.ddl</code> 。</p>
 <p><strong>schema.ddl。</strong></p>
 <pre><code class="prettyprint sql">CREATE TABLE reservations (
   id        STRING (36) NOT NULL,
@@ -215,14 +221,14 @@
 </code></pre>
 <p>向数据库注册模式。</p>
 <pre><code class="prettyprint shell">gcloud spanner databases ddl update reservations \
-  --instance=reservations --ddl="$(./gcp/src/main/resources/db/schema.ddl )"
+  --instance=reservations --ddl=&quot;$(./gcp/src/main/resources/db/schema.ddl )&quot;
 </code></pre>
 <p>现在，我们可以在Spring应用程序中从Spanner读取数据。为了与正确的数据库进行对话，自动配置需要一些配置。</p>
 <p><strong>application.properties。</strong></p>
 <pre><code class="prettyprint properties">spring.cloud.gcp.spanner.instance-id=reservations-demo
 spring.cloud.gcp.spanner.database=reservations
 </code></pre>
-<p>在使用Spanner时，我们将使用全新的Spring Data Spanner模块，该模块支持常见的Spring Data习惯用法。添加<code>org.springframework.cloud</code> ： <code>spring-cloud-gcp-starter-data-spanner</code>到您的Maven构建。让我们使用Spring Data存储库来简化数据库的读取工作。</p>
+<p>在使用Spanner时，我们将使用全新的Spring Data Spanner模块，该模块支持常见的Spring Data习惯用法。加<code>org.springframework.cloud</code> ： <code>spring-cloud-gcp-starter-data-spanner</code>到您的Maven版本。让我们使用Spring Data存储库来简化数据库的读取工作。</p>
 <pre><code class="prettyprint java">package com.example.gcp.spanner;
 
 import lombok.AllArgsConstructor;
@@ -259,10 +265,10 @@ public class SpannerApplication {
                 this.reservationRepository.deleteAll();
 
                 Stream
-                    .of("josh", "ray")
-                    .map(name -> new Reservation(UUID.randomUUID().toString(), name))
+                    .of(&quot;josh&quot;, &quot;ray&quot;)
+                    .map(name -&gt; new Reservation(UUID.randomUUID().toString(), name))
                     .forEach(this.reservationRepository::save);
-                this.reservationRepository.findAll().forEach(r -> log.info(r.toString()));
+                this.reservationRepository.findAll().forEach(r -&gt; log.info(r.toString()));
         }
 
         public static void main(String args[]) {
@@ -274,7 +280,7 @@ public class SpannerApplication {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "reservations")
+@Table(name = &quot;reservations&quot;)
 class Reservation {
 
         @Id
@@ -285,21 +291,22 @@ class Reservation {
 
 
 @RepositoryRestResource
-interface ReservationRepository extends PagingAndSortingRepository<Reservation, String> {
+interface ReservationRepository extends PagingAndSortingRepository&lt;Reservation, String&gt; {
 }
 </code></pre>
 <ul>
 <li>
-<p>我们启动应用程序，删除现有数据，然后使用我们的Spring Data Spanner支持的存储库将一些新数据写入数据库。</p></li>
+<p>我们启动该应用程序，删除现有数据，然后使用Spring Data Spanner支持的存储库将一些新数据写入数据库。</p></li>
 <li>
-<p>我们使用自定义映射注释<code>@Table</code>和<code>@PrimaryKey</code>定义Spring Data Spanner实体。</p></li>
+<p>我们使用自定义映射注释定义Spring Data Spanner实体， <code>@Table</code>和<code>@PrimaryKey</code> 。</p></li>
 <li>
 <p>我们创建了一个Spring Data存储库，该存储库也使用Spring Data REST作为REST API公开。</p></li>
 </ul>
 <p>如果您曾经使用过Spring Data，则此示例应该看起来很熟悉。Spring Data Spanner建立在熟悉的概念和模式（模板，存储库和实体）的基础上，以非常不同的数据库来支持熟悉的数据访问模式。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3365;
 
       (function(disqus_shortname, document) {
@@ -313,7 +320,8 @@ interface ReservationRepository extends PagingAndSortingRepository<Reservation, 
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -351,12 +359,14 @@ interface ReservationRepository extends PagingAndSortingRepository<Reservation, 
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

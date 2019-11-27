@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Groovy-Eclipse中更好的DSL支持</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -33,14 +37,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2011-05-09 03:57:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,12 +172,185 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Groovy语言是创建特定领域语言（DSL）的绝佳平台。好的DSL可以使程序更简洁，更具表现力，并使程序员更高效。但是，直到现在，编辑器中的Groovy-Eclipse都不直接支持这些DSL。大量使用DSL时，诸如内容辅助，搜索，悬停和导航之类的标准IDE功能将失去其价值。一段时间以来，可以编写一个Eclipse插件来扩展Groovy-Eclipse，但这是一种重量级的方法，需要对Eclipse API的专门知识。现在，Groovy-Eclipse支持<em>DSL描述符</em> （DSLD），在Groovy-Eclipse中支持自定义DSL将变得更加容易。</p>
+<div class="blog--post"><p>Groovy语言是创建特定领域语言（DSL）的绝佳平台。好的DSL可以使程序更简洁，更富有表现力，并使程序员更高效。但是，到目前为止，编辑器中的Groovy-Eclipse尚未直接支持这些DSL。大量使用DSL时，诸如内容辅助，搜索，悬停和导航之类的标准IDE功能将失去其价值。一段时间以来，可以编写一个Eclipse插件来扩展Groovy-Eclipse，但这是一种重量级的方法，需要对Eclipse API的专门知识。现在，Groovy-Eclipse支持<em>DSL描述符</em> （DSLD），在Groovy-Eclipse中支持自定义DSL将变得更加容易。</p>
 <h2>一个简单的例子</h2><p>考虑一下Joachim Baumann描述的<a href="https://joesgroovyblog.blogspot.com/2007/09/and-miles-to-go-before-i-sleep.html">DSL</a> 。他创建了一个简单的DSL以用于远距离工作。使用此DSL，您可以编写如下内容来计算总行驶距离：</p>
-<pre><code class="prettyprint groovy"><br>3.m + 2.yd + 2.mi - 1.km
-</code></pre><p>这是一个简单而富有表现力的DSL，但是当您在Groovy-Eclipse中将其键入Groovy编辑器时（为简洁起见，假定<code>$url</code>在其他位置定义）：</p><p>[标题ID =“ attachment_8774” align =“ aligncenter” width =“ 179”] <a href="http://blog.springsource.com/wp-content/uploads/2011/05/underlines.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/underlines.png" alt="Groovy-Eclipse中无法识别自定义DSL" title="强调无法识别的DSL" width="179" height="26" class="size-full wp-image-8774"></a> [/字幕]</p><p>您看到的是下划线，没有任何悬停，这意味着编辑器无法静态解析DSL的表达式。使用DSLD，可以<em>教</em>给编辑者这些自定义DSL背后的一些语义，并提供有关悬停的文档：</p><p>[标题id =“ attachment_8775” align =“ aligncenter” width =“ 683”] <a href="http://blog.springsource.com/wp-content/uploads/2011/05/no_underline_with_hover.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/no_underline_with_hover.png" alt="编辑器中的DSL，带文档，不带下划线" title="no_underline_with_hover" width="683" height="76" class="size-full wp-image-8775"></a> [/字幕]</p><p>要为距离DSL创建DSL描述符，您只需要向Groovy项目中添加一个扩展名为<em>.dsld</em>并具有以下内容的文件：</p>
-<pre><code class="prettyprint groovy"><br>currentType( subType( Number ) ).accept {   
-   property name:"m", type:"Distance", 
-    doc: """A <code>meter</code> from <a href="$url">$url</a>"""
+<pre><code class="prettyprint groovy"><br />3.m + 2.yd + 2.mi - 1.km
+</code></pre><p>这是一个简单而富有表现力的DSL，但是当您在Groovy-Eclipse中将其键入Groovy编辑器时（为简洁起见，请假设<code>$url</code>在其他地方定义）：</p><p>[标题ID =“ attachment_8774” align =“ aligncenter” width =“ 179”] <a href="http://blog.springsource.com/wp-content/uploads/2011/05/underlines.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/underlines.png" alt="Groovy-Eclipse中无法识别自定义DSL" title="强调无法识别的DSL" width="179" height="26" class="size-full wp-image-8774"></a> [/字幕]</p><p>您看到的是下划线，没有任何悬停，这意味着编辑器无法静态解析DSL的表达式。使用DSLD，可以<em>教</em>给编辑者这些自定义DSL背后的一些语义，并提供有关悬停的文档：</p><p>[标题ID =“ attachment_8775” align =“ aligncenter” width =“ 683”] <a href="http://blog.springsource.com/wp-content/uploads/2011/05/no_underline_with_hover.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/no_underline_with_hover.png" alt="编辑器中的DSL，带有文档，没有下划线" title="no_underline_with_hover" width="683" height="76" class="size-full wp-image-8775"></a> [/字幕]</p><p>要为距离DSL创建DSL描述符，您只需要向Groovy项目中添加一个扩展名为<em>.dsld</em>并具有以下内容的文件：</p>
+<pre><code class="prettyprint groovy"><br />currentType( subType( Number ) ).accept {   
+   property name:&quot;m&quot;, type:&quot;Distance&quot;, 
+    doc: &quot;&quot;&quot;A &lt;code&gt;meter&lt;/code&gt; from &lt;a href=&quot;$url&quot;&gt;$url&lt;/a&gt;&quot;&quot;&quot;
 }
-</code></pre><p>该脚本说， <em>只要编辑器中当前正在评估的类型是<code>java.lang.Number</code></em><code>java.lang.Number</code></p><p><code>java.lang.Number</code></p><code>java.lang.Number</code></div><code>java.lang.Number</code></div><code>java.lang.Number</code></article><code>java.lang.Number</code></div><code>java.lang.Number</code></div><code>java.lang.Number</code></div><code>java.lang.Number</code></div><code>java.lang.Number</code></body></html>
+</code></pre><p>该脚本说， <em>每当编辑器中当前正在评估的类型是的子类型时， <code>java.lang.Number</code> ，添加“ <code>m</code> '类型为的属性<code>Distance</code></em> 。的<code>currentType(subType(Number))</code>片段称为<em>切入点</em> ，而代码块则调用<code>property</code>被称为<em>贡献块</em> 。稍后将详细介绍这些概念。</p><p>上面的脚本片段不是完整的DSLD。它只会添加“ <code>m</code>的财产。要完成实现，您可以利用Groovy语法的全部功能：</p>
+<pre><code class="prettyprint groovy"><br />currentType( subType( Number ) ).accept {   
+    [ m: &quot;meter&quot;,  yd: &quot;yard&quot;,  cm: &quot;centimerter&quot;,  mi: &quot;mile&quot;,  km: &quot;kilometer&quot;].each {
+      property name:it.key, type:&quot;Distance&quot;, 
+        doc: &quot;&quot;&quot;A &lt;code&gt;${it.value}&lt;/code&gt; from &lt;a href=&quot;$url&quot;&gt;$url&lt;/a&gt;&quot;&quot;&quot;
+    }
+}
+</code></pre><p>这个简单的示例表明，相对较小的脚本可以创建一些强大的DSL支持。</p>
+<h2>DSLD的解剖</h2><p>DSLD增强了Groovy-Eclipse的<a href="https://contraptionsforprogramming.blogspot.com/2009/11/how-type-inferencing-for-groovy-in.html">类型推断引擎</a> ，该<a href="https://contraptionsforprogramming.blogspot.com/2009/11/how-type-inferencing-for-groovy-in.html">引擎</a>在编辑时在后台运行。DSLD由IDE评估，并在必要时由推理引擎查询。</p><p>DSLD脚本包含一组<strong>切入点</strong> ，每个<strong>切入点</strong>都与一个或多个<strong>贡献块</strong>关联。切入点粗略地描述了需要<em>在何处</em>增强类型推理（即，上下文中的哪种类型），而贡献块则描述<em>了</em>其增强方式（即，应添加哪些属性和方法）。</p><p>有许多切入点可用，并且在<a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse#DSLDescriptorsforGroovy-Eclipse-Pointcuts">DSLD文档中</a>通过示例对它们进行了详细描述。随着我们开始学习人们将如何创建脚本以及他们需要什么样的操作，在DSLD的未来版本中，可用的切入点的集合可能会扩展。</p><p>贡献块是Groovy代码块，它们通过以下方式与切入点相关联： <code>accept</code>方法。您可以在贡献块内执行的两个主要操作是<code>property</code> ，我们之前已经介绍过，以及<code>method</code> ，这会在贡献块中为要分析的类型添加一种方法。</p><p><em>切入点</em>一词是从<a href="http://www.jroller.com/colyer/entry/the_ted_neward_challenge_aop">面向方面的编程</a> （AOP）中借用的。实际上，DSLD <a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse#DSLDescriptorsforGroovy-Eclipse-Moreformally">可以被视为</a> AOP语言。DSLD与典型的AOP语言（例如<a href="https://eclipse.org/aspectj">AspectJ</a> ）之间的主要区别在于DSLD在正在编辑的程序的抽象语法树上运行，而类似AspectJ的语言在已编译程序的Java字节代码上运行。</p>
+<h2>DSLD入门</h2><p><a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse">在Codehaus</a>的<a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse">Wiki上</a>有完整的DSLD文档。在这里，我将简要描述如何开始使用DSLD。开始：</p>
+<ol>
+<li>使用此更新站点安装最新的Groovy-Eclipse夜间版本：<code>http://dist.codehaus.org/groovy/distributions/greclipse/snapshot/e3.6/</code></li>
+<li>在新的或现有的Groovy-Eclipse项目中，将DSLD Meta脚本复制到项目的源文件夹中。该脚本本身提供了对DSLD文件的编辑支持， <a href="http://docs.codehaus.org/download/attachments/204275718/DSLD_meta_script.dsld">可在此处获得</a></li>
+<li>使用向导创建一个新的DSLD脚本：File-> New-> Groovy DSL Descriptor：<a href="http://blog.springsource.com/wp-content/uploads/2011/05/DSLD_wizard.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/DSLD_wizard.png" alt="DSLD向导" title="DSLD向导" width="212" height="94" class="aligncenter size-full wp-image-8780"></a></li>
+<li>在新创建的文件中，取消注释示例文本。``groovy currentType（subType（'groovy.lang。GroovyObject'））。accept {属性名称：'newProp'，类型：字符串，提供者：'Sample DSL'，doc：'这是一个示例。您应该在所有GroovyObject的内容帮助中看到以下内容：<pre>newProp</pre>在DSLD内部，您应该看到特定于DSLD的内容辅助和悬停（这来自于步骤2中添加的meta-DSLD脚本）。它看起来像这样：<a href="http://blog.springsource.com/wp-content/uploads/2011/05/in_dsld_file.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/in_dsld_file.png" alt="带有悬停的DSLD文件的内容" title="在DSLD文件中" width="592" height="290" class="aligncenter size-full wp-image-8782"></a></li>
+<li>现在，您可以创建一个新的Groovy脚本，并使用刚刚创建的DSLD。您可以输入：```groovy this.newProp```</li>你应该看到<code>newProp</code>会正确突出显示，并且悬停将显示DSLD的文档，并且外观应如下所示： <a href="http://blog.springsource.com/wp-content/uploads/2011/05/sample.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/sample.png" alt="在文件中使用样本DSLD" title="样品" width="532" height="108" class="aligncenter size-full wp-image-8793"></a>
+
+<li>您可以更改DSLD。保存更改后，将立即在所有Groovy脚本和文件中提取更改。</li>
+<li>恭喜你！现在，您已经实现了第一个DSLD。</li>
+</ol><p>您可以从Groovy-> DSLD首选项页面查看和管理工作区中的所有DSLD：<br><a href="http://blog.springsource.com/wp-content/uploads/2011/05/preferences_page.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/preferences_page.png" alt="DSLD首选项页面" title="DSLD首选项页面" width="762" height="466" class="aligncenter size-full wp-image-8783"></a></p><p>在这里，您可以启用/禁用单个脚本以及选择要编辑的脚本。</p><p><strong>重要提示：</strong>由于在实施DSLD时发现并修复错误可能有点神秘，因此强烈建议您执行以下操作：<br></p><ul><br> <li>打开Eclipse错误日志</li><br> <li>打开<a href="http://groovy.codehaus.org/Groovy-Eclipse+2.1.1+New+and+Noteworthy#Groovy-Eclipse2.1.1NewandNoteworthy-GroovyEventConsole">Groovy事件控制台</a></li><br></ul><p></p><p>脚本的编译和运行时问题将在这两个地方之一显示。</p>
+<h2>Grails约束语言的DSLD</h2><p>对于更大的示例，让我们看一下Grails框架。<a href="http://grails.org/doc/latest/ref/Constraints/Usage.html">Grails约束DSL</a>提供了一种声明方法来验证Grails域类。简洁明了，但是由于没有对此DSL的直接编辑支持，Grails程序员依赖于外部文档，并且可能直到运行时才意识到语法错误。我们可以创建一个DSLD来解决这个问题</p>
+<pre><code class="prettyprint groovy"><br />// only available in STS 2.7.0 and above
+supportsVersion(grailsTooling:&quot;2.7.0&quot;)
+
+
+// a generic grails artifact is a class that is in a grails project, is not a script and is in one of the &#39;grails-app&#39; folders
+def grailsArtifact = { String folder -&gt; 
+	sourceFolderOfCurrentType(&quot;grails-app/&quot; + folder) &amp; 
+	nature(&quot;com.springsource.sts.grails.core.nature&quot;) &amp; (~isScript())
+}
+ 
+// define the various kinds of grails artifacts
+def domainClass = grailsArtifact(&quot;domain&quot;)
+// we only require domainClass, but we can also reference other kinds of artifacts here
+def controllerClass = grailsArtifact(&quot;controllers&quot;)
+def serviceClass = grailsArtifact(&quot;services&quot;)
+def taglibClass = grailsArtifact(&quot;taglib&quot;)
+
+ 
+// constraints
+// The constraints DSL is only applicable inside of the static &quot;constraints&quot; field declaration
+inClosure() &amp; (domainClass &amp; enclosingField(name(&quot;constraints&quot;) &amp; isStatic()) &amp; 
+		(bind(props : properties()) &amp; // &#39;bind&#39; props to the collection of properties in the domain class
+		currentTypeIsEnclosingType())).accept {
+
+	provider = &quot;Grails Constraints DSL&quot;  // this value will appear in content assist
+
+	// for each non-static property, there are numerous constraints &quot;methods&quot; that are available
+	// define them all here
+	for (prop in props) {
+		if (prop.isStatic()) {
+			continue
+		}
+		if (prop.type == ClassHelper.STRING_TYPE) {
+			method isStatic: true, name: prop.name, params: [blank:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [creditCard:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [email:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [url:Boolean], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [matches:String], useNamedArgs:true
+		} else if (prop.type.name == Date.name) {
+			method isStatic: true, name: prop.name, params: [max:Date], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [min:Date], useNamedArgs:true
+		} else if (ClassHelper.isNumberType(prop.type)) {
+			method isStatic: true, name: prop.name, params: [max:Number], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [min:Number], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [scale:Number], useNamedArgs:true
+		} else if (prop.type.implementsInterface(ClassHelper.LIST_TYPE)) {
+			method isStatic: true, name: prop.name, params: [maxSize:Number], useNamedArgs:true
+			method isStatic: true, name: prop.name, params: [minSize:Number], useNamedArgs:true
+		}
+		method isStatic: true, name: prop.name, params: [unique:Boolean], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [size:Integer], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [notEqual:Object], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [nullable:Boolean], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [range:Range], useNamedArgs:true
+		method isStatic: true, name: prop.name, params: [inList:List], useNamedArgs:true
+	}
+}
+</code></pre><p>如果您复制上面的DSLD脚本并将其添加到Grails项目中的DSLD文件中，那么约束语言将被教给STS。例如，在下面的简单域类中，您可以在constraints块中获得此内容以用于内容辅助：<br><a href="http://blog.springsource.com/wp-content/uploads/2011/05/constraints.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/05/constraints.png" alt="使用DSL限制" title="使用DSL限制" width="518" height="523" class="aligncenter size-full wp-image-8794"></a></p><p>可以对以上脚本进行调整以添加自定义文档。</p>
+<h2>我使用Groovy，但没有创建自己的DSL。我为什么要关心DSLD？</h2><p>即使大多数Groovy和Grails用户没有实现自己的DSL，他们也会使用DSL（在<a href="http://grails.org">Grails</a> ， <a href="http://groovy.codehaus.org/Gaelyk">Gaelyk中</a> ，通过<a href="http://groovy.codehaus.org/Builders">构建器</a>等）。因此，即使大多数STS用户不会创建自己的DSLD，也将从其他人创建的DSLD中受益。我们将与库和DSL开发人员一起努力，以便为Groovy生态系统的不同部分创建通用的DSLD。</p><p>可以预期，在即将发布的Groovy-Eclipse版本中，对流行的基于Groovy的框架的支持将大大增加。</p>
+<h2>DSLD的当前状态</h2><p>现在可以使用DSLD语言的核心实现，但是随着我们进一步了解用户需求以及他们希望支持的DSL类型，我们将对其进行调整。我们将实现更多切入点，扩展文档，并努力通过Groovy-Eclipse本身提供一些标准DSLD。</p><p>请尝试在此处或<a href="http://docs.codehaus.org/display/GROOVY/DSL+Descriptors+for+Groovy-Eclipse">Wiki</a>上介绍的一些DSLD，并在此博客文章， <a href="http://jira.codehaus.org/browse/GRECLIPSE">问题跟踪工具</a>或<a href="http://xircles.codehaus.org/lists/eclipse-plugin-user@groovy.codehaus.org">Groovy-Eclipse邮件列表</a>上给我们反馈。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 416;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>在SpringSource应用程序平台中运行Spring Batch作业</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -45,10 +49,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -176,35 +182,35 @@
 </header>
 <div class="blog--post"><p>在本文中，我将向您展示如何在SpringSource Application Platform中运行Spring Batch作业。我将其作为JavaOne的一个小示例运行了一个早期版本，然后又在London Spring User Group上运行，并认为分享它可能是一件好事。示例代码在<a href="http://blog.springsource.com/main/wp-content/uploads/2008/06/batch-ap-blog-v2.zip">这里</a> 。</p>
 <h2>捆绑包</h2><p>首先，我们将快速浏览示例代码中的捆绑软件。立即启动服务器，或在安装某些捆绑软件后的任何时候启动服务器。</p>
-<h3>捆绑包：hsql-server</h3><p>这对于进行开发和测试很有用。它所做的只是在服务器模式下启动HSQLDB实例，以便您可以连接到它并使用SQL语句检查数据库。您可以将其拖放到Servers视图中的Platform Server实例中。首先执行此操作，因为平台会记住捆绑软件的安装顺序，并以该顺序启动它们。必须首先启动该数据库，因为其他捆绑软件将尝试连接到数据库服务器。</p><p>捆绑包配置位于<tt>META-INF / spring / module-context.xml中</tt> （这是平台捆绑包的常规设置）-Spring DM从<tt>META-INF / spring中</tt>拾取所有XML文件。这只是使用Spring来配置和启动HSQL Server的实例。</p><p>有一个集成测试可用于检查配置。</p><p>Eclipse项目还包含用于HSQL Swing客户端的启动配置，因此您可以在GUI中查看数据库内容。启动它，并使用同一项目（url = jdbc：hsqldb： <a href="javascript:void(0);">hsql：// localhost：9005 / samples）</a>中<tt>META-INF / batch-hsql.properties</tt>中提供的属性连接到服务器实例。</p>
+<h3>捆绑包：hsql-server</h3><p>这对于进行开发和测试很有用。它所做的只是在服务器模式下启动HSQLDB实例，以便您可以连接到它并使用SQL语句检查数据库。您可以将其拖放到“服务器视图”中的“平台服务器”实例中。首先执行此操作，因为平台会记住捆绑软件的安装顺序，并以该顺序启动它们。必须首先启动该数据库，因为其他捆绑软件将尝试连接到数据库服务器。</p><p>捆绑包配置位于<tt>META-INF / spring / module-context.xml中</tt> （这是平台捆绑包的常规设置）-Spring DM从<tt>META-INF / spring中</tt>拾取所有XML文件。这只是使用Spring来配置和启动HSQL Server的实例。</p><p>有一个集成测试可用于检查配置。</p><p>Eclipse项目还包含用于HSQL Swing客户端的启动配置，因此您可以在GUI中查看数据库内容。启动它，并使用同一项目（url = jdbc：hsqldb： <a href="javascript:void(0);">hsql：// localhost：9005 / samples）</a>中<tt>META-INF / batch-hsql.properties</tt>中提供的属性连接到服务器实例。</p>
 <h3>捆绑包：数据源</h3><p>该捆绑软件是一个配置捆绑软件，它为<tt>javx.sql公开了一个OSGi服务<tt>。数据源</tt> 。接下来将其放入服务器。有一个简单的集成测试可用于检查配置-它只是从数据源获取连接并断言它不是null。</tt></p><tt>
-<h3>捆绑：数据源初始化器</h3><p>这是在测试环境中拥有的另一个方便的捆绑软件。它的工作是拆除数据库，然后重新安装其余捆绑软件所需的表（批处理元数据和作业本身的一些业务表）。当您将此捆绑包安装到服务器中时，它将添加表，然后将这些表显示在HSQL Swing GUI中。一旦安装完成，就可以将其删除（在“服务器视图”中的捆绑软件上单击鼠标右键，然后选择“删除”）。</p>
-<h3>捆绑包：工作启动器</h3><p>这是第一个包含一些Spring Batch依赖项的捆绑软件。它主要是一个配置捆绑包，为将实际运行作业的其他捆绑包提供服务（JobLauncher，JobRepository，TransactionManager）。安装完成后，就可以坐在那里提供服务。</p><p>束配置在<tt>META-INF /弹簧/模块context.xml中</tt>按通常。它是Spring Batch示例中的<tt>simple-job-launcher-context.xml</tt>的<tt>简化</tt>版本。它只需要定义将要导出的bean，即</p>
-<pre><code class="prettyprint xml"><bean id="jobLauncher"
-    class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-  <property name="jobRepository" ref="jobRepository" />
-</bean>
+<h3>捆绑包：数据源初始化器</h3><p>这是在测试环境中拥有的另一个方便的捆绑软件。它的工作是拆除数据库，然后重新安装其余捆绑软件所需的表（批处理元数据和作业本身的一些业务表）。当您将此捆绑包安装到服务器中时，它将添加表，然后将这些表显示在HSQL Swing GUI中。一旦安装完成，就可以将其删除（在“服务器视图”中的捆绑软件上单击鼠标右键，然后选择“删除”）。</p>
+<h3>捆绑包：工作启动器</h3><p>这是第一个包含一些Spring Batch依赖项的捆绑软件。它主要是一个配置捆绑包，为将实际运行作业的其他捆绑包提供服务（JobLauncher，JobRepository，TransactionManager）。安装完成后，就可以坐在那里提供服务。</p><p>通常，捆绑包配置位于<tt>META-INF / spring / module-context.xml</tt>中。它是Spring Batch示例中的<tt>simple-job-launcher-context.xml</tt>的<tt>简化</tt>版本。它只需要定义将要导出的bean，即</p>
+<pre><code class="prettyprint xml">&lt;bean id=&quot;jobLauncher&quot;
+    class=&quot;org.springframework.batch.core.launch.support.SimpleJobLauncher&quot;&gt;
+  &lt;property name=&quot;jobRepository&quot; ref=&quot;jobRepository&quot; /&gt;
+&lt;/bean&gt;
 
-<bean id="jobRepository"
-    class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
-  <property name="dataSource" ref="dataSource" />
-  <property name="databaseType" value="hsql" />
-</bean>
+&lt;bean id=&quot;jobRepository&quot;
+    class=&quot;org.springframework.batch.core.repository.support.JobRepositoryFactoryBean&quot;&gt;
+  &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;
+  &lt;property name=&quot;databaseType&quot; value=&quot;hsql&quot; /&gt;
+&lt;/bean&gt;
 	
-<bean id="transactionManager" 
-    class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-  <property name="dataSource" ref="dataSource"/>
-</bean>
-</code></pre><p>唯一的其他配置是<tt>JobRepository</tt>的交易建议（Spring Batch 1.1中不需要）。则dataSource参考来自通过上述<tt>数据源</tt>束露出的OSGi服务。要查看如何导入该引用以及如何向OSGi服务注册表公开本地服务，我们可以查看<tt>META-INF / spring / osgi-context.xml</tt> ：</p>
-<pre><code class="prettyprint xml"><reference id="dataSource" interface="javax.sql.DataSource" />
+&lt;bean id=&quot;transactionManager&quot; 
+    class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+  &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+&lt;/bean&gt;
+</code></pre><p>唯一的其他配置是<tt>JobRepository</tt>的交易建议（Spring Batch 1.1中不需要）。dataSource参考来自上面的<tt>数据源</tt>捆绑包提供的OSGi服务。要查看如何导入该引用以及如何向OSGi服务注册表公开本地服务，我们可以查看<tt>META-INF / spring / osgi-context.xml</tt> ：</p>
+<pre><code class="prettyprint xml">&lt;reference id=&quot;dataSource&quot; interface=&quot;javax.sql.DataSource&quot; /&gt;
 
-<service ref="jobLauncher"
-  interface="org.springframework.batch.core.launch.JobLauncher" />
-<service ref="jobRepository"
-  interface="org.springframework.batch.core.repository.JobRepository" />
-<service ref="transactionManager"
-  interface="org.springframework.transaction.PlatformTransactionManager" />
-</code></pre><p>这是对Spring DM的直接使用。重要的是，模块上下文与OSGi特定的上下文保持分开。这使我们可以编写模块上下文的集成测试，而不必部署到平台。因此，我们有：</p>
+&lt;service ref=&quot;jobLauncher&quot;
+  interface=&quot;org.springframework.batch.core.launch.JobLauncher&quot; /&gt;
+&lt;service ref=&quot;jobRepository&quot;
+  interface=&quot;org.springframework.batch.core.repository.JobRepository&quot; /&gt;
+&lt;service ref=&quot;transactionManager&quot;
+  interface=&quot;org.springframework.transaction.PlatformTransactionManager&quot; /&gt;
+</code></pre><p>这是对Spring DM的直接使用。重要的是，模块上下文与OSGi特定的上下文保持分开。这使我们能够为模块上下文编写集成测试，而不必部署到平台。因此，我们有：</p>
 <pre><code class="prettyprint java">@ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class JobLauncherIntegrationTests {
@@ -219,7 +225,7 @@ public class JobLauncherIntegrationTests {
 
 }
 </code></pre><p>该测试加载了上下文，添加了本地数据源定义来替换OSGi（请参见<tt>JobLauncherIntegrationTests-context.xml</tt> ），然后广告断言可以使用作业启动器。您可以以正常方式直接从Eclipse运行测试。</p>
-<h4><tt>SimpleJobLauncherBean</tt></h4><p>除了上面在OSGi容器中公开服务的配置之外，此捆绑包还导出软件包。看一下<tt>MANIFEST.MF</tt> ：</p>
+<h4><tt>SimpleJobLauncherBean</tt></h4><p>除了上面在OSGi容器中公开服务的配置之外，此捆绑包还导出了一个包。看一下<tt>MANIFEST.MF</tt> ：</p>
 <pre><code class="prettyprint plain">...
 Export-Package: com.springsource.consulting.batch.support
 ...
@@ -227,12 +233,12 @@ Export-Package: com.springsource.consulting.batch.support
 <pre><code class="prettyprint java">try {
   jobLauncher.run(job, converter.getJobParameters(parameters));
 } catch (JobExecutionAlreadyRunningException e) {
-  logger.error("This job is already running", e);
+  logger.error(&quot;This job is already running&quot;, e);
 } catch (JobInstanceAlreadyCompleteException e) {
-  logger.info("This job is already complete.  "
-    + "Maybe you need to change the input parameters?", e);
+  logger.info(&quot;This job is already complete.  &quot;
+    + &quot;Maybe you need to change the input parameters?&quot;, e);
 } catch (JobRestartException e) {
-  logger.error("Unspecified restart exception", e);
+  logger.error(&quot;Unspecified restart exception&quot;, e);
 }
 </code></pre><p>启动作业的计划是简单地为每个作业创建一个包，并让其定义这些<tt>SimpleJobLauncherBean</tt>实例之一。</p>
 <h3>捆绑包：hello-world</h3><p>这是一个非常简单的工作包。它具有较大工作的所有功能（从文件输入并输出到数据库），但可用于非常简单的域模型和非常小的数据集。</p><p>将捆绑软件放入正在运行的Server实例中。它开始很快，并且由于工作范围太小，您将立即在批处理元数据中看到效果。在HSQL Swing GUI中，您可以执行一些SQL，例如</p>
@@ -241,27 +247,27 @@ Export-Package: com.springsource.consulting.batch.support
 <table cellspacing="0" cellpadding="0" border="1"><tbody><tr><th>STEP_EXECUTION_ID</th><th>版</th><th>STEP_NAME</th><th>...</th><th>状态</th><th>...</th></tr>
 <tr><td>0</td><td>4</td><td>helloWorldStep</td><td>...</td><td>已完成</td><td>...</td></tr>
 </tbody></table><p>这表明作业已执行（并成功完成）。该步骤的配置位于<tt>META-INF / spring / module-context.xml中</tt> ：</p>
-<pre><code class="prettyprint xml"><bean
-	class="com.springsource.consulting.batch.support.SimpleJobLauncherBean">
-	<constructor-arg ref="jobLauncher" />
-	<constructor-arg ref="helloWorld" />
-	<property name="parameters" value="launch.timestamp=${launch.timestamp}"/>
-</bean>
+<pre><code class="prettyprint xml">&lt;bean
+	class=&quot;com.springsource.consulting.batch.support.SimpleJobLauncherBean&quot;&gt;
+	&lt;constructor-arg ref=&quot;jobLauncher&quot; /&gt;
+	&lt;constructor-arg ref=&quot;helloWorld&quot; /&gt;
+	&lt;property name=&quot;parameters&quot; value=&quot;launch.timestamp=${launch.timestamp}&quot;/&gt;
+&lt;/bean&gt;
 
-<bean id="helloWorld" parent="simpleJob">
-	<property name="steps">
-		<bean parent="simpleStep" id="helloWorldStep">
-			<property name="commitInterval" value="100" />
-			<property name="itemReader">
+&lt;bean id=&quot;helloWorld&quot; parent=&quot;simpleJob&quot;&gt;
+	&lt;property name=&quot;steps&quot;&gt;
+		&lt;bean parent=&quot;simpleStep&quot; id=&quot;helloWorldStep&quot;&gt;
+			&lt;property name=&quot;commitInterval&quot; value=&quot;100&quot; /&gt;
+			&lt;property name=&quot;itemReader&quot;&gt;
     ...
-			</property>
-			<property name="itemWriter">
+			&lt;/property&gt;
+			&lt;property name=&quot;itemWriter&quot;&gt;
     ...
-			</property>
-		</bean>
-	</property>
-</bean>
-</code></pre><p>从上面可以看到，我们只需一步就可以完成常规的Spring Batch作业配置（称为“ helloWorld”）。在上面的数据库查询中已经可以看到步骤ID（“ helloWorldStep”），表明该步骤已执行（一次）。所有步骤所做的就是从平面文件中读取数据，将行转换为域对象，并将其写入标准输出。您可以通过检查Platform主目录中的跟踪日志来查看结果，例如，如果您<tt>跟踪-f serviceability / trace / trace.log | grep -i你好，</tt>你应该看到：</p>
+			&lt;/property&gt;
+		&lt;/bean&gt;
+	&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>从上面可以看到，我们只需一步就可以完成常规的Spring Batch作业配置（称为“ helloWorld”）。在上面的数据库查询中已经可以看到步骤ID（“ helloWorldStep”），表明该步骤已执行（一次）。所有步骤要做的就是从平面文件中读取数据，将行转换为域对象，然后将其写入标准输出。您可以通过检查Platform主目录中的跟踪日志来查看结果，例如，如果您<tt>跟踪-f serviceability / trace / trace.log | grep -i你好，</tt>你应该看到：</p>
 <pre><code class="prettyprint plain">[2008-05-30 15:57:04.140] platform-dm-11              
   com.springsource.consulting.batch.hello.MessageWriter.unknown 
   I Message: [Hello World]
@@ -269,10 +275,10 @@ Export-Package: com.springsource.consulting.batch.support
   com.springsource.consulting.batch.hello.MessageWriter.unknown 
   I Message: [Hello Small World]
 </code></pre><p>如果愿意，您可以再次运行该作业，只需编辑捆绑软件中的一个文件（例如MANIFEST或Spring配置文件之一）并保存即可。工具获取更改并重新部署捆绑包。设置此作业的方式是，它使用一组新的参数（使用时间戳记）开始每次执行，因此应始终成功运行。</p>
-<h4>工作的结束</h4><p>一旦工作完成，无论成功与否，我们都希望将系统保持在已发生状态的状态。有很多可能的方法，但是我们真正需要的是一种可工具化的方法，以便可以通知操作员，并采取任何必要的措施（例如重新启动失败的作业或重新参数化成功的作业以进行下一次运行） ）。操作员可能是人，也可能是系统功能。</p><p>为了表示作业已结束， <tt>SimpleJobLauncherBean</tt>只需获取封闭的OSGi <tt>Bundle</tt>实例，然后将其停止。这是一个非常简单的模型，但是具有API定义明确且OSGi平台普遍支持的优点。原则上，只要容器（SpringSource应用程序平台）可以捕获那些捆绑事件，就可以非常灵活地扩展它。这些是我们可能会在平台版本2.0的批处理个性中看到的功能。如果您对行为应该是什么以及操作员需要什么功能有任何想法，请通过评论本文来帮助我们。</p><p>我们可以通过登录到Equinox控制台来验证作业捆绑包的状态。如果转到命令行并键入<tt>telnet localhost 2401</tt> ，则应该在平台上看到命令提示符：</p>
-<pre><code class="prettyprint plain">osgi>
+<h4>工作的结束</h4><p>一旦工作完成，无论成功与否，我们都希望将系统保持在已发生状态的状态。有很多可能的方法，但是我们真正需要的是一种可工具化的方法，以便可以通知操作员，并采取任何必要的措施（例如重新启动失败的作业或重新参数化成功的作业以进行下一次运行） ）。操作员可能是人，也可能是系统功能。</p><p>为了表示作业已结束， <tt>SimpleJobLauncherBean</tt>只需获取封闭的OSGi <tt>Bundle</tt>实例，然后将其停止。这是一个非常简单的模型，但是具有API定义明确且OSGi平台普遍支持的优点。原则上，只要容器（SpringSource Application Platform）可以捕获那些捆绑事件，就可以非常灵活地扩展它。这些是我们可能会在平台版本2.0的批处理个性中看到的功能。如果您对行为应该是什么以及操作员需要什么功能有任何想法，请通过评论本文来帮助我们。</p><p>我们可以通过登录到Equinox控制台来验证作业捆绑包的状态。如果转到命令行并键入<tt>telnet localhost 2401</tt> ，则应该在平台上看到命令提示符：</p>
+<pre><code class="prettyprint plain">osgi&gt;
 </code></pre><p>输入“ ss”并按回车键，您将看到已安装捆绑包的列表：</p>
-<pre><code class="prettyprint plain">osgi> ss
+<pre><code class="prettyprint plain">osgi&gt; ss
 
 Framework is launched.
 
@@ -284,11 +290,11 @@ id      State       Bundle
 97      ACTIVE      job.launcher_1.0.0
 99      RESOLVED    hello.world_1.0.0
 
-osgi>
-</code></pre><p>因此，id = 97的捆绑包是作业启动器，并且处于活动状态。id = 99的捆绑包是hello world作业（您的情况下id可能不同），它已解决，但未激活，因为在作业完成执行时已停止。</p><p>您可以从OSGi命令行再次重新启动作业：</p>
-<pre><code class="prettyprint plain">osgi> start 99
+osgi&gt;
+</code></pre><p>因此，id = 97的捆绑包是作业启动器，并且处于活动状态。id = 99的捆绑包是hello world作业（您的情况下id可能不同），它已解决，但由于在作业完成执行时已停止，所以未激活。</p><p>您可以从OSGi命令行重新启动作业：</p>
+<pre><code class="prettyprint plain">osgi&gt; start 99
 
-osgi> ss
+osgi&gt; ss
 
 Framework is launched.
 
@@ -300,7 +306,7 @@ id      State       Bundle
 97      ACTIVE      job.launcher_1.0.0
 99      RESOLVED    hello.world_1.0.0
 
-osgi>
+osgi&gt;
 </code></pre><p>作业捆绑包返回到已解决状态，但是它再次执行了该作业，您可以像以前一样从HSQL GUI或跟踪日志中进行验证。</p>
 <table cellspacing="0" cellpadding="0" border="1"><tbody><tr><th>STEP_EXECUTION_ID</th><th>版</th><th>STEP_NAME</th><th>...</th><th>状态</th><th>...</th></tr>
 <tr><td>0</td><td>4</td><td>helloWorldStep</td><td>...</td><td>已完成</td><td>...</td></tr>
@@ -332,16 +338,18 @@ osgi>
 <li>将activeByDefault标志更改为true，然后等待Q4E下载依赖项。</li>
 <li>使用Q4E可视化工具检查依赖关系（右键单击项目，然后选择Maven2->分析依赖关系（或可视化依赖关系）。您只需执行此操作即可查看传递依赖项是什么。（您也可以在命令行上使用<tt>$ mvndependency：tree</tt> 。）</li>
 <li>此时，我总是也总是右键单击该项目，然后选择Maven2-> Fetch Source JARs。这是可选的，但是使开发更容易并且可以进行调试。</li>
-<li>将直接依赖项复制到Platform <tt>bundles / usr</tt>目录。严格来说，您只需要复制<tt>bundles / ext中</tt>尚未存在的那些即可。在命令行（具有明智的操作系统）上，您可以执行<pre>$ find ~/.m2/repository -name \*.jar -exec cp {} bundles/usr \;</pre>
+<li>将直接依赖项复制到Platform <tt>bundles / usr</tt>目录。严格来说，您只需要复制<tt>bundles / ext中</tt>尚未存在的那些即可。在命令行（具有明智的操作系统）上，您可以执行<pre>$ find ~/.m2/repository -name \*.jar -exec cp {} bundles/usr \;
+</pre>
 </li>
 <li>您可能需要对捆绑包项目中的部分或全部<tt>MANIFEST.MF</tt>文件进行“伪编辑”，以强制刷新工具。</li>
 <li>将activeByDefault标志切换回false。</li>
 </ul><p>无需重启Eclipse或其他任何东西。然后，“捆绑依赖项”类路径容器应包含您刚刚下载的运行时依赖项。当“问题”视图中的所有Eclipse错误（红色的空白边距标记）消失后，我们就可以开始了。</p><p>我很高兴听到有更好方法的人的来信。其他人已经开发了其他方法，但是对我来说似乎没有一个方便。实际上，一个命令行Maven目标将很容易编写，但是我还没有看到。</p>
-<h4>Beta5更新</h4><p>使用beta5时，您不需要“查找并复制”步骤，因为platform.config允许您将本地Maven存储库作为依赖源而不是bundles / usr来指向。</p><p>原则上，您也完全不需要Maven本地存储库来获得运行时相关性。您可以打开平台运行时（在“服务器”视图中右键单击并打开），然后浏览依赖关系并将其直接下载到<tt>bundles / usr</tt> 。当前唯一的弱点（工具团队正在努力改善这一点）是，它没有提供有关传递依赖关系的任何视图-您必须明确知道需要哪些捆绑软件。就此博客的示例而言，这很容易，因为所有清单都已经完全指定了依赖项。当您不确定它们是什么并且必须从拼写方式创建清单时，就更难了。为此，我现在仍在使用Q4E。</p>
+<h4>Beta5更新</h4><p>使用beta5，您不需要“查找并复制”步骤，因为platform.config允许您将本地Maven存储库作为依赖源而不是bundles / usr来指向。</p><p>原则上，您也完全不需要Maven本地存储库来获得运行时相关性。您可以打开平台运行时（在“服务器”视图中右键单击并打开），然后浏览依赖关系并将其直接下载到<tt>bundles / usr</tt> 。当前唯一的弱点（工具团队正在努力改善这一点）是，它没有提供有关传递依赖关系的任何视图-您必须明确知道需要哪些捆绑软件。就此博客的示例而言，这很容易，因为所有清单都已经完全指定了依赖项。当您不确定它们是什么并且必须从拼写方式创建清单时，就更难了。为此，我现在仍在使用Q4E。</p>
 <h2>闭幕</h2><p>剥皮猫总是有不止一种方法，而且平台是一个非常丰富的环境，因此可以确定，我在这里展示的内容不是实现在平台上运行任务的唯一方法。希望这是一个很好的起点。</p><p>Application Platform 1.0版本的很多焦点都放在Web层上，尽管这显然是必不可少的（而且交付起来非常棘手），但还有其他鱼要炒。2.0版将具有与批处理相关的特定功能（批处理个性），因此我们现在所做的任何事情都会有助于充实该版本的功能要求。因此，如果您有机会尝试一下并提出一些建设性的意见，尤其是有关操作方面的意见，那么当我们开始构建批处理个性时，它们将派上用场。</p></tt></div><tt>
 </tt></div><tt>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 164;
 
       (function(disqus_shortname, document) {
@@ -355,7 +363,8 @@ osgi>
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -393,12 +402,14 @@ osgi>
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

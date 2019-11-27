@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Integration 2.2中的新增功能（第4部分-重试及更多内容）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="What's New in Spring Integration 2.2 (Part 4 - Retry and More)">
 <meta name="twitter:description" content="<h2>Introduction</h2>
-<p>This is the fourth part in a series of blog posts highlighting some of the new features available in Spring Integration 2.2 following the recent release of <a href=" http:="" ="" www.springsource.org="" node="" 366="="></head><body dir="ltr">Release Candidate 1. The <a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">first part</a> talks about the MongoDB adapters, the <a href="http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/">second part</a> talks about transaction synchronization; the <a href="http://blog.springsource.org/2012/10/05/whats-new-in-spring-integration-2-2-part-3-jpa-support/">third part</a> talks about JPA support.
+<p>This is the fourth part in a series of blog posts highlighting some of the new features available in Spring Integration 2.2 following the recent release of <a href=" http:="" ="" www.springsource.org="" node="" 366="="></head><body >Release Candidate 1. The <a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">first part</a> talks about the MongoDB adapters, the <a href="http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/">second part</a> talks about transaction synchronization; the <a href="http://blog.springsource.org/2012/10/05/whats-new-in-spring-integration-2-2-part-3-jpa-support/">third part</a> talks about JPA support.
 <p>Spring Integration 2.2 introduces the ability to apply one or more localized AOP Advice elements to a message handler. A number of standard Advice classes has also been provided as well as a sample application that explores the features they provide.</p>
 ">
 <meta name="twitter:creator" content="@gprussell">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -170,10 +176,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><h2>介绍</h2><p>这是一系列博客文章的第四部分，重点介绍了在最近发布的<a href="http://www.springsource.org/node/3665">Release Candidate 1</a>之后，Spring Integration 2.2中提供的一些新功能。<a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">第一部分</a>讨论MongoDB适配器， <a href="http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/">第二部分</a>讨论事务同步； <a href="http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/">第二部分</a>讨论事务同步。 <a href="http://blog.springsource.org/2012/10/05/whats-new-in-spring-integration-2-2-part-3-jpa-support/">第三部分</a>讨论JPA支持。</p><p>Spring Integration 2.2引入了将一个或多个本地化AOP Advice元素应用于消息处理程序的功能。还提供了许多标准的Advice类以及探索它们提供的功能的示例应用程序。</p><p></p><p></p><h2>背景</h2><br><blockquote>有关面向方面的编程（AOP）的一般介绍，请参见<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/aop.html">Spring文档。</a></blockquote><p></p><p>到目前为止，借助Spring Integration，可以应用<code><advice-chain/></code>给投票员。假设正在使用直接通道，则此链中的AOP建议适用于整个流程，包括所有下游组件。但是，有时建议仅建议单个端点重试某个操作，而不是使整个流程失败并在组件下游发生故障时重试，这是有利的。<br></p><p></p><h2>介绍</h2><br>Spring Integration 2.2引入了一个新的子元素<code><request-handler-advice-chain/></code>在许多端点上。<p></p><br>考虑一个Spring Integration流：<p></p><p><code>some-inbound-adapter<-poller->http-gateway1->http-gateway2->jdbc-outbound-adapter</code><br></p><p></p><br>如果数据库连接有故障，并且我们对轮询器有重试建议；整个流程将被重新处理；导致两个http网关被调用两次（或更多次）。<br><p></p><br>此功能提供了将重试建议（以及其他建议）仅应用于出站适配器的机制。同样，该Advice可以应用于许多其他端点，无论它们在流中出现的位置如何，例如，如果http-gateway2失败，我们可以仅重试。<p></p><p>除了具有配置建议链的一般功能之外，还提供了三个建议类：<strong><br></strong></p><ul><strong>RequestHandlerRetryAdvice<br>RequestHandlerCircuitBreakerAdvice<br>ExpressionEvaluatingRequestHandlerAdvice</strong></ul><p></p><p>这些将在下面更详细地描述，并在一个新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试</a>示例应用程序中进一步进行探讨。</p><p></p><p></p><h2>RequestHandlerRetryAdvice</h2><p></p><p>该建议提供了利用<a href="https://github.com/SpringSource/spring-retry">spring-retry项目</a>配置重试的能力，该<a href="https://github.com/SpringSource/spring-retry">项目</a>起源于Spring Batch。 spring-retry具有RetryTemplate，该模板允许配置重试策略，例如退避，恢复操作等。有关更多信息，请参考<a href="https://github.com/SpringSource/spring-retry/commits/master">spring-retry项目</a> 。<br></p><p></p><br>重试可以是无状态的，也可以是有状态的。无状态重试意味着重试仅在内部进行；当发生故障时，线程仅根据重试和退避策略重试。当消息源本身可以重试时（例如，事务性JMS或AMQP入站通道适配器），将使用状态恢复。在这种情况下，需要确定某些消息（例如JMSMessageID），之前已尝试过此消息。为此，提供了一个基于SpEL的RetryStateGenerator，例如，它可以从标头中提取标识符。<br><p></p><br>在这两种情况下，当重试用尽时，都可以调用RecoveryCallback。这用于处理失败的消息。提供了ErrorMessageSendingRecoverer，它将失败的消息发送到通道。<br><p></p><br>RequesHandlerRetryAdvice的示例在新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">retry-and-more</a>示例应用程序中显示。<p></p><p></p><p></p><h2>RequestHandlerCircuitBreakerAdvice</h2><p></p><p>该建议提供了断路器模式的实现。例如，如果远程服务不可用（请求因尝试的可配置次数而失败），则此建议可防止在某个（可配置的）时间段内再次尝试调用该服务。一旦该时间到期，建议将允许下次尝试调用该服务，但是，如果该服务仍然不可用，则会立即将其标记为该服务。当服务不可用时，将立即引发异常而不调用该服务；据说断路器是“断开”的。成功进行服务呼叫后，断路器将被“闭合”，并且所有后续呼叫将被路由到该服务，直到再次检测到该服务不可用，因为已超过配置的连续失败尝试次数。<br></p><p></p><br>所述RequestHandlerCircuitBreakerAdvice的一个例子显示在新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试和-多个</a>示例应用程序。<p></p><p></p><p></p><h2>ExpressionEvaluatingRequestHandlerAdvice</h2><p></p><p>该建议提供了一种机制，通过该机制可以在处理请求之后（成功或不成功）评估SpEL表达式。例如，对于FTP出站适配器，onSuccessExpression可能是<br></p><p></p><code>“payload.reNameTo(’/foo/succeeded/” + payload.name)“</code> ，<br><p></p>而onFailureExpression可能是<br><p></p><code>”payload.reNameTo(’/foo/failed/“ + payload.name)”</code> 。<br><p></p>每个表达式都有一个对应的通道，评估结果（如果有的话）发送到该通道。<br><p></p><br>新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试和更多</a>示例应用程序中也显示了此建议的示例。<p></p><p></p><p></p><h2>自定义建议类</h2><br>尽管可以应用任何AOP建议，但已提供了一个抽象类来帮助创建专门用于建议端点的建议类。有关更多信息，请参见参考文档中的“ <a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/htmlsingle/#custom-advice">自定义建议类”</a>部分。<p></p><p></p><p></p><h2>结论</h2><p></p><p>Spring Integration提供了很大的灵活性，可以将松耦合的组件组装到应用程序中。现在，将通用机制（例如重试）应用于该应用程序中的各个组件非常容易。请参阅<a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/htmlsingle/#message-handler-advice-chain">参考文档</a>和<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试更多</a>示例应用程序以获取更多信息。<br></p><p></p><p></p></div>
+<div class="blog--post"><h2>介绍</h2><p>这是一系列博客文章的第四部分，重点介绍了在最近发布的<a href="http://www.springsource.org/node/3665">Release Candidate 1</a>之后，Spring Integration 2.2中提供的一些新功能。<a href="http://blog.springsource.org/2012/09/24/whats-new-in-spring-integration-2-2-rc1-part-1-mongodb/">第一部分</a>讨论MongoDB适配器， <a href="http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/">第二部分</a>讨论事务同步； <a href="http://blog.springsource.org/2012/09/26/whats-new-in-spring-integration-2-2-part-2-transaction-synchronization/">第二部分</a>讨论事务同步。 <a href="http://blog.springsource.org/2012/10/05/whats-new-in-spring-integration-2-2-part-3-jpa-support/">第三部分</a>讨论JPA支持。</p><p>Spring Integration 2.2引入了将一个或多个本地化AOP Advice元素应用于消息处理程序的功能。还提供了许多标准的Advice类以及探索它们提供的功能的示例应用程序。</p><p></p><p></p><h2>背景</h2><br><blockquote>有关面向方面的编程（AOP）的一般介绍，请参见<a href="http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/aop.html">Spring文档。</a></blockquote><p></p><p>到目前为止，借助Spring Integration，可以应用<code><advice-chain/></code>给投票员。假设正在使用直接通道，则此链中的AOP建议适用于整个流程，包括所有下游组件。但是，有时建议仅建议单个端点重试某个操作，而不是使整个流程失败并在组件下游故障时重试，这是有利的。<br></p><p></p><h2>介绍</h2><br>Spring Integration 2.2引入了一个新的子元素<code><request-handler-advice-chain/></code>在许多端点上。<p></p><br>考虑一个Spring Integration流：<p></p><p><code>some-inbound-adapter<-poller->http-gateway1->http-gateway2->jdbc-outbound-adapter</code><br></p><p></p><br>如果数据库连接有故障，并且我们对轮询器有重试建议；整个流程将被重新处理；导致两个http网关被调用两次（或更多次）。<br><p></p><br>此功能提供了将重试建议（以及其他建议）仅应用于出站适配器的机制。同样，该Advice可以应用于许多其他端点，无论它们在流中出现的位置如何，例如，如果http-gateway2失败，我们可以仅重试。<p></p><p>除了具有配置建议链的一般功能之外，还提供了三个建议类：<strong><br></strong></p><ul><strong>RequestHandlerRetryAdvice<br>RequestHandlerCircuitBreakerAdvice<br>ExpressionEvaluatingRequestHandlerAdvice</strong></ul><p></p><p>这些将在下面更详细地描述，并在一个新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试</a>示例应用程序中进一步进行探讨。</p><p></p><p></p><h2>RequestHandlerRetryAdvice</h2><p></p><p>该建议提供了利用<a href="https://github.com/SpringSource/spring-retry">spring-retry项目</a>配置重试的能力，该<a href="https://github.com/SpringSource/spring-retry">项目</a>起源于Spring Batch。 spring-retry具有RetryTemplate，该模板允许配置重试策略，例如退避，恢复操作等。有关更多信息，请参考<a href="https://github.com/SpringSource/spring-retry/commits/master">spring-retry项目</a> 。<br></p><p></p><br>重试可以是无状态的，也可以是有状态的。无状态重试意味着重试仅在内部进行；当发生故障时，线程仅根据重试和退避策略重试。当消息源本身可以重试时（例如，事务性JMS或AMQP入站通道适配器），将使用状态恢复。在这种情况下，需要确定某些消息（例如JMSMessageID），之前已尝试过此消息。为此，提供了一个基于SpEL的RetryStateGenerator，例如，它可以从标头中提取标识符。<br><p></p><br>在这两种情况下，当重试用尽时，都可以调用RecoveryCallback。这用于处理失败的消息。提供了ErrorMessageSendingRecoverer，它将失败的消息发送到通道。<br><p></p><br>RequesHandlerRetryAdvice的示例在新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">retry-and-more</a>示例应用程序中显示。<p></p><p></p><p></p><h2>RequestHandlerCircuitBreakerAdvice</h2><p></p><p>该建议提供了断路器模式的实现。例如，如果远程服务不可用（请求因尝试的可配置次数而失败），则此建议可防止在某个（可配置的）时间段内再次尝试调用该服务。一旦该时间到期，建议将允许下次尝试调用该服务，但是，如果该服务仍然不可用，则会立即将其标记为该服务。当服务不可用时，将立即引发异常而不调用该服务；据说断路器是“断开”的。成功进行服务呼叫后，断路器将被“闭合”，并且所有后续呼叫将被路由到该服务，直到再次检测到该服务不可用，因为已超过配置的连续失败尝试次数。<br></p><p></p><br>新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试更多</a>示例应用程序中显示了RequestHandlerCircuitBreakerAdvice的示例。<p></p><p></p><p></p><h2>ExpressionEvaluatingRequestHandlerAdvice</h2><p></p><p>该建议提供了一种机制，通过该机制可以在处理请求之后（成功或不成功）评估SpEL表达式。例如，对于FTP出站适配器，onSuccessExpression可能是<br></p><p></p><code>“payload.reNameTo(’/foo/succeeded/” + payload.name)“</code> ，<br><p></p>而onFailureExpression可能是<br><p></p><code>”payload.reNameTo(’/foo/failed/“ + payload.name)”</code> 。<br><p></p>每个表达式都有一个对应的通道，评估结果（如果有的话）发送到该通道。<br><p></p><br>新的<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试和更多</a>示例应用程序中也显示了此建议的示例。<p></p><p></p><p></p><h2>定制建议类</h2><br>尽管可以应用任何AOP建议，但已提供了一个抽象类来帮助创建专门用于建议端点的建议类。有关更多信息，请参见参考文档中的“ <a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/htmlsingle/#custom-advice">自定义建议类”</a>部分。<p></p><p></p><p></p><h2>结论</h2><p></p><p>Spring Integration提供了很大的灵活性，可以将松耦合的组件组装到应用程序中。现在，将通用机制（例如重试）应用于该应用程序中的各个组件非常容易。请参阅<a href="http://static.springsource.org/spring-integration/docs/2.2.0.RC1/reference/htmlsingle/#message-handler-advice-chain">参考文档</a>和<a href="https://github.com/SpringSource/spring-integration-samples/tree/master/intermediate/retry-and-more">重试更多</a>示例应用程序以获取更多信息。<br></p><p></p><p></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 482;
 
       (function(disqus_shortname, document) {
@@ -187,7 +194,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -225,12 +233,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

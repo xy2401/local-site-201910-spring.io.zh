@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>在Cloud Foundry中使用Spring Boot绑定到数据服务</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Binding to Data Services with Spring Boot in Cloud Foundry">
-<meta name="twitter:description" content="<p>In this article we look at how to bind a <a href=" http:="" ="" projects.spring.io="" spring-boo="="></head><body dir="ltr">Spring Boot application to data services (JDBC, NoSQL, messaging etc.) and the various sources of default and automatic behaviour in <a href="http://pivotal.io/cloud">Cloud Foundry</a>, providing some guidance about which ones to use and which ones will be active under what conditions. Spring Boot provides a lot of autoconfiguration and external binding features, some of which are relevant to Cloud Foundry, and many of which are not. <a href="http://cloud.spring.io/spring-cloud-connectors">Spring Cloud Connectors</a> is a library that you can use in your application if you want to create your own components programmatically, but it doesn’t do anything “magical” by itself. And finally there is the Cloud Foundry <a href="https://github.com/cloudfoundry/java-buildpack">java buildpack</a> which has an “auto-reconfiguration” feature that tries to ease the burden of moving simple applications to the cloud. The key to correctly configuring middleware services, like JDBC or AMQP or Mongo, is to understand what each of these tools provides, how they influence each other at runtime, and and to switch parts of them on and off. The goal should be a smooth transition from local execution of an application on a developer’s desktop to a test environment in Cloud Foundry, and ultimately to production in Cloud Foundry (or otherwise) with no changes in source code or packaging, per the <a href="http://12factor.net">twelve-factor application</a> guidelines.
+<meta name="twitter:description" content="<p>In this article we look at how to bind a <a href=" http:="" ="" projects.spring.io="" spring-boo="=">Spring Boot application to data services (JDBC, NoSQL, messaging etc.) and the various sources of default and automatic behaviour in <a href="http://pivotal.io/cloud">Cloud Foundry</a>, providing some guidance about which ones to use and which ones will be active under what conditions. Spring Boot provides a lot of autoconfiguration and external binding features, some of which are relevant to Cloud Foundry, and many of which are not. <a href="http://cloud.spring.io/spring-cloud-connectors">Spring Cloud Connectors</a> is a library that you can use in your application if you want to create your own components programmatically, but it doesn’t do anything “magical” by itself. And finally there is the Cloud Foundry <a href="https://github.com/cloudfoundry/java-buildpack">java buildpack</a> which has an “auto-reconfiguration” feature that tries to ease the burden of moving simple applications to the cloud. The key to correctly configuring middleware services, like JDBC or AMQP or Mongo, is to understand what each of these tools provides, how they influence each other at runtime, and and to switch parts of them on and off. The goal should be a smooth transition from local execution of an application on a developer’s desktop to a test environment in Cloud Foundry, and ultimately to production in Cloud Foundry (or otherwise) with no changes in source code or packaging, per the <a href="http://12factor.net">twelve-factor application</a> guidelines.
 ">
 <meta name="twitter:creator" content="@david_syer">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=200">
@@ -37,10 +41,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,18 +172,18 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在本文中，我们研究了如何将<a href="https://projects.spring.io/spring-boot">Spring Boot</a>应用程序绑定到数据服务（JDBC，NoSQL，消息传递等）以及<a href="https://pivotal.io/cloud">Cloud Foundry中</a>各种默认和自动行为的来源，并提供了有关使用哪些以及将使用哪些的指南。在什么条件下保持活跃。Spring Boot提供了许多自动配置和外部绑定功能，其中一些与Cloud Foundry相关，而许多则与Cloud Foundry不相关。<a href="https://cloud.spring.io/spring-cloud-connectors">Spring Cloud Connectors</a>是一个库，如果您想以编程方式创建自己的组件，可以在应用程序中使用它，但是它本身并没有做任何“神奇的事情”。最后是Cloud Foundry <a href="https://github.com/cloudfoundry/java-buildpack">java buildpack</a> ，它具有“自动重新配置”功能，该功能试图减轻将简单应用程序迁移到云的负担。正确配置诸如JDBC或AMQP或Mongo之类的中间件服务的关键是要了解这些工具各自提供的功能，它们在运行时如何相互影响以及将它们的某些部分打开和关闭。目标应该是从开发人员桌面上的应用程序本地执行到Cloud Foundry中的测试环境的平稳过渡，并最终过渡到Cloud Foundry中的生产（或其他方式），而无需更改源代码或打包，这<a href="http://12factor.net">十二个要素应用</a>指南。</p>
-<p>本文附带一些<a href="https://github.com/dsyer/cloud-middleware-blog">简单的源代码</a> 。要使用它，您可以克隆存储库并将其导入到您喜欢的IDE中。您将需要从整个项目中删除两个依赖项，以达到我们开始讨论具体代码示例的同一点，即<code>spring-boot-starter-cloud-connectors</code>和<code>auto-reconfiguration</code> 。</p>
+<div class="blog--post"><p>在本文中，我们将研究如何将<a href="https://projects.spring.io/spring-boot">Spring Boot</a>应用程序绑定到数据服务（JDBC，NoSQL，消息传递等）以及<a href="https://pivotal.io/cloud">Cloud Foundry中</a>各种默认和自动行为的来源，并提供有关使用哪些以及将使用哪些的一些指导。在什么条件下保持活跃。Spring Boot提供了许多自动配置和外部绑定功能，其中一些与Cloud Foundry相关，而许多则与Cloud Foundry不相关。<a href="https://cloud.spring.io/spring-cloud-connectors">Spring Cloud Connectors</a>是一个库，如果您想以编程方式创建自己的组件，则可以在应用程序中使用它，但是它本身并没有做什么“魔术”的事情。最后是Cloud Foundry <a href="https://github.com/cloudfoundry/java-buildpack">java buildpack</a> ，它具有“自动重新配置”功能，该功能试图减轻将简单应用程序迁移到云的负担。正确配置诸如JDBC或AMQP或Mongo之类的中间件服务的关键是要了解这些工具各自提供的功能，它们在运行时如何相互影响以及将它们的某些部分打开和关闭。目标应该是从开发人员桌面上的应用程序本地执行到Cloud Foundry中的测试环境的平稳过渡，并最终过渡到Cloud Foundry中的生产（或其他方式），而无需更改源代码或打包，这<a href="http://12factor.net">十二个要素应用</a>指南。</p>
+<p>本文附带一些<a href="https://github.com/dsyer/cloud-middleware-blog">简单的源代码</a> 。要使用它，您可以克隆存储库并将其导入到您喜欢的IDE中。您将需要从整个项目中删除两个依赖项，以达到我们开始讨论具体代码示例的目的，即<code>spring-boot-starter-cloud-connectors</code>和<code>auto-reconfiguration</code> 。</p>
 <blockquote>
 <p>注意：正在讨论的所有库的当前坐标为<code>org.springframework.boot:spring-boot-*:1.2.3.RELEASE</code> ， <code>org.springframework.cloud:spring-cloud-*-connector:1.1.1.RELEASE</code> ， <code>org.cloudfoundry:auto-reconfiguration:1.7.0.RELEASE</code> 。</p>
-<p>提示：github中的源代码包括<code>docker-compose.yml</code>文件。如果尚未运行本地MySQL数据库，则可以使用它来创建本地MySQL数据库。您实际上并不需要它来运行下面的大多数代码，但它可能对验证其是否有效很有用。</p>
+<p>提示：github中的源代码包括一个<code>docker-compose.yml</code>文件。如果尚未运行本地MySQL数据库，则可以使用它来创建本地MySQL数据库。您实际上并不需要它来运行下面的大多数代码，但它可能对验证其是否有效很有用。</p>
 </blockquote><h2><a href="#punchline-for-the-impatient" class="anchor" name="punchline-for-the-impatient"></a>不耐烦的打孔电话</h2>
-<p>如果您想跳过这些细节，而您只需要使用H2在本地运行以及使用MySQL在云中运行的方法，那么从这里开始，然后在您想更深入地了解其他内容时阅读其余内容。（对于其他数据服务，例如RabbitMQ，Redis，Mongo等，也存在类似的选项。）</p>
-<p>您的第一个也是最简单的选择是什么都不做：根本不定义<code>DataSource</code>而是将H2放在类路径上。春天开机时会创建嵌入H2 <code>DataSource</code>你，当你在本地运行。当您在云中运行时，Cloud Foundry buildpack将检测数据库服务绑定并为您创建一个<code>DataSource</code> 。如果还添加了Spring Cloud Connectors，则只要包含连接器，您的应用程序就可以在其他云平台上运行。如果您只想使某些工作正常，那可能就足够了。</p>
-<p>如果要在生产中运行严肃的应用程序，则可能需要调整一些连接池设置（例如，池的大小，各种超时，对借位标志的重要测试）。在这种情况下，buildpack自动重新配置<code>DataSource</code>不能满足您的要求，您需要选择一种替代，有一些或多或少明智的选择。</p>
-<p>最好的选择可能是使用<a href="https://cloud.spring.io/spring-cloud-connectors">Spring Cloud Connectors</a>显式创建一个<code>DataSource</code> ，但要受“ cloud”配置文件的保护：</p>
+<p>如果您想跳过这些细节，而您只需要使用H2在本地运行以及使用MySQL在云中运行的方法，那么从这里开始，然后在您想更深入了解时阅读其余内容即可。（对于其他数据服务，例如RabbitMQ，Redis，Mongo等，也存在类似的选项。）</p>
+<p>您的第一个也是最简单的选择是什么都不做：不要定义<code>DataSource</code>除了将H2放在类路径上之外。Spring Boot将创建嵌入式H2 <code>DataSource</code>在本地运行时为您服务。Cloud Foundry buildpack将检测数据库服务绑定并创建一个<code>DataSource</code>当您在云中运行时为您服务。如果还添加了Spring Cloud Connectors，则只要包含连接器，您的应用程序就可以在其他云平台上运行。如果您只想使某些工作正常，那可能就足够了。</p>
+<p>如果要在生产中运行严肃的应用程序，则可能需要调整一些连接池设置（例如，池的大小，各种超时，对借位标志的重要测试）。在这种情况下，buildpack自动重新配置<code>DataSource</code>将无法满足您的要求，您需要选择一个替代方案，并且有许多或多或少的明智选择。</p>
+<p>最好的选择可能是创建一个<code>DataSource</code>明确使用<a href="https://cloud.spring.io/spring-cloud-connectors">Spring Cloud Connectors</a> ，但受“ cloud”配置文件保护：</p>
 <pre><code class="prettyprint java">@Configuration
-@Profile("cloud")
+@Profile(&quot;cloud&quot;)
 public class DataSourceConfiguration {
 
   @Bean
@@ -193,9 +199,9 @@ public class DataSourceConfiguration {
 
 }
 </code></pre>
-<p>您可以使用<code>spring.datasource.*</code>属性（例如，在<code>application.properties</code>或特定于配置文件的版本中）在运行时设置其他属性。buildpack将自动为您激活“云”配置文件。</p>
+<p>您可以使用<code>spring.datasource.*</code>属性（例如<code>application.properties</code>或特定于配置文件的版本）以在运行时设置其他属性。buildpack将自动为您激活“云”配置文件。</p>
 <p>现在了解详细信息。我们需要对运行时应用程序中发生的事情进行了解，因此我们可以从中学习如何为配置数据服务做出明智的选择。</p><h2><a href="#layers-of-autoconfiguration" class="anchor" name="layers-of-autoconfiguration"></a>自动配置层</h2>
-<p>让我们使用一个带有<code>DataSource</code>简单应用程序（类似的考虑适用于RabbitMQ，Mongo和Redis）：</p>
+<p>让我们用一个简单的应用程序<code>DataSource</code> （类似的考虑适用于RabbitMQ，Mongo，Redis）：</p>
 <pre><code class="prettyprint java">@SpringBootApplication
 public class CloudApplication {
 	
@@ -208,37 +214,322 @@ public class CloudApplication {
 
 }
 </code></pre>
-<p>这是一个完整的应用程序： <code>DataSource</code>可以<code>@Autowired</code>因为它是由Spring Boot为我们创建的。<code>DataSource</code>的详细信息（具体类，JDBC驱动程序，连接URL等）取决于类路径上的内容。假设应用程序通过<code>spring-boot-starter-jdbc</code> （或<code>spring-boot-starter-data-jpa</code> ）使用Spring JDBC，因此它具有可从Tomcat获得的<code>DataSource</code>实现（即使它不是Web应用程序） ，这就是Spring Boot的用途。</p>
+<p>这是一个完整的应用程序： <code>DataSource</code>可<code>@Autowired</code>因为它是由Spring Boot为我们创建的。详细<code>DataSource</code> （具体类，JDBC驱动程序，连接URL等）取决于类路径上的内容。假设应用程序通过以下方式使用Spring JDBC： <code>spring-boot-starter-jdbc</code> （要么<code>spring-boot-starter-data-jpa</code> ），因此它有一个<code>DataSource</code> Tomcat可用的实现（即使它不是Web应用程序），这就是Spring Boot的用途。</p>
 <p>考虑以下情况时会发生什么：</p>
 <ul>
 <li>
-<p>CLASSPATH包含H2（只），除首发：该<code>DataSource</code>是从Tomcat高性能池<code>DataSourceAutoConfiguration</code>并将其连接到内存数据库“TESTDB”。</p></li>
+<p>除启动程序外，类路径还包含H2（仅）： <code>DataSource</code>是Tomcat的高性能池<code>DataSourceAutoConfiguration</code>并连接到内存数据库“ testdb”。</p></li>
 <li>
-<p>Classpath包含H2和MySQL： <code>DataSource</code>仍然是H2（与以前相同），因为我们没有为MySQL提供任何其他配置，并且Spring Boot无法猜测用于连接的凭据。</p></li>
+<p>类路径包含H2和MySQL： <code>DataSource</code>仍为H2（与以前相同），因为我们没有为MySQL提供任何其他配置，并且Spring Boot无法猜测用于连接的凭据。</p></li>
 <li>
-<p>将<code>spring-boot-starter-cloud-connectors</code>到类路径： <code>DataSource</code>没有更改，因为Spring Cloud Connector不会检测到它们正在Cloud平台中运行。初学者附带的提供程序都在寻找特定的环境变量，除非您进行设置或在Cloud Foundry，Heroku等中运行该应用程序，否则它们将找不到。</p></li>
+<p>加<code>spring-boot-starter-cloud-connectors</code>到类路径：没有变化<code>DataSource</code>因为Spring Cloud Connector无法检测到它们正在Cloud平台上运行。初学者附带的提供程序都在寻找特定的环境变量，除非您进行设置或在Cloud Foundry，Heroku等中运行该应用程序，否则它们将找不到。</p></li>
 <li>
-<p>使用<code>spring.profiles.active=cloud</code>在“云”配置文件中运行应用程序： <code>DataSource</code>尚未更改，但这是当您的应用程序在Cloud Foundry中运行时<a href="https://github.com/cloudfoundry/java-buildpack">Java buildpack</a>要做的事情之一。</p></li>
+<p>使用以下命令在“云”配置文件中运行应用程序<code>spring.profiles.active=cloud</code> ：尚无更改<code>DataSource</code> ，但这是您的应用程序在Cloud Foundry中运行时<a href="https://github.com/cloudfoundry/java-buildpack">Java buildpack</a>要做的事情之一。</p></li>
 <li>
 <p>在“ cloud”配置文件中运行，并提供一些环境变量来模拟在Cloud Foundry中运行并绑定到MySQL服务：</p>
-<pre><code class="prettyprint">VCAP_APPLICATION={"name":"application","instance_id":"FOO"}
-VCAP_SERVICES={"mysql":[{"name":"mysql","tags":["mysql"],"credentials":{"uri":"mysql://root:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4634292932062a2925272a2e293532">[email protected]</a>/test"}}]}
+<pre><code class="prettyprint">VCAP_APPLICATION={&quot;name&quot;:&quot;application&quot;,&quot;instance_id&quot;:&quot;FOO&quot;}
+VCAP_SERVICES={&quot;mysql&quot;:[{&quot;name&quot;:&quot;mysql&quot;,&quot;tags&quot;:[&quot;mysql&quot;],&quot;credentials&quot;:{&quot;uri&quot;:&quot;mysql://root:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4634292932062a2925272a2e293532">[email&#160;protected]</a>/test&quot;}}]}
 </code></pre>
-<p>（“标签”提示我们要创建一个MySQL <code>DataSource</code> ，“ uri”提供位置，“名称”成为bean ID）。现在， <code>DataSource</code>正在使用MySQL和<code>VCAP_*</code>环境变量提供的凭据。Spring Boot对连接器有一些自动配置，因此，如果您查看应用程序中的bean，您会看到一个<code>CloudFactory</code> bean和<code>DataSource</code> bean（ID为“ mysql”）。<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cloud/CloudAutoConfiguration.java">自动配置</a>等效于将<code>@ServiceScan</code>添加到您的应用程序配置中。仅当您的应用程序在“ cloud”配置文件中运行，并且仅当不存在<code>Cloud</code>类型的<code>@Bean</code>且配置标志<code>spring.cloud.enabled</code>不是“ false”时，它才处于活动状态。</p></li>
+<p>（“标签”提示我们要创建一个MySQL <code>DataSource</code> ，“ uri”提供位置，“名称”成为Bean ID）。的<code>DataSource</code>现在正在使用MySQL提供的凭据<code>VCAP_*</code>环境变量。Spring Boot对连接器有一些自动配置，因此，如果您查看应用程序中的Bean，将会看到一个<code>CloudFactory</code>豆，还有<code>DataSource</code> bean（ID为“ mysql”）。<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cloud/CloudAutoConfiguration.java">自动配置</a>相当于添加<code>@ServiceScan</code>您的应用程序配置。仅当您的应用程序在“云”配置文件中运行且只有不存在该配置文件时，它才处于活动状态<code>@Bean</code>类型的<code>Cloud</code> ，以及配置标志<code>spring.cloud.enabled</code>不是“假”。</p></li>
 <li>
-<p>从Java buildpack中添加“自动重新配置” JAR（Maven协调<code>org.cloudfoundry:auto-reconfiguration:1.7.0.RELEASE</code> ）。您可以将其添加为本地依赖项，以模拟在Cloud Foundry中运行应用程序，但是对实际应用程序执行此操作是不正常的（这只是为了试验自动配置）。自动重配置JAR现在具有创建<code>DataSource</code>所需的一切，但还没有（尚未），因为它检测到您已经具有类型为<code>CloudFactory</code>的bean，该bean是Spring Boot添加的。</p></li>
+<p>从Java buildpack添加“自动重新配置” JAR（Maven坐标<code>org.cloudfoundry:auto-reconfiguration:1.7.0.RELEASE</code> ）。您可以将其添加为本地依赖项，以模拟在Cloud Foundry中运行应用程序，但是对实际应用程序执行此操作是不正常的（这只是为了试验自动配置）。现在，自动重新配置JAR拥有创建<code>DataSource</code> ，但还没有（因为），因为它检测到您已经具有类型的Bean <code>CloudFactory</code> ，这是Spring Boot添加的。</p></li>
 <li>
-<p>删除明确的“云”配置文件。当您的应用启动时，配置文件仍将处于活动状态，因为自动重新配置JAR会将其重新添加回去。<code>DataSource</code>仍然没有更改，因为Spring Boot通过<code>@ServiceScan</code>为您创建了它。</p></li>
+<p>删除明确的“云”配置文件。当您的应用启动时，配置文件仍处于活动状态，因为自动重新配置JAR会将其重新添加回去。仍然没有变化<code>DataSource</code>因为Spring Boot已通过<code>@ServiceScan</code> 。</p></li>
 <li>
-<p>删除<code>spring-boot-starter-cloud-connectors</code>依赖项，以便Spring Boot停止创建<code>CloudFactory</code> 。自动重新配置JAR实际上具有自己的Spring Cloud Connectors（所有具有不同包名称的类）副本，并且现在使用它们来创建<code>DataSource</code> （在<code>BeanFactoryPostProcessor</code> ）。Spring Boot自动配置的<code>DataSource</code>被替换为通过<code>VCAP_SERVICES</code>绑定到MySQL的<code>DataSource</code> 。无法控制池属性，但仍会使用Tomcat池（如果可用）（不支持Hikari或DBCP2）。</p></li>
+<p>去除<code>spring-boot-starter-cloud-connectors</code>依赖项，以便Spring Boot放弃创建一个<code>CloudFactory</code> 。自动重新配置的JAR实际上拥有自己的Spring Cloud Connectors（所有具有不同包名称的类）副本，并且现在使用它们来创建一个<code>DataSource</code> （在一个<code>BeanFactoryPostProcessor</code> ）。Spring Boot已自动配置<code>DataSource</code>被替换为通过<code>VCAP_SERVICES</code> 。无法控制池属性，但仍会使用Tomcat池（如果可用）（不支持Hikari或DBCP2）。</p></li>
 <li>
-<p>删除自动重配置JAR， <code>DataSource</code>恢复为H2。</p></li>
+<p>删除自动重新配置JAR和<code>DataSource</code>恢复为H2。</p></li>
 </ul>
 <blockquote>
-<p>提示：将Web和执行器启动器与<code>endpoints.health.sensitive=false</code>以通过“ / health”快速检查<code>DataSource</code> 。您还可以使用“ / beans”，“ / env”和“ / autoconfig”端点查看自动配置中的内容以及原因。</p>
-<p>注意：在Cloud Foundry中运行或在本地classpath中包含自动重新配置JAR都会激活“ cloud”配置文件（出于相同的原因）。<code>VCAP_*</code> env vars是使Spring Cloud和/或自动重配置JAR创建bean的东西。</p>
-<p>注意： <code>VCAP_SERVICES</code>的URL实际上不是“ jdbc”方案，对于JDBC连接应该是必需的。但是，这是Cloud Foundry通常采用的格式，因为它几乎适用于Java以外的所有其他语言。Spring Cloud Connector或buildpack自动重新配置（如果它们正在创建<code>DataSource</code> ）将为您将其转换为<code>jdbc:*</code> URL。</p>
-<p>注意：MySQL URL还包含用户凭证和数据库名称，这些用户凭证和数据库名称对于示例源代码中<code>docker-compose.yml</code>创建的Docker容器有效。如果您的本地MySQL服务器具有不同的凭据，则可以替换这些凭据。</p>
-<p>提示：如果您使用本地MySQL服务器并希望验证其是否已连接，则可以使用Spring Boot Actuator中的“ / health”端点（已包含在示例代码中）。或者，您可以在类路径的根目录中创建一个<code>schema-mysql.sql</code>文件，并在其中放置一个简单的保持活动查询（例如<code>SELECT 1</code> ）。Spring Boot将在启动时运行该程序，因此，如果应用程序成功启动，则说明您已正确配置数据库。</p>
+<p>提示：将Web和执行器启动器与<code>endpoints.health.sensitive=false</code>检查<code>DataSource</code>快速通过“ /健康”。您还可以使用“ / beans”，“ / env”和“ / autoconfig”端点查看自动配置中的内容以及原因。</p>
+<p>注意：在Cloud Foundry中运行或在本地classpath中包含自动重新配置JAR都会激活“ cloud”配置文件（出于相同的原因）。的<code>VCAP_*</code> env vars使Spring Cloud和/或自动重新配置JAR创建bean。</p>
+<p>注意： <code>VCAP_SERVICES</code>实际上不是“ jdbc”方案，对于JDBC连接应该是强制性的。但是，这是Cloud Foundry通常采用的格式，因为它适用于Java以外的几乎所有语言。Spring Cloud Connector或buildpack自动重新配置（如果它们正在创建一个<code>DataSource</code> ，将其转换为<code>jdbc:*</code>您的网址。</p>
+<p>注意：MySQL URL还包含用户凭据和数据库名称，这些用户凭据和数据库名称对于由<code>docker-compose.yml</code>在示例源代码中。如果您的本地MySQL服务器具有不同的凭据，则可以替换这些凭据。</p>
+<p>提示：如果您使用本地MySQL服务器，并且想验证它是否已连接，则可以使用Spring Boot Actuator中的“ / health”端点（已包含在示例代码中）。或者您可以创建一个<code>schema-mysql.sql</code>文件放在类路径的根目录中，并在其中添加一个简单的保持活动查询（例如<code>SELECT 1</code> ）。Spring Boot将在启动时运行该程序，因此，如果应用程序成功启动，则说明您已正确配置数据库。</p>
 </blockquote>
-<p>自动重新配置JAR始终位于Cloud Foundry中的类路径上（默认情况下），但是如果找到<code>org.springframework.cloud.CloudFactory</code></p><code>org.springframework.cloud.CloudFactory</code></div><code>org.springframework.cloud.CloudFactory</code></div><code>org.springframework.cloud.CloudFactory</code></article><code>org.springframework.cloud.CloudFactory</code></div><code>org.springframework.cloud.CloudFactory</code></div><code>org.springframework.cloud.CloudFactory</code></div><code>org.springframework.cloud.CloudFactory</code></div><code>org.springframework.cloud.CloudFactory</code></body></html>
+<p>自动重新配置JAR始终位于Cloud Foundry中的类路径上（默认情况下），但它会取消创建任何<code>DataSource</code>如果找到一个<code>org.springframework.cloud.CloudFactory</code> bean（由Spring Boot提供，如果<code>CloudAutoConfiguration</code>活跃）。因此，如果连接器也存在于Spring Boot应用程序中，则将其添加到类路径中的最终效果仅仅是启用“云”配置文件。您可以看到它决定在启动时在应用程序日志中跳过自动重新配置：</p>
+<pre><code class="prettyprint">015-04-14 15:11:11.765  INFO 12727 --- [           main] urceCloudServiceBeanFactoryPostProcessor : Skipping auto-reconfiguring beans of type javax.sql.DataSource
+2015-04-14 15:11:57.650  INFO 12727 --- [           main] ongoCloudServiceBeanFactoryPostProcessor : Skipping auto-reconfiguring beans of type org.springframework.data.mongodb.MongoDbFactory
+2015-04-14 15:11:57.650  INFO 12727 --- [           main] bbitCloudServiceBeanFactoryPostProcessor : Skipping auto-reconfiguring beans of type org.springframework.amqp.rabbit.connection.ConnectionFactory
+2015-04-14 15:11:57.651  INFO 12727 --- [           main] edisCloudServiceBeanFactoryPostProcessor : Skipping auto-reconfiguring beans of type org.springframework.data.redis.connection.RedisConnectionFactory
+...
+etc.
+</code></pre><h2><a href="#create-your-own-datasource" class="anchor" name="create-your-own-datasource"></a>创建自己的数据源</h2>
+<p>最后一部分介绍了各个库中的大多数重要自动配置功能。如果您想控制自己，可以做的一件事就是创建自己的<code>DataSource</code> 。例如，您可以使用<code>DataSourceBuilder</code>这是一个便利类，是Spring Boot的一部分（它基于类路径选择实现）：</p>
+<pre><code class="prettyprint java">@SpringBootApplication
+public class CloudApplication {
+	
+	@Bean
+	public DataSource dataSource() {
+		return DataSourceBuilder.create().build();
+	}
+	
+	...
+
+}
+</code></pre>
+<p>的<code>DataSource</code>正如我们定义的那样，它没有用，因为它没有连接URL或任何凭据，但是可以很容易地解决。让我们像在Cloud Foundry中一样运行此应用程序： <code>VCAP_*</code>环境变量和自动重新配置JAR，但类路径上没有Spring Cloud Connectors，也没有显式的“ cloud”配置文件。buildpack激活“云”配置文件，创建一个<code>DataSource</code>并将其绑定到<code>VCAP_SERVICES</code> 。如前所述，它将<em>删除</em>您的<code>DataSource</code>完全替换为一个手动注册的单例（在Spring Boot的“ / beans”端点中不显示）。</p>
+<p>现在，将Spring Cloud Connectors添加回应用程序的类路径中，并查看再次运行该应用程序时会发生什么。它实际上在启动时失败！发生了什么？的<code>@ServiceScan</code> （来自Connector）去查找绑定的服务，并为它们创建bean定义。这有点类似于buildpack，但是有所不同，因为它不会尝试替换任何现有的相同类型的bean定义。所以你会得到一个自动装配错误，因为有2 <code>DataSources</code>而且没有办法在需要的各种地方选择一种注入到您的应用程序中。</p>
+<p>要解决此问题，我们将必须控制云连接器（或根本不使用它们）。</p><h3><a href="#using-cloudfactory-to-create-a-datasource" class="anchor" name="using-cloudfactory-to-create-a-datasource"></a>使用CloudFactory创建数据源</h3>
+<p>您可以通过创建自己的配置来禁用Spring Boot自动配置<em>和</em> Java buildpack自动重新配置<code>Cloud</code>作为一个实例<code>@Bean</code> ：</p>
+<pre><code class="prettyprint java">@Bean
+public Cloud cloud() {
+  return new CloudFactory().getCloud();
+}
+
+@Bean
+@ConfigurationProperties(DataSourceProperties.PREFIX)
+public DataSource dataSource() {
+  return cloud().getSingletonServiceConnector(DataSource.class, null);
+}
+</code></pre>
+<p>优点：Spring Boot中的连接器自动配置已取消，因此只有一个<code>DataSource</code> 。可以使用调整<code>application.properties</code>通过<code>spring.datasource.*</code>属性，请参阅《 <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/">Spring Boot用户指南》</a> 。</p>
+<p>缺点：没有它就行不通<code>VCAP_*</code>环境变量（或其他一些云平台）。它还依赖于用户记住要停止<code>Cloud</code>作为一个<code>@Bean</code>为了禁用自动配置。</p>
+<p>简介：我们仍然处在一个不舒适的地方（在没有复杂的环境变量争夺的情况下运行的应用程序在实践中使用不多）。</p><h2><a href="#dual-running-local-with-h2-in-the-cloud-with-mysql" class="anchor" name="dual-running-local-with-h2-in-the-cloud-with-mysql"></a>双重运行：H2本地运行，MySQL云端运行</h2>
+<p>Spring Cloud Connectors中有一个本地配置文件选项，因此您不必在真正的云平台中就可以使用它们，但是尽管它是样板，但设置起来很麻烦，并且还必须在关闭时将其关闭你<em>是</em>一个真正的云平台。最后一点确实很重要，因为您最终需要一个本地文件才能在本地运行，但只能在本地运行，并且不能与其余应用程序代码打包在一起（例如，违反了十二要素准则）。</p>
+<p>所以要继续前进<code>@Bean</code>定义最好还是坚持主流的Spring和Spring Boot功能，例如使用“云”配置文件来保护显式创建<code>DataSource</code> ：</p>
+<pre><code class="prettyprint java">@Configuration
+@Profile(&quot;cloud&quot;)
+public class DataSourceConfiguration {
+
+  @Bean
+  public Cloud cloud() {
+    return new CloudFactory().getCloud();
+  }
+
+  @Bean
+  @ConfigurationProperties(DataSourceProperties.PREFIX)
+  public DataSource dataSource() {
+    return cloud().getSingletonServiceConnector(DataSource.class, null);
+  }
+
+}
+</code></pre>
+<p>有了这个，我们就有了一个可以在本地和Cloud Foundry中顺利运行的解决方案。Spring Boot将在本地创建一个<code>DataSource</code>与H2嵌入式数据库。在Cloud Foundry中，它将绑定到类型的单例服务<code>DataSource</code>并从Spring Boot中关闭自动配置的功能。它还具有与Spring Cloud Connectors支持的任何平台一起使用的优势，因此，例如，相同的代码将在Heroku和Cloud Foundry上运行。因为<code>@ConfigurationProperties</code>您可以将其他配置绑定到<code>DataSource</code>如果需要在生产环境中调整连接池属性和类似内容。</p>
+<blockquote>
+<p>注意：我们一直使用MySQL作为示例数据库服务器，但实际上PostgreSQL至少可以说是一个不错的选择。例如，在本地与H2配对时，可以将H2置于其“ Postgres兼容性”模式下，并在两种环境中使用相同的SQL。</p>
+</blockquote><h2><a href="#manually-creating-a-local-and-a-cloud-datasource" class="anchor" name="manually-creating-a-local-and-a-cloud-datasource"></a>手动创建本地和云数据源</h2>
+<p>如果您喜欢创建<code>DataSource</code> Bean，并且要在本地和云中进行操作，例如，可以使用2个配置文件（“云”和“本地”）。但是，当您不在云中时，默认情况下，您将必须找到一种方法来默认激活“本地”配置文件。Spring已经有一种方法可以做到这一点，因为总有一个默认配置文件称为“默认”（默认）。所以这应该工作：</p>
+<pre><code class="prettyprint java">@Configuration
+@Profile(&quot;default&quot;) // or &quot;!cloud&quot;
+public class LocalDataSourceConfiguration {
+	
+	@Bean
+    @ConfigurationProperties(DataSourceProperties.PREFIX)
+	public DataSource dataSource() {
+		return DataSourceBuilder.create().build();
+	}
+
+}
+
+@Configuration
+@Profile(&quot;cloud&quot;)
+public class CloudDataSourceConfiguration {
+
+  @Bean
+  public Cloud cloud() {
+    return new CloudFactory().getCloud();
+  }
+
+  @Bean
+  @ConfigurationProperties(DataSourceProperties.PREFIX)
+  public DataSource dataSource() {
+    return cloud().getSingletonServiceConnector(DataSource.class, null);
+  }
+
+}
+</code></pre>
+<p>“默认” <code>DataSource</code>在这个简单的示例中，它实际上与自动配置的相同，因此除非您需要（例如，创建自定义混凝土），否则您不会这样做。 <code>DataSource</code> Spring Boot不支持的类型。您可能会认为这一切都变得有些复杂，但是事实上Spring Boot并没有使它变得更困难，我们只是在处理需要控制权的后果。 <code>DataSource</code>在2种环境中施工。</p><h2><a href="#using-a-non-embedded-database-locally" class="anchor" name="using-a-non-embedded-database-locally"></a>在本地使用非嵌入式数据库</h2>
+<p>如果您不想在本地使用H2或任何内存数据库，那么您就无法避免必须对其进行配置（Spring Boot可以从URL中猜测很多，但至少需要这样做）。所以至少您需要设置一些<code>spring.datasource.*</code>属性（例如URL）。这并非难事，您可以使用其他配置文件在不同的环境中轻松设置不同的值，但是一旦这样做，您就需要在进入云时<em>关闭</em>默认值。为此，您可以定义<code>spring.datasource.*</code> “默认”配置文件的特定于配置文件的文件（或YAML中的文档）中的属性，例如<code>application-default.properties</code> ，这些将不会在“云”配置文件中使用。</p><h2><a href="#a-purely-declarative-approach" class="anchor" name="a-purely-declarative-approach"></a>纯声明式方法</h2>
+<p>如果您不想编写Java代码，或者不想使用Spring Cloud Connectors，则可以尝试对所有内容使用Spring Boot自动配置和外部属性（或YAML）文件。例如，Spring Boot创建一个<code>DataSource</code>如果您在类路径上找到正确的东西，可以通过以下方式完全控制它<code>application.properties</code> ，包括<code>DataSource</code>生产中所需的资源（例如池大小和验证查询）。因此，您所需要的只是一种从环境中发现服务的位置和凭据的方法。buildpack转换Cloud Foundry <code>VCAP_*</code>春天将环境变量转换为可用的属性源<code>Environment</code> 。因此，例如<code>DataSource</code>配置可能如下所示：</p>
+<pre><code class="prettyprint properties">spring.datasource.url: ${cloud.services.mysql.connection.jdbcurl:jdbc:h2:mem:testdb}
+spring.datasource.username: ${cloud.services.mysql.connection.username:sa}
+spring.datasource.password: ${cloud.services.mysql.connection.password:}
+spring.datasource.testOnBorrow: true
+</code></pre>
+<p>属性名称的“ mysql”部分是Cloud Foundry中的服务名称（因此由用户设置）。当然，相同的模式适用于所有类型的服务，而不仅仅是JDBC <code>DataSource</code> 。一般来说，最好使用外部配置，尤其是<code>@ConfigurationProperties</code>因为它们提供了最大的灵活性，例如在运行时使用系统属性或环境变量进行覆盖。</p>
+<blockquote>
+<p>注意：Spring Boot提供了类似的功能， <code>vcap.services.*</code>代替<code>cloud.services.*</code> ，因此实际上您最终会以多种方式完成此操作。但是，JDBC URL不能从<code>vcap.services.*</code>属性（非JDBC服务与<code>vcap.services.*credentials.url</code> ）。</p>
+</blockquote>
+<p>这种方法的局限性是：如果应用程序需要配置Spring Boot未提供的Bean（例如，如果您需要2），则该方法不适用<code>DataSources</code> ），在这种情况下，您仍然必须编写Java代码，并且可能会或可能不会选择使用属性文件对其进行参数化。</p>
+<p>但是，在您自己尝试之前，请注意，除非您同时禁用了buildpack自动重新配置（以及Spring Cloud连接器位于类路径中），否则它实际上是无法工作的。如果您不这样做，那么他们会创建一个新的<code>DataSource</code>为您，Spring Boot无法将其绑定到您的属性文件。因此，即使采用这种声明式方法，您最终仍需要明确<code>@Bean</code>定义，并且您需要“云”配置文件配置的这一部分：</p>
+<pre><code class="prettyprint java">@Configuration
+@Profile(&quot;cloud&quot;)
+public class CloudDataSourceConfiguration {
+
+  @Bean
+  public Cloud cloud() {
+    return new CloudFactory().getCloud();
+  }
+
+}
+</code></pre>
+<p>这纯粹是为了关闭buildpack自动重新配置（以及Spring Boot自动配置，但是可以通过属性文件条目将其禁用）。</p><h2><a href="#mixed-declarative-and-explicit-bean-definition" class="anchor" name="mixed-declarative-and-explicit-bean-definition"></a>混合声明式和显式Bean定义</h2>
+<p>您还可以混合使用两种方法：声明一个<code>@Bean</code>定义，以便您控制对象的构造，但使用绑定其他配置<code>@ConfigurationProperties</code> （并且在本地和Cloud Foundry中也是如此）。例：</p>
+<pre><code class="prettyprint java">@Configuration
+public class LocalDataSourceConfiguration {
+	
+	@Bean
+    @ConfigurationProperties(DataSourceProperties.PREFIX)
+	public DataSource dataSource() {
+		return DataSourceBuilder.create().build();
+	}
+
+}
+</code></pre>
+<p>（其中<code>DataSourceBuilder</code>将被用例所需要的任何奇特逻辑取代）。和<code>application.properties</code>与上述相同，但生产设置需要其他任何属性。</p><h2><a href="#a-third-way-discover-the-credentials-and-bind-manually" class="anchor" name="a-third-way-discover-the-credentials-and-bind-manually"></a>第三种方式：发现凭证并手动绑定</h2>
+<p>有助于平台和环境独立的另一种方法是为该对象声明显式的bean定义。 <code>@ConfigurationProperties</code> Spring Boot用来绑定其自动配置的连接器的bean。例如，为<code>DataSource</code>您可以声明一个<code>@Bean</code>类型的<code>DataSourceProperties</code> ：</p>
+<pre><code class="prettyprint java">@Bean
+@Primary
+public DataSourceProperties dataSourceProperties() {
+    DataSourceProperties properties = new DataSourceProperties();
+    properties.setInitialize(false);
+    return properties;
+}
+</code></pre>
+<p>这为“ initialize”标志设置了默认值，并允许其他属性从<code>application.properties</code> （或其他外部属性）。将其与Spring Cloud Connectors结合使用，可以在检测到云服务时控制凭据的绑定：</p>
+<pre><code class="prettyprint java"><br />@Autowired(required=&quot;false&quot;)
+Cloud cloud;
+
+@Bean
+@Primary
+public DataSourceProperties dataSourceProperties() {
+    DataSourceProperties properties = new DataSourceProperties();
+    properties.setInitialize(false);
+    if (cloud != null) {
+      List&lt;ServiceInfo&gt; infos = cloud.getServiceInfos(RelationalServiceInfo.class);
+      if (infos.size()==1) {
+        RelationalServiceInfo info = (RelationalServiceInfo) infos.get(0);
+        properties.setUrl(info.getJdbcUrl());
+        properties.setUsername(info.getUserName());
+        properties.setPassword(info.getPassword());
+      }
+    }
+    return properties;
+}
+</code></pre>
+<p>并且您仍然需要定义<code>Cloud</code> “云”配置文件中的bean。它最终需要很多代码，并且在这个简单的用例中是不必要的，但是如果您有更复杂的绑定，或者需要实现一些逻辑来选择<code>DataSource</code>在运行时。</p>
+<p>春季靴有类似<code>*Properties</code>您可能常用的其他中间件的bean（例如<code>RabbitProperties</code> ， <code>RedisProperties</code> ， <code>MongoProperties</code> ）。标记为的此类bean的实例<code>@Primary</code>足以重置自动配置的连接器的默认值。</p><h2><a href="#deploying-to-multiple-cloud-platforms" class="anchor" name="deploying-to-multiple-cloud-platforms"></a>部署到多个云平台</h2>
+<p>到目前为止，我们已经将Cloud Foundry视为唯一可在其中部署应用程序的云平台。Spring Cloud Connectors的一个不错的功能是它支持其他平台，无论是开箱即用还是作为扩展点。的<code>spring-boot-starter-cloud-connectors</code>甚至包括Heroku支持。如果您什么也不做，并且依靠自动配置（懒惰程序员的方法），那么您的应用程序将可部署在类路径上具有连接器的所有云中（即，如果使用启动器，则为Cloud Foundry和Heroku）。如果您采取显式<code>@Bean</code>那么您需要确保“云”配置文件在非Cloud Foundry平台中处于活动状态，例如通过环境变量。而且，如果您使用纯粹的声明性方法（或涉及属性文件的任何组合），则需要激活“云”配置文件以及可能还特定于您平台的另一个配置文件，以便正确的属性文件最终位于<code>Environment</code>在运行时。</p><h2><a href="#summary-of-autoconfiguration-and-provided-behaviour" class="anchor" name="summary-of-autoconfiguration-and-provided-behaviour"></a>自动配置和提供的行为摘要</h2>
+<ul>
+<li>
+<p>Spring Boot提供<code>DataSource</code> （还有RabbitMQ或Redis <code>ConnectionFactory</code> ，Mongo等），如果它在类路径上找到所有正确的内容。使用“ spring-boot-starter- *”依赖项足以激活该行为。</p></li>
+<li>
+<p>Spring Boot还提供了一个自动<code>CloudFactory</code>如果它在类路径上找到了Spring Cloud Connectors（但是只有找到一个<code>@Bean</code>类型的<code>Cloud</code> ）。</p></li>
+<li>
+<p>的<code>CloudAutoConfiguration</code>在Spring Boot中也有效地添加了一个<code>@CloudScan</code>到您的应用程序，如果您需要创建自己的应用程序，则需要将其关闭<code>DataSource</code> （或类似）。</p></li>
+<li>
+<p>除非已处于活动状态，否则Cloud Foundry Java buildpack会检测到Spring Boot应用程序并激活“ cloud”配置文件。如果您想在本地尝试，添加buildpack自动重新配置JAR会做同样的事情。</p></li>
+<li>
+<p>通过自动重新配置JAR，buildpack也将启动并创建一个<code>DataSource</code> （同上的RabbitMQ，Redis的，蒙戈等），如果它<em>没有</em>找到一个<code>CloudFactory</code>豆或<code>Cloud</code>豆（以及其他）。因此，在Spring Boot应用程序中包含Spring Cloud Connector会关闭“自动重新配置”行为（bean创建）的这一部分。</p></li>
+<li>
+<p>关闭Spring Boot <code>CloudAutoConfiguration</code>这很容易，但是如果您这样做的话，就必须记住要关闭buildpack自动重配置。唯一的方法是定义一个bean定义（可以是type <code>Cloud</code>要么<code>CloudFactory</code>例如）。</p></li>
+<li>
+<p>Spring Boot绑定<code>application.properties</code> （以及其他外部属性来源） <code>@ConfigurationProperties</code> bean，包括但不限于它自动配置的bean。您可以使用此功能来调整池属性和在生产环境中需要不同的其他设置。</p></li>
+</ul><h2><a href="#general-advice-and-conclusion" class="anchor" name="general-advice-and-conclusion"></a>一般建议和结论</h2>
+<p>在这篇简短的文章中，我们已经看到了很多选项和自动配置，并且我们仅真正使用了您的库（Spring Boot，Spring Cloud Connectors和Cloud Foundry buildpack自动重配置JAR）和一个平台（Cloud Foundry），计算本地部署。实际上，buildpack功能仅对非常简单的应用程序有用，因为在生产环境中无法灵活地调整连接。那就是说原型制作时能够做的一件好事。如果要实现在本地和云中部署相同代码的目标，但仍然能够在生产中进行必要的调整，只有三种主要方法：</p>
+<ol>
+<li>
+<p>使用Spring Cloud Connector显式创建<code>DataSource</code>和其他中间件连接并保护它们<code>@Beans</code>与<code>@Profile("cloud")</code> 。该方法始终有效，但是所生成的代码比许多应用程序可能需要的代码更多。</p></li>
+<li>
+<p>使用Spring Boot默认自动配置并使用以下命令声明云绑定<code>application.properties</code> （或在YAML中）。要充分利用您的利益，您还必须明确关闭buildpack自动重新配置。</p></li>
+<li>
+<p>使用Spring Cloud Connectors查找凭据并将其绑定到Spring Boot <code>@ConfigurationProperties</code>作为默认值（如果存在）。</p></li>
+</ol>
+<p>这三种方法实际上并不兼容，可以混合使用<code>@ConfigurationProperties</code>提供特定于配置文件的默认配置替代（例如，用于在生产环境中以不同方式设置连接池）。如果您有一个相对简单的Spring Boot应用程序，则在这两种方法之间进行选择的唯一方法可能是个人喜好。如果您有非Spring Boot应用程序，则显式<code>@Bean</code>如果您打算将应用程序部署在多个云平台（例如Heroku和Cloud Foundry）中，那么这种方法将是成功的，也可能会成功。</p>
+<blockquote>
+<p>注意：此博客是发现之旅（谁知道有很多东西要学习？？）。感谢所有提供评论和意见的人，尤其是<a href="">Scott Frederick</a> ，他发现了草案中的大多数错误，并且总是有时间查看新的修订。</p>
+</blockquote></div>
+</div>
+<section id="disqus_thread"></section>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2093;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+ <div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

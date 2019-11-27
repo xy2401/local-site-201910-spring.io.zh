@@ -1,4 +1,4 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search="" xmlns:th="http://www.thymeleaf.org"><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>AngularJS-将表达式沙箱转义为XSS</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
@@ -21,7 +21,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="AngularJS - Escaping the Expression Sandbox for XSS">
-<meta name="twitter:description" content="<p><strong>UPDATE</strong>: This is a summary of <a href=" http:="" ="" blog.portswigger.net="" 2016="" 01="" xss-without-html-client-side-template.htm="="></head><body dir="ltr" ng-app="">XSS without HTML: Client-Side Template Injection with AngularJS. Previously the citation was in the middle of the document and difficult to find. The goal of the summary is to present the exploit and a fix without all the nuances, not to claim the work as my own.
+<meta name="twitter:description" content="<p><strong>UPDATE</strong>: This is a summary of <a href=" http:="" ="" blog.portswigger.net="" 2016="" 01="" xss-without-html-client-side-template.htm="="></head><body >XSS without HTML: Client-Side Template Injection with AngularJS. Previously the citation was in the middle of the document and difficult to find. The goal of the summary is to present the exploit and a fix without all the nuances, not to claim the work as my own.
 <h1><a href="#introduction" class="anchor" name="introduction"></a>Introduction</h1>
 <p><a href="https://angularjs.org/">AngularJS</a> is a popular JavaScript framework that allows embedding <a href="https://code.angularjs.org/1.4.9/docs/guide/expression">expressions</a> within double curly braces. <a href="https://code.angularjs.org/1.4.9/docs/guide/expression#example">For example</a>, the expression <code>1+2={{1+2}}</code> will render as <code>1+2=3</code>.</p>
 <p>This means that if the server echos out user input that contains double curly braces, the user can perform a XSS exploit using Angular expressions.</p>
@@ -172,69 +172,69 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p><strong>更新</strong> ：这是<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">没有HTML</a>的<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">XSS</a>的摘要<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">：AngularJS的客户端模板注入</a> 。以前，引文位于文档中间，很难找到。总结的目的是在没有任何细微差别的情况下提供漏洞利用程序和修复程序，而不是声称这项工作是我自己的。</p><h1><a href="#introduction" class="anchor" name="introduction"></a>介绍</h1>
+<div class="blog--post"><p><strong>更新</strong> ：这是<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">没有HTML</a>的<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">XSS</a>的摘要<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">：AngularJS的客户端模板注入</a> 。以前，引文位于文档的中间，很难找到。总结的目的是在没有任何细微差别的情况下提供漏洞利用程序和修复程序，而不是声称这项工作是我自己的。</p><h1><a href="#introduction" class="anchor" name="introduction"></a>介绍</h1>
 <p><a href="https://angularjs.org/">AngularJS</a>是一种流行的JavaScript框架，它允许将<a href="https://code.angularjs.org/1.4.9/docs/guide/expression">表达式</a>嵌入到双花括号中。<a href="https://code.angularjs.org/1.4.9/docs/guide/expression#example">例如</a> ，表达式<code>1+2={{1+2}}</code>将呈现为<code>1+2=3</code> 。</p>
 <p>这意味着，如果服务器回显包含双花括号的用户输入，则用户可以使用Angular表达式执行XSS利用。</p><h1><a href="#writing-user-input-server-side" class="anchor" name="writing-user-input-server-side"></a>编写用户输入服务器端</h1>
-<p>让我们研究一个安全地HTML编码用户输入的页面。在下面的示例中，我们使用<a href="http://www.thymeleaf.org/">Thymeleaf</a>进行HTML编码，然后将属性<code>username</code>发送到页面div的文本中。</p>
-<pre><code class="prettyprint html"><html xmlns:th="http://www.thymeleaf.org">
-<head>
-<title>AngularJS - Escaping the Expression Sandbox</title>
-</head>
-<body>
-<div th:text="${username}"></div>
-</body>
-</html>
+<p>让我们研究一个安全地HTML编码用户输入的页面。在下面的示例中，我们使用<a href="http://www.thymeleaf.org/">Thymeleaf</a>进行HTML编码，然后输出属性<code>username</code>到我们页面的div文本。</p>
+<pre><code class="prettyprint html">&lt;html xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
+&lt;head&gt;
+&lt;title&gt;AngularJS - Escaping the Expression Sandbox&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div th:text=&quot;${username}&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
 <p>如果用户名是<code><script>alert('Rob')</script></code>输出可能如下所示：</p>
-<pre><code class="prettyprint html"><html xmlns:th="http://www.thymeleaf.org">
-<head>
-<title>AngularJS - Escaping the Expression Sandbox</title>
-</head>
-<body>
-<div>&lt;script&gt;alert(&#39;Rob&#39;)&lt;/script&gt;</div>
-</body>
-</html>
+<pre><code class="prettyprint html">&lt;html xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
+&lt;head&gt;
+&lt;title&gt;AngularJS - Escaping the Expression Sandbox&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div&gt;&amp;lt;script&amp;gt;alert(&amp;#39;Rob&amp;#39;)&amp;lt;/script&amp;gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
 <p>您会注意到输出已正确进行HTML编码。这意味着我们的应用程序当前可免受XSS攻击。</p><h1><a href="#adding-angularjs" class="anchor" name="adding-angularjs"></a>添加AngularJS</h1>
-<p>我们的应用程序当前对XSS攻击安全。让我们更新应用程序以使用AngularJS</p>
-<pre><code class="prettyprint html"><html xmlns:th="http://www.thymeleaf.org">
-<head>
-<title>Angular Expression - safe</title>
-<script src="angular-1.4.8.min.js"></script>
-</head>
-<body ng-app>
-<div th:text="${username}"></div>
-</body>
-</html>
+<p>我们的应用程序当前对XSS攻击是安全的。让我们更新应用程序以使用AngularJS</p>
+<pre><code class="prettyprint html">&lt;html xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
+&lt;head&gt;
+&lt;title&gt;Angular Expression - safe&lt;/title&gt;
+&lt;script src=&quot;angular-1.4.8.min.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body ng-app&gt;
+&lt;div th:text=&quot;${username}&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
 <p>您会注意到两个变化：</p>
 <ul>
-<li>我们包括添加的<code>angular-1.4.8.min.js</code></li>
-<li>我们在主体元素中添加了<code>ng-app</code></li>
+<li>我们添加了<code>angular-1.4.8.min.js</code></li>
+<li>我们加了<code>ng-app</code>身体元素</li>
 </ul>
-<p>我们的应用程序现在容易受到XSS攻击，但是我们如何利用它呢？最大的线索应该是我们对Angular表达式的介绍。用户名<code>1+2={{1+2}}</code>会发生什么？结果将是：</p>
-<pre><code class="prettyprint html"><html>
-<head>
-<title>Angular Expression - safe</title>
-<script src="angular-1.4.8.min.js"></script>
-</head>
-<body ng-app="">
-<div>1+2={{1+2}}</div>
-</body>
-</html>
+<p>我们的应用程序现在容易受到XSS攻击，但是我们如何利用它呢？最大的线索应该是我们对Angular表达式的介绍。用户名为会发生什么<code>1+2={{1+2}}</code> ？结果将是：</p>
+<pre><code class="prettyprint html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Angular Expression - safe&lt;/title&gt;
+&lt;script src=&quot;angular-1.4.8.min.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body ng-app=&quot;&quot;&gt;
+&lt;div&gt;1+2={{1+2}}&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
 <p>然后，Angular将DOM更新为：</p>
-<pre><code class="prettyprint html"><html>
-<head>
-<title>Angular Expression - safe</title>
-<script src="angular-1.4.8.min.js"></script>
-</head>
-<body ng-app="">
-<div>1+2=3</div>
-</body>
-</html>
+<pre><code class="prettyprint html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Angular Expression - safe&lt;/title&gt;
+&lt;script src=&quot;angular-1.4.8.min.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body ng-app=&quot;&quot;&gt;
+&lt;div&gt;1+2=3&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
-<p>我们可以尝试使用<code>{{alert('Rob')}}</code>用户名，但这将被<a href="https://code.angularjs.org/1.4.9/docs/guide/security#expression-sandboxing">Expression Sandboxing</a>阻止。在这一点上，您可能认为我们很安全。但是，尽管出现在文档的安全性部分中，Expression Sandboxing也不旨在提供安全性。</p>
+<p>我们可以尝试一个用户名<code>{{alert('Rob')}}</code> ，但<a href="https://code.angularjs.org/1.4.9/docs/guide/security#expression-sandboxing">表达式沙箱</a>会阻止该操作。在这一点上，您可能认为我们很安全。但是，尽管出现在文档的安全性部分中，Expression Sandboxing也不旨在提供安全性。</p>
 <p>更具体地说，文档指出以下有关<a href="https://code.angularjs.org/1.4.9/docs/guide/security#mixing-client-side-and-server-side-templates">混合客户端和服务器端模板的内容</a> ：</p>
 <blockquote>
 <p>通常，我们建议不要这样做，因为它会创建意外的XSS向量。</p>
@@ -242,13 +242,13 @@
 <p>最终，这意味着如果允许用户输入在服务器端的模板中呈现，则该应用程序容易受到XSS攻击。让我们看一个具体的例子。</p><h1><a href="#escaping-the-expression-sandbox" class="anchor" name="escaping-the-expression-sandbox"></a>转义表达式沙箱</h1>
 <p>如果我们的有效负载是沙盒，我们如何提供有效的XSS漏洞利用？<br>如果我们的用户名是：</p>
 <pre><code class="prettyprint javascript">{{
-'a'.constructor.prototype.charAt=[].join;
-eval('x=1} } };alert(1)//');
+&#39;a&#39;.constructor.prototype.charAt=[].join;
+eval(&#39;x=1} } };alert(1)//&#39;);
 }}
 </code></pre>
-<p>通过重写本机函数<code>charAt</code>我们可以绕过Angular的Expression Sandbox并允许我们执行<code>alert(1)</code> 。请参阅<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">不带HTML的XSS：使用AngularJS</a>进行<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">客户端模板注入，以</a>获取有关漏洞利用工作原理的完整详细信息。</p>
+<p>通过覆盖本机功能<code>charAt</code>我们可以绕过Angular的Expression Sandbox并允许我们执行<code>alert(1)</code> 。请参阅<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">不带HTML的XSS：使用AngularJS</a>进行<a href="http://blog.portswigger.net/2016/01/xss-without-html-client-side-template.html">客户端模板注入，以</a>获取有关漏洞利用工作原理的完整详细信息。</p>
 <p><strong>注意</strong> ：此有效负载针对Chrome和AngularJS 1.4.8。在其他浏览器中无法使用。</p><h1><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h1>
-<p>允许服务器将用户输入回显到Angular模板中会将您的应用程序暴露给XSS攻击。更一般而言，您不应将用户输入的服务器端呈现与客户端模板混为一谈。您可以在<a href="https://github.com/rwinch/angularjs-escaping-expression-sandbox">rwinch / angularjs-escaping-expression-sandbox上</a>找到此博客文章随附的示例。</p></div>
+<p>允许服务器将用户输入回显到Angular模板中会将您的应用程序暴露给XSS攻击。更一般而言，您不应将用户输入的服务器端呈现与客户端模板混为一谈。您可以在<a href="https://github.com/rwinch/angularjs-escaping-expression-sandbox">rwinch / angularjs-escaping-expression-sandbox中</a>找到此博客文章随附的示例。</p></div>
 </div>
 <section id="disqus_thread"></section>
 <script type="text/javascript">var disqus_shortname = 'spring-io';
@@ -286,13 +286,11 @@ eval('x=1} } };alert(1)//');
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -302,7 +300,7 @@ eval('x=1} } };alert(1)//');
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
 <script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
@@ -324,17 +322,14 @@ eval('x=1} } };alert(1)//');
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> •
-<a href="https://pivotal.io/privacy-policy">Privacy</a> •
-<a href="/trademarks">Trademark Guidelines</a>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
 <div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>

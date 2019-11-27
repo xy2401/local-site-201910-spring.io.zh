@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
-<title>在OSGi中公开启动类路径</title>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>在OSGi中公开引导类路径</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,20 +25,22 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Exposing the boot classpath in OSGi">
-<meta name="twitter:description" content="Exposing the boot classpath in OSGi" http:="" ="" blog.springsource.com="" 2008="" 02="" 18="" creating-osgi-bundles="" ="="></meta>bundles use the OSGi directive inside their manifests - mainly <tt>Export-Package</tt> and <tt>Import-Package</tt> for providing and demanding, a respectively, a class package dependency. Defining a bundle wiring is a crucial step for creating a modular application; however there are cases, as the issue above, where the needed package is not available from a bundle.
+<meta name="twitter:description" content="Exposing the boot classpath in OSGi" http:="" ="" blog.springsource.com="" 2008="" 02="" 18="" creating-osgi-bundles="" ="=">bundles use the OSGi directive inside their manifests - mainly <tt>Export-Package</tt> and <tt>Import-Package</tt> for providing and demanding, a respectively, a class package dependency. Defining a bundle wiring is a crucial step for creating a modular application; however there are cases, as the issue above, where the needed package is not available from a bundle.
 " > <meta property="og:title">
-<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2008="" 02="" 18="" creating-osgi-bundles="" ="="></meta>bundles use the OSGi directive inside their manifests - mainly <tt>Export-Package</tt> and <tt>Import-Package</tt> for providing and demanding, a respectively, a class package dependency. Defining a bundle wiring is a crucial step for creating a modular application; however there are cases, as the issue above, where the needed package is not available from a bundle.
+<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2008="" 02="" 18="" creating-osgi-bundles="" ="=">bundles use the OSGi directive inside their manifests - mainly <tt>Export-Package</tt> and <tt>Import-Package</tt> for providing and demanding, a respectively, a class package dependency. Defining a bundle wiring is a crucial step for creating a modular application; however there are cases, as the issue above, where the needed package is not available from a bundle.
 " > <meta>
 <meta property="og:article:published_time" content="2009-01-19 20:18:00.0">
-
-
+</head>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -141,7 +147,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">在OSGi中公开启动类路径</h1>
+<h1 class="blog--title">在OSGi中公开引导类路径</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -162,14 +168,14 @@
 </header>
 <div class="blog--post"><p>我不时遇到的一个相当普遍的问题是如何在OSGi环境中使用JDK特定的类。在某种程度上，这等效于无需捆绑OSGi即可访问引导类路径。为了表达包依赖关系， <a href="http://blog.springsource.com/2008/02/18/creating-osgi-bundles/">捆绑包</a>在清单中使用OSGi指令-主要是<tt>Export-Package</tt>和<tt>Import-Package</tt>分别提供和要求一个类包依赖关系。定义线束接线是创建模块化应用程序的关键步骤。但是，如上所述，在某些情况下，捆绑包中没有所需的软件包。</p>
 <h2>NoClassDefFoundError：com.sun ...</h2>
-<pre><code class="prettyprint">Notable examples of such packages would be the <tt>sun.*</tt> and <tt>com.sun.*</tt>, present in the JDK jars. Even though these are <a href="http://java.sun.com/products/jdk/faq/faq-sun-packages.html">internal</a> packages and are not guaranteed to be portable, some of them can be found even in non-Sun JDKs, due to their usage. Your application might not use them, but there are various libraries that do (in some cases due to performance, in others because it's the only way to achieve a certain functionality). If the using bundle declares an import on the <tt>com.sun</tt> package, it will fail to resolve since there are no providers for it. If the import is not declared, since the bundle doesn't contain the class definition, the loading process will usually fail. Clearly the packages above are not a corner case; generalizing the example, the packages available in the OSGi framework boot classpath are not visible to the OSGi environment. There are several solutions to this problem but first, let's take a closer look to see why it occurs.
+<pre><code class="prettyprint">Notable examples of such packages would be the &lt;tt&gt;sun.*&lt;/tt&gt; and &lt;tt&gt;com.sun.*&lt;/tt&gt;, present in the JDK jars. Even though these are &lt;a href=&quot;http://java.sun.com/products/jdk/faq/faq-sun-packages.html&quot;&gt;internal&lt;/a&gt; packages and are not guaranteed to be portable, some of them can be found even in non-Sun JDKs, due to their usage. Your application might not use them, but there are various libraries that do (in some cases due to performance, in others because it&#39;s the only way to achieve a certain functionality). If the using bundle declares an import on the &lt;tt&gt;com.sun&lt;/tt&gt; package, it will fail to resolve since there are no providers for it. If the import is not declared, since the bundle doesn&#39;t contain the class definition, the loading process will usually fail. Clearly the packages above are not a corner case; generalizing the example, the packages available in the OSGi framework boot classpath are not visible to the OSGi environment. There are several solutions to this problem but first, let&#39;s take a closer look to see why it occurs.
 </code></pre>
 <h2>班级空间</h2><p>在OSGi中，每个模块都有其自己的类加载器，用于加载资源和类。平台根据接线指令在各个模块之间创建一个委托网络。网络形成了一个类空间，该类空间表示（引用OSGi规范）： <i>“从给定包的类加载器可到达的所有类”</i>或用外行术语（包可以看到的），包<em>世界</em>视图。网络可以相交，因为同一软件包可以由多个捆绑包加载；但是，每个空间必须保持一致，这是平台在每个捆绑包的解析阶段强制执行的要求。网络模型的副作用（或目标）之一是类型隔离或类版本控制：同一类的多个版本可以很好地共存于同一VM中，因为每个虚拟机都被加载到其自己的网络，自己的空间中。</p><p>但是，有些类需要进行不同的加载，例如<tt>java。*</tt>包。这些类是Java运行时本身的一部分，因此是它们隐式必需的。例如，每个Java对象都是<tt>java.lang的子类<tt>。该对象</tt>实际上意味着<em>每个</em>捆绑包至少使用一个Java包（ <tt>java.lang</tt> ）。尽管可以通过捆绑清单中的指令来表达这种依赖性，但是由于其强制性，它变得不受欢迎。这就是为什么<tt>java。*</tt>包被视为隐含的导入，并且即使每个包都未声明它们也可以加载。实际上，OSGi规范禁止捆绑软件在<tt>java。*</tt>上指定导入，因为类连接<u>始终</u>暗含版本控制功能，这意味着无法在同一VM中运行多个Java版本（至少今天不能这样做）。</tt></p><p><tt>为了加载这些基本类型，OSGi平台使用父级委派而不是网络模型。也就是说，它使用启动OSGi框架的类加载器而不是OSGi类空间来加载类。由于实际上看起来似乎更复杂，所以我使用<a href="https://en.wikipedia.org/wiki/DOT_language">点</a>语言创建了一个图表：</tt></p><tt>
 <p align="center">
 <a href="http://blog.springsource.com/wp-content/uploads/2009/01/network.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/network.png" alt="网络模型" title="网络模型" width="297" height="354"></a>网络模型</p><p>从上面可以看出，这种加载模型与传统的Java约定有很大的不同，传统的Java约定依赖于父委托来解析所有软件包的类，而不仅仅是<tt>Java。*</tt> 。捆绑包根据它们的接线相互通信，同时将特殊类型的加载委托给父类加载器（图中的绿色箭头）</p>
-<h2>解决方案A：系统软件包</h2><p>细心的读者可能已经注意到， <em>只</em>提到了<tt>java。*</tt>包-JDK中没有其他可用的公共包（例如<tt>javax.net</tt>或<tt>javax.xml）</tt>是父级委托的，这意味着它们必须在类空间中解析。 。也就是说，捆绑软件需要导入软件包（这意味着<br>需要成为提供者），因为它们不是隐含的。OSGi的规范允许的框架（通过其系统插件）任何相关的包从它的父类加载器导出为使用<tt>org.osgi.framework.system.packages</tt>财产制包。<br>由于将托管JDK重新打包为捆绑包不是一个可行的选择，因此可以使用此设置让系统捆绑包（或ID为0的捆绑包）自己导出这些软件包。大多数OSGi实现已使用此属性来导出所有公共JDK包（基于检测到的JDK版本）。以下是Java 1.6的Equinox配置文件的摘录：</p><p><code><br>org.osgi.framework.system.packages = \<br>  javax.accessibility,\<br>  javax.activity,\<br>  javax.crypto,\<br>  javax.crypto.interfaces,\<br>  …<br>  org.xml.sax.helpers<br></code></p><p>使用此属性，可以添加额外的程序包，这些程序包将由框架加载和提供，并且可以连接到其他捆绑软件。</p><p><code><br>org.osgi.framework.system.packages = \<br>  javax.accessibility,\<br>  javax.activity,\<br>  …<br>  org.xml.sax.helpers, \<br>  <b>special.parent.package</b><br></code></p><p>可以通过询问系统捆绑包来看到（在Equinox中OSGi控制台的片段下方）：</p><p><code><br>osgi> bundle 0<br> <br>System Bundle [0]<br>   Id=0, Status=ACTIVE<br>    Registered Services<br>   …<br>   Exported packages<br>    …<br>    org.xml.sax.helpers; version=“0.0.0”[exported]<br>    <b>special.parent.package; version=“0.0.0”[exported]</b><br>    …<br></code></p><p>该设置需要在OSGi框架启动之前进行初始化，因此常见的模式是将其设置为系统属性。这种方法将覆盖默认配置，因此即将发布的OSGi 4.2定义了另一个名为<tt>org.osgi.framework.system.packages.extra的</tt>属性，该属性会将定义的系统程序包附加到<tt>org.osgi.framework.system.packages</tt>配置中，更容易扩展OSGi实现已定义的配置。可以添加新的软件包<br>只需将参数传递给启动平台的VM即可：</p><p><code><br>java -D<b>org.osgi.framework.system.packages.extra=special.parent.package;version=1.0</b> …<br></code></p><p>让我们从OSGi控制台再次检查软件包：</p><p><code><br>osgi> packages special.parent.package<br> <br>special.parent.package; version=“1.0.0” <org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br></code></p>
-<h2>解决方案A'：扩展束</h2><p>另一个可能的选择是通过扩展捆绑包来<em>增强</em>系统捆绑包。这些充当碎片；它们不是自己的捆绑包，而是连接到主机。附加后，片段内容（包括任何允许的标头）将被视为主机的一部分。扩展捆绑包是一种特殊的片段， <em>仅</em>附加到系统捆绑包上，以交付框架的可选部分（例如，启动级别服务）。可以使用这种机制来创建一个空扩展名，该扩展名仅声明所需的包，然后将加载工作留给其托管包（在本例中为Framework）：</p>
-<pre><code class="prettyprint code">osgi> ss
+<h2>解决方案A：系统软件包</h2><p>细心的读者可能已经注意到， <em>只</em>提到了<tt>java。*</tt>包-JDK中没有其他可用的公共包（例如<tt>javax.net</tt>或<tt>javax.xml）</tt>是父级委托的，这意味着它们必须在类空间中解析。 。也就是说，捆绑软件需要导入软件包（这意味着<br>需要成为提供者），因为它们不是隐含的。OSGi规范允许框架（通过其系统捆绑包）使用<tt>org.osgi.framework.system.packages</tt>属性将其父类加载器中的所有相关软件包导出为系统软件包。<br>由于将托管JDK重新打包为捆绑包不是一个可行的选择，因此可以使用此设置让系统捆绑包（或ID为0的捆绑包）自行导出这些软件包。大多数OSGi实现已使用此属性来导出所有公共JDK包（基于检测到的JDK版本）。以下是Java 1.6的Equinox配置文件的摘录：</p><p><code><br>org.osgi.framework.system.packages = \<br>  javax.accessibility,\<br>  javax.activity,\<br>  javax.crypto,\<br>  javax.crypto.interfaces,\<br>  …<br>  org.xml.sax.helpers<br></code></p><p>使用此属性，可以添加额外的程序包，这些程序包将由框架加载和提供，并且可以连接到其他捆绑软件。</p><p><code><br>org.osgi.framework.system.packages = \<br>  javax.accessibility,\<br>  javax.activity,\<br>  …<br>  org.xml.sax.helpers, \<br>  <b>special.parent.package</b><br></code></p><p>可以通过询问系统捆绑包来看到（在Equinox中OSGi控制台的片段下方）：</p><p><code><br>osgi> bundle 0<br> <br>System Bundle [0]<br>   Id=0, Status=ACTIVE<br>    Registered Services<br>   …<br>   Exported packages<br>    …<br>    org.xml.sax.helpers; version=“0.0.0”[exported]<br>    <b>special.parent.package; version=“0.0.0”[exported]</b><br>    …<br></code></p><p>该设置需要在OSGi框架启动之前进行初始化，因此常见的模式是将其设置为系统属性。这种方法将覆盖默认配置，因此即将发布的OSGi 4.2定义了另一个名为<tt>org.osgi.framework.system.packages.extra的</tt>属性，该属性会将定义的系统程序包附加到<tt>org.osgi.framework.system.packages</tt>配置中，更容易扩展OSGi实现已定义的配置。可以添加新的软件包<br>只需将参数传递给启动平台的VM即可：</p><p><code><br>java -D<b>org.osgi.framework.system.packages.extra=special.parent.package;version=1.0</b> …<br></code></p><p>让我们从OSGi控制台再次检查软件包：</p><p><code><br>osgi> packages special.parent.package<br> <br>special.parent.package; version=“1.0.0” <org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br></code></p>
+<h2>解决方案A'：扩展束</h2><p>另一个可能的选择是通过扩展捆绑包来<em>增强</em>系统捆绑包。这些充当碎片；它们不是自己的捆绑包，而是连接到主机。附加后，片段内容（包括任何允许的标头）将被视为主机的一部分。扩展捆绑包是一种特殊的片段， <em>仅</em>附加到系统捆绑包上，以交付框架的可选部分（例如，启动级别服务）。可以使用这种机制来创建一个空扩展名，该扩展名仅声明所需的包，然后将加载工作留给其托管捆绑包（在本例中为Framework）：</p>
+<pre><code class="prettyprint code">osgi&gt; ss
  
 Framework is launched.
  
@@ -179,42 +185,43 @@ id     State      Bundle
 1    RESOLVED    a.framework.extension_0.0.0
         Master=0
  
-osgi> bundle 1
+osgi&gt; bundle 1
  
 a.framework.extension_0.0.0 [1]
     Id=1, Status=RESOLVED    Data Root=...
     No registered services.
     No services in use.
     Exported packages
-       <b>special.parent.package; version="0.0.0"[exported]</b>
+       &lt;b&gt;special.parent.package; version=&quot;0.0.0&quot;[exported]&lt;/b&gt;
     No imported packages
     Host bundles
-       <b>org.eclipse.osgi_3.5.0.v20081201-1815 [0]</b>
+       &lt;b&gt;org.eclipse.osgi_3.5.0.v20081201-1815 [0]&lt;/b&gt;
     No named class spaces
     No required bundles
    
-osgi> headers 1
+osgi&gt; headers 1
  
 Bundle headers:
    Bundle-ManifestVersion = 2
    Bundle-SymbolicName = a.framework.extension
-   <b>Export-Package = special.parent.package</b>
-   <b>Fragment-Host = system.bundle; extension:=framework</b>
+   &lt;b&gt;Export-Package = special.parent.package&lt;/b&gt;
+   &lt;b&gt;Fragment-Host = system.bundle; extension:=framework&lt;/b&gt;
    Manifest-Version = 1.0
-</code></pre><p>注意上面的<tt>Fragment-Host</tt>标头中的特殊主机符号名称和extra属性。这告诉框架，该捆绑包不仅是普通的片段，而且是扩展捆绑包。<br>连接后，相关的扩展清单指令将与系统捆绑程序（其主机）的伪指令合并：</p>
-<pre><code class="prettyprint code"><br>osgi> packages special.parent.package
+</code></pre><p>注意上面的<tt>Fragment-Host</tt>标头中的特殊主机符号名称和extra属性。这告诉框架，该捆绑包不仅是普通片段，而且是扩展捆绑包。<br>连接后，相关的扩展清单指令将与系统捆绑程序（其主机）的伪指令合并：</p>
+<pre><code class="prettyprint code"><br />osgi&gt; packages special.parent.package
  
-special.parent.package; version="0.0.0"<org.eclipse.osgi_3.5.0.v20081201-1815 [0]> 
-</code></pre><p>解决方案A'基本上是A的变体（因此得名）-可以使用片段捆绑扩展系统捆绑，而不是使用系统属性，这在某些情况下可能更方便。<br>值得指出的是，扩展捆绑包可能使用Java引导类路径执行加载，该路径是规范定义的一种可选机制，对于兼容的实现不是必需的。但是，目前，我尝试过的所有OSGi框架都没有实现此功能。</p><p>两种解决方案的主要优点是，在OSGi中提供了该软件包（并因此对其进行了版本控制）。约定是对系统软件包使用默认版本（0.0.0），但这不是强制性的（如上所示）。一个强大的副作用是能够通过不同的捆绑包提供框架所声明的软件包的不同的，最新的版本。我们用它来解决由于JDK附带了不完整版本的<tt>javax.transaction</tt>包而导致的事务数据访问问题，该包由框架自动在OSGi环境中导出：</p><p><code><br>osgi> packages javax.transaction<br> <br>javax.transaction; version=“0.0.0”<org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br></code></p><p>解决方案是安装一个包含具有更高版本的完整<tt>javax.transaction</tt> API的<a href="http://www.springsource.com/repository/app/bundle/version/detail?name=com.springsource.javax.transaction&version=1.1.0">捆绑软件</a> ：<br><code><br>osgi> packages javax.transaction<br> <br>javax.transaction; version=“0.0.0”<org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br>javax.transaction; version=“1.1.0”<com.springsource.javax.transaction_1.1.0 [1]><br></code></p><p>这样，消费包可以使用它而不是JDK捆绑包：</p><p><code><br>osgi> ss<br> <br>Framework is launched.<br> <br>id     State      Bundle<br>0    ACTIVE    org.eclipse.osgi_3.5.0.v20081201-1815<br>1    ACTIVE    com.springsource.javax.transaction_1.1.0<br>2    ACTIVE    user.bundle_0.0.0<br> <br>osgi> headers 2<br> <br>Bundle headers:<br>   Bundle-ManifestVersion = 2<br>   Bundle-SymbolicName = user.bundle<br>   <b>Import-Package = javax.transaction;version=1.0</b><br>   Manifest-Version = 1.0<br>  <br>osgi> packages javax.transaction<br> <br>javax.transaction; version=“0.0.0”<org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br>javax.transaction; version=“1.1.0”<com.springsource.javax.transaction_1.1.0 [1]><br>   user.bundle_0.0.0 [2] imports<br></code></p><p>有关更多信息，请参见Spring DM FAQ <a href="http://static.springframework.org/osgi/docs/current/reference/html/spring-osgi-faq.html#jdk-crippled-jta-api">部分</a> 。</p>
+special.parent.package; version=&quot;0.0.0&quot;&lt;org.eclipse.osgi_3.5.0.v20081201-1815 [0]&gt; 
+</code></pre><p>解决方案A'基本上是A的变体（因此得名）-可以使用片段捆绑扩展系统捆绑，而不是使用系统属性，这在某些情况下可能更方便。<br>值得指出的是，扩展捆绑包可能使用Java引导类路径执行加载，该路径是规范定义的一种可选机制，对于兼容的实现不是必需的。但是，目前，我尝试过的所有OSGi框架都没有实现此功能。</p><p>两种解决方案的主要优点是，在OSGi中提供了该软件包（并由此对其进行了版本控制）。约定是对系统软件包使用默认版本（0.0.0），但这不是强制性的（如上所示）。一个强大的副作用是能够通过不同的捆绑包提供框架所声明的软件包的不同的，最新的版本。我们用它来解决由于JDK附带了不完整版本的<tt>javax.transaction</tt>包而导致的事务数据访问问题，该包由框架自动在OSGi环境中导出：</p><p><code><br>osgi> packages javax.transaction<br> <br>javax.transaction; version=“0.0.0”<org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br></code></p><p>解决方案是安装一个包含具有更高版本的完整<tt>javax.transaction</tt> API的<a href="http://www.springsource.com/repository/app/bundle/version/detail?name=com.springsource.javax.transaction&version=1.1.0">捆绑软件</a> ：<br><code><br>osgi> packages javax.transaction<br> <br>javax.transaction; version=“0.0.0”<org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br>javax.transaction; version=“1.1.0”<com.springsource.javax.transaction_1.1.0 [1]><br></code></p><p>这样，消费包可以使用它而不是JDK捆绑包：</p><p><code><br>osgi> ss<br> <br>Framework is launched.<br> <br>id     State      Bundle<br>0    ACTIVE    org.eclipse.osgi_3.5.0.v20081201-1815<br>1    ACTIVE    com.springsource.javax.transaction_1.1.0<br>2    ACTIVE    user.bundle_0.0.0<br> <br>osgi> headers 2<br> <br>Bundle headers:<br>   Bundle-ManifestVersion = 2<br>   Bundle-SymbolicName = user.bundle<br>   <b>Import-Package = javax.transaction;version=1.0</b><br>   Manifest-Version = 1.0<br>  <br>osgi> packages javax.transaction<br> <br>javax.transaction; version=“0.0.0”<org.eclipse.osgi_3.5.0.v20081201-1815 [0]><br>javax.transaction; version=“1.1.0”<com.springsource.javax.transaction_1.1.0 [1]><br>   user.bundle_0.0.0 [2] imports<br></code></p><p>有关更多信息，请参见Spring DM FAQ <a href="http://static.springframework.org/osgi/docs/current/reference/html/spring-osgi-faq.html#jdk-crippled-jta-api">部分</a> 。</p>
 <h2>解决方案B：引导委派</h2><p>OSGi支持的另一个选项是引导委托，您已经在<tt>java。*</tt>软件包中看到了。这允许用户创建“隐式”包，这些包将<u>始终</u>由框架父类加载器加载，即使捆绑包未提供正确的导入：</p>
 <p align="center">
-<a href="http://blog.springsource.com/wp-content/uploads/2009/01/delegation.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/delegation.png" alt="类加载委托" title="类加载委托" width="318" height="552"></a>类加载委托</p><p>创建此选项主要是为了适应各种极端情况，尤其是在JDK类中，这种情况希望总是发生父类加载委派，或者假定系统上的每个类加载器都可以完全访问整个引导路径。软件包<tt>sun。*</tt>和<tt>com.sun。*</tt>是两个最常见的示例（正如我已经提到的），因此，某些OSGi实现（即Equinox）默认启用它们：</p><p><code><br>org.osgi.framework.bootdelegation=sun.*,com.sun.*<br></code></p><p>附带说明一下，默认情况下，Spring DM在其集成测试框架内也使用相同的设置（ <tt>AbstractConfigurableOsgiTests＃getBootDelegationPackages（）</tt> ）</p>
-<h2>哪个解决方案更好？</h2><p>上面的每个解决方案都适用于大多数情况；但是，我强烈建议A / A'方法：它们清楚地表达了束线并允许扩展。接线易于控制，检测和诊断。解决方案B有点像黑魔法，因为捆绑包无法控制其加载并选择某个版本或提供程序，因为没有适当的类接线。此外，该设置会影响<u>所有</u>捆绑包，而<u>这些</u>捆绑包可能并不总是您想要的。<br>但是，在某些情况下，启动委托非常方便。很好的人选是工具，例如概要分析或代码覆盖率。大多数工具使用字节码编织来添加各种计数器或拦截执行流。不能在未更新清单的情况下将“仪表式”捆绑软件加载到OSGi中，因为新添加的代码指向捆绑软件未知的类。将自定义软件包添加到引导委派列表中提供了一种非常快速的方法来检测OSGi应用程序，而无需更改打包或部署过程。</p>
+<a href="http://blog.springsource.com/wp-content/uploads/2009/01/delegation.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/delegation.png" alt="类加载委托" title="类加载委托" width="318" height="552"></a>类加载委托</p><p>创建此选项主要是为了适应各种极端情况，尤其是在JDK类中，这种情况希望始终进行父类加载委派，或者假定系统上的每个类加载器都可以完全访问整个引导路径。软件包<tt>sun。*</tt>和<tt>com.sun。*</tt>是两个最常见的示例（正如我已经提到的），因此，某些OSGi实现（即Equinox）默认启用它们：</p><p><code><br>org.osgi.framework.bootdelegation=sun.*,com.sun.*<br></code></p><p>附带说明一下，默认情况下，Spring DM在其集成测试框架内也使用相同的设置（ <tt>AbstractConfigurableOsgiTests＃getBootDelegationPackages（）</tt> ）</p>
+<h2>哪个解决方案更好？</h2><p>上面的每个解决方案都适用于大多数情况；但是，我强烈建议A / A'方法：它们清楚地表达了束线并允许扩展。接线易于控制，检测和诊断。解决方案B有点像黑魔法，因为捆绑包无法控制其加载并选择某个版本或提供程序，因为没有适当的类接线。此外，该设置会影响<u>所有</u>捆绑包，而<u>这些</u>捆绑包可能并不总是您想要的。<br>但是，在某些情况下，启动委托非常方便。很好的人选是工具，例如概要分析或代码覆盖率。大多数工具使用字节码编织来添加各种计数器或拦截执行流。不能在不更新清单的情况下将“仪表式”捆绑软件加载到OSGi中，因为新添加的代码引用了捆绑软件未知的类。将自定义软件包添加到引导委派列表中提供了一种非常快速的方法来检测OSGi应用程序，而无需更改打包或部署过程。</p>
 <h3>关于父类加载器的注意</h3><p>在本条目中，我已将父类加载器称为遵循OSGi规范的术语来加载和启动（或引导）OSGi框架的实体。值得注意的是，某些OSGi实现（特别是Equinox）允许将父类加载器自定义为不同的值（例如应用程序，引导或扩展类加载器）。</p>
-<h3>链接</h3><p>有关OSGi类加载的更多信息，请参见以下链接：<br></p><ul><br> <li>OSGi的核心<a href="http://www.osgi.org/Download/Release4V41">规格</a> ，部分3.8，3.14和3.15</li><br> <li>ClassLoader <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/ClassLoader.html">API</a></li><br> <li>Eclipse运行时<a href="https://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.platform.doc.isv/reference/misc/runtime-options.html">选项</a> （特别是<tt>osgi.parentClassLoader</tt> ）</li><br></ul> <p></p><p>PS没有代码此条列出，但代码爱好者可以抓住的图形定义<a href="http://blog.springsource.com/wp-content/uploads/2009/01/graph-defs.zip">在这里</a> 。</p></tt></div><tt>
+<h3>链接</h3><p>有关OSGi类加载的更多信息，请参见以下链接：<br></p><ul><br> <li>OSGi核心<a href="http://www.osgi.org/Download/Release4V41">规范</a> 3.8、3.14和3.15节</li><br> <li>ClassLoader <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/ClassLoader.html">API</a></li><br> <li>Eclipse运行时<a href="https://help.eclipse.org/ganymede/index.jsp?topic=/org.eclipse.platform.doc.isv/reference/misc/runtime-options.html">选项</a> （特别是<tt>osgi.parentClassLoader</tt> ）</li><br></ul> <p></p><p>PS此条目没有代码清单，但代码狂热者可以在<a href="http://blog.springsource.com/wp-content/uploads/2009/01/graph-defs.zip">此处</a>获取图形定义。</p></tt></div><tt>
 </tt></div><tt>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 199;
 
       (function(disqus_shortname, document) {
@@ -228,7 +235,8 @@ special.parent.package; version="0.0.0"<org.eclipse.osgi_3.5.0.v20081201-1815 [0
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -266,12 +274,14 @@ special.parent.package; version="0.0.0"<org.eclipse.osgi_3.5.0.v20081201-1815 [0
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

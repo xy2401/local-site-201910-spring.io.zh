@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Grails和Cloud Foundry的一步式部署</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="One-step deployment with Grails and Cloud Foundry">
 <meta name="twitter:description" content="<p>A couple of years back, the co-founder of a startup spoke at the London Groovy and Grails User Group. I remember vividly how he said he dreamed of deploying a Grails application with “just one click”. With the announcement of the new Cloud Foundry service, his dream is nearly a reality for all Grails users. Now you not only get simple and rapid development with Grails, but also simple and rapid deployment to a cloud hosting provider.</p>
-<p>So how do Grails and Cloud Foundry work together? As long time Grails users would expect, we have <a href=" http:="" ="" grails.org="" plugin="" cloud-foundr="="></head><body dir="ltr">a plugin for that! To demonstrate how it works I’m going to walk you through deploying a sample application, <a href="https://github.com/SpringSource/cloudfoundry-samples/tree/master/petclinic-grails">Pet Clinic</a>, to Cloud Foundry. It’s a simple application and you can see it <a href="http://petclinic-grails.cloudfoundry.com/">in action on Cloud Foundry</a> already.
+<p>So how do Grails and Cloud Foundry work together? As long time Grails users would expect, we have <a href=" http:="" ="" grails.org="" plugin="" cloud-foundr="="></head><body >a plugin for that! To demonstrate how it works I’m going to walk you through deploying a sample application, <a href="https://github.com/SpringSource/cloudfoundry-samples/tree/master/petclinic-grails">Pet Clinic</a>, to Cloud Foundry. It’s a simple application and you can see it <a href="http://petclinic-grails.cloudfoundry.com/">in action on Cloud Foundry</a> already.
 ">
 
 <meta property="og:title" content="One-step deployment with Grails and Cloud Foundry">
@@ -36,10 +40,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,35 +171,41 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>几年前，一家初创公司的联合创始人在伦敦Groovy和Grails用户组上发表了讲话。我清楚地记得他说过的梦想，即“只需单击一次”即可部署Grails应用程序。随着新Cloud Foundry服务的发布，对于所有Grails用户而言，他的梦想几乎成为现实。现在，您不仅可以使用Grails进行简单，快速的开发，而且可以简单，快速地部署到云托管提供商。</p><p>那么Grails和Cloud Foundry如何一起工作？正如Grails用户希望的那样，我们为此提供<a href="http://grails.org/plugin/cloud-foundry">了一个插件</a> ！为了演示其工作原理，我将引导您完成将示例应用程序<a href="https://github.com/SpringSource/cloudfoundry-samples/tree/master/petclinic-grails">Pet Clinic</a>部署到Cloud Foundry的过程。这是一个简单的应用程序，您已经可以<a href="http://petclinic-grails.cloudfoundry.com/">在Cloud Foundry上</a>看到它<a href="http://petclinic-grails.cloudfoundry.com/">的实际</a>应用。</p>
-<h2>初始部署</h2><p>我将假定您已经安装了Grails和一个可以使用的应用程序。如果没有，请在网站上查看Grails <a href="http://grails.org/Installation">安装</a>和<a href="http://grails.org/Quick+Start">快速</a>入门指南。然后，您可以获取Pet Clinic应用程序的<a href="https://github.com/SpringSource/cloudfoundry-samples/tree/master/petclinic-grails">源代码</a> 。</p><p>宠物诊所应用程序非常简单，可以在SQL数据库中存储宠物，主人，兽医和来访者。因此，它依赖的主要插件是标准的Hibernate插件。那么，我们需要做什么来将应用程序部署到Cloud Foundry？我们首先安装Cloud Foundry插件：</p>
-<pre>grails install-plugin cloud-foundry</pre><p>完成后，我们需要提供用户名和密码才能访问Cloud Foundry服务。当然，在<a href="http://www.cloudfoundry.com/">注册帐户</a>之前您不能这样做，因此请确保尽快进行操作！放置凭据的最佳位置是您的个人设置文件： <tt>$ HOME / .grails / settings.groovy，</tt>因为它们将对<em>所有</em> Grails项目可用，并且您可以使其不受源代码控制。如果愿意，他们还可以进入<tt>grails-app / conf / BuildConfig.groovy</tt>或<tt>grails-app / conf / Config.groovy</tt> ，但是在正常情况下我不建议这样做。</p><p>因此，我们将以下属性添加到<tt>settings.groovy</tt>文件中，然后就可以开始使用了：</p>
-<pre><code class="prettyprint groovy">grails.plugin.cloudfoundry.username = "<your_username>"
-grails.plugin.cloudfoundry.password = "<pass>"
-</code></pre><p>首先，我们检查凭据是否正常运行，因此我们运行以下命令：<br></p><pre><br> grails cf-info<br></pre><br>一切顺利，将打印出：<br><pre><br> VMware’s Cloud Application Platform<br> For support visit <a href="/cdn-cgi/l/email-protection#c4e2e7bcf3f7ffe2e7bcf3f1ffe2e7bcf3f4ffe2e7bcf3f4ffe2e7f5f5f5ffe2e7f5f5f0ffb0e2e7bcf0f4ffe2e7fdfdffa8e2e7bcf2a2ffe2e7bcf3f1ffa0e2e7f5f4f6ffe2e7f5f5f5ffe2e7f5f5f3ffaae2e7f5f4f4ffe2e7bcf3f6ffbde2e7bcf6a1ffe2e7bcf2f7ffaba9">support@cloudfoundry.com</a><p></p>
+<div class="blog--post"><p>几年前，一家初创公司的联合创始人在伦敦Groovy和Grails用户组上发表了讲话。我清楚地记得他说过的梦想，即“只需单击一次”即可部署Grails应用程序。随着新的Cloud Foundry服务的发布，所有Grails用户的梦想几乎成为现实。现在，您不仅可以使用Grails进行简单，快速的开发，而且可以简单，快速地部署到云托管提供商。</p><p>那么Grails和Cloud Foundry如何一起工作？正如Grails用户希望的那样，我们为此提供<a href="http://grails.org/plugin/cloud-foundry">了一个插件</a> ！为了演示其工作原理，我将引导您完成将示例应用程序<a href="https://github.com/SpringSource/cloudfoundry-samples/tree/master/petclinic-grails">Pet Clinic</a>部署到Cloud Foundry的过程。这是一个简单的应用程序，您已经可以<a href="http://petclinic-grails.cloudfoundry.com/">在Cloud Foundry上</a>看到它<a href="http://petclinic-grails.cloudfoundry.com/">的实际</a>应用。</p>
+<h2>初始部署</h2><p>我将假定您已经安装了Grails和一个可以使用的应用程序。如果没有，请在网站上查看Grails <a href="http://grails.org/Installation">安装</a>和<a href="http://grails.org/Quick+Start">快速</a>入门指南。然后，您可以获取Pet Clinic应用程序的<a href="https://github.com/SpringSource/cloudfoundry-samples/tree/master/petclinic-grails">源代码</a> 。</p><p>宠物诊所应用程序非常简单，可以将宠物，主人，兽医和来访者存储在SQL数据库中。因此，它依赖的主要插件是标准的Hibernate插件。那么，我们需要做什么来将应用程序部署到Cloud Foundry？我们首先安装Cloud Foundry插件：</p>
+<pre>    grails install-plugin cloud-foundry
+</pre><p>完成后，我们需要提供用户名和密码才能访问Cloud Foundry服务。当然，您必须先<a href="http://www.cloudfoundry.com/">注册一个帐户</a> ，然后才能这样做，所以请确保您尽快这样做！放置凭据的最佳位置是您的个人设置文件： <tt>$ HOME / .grails / settings.groovy，</tt>因为它们将对<em>所有</em> Grails项目可用，并且您可以使其不受源代码控制。如果愿意，他们还可以进入<tt>grails-app / conf / BuildConfig.groovy</tt>或<tt>grails-app / conf / Config.groovy</tt> ，但是在正常情况下我不建议这样做。</p><p>因此，我们将以下属性添加到<tt>settings.groovy</tt>文件中，然后就可以开始使用了：</p>
+<pre><code class="prettyprint groovy">grails.plugin.cloudfoundry.username = &quot;&lt;your_username&gt;&quot;
+grails.plugin.cloudfoundry.password = &quot;&lt;pass&gt;&quot;
+</code></pre><p>首先，我们检查凭据是否正常运行，因此我们运行以下命令：<br></p><pre><br /> grails cf-info<br /></pre><br>一切顺利，将打印出：<br><pre><br /> VMware&rsquo;s Cloud Application Platform<br /> For support visit <a href="/cdn-cgi/l/email-protection#c4e2e7bcf3f7ffe2e7bcf3f1ffe2e7bcf3f4ffe2e7bcf3f4ffe2e7f5f5f5ffe2e7f5f5f0ffb0e2e7bcf0f4ffe2e7fdfdffa8e2e7bcf2a2ffe2e7bcf3f1ffa0e2e7f5f4f6ffe2e7f5f5f5ffe2e7f5f5f3ffaae2e7f5f4f4ffe2e7bcf3f6ffbde2e7bcf6a1ffe2e7bcf2f7ffaba9">&#x73;&#x75;&#x70;&#x70;&#111;&#114;t&#x40;&#99;l&#x6f;&#x75;d&#102;&#111;&#117;n&#100;&#x72;y&#x2e;&#x63;om</a></p>
 <pre><code class="prettyprint">Target:   http://api.cloudfoundry.com (v0.999)
 
-User:     &lt;your_username>
+User:     &amp;lt;your_username&gt;
 Usage:    Memory   (1.0G of 2.0G total)
           Services (4 of 16 total)
           Apps     (2 of 20 total)
 </code></pre><p></p></pre><p></p><p>该命令为您提供了一个简短的帐户摘要，包括您正在运行的应用程序数量以及正在使用的应用程序数量或内存配额。</p><p>现在，您一直在等待：一步一步地部署应用程序。只需运行以下命令：</p>
-<pre>grails prod cf-push</pre><p>请注意，我们甚至还没有配置<tt>DataSource.groovy-</tt>这是有意的，我们将很快回到数据源配置。但是现在，我们要做的就是在询问应用程序URL以及命令询问我们是否要创建和绑定MySQL服务时按回车键。然后，我们等待插件完成您的应用程序部署-瞧！该应用程序已启动并正在运行，可以使用。</p><p></p><div class="callout">
+<pre>    grails prod cf-push
+</pre><p>请注意，我们甚至还没有配置<tt>DataSource.groovy-</tt>这是有意的，我们将很快回到数据源配置。但是现在，我们要做的就是在询问应用程序URL以及命令询问我们是否要创建和绑定MySQL服务时按回车键。然后，我们等待插件完成您的应用程序的部署-瞧！该应用程序已启动并正在运行，可以使用。</p><p></p><div class="callout">
 <div class="callout-title">云铸造经典</div>您可能会注意到Cloud Foundry插件的0.1和0.2版本。这些仅适用于Classic Cloud Foundry服务，因此请确保您不会意外安装这些版本之一。
-</div><p></p><p>有什么可能更简单？在此阶段要注意的主要事情是， <em>您无法将应用程序部署到已经使用的URL上</em> ，因此您将无法将Pet Clinic应用程序部署到URL <a href="http://petclinic-grails.cloudfoundry.com/">http：// petclinic-</a>例如<a href="http://petclinic-grails.cloudfoundry.com/">grails.cloudfoundry.com/</a> 。不必担心：您可以在application.properties中更改应用程序的名称，也可以在部署时指定其他应用程序名称，这将在以后更详细地介绍一些命令时看到。</p><p>另一个注意事项： <tt>cf- *</tt>命令默认为“开发”环境，但是您通常要使用“生产”环境进行部署。这就是为什么我们在上面的命令中指定'prod'的原因。</p><p>当然，并非每个部署都能顺利进行，您的应用程序可能无法启动。如果是这种情况，那么您可以通过以下命令获取Tomcat日志：</p>
-<pre>grails cf-crashlogs</pre><p>日志应为您提供大量信息来诊断问题。</p><p>这就是一步部署！在本文的其余部分中，我将介绍您每天希望使用的一些最常见的命令，但是您可以在《 <a href="https://grails-plugins.github.com/grails-cloud-foundry/">插件用户指南》中</a>找到完整的参考。</p>
+</div><p></p><p>有什么可能更简单？在此阶段要注意的主要事情是， <em>您无法将应用程序部署到已经使用的URL上</em> ，因此您将无法将Pet Clinic应用程序部署到URL <a href="http://petclinic-grails.cloudfoundry.com/">http：// petclinic-</a>例如<a href="http://petclinic-grails.cloudfoundry.com/">grails.cloudfoundry.com/</a> 。不用担心：您可以在application.properties中更改应用程序的名称，也可以在部署时指定其他应用程序名称，这将在以后更详细地介绍一些命令时看到。</p><p>另一个注意事项： <tt>cf- *</tt>命令默认为“开发”环境，但是您通常要使用“生产”环境进行部署。这就是为什么我们在上面的命令中指定'prod'的原因。</p><p>当然，并非每个部署都能顺利进行，您的应用程序可能无法启动。如果是这种情况，那么您可以通过以下命令获取Tomcat日志：</p>
+<pre>    grails cf-crashlogs
+</pre><p>日志应为您提供大量信息来诊断问题。</p><p>这就是一步部署！在本文的其余部分中，我将介绍您每天希望使用的一些最常见的命令，但是您可以在《 <a href="https://grails-plugins.github.com/grails-cloud-foundry/">插件用户指南》中</a>找到完整的参考。</p>
 <h2>应用程序更新和预配置的细粒度控制</h2><p>将应用程序部署到Cloud Foundry之后，这还没有结束。要部署新版本时会发生什么？还是扩展应用程序以处理更多并发用户？Cloud Foundry插件具有丰富的命令集，可让您处理这些情况和其他情况。</p>
-<h3>更新应用程序</h3><p>假设您已经在Pet Clinic应用程序中添加了一个精美的新UI，现在您希望将其提供给全世界。您可能认为您只需要再次运行<tt>cf-push</tt> ，但是实际上有一个单独的命令可以更新已部署的应用程序：</p>
-<pre>grails prod cf-update</pre><p>有趣的是，此命令将仅推送WAR文件中已更改的部分，因此在初始部署后，将很快上传到服务器。它还将自动停止，然后重新启动应用程序服务器。同样，如果应用程序无法正确启动，则<tt>cf-crashlogs</tt>是您的朋友。</p>
-<h3>应用名称</h3><p>如前所述，您无法使用Cloud Foundry上已经使用的名称来部署应用程序。那么这是否意味着您必须在<tt>application.properties中</tt>更改应用程序名称？您当然可以这样做，因为该插件将其用作Cloud Foundry上的默认应用程序名称，但这并不是唯一的选择。</p><p>大多数<tt>cf- *</tt>命令使用<tt>–appname</tt>选项，该选项可让您覆盖默认值。例如，Pet Clinic示例的应用程序名称为“ petclinic-grails”，但您可以使用以下名称将其部署到Cloud Foundry上，并使用其他名称：</p>
-<pre>grails cf-push --appname=my-pet-clinic</pre><p>然后，该应用程序将在URL <a href="http://my-pet-clinic.cloudfoundry.com/">http://my-pet-clinic.cloudfoundry.com/上</a>可用。</p>
-<h3>服务</h3><p>大多数应用程序都需要将其数据存储在某个地方，无论是在SQL数据库中还是在NoSQL数据存储之一（如MongoDB）中。 Cloud Foundry通过服务的概念提供对此类商店的访问。将来，也希望看到其他类型的服务-例如缓存和文本搜索。</p><p>因此，您的应用程序必须先<em>配置</em> （即创建/分配）然后<em>绑定</em>到应用程序，然后才能运行。例如，在Pet Clinic的情况下，我们必须提供MySQL服务并将其绑定到应用程序，以便它可以在某个地方存储其数据。幸运的是， <tt>cf-push</tt>命令自动为我们完成了此操作。</p><p>如果运行<tt>cf-apps</tt>命令，您将看到如何将MySQL服务绑定到petclinic-grails应用程序：</p>
-<pre>+------------------+----+---------+-----------------------------------+---------------+
+<h3>更新应用程序</h3><p>假设您已经在Pet Clinic应用程序中添加了精美的新UI，现在您希望将其提供给全世界。您可能认为您只需要再次运行<tt>cf-push</tt> ，但是实际上有一个单独的命令可以更新已部署的应用程序：</p>
+<pre>    grails prod cf-update
+</pre><p>有趣的是，此命令将仅推送WAR文件中已更改的部分，因此在初始部署后，将很快上传到服务器。它还将自动停止，然后重新启动应用程序服务器。同样，如果应用程序无法正确启动，则<tt>cf-crashlogs</tt>是您的朋友。</p>
+<h3>应用名称</h3><p>如前所述，您不能使用Cloud Foundry上已经使用的名称来部署应用程序。那么这是否意味着您必须在<tt>application.properties中</tt>更改应用程序名称？您当然可以这样做，因为该插件将其用作Cloud Foundry上的默认应用程序名称，但这并不是唯一的选择。</p><p>大多数<tt>cf- *</tt>命令使用<tt>–appname</tt>选项，该选项可让您覆盖默认值。例如，Pet Clinic示例的应用程序名称为“ petclinic-grails”，但您可以使用以下名称将其部署到Cloud Foundry上，并使用其他名称：</p>
+<pre>    grails cf-push --appname=my-pet-clinic
+</pre><p>然后，该应用程序将在URL <a href="http://my-pet-clinic.cloudfoundry.com/">http://my-pet-clinic.cloudfoundry.com/上</a>可用。</p>
+<h3>服务</h3><p>大多数应用程序需要将其数据存储在某个地方，无论是在SQL数据库中还是在NoSQL数据存储之一（如MongoDB）中。 Cloud Foundry通过服务的概念提供对此类商店的访问。将来，也希望看到其他类型的服务-例如缓存和文本搜索。</p><p>因此，您的应用程序必须先<em>配置</em> （即创建/分配）然后<em>绑定</em>到应用程序，然后才能运行。例如，在Pet Clinic的情况下，我们必须提供MySQL服务并将其绑定到应用程序，以便它可以在某个地方存储其数据。幸运的是， <tt>cf-push</tt>命令自动为我们完成了此操作。</p><p>如果运行<tt>cf-apps</tt>命令，您将看到如何将MySQL服务绑定到petclinic-grails应用程序：</p>
+<pre>    +------------------+----+---------+-----------------------------------+---------------+
     | Application      | #  | Health  | URLs                              | Services      |
     +------------------+----+---------+-----------------------------------+---------------+
     | petclinic-grails | 1  | RUNNING | petclinic-grails.cloudfoundry.com | mysql-52db6   |
-    +------------------+----+---------+-----------------------------------+---------------+</pre><p>这表示“ petclinic-grails”应用程序已绑定到服务“ mysql-52db6”，换句话说，“ petclinic-grails”将数据存储在给定的MySQL实例中。如果我运行<tt>cf-services</tt> ，您将看到可以配置的所有可用服务以及已经配置的服务的列表：</p>
-<pre>============== System Services ==============
+    +------------------+----+---------+-----------------------------------+---------------+
+</pre><p>这表示“ petclinic-grails”应用程序已绑定到服务“ mysql-52db6”，换句话说，“ petclinic-grails”将数据存储在给定的MySQL实例中。如果我运行<tt>cf-services</tt> ，您将看到可以配置的所有可用服务以及已经配置的服务的列表：</p>
+<pre>    ============== System Services ==============
 
     +----------+---------+-------------------------------+
     | Service  | Version | Description                   |
@@ -209,25 +221,29 @@ Usage:    Memory   (1.0G of 2.0G total)
     | Name          | Service |
     +---------------+---------+
     | mysql-52db6   | mysql   |
-    +---------------+---------+</pre><p>如您所见，Cloud Foundry当前支持MySQL，Redis和MongoDB，在下一篇文章中，我将介绍一个使用这三种服务的更复杂的示例。</p><p>在当前示例中，Cloud Foundry为我们自动生成了预配服务的名称“ mysql-52db6”，但是如果您手动配给它们，您也可以使用自己的名称。例如：</p>
-<pre>grails cf-create-service mysql my-db</pre><p>将提供一个名为“ my-db”的MySQL服务。然后可以通过绑定将其用作应用程序的数据库：</p>
-<pre>grails cf-bind-service my-db --appname=my-pet-clinic</pre><p>您甚至可以指定将应用程序推送到Cloud Foundry时应绑定到的服务：只需指定“ –services”选项，如插件用户指南中所述。</p><p>到这个时候，您应该想到一个大问题：应用程序如何知道在哪里可以找到MySQL实例？我们没有在任何时候指定数据库连接URL，但是应用程序运行没有问题。这是怎么回事？</p>
-<h3>这是一种魔法</h3><p>将服务绑定到Cloud Foundry中的应用程序时，是在告诉云在运行时将该服务的连接设置传递给应用程序。然后，Cloud Foundry插件将获取该信息并覆盖应用程序中的连接设置。就像是魔术一样，您的应用程序随后可以透明地针对云服务运行，而无需您做任何事情！这适用于所有可用服务，而不仅仅是MySQL。</p><p>仅覆盖连接设置，因此您仍然可以控制通过自定义方言（例如InnoDB）创建哪种类型的MySQL表，以及Hibernate是否应保持数据库模式为最新（通过'dbCreate'属性）。只要确保将自定义设置放在适当的环境块中即可。例如，在<tt>DataSource.groovy中，</tt>您可能具有：</p>
+    +---------------+---------+
+</pre><p>如您所见，Cloud Foundry当前支持MySQL，Redis和MongoDB，在下一篇文章中，我将介绍一个使用这三种服务的更复杂的示例。</p><p>在当前示例中，Cloud Foundry为我们自动生成了预配服务的名称“ mysql-52db6”，但是如果您手动配给它们，您也可以使用自己的名称。例如：</p>
+<pre>    grails cf-create-service mysql my-db
+</pre><p>将提供一个名为“ my-db”的MySQL服务。然后可以通过绑定将其用作应用程序的数据库：</p>
+<pre>    grails cf-bind-service my-db --appname=my-pet-clinic
+</pre><p>您甚至可以指定将应用程序推送到Cloud Foundry时应绑定到的服务：只需指定“ –services”选项，如插件用户指南中所述。</p><p>到这个时候，您应该想到一个大问题：应用程序如何知道在哪里可以找到MySQL实例？我们没有在任何时候指定数据库连接URL，但是应用程序运行没有问题。这是怎么回事？</p>
+<h3>这是一种魔法</h3><p>将服务绑定到Cloud Foundry中的应用程序时，就是在告诉云在运行时将该服务的连接设置传递给应用程序。然后，Cloud Foundry插件将获取该信息并覆盖应用程序中的连接设置。就像是魔术一样，您的应用程序随后可以透明地针对云服务运行，而无需您做任何事情！这适用于所有可用服务，而不仅仅是MySQL。</p><p>仅覆盖连接设置，因此您仍然可以控制通过自定义方言（例如InnoDB）创建哪种类型的MySQL表，以及Hibernate是否应保持数据库模式为最新（通过'dbCreate'属性）。只要确保将自定义设置放在适当的环境块中即可。例如，在<tt>DataSource.groovy中，</tt>您可能具有：</p>
 <pre><code class="prettyprint groovy">    production {
         dataSource {
             dialect= org.hibernate.dialect.MySQLInnoDBDialect
-            driverClassName = "com.mysql.jdbc.Driver"
-            username = "n/a"
-            password = "n/a"
-            url = "n/a"
-            dbCreate = "update"
+            driverClassName = &quot;com.mysql.jdbc.Driver&quot;
+            username = &quot;n/a&quot;
+            password = &quot;n/a&quot;
+            url = &quot;n/a&quot;
+            dbCreate = &quot;update&quot;
         }
     }
-</code></pre><p>用户名，密码和url可以是本地MySQL实例的值，因为一旦将应用程序部署到Cloud Foundry，这些值将被覆盖。</p><p>覆盖连接设置的过程并不是Cloud Foundry插件提供的唯一魔力。它还知道与Cloud Foundry服务相对应的插件，因此，如果您安装了其中的任何插件，它将在部署应用程序时检查是否已配置了适当的服务。因此，为什么要问我们是否要为Pet Clinic应用程序设置和绑定MySQL服务：该应用程序安装了Hibernate插件。这也适用于MongoDB和Redis插件。</p><p>在总结之前，最后一件事：在将应用程序部署到使用这些服务的Cloud Foundry之前，请确保安装了最新版本的MongoDB和Redis插件。</p>
-<h2>部署的圣杯</h2><p>我已经介绍了相当一部分的Cloud Foundry服务和Grails插件，但是我希望您能看到Grails和Cloud Foundry的结合使部署变得多么简单。它们确实确实可以简化和快速部署Web应用程序。随着当前Cloud Foundry的成熟，将添加越来越多的服务，以便您可以在其上托管更复杂的应用程序。</p><p>最后，正如我之前提到的，在下一篇文章中，我将研究一个结合了多个Cloud Foundry服务的更复杂的示例应用程序。它将对部署到云服务以及您需要考虑的事情进行更深入的研究。您还可以从GitHub上的<a href="https://github.com/SpringSource/cloudfoundry-samples/wiki/Grails">Cloud Foundry Samples Wiki中</a>收集更多信息。直到下一次，享受新服务！</p></div>
+</code></pre><p>用户名，密码和URL可以是本地MySQL实例的值，因为一旦将应用程序部署到Cloud Foundry，这些值将被覆盖。</p><p>覆盖连接设置的过程并不是Cloud Foundry插件提供的唯一魔力。它还知道与Cloud Foundry服务相对应的插件，因此，如果您安装了其中的任何插件，它将在部署应用程序时检查是否已配置了适当的服务。因此，为什么要问我们是否要为Pet Clinic应用程序设置和绑定MySQL服务：该应用程序安装了Hibernate插件。这也适用于MongoDB和Redis插件。</p><p>在总结之前，最后一件事：在将应用程序部署到使用这些服务的Cloud Foundry之前，请确保安装了最新版本的MongoDB和Redis插件。</p>
+<h2>部署的圣杯</h2><p>我已经介绍了相当一部分的Cloud Foundry服务和Grails插件，但是我希望您能看到Grails和Cloud Foundry的结合使部署变得多么简单。它们确实确实可以简化和快速部署Web应用程序。随着当前Cloud Foundry的成熟，将添加越来越多的服务，以便您可以在其上托管更复杂的应用程序。</p><p>最后，正如我之前提到的，在下一篇文章中，我将研究一个结合了多个Cloud Foundry服务的更复杂的示例应用程序。它将对部署到云服务以及您需要考虑的事情进行更深入的研究。您还可以从GitHub上的<a href="https://github.com/SpringSource/cloudfoundry-samples/wiki/Grails">Cloud Foundry Samples Wiki中</a>收集其他信息。直到下一次，享受新服务！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" data-cfasync="false"></script><script type="text/javascript">var disqus_shortname = 'spring-io';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 407;
 
       (function(disqus_shortname, document) {
@@ -241,7 +257,8 @@ Usage:    Memory   (1.0G of 2.0G total)
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -279,12 +296,14 @@ Usage:    Memory   (1.0G of 2.0G total)
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

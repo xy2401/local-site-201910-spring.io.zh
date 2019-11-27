@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>Spring MVC中的异常处理</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Exception Handling in Spring MVC">
-<meta name="twitter:description" content="<p><strong>NOTE:</strong> <em><a href=" #recent-update="="></head><body dir="ltr">Revised April 2018
+<meta name="twitter:description" content="<p><strong>NOTE:</strong> <em><a href=" #recent-update="=">Revised April 2018
 <p>Spring MVC provides several complimentary approaches to exception handling but, when teaching Spring MVC, I often find that my students are confused or not comfortable with them.</p>
 <p>Today I’m going to show you the various options available. Our goal is to <i>not</i> handle exceptions explicitly in Controller methods where possible. They are a cross-cutting concern better handled separately in dedicated code.</p>
 <p>There are three options: per exception, per controller or globally.</p>
@@ -44,10 +48,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -179,43 +185,43 @@
 <p>有三个选项：每个异常，每个控制器或全局。</p>
 <p><em>可以在此处找到展示此处讨论要点的演示应用程序。<br><a href="https://github.com/paulc4/mvc-exceptions"></a> <a href="https://github.com/paulc4/mvc-exceptions">http://github.com/paulc4/mvc-exceptions</a> 。有关详细信息，请参见下面的<a href="#sample-application">示例应用程序</a> 。</em></p>
 <a name="recent-updates"></a>
-<p><strong>注意：</strong> <em>演示应用程序已经过更新和更新（2018年4月）以使用Spring Boot 2.0.1，并且（希望）更易于使用和理解。我还修复了一些断开的链接（感谢您的反馈，很抱歉花了一段时间）。</em></p><h2><a href="#spring-boot" class="anchor" name="spring-boot"></a>Spring Boot</h2>
+<p><strong>注意：</strong> <em>演示应用程序已经过更新和更新（2018年4月）以使用Spring Boot 2.0.1，并且（希望）更易于使用和理解。我还修复了一些断开的链接（感谢您的反馈，很抱歉花了一段时间）。</em></p><h2><a href="#spring-boot" class="anchor" name="spring-boot"></a>春季靴</h2>
 <p><a href="https://spring.io/spring-boot">Spring Boot</a>允许使用最少的配置来设置Spring项目，并且如果您的应用程序还不到几年，则很可能正在使用它。</p>
 <p>Spring MVC不提供开箱即用的默认（备用）错误页面。设置默认错误页面的最常见方法一直是<code>SimpleMappingExceptionResolver</code> （实际上是从Spring V1开始）。我们将在后面讨论。</p>
 <p>但是Spring Boot <em>确实</em>提供了一个后备错误处理页面。</p>
-<p>在启动时，Spring Boot会尝试查找<code>/error</code>的映射。按照约定，以<code>/error</code>结尾的URL映射到具有相同名称的逻辑视图： <code>error</code> 。在演示应用程序中，此视图依次映射到<code>error.html</code> Thymeleaf模板。（如果使用JSP，它将根据<code>InternalResourceViewResolver</code>的设置映射到<code>error.jsp</code> ）。实际的映射将取决于您或Spring Boot设置的<code>ViewResolver</code> （如果有）。</p>
-<p>如果找不到<code>/error</code>视图解析器映射，Spring Boot会定义自己的后备错误页面-所谓的“ Whitelabel Error Page”（最小页面，其中仅包含HTTP状态信息和任何错误详细信息，例如来自未捕获的异常的消息）。在示例应用程序中，如果将<code>error.html</code>模板重命名为<code>error2.html</code>然后重新启动，则会看到它正在被使用。</p>
+<p>在启动时，Spring Boot会尝试找到一个映射<code>/error</code> 。按照约定，URL结尾<code>/error</code>映射到同名的逻辑视图： <code>error</code> 。在演示应用程序中，此视图依次映射到<code>error.html</code>胸腺模板。（如果使用JSP，它将映射到<code>error.jsp</code>根据您的设置<code>InternalResourceViewResolver</code> ）。实际的映射将取决于<code>ViewResolver</code> （如果有的话）您或Spring Boot已设置。</p>
+<p>如果没有用于的视图解析器映射<code>/error</code>可以找到，Spring Boot定义了自己的后备错误页面-所谓的“ Whitelabel错误页面”（最小页面，其中仅包含HTTP状态信息和任何错误详细信息，例如未捕获的异常的消息）。在示例应用程序中，如果您重命名<code>error.html</code>例如， <code>error2.html</code>然后重新启动，您将看到它正在使用。</p>
 <p>如果您正在发出RESTful请求（HTTP请求指定了除HTML之外的所需响应类型），Spring Boot将返回与错误信息相同的JSON表示形式，该信息与“ Whitelabel”错误页面中放入的信息相同。</p>
-<pre><code class="prettyprint">$> curl -H "Accept: application/json" http://localhost:8080/no-such-page
+<pre><code class="prettyprint">$&gt; curl -H &quot;Accept: application/json&quot; http://localhost:8080/no-such-page
 
-{"timestamp":"2018-04-11T05:56:03.845+0000","status":404,"error":"Not Found","message":"No message available","path":"/no-such-page"}
+{&quot;timestamp&quot;:&quot;2018-04-11T05:56:03.845+0000&quot;,&quot;status&quot;:404,&quot;error&quot;:&quot;Not Found&quot;,&quot;message&quot;:&quot;No message available&quot;,&quot;path&quot;:&quot;/no-such-page&quot;}
 </code></pre>
-<p>Spring Boot还为容器设置了一个默认的错误页面，等效于<br><code><error-page></code> <code>web.xml</code>指令（尽管实现方式非常不同）。Spring Boot回退错误页面仍会报告在Spring MVC框架之外引发的异常（例如，从Servlet过滤器引发的异常）。该示例应用程序还显示了一个示例。</p>
+<p>Spring Boot还为容器设置了一个默认的错误页面，等效于<br><code><error-page></code>指令中<code>web.xml</code> （尽管实施方式大不相同）。Spring Boot回退错误页面仍会报告在Spring MVC框架之外引发的异常，例如从Servlet过滤器引发的异常。该示例应用程序还显示了一个示例。</p>
 <p>在本文的末尾可以找到有关Spring Boot错误处理的更深入的讨论。</p>
 <p><em>无论您使用的是带Spring Boot还是不带Spring Boot的Spring，本文的其余内容均适用</em> 。</p>
 <p><em>不耐烦的REST开发人员可能会选择直接跳到有关自定义REST错误响应的<a href="#errors-and-rest">部分</a> 。但是，他们应该阅读全文，因为大多数文章同样适用于所有Web应用程序（REST或其他）。</em></p><h2><a href="#using-http-status-codes" class="anchor" name="using-http-status-codes"></a>使用HTTP状态码</h2>
-<p>通常，在处理Web请求时抛出的任何未处理的异常都会导致服务器返回HTTP 500响应。但是，您自己编写的任何异常都可以使用<code>@ResponseStatus</code>annotation进行annotation（该annotation支持HTTP规范定义的所有HTTP状态代码）。当从控制器方法引发带<em>注释的</em>异常，并且未在其他地方处理该异常时，它将自动导致使用指定的状态代码返回适当的HTTP响应。</p>
+<p>通常，处理Web请求时引发的任何未处理的异常都会导致服务器返回HTTP 500响应。但是，您自己编写的任何异常都可以用<code>@ResponseStatus</code>批注（支持HTTP规范定义的所有HTTP状态代码）。当从控制器方法引发带<em>注释的</em>异常，并且未在其他地方处理该异常时，它将自动导致使用指定的状态代码返回适当的HTTP响应。</p>
 <p>例如，这是缺少订单的例外。</p>
-<pre><code class="prettyprint java"> @ResponseStatus(value=HttpStatus.NOT_FOUND, reason="No such Order")  // 404
+<pre><code class="prettyprint java"> @ResponseStatus(value=HttpStatus.NOT_FOUND, reason=&quot;No such Order&quot;)  // 404
  public class OrderNotFoundException extends RuntimeException {
      // ...
  }
 </code></pre>
 <p>这是使用它的控制器方法：</p>
-<pre><code class="prettyprint java"> @RequestMapping(value="/orders/{id}", method=GET)
- public String showOrder(@PathVariable("id") long id, Model model) {
+<pre><code class="prettyprint java"> @RequestMapping(value=&quot;/orders/{id}&quot;, method=GET)
+ public String showOrder(@PathVariable(&quot;id&quot;) long id, Model model) {
      Order order = orderRepository.findOrderById(id);
 
      if (order == null) throw new OrderNotFoundException(id);
 
      model.addAttribute(order);
-     return "orderDetail";
+     return &quot;orderDetail&quot;;
  }
 </code></pre>
 <p>如果此方法处理的URL包含未知的订单ID，则将返回熟悉的HTTP 404响应。</p><h2><a href="#controller-based-exception-handling" class="anchor" name="controller-based-exception-handling"></a>基于控制器的异常处理</h2><h3><a href="#using-exceptionhandler" class="anchor" name="using-exceptionhandler"></a>使用@ExceptionHandler</h3>
-<p>您可以添加额外的（ <code>@ExceptionHandler</code>任何控制器）的方法来专门处理由请求处理抛出的异常（ <code>@RequestMapping</code>在同一个控制器）的方法。此类方法可以：</p>
+<p>您可以添加额外的（ <code>@ExceptionHandler</code> ）任何控制器的方法，以专门处理由请求处理（ <code>@RequestMapping</code> ）方法在同一控制器中。此类方法可以：</p>
 <ol>
-<li>处理没有<code>@ResponseStatus</code>annotation的异常（通常是您未编写的预定义异常）</li>
+<li>在没有异常的情况下处理异常<code>@ResponseStatus</code>批注（通常未编写的预定义异常）</li>
 <li>将用户重定向到专用错误视图</li>
 <li>建立完全自定义的错误响应</li>
 </ol>
@@ -230,7 +236,7 @@ public class ExceptionHandlingController {
   
   // Convert a predefined exception to an HTTP Status code
   @ResponseStatus(value=HttpStatus.CONFLICT,
-                  reason="Data integrity violation")  // 409
+                  reason=&quot;Data integrity violation&quot;)  // 409
   @ExceptionHandler(DataIntegrityViolationException.class)
   public void conflict() {
     // Nothing to do
@@ -242,52 +248,52 @@ public class ExceptionHandlingController {
     // Nothing to do.  Returns the logical view name of an error page, passed
     // to the view-resolver(s) in usual way.
     // Note that the exception is NOT available to this view (it is not added
-    // to the model) but see "Extending ExceptionHandlerExceptionResolver"
+    // to the model) but see &quot;Extending ExceptionHandlerExceptionResolver&quot;
     // below.
-    return "databaseError";
+    return &quot;databaseError&quot;;
   }
 
   // Total control - setup a model and return the view name yourself. Or
   // consider subclassing ExceptionHandlerExceptionResolver (see below).
   @ExceptionHandler(Exception.class)
   public ModelAndView handleError(HttpServletRequest req, Exception ex) {
-    logger.error("Request: " + req.getRequestURL() + " raised " + ex);
+    logger.error(&quot;Request: &quot; + req.getRequestURL() + &quot; raised &quot; + ex);
 
     ModelAndView mav = new ModelAndView();
-    mav.addObject("exception", ex);
-    mav.addObject("url", req.getRequestURL());
-    mav.setViewName("error");
+    mav.addObject(&quot;exception&quot;, ex);
+    mav.addObject(&quot;url&quot;, req.getRequestURL());
+    mav.setViewName(&quot;error&quot;);
     return mav;
   }
 }
 </code></pre>
 <p>在上述任何一种方法中，您都可以选择进行其他处理-最常见的示例是记录异常。</p>
 <p>处理程序方法具有灵活的签名，因此您可以传递与Servlet相关的显而易见的对象，例如<code>HttpServletRequest</code> ， <code>HttpServletResponse</code> ， <code>HttpSession</code>和/或<code>Principle</code> 。</p>
-<p><strong>重要说明：</strong> <code>Model</code>可能<strong>不是</strong>任何<code>@ExceptionHandler</code>方法的参数。而是使用<code>ModelAndView</code>在方法内部设置模型，如上面的<code>handleError()</code>所示。</p><h3><a href="#exceptions-and-views" class="anchor" name="exceptions-and-views"></a>例外与观点</h3>
+<p><strong>重要说明：</strong> <code>Model</code>可能<strong>不是</strong>任何参数<code>@ExceptionHandler</code>方法。相反，请使用<code>ModelAndView</code>如图所示<code>handleError()</code>以上。</p><h3><a href="#exceptions-and-views" class="anchor" name="exceptions-and-views"></a>例外与观点</h3>
 <p>向模型添加例外时要小心。您的用户不想看到包含Java异常详细信息和堆栈跟踪的网页。您可能具有明确<em>禁止</em>将<em>任何</em>异常信息放入错误页面的安全策略。确保覆盖Spring Boot白色标签错误页面的另一个原因。</p>
 <p>确保异常记录有用，以便事件发生后由您的支持和开发团队进行分析。</p>
 <p><em>请记住以下内容可能很方便，但这<strong>并不是</strong>生产中的最佳实践</em> 。</p>
-<p>将异常详细信息作为注释隐藏在页面<em>源中</em>可能会很有用，以帮助<em>测试</em> 。如果使用JSP，则可以执行以下操作以输出异常和相应的堆栈跟踪（使用隐藏的<code><div></code></p><div></div>是另一种选择）。<p></p>
-<pre><code class="prettyprint html">  <h1>Error Page</h1>
-  <p>Application has encountered an error. Please contact support on ...</p>
+<p>将异常详细信息作为注释隐藏在页面<em>源中</em>可能会很有用，以帮助<em>测试</em> 。如果使用JSP，则可以执行以下操作以输出异常和相应的堆栈跟踪（使用隐藏的<code><div></code>是另一种选择）。</p>
+<pre><code class="prettyprint html">  &lt;h1&gt;Error Page&lt;/h1&gt;
+  &lt;p&gt;Application has encountered an error. Please contact support on ...&lt;/p&gt;
     
-  <!--
+  &lt;!--
     Failed URL: ${url}
     Exception:  ${exception.message}
-        <c:forEach items="${exception.stackTrace}" var="ste">    ${ste} 
-    </c:forEach>
-  -->
+        &lt;c:forEach items=&quot;${exception.stackTrace}&quot; var=&quot;ste&quot;&gt;    ${ste} 
+    &lt;/c:forEach&gt;
+  --&gt;
 </code></pre>
 <p>有关Thymeleaf的信息，请参见演示应用程序中的<a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/resources/templates/support.html">support.html</a> 。结果看起来像这样。</p>
 <p><img src="https://assets.spring.io/wp/wp-content/uploads/2013/10/support-page-example.png" alt="具有支持的隐藏异常的错误页面示例" title="具有隐藏异常的错误页面"></p><h2><a href="#global-exception-handling" class="anchor" name="global-exception-handling"></a>全局异常处理</h2><h3><a href="#using-controlleradvice-classes" class="anchor" name="using-controlleradvice-classes"></a>使用@ControllerAdvice类</h3>
-<p>控制器建议使您可以使用完全相同的异常处理技术，但可以将它们应用于整个应用程序，而不仅是单个控制器。您可以将它们视为注释驱动的拦截器。</p>
-<p>任何带有<code>@ControllerAdvice</code>annotation的类都将成为控制器建议，并且支持三种类型的方法：</p>
+<p>控制器建议允许您使用完全相同的异常处理技术，但将其应用于整个应用程序，而不仅是单个控制器。您可以将它们视为注释驱动的拦截器。</p>
+<p>任何带注释的类<code>@ControllerAdvice</code>成为控制器建议，并支持三种方法：</p>
 <ul>
-<li>用<code>@ExceptionHandler</code>annotation的异常处理方法。</li>
+<li>带有注释的异常处理方法<code>@ExceptionHandler</code> 。</li>
 <li>模型增强方法（用于向模型添加其他数据）<br><code>@ModelAttribute</code> 。请注意，这些属性<em>不可</em>用于异常处理视图。</li>
 <li>用以下注释的活页夹初始化方法（用于配置表单处理）<br><code>@InitBinder</code> 。</li>
 </ul>
-<p>我们只看异常处理-在<a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-controller">联机手册中</a>搜索<code>@ControllerAdvice</code>方法的更多信息。</p>
+<p>我们将只研究异常处理-搜索<a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html#mvc-controller">在线手册</a>以获取更多信息<code>@ControllerAdvice</code>方法。</p>
 <p>您上面看到的任何异常处理程序都可以在controller-advice类上定义-但是现在它们适用于从<em>任何</em>控制器抛出的异常。这是一个简单的示例：</p>
 <pre><code class="prettyprint java">@ControllerAdvice
 class GlobalControllerExceptionHandler {
@@ -301,7 +307,7 @@ class GlobalControllerExceptionHandler {
 <p>如果您想为<em>任何</em>异常使用默认处理程序，则会有些许皱纹。您需要确保框架处理注释的异常。代码如下：</p>
 <pre><code class="prettyprint java">@ControllerAdvice
 class GlobalDefaultExceptionHandler {
-  public static final String DEFAULT_ERROR_VIEW = "error";
+  public static final String DEFAULT_ERROR_VIEW = &quot;error&quot;;
 
   @ExceptionHandler(value = Exception.class)
   public ModelAndView
@@ -316,85 +322,85 @@ class GlobalDefaultExceptionHandler {
 
     // Otherwise setup and send the user to a default error-view.
     ModelAndView mav = new ModelAndView();
-    mav.addObject("exception", e);
-    mav.addObject("url", req.getRequestURL());
+    mav.addObject(&quot;exception&quot;, e);
+    mav.addObject(&quot;url&quot;, req.getRequestURL());
     mav.setViewName(DEFAULT_ERROR_VIEW);
     return mav;
   }
 }
 </code></pre><h2><a href="#going-deeper" class="anchor" name="going-deeper"></a>更深入</h2><h3><a href="#handlerexceptionresolver" class="anchor" name="handlerexceptionresolver"></a> HandlerExceptionResolver</h3>
-<p>在<code>DispatcherServlet</code>的应用程序上下文中声明的，实现<code>HandlerExceptionResolver</code>任何Spring bean将用于拦截和处理MVC系统中引发的任何异常，而不由Controller处理。该界面如下所示：</p>
+<p>在其中声明的任何Spring bean <code>DispatcherServlet</code>实现的应用程序上下文<code>HandlerExceptionResolver</code>将用于拦截和处理在MVC系统中引发且未被控制器处理的任何异常。该界面如下所示：</p>
 <pre><code class="prettyprint java">public interface HandlerExceptionResolver {
     ModelAndView resolveException(HttpServletRequest request, 
             HttpServletResponse response, Object handler, Exception ex);
 }
 </code></pre>
-<p><code>handler</code>是指生成异常的控制器（请记住<code>@Controller</code>实例只是Spring MVC支持的一种处理程序。例如： <code>HttpInvokerExporter</code>和WebFlow Executor也是处理程序的类型）。</p>
+<p>的<code>handler</code>指产生异常的控制器（请记住， <code>@Controller</code>实例只是Spring MVC支持的一种处理程序。例如： <code>HttpInvokerExporter</code>和WebFlow Executor也是处理程序的类型）。</p>
 <p>在后台，MVC默认情况下会创建三个此类解析器。这些解析器实现了上面讨论的行为：</p>
 <ul>
-<li><code>ExceptionHandlerExceptionResolver</code>将未捕获的异常与处理程序（控制器）和任何控制器建议上的适当<code>@ExceptionHandler</code>方法进行匹配。</li>
-<li><code>ResponseStatusExceptionResolver</code>查找由<code>@ResponseStatus</code>annotation的未捕获异常（如第1节所述）</li>
-<li><code>DefaultHandlerExceptionResolver</code>转换标准的Spring异常并将其转换为HTTP状态代码（由于它是Spring MVC的内部组件，因此我在上面没有提及）。</li>
+<li><code>ExceptionHandlerExceptionResolver</code>将未捕获的异常与适当的匹配<code>@ExceptionHandler</code>处理程序（控制器）和任何控制器建议上的方法。</li>
+<li><code>ResponseStatusExceptionResolver</code>寻找未被注释的未捕获异常<code>@ResponseStatus</code> （如第1节所述）</li>
+<li><code>DefaultHandlerExceptionResolver</code>转换标准的Spring异常并将其转换为HTTP状态代码（我在上面没有提到，因为它是Spring MVC的内部功能）。</li>
 </ul>
-<p>它们按照列出的顺序进行链接和处理<code>HandlerExceptionResolverComposite</code>在内部创建一个专用的bean（ <code>HandlerExceptionResolverComposite</code> ）来执行此操作。</p>
-<p>注意， <code>resolveException</code>的方法签名不包括<code>Model</code> 。这就是为什么<code>@ExceptionHandler</code>方法无法与模型一起注入的原因。</p>
-<p>如果愿意，可以实现自己的<code>HandlerExceptionResolver</code>来设置自己的自定义异常处理系统。处理程序通常实现Spring的<code>Ordered</code>接口，因此您可以定义处理程序运行的顺序。</p><h3><a href="#simplemappingexceptionresolver" class="anchor" name="simplemappingexceptionresolver"></a> SimpleMappingExceptionResolver</h3>
-<p>Spring长期以来一直提供<code>HandlerExceptionResolver</code>的简单但方便的实现，您很可能已经在自己的应用程序中使用了它<code>SimpleMappingExceptionResolver</code> 。它提供以下选项：</p>
+<p>它们按照列出的顺序进行链接和处理-在内部，Spring创建一个专用的bean（ <code>HandlerExceptionResolverComposite</code> ） 去做这个。</p>
+<p>注意，方法签名<code>resolveException</code>不包括<code>Model</code> 。这就是为什么<code>@ExceptionHandler</code>方法不能与模型一起注入。</p>
+<p>您可以根据需要实施自己的<code>HandlerExceptionResolver</code>设置您自己的自定义异常处理系统。处理程序通常实现Spring的<code>Ordered</code>接口，因此您可以定义处理程序的运行顺序。</p><h3><a href="#simplemappingexceptionresolver" class="anchor" name="simplemappingexceptionresolver"></a> SimpleMappingExceptionResolver</h3>
+<p>长期以来，Spring提供了一种简单但方便的实现<code>HandlerExceptionResolver</code>您很可能已经发现您的应用已经使用了- <code>SimpleMappingExceptionResolver</code> 。它提供以下选项：</p>
 <ul>
 <li>映射异常类名称以查看名称-只需指定类名称，就不需要包。</li>
 <li>为任何未在其他地方处理的异常指定默认（备用）错误页面</li>
 <li>记录一条消息（默认情况下未启用）。</li>
-<li>设置要添加到模型中的<code>exception</code>属性的名称，以便可以在视图中使用<br>（例如JSP）。默认情况下，此属性命名为<code>exception</code> 。设置为<code>null</code>以禁用。还记得返回意见<code>@ExceptionHandler</code>方法<em>没有</em>访问异常，但定义视图<code>SimpleMappingExceptionResolver</code> <em>做</em> 。</li>
+<li>设置名称<code>exception</code>属性添加到模型，以便可以在视图内使用<br>（例如JSP）。默认情况下，此属性命名为<code>exception</code> 。调成<code>null</code>禁用。请记住，视图是从<code>@ExceptionHandler</code>方法<em>无权</em>访问异常，但定义为<code>SimpleMappingExceptionResolver</code> <em>做</em> 。</li>
 </ul>
 <p>这是使用Java配置的典型配置：</p>
 <pre><code class="prettyprint java">@Configuration
-@EnableWebMvc  // Optionally setup Spring MVC defaults (if you aren't using
-               // Spring Boot & haven't specified @EnableWebMvc elsewhere)
+@EnableWebMvc  // Optionally setup Spring MVC defaults (if you aren&#39;t using
+               // Spring Boot &amp; haven&#39;t specified @EnableWebMvc elsewhere)
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
-  @Bean(name="simpleMappingExceptionResolver")
+  @Bean(name=&quot;simpleMappingExceptionResolver&quot;)
   public SimpleMappingExceptionResolver
                   createSimpleMappingExceptionResolver() {
     SimpleMappingExceptionResolver r =
                 new SimpleMappingExceptionResolver();
 
     Properties mappings = new Properties();
-    mappings.setProperty("DatabaseException", "databaseError");
-    mappings.setProperty("InvalidCreditCardException", "creditCardError");
+    mappings.setProperty(&quot;DatabaseException&quot;, &quot;databaseError&quot;);
+    mappings.setProperty(&quot;InvalidCreditCardException&quot;, &quot;creditCardError&quot;);
 
     r.setExceptionMappings(mappings);  // None by default
-    r.setDefaultErrorView("error");    // No default
-    r.setExceptionAttribute("ex");     // Default is "exception"
-    r.setWarnLogCategory("example.MvcLogger");     // No default
+    r.setDefaultErrorView(&quot;error&quot;);    // No default
+    r.setExceptionAttribute(&quot;ex&quot;);     // Default is &quot;exception&quot;
+    r.setWarnLogCategory(&quot;example.MvcLogger&quot;);     // No default
     return r;
   }
   ...
 }
 </code></pre>
 <p>或使用XML配置：</p>
-<pre><code class="prettyprint xml">  <bean id="simpleMappingExceptionResolver" class=
-     "org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-    <property name="exceptionMappings">
-      <map>
-         <entry key="DatabaseException" value="databaseError"/>
-         <entry key="InvalidCreditCardException" value="creditCardError"/>
-      </map>
-    </property>
+<pre><code class="prettyprint xml">  &lt;bean id=&quot;simpleMappingExceptionResolver&quot; class=
+     &quot;org.springframework.web.servlet.handler.SimpleMappingExceptionResolver&quot;&gt;
+    &lt;property name=&quot;exceptionMappings&quot;&gt;
+      &lt;map&gt;
+         &lt;entry key=&quot;DatabaseException&quot; value=&quot;databaseError&quot;/&gt;
+         &lt;entry key=&quot;InvalidCreditCardException&quot; value=&quot;creditCardError&quot;/&gt;
+      &lt;/map&gt;
+    &lt;/property&gt;
 
-    <!-- See note below on how this interacts with Spring Boot -->
-    <property name="defaultErrorView" value="error"/>
-    <property name="exceptionAttribute" value="ex"/>
+    &lt;!-- See note below on how this interacts with Spring Boot --&gt;
+    &lt;property name=&quot;defaultErrorView&quot; value=&quot;error&quot;/&gt;
+    &lt;property name=&quot;exceptionAttribute&quot; value=&quot;ex&quot;/&gt;
         
-    <!-- Name of logger to use to log exceptions. Unset by default, 
-           so logging is disabled unless you set a value. -->
-    <property name="warnLogCategory" value="example.MvcLogger"/>
-  </bean>
+    &lt;!-- Name of logger to use to log exceptions. Unset by default, 
+           so logging is disabled unless you set a value. --&gt;
+    &lt;property name=&quot;warnLogCategory&quot; value=&quot;example.MvcLogger&quot;/&gt;
+  &lt;/bean&gt;
 </code></pre>
 <p><em>defaultErrorView</em>属性特别有用，因为它可以确保任何未捕获的异常都会生成合适的应用程序定义的错误页面。（大多数应用程序服务器的默认设置是显示Java堆栈跟踪，这是用户<em>永远</em>都<em>不会</em>看到的）。Spring Boot的“ white-label”错误页面提供了另一种做同样事情的方法。</p><h3><a href="#extending-simplemappingexceptionresolver" class="anchor" name="extending-simplemappingexceptionresolver"></a>扩展SimpleMappingExceptionResolver</h3>
-<p>扩展<code>SimpleMappingExceptionResolver</code>很普遍，原因如下：</p>
+<p>扩展很普遍<code>SimpleMappingExceptionResolver</code>有几个原因：</p>
 <ul>
 <li>您可以使用构造函数直接设置属性-例如，启用异常日志记录并将记录器设置为使用</li>
-<li>通过覆盖<code>buildLogMessage</code>覆盖默认日志消息。默认实现始终返回以下固定文本：<ul style="margin-left:2em"><i>处理程序执行导致异常</i></ul></li>
-<li>通过重写<code>doResolveException</code>使其他信息可用于错误视图</li>
+<li>通过覆盖覆盖默认日志消息<code>buildLogMessage</code> 。默认实现始终返回以下固定文本：<ul style="margin-left:2em"><i>处理程序执行导致异常</i></ul></li>
+<li>通过覆盖使其他信息可用于错误视图<code>doResolveException</code></li>
 </ul>
 <p>例如：</p>
 <pre><code class="prettyprint java">public class MyMappingExceptionResolver extends SimpleMappingExceptionResolver {
@@ -405,7 +411,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
   @Override
   public String buildLogMessage(Exception e, HttpServletRequest req) {
-    return "MVC exception: " + e.getLocalizedMessage();
+    return &quot;MVC exception: &quot; + e.getLocalizedMessage();
   }
     
   @Override
@@ -416,14 +422,14 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
         
     // Make the full URL available to the view - note ModelAndView uses
     // addObject() but Model uses addAttribute(). They work the same. 
-    mav.addObject("url", request.getRequestURL());
+    mav.addObject(&quot;url&quot;, request.getRequestURL());
     return mav;
   }
 }
 </code></pre>
 <p>此代码在演示应用程序中为<a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/java/demo/example/ExampleSimpleMappingExceptionResolver.java">ExampleSimpleMappingExceptionResolver</a></p><h3><a href="#extending-exceptionhandlerexceptionresolver" class="anchor" name="extending-exceptionhandlerexceptionresolver"></a>扩展ExceptionHandlerExceptionResolver</h3>
-<p>也可以扩展<code>ExceptionHandlerExceptionResolver</code>并覆盖其<br><code>doResolveHandlerMethodException</code>方法相同。它具有几乎相同的签名（只使用新的<code>HandlerMethod</code>而不是<code>Handler</code> ）。</p>
-<p>为了确保它被使用，还要将继承的order属性（例如，在新类的构造函数中）设置为小于<code>MAX_INT</code>的值，以便它<em>在</em>默认的ExceptionHandlerExceptionResolver实例<em>之前</em>运行（创建自己的处理程序实例比try更容易）修改/替换由Spring创建的代码）。有关更多信息，请参见演示应用程序中的<a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/java/demo/example/ExampleExceptionHandlerExceptionResolver.java">ExampleExceptionHandlerExceptionResolver</a> 。</p><h3><a href="#errors-and-rest" class="anchor" name="errors-and-rest"></a>错误和REST</h3>
+<p>也可以扩展<code>ExceptionHandlerExceptionResolver</code>并覆盖其<br><code>doResolveHandlerMethodException</code>方法相同。它具有几乎相同的签名（只是采用了新的<code>HandlerMethod</code>代替<code>Handler</code> ）。</p>
+<p>为了确保它被使用，还要将继承的order属性（例如，在新类的构造函数中）设置为小于<code>MAX_INT</code>因此它可以<em>在</em>默认的ExceptionHandlerExceptionResolver实例<em>之前</em>运行（创建自己的处理程序实例比尝试修改/替换Spring创建的实例更容易）。有关更多信息，请参见演示应用程序中的<a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/java/demo/example/ExampleExceptionHandlerExceptionResolver.java">ExampleExceptionHandlerExceptionResolver</a> 。</p><h3><a href="#errors-and-rest" class="anchor" name="errors-and-rest"></a>错误和REST</h3>
 <p>RESTful GET请求也可能会生成异常，并且我们已经了解了如何返回标准的HTTP错误响应代码。但是，如果要返回有关错误的信息怎么办？这很容易做到。首先定义一个错误类：</p>
 <pre><code class="prettyprint java">public class ErrorInfo {
     public final String url;
@@ -435,7 +441,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     }
 }
 </code></pre>
-<p>现在，我们可以从处理程序以<code>@ResponseBody</code>返回实例，如下所示：</p>
+<p>现在我们可以从处理程序中返回一个实例作为<code>@ResponseBody</code>像这样：</p>
 <pre><code class="prettyprint java">@ResponseStatus(HttpStatus.BAD_REQUEST)
 @ExceptionHandler(MyBadDataException.class)
 @ResponseBody ErrorInfo
@@ -445,20 +451,20 @@ handleBadRequest(HttpServletRequest req, Exception ex) {
 </code></pre><h2><a href="#what-to-use-when" class="anchor" name="what-to-use-when"></a>什么时候使用？</h2>
 <p>和往常一样，Spring喜欢为您提供选择，那么您应该怎么做？这是一些经验法则。但是，如果您偏爱XML配置或注释，也可以。</p>
 <ul>
-<li>对于您编写的异常，请考虑向它们添加<code>@ResponseStatus</code> 。
-</li><li>对于所有其他异常， <code>@ExceptionHandler</code>在<code>@ControllerAdvice</code>类上实现<code>@ExceptionHandler</code>方法，或使用<code>SimpleMappingExceptionResolver</code>的实例。您可能已经为您的应用程序配置了<code>SimpleMappingExceptionResolver</code> ，在这种情况下，向其添加新的异常类可能比实现<code>@ControllerAdvice</code>容易。
-</li><li>对于控制器特定的异常处理，向控制器添加<code>@ExceptionHandler</code>方法。
-</li><li><b>警告：</b>在同一应用程序中，请小心混合太多这些选项。如果可以以多种方式处理同一个异常，则可能无法获得所需的行为。始终在任何<code>@ControllerAdvice</code>实例上选择<code>@ControllerAdvice</code>上的<code>@ExceptionHandler</code>方法。<i>尚不确定处理</i>哪种顺序的控制器建议。
+<li>对于您编写的异常，请考虑添加<code>@ResponseStatus</code>给他们。
+</li><li>对于所有其他例外，请实施<code>@ExceptionHandler</code>上的方法<code>@ControllerAdvice</code>类或使用的实例<code>SimpleMappingExceptionResolver</code> 。你可能有<code>SimpleMappingExceptionResolver</code>已经为您的应用程序进行了配置，在这种情况下，向其添加新的异常类可能比实现<code>@ControllerAdvice</code> 。
+</li><li>对于控制器特定的异常处理，添加<code>@ExceptionHandler</code>控制器的方法。
+</li><li><b>警告：</b>在同一应用程序中，请小心混合太多这些选项。如果可以以多种方式处理同一个异常，则可能无法获得所需的行为。 <code>@ExceptionHandler</code>总是先选择Controller上的方法<code>@ControllerAdvice</code>实例。<i>尚不确定处理</i>哪种顺序的控制器建议。
 </li></ul><h2><a href="#sample-application" class="anchor" name="sample-application"></a>样品申请</h2>
 <p>可以在<a href="https://github.com/paulc4/mvc-exceptions">github</a>上找到一个演示应用程序。它使用Spring Boot和Thymeleaf构建一个简单的Web应用程序。</p>
 <p>该应用程序已经过两次修订（2014年10月，2018年4月），并且（希望）更好，更容易理解。基本面保持不变。它使用Spring Boot V2.0.1和Spring V5.0.5，但是代码也适用于Spring 3.x和4.x。</p>
 <p>该演示在以下位置的Cloud Foundry上运行<a href="https://mvc-exceptions-v2.cfapps.io/"></a> <a href="https://mvc-exceptions-v2.cfapps.io/">http://mvc-exceptions-v2.cfapps.io/</a> 。</p><h3><a href="#about-the-demo" class="anchor" name="about-the-demo"></a>关于演示</h3>
 <p>该应用程序将引导用户浏览5个演示页面，重点介绍不同的异常处理技术：</p>
 <ol>
-<li>具有<code>@ExceptionHandler</code>方法的控制器可处理其自身的异常</li>
+<li>一个控制器<code>@ExceptionHandler</code>处理自身异常的方法</li>
 <li>一个向全局ControllerAdvice抛出异常的控制器</li>
-<li>使用<code>SimpleMappingExceptionResolver</code>处理异常</li>
-<li>与演示3相同，但<code>SimpleMappingExceptionResolver</code>禁用<code>SimpleMappingExceptionResolver</code>进行比较</li>
+<li>用一个<code>SimpleMappingExceptionResolver</code>处理异常</li>
+<li>与演示3相同，但带有<code>SimpleMappingExceptionResolver</code>禁用以进行比较</li>
 <li>显示Spring Boot如何生成其错误页面</li>
 </ol>
 <p>在项目的<a href="https://github.com/paulc4/mvc-exceptions/blob/master/README.md">README.md</a>中，可以找到应用程序中最重要文件的描述以及它们与每个演示的<a href="https://github.com/paulc4/mvc-exceptions/blob/master/README.md">关系</a> 。</p>
@@ -474,38 +480,39 @@ handleBadRequest(HttpServletRequest req, Exception ex) {
 <li><code>mvn spring-boot:run</code></li>
 </ul>
 <p>你的选择。主页网址为<a href="http://localhost:8080"></a> <a href="http://localhost:8080">http：// localhost：8080</a> 。</p><h3><a href="#error-page-contents" class="anchor" name="error-page-contents"></a>错误页面内容</h3>
-<p>在演示应用程序中，我还将展示如何创建一个“支持就绪”错误页面，并在HTML源代码中隐藏堆栈跟踪信息（作为注释）。理想情况下，支持人员应该从日志中获取此信息，但是生活并不总是理想的。无论如何，此页面<em>确实</em>显示了底层的错误处理方法<code>handleError</code>创建自己的<code>ModelAndView</code>来在错误页面中提供额外的信息。看到：</p>
+<p>在演示应用程序中，我还将展示如何创建一个“支持就绪”错误页面，并在HTML源代码中隐藏堆栈跟踪信息（作为注释）。理想情况下，支持人员应该从日志中获取此信息，但是生活并不总是理想的。无论如何，这是什么<em>做</em>网页显示的是如何在底层的错误处理方法<code>handleError</code>创建自己的<code>ModelAndView</code>在错误页面上提供其他信息。看到：</p>
 <ul>
-<li><a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/java/demo1/web/ExceptionHandlingController.java">github</a>上的<code>ExceptionHandlingController.handleError()</code></li>
-<li><a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/java/demo2/web/GlobalExceptionHandlingControllerAdvice.java">GitHub</a>上的<code>GlobalControllerExceptionHandler.handleError()</code></li>
+<li><code>ExceptionHandlingController.handleError()</code>在<a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/java/demo1/web/ExceptionHandlingController.java">github上</a></li>
+<li><code>GlobalControllerExceptionHandler.handleError()</code>在<a href="https://github.com/paulc4/mvc-exceptions/blob/master/src/main/java/demo2/web/GlobalExceptionHandlingControllerAdvice.java">github上</a></li>
 </ul><h2><a href="#spring-boot-and-error-handling" class="anchor" name="spring-boot-and-error-handling"></a> Spring Boot和错误处理</h2>
 <p><a href="https://spring.io/spring-boot">Spring Boot</a>允许使用最少的配置来设置Spring项目。当Spring Boot在类路径上检测到某些键类和包时，它会自动创建合理的默认值。例如，如果发现您正在使用Servlet环境，它将使用最常用的视图解析器，处理程序映射等设置Spring MVC。如果看到JSP和/或Thymeleaf，它将设置这些视图技术。</p><h3><a href="#fallback-error-page" class="anchor" name="fallback-error-page"></a>后备错误页面</h3>
 <p>Spring Boot如何支持本文开头所述的默认错误处理？</p>
 <ol>
-<li>如果发生任何无法处理的错误，Spring Boot会在内部转发到<code>/error</code> 。</li>
-<li>引导程序设置<code>BasicErrorController</code>来处理对<code>/error</code>任何请求。控制器将错误信息添加到内部模型，并返回<code>error</code>作为逻辑视图名称。</li>
+<li>如果发生任何未处理的错误，Spring Boot会内部转发给<code>/error</code> 。</li>
+<li>开机设置<code>BasicErrorController</code>处理任何要求<code>/error</code> 。控制器将错误信息添加到内部模型并返回<code>error</code>作为逻辑视图名称。</li>
 <li>如果配置了任何视图解析器，它们将尝试使用相应的错误视图。</li>
-<li>否则，将使用专用的<code>View</code>对象提供默认错误页面（使其独立于您可能使用的任何视图分辨率系统）。</li>
-<li>Spring Boot设置了<code>BeanNameViewResolver</code>以便<code>/error</code>可以映射到同名的<code>View</code> 。</li>
-<li>如果查看Boot的<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/servlet/error/ErrorMvcAutoConfiguration.java"><code>ErrorMvcAutoConfiguration</code></a>类，则会看到<code>defaultErrorView</code>作为名为<code>error</code>的bean返回。这是<code>BeanNameViewResolver</code>找到的View bean。</li>
+<li>否则，将使用专用的<code>View</code>对象（使其独立于您可能使用的任何视图分辨率系统）。</li>
+<li>Spring Boot设置了一个<code>BeanNameViewResolver</code>以便<code>/error</code>可以映射到<code>View</code>同名。</li>
+<li>如果你看Boot的<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/web/servlet/error/ErrorMvcAutoConfiguration.java"><code>ErrorMvcAutoConfiguration</code></a>上课，您会看到<code>defaultErrorView</code>以名为的bean的形式返回<code>error</code> 。这是由<code>BeanNameViewResolver</code> 。</li>
 </ol>
 <p>“ Whitelabel”错误页面故意最小且难看。您可以覆盖它：</p>
 <ol>
-<li>通过定义错误模板-在我们的演示中，我们使用Thymeleaf，因此错误模板位于<code>src/main/resources/templates/error.html</code> （此位置由Spring Boot属性<code>spring.thymeleaf.prefix</code> -类似的属性存在于其他受支持的服务器端视图技术（例如JSP或Mustache）。</li>
-<li>如果您<em>不</em>使用服务器端渲染<br>2.1将您自己的错误视图定义为一个名为<code>error</code>的bean。<br>2.1或通过设置属性禁用Spring Boot的“ Whitelabel”错误页面<br><code>server.error.whitelabel.enabled</code>为<code>false</code> 。而是使用容器的默认错误页面。</li>
+<li>通过定义错误模板-在我们的演示中，我们使用Thymeleaf，因此错误模板位于<code>src/main/resources/templates/error.html</code> （此位置由Spring Boot属性设置<code>spring.thymeleaf.prefix</code> -其他受支持的服务器端视图技术（例如JSP或Mustache）也存在类似的属性。</li>
+<li>如果您<em>不</em>使用服务器端渲染<br>2.1将自己的错误视图定义为名为的bean <code>error</code> 。<br>2.1或通过设置属性禁用Spring Boot的“ Whitelabel”错误页面<br><code>server.error.whitelabel.enabled</code>至<code>false</code> 。而是使用容器的默认错误页面。</li>
 </ol>
-<p>按照约定，Spring Boot属性通常在<code>application.properties</code>或<code>application.yml</code>设置。</p><h3><a href="#integration-with-em-simplemappingexceptionresolver-em" class="anchor" name="integration-with-em-simplemappingexceptionresolver-em"></a>与<em>SimpleMappingExceptionResolver</em>集成</h3>
-<p>如果您已经在使用<code>SimpleMappingExceptionResolver</code>设置默认值<code>SimpleMappingExceptionResolver</code><br>错误视图？很简单，使用<code>setDefaultErrorView()</code>定义Spring Boot使用的相同视图： <code>error</code> 。</p>
-<p>请注意，在演示中，故意将<code>SimpleMappingExceptionResolver</code>的<code>defaultErrorView</code>属性设置为不是<code>error</code>而是设置为<code>defaultErrorPage</code>以便您可以看到处理程序何时生成错误页面以及何时由Spring Boot负责。通常， <em>两者都</em>将设置为<code>error</code> 。</p><h3><a href="#container-wide-exception-handling" class="anchor" name="container-wide-exception-handling"></a>容器范围的异常处理</h3>
+<p>按照惯例，Spring Boot属性通常在<code>application.properties</code>要么<code>application.yml</code> 。</p><h3><a href="#integration-with-em-simplemappingexceptionresolver-em" class="anchor" name="integration-with-em-simplemappingexceptionresolver-em"></a>与<em>SimpleMappingExceptionResolver</em>集成</h3>
+<p>如果您已经在使用该怎么办<code>SimpleMappingExceptionResolver</code>设置默认值<br>错误视图？简单易用<code>setDefaultErrorView()</code>定义Spring Boot使用的相同视图： <code>error</code> 。</p>
+<p>请注意，在演示中， <code>defaultErrorView</code>的属性<code>SimpleMappingExceptionResolver</code>故意设置为不<code>error</code>但是<code>defaultErrorPage</code>这样您就可以看到处理程序何时生成错误页面以及Spring Boot何时负责。通常<em>两者都</em>将设置为<code>error</code> 。</p><h3><a href="#container-wide-exception-handling" class="anchor" name="container-wide-exception-handling"></a>容器范围的异常处理</h3>
 <p>Spring Boot的后备错误页面也会报告在Spring Framework外部抛出的异常，例如从Servlet过滤器引发的异常。</p>
-<p>为此，Spring Boot必须为容器注册一个默认错误页面。在Servlet 2中，有一个<code><error-page></code>您可以将其添加到<code>web.xml</code>来执行此操作。不幸的是，Servlet 3没有提供Java API等效项。相反，Spring Boot会执行以下操作：</p>
+<p>为此，Spring Boot必须为容器注册一个默认错误页面。在Servlet 2中，有一个<code><error-page></code>您可以添加到您的指令中<code>web.xml</code>去做这个。不幸的是，Servlet 3没有提供Java API等效项。相反，Spring Boot会执行以下操作：</p>
 <ul>
 <li>对于具有嵌入式容器的Jar应用程序，它将使用特定于容器的API来注册默认错误页面。</li>
 <li>对于作为传统WAR文件部署的Spring Boot应用程序，Servlet过滤器用于<br>捕获进一步提出的异常并进行处理。</li>
 </ul></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1207;
 
       (function(disqus_shortname, document) {
@@ -519,7 +526,8 @@ handleBadRequest(HttpServletRequest req, Exception ex) {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -557,12 +565,14 @@ handleBadRequest(HttpServletRequest req, Exception ex) {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

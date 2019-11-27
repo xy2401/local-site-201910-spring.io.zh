@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>存根和模拟的单元测试</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -35,14 +39,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2007-01-15 10:51:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,9 +174,9 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>前几天，我和一些客户在现场，他们问我有关单元测试和模拟对象的问题。我决定写一些我们作为单元测试创建依赖关系（协作者）的教程的讨论。我们讨论了存根对象和模拟对象这两个选项，并给出了一些简单的示例来说明其用法以及两种方法的优缺点。</p><p>在单元测试中，通常会模拟或残存被测试类的协作者，因此测试独立于协作者的实现。能够精确地控制测试所使用的测试数据，并验证设备是否按预期运行，也是一件有用的事情。</p>
-<h2>存根</h2><p>存根方法易于使用，并且不涉及单元测试的额外依赖项。基本技术是将协作者实现为具体的类，这些类仅展示被测试类所需的协作者总体行为的一小部分。作为示例，请考虑测试服务实现的情况。该实现有一个合作者：</p>
-<pre><code class="prettyprint java"><br>public class SimpleService implements Service {
+<div class="blog--post"><p>前几天，我和一些客户在现场，他们问我有关单元测试和模拟对象的问题。我决定写一些我们作为单元测试创建依赖关系（协作者）的教程的讨论。我们讨论了存根对象和模拟对象这两个选项，并给出了一些简单的示例来说明其用法以及两种方法的优缺点。</p><p>在单元测试中，通常会模拟或残存被测试类的协作者，因此测试独立于协作者的实现。能够精确控制测试所使用的测试数据，并验证设备是否按预期运行，也是一件有用的事情。</p>
+<h2>存根</h2><p>存根方法易于使用，并且不涉及单元测试的任何额外依赖项。基本技术是将协作者实现为具体的类，这些类仅展示被测试类所需的协作者总体行为的一小部分。作为示例，请考虑测试服务实现的情况。该实现有一个合作者：</p>
+<pre><code class="prettyprint java"><br />public class SimpleService implements Service {
 
     private Collaborator collaborator;
     public void setCollaborator(Collaborator collaborator) {
@@ -183,7 +189,7 @@
     }
 }
 </code></pre><p>为了测试isActive的实现，我们可以进行如下的单元测试：</p>
-<pre><code class="prettyprint java"><br>public void testActiveWhenCollaboratorIsActive() throws Exception {
+<pre><code class="prettyprint java"><br />public void testActiveWhenCollaboratorIsActive() throws Exception {
 
     Service service = new SimpleService();
     service.setCollaborator(new StubCollaborator());
@@ -199,7 +205,7 @@ class StubCollaborator implements Collaborator {
     }
 }
 </code></pre><p>存根协作者所做的只是返回测试所需的值。</p><p>通常将这样的存根作为匿名内部类以内联方式实现，例如</p>
-<pre><code class="prettyprint java"><br>public void testActiveWhenCollaboratorIsActive() throws Exception {
+<pre><code class="prettyprint java"><br />public void testActiveWhenCollaboratorIsActive() throws Exception {
 
     Service service = new SimpleService();
     service.setCollaborator(new Collaborator() {
@@ -211,13 +217,13 @@ class StubCollaborator implements Collaborator {
 
 }
 </code></pre><p>这为我们节省了将存根类作为单独的声明维护的大量时间，还有助于避免存根实现的常见陷阱：在单元测试中重用存根，以及项目中具体存根数量的爆炸式增长。</p><p>这幅画怎么了？好吧，像这样的服务中的协作者接口常常不像这个简单的例子那么简单，并且要实现内联存根，需要数十行未使用的方法的空声明。此外，如果协作者界面发生更改（例如，添加了方法），我们必须在所有测试用例中手动更改所有内联存根实现，这可能需要大量工作。</p><p>为了解决这两个问题，我们从基类开始，而不是为每个测试用例重新实现接口，我们扩展了基类。如果接口更改，我们只需要更改基类。通常，基类将存储在我们项目的单元测试目录中，而不是生产目录或主源目录中。</p><p>例如，这是所定义的接口的合适基类：</p>
-<pre><code class="prettyprint java"><br>public class StubCollaboratorAdapter implements Collaborator {
+<pre><code class="prettyprint java"><br />public class StubCollaboratorAdapter implements Collaborator {
    public boolean isActive() {
        return false;
    }
 }
 </code></pre><p>这是新的测试用例：</p>
-<pre><code class="prettyprint java"><br>public void testActiveWhenCollaboratorIsActive() throws Exception {
+<pre><code class="prettyprint java"><br />public void testActiveWhenCollaboratorIsActive() throws Exception {
 
     Service service = new SimpleService();
     service.setCollaborator(new StubCollaboratorAdapter() {
@@ -228,9 +234,9 @@ class StubCollaborator implements Collaborator {
     assertTrue(service.isActive());
 
 }
-</code></pre><p>现在，测试用例与协作者界面的更改（不影响isActive方法）之间保持隔离。实际上，使用IDE，它也可以与确实影响isActive方法的接口中的某些更改相隔离-例如，在所有测试用例中，IDE都可以自动进行名称或签名更改。</p><p>内联存根方法非常有用且易于实现，但是可以更好地控制测试用例，并确保如果服务对象的实现发生变化，那么测试用例也会相应地发生变化，那么模拟对象方法会更好。</p>
-<h2>模拟对象</h2><p>使用模拟对象（例如来自<a href="http://www.easymock.org">EasyMock</a>或<a href="http://www.jmock.org">JMock的</a>对象），我们可以对测试被测单元的内部实现进行高度控制。</p><p>为了在实践中看到这一点，请考虑将上面的示例重写为使用EasyMock。首先，我们看一下EasyMock 1（即不利用EasyMock 2中的Java 5扩展）。测试用例如下所示：</p>
-<pre><code class="prettyprint java"><br>MockControl control = MockControl.createControl(Collaborator.class);
+</code></pre><p>现在，测试用例与协作者界面的更改（不影响isActive方法）之间保持隔离。实际上，使用IDE，它也可以与确实影响isActive方法的接口中的某些更改隔离开来-例如，在所有测试用例中，IDE都可以自动进行名称或签名更改。</p><p>内联存根方法非常有用且易于实现，但是可以更好地控制测试用例，并确保如果服务对象的实现发生变化，那么测试用例也会相应地发生变化，那么模拟对象方法会更好。</p>
+<h2>模拟对象</h2><p>使用模拟对象（例如来自<a href="http://www.easymock.org">EasyMock</a>或<a href="http://www.jmock.org">JMock</a> ），可以对测试被测单元实现的内部进行高度控制。</p><p>为了在实践中看到这一点，请考虑将上面的示例重写为使用EasyMock。首先，我们看一下EasyMock 1（即不利用EasyMock 2中的Java 5扩展）。测试用例如下所示：</p>
+<pre><code class="prettyprint java"><br />MockControl control = MockControl.createControl(Collaborator.class);
 Collaborator collaborator = (Collaborator) control.getMock();
 control.expectAndReturn(collaborator.isActive(), true);
 control.replay();
@@ -240,7 +246,7 @@ assertTrue(service.isActive());
 
 control.verify();
 </code></pre><p>如果实现更改为以其他方式使用协作者，则单元测试将立即失败，并向开发人员发送信号，告知其需要重新编写。假设服务的内部更改为完全不使用协作者：</p>
-<pre><code class="prettyprint java"><br>public class SimpleService implements Service {
+<pre><code class="prettyprint java"><br />public class SimpleService implements Service {
 
     ...
 
@@ -251,7 +257,7 @@ control.verify();
 }
 </code></pre><p>上面使用EasyMock的测试将失败，并显示一条明显的消息，提示未执行对协作者的预期方法调用。在存根实现中，测试可能会失败，也可能不会失败：如果失败，错误消息将是神秘的；如果没有，那只会是偶然的。</p><p>为了修复失败的测试，我们必须对其进行修改以反映服务的内部实现。不断地重做测试用例以反映实现内部的情况被某些人视为负担，但实际上，必须这样做是单元测试的本质。我们正在测试单元的实施，而不是与系统其余部分的合同。为了测试合同，我们将使用集成测试，并将服务视为由其接口而不是其实现定义的黑盒。</p>
 <h2>EasyMock 2</h2><p>请注意，如果我们使用Java 5和EasyMock 2，则可以简化上述测试用例的实现：</p>
-<pre><code class="prettyprint java"><br>Collaborator collaborator = EasyMock.createMock(Collaborator.class);
+<pre><code class="prettyprint java"><br />Collaborator collaborator = EasyMock.createMock(Collaborator.class);
 EasyMock.expect(collaborator.isActive()).andReturn(true);
 EasyMock.replay(collaborator);
 
@@ -261,7 +267,7 @@ assertTrue(service.isActive());
 EasyMock.verify(collaborator);
 </code></pre><p>在新的测试案例中，不需要MockControl。如果只有一个协作者（如此处），这没什么大不了的，但是如果有很多协作者，那么测试用例的编写和读取就变得非常容易。</p>
 <h2>何时使用存根和模拟？</h2><p>如果模拟对象更好，为什么我们还要使用存根？这个问题很可能使我们进入宗教辩论的领域，我们现在将避免这样做。因此，简单的答案是：“做适合您的测试用例的工作，并创建最简单的代码来读取和维护”。如果使用存根进行的测试可以快速读写，并且您不太担心对协作者的更改或对测试单元内部使用协作者的担心，那就很好。如果协作者不受您的控制（例如，来自第三方库），则通常情况下，存根更难编写。</p><p>存根比模拟更易于实现（和读取）的一种常见情况是，被测单元需要在协作者上使用嵌套的方法调用。例如，考虑一下如果我们更改服务会发生什么，因此它不再直接使用协作者的isActive，而是将调用嵌套到另一个协作者（属于另一个类，例如Task）：</p>
-<pre><code class="prettyprint java"><br>public class SimpleService implements Service {
+<pre><code class="prettyprint java"><br />public class SimpleService implements Service {
 
     public boolean isActive() {
         return !collaborator.getTask().isActive();
@@ -269,7 +275,7 @@ EasyMock.verify(collaborator);
 
 }
 </code></pre><p>要在EasyMock 2中使用模拟对象对此进行测试：</p>
-<pre><code class="prettyprint java"><br>Collaborator collaborator = EasyMock.createMock(Collaborator.class);
+<pre><code class="prettyprint java"><br />Collaborator collaborator = EasyMock.createMock(Collaborator.class);
 Task task = EasyMock.createMock(Task.class);
 
 EasyMock.expect(collaborator.getTask()).andReturn(task);
@@ -281,7 +287,7 @@ assertTrue(service.isActive());
 
 EasyMock.verify(collaborator, task);
 </code></pre><p>相同测试的存根实现将是</p>
-<pre><code class="prettyprint java"><br>Service service = new SimpleService();
+<pre><code class="prettyprint java"><br />Service service = new SimpleService();
 service.setCollaborator(new StubCollaboratorAdapter() {
     public Task getTask() {
         return (new StubTaskAdapter() {
@@ -293,7 +299,7 @@ service.setCollaborator(new StubCollaboratorAdapter() {
 });
 assertTrue(service.isActive());
 </code></pre><p>就长度而言，没有什么可区分两者（忽略适配器基类中的代码，我们可以在其他测试中重复使用）。模拟版本更健壮（出于上述原因），因此我们更喜欢它。但是，如果由于无法使用Java 5而不得不使用EasyMock 1，则情况可能会有所不同：实现模拟版本会更加难看。这里是：</p>
-<pre><code class="prettyprint java"><br>MockControl controlCollaborator = MockControl.createControl(Collaborator.class);
+<pre><code class="prettyprint java"><br />MockControl controlCollaborator = MockControl.createControl(Collaborator.class);
 Collaborator collaborator = (Collaborator) controlCollaborator.getMock();
 
 MockControl controlTask = MockControl.createControl(Task.class);
@@ -310,10 +316,11 @@ assertTrue(service.isActive());
 
 controlCollaborator.verify();
 controlTask.verify();
-</code></pre><p>测试时间又延长了一半，因此相应地更难以阅读和维护。在现实中事情很容易变得更糟。在这种情况下，我们可能会为了轻松生活而考虑执行存根。当然，模拟对象的真正信奉者会指出，这是一种错误的经济做法，从长期来看，单元测试将比使用存根的测试更健壮和更好。</p></div>
+</code></pre><p>测试时间又延长了一半，因此相应地更难以阅读和维护。在现实中事情很容易变得更糟。在这种情况下，为了方便生活，我们可能会考虑使用存根实现。当然，模拟对象的真正信奉者会指出，这是一种错误的经济做法，从长期来看，单元测试将比使用存根的测试更健壮和更好。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 46;
 
       (function(disqus_shortname, document) {
@@ -327,7 +334,8 @@ controlTask.verify();
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -365,12 +373,14 @@ controlTask.verify();
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

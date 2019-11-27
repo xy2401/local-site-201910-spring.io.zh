@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>消息驱动的POJO！</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -37,14 +41,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2006-08-11 17:01:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -185,26 +191,26 @@
 </ul>
 <p></p>
 <h3>设置环境</h3>
-<p>首先，我们需要设置环境。我将使用ActiveMQ，但是更改提供程序的影响将仅限于对该文件进行的修改。我将这个文件称为“ shared-context.xml”，因为您很快就会看到，我将为JMS通信的两侧导入这些bean定义。以下是“共享的” bean定义：连接工厂和两个队列（一个用于请求，一个用于答复）：</p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+<p>首先，我们需要设置环境。我将使用ActiveMQ，但是更改提供程序的影响将仅限于对该文件进行修改。我将这个文件称为“ shared-context.xml”，因为您很快就会看到，我将为JMS通信的两侧导入这些bean定义。以下是“共享” bean定义：连接工厂和两个队列（一个用于请求，一个用于答复）：</p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
 	
-    <bean id="requestQueue" class="org.activemq.message.ActiveMQQueue">
-        <constructor-arg value="requestQueue"/>
-    </bean>
+    &lt;bean id=&quot;requestQueue&quot; class=&quot;org.activemq.message.ActiveMQQueue&quot;&gt;
+        &lt;constructor-arg value=&quot;requestQueue&quot;/&gt;
+    &lt;/bean&gt;
  
-    <bean id="replyQueue" class="org.activemq.message.ActiveMQQueue">
-        <constructor-arg value="replyQueue"/>
-    </bean>
+    &lt;bean id=&quot;replyQueue&quot; class=&quot;org.activemq.message.ActiveMQQueue&quot;&gt;
+        &lt;constructor-arg value=&quot;replyQueue&quot;/&gt;
+    &lt;/bean&gt;
  
-    <bean id="connectionFactory" class="org.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="tcp://localhost:61616"/>
-    </bean>
+    &lt;bean id=&quot;connectionFactory&quot; class=&quot;org.activemq.ActiveMQConnectionFactory&quot;&gt;
+        &lt;property name=&quot;brokerURL&quot; value=&quot;tcp://localhost:61616&quot;/&gt;
+    &lt;/bean&gt;
  
-</beans>
+&lt;/beans&gt;
 </code></pre>
 <p>如您所见，我将在tcp上运行ActiveMQ（我只是从发行版的bin目录中运行“ activemq”）。也可以运行嵌入式程序（改为使用“ vm：// localhost”）-或者您可以运行org.activemq.broker.impl的main方法。主班。如果要获取发行版，请访问： <a href="http://www.activemq.org">http</a> : <a href="http://www.activemq.org">//www.activemq.org</a> 。</p>
 <h3>示例域</h3>
@@ -212,7 +218,7 @@
 </p>
 <p>最终，我们将接受来自用户的输入（通过stdin输入“名称”），并将其转换为针对某些未指定事件的“注册请求”。该消息将异步发送，但是我们将有另一个队列来处理回复。然后，ReplyNotifier将把确认（或“未确认”消息）写入标准输出。
 </p><p>顺便说一下，我正在“ blog.mdp”包中创建所有这些类。<br>第一类是<i>RegistrationRequest</i> ：</p>
-<pre><code class="prettyprint java"><br>package blog.mdp;
+<pre><code class="prettyprint java"><br />package blog.mdp;
 
 import java.io.Serializable;
 
@@ -231,7 +237,7 @@ public class RegistrationRequest implements Serializable {
     }
 }
 </code></pre><p>接下来是<i>RegistrationReply</i> ：</p>
-<pre><code class="prettyprint java"><br>package blog.mdp;
+<pre><code class="prettyprint java"><br />package blog.mdp;
 
 import java.io.Serializable;
 
@@ -248,13 +254,13 @@ public class RegistrationReply implements Serializable {
     }
 	
     public String toString() {
-        return (confirmationId >= 0) 
-                ? name + ": Confirmed #" + confirmationId 
-                : name + ": Not Confirmed";
+        return (confirmationId &gt;= 0) 
+                ? name + &quot;: Confirmed #&quot; + confirmationId 
+                : name + &quot;: Not Confirmed&quot;;
     }
 }
 </code></pre><p>和<i>RegistrationService</i> ：</p>
-<pre><code class="prettyprint java"><br>package blog.mdp;
+<pre><code class="prettyprint java"><br />package blog.mdp;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -275,8 +281,8 @@ public class RegistrationService {
         return new RegistrationReply(request.getName(), id);
     }
 }
-</code></pre><p>如您所见，这仅是一个示例。实际上，注册地图可能会做一些事情。另外，您会看到20％的注册尝试都将被拒绝（给定-1 ConfirmationId）-这不是处理注册请求的非常实用的方法，但是它将为答复消息提供一些变化。同样，重要的是该服务类与Spring或JMS没有关系。但是，正如您稍后将看到的那样，它将处理通过JMS发送的消息的有效负载。换句话说，此RegistrationService <i>是</i> <b>消息驱动的POJO</b> 。</p><p>最后，创建一个简单的类来记录回复消息：</p>
-<pre><code class="prettyprint java"><br>package blog.mdp;
+</code></pre><p>如您所见，这仅是一个示例。实际上，注册地图可能会做一些事情。另外，您会看到20％的注册尝试都将被拒绝（给出-1 ConfirmationId）-这不是处理注册请求的非常实用的方法，但是它将为答复消息提供一些变化。同样，重要的是该服务类与Spring或JMS没有关系。但是，正如您稍后将看到的那样，它将处理通过JMS发送的消息的有效负载。换句话说，此RegistrationService <i>是</i> <b>消息驱动的POJO</b> 。</p><p>最后，创建一个简单的类来记录回复消息：</p>
+<pre><code class="prettyprint java"><br />package blog.mdp;
 
 public class ReplyNotifier {
 
@@ -286,13 +292,13 @@ public class ReplyNotifier {
 }
 </code></pre>
 <h3>配置消息驱动的POJO</h3>
-<p>现在最重要的部分。我们如何使用Spring配置POJO服务，以便它将接收JMS消息？答案以2种bean定义的形式出现（嗯，如果算上服务本身，则为3种）。在下一个bean定义文件中，请注意“容器”，它实际上接收消息并启用异步<i>监听器</i> 。容器需要知道<i>connectionFactory</i>以及从其接收消息的<i>目的地</i> 。有多种类型的容器可用，但这超出了本博客的范围。阅读参考文档以获取更多信息： <a href="http://static.springframework.org/spring/docs/2.0-rc2/reference/jms.html#d0e22774">消息侦听器容器</a> 。
+<p>现在最重要的部分。我们如何使用Spring配置POJO服务，以便它将接收JMS消息？答案以2种bean定义的形式出现（嗯，如果算上服务本身，则为3种）。在下一个bean定义文件中，请注意“容器”，它实际上接收消息并启用异步<i>侦听器</i> 。容器需要知道<i>connectionFactory</i>以及从其接收消息的<i>目的地</i> 。有多种类型的容器可用，但这超出了本博客的范围。阅读参考文档以获取更多信息： <a href="http://static.springframework.org/spring/docs/2.0-rc2/reference/jms.html#d0e22774">消息侦听器容器</a> 。
 </p>
 <p>在这种情况下，“侦听器”是Spring的<i>MessageListenerAdapter的</i>一个实例。它具有对<i>委托</i>的引用（POJO服务）和处理程序方法的名称。在这种情况下，我们还提供了<i>defaultResponseDestination</i> 。对于返回空隙的方法，您显然不需要这样做。另外（可能更可能在生产应用程序中），您可以省略此设置，而改为设置传入的JMS Message的“ reply-to”属性。
 </p>
 <p>现在我们已经讨论了各种参与者，下面是bean的定义（我已经将此文件命名为“ server-context.xml”）：```xml <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemalocation="http://www.springframework.org/schema/beans 
                            http://www.springframework.org/schema/beans/spring-beans.xsd"><import resource="shared-context.xml"></import><bean id="registrationService" class="blog.mdp.RegistrationService"></bean> <bean id="listener" class="org.springframework.jms.listener.adapter.MessageListenerAdapter"><property name="delegate" ref="registrationService"></property><property name="defaultListenerMethod" value="processRequest"></property><property name="defaultResponseDestination" ref="replyQueue"></property></bean> <bean id="container" class="org.springframework.jms.listener.SimpleMessageListenerContainer"><property name="connectionFactory" ref="connectionFactory"></property><property name="messageListener" ref="listener"></property><property name="destination" ref="requestQueue"></property></bean></beans> ```</p><p>因为这是一个简单的独立示例，所以最后一步是提供一种用于运行服务的引导机制。我刚刚创建了一个简单的main方法来启动具有相关bean定义的ApplicationContext，然后进行阻止：</p>
-<pre><code class="prettyprint java"><br>package blog.mdp;
+<pre><code class="prettyprint java"><br />package blog.mdp;
 
 import java.io.IOException;
 
@@ -301,41 +307,41 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class RegistrationServiceRunner {
 	
     public static void main(String[] args) throws IOException {
-        new ClassPathXmlApplicationContext("/blog/mdp/server-context.xml");
+        new ClassPathXmlApplicationContext(&quot;/blog/mdp/server-context.xml&quot;);
         System.in.read();
     }
 }
 </code></pre>
 <h3>配置客户端</h3><p>在“客户端”端，我们将发送注册请求并记录回复。首先，我将列出bean的定义。在上一节之后，您应该了解“容器”和“侦听器”的作用。在这种情况下， <i>委托</i>是<i>ReplyNotifier，</i>并且由于其返回类型为void，因此它本身不会发送答复（因此，不存在“ defaultResponseDestination”属性）。我已将此文件命名为“ client-context.xml”：</p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
 	
-    <import resource="shared-context.xml"/>
+    &lt;import resource=&quot;shared-context.xml&quot;/&gt;
 	
-    <bean id="replyNotifier" class="blog.mdp.ReplyNotifier"/>
+    &lt;bean id=&quot;replyNotifier&quot; class=&quot;blog.mdp.ReplyNotifier&quot;/&gt;
 	
-    <bean id="listener" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
-        <property name="delegate" ref="replyNotifier"/>
-        <property name="defaultListenerMethod" value="notify"/>
-    </bean>
+    &lt;bean id=&quot;listener&quot; class=&quot;org.springframework.jms.listener.adapter.MessageListenerAdapter&quot;&gt;
+        &lt;property name=&quot;delegate&quot; ref=&quot;replyNotifier&quot;/&gt;
+        &lt;property name=&quot;defaultListenerMethod&quot; value=&quot;notify&quot;/&gt;
+    &lt;/bean&gt;
 	
-    <bean id="container" class="org.springframework.jms.listener.SimpleMessageListenerContainer">
-        <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="messageListener" ref="listener"/>
-        <property name="destination" ref="replyQueue"/>
-    </bean>
+    &lt;bean id=&quot;container&quot; class=&quot;org.springframework.jms.listener.SimpleMessageListenerContainer&quot;&gt;
+        &lt;property name=&quot;connectionFactory&quot; ref=&quot;connectionFactory&quot;/&gt;
+        &lt;property name=&quot;messageListener&quot; ref=&quot;listener&quot;/&gt;
+        &lt;property name=&quot;destination&quot; ref=&quot;replyQueue&quot;/&gt;
+    &lt;/bean&gt;
 	
-    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="defaultDestination" ref="requestQueue"/>
-    </bean>
+    &lt;bean id=&quot;jmsTemplate&quot; class=&quot;org.springframework.jms.core.JmsTemplate&quot;&gt;
+        &lt;property name=&quot;connectionFactory&quot; ref=&quot;connectionFactory&quot;/&gt;
+        &lt;property name=&quot;defaultDestination&quot; ref=&quot;requestQueue&quot;/&gt;
+    &lt;/bean&gt;
 	
-</beans>
-</code></pre><p>那里定义了另一个bean-Spring的“ jmsTemplate”实例。我们将使用它来将注册请求消息发送到其<i>defaultDestination</i> 。使用Spring提供的简单的<i>convertAndSend（..）</i>方法，发送JMS消息变得很简单。我创建了一个接受用户输入的类，然后使用此“ jmsTemplate”发送消息：</p>
-<pre><code class="prettyprint java"><br>package blog.mdp;
+&lt;/beans&gt;
+</code></pre><p>那里定义了另一个bean-Spring的“ jmsTemplate”实例。我们将使用它来将注册请求消息发送到其<i>defaultDestination</i> 。通过Spring提供的简单的<i>convertAndSend（..）</i>方法，JMS消息的发送变得很简单。我创建了一个接受用户输入的类，然后使用此“ jmsTemplate”发送消息：</p>
+<pre><code class="prettyprint java"><br />package blog.mdp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -348,13 +354,13 @@ import org.springframework.jms.core.JmsTemplate;
 public class RegistrationConsole {
 	
     public static void main(String[] args) throws IOException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("/blog/mdp/client-context.xml");
-        JmsTemplate jmsTemplate = (JmsTemplate) context.getBean("jmsTemplate");
+        ApplicationContext context = new ClassPathXmlApplicationContext(&quot;/blog/mdp/client-context.xml&quot;);
+        JmsTemplate jmsTemplate = (JmsTemplate) context.getBean(&quot;jmsTemplate&quot;);
 		
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));		
 		
         for (;;) {
-            System.out.print("To Register, Enter Name: ");
+            System.out.print(&quot;To Register, Enter Name: &quot;);
             String name = reader.readLine();
             RegistrationRequest request = new RegistrationRequest(name);
             jmsTemplate.convertAndSend(request);
@@ -363,10 +369,11 @@ public class RegistrationConsole {
 }
 </code></pre>
 <h3>运行示例</h3><p>现在是有趣的部分。启动ActiveMQ代理（如“设置环境”一节中简要讨论的）。运行<i>RegistrationServiceRunner</i>的main（..）方法。运行<i>RegistrationConsole</i>的main（..）方法。输入名称，您将在同一控制台中看到答复。</p>
-<h3>更多资源</h3><p>希望这足以让您了解Spring的新消息驱动POJO支持的含义。但是，正如我提到的，其中涉及更多的内容-不同的容器类型，事务支持，使用者线程的配置，可插入消息转换策略等。请继续关注<a href="http://blog.interface21.com/main/">Interface21 Team Blog，</a>以获取有关这些功能的更多示例和信息。同时，您可以查看<a href="http://static.springframework.org/spring/docs/2.0-rc2/reference/jms.html">JMS上</a>的<a href="http://static.springframework.org/spring/docs/2.0-rc2/reference/jms.html">Spring参考文档</a> 。另外，在您开始探索这一令人兴奋的新功能时，一定要访问<a href="http://forum.springframework.org/forumdisplay.php?f=30">Spring支持论坛</a>的<a href="http://forum.springframework.org/forumdisplay.php?f=30">“ Remoting and JMS”部分</a> 。</p></div>
+<h3>更多资源</h3><p>希望这足以使您了解Spring的新消息驱动POJO支持的含义。但是，正如我提到的，其中涉及更多的内容-不同的容器类型，事务支持，使用者线程的配置，可插入消息转换策略等。请继续关注<a href="http://blog.interface21.com/main/">Interface21 Team Blog，</a>以获取有关这些功能的更多示例和信息。同时，您可以查看<a href="http://static.springframework.org/spring/docs/2.0-rc2/reference/jms.html">JMS上</a>的<a href="http://static.springframework.org/spring/docs/2.0-rc2/reference/jms.html">Spring参考文档</a> 。另外，在开始探索这一令人兴奋的新功能时，一定要访问<a href="http://forum.springframework.org/forumdisplay.php?f=30">Spring支持论坛</a>的<a href="http://forum.springframework.org/forumdisplay.php?f=30">“ Remoting and JMS”部分</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 18;
 
       (function(disqus_shortname, document) {
@@ -380,7 +387,8 @@ public class RegistrationConsole {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -418,12 +426,14 @@ public class RegistrationConsole {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

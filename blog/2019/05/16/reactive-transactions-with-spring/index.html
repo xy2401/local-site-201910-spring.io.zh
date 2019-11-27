@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>与Spring进行反应式交易</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Reactive Transactions with Spring">
 <meta name="twitter:description" class="anchor" content="<p>Back in 2016, our reactive journey started with Spring Framework 5 accompanied by a couple of reactive integrations. Throughout our journey, other projects joined the reactive movement. With R2DBC, we now also provide a reactive integration for SQL databases. With the growth of transaction-capable integrations, we constantly got asked:</p>
-<h2><a href=" #does-spring-framework-support-reactive-transactio="="></head><body dir="ltr">Does Spring Framework support Reactive @Transaction?
+<h2><a href=" #does-spring-framework-support-reactive-transactio="="></head><body >Does Spring Framework support Reactive @Transaction?
 <p>At the time our journey began, we had no reactive form of transactional integrations, so this question was simple to answer: There’s no need for reactive transaction management. </p>
 ">
 <meta name="twitter:creator" content="@mp911de">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -172,18 +178,18 @@
 </header>
 <div class="blog--post"><p>早在2016年，我们的响应式旅程就从Spring Framework 5开始，伴随着几个响应式集成。在我们的整个旅程中，其他项目也加入了反动运动。借助R2DBC，我们现在还为SQL数据库提供了反应式集成。随着具有事务处理能力的集成的发展，我们不断被问到：</p><h2><a href="#does-spring-framework-support-reactive-transaction" class="anchor" name="does-spring-framework-support-reactive-transaction"></a> Spring Framework是否支持Reactive @Transaction？</h2>
 <p>在我们的旅程开始之时，我们没有被动式的交易集成形式，所以这个问题很容易回答：不需要被动式的交易管理。</p>
-<p>随着时间的流逝，MongoDB开始使用MongoDB Server 4.0支持多文档事务。R2DBC（反应式SQL数据库驱动程序的规范）开始出现，我们决定使用Spring Data R2DBC来使用R2DBC。这两个项目都希望公开交易行为，因此他们最终在其模板API上提供了<code>inTransaction(…)</code>方法，以执行受本机交易保护的工作单元。</p>
-<p>虽然使用<code>inTransaction(…)</code>方法处理较小的工作块很方便，但它并不反映Spring支持事务的方式。当使用命令式编程模型时，Spring Framework允许事务管理的两种安排： <code>@Transactional</code>和<code>TransactionTemplate</code> （分别声明式编程事务管理）。</p>
-<p>两种事务管理方法都建立在<code>PlatformTransactionManager</code>之上，后者管理事务资源的事务。<code>PlatformTransactionManager</code>可以是Spring提供的事务管理器实现，也可以是基于JTA的Java EE。</p>
-<p>两种方法的共同点是它们将事务状态绑定到<code>ThreadLocal</code>存储，这允许在不传递<code>TransactionStatus</code>对象的情况下进行事务状态管理。交易管理应在后台以非侵入方式进行。<br><code>ThreadLocal</code>以命令式编程的方式工作，因为这种基本假设是，我们不使用线程来继续事务中的工作。</p><h2><a href="#how-imperative-transaction-management-works" class="anchor" name="how-imperative-transaction-management-works"></a>命令性交易管理如何工作</h2>
-<p>事务管理需要将其事务状态与执行关联。在命令式编程中，这通常是<code>ThreadLocal</code>存储-事务状态绑定到<code>Thread</code> 。基本假设是事务代码在容器调用它的同一线程上执行。</p>
+<p>随着时间的流逝，MongoDB开始使用MongoDB Server 4.0支持多文档事务。R2DBC（反应式SQL数据库驱动程序的规范）开始出现，我们决定使用Spring Data R2DBC来使用R2DBC。两个项目都希望公开交易行为，因此他们最终提供了<code>inTransaction(…)</code>模板API上的方法来执行受本机事务保护的工作单元。</p>
+<p>虽然使用起来很方便<code>inTransaction(…)</code>方法用于较小的工作量，它不能反映Spring支持事务的方式。当使用命令式编程模型时，Spring Framework允许事务管理的两种安排： <code>@Transactional</code>和<code>TransactionTemplate</code> （分别声明性程序化交易管理）。</p>
+<p>两种交易管理方法都建立在<code>PlatformTransactionManager</code> ，它管理交易资源的交易。 <code>PlatformTransactionManager</code>可以是Spring提供的事务管理器实现，也可以是基于JTA的Java EE。</p>
+<p>两种方法的共同点是它们将事务状态绑定到<code>ThreadLocal</code>存储，允许进行事务状态管理而无需传递<code>TransactionStatus</code>宾语。交易管理应在后台以非侵入方式进行。<br><code>ThreadLocal</code>之所以以命令式编程方式工作是因为基本假设，即我们不使用线程来继续事务中的工作。</p><h2><a href="#how-imperative-transaction-management-works" class="anchor" name="how-imperative-transaction-management-works"></a>命令性交易管理如何工作</h2>
+<p>事务管理需要将其事务状态与执行关联。在命令式编程中，这通常是<code>ThreadLocal</code>存储–事务状态绑定到<code>Thread</code> 。基本假设是事务代码在容器调用它的同一线程上执行。</p>
 <p>反应式编程模型消除了命令式（同步/阻塞）编程模型的基本假设。仔细研究响应式执行，我们可以观察到代码在不同的线程上执行。使用进程间通信时，这一点更加明显。我们不能再安全地假设我们的代码已在同一线程上完全执行。</p>
-<p>假设的这种更改会使依赖<code>ThreadLocal</code>事务管理实现无效。</p>
-<p>由于集成和优化（例如运算符融合），线程切换在任意时间发生。此更改将破坏所有依赖<code>ThreadLocal</code>代码。结果是我们需要一种不同的安排来反映事务状态，而不必始终传递<code>TransactionStatus</code>对象。</p>
-<p>关联带外数据并不是反应空间中的新要求。我们面临的其他领域，如这一要求<code>SecurityContext</code>使用Spring Security的反应方法的安全性（仅举一个例子）。从3.1版开始，Project Reactor是Spring在其之上建立其反应式支持的反应式库，它为订户上下文提供了支持。</p>
-<p>Reactor <code>Context</code>是响应式编程，而<code>ThreadLocal</code>则是命令式编程：上下文允许将上下文数据绑定到特定执行。对于反应式编程，这是一个<code>Subscription</code> 。通过Reactor的<code>Context</code> ，Spring可以将事务状态以及所有资源和同步绑定到特定的<code>Subscription</code> 。现在，所有使用Project Reactor的反应式代码都可以参与反应式事务。返回标量值并想要访问事务详细信息的代码必须进行重写，以使用反应性类型来参与事务。否则， <code>Context</code>不可用。</p><h2><a href="#reactive-transaction-management" class="anchor" name="reactive-transaction-management"></a>反应式交易管理</h2>
-<p>从Spring Framework 5.2 M2开始，Spring通过<code>ReactiveTransactionManager</code> SPI支持反应式事务管理。</p>
-<p><code>ReactiveTransactionManager</code>是用于使用事务资源的反应性和非阻塞式集成的事务管理抽象。它是返回<code>Publisher</code>类型的反应式<code>@Transactional</code>方法以及使用<code>TransactionalOperator</code>程序化事务管理的基础。</p>
+<p>假设的这种更改会使依赖于<code>ThreadLocal</code> 。</p>
+<p>由于集成和优化（例如运算符融合），线程切换在任意时间发生。此更改将破坏所有依赖的代码<code>ThreadLocal</code> 。结果是我们需要一种不同的安排来反映交易状态，而又不会通过<code>TransactionStatus</code>一直反对。</p>
+<p>关联带外数据并不是反应空间中的新要求。我们在其他领域（例如<code>SecurityContext</code>使用Spring Security来实现反应性方法安全性（仅举一个例子）。从3.1版开始，Project Reactor是Spring在其之上建立其反应式支持的反应式库，它为订户上下文提供了支持。</p>
+<p>反应堆<code>Context</code>反应式编程是什么<code>ThreadLocal</code>是命令式编程：上下文允许将上下文数据绑定到特定执行。对于反应式编程，这是一个<code>Subscription</code> 。反应堆<code>Context</code>让Spring将事务状态以及所有资源和同步绑定到特定的<code>Subscription</code> 。现在，所有使用Project Reactor的反应式代码都可以参与反应式事务。返回标量值并想要访问事务详细信息的代码必须进行重写，以使用反应性类型来参与事务。否则， <code>Context</code>不可用。</p><h2><a href="#reactive-transaction-management" class="anchor" name="reactive-transaction-management"></a>反应式交易管理</h2>
+<p>从Spring Framework 5.2 M2开始，Spring通过以下方式支持反应式事务管理： <code>ReactiveTransactionManager</code> SPI。</p>
+<p><code>ReactiveTransactionManager</code>是用于使用事务资源的反应性和非阻塞式集成的事务管理抽象。这是反应的基础<code>@Transactional</code>返回的方法<code>Publisher</code>类型和用于使用的程序化交易管理<code>TransactionalOperator</code> 。</p>
 <p>前两个反应式事务管理器实现是：</p>
 <ul>
 <li>通过Spring Data R2DBC 1.0 M2进行R2DBC</li>
@@ -199,66 +205,66 @@
   }
 
   @Transactional
-  Mono<Void> insertRows() {
+  Mono&lt;Void&gt; insertRows() {
 
     return db.execute()
-      .sql("INSERT INTO person (name, age) VALUES('Joe', 34)")
+      .sql(&quot;INSERT INTO person (name, age) VALUES(&#39;Joe&#39;, 34)&quot;)
       .fetch().rowsUpdated()
-      .then(db.execute().sql("INSERT INTO contacts (name) VALUES('Joe')")
+      .then(db.execute().sql(&quot;INSERT INTO contacts (name) VALUES(&#39;Joe&#39;)&quot;)
       .then();
   }
 }
 </code></pre>
-<p>在注释驱动的安排中，反应式事务看起来与命令式事务非常相似。不过，主要区别在于我们使用<code>DatabaseClient</code> ，这是一种反应式资源抽象。利用Spring的事务拦截器和<code>ReactiveTransactionManager</code> ，所有事务管理都在后台进行。</p>
+<p>在注释驱动的安排中，反应式事务看起来与命令式事务非常相似。不过，主要区别在于我们与<code>DatabaseClient</code> ，这是一种反应式资源抽象。所有交易管理都是在后台进行的，利用Spring的交易拦截器和<code>ReactiveTransactionManager</code> 。</p>
 <p>Spring根据方法返回类型区分要应用的事务管理类型：</p>
 <ul>
-<li>方法返回<code>Publisher</code>类型：反应式事务管理</li>
+<li>方法返回一个<code>Publisher</code>类型：反应式交易管理</li>
 <li>所有其他退货类型：强制性交易管理</li>
 </ul>
-<p>这种区别非常重要，因为您仍然可以使用命令性组件，例如JPA或JDBC查询。结束语这些结果为<code>Publisher</code>类型的信号春季申请被动而非命令式事务管理。话虽这么说，反应性事务安排不会打开<code>ThreadLocal</code>绑定的事务，这对于JPA或JDBC是必需的。</p><h2><a href="#transactionaloperator" class="anchor" name="transactionaloperator"></a>交易操作员</h2>
-<p>下一步，我们使用<code>TransactionalOperator</code>来研究程序化事务管理：</p>
+<p>这种区别非常重要，因为您仍然可以使用命令性组件，例如JPA或JDBC查询。将这些结果包装成一个<code>Publisher</code>类型信号指示Spring应用反应式而非命令式事务管理。话虽如此，被动交易安排并没有打开<code>ThreadLocal</code>绑定事务，这是JPA或JDBC必需的。</p><h2><a href="#transactionaloperator" class="anchor" name="transactionaloperator"></a>交易操作员</h2>
+<p>下一步，我们来看一下使用<code>TransactionalOperator</code> ：</p>
 <pre><code class="prettyprint java">ConnectionFactory factory = …
 ReactiveTransactionManager tm = new R2dbcTransactionManager(factory);
 DatabaseClient db = DatabaseClient.create(factory);
 
 TransactionalOperator rxtx = TransactionalOperator.create(tm);
 
-Mono<Void> atomicOperation = db.execute()
-  .sql("INSERT INTO person (name, age) VALUES('joe', 'Joe')")
+Mono&lt;Void&gt; atomicOperation = db.execute()
+  .sql(&quot;INSERT INTO person (name, age) VALUES(&#39;joe&#39;, &#39;Joe&#39;)&quot;)
   .fetch().rowsUpdated()
   .then(db.execute()
-    .sql("INSERT INTO contacts (name) VALUES('Joe')")
+    .sql(&quot;INSERT INTO contacts (name) VALUES(&#39;Joe&#39;)&quot;)
     .then())
   .as(rxtx::transactional);
 </code></pre>
 <p>上面的代码包含一些值得注意的组件：</p>
 <ul>
-<li><code>R2dbcTransactionManager</code> ：这是R2DBC <code>ConnectionFactory</code>的反应式事务管理器。</li>
+<li><code>R2dbcTransactionManager</code> ：这是R2DBC的反应式事务管理器<code>ConnectionFactory</code> 。</li>
 <li><code>DatabaseClient</code> ：客户端使用R2DBC驱动程序提供对SQL数据库的访问。</li>
-<li><code>TransactionalOperator</code> ：此操作符的所有上游R2DBC出版商事务上下文关联。您可以使用运算符样式<code>as(…::transactional)</code>或通过<code>execute(txStatus -> …)</code>使用回调样式。</li>
+<li><code>TransactionalOperator</code> ：此运算符将所有上游R2DBC发布者与事务上下文相关联。您可以使用两种运算符样式<code>as(…::transactional)</code>或使用<code>execute(txStatus -> …)</code> 。</li>
 </ul>
-<p>订阅后会延迟启动反应式事务。操作员启动事务，设置适当的隔离级别，并将数据库连接与其订户上下文相关联。所有参与的（上游） <code>Publisher</code>实例都使用单个<code>Context</code>绑定的事务连接。</p>
-<p>反应功能操作员链可以是线性的（通过使用单个<code>Publisher</code> ），也可以是非线性的（通过合并多个流）。使用操作员样式时，反应式事务会影响所有上游<code>Publisher</code> 。为了限制交易范围，一组特定的<code>Publisher</code> S，适用回调风格，如下：</p>
+<p>订阅后会延迟启动反应式事务。操作员启动事务，设置适当的隔离级别，并将数据库连接与其订户上下文相关联。所有参与（上游） <code>Publisher</code>实例使用一个<code>Context</code>绑定事务连接。</p>
+<p>反应功能操作员链可以是线性的（通过使用单个<code>Publisher</code> ）或非线性（通过合并多个流）。反应性交易会影响所有上游<code>Publisher</code>使用操作符样式时。将交易范围限制为一组特定的<code>Publisher</code> s，应用回调样式，如下：</p>
 <pre><code class="prettyprint java">TransactionalOperator rxtx = TransactionalOperator.create(tm);
 
-Mono<Void> outsideTransaction = db.execute()
-  .sql("INSERT INTO person (name, age) VALUES('Jack', 31)")
+Mono&lt;Void&gt; outsideTransaction = db.execute()
+  .sql(&quot;INSERT INTO person (name, age) VALUES(&#39;Jack&#39;, 31)&quot;)
   .then();
 
-Mono<Void> insideTransaction = rxtx.execute(txStatus -> {
+Mono&lt;Void&gt; insideTransaction = rxtx.execute(txStatus -&gt; {
   return db.execute()
-    .sql("INSERT INTO person (name, age) VALUES('Joe', 34)")
+    .sql(&quot;INSERT INTO person (name, age) VALUES(&#39;Joe&#39;, 34)&quot;)
     .fetch().rowsUpdated()
     .then(db.execute()
-      .sql("INSERT INTO contacts (name) VALUES('Joe Black')")
+      .sql(&quot;INSERT INTO contacts (name) VALUES(&#39;Joe Black&#39;)&quot;)
       .then());
   }).then();
 
-Mono<Void> completion = outsideTransaction.then(insideTransaction);
+Mono&lt;Void&gt; completion = outsideTransaction.then(insideTransaction);
 </code></pre>
-<p>在上面的示例中，事务管理限于在<code>execute(…)</code>内订阅的<code>Publisher</code>实例。或者，换句话说，事务是有作用域的。<code>execute(…)</code>中的<code>Publisher</code>实例参与事务，并且名为<code>outsideTransaction</code>的<code>Publisher</code>者在事务之外执行其工作。</p>
+<p>在上面的示例中，交易管理仅限于<code>Publisher</code>内订阅的实例<code>execute(…)</code> 。或者，换句话说，事务是有作用域的。 <code>Publisher</code>内的实例<code>execute(…)</code>参与交易，并且<code>Publisher</code>命名<code>outsideTransaction</code>在交易之外执行其工作。</p>
 <p>R2DBC是Spring与反应式事务的集成之一。另一个集成是通过Spring Data MongoDB进行的MongoDB，您可以使用反应式编程将其用于参与多文档事务。</p>
-<p>Spring Data MongoDB随附<code>ReactiveMongoTransactionManager</code>作为<code>ReactiveTransactionManager</code>实现。它创建一个会话并管理交易，以便在托管交易中执行的代码参与多文档交易。</p>
+<p>Spring Data MongoDB随附<code>ReactiveMongoTransactionManager</code>作为一个<code>ReactiveTransactionManager</code>实施。它创建一个会话并管理交易，以便在托管交易中执行的代码参与多文档交易。</p>
 <p>以下示例显示了使用MongoDB进行程序化事务管理：</p>
 <pre><code class="prettyprint java">ReactiveTransactionManager tm 
   = new ReactiveMongoTransactionManager(databaseFactory);
@@ -267,18 +273,19 @@ template.setSessionSynchronization(ALWAYS);
 
 TransactionalOperator rxtx = TransactionalOperator.create(tm);
 
-Mono<Void> atomic = template.update(Step.class)
-  .apply(Update.set("state", …))
+Mono&lt;Void&gt; atomic = template.update(Step.class)
+  .apply(Update.set(&quot;state&quot;, …))
   .then(template.insert(EventLog.class).one(new EventLog(…))
   .as(rxtx::transactional)
   .then();
 </code></pre>
-<p>上面的代码设置了<code>ReactiveTransactionManager</code>并使用<code>TransactionalOperator</code>在单个事务中执行多个写操作。<code>ReactiveMongoTemplate</code>配置为参与反应式交易。</p><h2><a href="#next-steps" class="anchor" name="next-steps"></a>下一步</h2>
-<p>Reactive Transaction Management随Spring Framework 5.2 M2，Spring Data MongoDB 2.2 M4和Spring Data R2DBC 1.0 M2里程碑版本一起提供。您可以选择这些并开始在代码中集成反应式事务管理。我们期待社区的反馈，以便我们可以在6月初发布候选版本之前消除任何尖锐的边缘。</p>
+<p>上面的代码设置了一个<code>ReactiveTransactionManager</code>和用途<code>TransactionalOperator</code>在单个事务中执行多个写操作。 <code>ReactiveMongoTemplate</code>被配置为参与被动交易。</p><h2><a href="#next-steps" class="anchor" name="next-steps"></a>下一步</h2>
+<p>Reactive Transaction Management随Spring Framework 5.2 M2，Spring Data MongoDB 2.2 M4和Spring Data R2DBC 1.0 M2里程碑版本一起提供。您可以选择这些，然后开始在代码中集成反应式事务管理。我们期待社区的反馈，以便我们可以在6月初发布候选版本之前消除任何尖锐的边缘。</p>
 </div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3668;
 
       (function(disqus_shortname, document) {
@@ -292,7 +299,8 @@ Mono<Void> atomic = template.update(Step.class)
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -330,12 +338,14 @@ Mono<Void> atomic = template.update(Step.class)
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

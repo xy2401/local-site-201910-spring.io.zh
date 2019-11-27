@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>通过里程碑1偷窥Reactor-Core 3.2</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Sneak peek at Reactor-Core 3.2 with Milestone 1">
 <meta name="twitter:description" content="<div class=" paragrap="="> 
- </head><body dir="ltr"><p>Greetings Reactive Spring community!</p> 
+ </head><body ><p>Greetings Reactive Spring community!</p> 
 
 <div class="paragraph"> 
  <p>While the team is still working heavily on the 3.1 line, we also wanted to give the community a chance to get a sneak peek at what’s coming for the future 3.2 line.</p> 
@@ -61,10 +65,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -194,47 +200,47 @@
 <p>问候语Reactive Spring社区！</p>
 </div>
 <div class="paragraph">
-<p>尽管该团队仍在为3.1线进行大量工作，但我们也想给社区一个机会，让他们一窥未来的3.2线。</p>
+<p>尽管该团队仍在3.1线上进行大量工作，但我们也想给社区一个机会，让我们一窥未来的3.2线。</p>
 </div>
 <div class="paragraph">
-<p>特别值得一提的是，这家大型糖果店的定价为3.2.0。RELEASE是我们一直所说的“错误模式”，“继续模式”或最近更正式的“错误策略”的补充。</p>
+<p>特别值得一提的是，该大礼包的定价为3.2.0。RELEASE是我们一直所说的“错误模式”，“继续模式”或最近更正式的“错误策略”的补充。</p>
 </div>
 <h1 id="the-idea" class="sect0"><a class="anchor" href="#the-idea"></a>这个主意</h1>
 <div class="paragraph">
 <p>确实很简单：如果可以从在操作符中执行的用户代码异常中恢复出来，使序列<em>继续下去</em> ，该怎么办？</p>
 </div>
 <div class="paragraph">
-<p>让我们举个例子，并假设您具有以下方法：</p>
+<p>让我们以一个示例为例，并假设您具有以下方法：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public Flux<Integer> divide100By(Flux<Integer> dividers) {
-  return dividers.map(div -> 100 / div);
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public Flux&lt;Integer&gt; divide100By(Flux&lt;Integer&gt; dividers) {
+  return dividers.map(div -&gt; 100 / div);
 }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>如果<code>dividers</code>源在某个点发出<code>0</code> ，则最终的<code>Flux</code>将立即终止，并带有<code>ArithmeticException</code>的<code>onError</code>信号。</p>
+<p>万一<code>dividers</code>源发出<code>0</code>在某个时候，结果<code>Flux</code>会立即以<code>onError</code>一个信号<code>ArithmeticException</code> 。</p>
 </div>
 <div class="paragraph">
-<p>如果源恰好是说， <code>Flux.range(0, 10)</code>还是有可能已被映射9个完全有效的值。</p>
+<p>假设来源是， <code>Flux.range(0, 10)</code> ，仍然可以映射9个完全有效的值。</p>
 </div>
 <div class="paragraph">
-<p>您如何做到这一点，以使这样的暂时异常（仅该异常）被忽略，并有机会进一步处理有效值？</p>
+<p>您如何做到这一点，以使这样的短暂异常（仅该异常）被忽略，并有机会进一步处理有效值？</p>
 </div>
 <h1 id="the-current-workaround" class="sect0"><a class="anchor" href="#the-current-workaround"></a>当前的解决方法</h1>
 <div class="paragraph">
-<p>在Reactor 3.1中，有一个解决方法，您可以通过使用<code>flatMap</code>为每个元素创建内部序列来应用，然后将错误恢复操作符应用于这些粒度序列：</p>
+<p>在Reactor 3.1中，有一种解决方法可以通过使用<code>flatMap</code>为每个元素创建内部序列，然后将错误恢复操作符应用于这些粒度序列：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public Flux<Integer> divide100By(Flux<Integer> dividers) {
-  return dividers.flatMap(div -> <b class="conum">(1)</b>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public Flux&lt;Integer&gt; divide100By(Flux&lt;Integer&gt; dividers) {
+  return dividers.flatMap(div -&gt; <b class="conum">(1)</b>
       Mono.just(100 / div) <b class="conum">(2)</b>
-          .doOnError(e -> { <b class="conum">(3)</b>
+          .doOnError(e -&gt; { <b class="conum">(3)</b>
               if (e instanceof ArithmeticException) process(e); <b class="conum">(4)</b>
           })
-          .onErrorResume(ArithmeticException.class, e -> Mono.empty()) <b class="conum">(5)</b>
+          .onErrorResume(ArithmeticException.class, e -&gt; Mono.empty()) <b class="conum">(5)</b>
       );
 }</code></pre>
 </div>
@@ -242,27 +248,27 @@
 <div class="colist arabic">
 <ol>
 <li>
-<p>我们使用<code>flatMap</code>代替<code>map</code> ，为每个值生成一个小的内部<code>Mono</code></p>
+<p>代替<code>map</code>我们用<code>flatMap</code> ，产生一个小的内部<code>Mono</code>对于每个值</p>
 </li>
 <li>
-<p><code>Mono</code>基本上是旧<code>map</code>操作...</p>
+<p>那<code>Mono</code>基本上是旧的<code>map</code>操作...</p>
 </li>
 <li>
 <p>…添加了错误恢复。</p>
 </li>
 <li>
-<p>首先，我们确保在“恢复”之前处理（例如日志） <code>ArithmeticException</code> （并且仅处理）</p>
+<p>首先，我们确保要处理（例如日志） <code>ArithmeticException</code> （仅这些）在“恢复”之前</p>
 </li>
 <li>
-<p>然后，我们将<code>onErrorResume</code>与<code>Mono.empty()</code>以有效地忽略结果序列中的异常</p>
+<p>然后我们用<code>onErrorResume</code>与一个<code>Mono.empty()</code>有效地忽略结果序列中的异常</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>这行得通，但是编写起来有点痛苦（尽管<code>compose</code>和<code>transform</code>可以帮助使此类代码相互化）。但是，我们也从一个单一的<code>map</code>运算符转移到了带有多个内部运算符的<code>flatMap</code> 。</p>
+<p>可以，但是写起来有点麻烦（尽管<code>compose</code>和<code>transform</code>可以帮助使这类代码相互化）。而且，我们从单一<code>map</code>运算符<code>flatMap</code>与几个内部运算符。</p>
 </div>
 <div class="paragraph">
-<p>由于需要协调多个源， <code>flatMap</code>比<code>map</code>有更多开销。即使像操作员融合之类的东西降低了该成本，它仍然存在。</p>
+<p><code>flatMap</code>具有比<code>map</code> ，因为需要协调多个来源。即使像操作员融合之类的事情减少了该成本，它仍然存在。</p>
 </div>
 <div class="sect1">
 <h2 id="introducing-error-strategy"><a class="anchor" href="#introducing-error-strategy"></a>引入错误策略</h2>
@@ -271,19 +277,19 @@
 <p>如果要进一步减少此类处理的开销，困难在于我们现在必须在每个操作员的实现级别上进行工作。</p>
 </div>
 <div class="paragraph">
-<p>必须以某种方式使链中的每个运算符都知道应该捕获异常，但不能通过<code>onError</code>传播异常，而应以不同的方式进行处理。这是一个很大的变化，而且是横向的！</p>
+<p>必须以某种方式使链中的每个运算符都知道应该捕获异常，但不能通过异常传播<code>onError</code> ，但处理方式有所不同。这是一个很大的变化，而且是横向的！</p>
 </div>
 <div class="paragraph">
-<p>请注意，从概念上讲，这听起来像是个<code>filter</code> ，但是有错误。像<code>filter</code>一样，这意味着在其<code>onNext</code>抛出异常后继续处理其源的运算符也应从其源中至少请求另外一个元素。</p>
+<p>请注意，这在概念上听起来像是<code>filter</code> ，但有错误。像一个<code>filter</code>这意味着操作员在其中一个操作之后继续处理其源<code>onNext</code>引发异常的情况下，还应从其源中至少再请求一个元素。</p>
 </div>
 <div class="paragraph">
 <p>尽管可以将其隔离到特殊的执行路径，但对于操作员而言，这仍然是一个复杂的核心实现更改。</p>
 </div>
 <div class="paragraph">
-<p>然后是API的问题：将它作为构造函数参数放置在位置真的很麻烦，或者在<code>Flux</code>使用<code>Flux</code>错误恢复''布尔值进行额外的重载...我们真的需要将其中的方法数量增加一倍吗？支持该功能的<code>Flux</code> API？</p>
+<p>然后是API的问题：将它放置为构造函数参数，否则会产生额外的重载，这确实很繁琐。 <code>Flux</code>带有``错误恢复''布尔值...我们真的需要将方法中的方法数量加倍吗？ <code>Flux</code>支持该功能的API？</p>
 </div>
 <div class="paragraph">
-<p>所幸没有：从3.1开始，我们有了<code>Context</code> ，这是将此类信息传播给链中每个（Reactor）运算符的好方法。</p>
+<p>所幸没有：从3.1开始，我们有了<code>Context</code> ，这是将此类信息传播给链中每个（Reactor）操作员的好方法。</p>
 </div>
 <div class="paragraph">
 <p>这就是我们采取错误策略功能的道路：</p>
@@ -291,16 +297,16 @@
 <div class="ulist">
 <ul>
 <li>
-<p>仅将支持添加到<strong>特定的运算符</strong> （ <code>map</code> ， <code>filter</code> ， <code>flatMap</code> ， <code>handle</code>等等）。这些具有特殊的javadoc标记来记录该事实。</p>
+<p>支持仅添加到<strong>特定的运算符</strong> （ <code>map</code> ， <code>filter</code> ， <code>flatMap</code> ， <code>handle</code>仅举几例...）。这些具有特殊的javadoc标记来记录该事实。</p>
 </li>
 <li>
-<p>通过在<code>Context</code>放置特殊键，可以为给定的<code>Flux</code>激活该功能</p>
+<p>该功能已针对给定激活<code>Flux</code>通过在其上放置一个特殊的键<code>Context</code></p>
 </li>
 <li>
-<p>每个受支持的运算符在其<code>onNext</code>实现中都有一个特殊的路径，该路径会检查该密钥，如果找到该密钥，则将更改其处理错误的方式。</p>
+<p>每个支持的运算符在其中都有一条特殊的路径<code>onNext</code>检查该密钥的实现，如果找到，将更改其处理错误的方式。</p>
 </li>
 <li>
-<p>该功能通过<code>errorStrategyContinue()</code> API向用户公开</p>
+<p>该功能通过<code>errorStrategyContinue()</code> API</p>
 </li>
 <li>
 <p>它可能更精细：可以过滤可以从中恢复的异常，还可以为此类恢复的异常设置自定义处理程序。</p>
@@ -313,7 +319,8 @@
 <td class="icon">
 <div class="title">重要</div>
 </td>
-<td class="content">要记住的一件事是，由于这是通过<code>Context</code>激活的，因此该功能遵循与<code>Context</code>相同的传播规则。例如，它将在<code>flatMap</code>内部序列上激活。如果不希望这样，请在flatMap中使用<code>errorStrategyStop()</code>返回默认行为（这不会逃避flatMap的范围）。<strong>它还向后传播，激活<code>errorStrategyXXX</code>之前的运算符</strong> 。</td>
+<td class="content">要记住的一件事是，因为这是通过<code>Context</code> ，该功能遵循与以下相同的传播规则<code>Context</code> 。例如，它将在内部序列中激活<code>flatMap</code> 。如果不希望这样，请使用<code>errorStrategyStop()</code>在flatMap中返回默认行为（这不会逃避flatMap的范围）。<strong>它还向后传播，激活之前的运算符<code>errorStrategyXXX</code></strong> 。
+</td>
 </tr>
 </tbody></table>
 </div>
@@ -322,20 +329,20 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public Flux<Integer> divide100By(Flux<Integer> dividers) {
-  return dividers.map(div -> 100 / div) <b class="conum">(1)</b>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public Flux&lt;Integer&gt; divide100By(Flux&lt;Integer&gt; dividers) {
+  return dividers.map(div -&gt; 100 / div) <b class="conum">(1)</b>
       .errorStrategyContinue(ArithmeticException.class, <b class="conum">(2)</b>
-          (error, value) -> process(error)); <b class="conum">(3)</b>
+          (error, value) -&gt; process(error)); <b class="conum">(3)</b>
 }</code></pre>
 </div>
 </div>
 <div class="colist arabic">
 <ol>
 <li>
-<p>回到简单的<code>map</code></p>
+<p>回到简单<code>map</code></p>
 </li>
 <li>
-<p>我们只能从<code>ArithmeticException</code>恢复</p>
+<p>我们只能从<code>ArithmeticException</code></p>
 </li>
 <li>
 <p>我们将此类异常传递给内部处理程序（请注意，我们也可以访问导致异常的原始值，如果有的话）</p>
@@ -346,7 +353,7 @@
 </div>
 <h1 id="testing-it-out-with-milestone-1" class="sect0"><a class="anchor" href="#testing-it-out-with-milestone-1"></a>用里程碑1进行测试</h1>
 <div class="paragraph">
-<p>我们刚刚发布了<code>3.2.0.M1</code>里程碑<sup class="footnote">[ <a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="查看脚注。">1</a> ]</sup> ，主要包含错误策略功能，我们希望您对其进行测试🙇</p>
+<p>我们刚刚发布了一个<code>3.2.0.M1</code>里程碑<sup class="footnote">[ <a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="查看脚注。">1</a> ]</sup> ，主要包含错误策略功能，我们希望您对其进行测试🙇</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -354,21 +361,21 @@
 <td class="icon">
 <div class="title">注意</div>
 </td>
-<td class="content">这是一个横向变化，即使您不打算使用它，也可以使用工件运行测试，以验证如果您不显式使用<code>errorStrategyContinue()</code> ，那么您应该看不到任何东西行为更改（因为功能包含在特定的执行路径中）。
+<td class="content">这是一个横向变化，即使您不打算使用它，也可以使用工件来进行测试，以验证是否未明确使用它，这很有价值。 <code>errorStrategyContinue()</code> ，则您不应看到任何行为上的变化（因为该功能包含在特定的执行路径中）。
 </td>
 </tr>
 </tbody></table>
 </div>
 <div class="paragraph">
-<p><strong>为了获得里程碑，</strong>将<a href="https://repo.spring.io/milestone/io/projectreactor/reactor-core/3.2.0.M1/"><code>repo.spring.io/milestone</code></a>存储库添加到您的Maven或Gradle构建配置中并获取<a href="https://repo.spring.io/milestone/io/projectreactor/reactor-core/3.2.0.M1/"><code>repo.spring.io/milestone</code></a> <code>reactor-core</code> <code>3.2.0.M1</code>工件：</p>
+<p><strong>为了获得里程碑，请</strong>添加<a href="https://repo.spring.io/milestone/io/projectreactor/reactor-core/3.2.0.M1/"><code>repo.spring.io/milestone</code></a>仓库到您的Maven或Gradle构建配置并获取<code>reactor-core</code><code>3.2.0.M1</code>工件：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml"><dependency>
-  <groupId>io.projectreactor</groupId>
-  <artifactId>reactor-core</artifactId>
-  <version>3.2.0.M1</version>
-</dependency></code></pre>
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.projectreactor&lt;/groupId&gt;
+  &lt;artifactId&gt;reactor-core&lt;/artifactId&gt;
+  &lt;version&gt;3.2.0.M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -385,7 +392,8 @@
 </div></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3137;
 
       (function(disqus_shortname, document) {
@@ -399,7 +407,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -437,12 +446,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

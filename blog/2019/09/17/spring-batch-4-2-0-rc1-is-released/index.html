@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Batch 4.2.0。RC1发布了！</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Batch 4.2.0.RC1 is released!">
 <meta name="twitter:description" class="anchor" content="<p>On behalf of the Spring Batch team, I am pleased to announce the release of Spring Batch 4.2.0.RC1. We have been working on some performance improvements in the core framework, and this post highlights the major changes.</p>
-<h2><a href=" #major-performance-improvement="="></head><body dir="ltr">Major Performance Improvements
+<h2><a href=" #major-performance-improvement="="></head><body >Major Performance Improvements
 <p>We have made some performance improvements, including:</p>
 <ul> 
  <li><a href="#enhanced-step-partitioning">Enhanced Step Partitioning</a></li> 
@@ -59,10 +63,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -188,21 +194,134 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>我很高兴代表Spring Batch团队宣布发布Spring Batch 4.2.0。RC1。我们一直在努力改善核心框架的性能，并且本文重点介绍了主要变化。</p><h2><a href="#major-performance-improvements" class="anchor" name="major-performance-improvements"></a>主要性能改进</h2>
+<div class="blog--post"><p>我很高兴代表Spring Batch团队宣布发布Spring Batch 4.2.0。RC1。我们一直在努力改善核心框架的性能，并且这篇文章重点介绍了主要的变化。</p><h2><a href="#major-performance-improvements" class="anchor" name="major-performance-improvements"></a>主要性能改进</h2>
 <p>我们对性能进行了一些改进，包括：</p>
 <ul>
 <li><a href="#enhanced-step-partitioning">增强的步骤分区</a></li>
 <li><a href="#improved-job-stop">改善工作停止</a></li>
-<li><a href="#faster-writes-with-the-jpaitemwriter">使用<code>JpaItemWriter</code>更快地写入</a></li>
-<li><a href="#optimized-bean-mapping-with-the-beanwrapperfieldsetmapper">使用<code>BeanWrapperFieldSetMapper</code>优化Bean映射</a></li>
+<li><a href="#faster-writes-with-the-jpaitemwriter">用更快的速度写<code>JpaItemWriter</code></a></li>
+<li><a href="#optimized-bean-mapping-with-the-beanwrapperfieldsetmapper">使用优化的Bean映射<code>BeanWrapperFieldSetMapper</code></a></li>
 </ul>
 <a name="enhanced-step-partitioning"></a><h3><a href="#enhanced-step-partitioning" class="anchor" name="enhanced-step-partitioning"></a>增强的步骤分区</h3>
-<p>开始分区的步骤是框架没有得到很好优化的领域。在此版本中，我们深入研究了分区过程，以找出导致此性能问题的根本原因。分区过程的主要步骤之一是找到最后一步执行（以查看当前执行是否是重新启动）。我们发现，查找最后一步执行涉及在内存中为给定的作业实例从所有作业执行中加载所有步骤执行，这显然效率低下！</p>
-<p>我们用在数据库级别进行查询的SQL查询替换了此代码，以仅返回最后一步的执行。结果非常出色：根据我们的基准<a href="#footnotes">partitioned-step-benchmark</a> ，使用这种方法将步骤执行划分为5000个分区几乎快了10倍：</p>
+<p>开始分区的步骤是框架没有得到很好优化的领域。在此版本中，我们深入研究了分区过程，以找出导致此性能问题的根本原因。分区过程的主要步骤之一是找到最后一步执行（以查看当前执行是否是重新启动）。我们发现查找最后一步执行涉及在内存中为给定的作业实例从所有作业执行中加载所有步骤执行，这显然是效率低下的！</p>
+<p>我们用在数据库级别进行查询的SQL查询替换了此代码，以仅返回最后一步的执行。结果非常出色：根据我们的基准<a href="#footnotes">partitioned-step-benchmark</a> ，使用这种方法将步骤执行划分为5000个分区的速度几乎快10倍：</p>
 <p><img src="https://raw.githubusercontent.com/benas/spring-batch-sandbox/master/batch2716/perf-partitioning.png" alt="性能分区"></p>
 <a name="improved-job-stop"></a><h3><a href="#improved-job-stop" class="anchor" name="improved-job-stop"></a>改善工作停止</h3>
-<p>运行作业时，事情可能会出错..为了避免数据损坏，适当地快速停止破坏性的作业应该有效。在v4.1之前的版本中，由于将所有作业执行加载到内存中以查找作业是否正在运行，因此使用<code>CommandLineJobRunner</code>停止作业的性能很差。使用这种方法，使用包含数千个作业执行的生产数据库，停止作业可能需要几分钟的时间！</p>
+<p>运行作业时，事情可能会出错..为了避免数据损坏，适当地快速停止破坏性的作业应该是快速而有效的。直到v4.1，使用<code>CommandLineJobRunner</code>由于将所有作业执行加载到内存中以查找作业当前是否正在运行，因此性能不佳。使用这种方法，使用包含数千个作业执行的生产数据库，停止作业可能需要几分钟的时间！</p>
 <p>在此版本中，我们通过使用在数据库级别进行过滤的SQL查询优化了停止过程。同样，结果令人印象深刻：根据我们的基准<a href="#footnotes">停止基准</a> ，在数据库中给定作业的100.000个作业执行后，使用这种方法停止作业的速度几乎快40倍：</p>
 <p><img src="https://raw.githubusercontent.com/benas/spring-batch-sandbox/master/batch2422/perf-stop.png" alt="性能停止"></p>
-<a name="faster-writes-with-the-jpaitemwriter"></a><h3><a href="#faster-writes-with-the-code-jpaitemwriter-code" class="anchor" name="faster-writes-with-the-code-jpaitemwriter-code"></a>使用<code>JpaItemWriter</code>更快地写入</h3>
-<p><code>JpaItemWriter</code>使用<code>javax.persistence.EntityManager#merge</code>函数可在JPA持久性上下文中编写项目。当项目的持久状态未知或已知为更新时，这是有意义的。但是，在许多文件提取作业中，使用<code>javax.persistence.EntityManager#merge</code></p><code>javax.persistence.EntityManager#merge</code></div><code>javax.persistence.EntityManager#merge</code></div><code>javax.persistence.EntityManager#merge</code></article><code>javax.persistence.EntityManager#merge</code></div><code>javax.persistence.EntityManager#merge</code></div><code>javax.persistence.EntityManager#merge</code></div><code>javax.persistence.EntityManager#merge</code></div><code>javax.persistence.EntityManager#merge</code></body></html>
+<a name="faster-writes-with-the-jpaitemwriter"></a><h3><a href="#faster-writes-with-the-code-jpaitemwriter-code" class="anchor" name="faster-writes-with-the-code-jpaitemwriter-code"></a>用更快的速度写<code>JpaItemWriter</code></h3>
+<p>的<code>JpaItemWriter</code>使用<code>javax.persistence.EntityManager#merge</code>用于在JPA持久性上下文中编写项目的函数。当项目的持久状态未知或已知为更新时，这是有意义的。但是，在许多文件提取作业中，已知数据是新数据，应将其视为插入，使用<code>javax.persistence.EntityManager#merge</code>效率不高。</p>
+<p>在此版本中，我们在<code>JpaItemWriter</code>使用<code>persist</code>而不是<code>merge</code>在这种情况下。有了这个新选项，使用<code>JpaItemWriter</code>根据我们的基准<a href="#footnotes">jpa-writer-benchmark</a> ，在数据库中插入一百万个项目的速度快了2倍：</p>
+<p><img src="https://raw.githubusercontent.com/benas/spring-batch-sandbox/master/batch2462/perf-jpaitemwriter.png" alt="perf-jpaitemwriter"></p>
+<a name="optimized-bean-mapping-with-the-beanwrapperfieldsetmapper"></a><h3><a href="#optimized-bean-mapping-with-the-code-beanwrapperfieldsetmapper-code" class="anchor" name="optimized-bean-mapping-with-the-code-beanwrapperfieldsetmapper-code"></a>使用优化的Bean映射<code>BeanWrapperFieldSetMapper</code></h3>
+<p>的<code>BeanWrapperFieldSetMapper</code>提供了一个很好的功能，使我们可以使用给定JavaBean的字段名称的模糊匹配（驼峰大小写，嵌套属性，等等）。但是，当字段名称与列名称匹配时，可以通过设置<code>distanceLimit</code>参数设置为0。</p>
+<p>在此版本中，我们修复了<code>BeanWrapperFieldSetMapper</code>通过在每次迭代中使用反射来自省字段名称，即使要求精确匹配（通过设置<code>distanceLimit=0</code> ）。结果是，根据我们的JMH基准[bean-mapping-benchmark（#footnotes），项目映射现在比以前的版本快1.5倍：</p>
+<p align="center">
+<img src="https://raw.githubusercontent.com/benas/spring-batch-sandbox/master/batch1801/perf-mapping.png" alt="性能映射">
+</p><h2><a href="#feedback" class="anchor" name="feedback"></a>反馈</h2>
+<p>请注意，这些数字可能因您而异。我们鼓励您试用Spring Batch 4.2.0。RC1（可以在Spring Boot 2.2.0中使用。M6）并分享您的反馈。请参考<a href="https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10090&version=17487">4.2.0版的更改日志</a><a href="https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10090&version=17487">。RC1</a>和<a href="https://jira.spring.io/secure/ReleaseNote.jspa?projectId=10090&version=17628">4.2.0。M3</a>列出完整的更改。</p>
+<p><a href="https://www.twitter.com/b_e_n_a_s">随时</a>在Twitter上ping <a href="https://www.twitter.com/michaelminella">@michaelminella</a>或<a href="https://www.twitter.com/b_e_n_a_s">@b_e_n_a_s</a>或在<a href="https://stackoverflow.com/questions/tagged/spring-batch">StackOverflow</a>或<a href="https://gitter.im/spring-batch/Lobby">Gitter</a>上提问。如果发现任何问题，请在<a href="https://jira.spring.io/projects/BATCH/">Jira</a>上打开一张票。</p><h2><a href="#what-rsquo-s-next" class="anchor" name="what-rsquo-s-next"></a>下一步是什么</h2>
+<p>我们计划为即将到来的Spring Batch 4.2.0稳定这个新版本的候选对象。发行计划于2019年9月30日。敬请关注！</p><h2><a href="#footnotes" class="anchor" name="footnotes"></a>脚注</h2>
+<p>所有基准测试均在Macbook Pro 16Go RAM，2.9 GHz Intel Core i7 CPU，MacOS Mojave 10.14.5，Oracle JDK 1.8.0_201上执行。您可以在以下链接中找到所有基准的源代码：</p>
+<ul>
+<li>分区步骤基准： <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch2716">https</a> : <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch2716">//github.com/benas/spring-batch-sandbox/tree/master/batch2716</a></li>
+<li>停止基准测试： <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch2422">https</a> : <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch2422">//github.com/benas/spring-batch-sandbox/tree/master/batch2422</a></li>
+<li>jpa-writer-benchmark： <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch2462">https</a> ： <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch2462">//github.com/benas/spring-batch-sandbox/tree/master/batch2462</a></li>
+<li>bean-mapping-benchmark： <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch1801">https</a> : <a href="https://github.com/benas/spring-batch-sandbox/tree/master/batch1801">//github.com/benas/spring-batch-sandbox/tree/master/batch1801</a></li>
+</ul>
+<p><a href="https://spring.io/projects/spring-batch">春季批处理</a> <a href="https://github.com/spring-projects/spring-batch">源于GitHub</a> | <a href="https://docs.spring.io/spring-batch/4.2.x/reference/html/index.html">参考文件</a></p>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3792;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

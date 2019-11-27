@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Framework 3.1 M1发布</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -51,14 +55,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2011-02-11 10:08:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -187,16 +193,16 @@
 <div class="blog--post"><p>Spring 3.1的第一个里程碑版本刚刚发布[1]，本文开始了一系列的帖子，在这些帖子中，我和其他团队成员将介绍每个主要功能。即使在第一个里程碑，也已经有很多要讨论的话题！</p>
 <ul>
 <li>Bean定义配置文件</li>
-<li>通过Spring的新<code>Environment</code>抽象实现统一的财产管理</li>
-<li>使用<code>@Feature</code>方法增强基于Java的配置</li>
+<li>通过Spring的新产品进行统一的物业管理<code>Environment</code>抽象</li>
+<li>增强基于Java的配置<code>@Feature</code>方法</li>
 <li>扩展的MVC名称空间支持和等效的基于Java的配置</li>
-<li><code>RestTemplate</code> API的流支持和新的拦截模型</li>
+<li>流媒体支持和新的拦截模型<code>RestTemplate</code> API</li>
 <li>全面的缓存支持</li>
-<li>新的<code>c:</code> XML名称空间，用于构造函数注入的简洁配置</li>
+<li>新<code>c:</code> XML名称空间，用于构造函数注入的简洁配置</li>
 </ul><p><br>今天，我将讨论第一项–我们称为<em>bean定义配置文件</em>的新功能。我们最常见的请求之一是在核心容器中提供一种机制，该机制允许在不同环境中注册不同的bean。“环境”一词对不同的用户可能具有不同的含义，但是典型的情况可能是仅在将应用程序部署到性能环境中时注册监视基础结构，或者为客户A和客户B部署注册bean的自定义实现。也许最常见的情况之一是在开发中使用独立的数据源，而不是在QA或生产中从JNDI查找相同的数据源。Bean定义配置文件表示满足此类用例的通用方法，我们将在下面的示例中探讨后者。</p>
 <h3>亲身体验样品</h3><p>我已经为这篇文章提供了一个小样本，您可能现在想花点时间检查一下（如果没有，请不要担心；您不需要下面的代码）。只需按照README上的说明进行操作即可<a href="https://bit.ly/gIHN2D"></a> <a href="https://github.com/cbeams/spring-3.1-profiles-xml">https://github.com/cbeams/spring-3.1-profiles-xml</a> 。如果您不熟悉Git，则README也提供有关SVN访问的说明。</p>
-<h3>了解应用程序</h3><p>首先，让我们看一个JUnit测试用例，该用例演示了如何在我们的银行应用程序中在两个帐户之间进行转账：</p><p><code>src/test/com/bank/config/xml/IntegrationTests.java</code></p>
-<pre><code class="prettyprint java"><br>public class IntegrationTests {
+<h3>了解应用程序</h3><p>首先，让我们看一下一个JUnit测试用例，该用例演示了如何在我们的银行应用程序中在两个帐户之间进行转账：</p><p><code>src/test/com/bank/config/xml/IntegrationTests.java</code></p>
+<pre><code class="prettyprint java"><br />public class IntegrationTests {
 	@Test
 	public void transferTenDollars() throws InsufficientFundsException {
 
@@ -205,45 +211,45 @@
 		TransferService transferService = ctx.getBean(TransferService.class);
 		AccountRepository accountRepository = ctx.getBean(AccountRepository.class);
 
-		assertThat(accountRepository.findById("A123").getBalance(), equalTo(100.00));
-		assertThat(accountRepository.findById("C456").getBalance(), equalTo(0.00));
+		assertThat(accountRepository.findById(&quot;A123&quot;).getBalance(), equalTo(100.00));
+		assertThat(accountRepository.findById(&quot;C456&quot;).getBalance(), equalTo(0.00));
 
-		transferService.transfer(10.00, "A123", "C456");
+		transferService.transfer(10.00, &quot;A123&quot;, &quot;C456&quot;);
 
-		assertThat(accountRepository.findById("A123").getBalance(), equalTo(90.00));
-		assertThat(accountRepository.findById("C456").getBalance(), equalTo(10.00));
+		assertThat(accountRepository.findById(&quot;A123&quot;).getBalance(), equalTo(90.00));
+		assertThat(accountRepository.findById(&quot;C456&quot;).getBalance(), equalTo(10.00));
 	}
 }
 </code></pre><p>稍后我们将详细介绍创建Spring容器的细节，但首先请注意，我们的目标很简单–从帐户“ A123”向帐户“ C456”转移$ 10.00。单元测试仅声明两个帐户中的初始余额，执行转移，然后声明最终余额反映了更改。</p>
-<h3>典型的XML配置</h3><p>与使用Spring <code>@Configuration</code>类配置容器时一样，Spring XML也同样很好地支持bean定义配置文件功能，但是在今天的文章中，我们将介绍XML方法，因为这是大多数用户所熟悉的。</p><p>暂时忘掉bean定义配置文件，要在Spring XML中配置此应用程序通常会执行以下代码段。假设我们处于开发过程的早期，并且优先使用独立数据源。为了方便起见，我们将使用HSQLDB，但是您当然可以想象您所选择的数据源已配置。</p><p><code>src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
-<pre><code class="prettyprint xml"><br><beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xsi:schemaLocation="...">
+<h3>典型的XML配置</h3><p>与使用Spring时一样，Spring XML同样很好地支持bean定义配置文件功能<code>@Configuration</code>类来配置容器，但是在今天的文章中，我们将介绍XML方法，因为这是大多数用户所熟悉的。</p><p>暂时忘掉bean定义配置文件，在Spring XML中配置此应用程序通常会执行以下代码段。假设我们处于开发过程的早期，并且优先使用独立数据源。为了方便起见，我们将使用HSQLDB，但是您当然可以想象您所选择的数据源已配置。</p><p><code>src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
+<pre><code class="prettyprint xml"><br />&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;
+	xsi:schemaLocation=&quot;...&quot;&gt;
 
-	<bean id="transferService" class="com.bank.service.internal.DefaultTransferService">
-		<constructor-arg ref="accountRepository"/>
-		<constructor-arg ref="feePolicy"/>
-	</bean>
+	&lt;bean id=&quot;transferService&quot; class=&quot;com.bank.service.internal.DefaultTransferService&quot;&gt;
+		&lt;constructor-arg ref=&quot;accountRepository&quot;/&gt;
+		&lt;constructor-arg ref=&quot;feePolicy&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="accountRepository" class="com.bank.repository.internal.JdbcAccountRepository">
-		<constructor-arg ref="dataSource"/>
-	</bean>
+	&lt;bean id=&quot;accountRepository&quot; class=&quot;com.bank.repository.internal.JdbcAccountRepository&quot;&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="feePolicy" class="com.bank.service.internal.ZeroFeePolicy"/>
+	&lt;bean id=&quot;feePolicy&quot; class=&quot;com.bank.service.internal.ZeroFeePolicy&quot;/&gt;
 
-	<jdbc:embedded-database id="dataSource">
-		<jdbc:script location="classpath:com/bank/config/sql/schema.sql"/>
-		<jdbc:script location="classpath:com/bank/config/sql/test-data.sql"/>
-	</jdbc:embedded-database>
-</beans>
-</code></pre><p>上面唯一可能不熟悉的项目可能是使用Spring的<code>jdbc:</code>名称空间。在Spring 3.0中引入的元素可以轻松配置常用的嵌入式数据库类型。这里只是为了方便起见。</p><p>考虑到此配置，我们现在可以完成上面开始的单元测试的编写。</p><p><code>src/test/com/bank/config/xml/IntegrationTests.java</code></p>
-<pre><code class="prettyprint java"><br>public class IntegrationTests {
+	&lt;jdbc:embedded-database id=&quot;dataSource&quot;&gt;
+		&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/schema.sql&quot;/&gt;
+		&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/test-data.sql&quot;/&gt;
+	&lt;/jdbc:embedded-database&gt;
+&lt;/beans&gt;
+</code></pre><p>上面唯一可能不熟悉的项目可能是使用Spring的<code>jdbc:</code>命名空间。在Spring 3.0中引入的元素可以轻松配置常用的嵌入式数据库类型。这里只是为了方便起见。</p><p>考虑到此配置，我们现在可以完成上面开始的单元测试的编写。</p><p><code>src/test/com/bank/config/xml/IntegrationTests.java</code></p>
+<pre><code class="prettyprint java"><br />public class IntegrationTests {
 	@Test
 	public void transferTenDollars() throws InsufficientFundsException {
 
 		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-		ctx.load("classpath:/com/bank/config/xml/transfer-service-config.xml");
+		ctx.load(&quot;classpath:/com/bank/config/xml/transfer-service-config.xml&quot;);
 		ctx.refresh();
 
 		TransferService transferService = ctx.getBean(TransferService.class);
@@ -252,109 +258,110 @@
 		// perform transfer and issue assertions as above ...
 	}
 }
-</code></pre><p><em>旁注：</em>我们正在使用Spring的<code>GenericXmlApplicationContext</code>应用程序上下文来加载XML配置。许多Spring用户将对<code>ClassPathXmlApplicationContext</code>更加熟悉，它们同样可以正常工作。但是，作为一般规则， <code>GenericXmlApplicationContext</code>是更灵活的替代方法，应通常首选。</p><p>运行此测试时，该条将变为绿色。我们的简单应用程序是通过容器连接的，我们检索了一些bean并进行了锻炼-亲爱的，这里没什么特别的。当我们考虑如何将此应用程序部署到QA或生产环境中时，它会变得很有趣。例如，对于企业来说，出于易用性的原因，使用Spring针对Tomcat开发Web应用程序，然后将这些应用程序部署到生产环境中的企业通常是这样。应用程序的数据源很有可能会在生产应用程序服务器的JNDI目录中注册。这意味着为了获得数据源，我们必须执行JNDI查找。当然，Spring为此提供了强大的支持，一种流行的方式是通过Spring的<code><jee:jndi-lookup/></code>元件。上面的配置文件的生产版本最终可能看起来像以下内容：</p><p><code>src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
-<pre><code class="prettyprint xml"><br><beans ...>
-	<bean id="transferService" ... />
+</code></pre><p><em>旁注：</em>我们正在使用Spring的<code>GenericXmlApplicationContext</code>应用程序上下文以加载XML配置。许多Spring用户将更加熟悉<code>ClassPathXmlApplicationContext</code> ，效果也一样。但是，作为一般规则， <code>GenericXmlApplicationContext</code>是通常应首选的更灵活的替代方案。</p><p>运行此测试时，该条将变为绿色。我们的简单应用程序是通过容器连接的，我们检索了一些bean并进行了锻炼-亲爱的，这里没什么特别的。当我们考虑如何将此应用程序部署到QA或生产环境中时，它会变得很有趣。例如，对于企业来说，出于易用性的原因，使用Spring针对Tomcat开发Web应用程序，然后将这些应用程序部署到生产环境中的企业通常是这样。应用程序的数据源很有可能会在生产应用程序服务器的JNDI目录中注册。这意味着为了获得数据源，我们必须执行JNDI查找。当然，Spring为此提供了强大的支持，一种流行的方式是通过Spring的<code><jee:jndi-lookup/></code>元件。上面的配置文件的生产版本最终可能看起来像以下内容：</p><p><code>src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
+<pre><code class="prettyprint xml"><br />&lt;beans ...&gt;
+	&lt;bean id=&quot;transferService&quot; ... /&gt;
 
-	<bean id="accountRepository" class="com.bank.repository.internal.JdbcAccountRepository">
-		<constructor-arg ref="dataSource"/>
-	</bean>
+	&lt;bean id=&quot;accountRepository&quot; class=&quot;com.bank.repository.internal.JdbcAccountRepository&quot;&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="feePolicy" ... />
+	&lt;bean id=&quot;feePolicy&quot; ... /&gt;
 
-	<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/datasource"/>
-</beans>
-</code></pre><p>当然，此配置效果很好。问题是如何根据当前环境在使用这两种变体之间进行切换。随着时间的流逝，Spring用户已经设计出许多方法来完成此任务，通常依靠系统环境变量和XML的组合<code><import/></code>包含<code>${placeholder}</code>标记的语句，这些标记根据环境变量的值解析为正确的配置文件路径。尽管可以使这些解决方案和其他解决方案正常工作，但它们几乎不是容器所提供的“一流”解决方案。</p>
-<h3>输入bean定义配置文件</h3><p>如果我们将上述特定于环境的Bean定义的示例用例进行概括，最终将需要在某些上下文中而不是在其他上下文中注册某些Bean定义。你可以说，你要注册的情况的bean定义一定<em>的空间</em> ，在情况B.不同的配置文件</p><p>在Spring 3.1中， <code><beans/></code> XML文档现在包含了这个新概念。我们可以将配置分为以下三个文件。注意<code>*-datasource.xml</code>文件上的<code>profile=“…”</code>属性：</p><p><code>src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
-<pre><code class="prettyprint xml"><br><beans ...>
-	<bean id="transferService" ... />
+	&lt;jee:jndi-lookup id=&quot;dataSource&quot; jndi-name=&quot;java:comp/env/jdbc/datasource&quot;/&gt;
+&lt;/beans&gt;
+</code></pre><p>当然，此配置效果很好。问题是如何根据当前环境在使用这两种变体之间进行切换。随着时间的流逝，Spring用户已经设计出许多方法来完成此任务，通常依靠系统环境变量和XML的组合<code><import/></code>陈述包含<code>${placeholder}</code>根据环境变量的值解析为正确的配置文件路径的令牌。尽管可以使这些解决方案和其他解决方案正常工作，但它们几乎不是容器所提供的“一流”解决方案。</p>
+<h3>输入bean定义配置文件</h3><p>如果我们将上述特定于环境的Bean定义的示例用例进行概括，最终将需要在某些上下文中而不是在其他上下文中注册某些Bean定义。你可以说，你要注册的情况的bean定义一定<em>的空间</em> ，在情况B.不同的配置文件</p><p>在Spring 3.1中， <code><beans/></code> XML文档现在包含了这个新概念。我们可以将配置分为以下三个文件。注意<code>profile=“…”</code>的属性<code>*-datasource.xml</code>文件：</p><p><code>src/main/com/bank/config/xml/transfer-service-config.xml</code></p>
+<pre><code class="prettyprint xml"><br />&lt;beans ...&gt;
+	&lt;bean id=&quot;transferService&quot; ... /&gt;
 
-	<bean id="accountRepository" class="com.bank.repository.internal.JdbcAccountRepository">
-		<constructor-arg ref="dataSource"/>
-	</bean>
+	&lt;bean id=&quot;accountRepository&quot; class=&quot;com.bank.repository.internal.JdbcAccountRepository&quot;&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="feePolicy" ... />
-</beans>
+	&lt;bean id=&quot;feePolicy&quot; ... /&gt;
+&lt;/beans&gt;
 </code></pre><p><code>src/main/com/bank/config/xml/standalone-datasource-config.xml</code></p>
-<pre><code class="prettyprint xml"><br><beans profile="dev">
-	<jdbc:embedded-database id="dataSource">
-		<jdbc:script location="classpath:com/bank/config/sql/schema.sql"/>
-		<jdbc:script location="classpath:com/bank/config/sql/test-data.sql"/>
-	</jdbc:embedded-database>
-</beans>
+<pre><code class="prettyprint xml"><br />&lt;beans profile=&quot;dev&quot;&gt;
+	&lt;jdbc:embedded-database id=&quot;dataSource&quot;&gt;
+		&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/schema.sql&quot;/&gt;
+		&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/test-data.sql&quot;/&gt;
+	&lt;/jdbc:embedded-database&gt;
+&lt;/beans&gt;
 </code></pre><p><code>src/main/com/bank/config/xml/jndi-datasource-config.xml</code></p>
-<pre><code class="prettyprint xml"><br><beans profile="production">
-	<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/datasource"/>
-</beans>
+<pre><code class="prettyprint xml"><br />&lt;beans profile=&quot;production&quot;&gt;
+	&lt;jee:jndi-lookup id=&quot;dataSource&quot; jndi-name=&quot;java:comp/env/jdbc/datasource&quot;/&gt;
+&lt;/beans&gt;
 </code></pre><p>然后，我们可以更新测试用例以加载所有三个文件：</p>
-<pre><code class="prettyprint java"><br>	GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-	ctx.load("classpath:/com/bank/config/xml/*-config.xml");
+<pre><code class="prettyprint java"><br />	GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+	ctx.load(&quot;classpath:/com/bank/config/xml/*-config.xml&quot;);
 	ctx.refresh();
-</code></pre><p>但这还不够。在进行这些更改之后运行单元测试时，我们会看到抛出<code>NoSuchBeanDefinitionException</code> ，因为容器找不到名为“ dataSource”的Spring bean。原因是，尽管我们已经明确定义了两个bean定义配置文件-“ dev”和“ production”，但我们尚未<i>激活</i>它们中的任何一个。</p>
-<h3>进入环境</h3><p>Spring的<em><code>Environment</code></em>概念是3.1的新功能。这种抽象已集成到整个容器中，在接下来的几天中，我们将在博客文章中多次看到它。对于我们这里的目的，重要的是要了解<code>Environment</code>包含有关当前哪些配置文件（如果有）处于活动状态的信息。当上面的Spring <code>ApplicationContext</code>加载我们的三个bean定义文件时，它会密切注意<code><beans profile=“…”></code>每个属性。如果存在并且设置为当前未激活的概要文件的名称，那么将跳过整个文件-不会解析或注册任何bean定义。</p><p>可以通过多种方式来激活配置文件，但最简单的方法是针对<code>ApplicationContext</code> API以编程方式进行配置：</p>
-<pre><code class="prettyprint java"><br>	GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-	ctx.getEnvironment().setActiveProfiles("dev");
-	ctx.load("classpath:/com/bank/config/xml/*-config.xml");
+</code></pre><p>但这还不够。在进行这些更改后运行单元测试时，我们会看到<code>NoSuchBeanDefinitionException</code>抛出该错误，因为该容器找不到名为“ dataSource”的Spring bean。原因是，尽管我们已经明确定义了两个bean定义配置文件-“ dev”和“ production”，但我们尚未<i>激活</i>它们中的任何一个。</p>
+<h3>进入环境</h3><p>Spring的3.1中的新概念<em><code>Environment</code></em> 。这种抽象已集成到整个容器中，在接下来的几天中，我们将在博客文章中多次看到它。对于我们这里的目的，重要的是要了解<code>Environment</code>包含有关哪些配置文件（如果有）当前处于活动状态的信息。当春天<code>ApplicationContext</code>上面正在加载我们的三个bean定义文件，它非常注意<code><beans profile=“…”></code>每个属性。如果存在并且设置为当前未激活的概要文件的名称，那么将跳过整个文件-不会解析或注册任何bean定义。</p><p>可以通过多种方式来激活配置文件，但是最直接的方法是针对<code>ApplicationContext</code> API：</p>
+<pre><code class="prettyprint java"><br />	GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+	ctx.getEnvironment().setActiveProfiles(&quot;dev&quot;);
+	ctx.load(&quot;classpath:/com/bank/config/xml/*-config.xml&quot;);
 	ctx.refresh();
-</code></pre><p>此时，运行我们的单元测试将显示绿色条。让我们分解一下容器在加载与<code>*-config.xml</code>匹配的三个文件时如何思考事情：</p>
+</code></pre><p>此时，运行我们的单元测试将显示绿色条。让我们分解一下容器在加载匹配的三个文件时如何思考事情<code>*-config.xml</code> ：</p>
 <ul>
-<li><code>transfer-service-config.xml</code>根本不指定配置文件属性，因此始终对其进行解析</li>
-<li><code>standalone-datasource-config.xml</code>指定<code>profile="dev"</code>且“ dev”概要文件当前处于活动状态，因此将对其进行解析</li>
-<li><code>jndi-datasource-config.xml</code>指定<code>profile="production"</code>但是“ production”概要文件当前未激活，因此将被跳过。</li>
-</ul><p>结果恰好是一个名为“ dataSource”的注册bean，它满足“ accountRepository” bean的依赖项注入需求。一切再次正常。</p><p>当实际投入生产时，如何切换到JNDI查找？当然，必须激活“生产”配置文件。出于上述目的进行单元测试的目的，以编程方式进行此操作很好，但是一旦创建了WAR文件并且已准备好部署该应用程序，这种方法将不可行。因此，还可以通过<em><code>spring.profiles.active</code></em>属性<i>声明性</i>地激活配置文件，该属性可以通过系统环境变量，JVM系统属性， <code>web.xml</code> servlet上下文参数或什至作为JNDI [2]中的条目来指定。例如，您可以按以下方式配置<code>web.xml</code> ：</p>
-<pre><code class="prettyprint xml"><br>  <servlet>
-      <servlet-name>dispatcher</servlet-name>
-      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-      <init-param>
-          <param-name>spring.profiles.active</param-name>
-          <param-value>production</param-value>
-      </init-param>
-  </servlet>
-</code></pre><p>请注意，配置文件不是“非此即彼”的命题；可以一次激活多个配置文件。以编程方式，只需为<code>setActiveProfiles(</code> ）方法提供多个配置文件名称，即可接受<code>String…</code> varargs：</p>
-<pre><code class="prettyprint java"><br>	ctx.getEnvironment().setActiveProfiles("profile1", "profile2");
+<li><code>transfer-service-config.xml</code>根本不指定配置文件属性，因此始终会对其进行解析</li>
+<li><code>standalone-datasource-config.xml</code>指定<code>profile="dev"</code>并且“ dev”配置文件当前处于活动状态，因此已对其进行了解析</li>
+<li><code>jndi-datasource-config.xml</code>指定<code>profile="production"</code>但是“生产”配置文件当前未处于活动状态，因此将被跳过。</li>
+</ul><p>结果就是一个名为“ dataSource”的注册bean，它满足了“ accountRepository” bean的依赖项注入需求。一切再次正常。</p><p>当实际投入生产时，如何切换到JNDI查找？当然，必须激活“生产”配置文件。出于上述目的进行单元测试的目的，以编程方式进行此操作很好，但是一旦创建了WAR文件并且已准备好部署该应用程序，这种方法将不可行。出于这个原因，配置文件也可以通过<i>声明</i>的激活<em><code>spring.profiles.active</code></em>属性，可以通过系统环境变量，JVM系统属性， <code>web.xml</code>甚至作为JNDI [2]中的条目。例如，您可以配置<code>web.xml</code>如下：</p>
+<pre><code class="prettyprint xml"><br />  &lt;servlet&gt;
+      &lt;servlet-name&gt;dispatcher&lt;/servlet-name&gt;
+      &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+      &lt;init-param&gt;
+          &lt;param-name&gt;spring.profiles.active&lt;/param-name&gt;
+          &lt;param-value&gt;production&lt;/param-value&gt;
+      &lt;/init-param&gt;
+  &lt;/servlet&gt;
+</code></pre><p>请注意，配置文件不是“非此即彼”的命题；可以一次激活多个配置文件。通过编程，只需将多个配置文件名称提供给<code>setActiveProfiles(</code> ）方法，它接受<code>String…</code>可变参数：</p>
+<pre><code class="prettyprint java"><br />	ctx.getEnvironment().setActiveProfiles(&quot;profile1&quot;, &quot;profile2&quot;);
 </code></pre><p>声明性地， <code>spring.profiles.active</code>可以接受以逗号分隔的配置文件名称列表：</p>
-<pre><code class="prettyprint source">	-Dspring.profiles.active="profile1,profile2"
+<pre><code class="prettyprint source">	-Dspring.profiles.active=&quot;profile1,profile2&quot;
 </code></pre><p>可以用类似的方式将Bean定义文件标记为多个配置文件的候选文件：</p>
-<pre><code class="prettyprint xml"><br>	<beans profile="profile1,profile2">
+<pre><code class="prettyprint xml"><br />	&lt;beans profile=&quot;profile1,profile2&quot;&gt;
 		...
-	</beans>
+	&lt;/beans&gt;
 </code></pre><p>这提供了一种灵活的方法来分解您的应用程序，对在哪种情况下注册了哪些bean进行切片和切块。</p>
-<h3>使之更简单：引入嵌套<code><beans/></code>元素</h3><p>到目前为止，bean定义配置文件为我们提供了一种方便的机制，用于根据应用程序的部署上下文确定要注册哪些bean，但是它有一个缺点：上面有一个Spring XML配置文件，现在有三个。为了区分<code>profile=“dev”</code>与<code>profile=“production”</code> bean，必须进行此拆分，因为<code>profile</code>属性是在<code><beans></code>元素级别。</p><p>使用Spring 3.1，现在可以嵌套<code><beans/></code>同一文件中的元素。这意味着，如果需要，我们可以返回到单个配置文件：</p>
-<pre><code class="prettyprint java"><br><beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xmlns:jee="http://www.springframework.org/schema/jee"
-	xsi:schemaLocation="...">
+<h3>使之更简单：引入嵌套<code><beans/></code>元素</h3><p>到目前为止，bean定义配置文件为我们提供了一种方便的机制，用于根据应用程序的部署上下文确定要注册哪些bean，但是它有一个缺点：上面有一个Spring XML配置文件，现在有三个。为了区分，有必要进行此拆分<code>profile=“dev”</code>与<code>profile=“production”</code>豆，因为<code>profile</code>属性在<code><beans></code>元素级别。</p><p>使用Spring 3.1，现在可以嵌套<code><beans/></code>同一文件中的元素。这意味着，如果需要，我们可以返回到单个配置文件：</p>
+<pre><code class="prettyprint java"><br />&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;
+	xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;
+	xsi:schemaLocation=&quot;...&quot;&gt;
 
-	<bean id="transferService" class="com.bank.service.internal.DefaultTransferService">
-		<constructor-arg ref="accountRepository"/>
-		<constructor-arg ref="feePolicy"/>
-	</bean>
+	&lt;bean id=&quot;transferService&quot; class=&quot;com.bank.service.internal.DefaultTransferService&quot;&gt;
+		&lt;constructor-arg ref=&quot;accountRepository&quot;/&gt;
+		&lt;constructor-arg ref=&quot;feePolicy&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="accountRepository" class="com.bank.repository.internal.JdbcAccountRepository">
-		<constructor-arg ref="dataSource"/>
-	</bean>
+	&lt;bean id=&quot;accountRepository&quot; class=&quot;com.bank.repository.internal.JdbcAccountRepository&quot;&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="feePolicy" class="com.bank.service.internal.ZeroFeePolicy"/>
+	&lt;bean id=&quot;feePolicy&quot; class=&quot;com.bank.service.internal.ZeroFeePolicy&quot;/&gt;
 
-	<beans profile="dev">
-		<jdbc:embedded-database id="dataSource">
-			<jdbc:script location="classpath:com/bank/config/sql/schema.sql"/>
-			<jdbc:script location="classpath:com/bank/config/sql/test-data.sql"/>
-		</jdbc:embedded-database>
-	</beans>
+	&lt;beans profile=&quot;dev&quot;&gt;
+		&lt;jdbc:embedded-database id=&quot;dataSource&quot;&gt;
+			&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/schema.sql&quot;/&gt;
+			&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/test-data.sql&quot;/&gt;
+		&lt;/jdbc:embedded-database&gt;
+	&lt;/beans&gt;
 
-	<beans profile="production">
-		<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/datasource"/>
-	</beans>
-</beans>
-</code></pre><p><code>spring-beans-3.1.xsd</code>已更新为允许此嵌套，但已被限制为仅允许这些元素作为文件中的最后一个元素。这应该有助于提供灵活性，而不会引起XML文件混乱。虽然此增强功能是在bean定义配置文件的服务中开发的，但嵌套<code><beans/></code>元素通常很有用。假设您在给定文件中有一部分bean，应将其标记为<code>lazy-init=“true”</code> 。与其标记每个bean，不如声明一个嵌套的<code><beans default-lazy-init=“true”/></code>元素，并且其中的所有bean都将继承该默认值。文件中其他位置定义的Bean将保持默认的默认值<code>lazy-init=“false”</code> 。这适用于的所有<code>default-*</code>属性<code><beans/></code>元素，例如<code>default-lazy-init</code> ， <code>default-init-method</code> ， <code>default-destroy-method</code>等。</p>
-<h3>注意事项</h3><p>在考虑使用Bean定义配置文件时，需要注意一些事项。</p><p><strong>如果更简单的方法可以完成任务，请不要使用配置文件。</strong> 如果配置文件之间改变的唯一事情是物业的价值，Spring的现有<code>PropertyPlaceholderConfigurer</code> / <code><context:property-placeholder/></code>可能就是您所需要的。</p><p><strong>在两个概要文件之间注册的Bean集合可能应该更相似而不是不同。</strong> 例如，如果您在开发和质量保证中与在生产中使用的bean根本不同，那么问题就变成： <em>您是否在测试应做的一切？</em> 。根据经验，bean在dev / QA划分之外应该没有太大区别。一个例外可能是有条件地在性能环境中引入监视方面。</p><p><strong>注意不要将“太多”的产品运送到生产中。</strong> 如果在开发过程中存在某些bean和类库，但是在生产中是不必要的或不必要的，则可能会打包所有这些包并进行实时部署。这很浪费（如果不需要，为什么将所有内容都拖到WAR中），但也可能不安全。请记住，激活配置文件的方式是通过属性。例如，如果在生产环境中同时存在完全不安全的“无操作密码加密器” bean定义和类，并且仅通过意外激活“ dev”配置文件就可以启用此功能，那么危险就很明显了。减轻此风险的几个选项可能是自定义构建系统以从生产部署档案中排除不必要或不需要的类，或与本机Java <code>SecurityManager</code> API一起使用以禁止访问<code>spring.profiles.active</code>系统环境变量和/或JVM。系统属性。这样做将意味着即使Spring可能尝试读取这些值，它也将无法继续运行，就好像从未设置过一样。</p>
-<h3>摘要</h3><p>现在就这样；我鼓励您看一下示例应用程序并进行试用。例如，尝试按原样运行单元测试，然后尝试将<code>spring.profiles.active</code>系统属性设置为“生产”，然后看看会发生什么。</p><p>在本系列的下一篇文章中，我们将介绍在使用<code>@Configuration</code>类而不是XML配置容器时如何使用bean定义配置文件。新的<code>@Profile</code>annotation将帮助我们。</p>
-<h3>脚注</h3><p>[1]里程碑构建发布到<a href="http://maven.springframework.org/milestone">http://maven.springframework.org/milestone</a> 。请参阅样本中的<a href="https://bit.ly/hnVADP">pom.xml</a>和<a href="https://bit.ly/ideYr9">build.gradle</a>文件，以获取有关如何从此存储库中提取信息的详细信息。</p><p>[2]从技术<code>spring.profiles.active</code>可以在向<code>ApplicationContext</code>的<code>Environment</code>注册的任何<code>PropertySource</code>对象中指定<code>spring.profiles.active</code> 。我们将在随后的博客文章中介绍财产来源的概念。</p></div>
+	&lt;beans profile=&quot;production&quot;&gt;
+		&lt;jee:jndi-lookup id=&quot;dataSource&quot; jndi-name=&quot;java:comp/env/jdbc/datasource&quot;/&gt;
+	&lt;/beans&gt;
+&lt;/beans&gt;
+</code></pre><p><code>spring-beans-3.1.xsd</code>已进行了更新，以允许此嵌套，但已被限制为仅允许这些元素作为文件中的最后一个元素。这应该有助于提供灵活性，而不会引起XML文件混乱。虽然此增强功能是在bean定义配置文件的服务中开发的，但嵌套<code><beans/></code>元素通常很有用。假设您在给定文件中有一部分子豆应该标记<code>lazy-init=“true”</code> 。与其标记每个bean，不如声明一个嵌套的<code><beans default-lazy-init=“true”/></code>元素，并且其中的所有bean都将继承该默认值。文件中其他地方定义的Bean将保持正常的默认值<code>lazy-init=“false”</code> 。这适用于所有<code>default-*</code>的属性<code><beans/></code>元素，例如<code>default-lazy-init</code> ， <code>default-init-method</code> ， <code>default-destroy-method</code> ， 等等。</p>
+<h3>注意事项</h3><p>在考虑使用Bean定义配置文件时，需要注意一些事项。</p><p><strong>如果更简单的方法可以完成任务，请不要使用配置文件。</strong> 如果在配置文件之间唯一改变的是属性的值，那么Spring现有的<code>PropertyPlaceholderConfigurer</code> / <code><context:property-placeholder/></code>可能就是您所需要的。</p><p><strong>在两个概要文件之间注册的Bean集合可能应该更相似而不是不同。</strong> 例如，如果您在开发和质量保证中与在生产中使用的bean根本不同，那么问题就变成： <em>您是否在测试应做的一切？</em> 。根据经验，bean在dev / QA划分之外应该没有太大区别。一个例外可能是有条件地在性能环境中引入监视方面。</p><p><strong>注意不要将“太多”的产品运送到生产中。</strong> 如果在开发过程中存在某些bean和类库，但是在生产中是不必要或不需要的，则可能会打包所有这些包并进行实时部署。这很浪费（如果不需要，为什么将所有内容都拖入WAR中），但也可能不安全。请记住，激活配置文件的方式是通过属性。例如，如果在生产环境中同时存在完全不安全的“无操作密码加密器” bean定义和类，并且仅通过意外激活“ dev”配置文件就可以启用此功能，那么危险就很明显了。减轻此风险的几个选项可能是自定义构建系统，以从生产部署档案中排除不必要或不需要的类，或者使用本机Java。 <code>SecurityManager</code>禁止访问API的API <code>spring.profiles.active</code>系统环境变量和/或JVM系统属性。这样做将意味着即使Spring可能尝试读取这些值，它也将无法继续运行，就好像从未设置过一样。</p>
+<h3>摘要</h3><p>现在就这样；我鼓励您看一下示例应用程序并进行试用。例如，尝试按原样运行单元测试，然后尝试设置<code>spring.profiles.active</code>系统属性转到“生产”，看看会发生什么。</p><p>在本系列的下一篇文章中，我们将介绍在使用以下命令配置容器时如何使用bean定义配置文件<code>@Configuration</code>类而不是XML；新的<code>@Profile</code>注释将帮助我们。</p>
+<h3>脚注</h3><p>[1]里程碑构建发布到<a href="http://maven.springframework.org/milestone">http://maven.springframework.org/milestone</a> 。请参阅样本中的<a href="https://bit.ly/hnVADP">pom.xml</a>和<a href="https://bit.ly/ideYr9">build.gradle</a>文件，以获取有关如何从此存储库中提取信息的详细信息。</p><p>[2]从技术上讲<code>spring.profiles.active</code>可以在任何<code>PropertySource</code>向的对象注册<code>ApplicationContext</code>的<code>Environment</code> 。我们将在随后的博客文章中介绍财产来源的概念。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 390;
 
       (function(disqus_shortname, document) {
@@ -368,7 +375,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -406,12 +414,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

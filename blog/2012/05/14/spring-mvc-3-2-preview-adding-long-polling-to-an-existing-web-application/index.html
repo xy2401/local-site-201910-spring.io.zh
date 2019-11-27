@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring MVC 3.2预览版：向现有的Web应用程序添加长轮询</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring MVC 3.2 Preview: Adding Long Polling to an Existing Web Application">
 <meta name="twitter:description" content="<p><strong><em>Last updated on November 5th, 2012 (Spring MVC 3.2 RC1)</em></strong></p>
-<p>In my <a href=" http: ="" blog.springsource.org="" 2012="" 05="" 10="" spring-mvc-3-2-preview-making-a-controller-method-asynchronous="" ="="></meta>last post I discussed how to make a Spring MVC controller method asynchronous by returning a <a href=" docs.oracle.com javase 6 docs api java util concurrent Callable.html"></head><body dir="ltr">Callable which is then invoked in a separate thread by Spring MVC.
+<p>In my <a href=" http: ="" blog.springsource.org="" 2012="" 05="" 10="" spring-mvc-3-2-preview-making-a-controller-method-asynchronous="" ="=">last post I discussed how to make a Spring MVC controller method asynchronous by returning a <a href=" docs.oracle.com javase 6 docs api java util concurrent Callable.html"></head><body >Callable which is then invoked in a separate thread by Spring MVC.
 <p>But what if async processing depended on receiving some external event in a thread not known to Spring MVC -- e.g. receiving a JMS message, an AMQP message, a Redis pub-sub notification, a Spring Integration event, and so on? I'll explore this scenario by modifying an existing sample from the <a href="http://www.springsource.org/spring-amqp">Spring AMQP</a> project.</p>
 ">
 <meta name="twitter:creator" content="@rstoya05">
@@ -31,7 +35,7 @@
 <meta property="og:title" content="Spring MVC 3.2 Preview: Adding Long Polling to an Existing Web Application">
 <meta property="og:image" content="https://gravatar.com/avatar/4b12b9c0c665bc0345467c1a218ed0f7?s=200">
 <meta property="og:description" content="<p><strong><em>Last updated on November 5th, 2012 (Spring MVC 3.2 RC1)</em></strong></p>
-<p>In my <a href=" http: ="" blog.springsource.org="" 2012="" 05="" 10="" spring-mvc-3-2-preview-making-a-controller-method-asynchronous="" ="="></meta>last post I discussed how to make a Spring MVC controller method asynchronous by returning a <a href=" docs.oracle.com javase 6 docs api java util concurrent Callable.html">Callable which is then invoked in a separate thread by Spring MVC.
+<p>In my <a href=" http: ="" blog.springsource.org="" 2012="" 05="" 10="" spring-mvc-3-2-preview-making-a-controller-method-asynchronous="" ="=">last post I discussed how to make a Spring MVC controller method asynchronous by returning a <a href=" docs.oracle.com javase 6 docs api java util concurrent Callable.html">Callable which is then invoked in a separate thread by Spring MVC.
 <p>But what if async processing depended on receiving some external event in a thread not known to Spring MVC -- e.g. receiving a JMS message, an AMQP message, a Redis pub-sub notification, a Spring Integration event, and so on? I'll explore this scenario by modifying an existing sample from the <a href="http://www.springsource.org/spring-amqp">Spring AMQP</a> project.</p>
 ">
 <meta content="article" property="og:type">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -171,26 +177,26 @@
 </div>
 </header>
 <div class="blog--post"><p><strong><em>最后更新时间为2012年11月5日（Spring MVC 3.2 RC1）</em></strong></p>
-<p>在<a href="http://blog.springsource.org/2012/05/10/spring-mvc-3-2-preview-making-a-controller-method-asynchronous/">上</a>一篇<a href="http://blog.springsource.org/2012/05/10/spring-mvc-3-2-preview-making-a-controller-method-asynchronous/">文章中，</a>我讨论了如何通过返回一个<a href="https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">Callable</a>来使Spring MVC控制器方法异步，然后由MVC在另一个线程中调用该<a href="https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">Callable</a> 。</p>
-<p>但是，如果异步处理依赖于在Spring MVC未知的线程中接收某个外部事件，例如接收JMS消息，AMQP消息，Redis pub-sub通知，Spring Integration事件等等，该怎么办？我将通过修改<a href="http://www.springsource.org/spring-amqp">Spring AMQP</a>项目中的现有示例来探索这种情况。</p><p><strong>这个样本</strong></p>
-<p>春天AMQP拥有<a href="https://github.com/SpringSource/spring-amqp-samples">股票交易样品</a> ，其中一个<code>QuoteController</code>通过Spring AMQP的发送交易执行的消息<a href="http://static.springsource.org/spring-amqp/docs/1.0.x/apidocs/org/springframework/amqp/rabbit/core/RabbitTemplate.html">RabbitTemplate</a>并接收通过Spring AMQP的RabbitMQ的交易确认书和报价的消息<a href="http://static.springsource.org/spring-amqp/reference/html/#d0e377">监听器容器</a>在消息驱动的POJO风格。</p>
-<p>在浏览器中，该示例使用轮询来显示价格报价。对于交易，初始请求提交交易，并返回确认ID，然后将其用于轮询以获取最终确认。我已经更新了示例以利用Spring 3.2 Servlet 3异步支持。的<a href="https://github.com/SpringSource/spring-amqp-samples/tree/master/stocks">主</a>支路具有的代码之前和<a href="https://github.com/SpringSource/spring-amqp-samples/tree/spring-mvc-async">弹簧MVC-异步</a>分支具有改变后的代码。下图显示了使用Chrome开发者工具对报价请求频率的影响：</p>
+<p>在我的<a href="http://blog.springsource.org/2012/05/10/spring-mvc-3-2-preview-making-a-controller-method-asynchronous/">上</a>一篇<a href="http://blog.springsource.org/2012/05/10/spring-mvc-3-2-preview-making-a-controller-method-asynchronous/">文章中，</a>我讨论了如何通过返回<a href="https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">Callable</a>使Spring MVC控制器方法异步，然后由MVC在另一个线程中调用该<a href="https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/Callable.html">Callable</a> 。</p>
+<p>但是，如果异步处理依赖于在Spring MVC未知的线程中接收某个外部事件，例如接收JMS消息，AMQP消息，Redis发布订阅通知，Spring Integration事件等等，该怎么办？我将通过修改<a href="http://www.springsource.org/spring-amqp">Spring AMQP</a>项目中的现有示例来探索这种情况。</p><p><strong>这个样本</strong></p>
+<p>春季AMQP有一个<a href="https://github.com/SpringSource/spring-amqp-samples">股票交易样本</a> ，其中<code>QuoteController</code>通过Spring AMQP的<a href="http://static.springsource.org/spring-amqp/docs/1.0.x/apidocs/org/springframework/amqp/rabbit/core/RabbitTemplate.html">RabbitTemplate</a>发送交易执行消息，并通过Spring AMQP的RabbitMQ <a href="http://static.springsource.org/spring-amqp/reference/html/#d0e377">侦听器容器</a>以消息驱动的POJO样式接收交易确认和报价消息。</p>
+<p>在浏览器中，该示例使用轮询来显示价格报价。对于交易，初始请求提交交易，并返回确认ID，然后将其用于轮询以获取最终确认。我已经更新了示例以利用Spring 3.2 Servlet 3异步支持。<a href="https://github.com/SpringSource/spring-amqp-samples/tree/master/stocks">master</a>分支具有更改之前的代码，而<a href="https://github.com/SpringSource/spring-amqp-samples/tree/spring-mvc-async">spring-mvc-async</a>分支具有更改之后的代码。下图显示了使用Chrome开发者工具对报价请求频率的影响：</p>
 <p><a href="http://blog.springsource.org/wp-content/uploads/2012/04/quotes-traditional-poll1.png"><img src="http://blog.springsource.org/wp-content/uploads/2012/04/quotes-traditional-poll1.png" alt="" title="传统民意测验" width="572" height="230" class="alignnone size-full wp-image-10881"></a></p>
 <p><em>更改之前：传统投票</em></p>
 <p><a href="http://blog.springsource.org/wp-content/uploads/2012/04/quotes-long-poll1.png"><img src="http://blog.springsource.org/wp-content/uploads/2012/04/quotes-long-poll1.png" alt="" title="长时间轮询" width="571" height="230" class="alignnone size-full wp-image-10885"></a></p>
 <p><em>变更后：长期投票</em></p>
 <p>如您所见，定期轮询会非常频繁地发送新请求（相隔毫秒），而长时间轮询会发送新请求，相隔5、10、20或更长时间-大大减少了请求总数，而不会丢失延迟，即新的报价出现在浏览器中的时间。</p><p><strong>获取报价</strong></p>
 <p>那么，需要进行哪些更改？从客户端角度看，传统轮询和长时间轮询是无法区分的，因此HTML和JavaScript不会发生变化。从服务器的角度来看，必须阻止请求，直到新的报价到达为止。这是控制器处理报价请求的方式：</p>
-<pre><code class="prettyprint java"><br><br>// Class field
-private Map<String, DeferredResult> suspendedTradeRequests = new ConcurrentHashMap<String, DeferredResult>();
+<pre><code class="prettyprint java"><br /><br />// Class field
+private Map&lt;String, DeferredResult&gt; suspendedTradeRequests = new ConcurrentHashMap&lt;String, DeferredResult&gt;();
 
 ...
 
-@RequestMapping("/quotes")
+@RequestMapping(&quot;/quotes&quot;)
 @ResponseBody
-public DeferredResult<List<Quote>> quotes(@RequestParam(required = false) Long timestamp) {
+public DeferredResult&lt;List&lt;Quote&gt;&gt; quotes(@RequestParam(required = false) Long timestamp) {
 
-  final DeferredResult<List<Quote>> result = new DeferredResult<List<Quote>>(null, Collections.emptyList());
+  final DeferredResult&lt;List&lt;Quote&gt;&gt; result = new DeferredResult&lt;List&lt;Quote&gt;&gt;(null, Collections.emptyList());
   this.quoteRequests.put(result, timestamp);
 
   result.onCompletion(new Runnable() {
@@ -199,7 +205,7 @@ public DeferredResult<List<Quote>> quotes(@RequestParam(required = false) Long t
     }
   });
 
-  List<Quote> list = getLatestQuotes(timestamp);
+  List&lt;Quote&gt; list = getLatestQuotes(timestamp);
   if (!list.isEmpty()) {
     result.setResult(list);
   }
@@ -207,27 +213,28 @@ public DeferredResult<List<Quote>> quotes(@RequestParam(required = false) Long t
   return result;
 }
 </code></pre>
-<p>在控制器方法上面的例子中准备，并返回一个<a href="http://static.springsource.org/spring/docs/3.2.0.BUILD-SNAPSHOT/api/org/springframework/web/context/request/async/DeferredResult.html">DeferredResult</a> ，它可以立即设置，如果当通过RabbitMQ的在接收到新的报价的报价已经上市，或更高版本。 <code>DeferredResult</code>保存在Map中，当异步请求通过已注册的<code>onCompletion</code>回调完成时，将从中将其删除。</p>
-<p>这是控制器方法，当收到新报价时，该方法将更新保存的<code>DeferredResult</code>实例：</p>
-<pre><code class="prettyprint java"><br><br>// Invoked in Spring AMQP's RabbitMQ listener container thread
+<p>在上面的示例中，控制器方法准备并返回<a href="http://static.springsource.org/spring/docs/3.2.0.BUILD-SNAPSHOT/api/org/springframework/web/context/request/async/DeferredResult.html">DeferredResult</a> ，如果引号已经可用，则可以立即设置<a href="http://static.springsource.org/spring/docs/3.2.0.BUILD-SNAPSHOT/api/org/springframework/web/context/request/async/DeferredResult.html">DeferredResult</a> ；如果稍后通过RabbitMQ收到新的引号，则可以立即设置<a href="http://static.springsource.org/spring/docs/3.2.0.BUILD-SNAPSHOT/api/org/springframework/web/context/request/async/DeferredResult.html">DeferredResult</a> 。的<code>DeferredResult</code>已保存在Map中，当注册者完成异步请求后，将从中将其删除<code>onCompletion</code>打回来。</p>
+<p>这是更新保存的控制器方法<code>DeferredResult</code>收到新报价的实例：</p>
+<pre><code class="prettyprint java"><br /><br />// Invoked in Spring AMQP&#39;s RabbitMQ listener container thread
 
 public void handleQuote(Quote message) {
   // ...
-  for (Entry<DeferredResult<List<Quote>>, Long> entry : this.quoteRequests.entrySet()) {
-    List<Quote> newQuotes = getLatestQuotes(entry.getValue());
+  for (Entry&lt;DeferredResult&lt;List&lt;Quote&gt;&gt;, Long&gt; entry : this.quoteRequests.entrySet()) {
+    List&lt;Quote&gt; newQuotes = getLatestQuotes(entry.getValue());
     entry.getKey().setResult(newQuotes);
   }
   // ...
 }
 </code></pre>
-<p>当新的报价到达时，上述方法用最新的报价更新每个保存的<code>DeferredResult</code> 。由于<code>DeferredResult</code>最初是在<code>@ResponseBody</code>方法中创建的，因此引号作为JSON写入响应的主体。</p><p><strong>超时时间</strong></p>
-<p>如果与<code>DeferredResult</code>相关的异步请求超时怎么办？从浏览器的角度来看，每个请求都应带引号，如果超时，则应返回0个引号。</p>
+<p>当新的报价到达时，上述方法会更新每个已保存的报价<code>DeferredResult</code>最新报价。自从<code>DeferredResult</code>最初是在<code>@ResponseBody</code>方法，将引号作为JSON写入响应的主体。</p><p><strong>超时时间</strong></p>
+<p>如果异步请求与<code>DeferredResult</code>超时了吗？从浏览器的角度来看，每个请求都应带引号，如果超时，则应返回0个引号。</p>
 <p>您可能已经在上面的示例代码中注意到， <code>DeferredResult</code>是使用两个构造函数参数创建的。第一个是要使用的超时值，第二个是发生超时时要使用的默认结果，在这种情况下为空列表。</p><p><strong>执行交易</strong></p>
 <p>交易执行所需的更改遵循类似的模式。无需发送一个执行交易的请求然后轮询确认，而是一个请求提交交易，然后保留确认。</p>
 <p><a href="http://blog.springsource.org/2012/05/16/spring-mvc-3-2-preview-chat-sample/">下一篇和最后一篇文章</a>介绍了持久聊天示例。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 472;
 
       (function(disqus_shortname, document) {
@@ -241,7 +248,8 @@ public void handleQuote(Quote message) {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -279,12 +287,14 @@ public void handleQuote(Quote message) {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

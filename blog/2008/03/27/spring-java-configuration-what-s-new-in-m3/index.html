@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Java配置-M3中的新增功能</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Java Configuration - What's New in M3">
-<meta name="twitter:description" content="<p>Today marks the third milestone release of the <a href=" http:="" ="" springframework.org="" javaconfi="=">Spring Java Configuration project (JavaConfig for short). The release contains numerous bug fixes and new features - I’ll highlight a few of the most interesting changes below, but first let me give a quick refresher as to what JavaConfig is all about.
+<meta name="twitter:description" content="<p>Today marks the third milestone release of the <a href=" http:="" ="" springframework.org="" javaconfi="="></head><body >Spring Java Configuration project (JavaConfig for short). The release contains numerous bug fixes and new features - I’ll highlight a few of the most interesting changes below, but first let me give a quick refresher as to what JavaConfig is all about.
 <p>If you have any experience with Spring, the following snippet of XML configuration will likely be familiar. Let’s assume we’re looking at a file named <span style="font-family:courier">application-config.xml</span>:</p>
 <pre><code class="prettyprint xml"><br><beans>
 	<bean id="orderService" class="com.acme.OrderService"/>
@@ -57,10 +61,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -213,15 +219,15 @@ public class ApplicationConfig {
 		// instantiate and return an new DataSource ...
 	}
 }
-</code></pre><p>与原始XML文件一样，此类仅是关于如何构造应用程序的各种组件的一组指令。我们将这些指令提供给<span style="font-family:courier">ApplicationContext</span>实现，该实现专门设计用于读取和执行基于Java的配置指令：</p>
+</code></pre><p>与原始XML文件一样，此类仅是关于如何构造应用程序的各种组件的一组指令。我们将这些指令提供给<span style="font-family:courier">ApplicationContext</span>实现，该实现专门用于读取和执行基于Java的配置指令：</p>
 <pre><code class="prettyprint java"><br>JavaConfigApplicationContext ctx = new JavaConfigApplicationContext(ApplicationConfig.class);
 OrderService orderService = ctx.getBean(OrderService.class);
-</code></pre><p>就是这样！好吧，差不多。当然，JavaConfig还有很多东西，但是在大多数情况下，功能集是1：1，与Spring的XML配置中可用的功能相同。有关如何使用JavaConfig的完整详细信息，请<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/">参阅参考文档</a> 。如果您不熟悉JavaConfig，请务必查看“ <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/quick-start.html">快速入门”</a>部分。</p><p>无论如何，JavaConfig的好处显而易见：<br></p><ul><br> <li>它是纯Java，因此不需要XML</li><br> <li>您可以在配置代码中获得面向对象的所有好处</li><br> <li>类型安全且易于重构</li><br> <li>您仍然可以获得核心Spring IoC容器的全部功能</li><br></ul><p></p><p>考虑到这一点，让我们看一下M3版本中的更改内容：</p>
-<h5><span style="font-family:courier">AnnotationApplicationContext</span>已弃用</h5><p>几乎不是“新功能”，但要提及此更改很重要，因为我将在下面讨论的许多内容都围绕<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/JavaConfigApplicationContext.html"><span style="font-family:courier">JavaConfigApplicationContext</span></a> ，后者是<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/AnnotationApplicationContext.html"><span style="font-family:courier">AnnotationApplicationContext</span></a>的后继者。<em>为什么要进行此更改？</em> <span style="font-family:courier">AnnotationApplicationContext</span>与Spring 2.5的<em>Annotation-Driven Injection</em>工具造成了重大的命名冲突。JavaConfig提供了与注释驱动注入不同的配置方法，因此我们希望通过重命名该类来明确区分。在1.0.0.rc1发行版之前， <span style="font-family:courier">AnnotationApplicationContext</span>将保持弃用状态，届时它将被永久删除。</p>
+</code></pre><p>就是这样！好吧，差不多。当然，JavaConfig还有很多东西，但是大多数情况下，功能集是1：1，与Spring的XML配置中可用的功能相同。有关如何使用JavaConfig的完整详细信息，请<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/">参阅参考文档</a> 。如果您不熟悉JavaConfig，请务必查看“ <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/quick-start.html">快速入门”</a>部分。</p><p>无论如何，JavaConfig的好处显而易见：<br></p><ul><br> <li>它是纯Java，因此不需要XML</li><br> <li>您可以在配置代码中获得面向对象的所有好处</li><br> <li>类型安全且易于重构</li><br> <li>您仍然可以获得核心Spring IoC容器的全部功能</li><br></ul><p></p><p>考虑到这一点，让我们看一下M3版本中的更改内容：</p>
+<h5><span style="font-family:courier">AnnotationApplicationContext</span>已弃用</h5><p>几乎不是“新功能”，但要提及此更改很重要，因为我下面将讨论的大部分内容都围绕<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/JavaConfigApplicationContext.html"><span style="font-family:courier">JavaConfigApplicationContext</span></a> ，后者是<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/AnnotationApplicationContext.html"><span style="font-family:courier">AnnotationApplicationContext</span></a>的后继者。<em>为什么要进行此更改？</em> <span style="font-family:courier">AnnotationApplicationContext</span>与Spring 2.5的<em>Annotation-Driven Injection</em>工具造成了重大的命名冲突。JavaConfig提供了一种与注释驱动注入不同的配置方法，因此我们希望通过完全重命名该类来使这种区别清晰可见。在1.0.0.rc1发行版之前， <span style="font-family:courier">AnnotationApplicationContext</span>将保持弃用状态，届时它将被永久删除。</p>
 <h5>类型安全性改进</h5><p>尽管上述<span style="font-family:courier">JavaConfigApplicationContext的</span>行为在很大程度上与其前身相似，但它还引入了类型安全的<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/JavaConfigApplicationContext.html#getBean(java.lang.Class)"><span style="font-family:courier">getBean（）</span></a>方法，该方法充分利用了泛型。现在可以使用以下代码（从现在开始，这是与JavaConfig结合使用的首选方法）：</p>
 <pre><code class="prettyprint java"><br>JavaConfigApplicationContext context = new JavaConfigApplicationContext(AppConfig.class);
 OrderService orderService = context.getBean(OrderService.class);
-</code></pre><p>妈，不要铸造！也没有基于字符串的查找。当然，这将是一个问题， <em>“如果在上下文中配置了两个或多个<span style="font-family:courier">OrderService</span>类型的对象，该怎么办？”</em> 这是一种很容易发生的情况，有多种解决方法。为了简洁起见，我只请有兴趣的人员阅读参考文档的<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/creating-bean-definitions.html#typesafe-getbean">歧义消除选项</a>部分。</p><p>这些类型安全的getBean（）方法也已装配到<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/support/ConfigurationSupport.html"><span style="font-family:courier">ConfigurationSupport</span></a>基类上，从而可以实现以下目的：</p>
+</code></pre><p>妈，不要铸造！也没有基于字符串的查找。当然，这将是一个问题， <em>“如果在上下文中配置了两个或多个<span style="font-family:courier">OrderService</span>类型的对象，该怎么办？”</em> 这是一种很容易发生的情况，有多种解决方法。为了简短起见，我只请有兴趣的人员阅读参考文档的<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/creating-bean-definitions.html#typesafe-getbean">歧义消除选项</a>部分。</p><p>这些类型安全的getBean（）方法也已装配到<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/support/ConfigurationSupport.html"><span style="font-family:courier">ConfigurationSupport</span></a>基类上，从而可以实现以下目的：</p>
 <pre><code class="prettyprint java"><br>@Configuration
 public class ApplicationConfig extends ConfigurationSupport {
 	public @Bean OrderRepository orderRepository() {
@@ -229,7 +235,7 @@ public class ApplicationConfig extends ConfigurationSupport {
 	}
 }
 </code></pre>
-<h5>主要文档更新</h5><p>我们一直在努力使JavaConfig的文档达到与Spring著名的质量相当的水平。如上所示，参考文档以<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html">HTML</a>以及<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/pdf/">PDF</a>格式提供。请注意，此文档也包装成正规的一部分<a href="https://sourceforge.net/project/showfiles.php?group_id=73357&package_id=213222&release_id=587200">zip发行</a>通过SourceForge上可用。与M3中的所有其他功能一样，您对文档的反馈将有助于在项目前进至1.0 GA版本时对其进行改进。</p>
+<h5>主要文档更新</h5><p>我们一直在努力使JavaConfig的文档达到与Spring著名的质量相当的水平。如上所示，参考文档以<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html">HTML</a>以及<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/pdf/">PDF</a>格式提供。请注意，本文档也打包为可通过SourceForge获得的常规<a href="https://sourceforge.net/project/showfiles.php?group_id=73357&package_id=213222&release_id=587200">zip发行版的</a>一部分。与M3中的所有其他功能一样，您对文档的反馈将有助于在项目前进至1.0 GA版本时对其进行改进。</p>
 <h5>在Web层中支持JavaConfig</h5><p>在此发行版之前，必须通过XML“引导” JavaConfig，以便与Spring的<span style="font-family:courier">ContextLoaderListener</span>和<span style="font-family:courier">DispatcherServlet</span>类结合使用。为了解决此限制，已添加<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/apidocs/org/springframework/config/java/context/JavaConfigWebApplicationContext.html"><span style="font-family:courier">JavaConfigWebApplicationContext</span></a> 。只需在<span style="font-family:courier">web.xml</span>中将此类指定为<span style="font-family:courier">contextClass</span>参数，就可以直接使用<span style="font-family:courier">@Configuration</span>类：</p>
 <pre><code class="prettyprint xml"><br><web-app>
     <!-- Configure ContextLoaderListener to use JavaConfigWebApplicationContext
@@ -267,7 +273,7 @@ public class ApplicationConfig extends ConfigurationSupport {
     </servlet>
 </web-app>
 </code></pre><p>实际上，很多人可能会希望继续使用XML和JavaConfig的组合，尤其是在Web应用程序中。这种方法仍然可以很好地工作（请参阅<a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/combining-config-approaches.html">结合配置方法</a> ），但是对于团队而言，重要的是，如果用户愿意，我们可以为他们提供真正的“无XML”方法。这种变化消除了这种可能性。</p>
-<h5>带有新的<span style="font-family:courier">@Import</span>annotation的模块化改进</h5><p>很像Spring XML配置的<import></import>元素，现在可以让一个<span style="font-family:courier">@Configuration</span>类导入另一个（以及所有其bean定义）：</p>
+<h5>带有新的<span style="font-family:courier">@Import</span>批注的模块化改进</h5><p>很像Spring XML配置的<import></import>元素，现在可以让一个<span style="font-family:courier">@Configuration</span>类导入另一个（以及所有其bean定义）：</p>
 <pre><code class="prettyprint java"><br>@Configuration
 public class FooConfig {
 	public @Bean Foo foo() { ... }
@@ -284,7 +290,7 @@ JavaConfigApplicationContext ctx = new JavaConfigApplicationContext(ApplicationC
 // foo, bar, and serviceA beans will all be available
 ctx.getBean(ServiceA.class); // works
 ctx.getBean(Foo.class); // works too
-</code></pre><p>此功能只是提供了另一个工具，可以有效地将<span style="font-family:courier">@Configuration</span>类模块化。</p>
+</code></pre><p>该功能只是提供了另一个工具，可以有效地将<span style="font-family:courier">@Configuration</span>类模块化。</p>
 <h5>使用<span style="font-family:courier">@ExternalValue</span>和<span style="font-family:courier">@ResourceBundles</span>外部化值</h5><p>一些人建议在JavaConfig中引入与<span style="font-family:courier">PropertyPlaceholderConfigurer</span>等效的功能，以便在配置过程中访问属性文件中的值。M3提供了这一点。假设我们有一个典型的<span style="font-family:courier">数据源</span> ，需要它的JDBC URL，用户名和密码。通常，这些值存储在属性文件中。对于下面的示例，该属性文件将在<span style="font-family:courier">com / acme / datasource.properties的</span>类路径中提供。该文件的内容如下：</p>
 <pre><code class="prettyprint code">datasource.url=jdbc:localhost:...
 datasource.username=scott
@@ -309,12 +315,13 @@ public abstract class ApplicationConfig {
 	abstract @ExternalValue("datasource.username") String username();
 	abstract @ExternalValue("datasource.password") String password();
 }
-</code></pre><p>这里需要注意几件事：看看<span style="font-family:courier">@ResourceBundles</span>annotation的值如何不以<span style="font-family:courier">.properties</span>结尾？这是因为JavaConfig在下面使用了Spring的国际化基础结构，并将根据当前语言环境查找<span style="font-family:courier">datasource.properties的</span>变体，例如<span style="font-family:courier">datasource_en.properties</span> 。同样，尽管此示例将字符串值提供给<span style="font-family:courier">@ExternalValue</span>annotation，但默认设置是基于方法名称查找属性。因此，如果我们没有提供<span style="font-family:courier">@ExternalValue（“ datasource.url”）String url（）</span> ，而是仅提供<span style="font-family:courier">@ExternalValue String url（）</span> ，则JavaConfig会查找名为'url'的属性。</p>
-<h5>下一步是什么？</h5><p>许多用户一直在问我们何时会看到JavaConfig 1.0版，这是有很长的路要走的！在内部和公共API方面仍然存在许多重要变化，在我们准备将其称为“生产质量”软件之前，必须解决这些变化。期望在接下来的几周内看到更频繁的里程碑并发布候选人。底线：JavaConfig现在并且将来将继续受到完全支持。如果您想了解进度，请访问JavaConfig的<a href="http://jira.springframework.org/browse/SJC">JIRA问题跟踪</a> ，尤其是<a href="http://jira.springframework.org/browse/SJC?report=com.atlassian.jira.plugin.system.project:roadmap-panel">路线图</a>视图。</p>
-<h5>反馈要求！</h5><p>如果您在发布中已经做到了这一点，那么可以肯定，您至少<em>对</em> JavaConfig <em>感兴趣</em> ：)因此，请继续下一步！<a href="https://sourceforge.net/project/showfiles.php?group_id=73357&package_id=213222&release_id=587200">下载发行版</a> ， <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/">阅读文档</a> ，进行一下试用， <a href="http://jira.springframework.org/browse/SJC">让我们知道您的想法</a> 。</p><p><em>[ <strong>Update 3/27</strong> ：帖子被意外删除，因此被重新发布-对那些已经写过评论的人表示歉意，因为他们在此过程中被删除了。]</em><br><em>[ <strong>更新4/4</strong> ：修复了示例web.xml中的错字。]</em></p></div>
+</code></pre><p>这里需要注意几件事：看看<span style="font-family:courier">@ResourceBundles</span>批注的值如何不以<span style="font-family:courier">.properties</span>结尾？这是因为JavaConfig在下面使用了Spring的国际化基础结构，并将根据当前语言环境查找<span style="font-family:courier">datasource.properties的</span>变体，例如<span style="font-family:courier">datasource_en.properties</span> 。同样，尽管此示例将字符串值提供给<span style="font-family:courier">@ExternalValue</span>批注，但默认设置是基于方法名称查找属性。因此，如果我们没有提供<span style="font-family:courier">@ExternalValue（“ datasource.url”）String url（）</span> ，而是仅提供<span style="font-family:courier">@ExternalValue String url（）</span> ，则JavaConfig会查找名为'url'的属性。</p>
+<h5>下一步是什么？</h5><p>许多用户一直在问我们何时会看到JavaConfig 1.0版，并且有充分的理由-这已经很长时间了！在内部和公共API方面仍然存在许多重要变化，在我们准备将其称为“生产质量”软件之前，必须解决这些变化。期望在接下来的几周内看到更频繁的里程碑并发布候选人。底线：JavaConfig现在并且将来将继续受到完全支持。如果您想随时了解进度，请访问JavaConfig的<a href="http://jira.springframework.org/browse/SJC">JIRA问题跟踪</a> ，尤其是<a href="http://jira.springframework.org/browse/SJC?report=com.atlassian.jira.plugin.system.project:roadmap-panel">路线图</a>视图。</p>
+<h5>反馈要求！</h5><p>如果您在发布中已经做到了这一点，那么可以肯定，您至少<em>对</em> JavaConfig <em>感兴趣</em> ：)因此，请继续下一步！<a href="https://sourceforge.net/project/showfiles.php?group_id=73357&package_id=213222&release_id=587200">下载发行版</a> ， <a href="http://static.springframework.org/spring-javaconfig/docs/1.0.0.m3/reference/html/">阅读文档</a> ，进行一下试用， <a href="http://jira.springframework.org/browse/SJC">让我们知道您的想法</a> 。</p><p><em>[ <strong>Update 3/27</strong> ：帖子被意外删除，因此被重新发布-对那些已经写过评论的人表示歉意，因为在此过程中他们被删除了。]</em><br><em>[ <strong>更新4/4</strong> ：修复了示例web.xml中的错字。]</em></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 142;
 
       (function(disqus_shortname, document) {
@@ -328,7 +335,8 @@ public abstract class ApplicationConfig {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -366,12 +374,14 @@ public abstract class ApplicationConfig {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用自定义ANT任务上传到Amazon S3</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Uploading to Amazon S3 using a custom ANT task">
-<meta name="twitter:description" content="<p>One of the interesting side effects of a solid CI structure is that when things are running reliably, new problems start to crop up. Shortly after Spring’s CI system started running smoothly, our occasional space and bandwidth issues on <span style=" font-family:courie="="></head><body dir="ltr">static.springframework.org became more pronounced. Colin Sampaleanu had done research earlier on how to alleviate some of these problems and had settled on <a href="http://aws.amazon.com/s3">Amazon S3</a>.
+<meta name="twitter:description" content="<p>One of the interesting side effects of a solid CI structure is that when things are running reliably, new problems start to crop up. Shortly after Spring’s CI system started running smoothly, our occasional space and bandwidth issues on <span style=" font-family:courie="="></head><body >static.springframework.org became more pronounced. Colin Sampaleanu had done research earlier on how to alleviate some of these problems and had settled on <a href="http://aws.amazon.com/s3">Amazon S3</a>.
 <p>Amazon S3 is part of the <a href="http://aws.amazon.com">Amazon Web Services</a> umbrella and provides an incredibly cheap online file storage service. What does ‘incredibly cheap’ mean? Well, from the website, it appears that 1 GB*month of storage costs US$0.15 and 1 GB of bandwidth costs US$0.20. Add to that, a high-bandwidth transparent mirroring service, and S3 becomes very appealing for storing our nightly snapshots. On a tangent, Amazon actually uses the exact same infrastructure internally, so you know that there is a team of admins guaranteeing their five 9’s promise.</p>
 ">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200">
@@ -38,10 +42,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,29 +174,29 @@
 </div>
 </header>
 <div class="blog--post"><p>可靠的CI结构的有趣的副作用之一是，当事情可靠地运行时，就会出现新的问题。在Spring的CI系统开始平稳运行之后不久，我们在<span style="font-family:courier">static.springframework.org</span>上偶尔出现的空间和带宽问题就变得更加明显。Colin Sampaleanu早些时候就如何缓解这些问题进行了研究，并选择了<a href="https://aws.amazon.com/s3">Amazon S3</a> 。</p><p>Amazon S3是<a href="https://aws.amazon.com">Amazon Web Services的</a>一部分，并提供了一种非常便宜的在线文件存储服务。“便宜得令人难以置信”是什么意思？从网站上看，似乎1 GB *月的存储成本为0.15美元，而1 GB带宽的成本为0.20美元。除此之外，高带宽透明镜像服务，S3对于存储我们的夜间快照变得非常有吸引力。从切线上看，亚马逊实际上在内部使用了完全相同的基础架构，因此您知道有一个管理员团队保证兑现其五个9的承诺。</p><p>要将S3用于夜间快照，我们首先必须替换使用<span style="font-family:courier">scp</span>的旧快照上传过程。环顾四周，我没有看到任何上载到S3的ANT任务，因此我着手创建自己的任务。我的目标配置非常简单：</p>
-<pre><code class="prettyprint xml"><br><aws:s3 accessKey="${s3.accessKey}" secretKey="${s3.secretKey}">
-	<upload bucketName="static.springframework.org"
-		file="${target.release.dir}/${release-with-dependencies.zip}"
-		toFile="SPR/spring-framework-${spring-version}-with-dependencies-${tstamp}-${build.number}.zip"
-		publicRead="true"/>
-	<upload bucketName="static.springframework.org"
-		file="${target.release.dir}/${release.zip}"
-		toFile="SPR/spring-framework-${spring-version}-${tstamp}-${build.number}.zip"
-		publicRead="true"/>
-</aws:s3>
-</code></pre><p>我希望能够定义一个由我们的访问和秘密密钥（S3的加密登录名）控制的S3会话，并在该定义中执行多个上载。每次上传都会进入一个“存储桶”，这是S3提供的唯一粒度级别。</p><p>S3本身通常用作REST-ful服务，因此易于交互。为此，我使用了一个名为<a href="https://jets3t.dev.java.net/">jets3t</a> （发音为jet-set）的库。对于将S3与Java结合使用的人，这是使用S3的首选方式（据我所知，这是Amazon认可的唯一库）。Jets3t使用与我的XML定义类似的范例（或者也许我使用了它们的范例？）您将创建对服务器的引用，然后重复使用它来执行多个操作。在ANT任务中，我基于访问密钥和秘密密钥创建了一组凭据，并将它们绑定到对服务的引用中：</p>
-<pre><code class="prettyprint java"><br>AWSCredentials credentials = new AWSCredentials(accessKey, secretKey);
+<pre><code class="prettyprint xml"><br />&lt;aws:s3 accessKey=&quot;${s3.accessKey}&quot; secretKey=&quot;${s3.secretKey}&quot;&gt;
+	&lt;upload bucketName=&quot;static.springframework.org&quot;
+		file=&quot;${target.release.dir}/${release-with-dependencies.zip}&quot;
+		toFile=&quot;SPR/spring-framework-${spring-version}-with-dependencies-${tstamp}-${build.number}.zip&quot;
+		publicRead=&quot;true&quot;/&gt;
+	&lt;upload bucketName=&quot;static.springframework.org&quot;
+		file=&quot;${target.release.dir}/${release.zip}&quot;
+		toFile=&quot;SPR/spring-framework-${spring-version}-${tstamp}-${build.number}.zip&quot;
+		publicRead=&quot;true&quot;/&gt;
+&lt;/aws:s3&gt;
+</code></pre><p>我希望能够定义一个由我们的访问和秘密密钥（S3的密码登录名）控制的S3会话，并在该定义中执行多个上载。每次上传都会进入一个“存储桶”，这是S3提供的唯一粒度级别。</p><p>S3本身通常用作REST-ful服务，因此易于交互。为此，我使用了一个名为<a href="https://jets3t.dev.java.net/">jets3t</a> （发音为jet-set）的库。对于将S3与Java结合使用的人，这是使用S3的首选方式（据我所知，这是Amazon认可的唯一库）。Jets3t使用与我的XML定义类似的范例（或者也许我使用了它们的范例？）您将创建对服务器的引用，然后重复使用它来执行多个操作。在ANT任务中，我基于访问密钥和秘密密钥创建了一组凭据，并将它们绑定到对服务的引用中：</p>
+<pre><code class="prettyprint java"><br />AWSCredentials credentials = new AWSCredentials(accessKey, secretKey);
 S3Service service = new RestS3Service(credentials);
 
 for (Upload upload : uploads) {
 	upload.upload(service);
 }
-</code></pre><p>如您所见，我已经对上传操作进行了模块化，以便将来如果需要扩展s3任务来执行其他操作（下载，设置权限等），我可以这样做。The <span style="font-family:courier">Upload</span> object does the heavy lifting. It creates a reference to a bucket based on the <span style="font-family:courier">bucketName</span>, creates a reference to the new object based on the <span style="font-family:courier">toFile</span> value, and then uploads the contents of the file via HTTP.</p>
-<pre><code class="prettyprint java"><br>private S3Bucket getBucket() {
+</code></pre><p>如您所见，我已经对上传操作进行了模块化，以便将来如果我需要扩展s3任务来做其他事情（下载，设置权限等），可以这样做。<span style="font-family:courier">Upload</span>对象很繁重。它基于<span style="font-family:courier">bucketName</span>创建对存储桶的引用，基于<span style="font-family:courier">toFile</span>值创建对新对象的引用，然后通过HTTP上传文件的内容。</p>
+<pre><code class="prettyprint java"><br />private S3Bucket getBucket() {
 	return new S3Bucket(bucketName);
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>private S3Object getObject() {
+<pre><code class="prettyprint java"><br />private S3Object getObject() {
 	S3Object object = new S3Object(toFile);
 	if (publicRead) {
 		object.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
@@ -200,10 +206,10 @@ for (Upload upload : uploads) {
 	return object;
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>S3Bucket bucket = getBucket();
+<pre><code class="prettyprint java"><br />S3Bucket bucket = getBucket();
 S3Object object = getObject();
 service.putObject(bucket, object);
-</code></pre><p>In the actual code for this task, I’ve added some pretty output so that you can see how fast the file is uploaded and what the upload speed is:</p>
+</code></pre><p>在此任务的实际代码中，我添加了一些漂亮的输出，以便您可以查看文件上传的速度以及上传速度：</p>
 <pre>upload-s3:
    [aws:s3] Uploading /opt/j2ee/domains/springframework.org/build/bamboo-home/xml-data/build-dir/
                 SPR-NIGHTLY/spring/target/release/spring-framework-2.0.5-with-dependencies.zip (65132641B)
@@ -212,10 +218,12 @@ service.putObject(bucket, object);
    [aws:s3] Uploading /opt/j2ee/domains/springframework.org/build/bamboo-home/xml-data/build-dir/
                 SPR-NIGHTLY/spring/target/release/spring-framework-2.0.5.zip (10752085B)
                 to bucket static.springframework.org
-   [aws:s3] Transfer Time: 6.0s - Transfer Rate: 1792014.1B/​s</pre><p>The effort was so successful for us that we’ve expanded it all of the ANT based builds in the Spring portfolio. The Spring Framework, Spring LDAP, Spring Web Flow, and Spring Modules all now upload to this S3 nightly snapshot repository and on my list of things to do is to give some love to the Maven projects as well. The upshot to this is that we’ve freed up over 30GB of space and drastically reduced bandwidth usage all for about US$4.00 over the last two months.</p><p>Since I had to write some code to make this all work, I dropped it into our source control area. I also went ahead and put it up on our internal private Maven repo which is mirrored to the public Maven repo. If you’re interested in seeing the code take a look in the <a href="https://springframework.svn.sourceforge.net/svnroot/springframework/spring-aws/">SVN repository</a>. If you’d like to use the ANT task you can grab it from Maven with a <span style="font-family:courier">groupId</span> of <span style="font-family:courier">org.springframework.aws</span> and an <span style="font-family:courier">artifactId</span> of <span style="font-family:courier">spring-aws-ant</span>. <b>Please note that this is totally unsupported and undocumented code!</b> What it does is very limited and there are no current plans to improve or document it in any way. If I get some spare time, that might change, but don’t count on it :)</p><p>看来我的航班现在正在降落，所以我将借此机会结束。寻找以下说明我们如何构建快照下载页面的帖子，以便您可以直接从S3抓取快照。</p></div>
+   [aws:s3] Transfer Time: 6.0s - Transfer Rate: 1792014.1B/​s
+</pre><p>这项工作对我们来说是如此成功，以至于我们已经在Spring产品组合中扩展了所有基于ANT的版本。现在，Spring框架，Spring LDAP，Spring Web Flow和Spring模块都上载到该S3夜间快照存储库，在我看来，要做的事情也是对Maven项目也有所帮助。最终的结果是，在过去两个月中，我们释放了超过30GB的空间，并大幅度降低了带宽使用量，共计约4.00美元。</p><p>由于必须编写一些代码才能使其全部正常工作，因此将其放入了源代码控制区域。我还继续将其放在我们内部的私有Maven回购中，该回购已映射到公共Maven回购。如果您有兴趣查看代码，请查看<a href="https://springframework.svn.sourceforge.net/svnroot/springframework/spring-aws/">SVN信息库</a> 。如果您想使用ANT任务，则可以使用<span style="font-family:courier">groupId</span>为<span style="font-family:courier">org.springframework.aws</span>和<span style="font-family:courier">artifactId</span>为<span style="font-family:courier">spring-aws-ant的</span> Maven抓取它。<b>请注意，这是完全不受支持和未记录的代码！</b> 它的作用非常有限，目前没有计划以任何方式对其进行改进或记录。如果我有一些空闲时间，那可能会改变，但是不要指望它:)</p><p>看来我的航班现在正在降落，所以我将借此机会结束。寻找以下说明我们如何构建快照下载页面的帖子，以便您可以直接从S3抓取快照。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 68;
 
       (function(disqus_shortname, document) {
@@ -229,7 +237,8 @@ service.putObject(bucket, object);
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -267,12 +276,14 @@ service.putObject(bucket, object);
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

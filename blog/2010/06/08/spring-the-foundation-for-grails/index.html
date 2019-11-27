@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>春天：Grails的基础</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -32,14 +36,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2010-06-08 10:39:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,25 +174,25 @@
 <div class="blog--post"><p>在针对Groovy＆Grails的SpringSource培训课程中，我们强调Grails站在巨人的肩膀上。那些巨人之一就是春天。没有它，Grails根本不会像现在这样快地被开发出来。它也可能没有灵活性，无法轻松地与企业Java系统集成。仅查看可用插件的数量：许多插件基于具有Spring支持的Java库。</p><p>在这篇文章中，我想先从Grails如何使用Spring开始，然后介绍可以利用这种原始能力和灵活性的各种方式。</p>
 <h2>春天的孩子</h2><p>您可能没有意识到这一点，但是当您创建Grails应用程序时，您也在创建一个Spring MVC应用程序。在后台，Grails创建了Spring MVC的<tt>DispatcherServlet</tt>的变体，并配置了一堆bean来完成繁重的工作。当然，这意味着存在一个Spring上下文来支持您的应用程序-您可以访问的上下文将在以后看到。</p><p>如果在典型的Grails应用程序的Spring上下文中查看，则可以找到以下bean的一些示例：<br></p><ul><br><li><em>grailsApplication-</em>代表当前应用程序及其资源的Bean</li><br><li><em>pluginManager-</em>插件管理器，您可以查询有关已加载插件的信息</li><br><li><em>jspViewResolver-</em>用于GSP的自定义MVC视图解析器，可回退到JSP</li><br><li><em>messageSource-</em>本地化消息的来源</li><br><li><em>localeResolver-</em>如何确定用户的语言环境</li><br><li><em>注解</em> <tt>HandlerMapping-</tt>允许使用<tt>@Controller</tt>注解</li><br></ul><br>那只是Grails创建的许多bean中的几个。实际上，您可能会惊讶地发现所有应用程序控制器，标记库，域类和服务也是bean。<p></p><p>Grails在其他哪些领域还依赖Spring？好吧，这里有一个数据绑定的开始：Spring将所有字符串数据物理绑定到对象属性。它也不只是Web层：GORM使用Spring的Hibernate模板保存和查询域类。也许最重要的是，Grails使用Spring的事务管理。正如我已经提到的，许多插件都利用Java库提供的Spring集成。</p><p>因此，Grails应用程序实际上是Spring应用程序。这就提出了一个问题，即在需要时如何利用底层的Spring组件。</p>
 <h2>和春天说话</h2><p>您可以轻松编写Grails应用程序，甚至是相当复杂的应用程序，而不必担心Spring。太好了，因为这意味着新开发人员不必立即学习该技术。但是，仅仅因为你<em>没有</em>使用Spring直接交互，并不意味着它很难。</p><p>您可以采取几种方法，我将依次介绍每种方法。</p>
-<h3>服务和自动接线</h3><p>Spring的关键是bean的创建和连接。通常，您必须提供一些配置才能执行此操作，但是Grails服务为您提供了一种轻量级的，基于约定的替代方法。如前所述，您在Grails应用程序中创建的多个工件会自动变为Spring Bean，但这是使您获得最大控制权的服务。</p><p>原理很简单：在<tt>grails-app / services</tt>下创建一个带有<tt>Service</tt>后缀的类，您将在应用程序中自动获得一个新的（单个）Spring bean。那个豆的名字？简单：类名带有小写的首字母。例如， <tt>SecurityService</tt>类将产生一个名为“ securityService”的bean。<tt>AuditReportService</tt>将同样成为“ auditReportService” bean。</p><p>将其他Bean连接到您的服务（以及所有其他Grails核心构件）也很简单：声明一个与您想要的Bean具有相同名称的属性。例如，假设我想使用其他服务（或控制器）中的“ auditReportService” bean。我可以这样连接：</p>
+<h3>服务和自动接线</h3><p>Spring的关键是bean的创建和连接。通常，您必须提供一些配置才能执行此操作，但是Grails服务为您提供了一种轻量级的，基于约定的替代方法。如前所述，您在Grails应用程序中创建的多个工件会自动变为Spring Bean，但这是使您获得最大控制权的服务。</p><p>原理很简单：在<tt>grails-app / services</tt>下创建一个带有<tt>Service</tt>后缀的类，您将在应用程序中自动获得一个新的（单个）Spring bean。那个豆的名字？简单：类名带有小写的首字母。例如， <tt>SecurityService</tt>类将产生一个名为“ securityService”的bean。<tt>AuditReportService</tt>将同样成为“ auditReportService” bean。</p><p>将其他Bean连接到您的服务（以及所有其他Grails核心构件）也很简单：声明一个与您想要的Bean具有相同名称的属性。例如，假设我想使用另一个服务（或控制器）中的“ auditReportService” bean。我可以这样连接：</p>
 <pre><code class="prettyprint groovy">class MyService {
     def auditReportService
     ...
 }
 </code></pre><p>我相信您会同意这很简单。这是Spring自动接线的一个示例。即使您为属性指定类型，Grails也会按名称对bean进行接线。</p><p>服务的另一个有用功能是默认情况下它们是事务性的。这使它们成为抽象化数据访问并为您的应用程序构建健壮的体系结构的好方法。一种典型的方法是为您的服务创建不同的“网关”：HTML UI，XML REST接口，通过RMI进行远程处理等，所有这些都将调用您的服务。</p><p>最后一点：我说过Grails会将服务实例化为单例bean，但是您可以基于每个服务更改此行为。只需将静态<tt>作用域</tt>属性添加到您的服务类，如下所示：</p>
 <pre><code class="prettyprint groovy">class MyService {
-    static scope = "request"
+    static scope = &quot;request&quot;
     ...
 }
 </code></pre><p>如您所见，当您使用服务时，几乎可以毫不费力地获得Spring的许多主要好处。太好了，但是如果您想将现有的类转换为bean，该怎么办？也许您已经用Java编写了它们，或者将它们打包在JAR文件中。对于纯Spring，您可以手动配置它们。幸运的是，您可以在Grails中执行相同的操作。</p>
-<h3>手动定义豆</h3><p>在过去的美好时光中，在注释之前，您将为Spring应用程序创建一个或多个XML格式的bean描述符文件。Grails允许您对<tt>grails-app / conf / spring / resources.xml</tt>文件执行相同的操作。没什么特别的，因此标准的Spring文档适用！</p><p>我不得不说我不再是编写XML的忠实拥护者，因此我更喜欢另一种bean定义格式：Grails的Spring Bean DSL。这是在<tt>grails-app / conf / spring / resources.groovy</tt>中定义报告生成器bean的非常简单的示例：</p>
+<h3>手动定义豆</h3><p>在过去的美好时光中，在注释之前，您将为Spring应用程序创建一个或多个XML格式的bean描述符文件。Grails允许您对<tt>grails-app / conf / spring / resources.xml</tt>文件执行相同的操作。没什么特别的，因此标准的Spring文档适用！</p><p>我不得不说我不再是编写XML的忠实拥护者，因此我更喜欢另一种bean定义格式：Grails的Spring Bean DSL。这里的定义中<tt>的grails-app / conf目录/春/ resources.groovy</tt>报告生成bean的一个很简单的例子：</p>
 <pre><code class="prettyprint groovy">beans = {
     reportGenerator(org.example.XmlReportGenerator)
 }
 </code></pre><p>定义以bean的名称（“ reportGenerator”）开头，后跟括号中的类（“ XmlReportGenerator”）。您还可以配置bean和bean定义属性：</p>
 <pre><code class="prettyprint groovy">beans = {
-    reportGenerator(org.example.XmlReportGenerator) { bean ->
-        bean.autowire = "byName"
+    reportGenerator(org.example.XmlReportGenerator) { bean -&gt;
+        bean.autowire = &quot;byName&quot;
         prettyFormat = true
     }
 }
@@ -197,13 +203,13 @@ beans = {
     if (Environment.current == Environment.PRODUCTION) {
         // Use the real web service for production
         securityService(org.example.WsClientSecurityService) {
-            endpoint = "http://..."
+            endpoint = &quot;http://...&quot;
         }
     }
     else {
         // Use a dummy service for development and testing
         securityService(org.example.DummySecurityService)  {
-            userRoles = [ peter: [ "admin", "user"], tom: [ "user" ] ]
+            userRoles = [ peter: [ &quot;admin&quot;, &quot;user&quot;], tom: [ &quot;user&quot; ] ]
         }
     }
 }
@@ -211,13 +217,13 @@ beans = {
 <h3>注解</h3><p>Spring 2.5引入了对各种事物的注释，例如组件，Spring MVC控制器，事务等。您会很高兴知道可以在Grails应用程序中使用这些注释。例如，假设您在<tt>src / java</tt>下有一个Java类，如下所示：</p>
 <pre><code class="prettyprint java">package org.example;
 
-@Component("securityService")
+@Component(&quot;securityService&quot;)
 public class DummySecurityService implements SecurityService {
     ...
 }
-</code></pre><p>这应该会自动成为名称为“ securityService”的Spring bean，但这不会发生。还需要执行一个步骤：您必须指定Grails应该扫描的软件包以查找Springannotation。因此，在此示例中，我们希望扫描<tt>org.example</tt>软件包。为此，只需将以下设置添加到<tt>grails-app / conf / Config.groovy即可</tt> ：</p>
-<pre><code class="prettyprint groovy">grails.spring.bean.packages = [ "org.example" ]
-</code></pre><p>现在，该类将自动创建为Spring bean。请注意，Grails也会扫描所有子包，因此即使该类在<tt>org.example.sub.pkg</tt>包中，上述方法也可以使用。</p><p>只要您通过<tt>grails.spring.bean.packages</tt>指定包，您甚至可以使用@Controllerannotation将类添加为控制器。如果您决定从Spring MVC迁移到Grails，或者团队已经开发了一些要放入Grails应用程序的Spring MVC控制器，这将很有帮助。</p><p>如您所见，在Grails中有足够的选项来定义bean，以适合大多数人。这就只剩下Spring应用程序上下文的运行时查询了。</p>
+</code></pre><p>这应该会自动成为名称为“ securityService”的Spring bean，但这不会发生。还需要执行一个步骤：您必须指定Grails应该扫描的软件包以查找Spring批注。因此，在此示例中，我们希望扫描<tt>org.example</tt>软件包。为此，只需将以下设置添加到<tt>grails-app / conf / Config.groovy即可</tt> ：</p>
+<pre><code class="prettyprint groovy">grails.spring.bean.packages = [ &quot;org.example&quot; ]
+</code></pre><p>现在，该类将自动创建为Spring bean。请注意，Grails也会扫描所有子包，因此即使该类在<tt>org.example.sub.pkg</tt>包中，上述方法也可以使用。</p><p>只要通过<tt>grails.spring.bean.packages</tt>指定包，您甚至可以使用@Controller注释将类添加为控制器。如果您决定从Spring MVC迁移到Grails，或者如果团队已经开发了一些要放入Grails应用程序的Spring MVC控制器，这将很有帮助。</p><p>如您所见，在Grails中有足够的选项来定义bean，以适合大多数人。这就只剩下Spring应用程序上下文的运行时查询了。</p>
 <h3>运行时交互</h3><p>许多应用程序都发现直接与Spring应用程序上下文进行通信很有用，无论是查找特定类型的所有bean，还是简单地检索特定bean而无需依赖自动接线。您如何访问应用程序上下文？</p><p>如果您的类是Spring Bean，则可以简单地实现<tt>ApplicationContextAware</tt>接口。然后，Spring将自动将上下文注入到<tt>applicationContext</tt>属性中。另外，您可以注入<tt>grailsApplication</tt> bean并通过<tt>grailsApplication.mainContext</tt>检索上下文。</p><p>另一方面，如果您的班级不是由Spring管理的，则必须做一些手工工作。它不是很漂亮，但是您可以通过以下代码片段获取上下文：</p>
 <pre><code class="prettyprint groovy">import org.springframework.web.context.support.WebApplicationContextUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
@@ -227,7 +233,8 @@ def ctx = WebApplicationContextUtils.getWebApplicationContext(ServletContextHold
 </code></pre><p>当心：您没有在Grails中处理单个应用程序上下文。从上述不同技术中获得的应用程序上下文具有父应用程序上下文。该父级包含<tt>grailsApplication</tt> ， <tt>pluginManager</tt>和其他从<tt>web-app / WEB-INF / applicationContext.xml</tt>文件配置的bean。您可能会发现使您能够以与刚才所详述的方式不同的方式获取应用程序上下文的代码，但最终可能会引用到父项，其中不包含服务，控制器等。</p><p>总结起来，Grails从根本上来说是一个变相的Spring应用程序。尽管它使Spring不受偶然检查的影响，但是它确实提供了一些强大的技术来直接与Spring交互。这意味着您可以轻松利用现有的Java / Spring库，并利用一个框架使大型应用程序比以前更易于管理。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 329;
 
       (function(disqus_shortname, document) {
@@ -241,7 +248,8 @@ def ctx = WebApplicationContextUtils.getWebApplicationContext(ServletContextHold
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -279,12 +287,14 @@ def ctx = WebApplicationContextUtils.getWebApplicationContext(ServletContextHold
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

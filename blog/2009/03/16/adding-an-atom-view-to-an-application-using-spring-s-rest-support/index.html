@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Spring的REST支持向应用程序添加Atom视图</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,14 +38,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2009-03-16 22:07:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -170,57 +176,57 @@
 <div class="blog--post"><p>在Spring 3.0中，将通过REST支持来增强Spring MVC。这篇文章描述了如何使用REST支持在一个简单的示例应用程序之上实现AtomView。请按照以下逐步过程进行操作，以了解在Spring MVC中使用新的REST支持在简单应用程序之上实现AtomView有多么容易。</p>
 <h2>步骤1：下载应用程序框架</h2><p>在此博客文章的底部附近，您将找到一个简单的下载，其中包含Web应用程序的框架。在内部，您将找到此应用程序所需的所有Spring 3.0二进制文件，以及Atom功能所需的一些其他功能。Spring二进制文件基于每晚构建，并且在Spring 3.0最终发布后可能会被最终构建替换。</p><p>接下来，使用“导入>将现有项目导入到工作区”向导（从“文件”菜单）在Eclipse中加载项目。该应用程序是一个简单的Eclipse动态Web项目，具有用于Spring MVC设置的所有基础结构。因此，如果您对Spring MVC熟悉，那么这没什么大不了的。</p>
 <h2>步骤2：检查应用程序的设置</h2><p>在/WEB-INF/web.xml中，您将找到正在定义的Spring MVC DispatcherServlet。它从/WEB-INF/rest-servlet.xml文件加载应用程序上下文。该文件又包含一个组件扫描程序，该组件扫描程序扫描com.springsource.samples.rest包中的@Components（也称为@Controllers）。</p><p>接下来，在com.springsource.samples.rest包中，您将找到带有两个控制器方法的ContentController。</p>
-<pre><code class="prettyprint java"><br>@Controller
+<pre><code class="prettyprint java"><br />@Controller
 public class ContentController {
 	
-	private List<SampleContent> contentList = new ArrayList<SampleContent>();
+	private List&lt;SampleContent&gt; contentList = new ArrayList&lt;SampleContent&gt;();
 	
-	@RequestMapping(value="/content.*", method=RequestMethod.GET)
+	@RequestMapping(value=&quot;/content.*&quot;, method=RequestMethod.GET)
 	public ModelAndView getContent() {
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("content");
-		mav.addObject("sampleContentList", contentList);
+		mav.setViewName(&quot;content&quot;);
+		mav.addObject(&quot;sampleContentList&quot;, contentList);
 		return mav;
 	}
 	
-	@RequestMapping(value="/content.html", method=RequestMethod.POST)
+	@RequestMapping(value=&quot;/content.html&quot;, method=RequestMethod.POST)
 	public String addContent() {
-		contentList.add(SampleContent.generateContent("Alef Arendsen", new Date()));
-		return "redirect:content.html";
+		contentList.add(SampleContent.generateContent(&quot;Alef Arendsen&quot;, new Date()));
+		return &quot;redirect:content.html&quot;;
 	}
 }
-</code></pre><p>第一个处理程序返回SampleContent项目的列表。第二个处理程序通过使用SampleContent.generateContent（）方法添加一个新的SampleContent项。第一个处理程序对GET请求作出反应，第二个处理程序对POST请求作出反应。方法本身已使用@RequestMapping注释进行了注释。</p><p>在组件服务器扫描程序的rest-servlet.xml应用程序上下文文件中，您还将获得一个ViewResolver，在本例中是一个InternalResourceViewResolver。它将负责视图名称（在getContent（）处理程序中为“内容”）和JSP页面之间的转换。</p><p>将其部署到例如Tomcat之后，您应该可以转到<a href="http://localhost:8080/spring-rest/rest"></a> <a href="http://localhost:8080/spring-rest/rest">HTTP：//本地主机：8080 /弹簧休息/休息</a> 。这会将您重定向到/ rest / content，该URL由处理程序获取。</p>
+</code></pre><p>第一个处理程序返回SampleContent项目的列表。第二个处理程序通过使用SampleContent.generateContent（）方法添加一个新的SampleContent项。第一个处理程序对GET请求作出反应，第二个处理程序对POST请求作出反应。方法本身已使用@RequestMapping注释进行了注释。</p><p>在组件服务器扫描程序的rest-servlet.xml应用程序上下文文件中，您还将获得一个ViewResolver，在本例中是一个InternalResourceViewResolver。它将负责视图名称（在getContent（）处理程序中为“内容”）和JSP页面之间的转换。</p><p>将其部署到例如Tomcat之后，您应该可以转到<a href="http://localhost:8080/spring-rest/rest"></a> <a href="http://localhost:8080/spring-rest/rest">http：// localhost：8080 / spring-rest / rest</a> 。这会将您重定向到/ rest / content，该URL由处理程序获取。</p>
 <h2>步骤3：实现AtomView</h2><p>为了实现AtomView，我们将使用Rome项目，该项目可从以下网站获得<a href="https://rome.dev.java.net/"></a> <a href="https://rome.dev.java.net/">https://rome.dev.java.net/</a> 。在应用程序的原始设置中，视图名称由视图解析器转换为InternalResourceView实例，在这种情况下，该实例将呈现JSP。我们将创建自己的View接口专用实例，而不是呈现Atom提要。</p><p>在com.springsource.samples.rest包中创建一个名为SampleContentAtomView的类，然后粘贴以下代码。该代码使用Spring MVC中的Atom支持类以及Rome项目中Atom提要的文档对象模型。</p>
-<pre><code class="prettyprint java"><br>public class SampleContentAtomView extends AbstractAtomFeedView {
+<pre><code class="prettyprint java"><br />public class SampleContentAtomView extends AbstractAtomFeedView {
 
 	@Override
-	protected void buildFeedMetadata(Map<String, Object> model, Feed feed, HttpServletRequest request) {
-		feed.setId("tag:springsource.com");
-		feed.setTitle("Sample Content");
-		@SuppressWarnings("unchecked")
-		List<SampleContent> contentList = (List<SampleContent>)model.get("sampleContentList");
+	protected void buildFeedMetadata(Map&lt;String, Object&gt; model, Feed feed, HttpServletRequest request) {
+		feed.setId(&quot;tag:springsource.com&quot;);
+		feed.setTitle(&quot;Sample Content&quot;);
+		@SuppressWarnings(&quot;unchecked&quot;)
+		List&lt;SampleContent&gt; contentList = (List&lt;SampleContent&gt;)model.get(&quot;sampleContentList&quot;);
 		for (SampleContent content : contentList) {
 			Date date = content.getPublicationDate();
-			if (feed.getUpdated() == null || date.compareTo(feed.getUpdated()) > 0) {
+			if (feed.getUpdated() == null || date.compareTo(feed.getUpdated()) &gt; 0) {
 				feed.setUpdated(date);
 			}
 		}
 	}
 
 	@Override
-	protected List<Entry> buildFeedEntries(Map<String, Object> model,
+	protected List&lt;Entry&gt; buildFeedEntries(Map&lt;String, Object&gt; model,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		@SuppressWarnings("unchecked")
-		List<SampleContent> contentList = (List<SampleContent>)model.get("sampleContentList");
-		List<Entry> entries = new ArrayList<Entry>(contentList.size());
+		@SuppressWarnings(&quot;unchecked&quot;)
+		List&lt;SampleContent&gt; contentList = (List&lt;SampleContent&gt;)model.get(&quot;sampleContentList&quot;);
+		List&lt;Entry&gt; entries = new ArrayList&lt;Entry&gt;(contentList.size());
 
 		for (SampleContent content : contentList) {
 			Entry entry = new Entry();
-			String date = String.format("%1$tY-%1$tm-%1$td", content.getPublicationDate());
+			String date = String.format(&quot;%1$tY-%1$tm-%1$td&quot;, content.getPublicationDate());
 			// see http://diveintomark.org/archives/2004/05/28/howto-atom-id#other
-			 entry.setId(String.format("tag:springsource.com,%s:%d", date, content.getId()));
-			entry.setTitle(String.format("On %s, %s wrote", date, content.getAuthor()));
+			 entry.setId(String.format(&quot;tag:springsource.com,%s:%d&quot;, date, content.getId()));
+			entry.setTitle(String.format(&quot;On %s, %s wrote&quot;, date, content.getAuthor()));
 			entry.setUpdated(content.getPublicationDate());
 
 			Content summary = new Content();
@@ -235,27 +241,27 @@ public class ContentController {
 	}
 }
 </code></pre>
-<h2>步骤4：设置内容协商</h2><p>框架Web应用程序已经提供了HTML视图，现在我们还实现了生成Atom提要的视图。我们需要做的最后一件事是确保对Atom提要的请求实际上将使用SampleContentAtomView呈现，并且在请求HTML视图时将呈现JSP。</p><p>在理想情况下，客户端会使用“接受HTTP”标头来请求其偏爱的某种表示形式。Accept HTTP标头（由HTTP规范定义）可以采用一种或多种媒体类型，并且应由浏览器（或任何与此相关的HTTP客户端）发送，以指示其喜欢哪种表示形式。例如，Atom提要的适当媒体类型是'application / atom + xml'，而HTML视图可能只是发送'text / html'或'text / xhtml'作为Accept标头。但是，这有一个小问题。浏览器通常具有一组固定的媒体类型，它们作为Accept HTTP标头发送，并且没有办法（除了使用JavaScript）修改浏览器发送的Accept标头。这就是文件扩展名是向服务器指示所需的表示形式的好选择的原因。</p><p>Spring 3.0具有一个ContentNegotiatingViewResolver，它可以与扩展名和Accept标头一起使用。找到合适的媒体类型后，它委托一组其他视图解析器为我们完成此操作。需要将以下内容粘贴到rest-servlet.xml中，以使其正常工作。如您所见，ContentNegotiatingViewResolver将委派给BeanNameViewResolver（如果需要，解析为SampleContentAtomView）或InternalResourceViewResolver。顺便说一下，下面的代码片段应替换在rest-servlet.xml文件中已经配置的InternalResourceViewResolver。</p><p>ContentNegotiatingViewResolver首先查看文件扩展名，然后使用Accept标头（通过某种程度可定制的方式）。我们必须将适当的扩展名映射到适当的媒体类型。在此示例中，我们将.html映射到text / html媒体类型，并将.atom映射到application / atom + xml。这将确保呈现适当的视图。</p><p>如果出现.atom请求，则ContentNegotiatingViewResolver将查找与application / atom + xml媒体类型匹配的视图。视图解析器将查找媒体类型为text / html的视图呈现内容，这是一个.html请求传入的。</p>
-<pre><code class="prettyprint xml"><br><bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-	<property name="mediaTypes">
-		<map>
-			<entry key="atom" value="application/atom+xml"/>
-			<entry key="html" value="text/html"/>
-		</map>
-	</property>
-	<property name="viewResolvers">
-		<list>
-			<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"/>
-			<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-				<property name="prefix" value="/WEB-INF/jsp/"/>
-				<property name="suffix" value=".jsp"/>
-			</bean>
-		</list>
-	</property>
-</bean>
+<h2>步骤4：设置内容协商</h2><p>框架Web应用程序已经提供了HTML视图，现在我们还实现了生成Atom提要的视图。我们需要做的最后一件事是确保对Atom提要的请求实际上将使用SampleContentAtomView呈现，并且在请求HTML视图时将呈现JSP。</p><p>在理想情况下，客户端会使用“接受HTTP”标头来请求其偏爱的某种表示形式。Accept HTTP标头（由HTTP规范定义）可以采用一种或多种媒体类型，并且应由浏览器（或任何与此相关的HTTP客户端）发送，以指示其喜欢哪种表示形式。例如，Atom提要的适当媒体类型是'application / atom + xml'，而HTML视图可能只是发送'text / html'或'text / xhtml'作为Accept标头。但是，这有一个小问题。浏览器通常具有一组固定的媒体类型，它们作为Accept HTTP标头发送，并且没有办法（除了使用JavaScript）修改浏览器发送的Accept标头。这就是文件扩展名是向服务器指示所需的表示形式的好选择的原因。</p><p>Spring 3.0具有一个ContentNegotiatingViewResolver，它可以与扩展名和Accept标头一起使用。找到合适的媒体类型后，它委托一组其他视图解析器为我们完成此操作。需要将以下内容粘贴到rest-servlet.xml中，以使其正常工作。如您所见，ContentNegotiatingViewResolver将委派给BeanNameViewResolver（如果需要，解析为SampleContentAtomView）或InternalResourceViewResolver。顺便说一下，下面的代码片段应替换在rest-servlet.xml文件中已经配置的InternalResourceViewResolver。</p><p>ContentNegotiatingViewResolver首先查看文件扩展名，然后使用Accept标头（通过某种程度可定制的方式）。我们必须将适当的扩展名映射到适当的媒体类型。在此示例中，我们将.html映射到text / html媒体类型，并将.atom映射到application / atom + xml。这将确保呈现适当的视图。</p><p>如果出现.atom请求，则ContentNegotiatingViewResolver将查找与application / atom + xml媒体类型匹配的视图。视图解析器将查找带有.html请求的媒体类型为text / html的视图呈现内容。</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.web.servlet.view.ContentNegotiatingViewResolver&quot;&gt;
+	&lt;property name=&quot;mediaTypes&quot;&gt;
+		&lt;map&gt;
+			&lt;entry key=&quot;atom&quot; value=&quot;application/atom+xml&quot;/&gt;
+			&lt;entry key=&quot;html&quot; value=&quot;text/html&quot;/&gt;
+		&lt;/map&gt;
+	&lt;/property&gt;
+	&lt;property name=&quot;viewResolvers&quot;&gt;
+		&lt;list&gt;
+			&lt;bean class=&quot;org.springframework.web.servlet.view.BeanNameViewResolver&quot;/&gt;
+			&lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+				&lt;property name=&quot;prefix&quot; value=&quot;/WEB-INF/jsp/&quot;/&gt;
+				&lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;/&gt;
+			&lt;/bean&gt;
+		&lt;/list&gt;
+	&lt;/property&gt;
+&lt;/bean&gt;
 
-<bean id="content" class="com.springsource.samples.rest.SampleContentAtomView"/>
-</code></pre><p>将其放在您的应用程序上下文中后，让服务器重新启动应该可以解决问题。去<a href="http://localhost:8080/spring-rest/rest/content.html"></a> <a href="http://localhost:8080/spring-rest/rest/content.html">http://localhost:8080/spring-rest / rest / content.html</a>查看所有内容项并生成新的内容项。去<a href="http://localhost:8080/spring-rest/rest/content.atom"></a> <a href="http://localhost:8080/spring-rest/rest/content.atom">http://localhost:8080/spring-rest / rest / content.atom</a>订阅Atom提要。</p><p>我希望这个小博客条目向您展示将Atom提要添加到您的应用程序有多么简单。除了Atom，Spring还提供视图支持类，用于呈现PDF和Excel文件，JSON表示形式和XML文档。检查他们，让我们知道您的想法！</p>
+&lt;bean id=&quot;content&quot; class=&quot;com.springsource.samples.rest.SampleContentAtomView&quot;/&gt;
+</code></pre><p>将其放在您的应用程序上下文中后，让服务器重新启动应该可以解决问题。去<a href="http://localhost:8080/spring-rest/rest/content.html"></a> <a href="http://localhost:8080/spring-rest/rest/content.html">http：// localhost：8080 / spring-rest / rest / content.html</a>查看所有内容项并生成新的内容项。去<a href="http://localhost:8080/spring-rest/rest/content.atom"></a> <a href="http://localhost:8080/spring-rest/rest/content.atom">http：// localhost：8080 / spring-rest / rest / content.atom</a>订阅Atom提要。</p><p>我希望这个小博客条目向您展示将Atom提要添加到您的应用程序有多么简单。除了Atom，Spring还提供视图支持类，用于呈现PDF和Excel文件，JSON表示形式和XML文档。检查他们，让我们知道您的想法！</p>
 <h2>资料下载</h2><p>如所承诺的，这里是下载。请注意，这些项目基于Spring的每晚构建。有关Spring 3.0的最新版本，请确保检查<a href="http://www.springsource.org">www.springsource.org</a> 。</p>
 <ul>
 <li><a href="http://blog.springsource.com/wp-content/uploads/2009/02/spring-rest1.zip">骨架式Webapp</a></li>
@@ -263,7 +269,8 @@ public class ContentController {
 </ul></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 204;
 
       (function(disqus_shortname, document) {
@@ -277,7 +284,8 @@ public class ContentController {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -315,12 +323,14 @@ public class ContentController {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Grails 1.3管理插件</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -52,14 +56,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2010-05-18 07:29:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -185,34 +191,35 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>长期以来，管理Grails依赖项仅意味着将它们放置在应用程序的<tt>lib</tt>目录中。接下来是Grails 1.2和依赖项DSL：您最终可以声明依赖项，并让Grails自动下载它们并使它们可用于您的应用程序。大！</p><p>现在，Grails 1.3将依赖项DSL带到了插件领域。<br></p><h3>所以呢？</h3><br>到目前为止，用户经常会在插件系统中遇到两个问题：<br><ol><br> <li>设置合适的Subversion服务器充当Grails插件存储库并不容易；和</li><br> <li>您无法控制插件将哪些依赖项带入您的应用程序。</li><br></ol><br>其中的第一个并不是特别适用于个人开发人员，但对于可能限制访问互联网或希望对“最新”版本的库和插件进行更多控制的公司而言，这是一笔更大的交易。如果他们可以使用<a href="http://nexus.sonatype.org/">Nexus</a>或<a href="http://www.jfrog.org/">Artifactory</a>这样的存储库管理器，那就好多了。<p></p><p>至于依赖关系，一些插件包括不需要的库（甚至更糟）会破坏您的应用程序。使用依赖性DSL，您可以明确排除有问题的库。</p><p>这些就是为什么此更改对您很重要的一些原因。那么，您如何使用新功能？<br></p><h3>依赖两步</h3><br>为了正确演示Grails依赖管理的实用性，我们必须建立一个本地存储库。对于本文，我们将使用Artifactory。您同样可以使用Nexus或任何其他工具来创建兼容Maven的存储库。<p></p><p>我假设Artifactory已经安装并正在运行-有关进入此阶段的详细信息，请访问其网站，尤其是<a href="http://www.jfrog.org/screencast.php?id=2FGHwZSAqog">“一分钟Artifactory”截屏</a> 。至此，我们有了一个本地存储库，但是它尚未提供任何工件。让我们修复它。</p><p>我将添加“ db-util”插件和“ commons-digester”库。您可以尝试使用任何可用的插件或JAR。只需导航至Artifactory的“部署”选项卡（已使用用户名“ admin”，密码“ password”登录），选择适当的文件并上传。我抓起文件：<br></p><pre>$USER_HOME/.ivy2/cache/commons-digester/commons-digester/jars/commons-digester-2.0.jar<br> $USER_HOME/.grails/1.2.1/plugins/db-util-0.4.zip</pre><br>并通过Artifactory UI添加了它们：<br><a href="http://www.cacoethes.co.uk/blog/wp-content/uploads/2010/05/artifactory-upload.png"><img class="aligncenter size-full wp-image-264" title="人工上传" src="http://www.cacoethes.co.uk/blog/wp-content/uploads/2010/05/artifactory-upload.png" alt="" width="680" height="410"></a><p></p><p>请注意，UI允许您指定上载的目标存储库。我为“ db-util”插件选择了“ plugins-releases-local”，为“ commons-digester”选择了“ libs-releases-local”。另外，在提交插件工件之前，我将其groupId设置为“ org.grails.plugins”，并将其artifactId设置为“ db-util”（默认值均为“ grails-db-util”）。“ org.grails.plugins” groupId是Grails假设的用于插件依赖性的组。还请注意artifactId如何不包含“ grails-”前缀。</p><p>这两个工件现在可以在本地任何Grails应用程序中使用。现在，我们需要在Grails应用程序中配置存储库和依赖项。<br></p><h3>依赖DSL</h3><br>接下来的部分出奇的简单。我们需要做两件事：<br><ol><br> <li>配置Grails从我们的Artifactory资源库下载插件和JAR；和</li><br> <li>指定我们的依赖项。</li><br></ol><br>与Grails 1.2一样，此操作在<tt>grails-app / conf / BuildConfig.groovy中完成</tt> 。以下是示例Grails应用程序中的相关部分：<p></p>
+<div class="blog--post"><p>长期以来，管理Grails依赖项仅意味着将它们放置在应用程序的<tt>lib</tt>目录中。然后是Grails 1.2和依赖项DSL：您最终可以声明依赖项，并让Grails自动下载它们并使它们可用于您的应用程序。大！</p><p>现在，Grails 1.3将依赖项DSL带到了插件领域。<br></p><h3>所以呢？</h3><br>到目前为止，用户经常会在插件系统中遇到两个问题：<br><ol><br> <li>设置合适的Subversion服务器充当Grails插件存储库并不容易；和</li><br> <li>您无法控制插件将哪些依赖项带入您的应用程序。</li><br></ol><br>其中的第一个并不是特别适用于个人开发人员，但对于可能限制访问互联网或希望对“最新”版本的库和插件进行更多控制的公司而言，这是一笔更大的交易。如果他们可以使用<a href="http://nexus.sonatype.org/">Nexus</a>或<a href="http://www.jfrog.org/">Artifactory</a>这样的存储库管理器，那就好多了。<p></p><p>至于依赖项，某些插件包括不需要的库（甚至更糟）会破坏您的应用程序。使用依赖性DSL，您可以明确排除有问题的库。</p><p>这些就是为什么此更改对您很重要的一些原因。那么，您如何使用新功能？<br></p><h3>依赖两步</h3><br>为了正确演示Grails依赖管理的实用性，我们必须建立一个本地存储库。对于本文，我们将使用Artifactory。您同样可以使用Nexus或任何其他工具来创建兼容Maven的存储库。<p></p><p>我假设Artifactory已经安装并正在运行-有关进入此阶段的详细信息，请访问其网站，尤其是<a href="http://www.jfrog.org/screencast.php?id=2FGHwZSAqog">“一分钟Artifactory”截屏</a> 。至此，我们有了一个本地存储库，但是它尚未提供任何工件。让我们修复它。</p><p>我将添加“ db-util”插件和“ commons-digester”库。您可以尝试使用任何可用的插件或JAR。只需导航至Artifactory的“部署”选项卡（已使用用户名“ admin”，密码“ password”登录），选择适当的文件并上传。我抓起文件：<br></p><pre> $USER_HOME/.ivy2/cache/commons-digester/commons-digester/jars/commons-digester-2.0.jar<br /> $USER_HOME/.grails/1.2.1/plugins/db-util-0.4.zip</pre><br>并通过Artifactory UI添加了它们：<br><a href="http://www.cacoethes.co.uk/blog/wp-content/uploads/2010/05/artifactory-upload.png"><img class="aligncenter size-full wp-image-264" title="人工上传" src="http://www.cacoethes.co.uk/blog/wp-content/uploads/2010/05/artifactory-upload.png" alt="" width="680" height="410"></a><p></p><p>请注意，UI允许您指定上载的目标存储库。我为“ db-util”插件选择了“ plugins-releases-local”，为“ commons-digester”选择了“ libs-releases-local”。另外，在提交插件工件之前，我将其groupId设置为“ org.grails.plugins”，并将其artifactId设置为“ db-util”（默认值均为“ grails-db-util”）。“ org.grails.plugins” groupId是Grails假设的用于插件依赖性的组。还请注意artifactId如何不包含“ grails-”前缀。</p><p>这两个工件现在可以在本地任何Grails应用程序中使用。现在，我们需要在Grails应用程序中配置存储库和依赖项。<br></p><h3>依赖DSL</h3><br>接下来的部分出奇的简单。我们需要做两件事：<br><ol><br> <li>配置Grails从我们的Artifactory资源库下载插件和JAR；和</li><br> <li>指定我们的依赖项。</li><br></ol><br>与Grails 1.2一样，此操作在<tt>grails-app / conf / BuildConfig.groovy中完成</tt> 。以下是示例Grails应用程序中的相关部分：<p></p>
 <pre><code class="prettyprint groovy">grails.project.dependency.resolution = {
     ...
-    log "warn"
+    log &quot;warn&quot;
     repositories {
         grailsPlugins()
         grailsHome()
-        mavenRepo "http://localhost:8081/artifactory/libs-releases-local/"
-        mavenRepo "http://localhost:8081/artifactory/plugins-releases-local/"
+        mavenRepo &quot;http://localhost:8081/artifactory/libs-releases-local/&quot;
+        mavenRepo &quot;http://localhost:8081/artifactory/plugins-releases-local/&quot;
         grailsCentral()
     }
     plugins {
-        build "org.grails.plugins:db-util:0.4"
+        build &quot;org.grails.plugins:db-util:0.4&quot;
     }
     dependencies {
-        compile "commons-digester:commons-digester:2.0"
+        compile &quot;commons-digester:commons-digester:2.0&quot;
     }
 }
-</code></pre><p>因此，在<tt>库</tt>部分添加由Artifactory的服务器暴露每一个“仓库”一<tt>mavenRepo</tt>条目。请注意，在这种情况下，我们同时添加了“ libs-releases-local”存储库和“ plugins-releases-local”存储库。</p><p>DSL的新增功能是“ <tt>插件”</tt>部分，该部分（毫无疑问）用于声明Grails插件。它的语法与“ <tt>依赖项”</tt>部分完全相同。因此，在<tt>插件</tt>下声明了“ db-util”，在<tt>dependencies</tt>下声明了“ commons-digester”。</p><p>那就是你要做的。如果现在执行<tt>grails run-app</tt> ，则会看到类似以下的输出：<br></p><pre><br>…<br>Resolving dependencies…<br>Downloading: <a href="http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom">http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom</a> …<br>Download complete.<br>Downloading: <a href="http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom.sha1">http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom.sha1</a> …<br>Download complete.<br>…<br>Downloading new plugins. Please wait… …<br>Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom</a> …<br>Download complete.<br>Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom.sha1">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom.sha1</a> …<br>Download complete.<br>Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip</a> …<br>Download complete.<br>Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip.sha1">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip.sha1</a> …<br>Download complete.<br>Installing zip /home/pal20/.ivy2/cache/org.grails.plugins/db-util/zips/db-util-0.4.zip…<br>…<br></pre><br>安装了“ db-util”插件，并且在类路径中包含了“ commons-digester” JAR。简单。<p></p><p>如果遇到依赖项解析问题，则可以通过将BuildConfig.groovy中的<tt>日志“警告”</tt>行替换为<tt>日志“ info”</tt>甚至<tt>日志“ debug”</tt>来拨号记录<tt>日志</tt> 。</p><p>当然，有时您会希望托管自己的插件或公共插件的自定义/修补版本。现有的<tt>release-plugin</tt>命令仅适用于旧式Subversion存储库，那么您该怎么办？<br></p><h3>将插件发布到兼容Maven的存储库</h3><br>Grails核心在这里无济于事，但随后并不需要。有一个Grails插件专用于发布Grails应用程序和兼容Maven的存储库的<a href="http://grails.org/plugin/maven-publisher">插件</a> ： <a href="http://grails.org/plugin/maven-publisher">Maven Publisher插件</a> 。<p></p><p>将其安装在您的插件项目中，将以下条目添加到您的BuildConfig.groovy文件中：</p>
+</code></pre><p>因此，在<tt>库</tt>部分添加由Artifactory的服务器暴露每一个“仓库”一<tt>mavenRepo</tt>条目。请注意，在这种情况下，我们同时添加了“ libs-releases-local”存储库和“ plugins-releases-local”存储库。</p><p>DSL的新增功能是“ <tt>插件”</tt>部分，该部分（毫不奇怪）用于声明Grails插件。它的语法与“ <tt>依赖项”</tt>部分完全相同。因此，“ db-util”在<tt>插件</tt>下声明，“ commons-digester”在<tt>dependencies</tt>下声明。</p><p>那就是你要做的。如果现在执行<tt>grails run-app</tt> ，则会看到类似以下的输出：<br></p><pre><br />&hellip;<br />Resolving dependencies&hellip;<br />Downloading: <a href="http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom">http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom.sha1">http://localhost:8081/artifactory/libs-releases-local/commons-digester/commons-digester/2.0/commons-digester-2.0.pom.sha1</a> &hellip;<br />Download complete.<br />&hellip;<br />Downloading new plugins. Please wait&hellip; &hellip;<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom.sha1">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.pom.sha1</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip</a> &hellip;<br />Download complete.<br />Downloading: <a href="http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip.sha1">http://localhost:8081/artifactory/plugins-releases-local/org/grails/plugins/db-util/0.4/db-util-0.4.zip.sha1</a> &hellip;<br />Download complete.<br />Installing zip /home/pal20/.ivy2/cache/org.grails.plugins/db-util/zips/db-util-0.4.zip&hellip;<br />&hellip;<br /></pre><br>安装了“ db-util”插件，并且在类路径中包含了“ commons-digester” JAR。简单。<p></p><p>如果遇到依赖项解析问题，则可以通过将BuildConfig.groovy中的<tt>日志“警告”</tt>行替换为<tt>日志“ info”</tt>甚至<tt>日志“ debug”</tt>来拨号记录<tt>日志</tt> 。</p><p>当然，有时您会希望托管自己的插件或公共插件的自定义/修补版本。现有的<tt>release-plugin</tt>命令仅适用于旧式Subversion存储库，那么您该怎么办？<br></p><h3>将插件发布到兼容Maven的存储库</h3><br>Grails核心在这里无济于事，但随后并不需要。有一个Grails插件专用于发布Grails应用程序和兼容Maven的存储库的<a href="http://grails.org/plugin/maven-publisher">插件</a> ： <a href="http://grails.org/plugin/maven-publisher">Maven Publisher插件</a> 。<p></p><p>将其安装在您的插件项目中，将以下条目添加到您的BuildConfig.groovy文件中：</p>
 <pre><code class="prettyprint groovy">grails.project.dependency.distribution = {
-    remoteRepository(id: "pluginSnapshots", url: "http://localhost:8081/artifactory/plugins-snapshots-local/") {
-        authentication username: "admin", password: "password"
+    remoteRepository(id: &quot;pluginSnapshots&quot;, url: &quot;http://localhost:8081/artifactory/plugins-snapshots-local/&quot;) {
+        authentication username: &quot;admin&quot;, password: &quot;password&quot;
     }
 }
-</code></pre><p>然后运行<br><code><tt>grails maven-deploy –repository=pluginSnapshots</tt></code><br>瞧！您的插件将以groupId为<tt>org.grails.plugins</tt>部署到本地Artifactory的“ plugins-snapshots-local”存储库。请注意，您为<tt>–repository</tt>参数传递的值应与BuildConfig.groovy中<tt>grails.project.dependency.distribution</tt>闭包中定义的远程存储库的“ id”相匹配。</p><p>您可以对部署进行微调，例如通过将pom.xml文件与<tt><distributionmanagement></distributionmanagement></tt>元素或通过向插件描述符添加<tt>groupId</tt>属性，但是基本步骤都很简单。</p><p>剩下要解释的是依赖性信息的保存位置。例如，正常工件（例如JAR库）的依赖项存储在元数据文件（如pom.xml）中。Grails插件不同。他们的JAR依赖项位于Dependencies.groovy文件中的zip包中。至于插件依赖性，您可以像以前一样在插件描述符的<tt>dependsOn</tt>字段中定义它们。然后将它们转换为插件生成的pom.xml文件（与存储库中的插件zip文件一起存储）中的依赖项声明。</p><p>真正的全部就是它。现在，您可以提供自己的易于管理的Maven兼容存储库，这样您的团队成员就不必在每次需要插件或依赖项时都可以访问Internet。您还可以通过控制可用的Grails插件版本来为项目注入一些一致性。您可以轻松地修补公共插件，并在等待修复程序将其发布为正式版本时将这些版本提供给本地团队。</p></div>
+</code></pre><p>然后运行<br><code><tt>grails maven-deploy –repository=pluginSnapshots</tt></code><br>瞧！您的插件将以groupId为<tt>org.grails.plugins</tt>部署到本地Artifactory的“ plugins-snapshots-local”存储库。请注意，您为<tt>–repository</tt>参数传递的值应与BuildConfig.groovy中<tt>grails.project.dependency.distribution</tt>闭包中定义的远程存储库的“ id”相匹配。</p><p>您可以对部署进行微调，例如通过将pom.xml文件与<tt><distributionmanagement></distributionmanagement></tt>元素或通过在插件描述符中添加<tt>groupId</tt>属性，但是基本步骤都很简单。</p><p>剩下要解释的是依赖性信息的保存位置。例如，正常工件（例如JAR库）的依赖项存储在元数据文件（如pom.xml）中。Grails插件不同。它们的JAR依赖项位于Dependencies.groovy文件中的zip包中。至于插件依赖性，您可以像以前一样在插件描述符的<tt>dependsOn</tt>字段中定义它们。然后将它们转换为插件生成的pom.xml文件（与存储库中的插件zip文件一起存储）中的依赖项声明。</p><p>真正的全部就是它。现在，您可以提供自己的易于管理的Maven兼容存储库，这样您的团队成员就不必在每次需要插件或依赖项时都可以访问Internet。您还可以通过控制可用的Grails插件版本来为项目注入一些一致性。您可以轻松地修补公共插件，并在等待修复程序将其发布为正式版本时将这些版本提供给本地团队。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 319;
 
       (function(disqus_shortname, document) {
@@ -226,7 +233,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -264,12 +272,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Cloud Stream-神秘化和简化</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Cloud Stream - demystified and simplified">
-<meta name="twitter:description" content="<p>This is the first post in a series of blog posts meant to clarify and preview what’s coming in the upcoming releases of <a href=" https:="" ="" spring.io="" projects="" spring-cloud-strea="="></head><body dir="ltr">spring-cloud-stream and <a href="https://spring.io/projects/spring-cloud-function">spring-cloud-function</a> (both 3.0.0).
+<meta name="twitter:description" content="<p>This is the first post in a series of blog posts meant to clarify and preview what’s coming in the upcoming releases of <a href=" https:="" ="" spring.io="" projects="" spring-cloud-strea="="></head><body >spring-cloud-stream and <a href="https://spring.io/projects/spring-cloud-function">spring-cloud-function</a> (both 3.0.0).
 <p>Recently, I had a discussion with a user and heard something that prompted me to begin a series of blog posts (starting with this one) with the goal of both demystifying the true goals of <em>Spring Cloud Stream</em> and <em>Spring Cloud Function</em> projects as well as demonstrating their new features.</p>
 <h3><a href="#spring-integration-wrapper" class="anchor" name="spring-integration-wrapper"></a>Spring Integration Wrapper?</h3>
 <p>The specific phrase that prompted all this was - <em>"Spring Cloud Stream, being a light Spring Integration input/output router…”</em>. That’s an interesting perception, but I have to disagree. While it may have been inspired by Enterprise Integration Patterns (EIP) and builds on top of Spring Integration (SI), that last part is really just an implementation detail. Spring Cloud Stream (SCSt) as a framework was never about <em>“being a light Spring Integration input/output router”</em>. In fact, this statement shows part of the problem, where SI (the framework of choice to support some of the internal requirements of SCSt) was somehow perceived to be the core of SCSt in such way that many perceive SCSt to be an extension or a wrapper to SI. It is not. It has always been about pure microservices and binding them to <em>sources</em> and <em>targets</em> of data (i.e., messaging systems) . Simple as that.<br>If you abstract yourself far enough from knowing the internals of SCSt, you quickly realize that it is really a binding and activation framework. It binds a piece of code (provided by the user) to source/target of data exposed by the binder and activates such code according to binder implementation (for example, message arrival and so on). That is pretty much it.</p>
@@ -43,10 +47,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -193,19 +199,20 @@ public class SampleApplication  {
 <pre><code class="prettyprint">@SpringBootApplication
 public class SampleApplication  {
     @Bean
-    public Function<String, String> uppercase() {
-        return value -> value.toUpperCase();
+    public Function&lt;String, String&gt; uppercase() {
+        return value -&gt; value.toUpperCase();
     }
 }
 </code></pre>
-<p>两者都是有效且功能齐全的SCSt应用程序。两者都做同样的事情，并且都产生相同的结果–区别在于，在基于注释的示例中，用户必须了解SCSt抽象（即消息传递，通道，绑定等），而实际的用户代码与它们无关。这就提出了一个问题：为什么？Spring一直以来都是<em>“您担心功能需求，我们会处理非功能性（样板）”</em> 。因此，在SCSt作为框架及其“绑定和激活/触发”核心目标的上下文中，我们很快意识到这些抽象是样板，不应泄漏到用户代码中，尤其是以注释的形式泄漏，因为它们有助于无正当理由而导致此类代码对SCSt的二进制依赖性。<br>另外，考虑到Spring产品组合中大多数新框架的基础是Spring Boot，请考虑一下Spring Boot的核心信息–依赖关系（例如JAR）包括自动配置，这实际上是<em>对我们（Spring）如何相信</em>的<em>看法事情应该是</em> ，同时让您选择退出。因此，在这种情况下，为什么您需要提供这么多指令，尤其是通过注释（ <code>EnableBinding, Processor, StreamListener</code>等），在其中可以通过简单地遵循以下步骤轻松提取或推断相同信息（在SCSt的上下文中）一些约定。例如，在SCSt上下文中的功能bean是处理器。我们知道一个处理器只有一个输入目标和一个输出，并且我们知道它们的名称，那么为什么我们需要显式声明已知和显而易见的名称呢？依此类推……同样，请记住，在推导所有这些内容的同时，我们仍然保留使用现有的使用者和生产者属性以及所有其他配置选项。它们仍然适用于此处，使您可以配置和重新配置与<code>StreamListener</code>相同的东西。</p>
-<p>因此，我要说的是，我们正从缓慢的旅程开始，从基于注释的编程模型转变为更加敏捷，简单且符合Spring Boot要求的，带有明确文档和直观约定的，固执己见的模型，并且该过程非常有限。用户所需的即用型配置。</p>
+<p>两者都是有效且功能齐全的SCSt应用程序。两者都做同样的事情，并且都产生相同的结果–区别在于，在基于注释的示例中，用户必须了解SCSt抽象（即消息传递，通道，绑定等），而实际的用户代码与它们无关。这就提出了一个问题：为什么？Spring一直以来都是<em>“您担心功能需求，我们会处理非功能性（样板）”</em> 。因此，在SCSt作为框架及其“绑定和激活/触发”核心目标的上下文中，我们很快意识到这些抽象是样板，不应泄漏到用户代码中，尤其是以注释的形式泄漏，因为它们有助于无正当理由而导致此类代码对SCSt的二进制依赖性。<br>另外，鉴于Spring产品组合中大多数新框架的基础是Spring Boot，请考虑一下Spring Boot的核心信息–依赖关系（例如JAR）包括自动配置，这实际上是<em>对我们（Spring）如何相信</em>的<em>看法事情应该是</em> ，同时让您选择退出。因此，在这种情况下，为什么需要提供那么多指令，尤其是通过注释（ <code>EnableBinding, Processor, StreamListener</code>以及其他），只需遵循一些约定即可轻松提取或推断相同的信息（在SCSt的上下文中）。例如，在SCSt上下文中的功能bean是处理器。我们知道一个处理器只有一个输入目标和一个输出，并且我们知道它们的名称，那么为什么我们需要显式声明已知和显而易见的名称呢？依此类推……同样，请记住，在推导所有这些内容的同时，我们仍然保留使用现有的使用者和生产者属性以及所有其他配置选项。它们仍然在此处适用，可让您配置和重新配置与<code>StreamListener</code> 。</p>
+<p>因此，我要说的是，我们正从缓慢的旅程开始，从基于注释的编程模型转变为更加敏捷，简单且符合Spring Boot要求的，带有明确文档和直观约定的，固执己见的模型，并且该过程非常有限。用户需要的即用型配置。</p>
 <p>有关spring-cloud-stream中功能支持的更多最新信息，请点击此<a href="https://github.com/spring-cloud/spring-cloud-stream/blob/master/docs/src/main/asciidoc/spring-cloud-stream.adoc#spring_cloud_function">链接</a> 。</p>
 <p>请随时提供任何反馈。</p>
 </div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3833;
 
       (function(disqus_shortname, document) {
@@ -219,7 +226,8 @@ public class SampleApplication  {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -257,12 +265,14 @@ public class SampleApplication  {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>将Spring Web Flow进行负载测试</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -43,14 +47,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2007-06-22 05:59:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -176,13 +182,13 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>对Web Flow应用程序进行负载测试类似于对任何其他Web应用程序进行负载测试-我们将使用负载测试工具来模拟不断增加的并发客户端访问级别，以捕获基本的性能统计信息。</p><p>使用Web Flow，负载测试将有两个重要的注意事项：</p>
+<div class="blog--post"><p>对Web Flow应用程序进行负载测试类似于对任何其他Web应用程序进行负载测试-我们将使用负载测试工具来模拟并发客户端访问级别的提高，以捕获基本的性能统计信息。</p><p>使用Web Flow，负载测试将有两个重要的注意事项：</p>
 <ol>
 <li>负载测试必须维护独立的“ cookie存储区”，以便每个客户端请求都可以承载独立的HTTP会话。
 </li>
 <li>我们需要一种机制，用于从初始响应中提取唯一的流执行密钥，并使用它来定制同一流会话中的后续请求。
 </li>
-</ol><p>Apache JMeter是一个开放源代码性能测试工具，可以满足这两个方面的考虑。</p><p>对于1），我们在每个行使Web Flow功能的测试组的根部添加一个HTTP Cookie Manager元素。Cookie管理器确保每个模拟的客户端请求可以具有独立于其他客户端请求的自己的cookie，从而允许servlet容器通过jsessionid cookie跟踪独立的HTTP会话。</p><p>对于2），我们在启动流程的HTTP请求元素之后立即添加一个正则表达式提取器。Extractor的目的是解析HTTP响应，使用我们提供的正则表达式查找某些文本，并使该文本可用作变量供后续的HTTP Request元素使用。这是一个示例正则表达式提取器配置：</p><p><code>Reference Name: flowExecutionKey<br>Regular Expression: name="_flowExecutionKey“ value=”(.*)"<br>Template: $1$<br>Match No.: 0<br></code></p><p>通过以上配置，我们现在可以将变量$ {flowExecutionKey}嵌入到同一流会话的后续HTTP请求元素中。<br><br><br><br><br>现在，我们使用它来对Web Flow进行负载测试。为了适当地行使代表性的Web Flow功能，我创建了一个示例Web Flow应用程序，以模仿6步购物车流程，以收集用户输入的送货地址，送货选项，信用卡，账单地址，订单确认以及订单摘要。结束。该流程中的各个步骤包括数据绑定和验证，视图状态，操作状态，决策状态和子流程状态-我们希望在典型的Web Flow应用程序中找到这些内容。但是，该应用程序使用存根而不是实际的数据库访问代码来避免在整体统计信息中包含此类数字。在此测试中，我们仅关注Web Flow。</p><p>构建应用程序并创建JMeter脚本后，我添加了一个Aggregate Report元素来记录具有不同负载水平的测试的性能统计信息。</p><p>使用运行Ubuntu和Apache Tomcat 5.5版的Lenovo T60双核笔记本电脑作为配置为最多150个并发连接的servlet容器，我观察到以下结果：</p>
+</ol><p>Apache JMeter是一个开放源代码性能测试工具，可以满足这两个方面的考虑。</p><p>对于1），我们在每个行使Web Flow功能的测试组的根部添加一个HTTP Cookie Manager元素。Cookie管理器确保每个模拟的客户端请求可以具有独立于其他客户端请求的自己的cookie，从而允许servlet容器通过jsessionid cookie跟踪独立的HTTP会话。</p><p>对于2），我们在启动流程的HTTP请求元素之后立即添加一个正则表达式提取器。Extractor的目的是解析HTTP响应，使用我们提供的正则表达式查找某些文本，并使该文本可用作变量供后续的HTTP Request元素使用。这是一个示例正则表达式提取器配置：</p><p><code>Reference Name: flowExecutionKey<br>Regular Expression: name="_flowExecutionKey“ value=”(.*)"<br>Template: $1$<br>Match No.: 0<br></code></p><p>通过以上配置，我们现在可以将变量$ {flowExecutionKey}嵌入到同一流会话的后续HTTP请求元素中。<br><br><br><br><br>现在，我们使用它来对Web Flow进行负载测试。为了正确地行使代表性的Web Flow功能，我创建了一个示例Web Flow应用程序，以模仿6步购物车流程，以收集用户输入的送货地址，送货选项，信用卡，账单地址，订单确认以及订单摘要。结束。该流程中的各个步骤包括数据绑定和验证，视图状态，操作状态，决策状态和子流程状态-我们希望在典型的Web Flow应用程序中找到这些内容。但是，该应用程序使用存根而不是实际的数据库访问代码来避免在整体统计信息中包含此类数字。在此测试中，我们仅关注Web Flow。</p><p>构建应用程序并创建JMeter脚本后，我添加了一个Aggregate Report元素来记录具有不同负载水平的测试的性能统计信息。</p><p>使用运行Ubuntu和Apache Tomcat 5.5版的Lenovo T60双核笔记本电脑作为配置为最多150个并发连接的servlet容器，我观察到以下结果：</p>
 <table border="1" cellpadding="5">
 <tbody><tr>
 <td align="right">用户数</td>
@@ -232,10 +238,11 @@
 <td align="right">332</td>
 <td align="right">18000</td>
 </tr>
-</tbody></table><p>实际负载测试应在实际硬件上并根据实际用例进行。没有替代品。但是，我们可以从上述数字得出某些结论。</p><p>以上数字表明，即使同时使用的用户数量大大增加，使用核心Web Flow功能时吞吐量仍保持稳定。90％用户的响应时间不到一秒钟。随着负载的增加，最差的响应时间会增加，但是考虑到用于测试的硬件不足，这并不奇怪。</p><p>使用以上技术，您可以负载测试您自己的Web Flow应用程序。</p><p><a class="imagelink" title="jmeter快照。JPG格式" href="http://blog.interface21.com/main/wp-content/uploads/2007/07/jmeter-snapshot.JPG"><img id="image203" height="82" alt="jmeter快照。JPG格式" src="http://blog.interface21.com/main/wp-content/uploads/2007/07/jmeter-snapshot.JPG"></a></p><p><a id="p204" title="swf-shoppingcart-regexp.txt" href="http://blog.interface21.com/main/2007/06/22/putting-spring-web-flow-to-a-load-test/swf-shoppingcart-regexptxt/" rel="attachment">swf-shoppingcart-regexp.txt</a></p></div>
+</tbody></table><p>实际负载测试应在实际硬件上并根据实际用例进行。没有替代品。但是，我们可以从上述数字得出某些结论。</p><p>以上数字表明，即使同时使用的用户数量大大增加，使用核心Web Flow功能时吞吐量仍保持稳定。90％用户的响应时间不到一秒钟。随着负载的增加，最差的响应时间会增加，但是考虑到用于测试的硬件不足，这不足为奇。</p><p>使用以上技术，您可以负载测试您自己的Web Flow应用程序。</p><p><a class="imagelink" title="jmeter快照。JPG格式" href="http://blog.interface21.com/main/wp-content/uploads/2007/07/jmeter-snapshot.JPG"><img id="image203" height="82" alt="jmeter快照。JPG格式" src="http://blog.interface21.com/main/wp-content/uploads/2007/07/jmeter-snapshot.JPG"></a></p><p><a id="p204" title="swf-shoppingcart-regexp.txt" href="http://blog.interface21.com/main/2007/06/22/putting-spring-web-flow-to-a-load-test/swf-shoppingcart-regexptxt/" rel="attachment">swf-shoppingcart-regexp.txt</a></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 90;
 
       (function(disqus_shortname, document) {
@@ -249,7 +256,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -287,12 +295,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

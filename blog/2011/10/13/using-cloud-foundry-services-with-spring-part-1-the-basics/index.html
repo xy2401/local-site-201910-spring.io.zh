@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>在春季使用Cloud Foundry服务：第1部分-基础知识</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -31,15 +35,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2011-10-13 19:02:00.0">
-
-
+</head>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,17 +171,17 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Cloud Foundry提供的服务使编写高效的应用程序成为可能。开发人员现在可以选择正确的服务类型，而不必担心操作这些服务。例如，应用程序的一部分可以选择Postgres来处理事务访问至关重要的部分，MongoDB可以将数据作为文档的集合进行交互，Redis的键值是正确的抽象，RabbitMQ的消息传递可以帮助创建有效的部分。建筑。在这个由四部分组成的博客系列中，我们将探索Spring应用程序如何使用Cloud Foundry服务。虽然我们的重点是Spring，但是使用其他框架，尤其是基于JVM的框架（Grails，Lift和纯Java Web）的开发人员将发现这些博客中有很多相关。</p><p>在第一部分中，我们将探讨Cloud Foundry如何将服务信息公开给应用程序。在下一个博客中，我将描述典型的Spring应用程序如何使用自动重新配置机制，该机制允许无需修改即可使用服务。在第三篇博客中，托马斯·里斯伯格（Thomas Risberg）将解释如何使用“云”命名空间来对使用服务进行显式控制。在第四部分中，Scott Andrews将展示如何将Spring 3.1中的配置文件支持与“ cloud”命名空间相结合，以创建允许对服务进行显式控制的应用程序，同时允许应用程序在本地或Cloud Foundry中运行而无需进行任何更改。在本系列博客的最后，您应该已经有了足够的信息，可以从Spring应用程序有效地使用Cloud Foundry服务。</p><p>当您将Cloud Foundry服务（例如Postgres或Mongo）绑定到应用程序时，有关绑定的服务（例如主机，端口和凭据）的信息会通过环境变量（其值编码为JSON）公开。为了说明这一点，我们将创建一个显示所有环境变量的简单Web应用程序。我们从Spring MVC Template项目开始，然后将以下端点添加到HomeController（您可以在<a href="https://github.com/cloudfoundry-samples/spring-hello-env">github</a>上看到此应用程序）。</p>
-<pre><code class="prettyprint java"><br>@RequestMapping("/env")
+<div class="blog--post"><p>Cloud Foundry提供的服务使编写高效的应用程序成为可能。开发人员现在可以选择正确的服务类型，而不必担心操作这些服务。例如，对于需要进行事务访问的部分，应用程序的一部分可以选择Postgres；可以将MongoDB与数据作为文档的集合进行交互；对于Redis，键值是正确的抽象；对于RabbitMQ，消息传递可以帮助创建有效的部分。建筑。在这个由四部分组成的博客系列中，我们将探索Spring应用程序如何使用Cloud Foundry服务。虽然我们的重点是Spring，但是使用其他框架，尤其是基于JVM的框架（Grails，Lift和纯Java Web）的开发人员将发现这些博客中有很大一部分是相关的。</p><p>在第一部分中，我们将探索Cloud Foundry如何将服务信息公开给应用程序。在下一个博客中，我将描述典型的Spring应用程序如何使用自动重新配置机制，该机制允许无需修改即可使用服务。在第三篇博客中，托马斯·里斯伯格（Thomas Risberg）将解释如何使用“云”命名空间来对使用服务进行显式控制。在第四部分中，Scott Andrews将展示如何将Spring 3.1中的配置文件支持与“ cloud”命名空间相结合，以创建允许对服务进行显式控制的应用程序，同时允许应用程序在本地或Cloud Foundry中运行而无需进行任何更改。在本系列博客的最后，您应该已经有了足够的信息，可以从Spring应用程序有效地使用Cloud Foundry服务。</p><p>当您将Cloud Foundry服务（例如Postgres或Mongo）绑定到应用程序时，有关绑定的服务（例如主机，端口和凭据）的信息会通过环境变量（其值编码为JSON）公开。为了说明这一点，我们将创建一个显示所有环境变量的简单Web应用程序。我们从一个Spring MVC Template项目开始，并将以下端点添加到HomeController（您可以在<a href="https://github.com/cloudfoundry-samples/spring-hello-env">github</a>上看到此应用程序）。</p>
+<pre><code class="prettyprint java"><br />@RequestMapping(&quot;/env&quot;)
 public void env(HttpServletResponse response) throws IOException {
-    response.setContentType("text/plain");
+    response.setContentType(&quot;text/plain&quot;);
     PrintWriter out = response.getWriter();
-    out.println("System Environment:");
-    for (Map.Entry<String, String> envvar : System.getenv().entrySet()) {
-        out.println(envvar.getKey() + ": " + envvar.getValue());
+    out.println(&quot;System Environment:&quot;);
+    for (Map.Entry&lt;String, String&gt; envvar : System.getenv().entrySet()) {
+        out.println(envvar.getKey() + &quot;: &quot; + envvar.getValue());
     }
 }
-</code></pre><p>Let’s deploy this application. I will use the ‘vmc’ tool, but using STS with the Cloud Foundry plugin will work, as well. Note that I am using hello-env as the application name and default URL based on it (hello-env.cloudfoundry.com). If you are coding along with this blog, you will want to choose an application name such as the default URL for it is not already taken. Alternatively, you can deploy to <a href="http://www.cloudfoundry.com/micro">Micro Cloud Foundry</a>.</p>
+</code></pre><p>让我们部署这个应用程序。我将使用“ vmc”工具，但是将STS与Cloud Foundry插件一起使用也可以。请注意，我正在使用hello-env作为应用程序名称和基于它的默认URL（hello-env.cloudfoundry.com）。如果您与此博客一起编码，则需要选择一个应用程序名称，例如尚未使用的默认URL。或者，您可以部署到<a href="http://www.cloudfoundry.com/micro">Micro Cloud Foundry</a> 。</p>
 <pre><code>
 $ vmc push hello-env -n
 Creating Application: OK
@@ -187,9 +193,10 @@ Uploading Application:
 Push Status: OK
 Staging Application: OK                                                         
 Starting Application: OK
-</code></pre><p>At this point if you navigate to <a href="http://hello-env.cloudfoundry.com/env"></a><a href="http://hello-env.cloudfoundry.com/env">http://hello-env.cloudfoundry.com/env</a>, you will see a page full for all environment variables, many with the name starting with VCAP_ exposing all sorts of information about the application. Of our interest is the VCAP_SERVICES variable, which currently shows as</p>
-<pre><code class="prettyprint javascript"><br>VCAP_SERVICES: {}
-</code></pre><p>We see the variable as empty map (in JSON representation) indicating, rightly so, that no services have been bound. Let’s create a Postgres service, name it env-postgresql, and bind it to our application. Note the form of the command: <code>vmc create-service <service-type> <service-name> <applciation-name></code>.</p>
+</code>
+</pre><p>此时，如果您导航到<a href="http://hello-env.cloudfoundry.com/env"></a> <a href="http://hello-env.cloudfoundry.com/env">http://hello-env.cloudfoundry.com/env</a> ，您将看到一个完整的页面，其中包含所有环境变量，其中许多名称以VCAP_开头，公开了有关应用程序的各种信息。我们感兴趣的是VCAP_SERVICES变量，当前显示为</p>
+<pre><code class="prettyprint javascript"><br />VCAP_SERVICES: {}
+</code></pre><p>我们将变量视为空映射（以JSON表示），正确地指示没有服务绑定。让我们创建一个Postgres服务，将其命名为env-postgresql，并将其绑定到我们的应用程序。注意命令的形式： <code>vmc create-service <service-type> <service-name> <applciation-name></code> 。</p>
 <pre><code>
 $ vmc create-service postgresql env-postgresql hello-env
 Creating Service: OK
@@ -197,62 +204,65 @@ Binding Service: OK
 Stopping Application: OK
 Staging Application: OK                                                         
 Starting Application: OK
-</code></pre><p>Now, let’s navigate again to <a href="http://hello-env.cloudfoundry.com/env"></a><a href="http://hello-env.cloudfoundry.com/env">http://hello-env.cloudfoundry.com/env</a> and you will see the VCAP_SERVICES environment variable as (formatted here for readability):</p>
-<pre><code class="prettyprint javascript"><br>{
-    "postgresql-9.0": [{
-        "name": "env-postgresql",
-        "label": "postgresql-9.0",
-        "plan": "free",
-        "credentials": {
-            "name": "de24667f9344b4eeaad6b5a2326d52faa",
-            "host": "172.30.48.122",
-            "hostname": "172.30.48.122",
-            "port": 5432,
-            "user": "u50ce600bba434bacbc99e034bb415644",
-            "username": "u50ce600bba434bacbc99e034bb415644",
-            "password": "pf4dca5bd449d4732841f0c4ae3f299d0"
+</code>
+</pre><p>现在，让我们再次导航到<a href="http://hello-env.cloudfoundry.com/env"></a> <a href="http://hello-env.cloudfoundry.com/env">http://hello-env.cloudfoundry.com/env</a> ，您将看到VCAP_SERVICES环境变量为（此处为便于阅读而设置）：</p>
+<pre><code class="prettyprint javascript"><br />{
+    &quot;postgresql-9.0&quot;: [{
+        &quot;name&quot;: &quot;env-postgresql&quot;,
+        &quot;label&quot;: &quot;postgresql-9.0&quot;,
+        &quot;plan&quot;: &quot;free&quot;,
+        &quot;credentials&quot;: {
+            &quot;name&quot;: &quot;de24667f9344b4eeaad6b5a2326d52faa&quot;,
+            &quot;host&quot;: &quot;172.30.48.122&quot;,
+            &quot;hostname&quot;: &quot;172.30.48.122&quot;,
+            &quot;port&quot;: 5432,
+            &quot;user&quot;: &quot;u50ce600bba434bacbc99e034bb415644&quot;,
+            &quot;username&quot;: &quot;u50ce600bba434bacbc99e034bb415644&quot;,
+            &quot;password&quot;: &quot;pf4dca5bd449d4732841f0c4ae3f299d0&quot;
         }
     }]
 }
-</code></pre><p>它具有应用程序连接到它的所有必需信息：创建JDBC URL的主机，端口和名称，以及连接到它的用户名和密码（不建议使用主机名，并且在以后的版本中将删除该主机名）。</p><p>让我们绑定另一个服务，这次是MongoDB。</p>
+</code></pre><p>这具有应用程序连接到它的所有必需信息：创建JDBC URL的主机，端口和名称，以及连接到它的用户名和密码（不建议使用主机名，并且在以后的版本中将删除该主机名）。</p><p>让我们绑定另一个服务，这次是MongoDB。</p>
 <pre><code>
 $ vmc create-service mongodb env-mongodb hello-env
-</code></pre><p>现在环境变量将如下所示：</p>
-<pre><code class="prettyprint javascript"><br>{
-    "mongodb-1.8": [{
-        "name": "env-mongodb",
-        "label": "mongodb-1.8",
-        "plan": "free",
-        "tags": ["mongodb", "mongodb-1.8", "nosql"],
-        "credentials": {
-            "hostname": "172.30.48.68",
-            "host": "172.30.48.68",
-            "port": 25026,
-            "username": "b8b312a0-9b43-4104-90f8-52f2ac8bc7c6",
-            "password": "6a62732d-f820-4690-9bab-d1c85af13323",
-            "name": "416e990a-6f81-46f9-abaa-1233a11ca5d6",
-            "db": "db"
+</code>
+</pre><p>现在环境变量将如下所示：</p>
+<pre><code class="prettyprint javascript"><br />{
+    &quot;mongodb-1.8&quot;: [{
+        &quot;name&quot;: &quot;env-mongodb&quot;,
+        &quot;label&quot;: &quot;mongodb-1.8&quot;,
+        &quot;plan&quot;: &quot;free&quot;,
+        &quot;tags&quot;: [&quot;mongodb&quot;, &quot;mongodb-1.8&quot;, &quot;nosql&quot;],
+        &quot;credentials&quot;: {
+            &quot;hostname&quot;: &quot;172.30.48.68&quot;,
+            &quot;host&quot;: &quot;172.30.48.68&quot;,
+            &quot;port&quot;: 25026,
+            &quot;username&quot;: &quot;b8b312a0-9b43-4104-90f8-52f2ac8bc7c6&quot;,
+            &quot;password&quot;: &quot;6a62732d-f820-4690-9bab-d1c85af13323&quot;,
+            &quot;name&quot;: &quot;416e990a-6f81-46f9-abaa-1233a11ca5d6&quot;,
+            &quot;db&quot;: &quot;db&quot;
         }
     }],
-    "postgresql-9.0": [{
-        "name": "env-postgresql",
-        "label": "postgresql-9.0",
-        "plan": "free",
-        "credentials": {
-            "name": "de24667f9344b4eeaad6b5a2326d52faa",
-            "host": "172.30.48.122",
-            "hostname": "172.30.48.122",
-            "port": 5432,
-            "user": "u50ce600bba434bacbc99e034bb415644",
-            "username": "u50ce600bba434bacbc99e034bb415644",
-            "password": "pf4dca5bd449d4732841f0c4ae3f299d0"
+    &quot;postgresql-9.0&quot;: [{
+        &quot;name&quot;: &quot;env-postgresql&quot;,
+        &quot;label&quot;: &quot;postgresql-9.0&quot;,
+        &quot;plan&quot;: &quot;free&quot;,
+        &quot;credentials&quot;: {
+            &quot;name&quot;: &quot;de24667f9344b4eeaad6b5a2326d52faa&quot;,
+            &quot;host&quot;: &quot;172.30.48.122&quot;,
+            &quot;hostname&quot;: &quot;172.30.48.122&quot;,
+            &quot;port&quot;: 5432,
+            &quot;user&quot;: &quot;u50ce600bba434bacbc99e034bb415644&quot;,
+            &quot;username&quot;: &quot;u50ce600bba434bacbc99e034bb415644&quot;,
+            &quot;password&quot;: &quot;pf4dca5bd449d4732841f0c4ae3f299d0&quot;
         }
     }]
 }
-</code></pre><p>同样，MongoDB部分具有创建与其连接所需的所有信息。</p><p>这就是Cloud Foundry如何将服务信息公开给您的应用程序，以便它可以使用绑定到它的服务。这需要访问环境变量，解析JSON并创建访问对象（例如关系数据库的<code>DataSource</code> ）。尽管不太困难，但这不是程序员想要或不喜欢直接处理的事情。因此，Cloud Foundry提供了一些机制来简化连接服务的任务，我们将在本系列的后面部分中进行探讨。</p><p>在下一部分中，我将向您展示自动重新配置机制，该机制使典型的Spring应用程序可以使用服务而无需更改应用程序中的任何内容。在此之前，请尽情享受！</p></div>
+</code></pre><p>同样，MongoDB部分具有创建与其连接所需的所有信息。</p><p>这就是Cloud Foundry如何将服务信息公开给您的应用程序，以便它可以使用绑定到它的服务。这需要访问环境变量，解析JSON并创建访问对象（例如<code>DataSource</code>用于关系数据库）。虽然不太困难，但这不是程序员想要或不喜欢直接处理的东西。因此，Cloud Foundry提供了一些机制来简化连接服务的任务，我们将在本系列的后面部分中进行探讨。</p><p>在下一部分中，我将向您展示自动重新配置机制，该机制使典型的Spring应用程序可以使用服务而无需更改应用程序中的任何内容。在此之前，请尽情享受！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 444;
 
       (function(disqus_shortname, document) {
@@ -266,7 +276,8 @@ $ vmc create-service mongodb env-mongodb hello-env
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -304,12 +315,14 @@ $ vmc create-service mongodb env-mongodb hello-env
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

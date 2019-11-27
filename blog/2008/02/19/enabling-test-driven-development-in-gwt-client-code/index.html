@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>在GWT客户端代码中启用测试驱动开发</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,14 +38,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2008-02-19 11:23:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -167,10 +173,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在过去的几个月中，我一直与各种客户一起使用Google Web Toolkit [GWT]进行项目。我喜欢GWT主要是因为Java到javascript编译器。这是让普通的Java开发人员无需学习新语言即可创建RIA的大门的关键。</p><p>我一直都是测试驱动开发的狂热者，令我一眼失望的是，看起来TDD和GWT不会一起玩。</p><p>测试GWT代码有点问题。问题的核心是GWT代码在运行之前已被编译为javascript。在许多情况下，使用GWT.create（）语句来挂钩动态绑定机制。在正常的Java环境中执行时，此语句会导致异常。</p><p>即使使用EasyMock之类的模拟库来模拟罪魁祸首，如果例如从构造函数中触发它，您仍然很可能会遇到问题。为所有小部件创建接口的开销太大，即使这样做，也将无法测试其中具有GWT.create（）的特定类。</p><p>GWT在GWTTestCase中提供了针对此问题的解决方案，但是此类本身有很多问题。仅举几个：<br></p><ul><br> <li>它从testrunner内部启动托管模式（使其变慢）</li><br> <li>它需要在GWT编译的代码上运行（使其变慢）</li><br> <li>它等待带有超时的异步服务（使其变慢）</li><br></ul><br>它提供了一种不错的机制来对您的客户端代码进行集成测试，但是对于单元测试而言，它过于肿。<p></p><p>在进行测试驱动的开发时，您需要至少能够编写具有以下属性的测试：<br></p><ul><br> <li>它们立即从IDE运行（无需切换，无需等待）</li><br> <li>它们运行速度很快（上限大约为10秒）</li><br> <li>他们可以隔离测试单元（模拟或存根依赖性）</li><br></ul><br>所有这些要求都是关于在测试模式和开发模式之间快速轻松地切换。因为如果可能的话，您可以全神贯注于解决问题。从个人经验来看，我可以肯定地说这是一种可靠的方式，但是您的里程可能会有所不同。无论如何，如果这些基本要求<em>得不到</em>满足，您<em>将</em>在开发过程中分心，这消除了TDD的本质，即前期测试的优势。<p></p><p>那么，我们该怎么做，以防止由于缺乏测试而使代码变成意大利面条，而又将那些缓慢的GWTTestCases保持在最低水平？<br><strong><br>MVC进行救援</strong></p><p>MVC是一种资深模式。它有许多应用程序，除了名称之外，其中一些与原始MVC模式几乎没有任何共同之处，但我要指出的总体方向最好由Martin Fowler以Humble View的名称概括。</p><p>我什至更简短的总结是：视图通常很难测试，因此它们应该知道并且做得尽可能少。在GWT中，视图与Widget相同。现在这里有一个小问题：在客户端上运行的所有内容都由Widget拥有。大多数GWT代码几乎都具有小部件中的所有逻辑，因此大多数使用GWT的开发人员扩展了小部件并仅添加了更多逻辑。</p><p>我的建议很简单：不要去那里。类型安全性很容易获得IDE的支持，它并不能阻止您编写错误的代码。因此，如果您不进行单元测试，那么您的代码将最终变得一团糟。</p><p>如果您不遵循在视图（小部件子类）中放置逻辑的方法，则需要另一个放置它的位置。那就是Controller进来的地方。回到我之前提到的问题，我们将需要从Widget或EntryPoint引导控制器。真的没有办法解决这个问题，所以让我们做一下，看看它看起来有多糟糕：</p><p><code><br></code></p><pre><code>public class NoteEditor extends Composite {<br> public NoteEditor() {<br> //do the dependency injection stuff<br> NoteModel noteModel = new NoteModel();<br> NoteEditorController controller =<br> new NoteEditorController(noteModel, NoteService.App.getInstance(), new AlertCallback());<br> //…<br> }<br>}</code></pre><code><br></code><p></p><p>如您所见，我在这里的代码中做了一些依赖注入，因为我们在客户端上还没有Spring。我说了，因为稍后可以使用GWToolbox或Rocket。该服务使用GWT.create（）进行引导，并且AlertCallback用于将控制器与Window分离，以偶尔发出警报。我要说的还算不错，无需编写此代码的测试就可以轻松入睡。麻烦还没有完全解决，因为我们要在视图中使用的任何元素（按钮，标签等）都需要在视图中实例化，然后在控制器中注册：</p><p><code><br></code></p><pre><code>controller.registerDetailViewSelector(new DeckPanelSelector(detailView));<br>detailView.addStyleName(“detailPanel”);<br>main.add(detailView, DockPanel.CENTER);<br>//some buttons at the bottom of the screen<br>buttonPanel.add((Widget)controller.registerClearButton(new Button(“Clear”)));<br>buttonPanel.add((Widget)controller.registerLoadButton(new Button(“Load existing Note”)));</code></pre><code><br></code><p></p><p>控制器接受其界面（SourcesClickEvents）下的按钮，作为奖励，我们可以使用外观不同的Widget替换按钮，而无需更改控制器。这里没有什么新鲜的，这正是MVC所关注的关注点分离。老实说，我通常更喜欢编写一个测试来检查注册是否正确进行，但是如果没有GWTTesCase，这是无法完成的。现在是时候让我们的IDE为我们创建该控制器+方法并编写测试，以便我们实现逻辑了。例如，加载按钮的测试如下所示：</p><p><code><br></code></p><pre><code> public void testLoadButtonPressed_success() throws Exception {<br> final Foo expectedFoo = new Foo(“expected”);<br> fooServiceMock.loadFoo(isA(String.class), isA(AsyncCallback.class));<br> expectLastCall().andAnswer(new IAnswer() {<br> public Object answer() throws Throwable {<br> ((AsyncCallback) getCurrentArguments()[1]).onSuccess(expectedFoo);<br> return null;<br> }<br> });<br> fooModelMock.setFoo(expectedFoo);<br> replay(allMocks);<br> loadButton.fireClick();<br> verify(allMocks);<br> }<br></code></pre><code><br></code><p></p><p>然后出发！我附上了一个简短的示例来展示这个想法。您可以将其用作实验的起点。</p><p>2008-10更新：示例的来源已过时。一般建议仍然成立。</p><p>总结一下GWT风格的MVC模式的快速草图。但是，当然，只要您<em>将逻辑保持在可测试的类中</em> ，就可以选择自己的口味。</p><p><img alt="GWT风格的MVC模式" src="http://blog.springsource.com/main/wp-content/uploads/2008/02/gwt-mvc-picture.png"></p></div>
+<div class="blog--post"><p>在过去的几个月中，我一直与各种客户一起使用Google Web Toolkit [GWT]进行项目。我喜欢GWT主要是因为Java到javascript编译器。这是让普通的Java开发人员无需学习新语言即可创建RIA的大门的关键。</p><p>我一直是测试驱动开发的忠实拥护者，令我一眼失望的是，看起来TDD和GWT不会一起玩。</p><p>测试GWT代码有点问题。问题的核心是GWT代码在运行之前已被编译为javascript。在许多情况下，使用GWT.create（）语句来挂钩动态绑定机制。在正常的Java环境中执行时，此语句会导致异常。</p><p>即使使用EasyMock之类的模拟库来模拟罪魁祸首，如果例如从构造函数中触发它，您仍然很可能会遇到问题。为所有小部件创建接口的开销太大，即使这样做，也将无法测试其中具有GWT.create（）的特定类。</p><p>GWT在GWTTestCase中提供了针对此问题的解决方案，但是此类本身有很多问题。仅举几个：<br></p><ul><br> <li>它从testrunner内部启动托管模式（使其变慢）</li><br> <li>它需要在GWT编译的代码上运行（使其变慢）</li><br> <li>它等待带有超时的异步服务（使其变慢）</li><br></ul><br>它提供了一种对客户端代码进行集成测试的不错的机制，但是对于单元测试而言，它太过膨胀了。<p></p><p>当您进行测试驱动的开发时，您需要至少能够编写具有以下属性的测试：<br></p><ul><br> <li>它们立即从IDE运行（无需切换，无需等待）</li><br> <li>它们运行速度很快（上限大约为10秒）</li><br> <li>他们可以隔离测试单元（模拟或存根依赖性）</li><br></ul><br>所有这些要求都是关于在测试模式和开发模式之间快速轻松地切换。因为如果可能的话，您可以全神贯注于解决问题。从个人经验来看，我可以肯定地说这是一种可靠的方式，但是您的里程可能会有所不同。无论如何，如果这些基本要求<em>得不到</em>满足，您<em>将</em>在开发过程中分心，这消除了TDD的本质，即前期测试的优势。<p></p><p>那么，我们该怎么做，以防止由于缺乏测试而使代码变成意大利面条，而又将那些缓慢的GWTTestCases保持在最低水平？<br><strong><br>MVC进行救援</strong></p><p>MVC是一种资深模式。它有许多应用程序，除了名称之外，其中一些与原始MVC模式几乎没有任何共同之处，但我要指出的总体方向最好由Martin Fowler以Humble View的名称概括。</p><p>我什至更简短的总结是：视图通常很难测试，因此它们应该知道并且做得尽可能少。在GWT中，视图与Widget相同。现在这里有一个小问题：在客户端上运行的所有内容都由Widget拥有。大多数GWT代码几乎都具有小部件中的所有逻辑，因此大多数使用GWT的开发人员都扩展了小部件并仅添加了更多逻辑。</p><p>我的建议很简单：不要去那里。类型安全性很容易获得IDE的支持，它并不能阻止您编写错误的代码。因此，如果您不进行单元测试，那么您的代码将最终变得一团糟。</p><p>如果您不遵循在视图（小部件子类）中放置逻辑的方法，则需要在另一个地方放置逻辑。那就是Controller进来的地方。回到我之前提到的陷阱，我们将需要从Widget或EntryPoint引导控制器。真的没有办法解决这个问题，所以让我们做一下，看看它看起来有多糟糕：</p><p><code><br></code></p><pre>public class NoteEditor extends Composite {<br /> public NoteEditor() {<br /> //do the dependency injection stuff<br /> NoteModel noteModel = new NoteModel();<br /> NoteEditorController controller =<br /> new NoteEditorController(noteModel, NoteService.App.getInstance(), new AlertCallback());<br /> //&hellip;<br /> }<br />}</pre><code><br></code><p></p><p>如您所见，我在这里的代码中做了一些依赖注入，因为我们在客户端上还没有Spring。我说了，因为稍后可以使用GWToolbox或Rocket。该服务使用GWT.create（）进行引导，并且AlertCallback用于将控制器与Window分离，以偶尔发出警报。我要说的还算不错，无需编写此代码的测试就可以轻松入睡。麻烦还没有完全解决，因为我们要在视图中使用的任何元素（按钮，标签等）都需要在视图中实例化，然后在控制器中注册：</p><p><code><br></code></p><pre>controller.registerDetailViewSelector(new DeckPanelSelector(detailView));<br />detailView.addStyleName(&ldquo;detailPanel&rdquo;);<br />main.add(detailView, DockPanel.CENTER);<br />//some buttons at the bottom of the screen<br />buttonPanel.add((Widget)controller.registerClearButton(new Button(&ldquo;Clear&rdquo;)));<br />buttonPanel.add((Widget)controller.registerLoadButton(new Button(&ldquo;Load existing Note&rdquo;)));</pre><code><br></code><p></p><p>控制器接受其界面（SourcesClickEvents）下的按钮，作为奖励，我们可以使用外观不同的Widget替换按钮，而无需更改控制器。这里没有什么新鲜的，这正是MVC所关注的关注点分离。老实说，我通常更喜欢编写一个测试来检查注册是否正确进行，但是如果没有GWTTesCase，这是无法完成的。现在是时候让我们的IDE为我们创建该控制器+方法并编写测试，以便我们实现逻辑了。例如，加载按钮的测试如下所示：</p><p><code><br></code></p><pre> public void testLoadButtonPressed_success() throws Exception {<br /> final Foo expectedFoo = new Foo(&ldquo;expected&rdquo;);<br /> fooServiceMock.loadFoo(isA(String.class), isA(AsyncCallback.class));<br /> expectLastCall().andAnswer(new IAnswer() {<br /> public Object answer() throws Throwable {<br /> ((AsyncCallback) getCurrentArguments()[1]).onSuccess(expectedFoo);<br /> return null;<br /> }<br /> });<br /> fooModelMock.setFoo(expectedFoo);<br /> replay(allMocks);<br /> loadButton.fireClick();<br /> verify(allMocks);<br /> }<br /></pre><code><br></code><p></p><p>然后出发！我附上了一个简短的示例来展示这个想法。您可以将其用作实验的起点。</p><p>2008-10更新：示例的来源已过时。一般建议仍然成立。</p><p>总结一下GWT风格的MVC模式的快速草图。但是，当然，只要您<em>将逻辑保持在可测试的类中</em> ，就可以选择自己的口味。</p><p><img alt="GWT风格的MVC模式" src="http://blog.springsource.com/main/wp-content/uploads/2008/02/gwt-mvc-picture.png"></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 137;
 
       (function(disqus_shortname, document) {
@@ -184,7 +191,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -222,12 +230,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Boot 2.0中的属性绑定</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Property Binding in Spring Boot 2.0">
 <meta name="twitter:description" content="<div class=" paragrap="="> 
- </head><body dir="ltr"><p>Since the first release of Spring Boot, it has been possible to bind properties to classes by using the <code>@ConfigurationProperties</code> annotation. It has also been possible to specify property names in different forms. For example, <code>person.first-name</code>, <code>person.firstName</code> and <code>PERSON_FIRSTNAME</code> can all be used interchangeably. We call this feature “relaxed binding”.</p> 
+ </head><body ><p>Since the first release of Spring Boot, it has been possible to bind properties to classes by using the <code>@ConfigurationProperties</code> annotation. It has also been possible to specify property names in different forms. For example, <code>person.first-name</code>, <code>person.firstName</code> and <code>PERSON_FIRSTNAME</code> can all be used interchangeably. We call this feature “relaxed binding”.</p> 
 
 <div class="paragraph"> 
  <p>Unfortunately, in Spring Boot 1.x, “relaxed binding” turned out to be a little bit too relaxed. It was quite hard to define exactly what the binding rules were and when specific formats could be used. We also started to get reports of issues that were very hard to fix with our 1.x implementation. For example, in Spring Boot 1.x it is not possible to bind items to a <code>java.util.Set</code>.</p> 
@@ -47,10 +51,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -177,22 +183,22 @@
 </div>
 </header>
 <div class="blog--post"><div class="paragraph">
-<p>从Spring Boot的第一个版本开始，就可以使用<code>@ConfigurationProperties</code>annotation将属性绑定到类。也可以用不同的形式指定属性名称。例如， <code>person.first-name</code> ， <code>person.firstName</code>和<code>PERSON_FIRSTNAME</code>都可以互换使用。我们称此功能为“轻松绑定”。</p>
+<p>从Spring Boot的第一个版本开始，就可以通过使用<code>@ConfigurationProperties</code>注解。也可以用不同的形式指定属性名称。例如， <code>person.first-name</code> ， <code>person.firstName</code>和<code>PERSON_FIRSTNAME</code>可以全部互换使用。我们称此功能为“轻松绑定”。</p>
 </div>
 <div class="paragraph">
-<p>不幸的是，在Spring Boot 1.x中，“松弛绑定”显得有些放松。确切定义绑定规则是什么以及何时可以使用特定格式非常困难。我们还开始获得有关问题的报告，这些问题很难用我们的1.x实施来解决。例如，在Spring Boot 1.x中，不可能将项目绑定到<code>java.util.Set</code> 。</p>
+<p>不幸的是，在Spring Boot 1.x中，“松弛绑定”显得有些放松。确切定义绑定规则是什么以及何时可以使用特定格式非常困难。我们还开始获得有关问题的报告，这些问题很难用我们的1.x实施来解决。例如，在Spring Boot 1.x中，无法将项目绑定到<code>java.util.Set</code> 。</p>
 </div>
 <div class="paragraph">
-<p>因此，在Spring Boot 2.0中，我们着手重新设计绑定发生的方式。我们添加了几个新的抽象，并且我们开发了一个全新的绑定API。在此博客文章中，我们介绍了一些新的类和接口，并描述了为什么要添加它们，做什么以及如何在自己的代码中使用它们。</p>
+<p>因此，在Spring Boot 2.0中，我们着手重新设计绑定发生的方式。我们添加了几个新的抽象，并且我们开发了一个全新的绑定API。在此博客文章中，我们介绍了一些新的类和接口，并描述了为什么要添加它们，它们做什么以及如何在自己的代码中使用它们。</p>
 </div>
 <div class="sect1">
 <h2 id="property-sources"><a class="anchor" href="#property-sources"></a>财产来源</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>如果您已经使用Spring一段时间，那么您可能对<code>Environment</code>抽象很熟悉。此接口是<code>PropertyResolver</code> ，使您可以从某些基础<code>PropertySource</code>实现中解析属性。</p>
+<p>如果您已经使用Spring一段时间了，那么您可能对<code>Environment</code>抽象。这个界面是一个<code>PropertyResolver</code>使您可以从某些基础层解析属性<code>PropertySource</code>实现。</p>
 </div>
 <div class="paragraph">
-<p>Spring Framework为常见的事物（例如系统属性，命令行标志和属性文件）提供了<code>PropertySource</code>实现。Spring Boot以对大多数应用程序有意义的方式自动配置这些实现（例如，加载<code>application.properties</code> ）。</p>
+<p>Spring框架提供<code>PropertySource</code>常见事物的实现，例如系统属性，命令行标志和属性文件。Spring Boot以对大多数应用程序有意义的方式自动配置这些实现（例如，加载<code>application.properties</code> ）。</p>
 </div>
 </div>
 </div>
@@ -200,7 +206,7 @@
 <h2 id="configuration-property-sources"><a class="anchor" href="#configuration-property-sources"></a>配置属性源</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Spring Boot 2.0并没有直接使用现有的<code>PropertySource</code>接口进行绑定，而是引入了新的<code>ConfigurationPropertySource</code>接口。我们引入了一个新接口，为我们提供了一个逻辑上的位置，以实现以前是活页夹一部分的宽松的绑定规则。</p>
+<p>而不是直接使用现有的<code>PropertySource</code>绑定接口，Spring Boot 2.0引入了新的<code>ConfigurationPropertySource</code>接口。我们引入了一个新接口，为我们提供了一个逻辑上的位置，以实现以前是活页夹一部分的宽松的绑定规则。</p>
 </div>
 <div class="paragraph">
 <p>该接口的主要API非常简单：</p>
@@ -211,19 +217,19 @@
 </div>
 </div>
 <div class="paragraph">
-<p>还有一个实现<code>Iterable<ConfigurationPropertyName></code>的<code>IterableConfigurationPropertySource</code>变体<code>Iterable<ConfigurationPropertyName></code>这样您就可以发现源中包含的所有名称。</p>
+<p>还有一个<code>IterableConfigurationPropertySource</code>实现的变体<code>Iterable<ConfigurationPropertyName></code>这样您就可以发现源中包含的所有名称。</p>
 </div>
 <div class="paragraph">
-<p>您可以使用以下代码使Spring <code>Environment</code>适应<code>ConfigurationPropertySources</code> ：</p>
+<p>你可以适应春天<code>Environment</code>至<code>ConfigurationPropertySources</code>通过使用以下代码：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Iterable<ConfigurationPropertySource> sources =
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Iterable&lt;ConfigurationPropertySource&gt; sources =
 	ConfigurationPropertySources.get(environment);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>如果您需要它，我们还提供了一个简单的<code>MapConfigurationPropertySource</code>实现。</p>
+<p>如果您需要它，我们还提供了一个简单的方法<code>MapConfigurationPropertySource</code>实施。</p>
 </div>
 </div>
 </div>
@@ -234,10 +240,10 @@
 <p>事实证明，如果将放宽的属性名称限制在一个方向，则更容易实现。无论属性如何在基础源中表示，都应始终使用规范形式访问代码中的属性。</p>
 </div>
 <div class="paragraph">
-<p><code>ConfigurationPropertyName</code>类强制执行这些规范的命名规则，这些规则基本上可以归结为“使用小写的kebab-case名称”。</p>
+<p>的<code>ConfigurationPropertyName</code>类强制执行这些规范的命名规则，这些规则基本上可以归结为“使用小写的kebab-case名称”。</p>
 </div>
 <div class="paragraph">
-<p>因此，例如，即使在基础源中使用了<code>person.firstName</code>或<code>PERSON_FIRSTNAME</code> ，也应将代码中的属性称为<code>person.first-name</code> 。</p>
+<p>因此，例如，您应该在代码中引用一个属性为<code>person.first-name</code>即使<code>person.firstName</code>要么<code>PERSON_FIRSTNAME</code>用于基础源。</p>
 </div>
 </div>
 </div>
@@ -245,13 +251,13 @@
 <h2 id="origin-support"><a class="anchor" href="#origin-support"></a>来源支持</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>正如你所期望的<code>ConfigurationProperty</code>从返回的对象<code>ConfigurationPropertySource</code>封装的实际属性值，但它也可以包括一个可选<code>Origin</code>对象。</p>
+<p>如您所料， <code>ConfigurationProperty</code>从传回的物件<code>ConfigurationPropertySource</code>封装实际的属性值，但也可以包含可选的<code>Origin</code>宾语。</p>
 </div>
 <div class="paragraph">
-<p><code>Origin</code>是Spring Boot 2.0中引入的新接口，可让您查明加载值的确切位置。有许多的<code>Origin</code>实现，也许是最有用的存在<code>TextResourceOrigin</code> 。这提供了已加载<code>Resource</code>详细信息，以及该值的行号和列号。</p>
+<p>一个<code>Origin</code>是Spring Boot 2.0中引入的新接口，可让您查明加载值的确切位置。有一些<code>Origin</code>实现，也许是最有用的<code>TextResourceOrigin</code> 。这提供了详细信息<code>Resource</code>加载的值以及该行的行号和列号。</p>
 </div>
 <div class="paragraph">
-<p>对于<code>.properties</code>和<code>.yaml</code>文件，我们编写了自定义加载程序，这些加载程序可在文件加载时跟踪来源。已经对几种现有的Spring Boot功能进行了改造，以利用原始信息。例如，粘合剂验证异常现在表明，无法绑定值<em>和</em>原点。故障分析器显示错误的方法如下：</p>
+<p>对于<code>.properties</code>和<code>.yaml</code>文件，我们已经编写了自定义加载程序，用于在文件加载时跟踪来源。已经对几种现有的Spring Boot功能进行了改造，以利用原始信息。例如，活页夹验证异常现在显示了无法绑定的值<em>和</em>来源。故障分析器显示错误的方法如下：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -280,12 +286,12 @@ Update your application's configuration</pre>
 <h2 id="binder-api"><a class="anchor" href="#binder-api"></a>活页夹API</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>Binder</code>类（在<code>org.springframework.boot.context.properties.bind</code> ）使您可以获取一个或多个<code>ConfigurationPropertySource</code>并从中绑定某些内容。更准确地说， <code>Binder</code>将<code>Bindable</code>并返回<code>BindResult</code> 。</p>
+<p>的<code>Binder</code>类（在<code>org.springframework.boot.context.properties.bind</code> ）让您选一个或多个<code>ConfigurationPropertySource</code>并从他们身上绑定一些东西。更确切地说， <code>Binder</code>需要一个<code>Bindable</code>并返回一个<code>BindResult</code> 。</p>
 </div>
 <div class="sect2">
 <h3 id="bindable"><a class="anchor" href="#bindable"></a>可绑定</h3>
 <div class="paragraph">
-<p>一个<code>Bindable</code>可能是一个现有的Java bean，类类型，或复杂<code>ResolvableType</code> （如<code>List<Person></code> ）。这里有些例子：</p>
+<p>一种<code>Bindable</code>可能是现有的Java bean，类类型或复杂的<code>ResolvableType</code> （比如一个<code>List<Person></code> ）。这里有些例子：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -302,10 +308,10 @@ Bindable.of(resovableType);</code></pre>
 <div class="sect2">
 <h3 id="bindresult"><a class="anchor" href="#bindresult"></a>绑定结果</h3>
 <div class="paragraph">
-<p>绑定器不是直接返回绑定的对象，而是返回称为<code>BindResult</code>东西。与Java 8 <code>Streams</code>返回<code>Optional</code>的方式类似， <code>BinderResult</code>表示可能已绑定或未绑定的内容。</p>
+<p>联编程序不是直接返回绑定的对象，而是返回称为a的内容。 <code>BindResult</code> 。类似于Java 8的方式<code>Streams</code>返回<code>Optional</code> ， 一种<code>BinderResult</code>表示可能已绑定或未绑定的内容。</p>
 </div>
 <div class="paragraph">
-<p>如果尝试获取未绑定对象的实际结果，则会引发异常。我们还提供了一些方法，当没有任何绑定或<code>map</code>到不同类型时，这些方法可让您提供替代值：</p>
+<p>如果尝试获取未绑定对象的实际结果，则会引发异常。我们还提供了一些方法，可让您在未绑定任何内容或<code>map</code>不同的类型：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -326,19 +332,19 @@ bound.orElseThrow(NoDateOfBirthException::new);</code></pre>
 <div class="sect2">
 <h3 id="formatting-and-conversion"><a class="anchor" href="#formatting-and-conversion"></a>格式化和转换</h3>
 <div class="paragraph">
-<p>大多数<code>ConfigurationPropertySource</code>实现将其基础值公开为字符串。当<code>Binder</code>需要将源值转换为其他类型时，它将委托给Spring的<code>ConversionService</code> API。如果需要调整值的转换方式，可以自由使用格式器annotation，例如<code>@NumberFormat</code>或<code>@DateFormat</code> 。</p>
+<p>最<code>ConfigurationPropertySource</code>实现将其基础值公开为字符串。当。。。的时候<code>Binder</code>需要将源值转换为其他类型，它将委托给Spring的<code>ConversionService</code> API。如果您需要调整值的转换方式，则可以自由使用格式器注释，例如<code>@NumberFormat</code>要么<code>@DateFormat</code> 。</p>
 </div>
 <div class="paragraph">
-<p>Spring Boot 2.0还引入了一些新的annotation和转换器，它们对于绑定特别有用。例如，您现在可以将<code>4s</code>等值转换为<code>Duration</code> 。查看<code>org.springframework.boot.convert</code>包以获取详细信息。</p>
+<p>Spring Boot 2.0还引入了一些新的批注和转换器，它们对于绑定特别有用。例如，您现在可以转换诸如<code>4s</code>至<code>Duration</code> 。看着那（这<code>org.springframework.boot.convert</code>包以获取详细信息。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="bindhandler"><a class="anchor" href="#bindhandler"></a> BindHandler</h3>
 <div class="paragraph">
-<p>有时，绑定时可能需要实现其他逻辑，而<code>BindHandler</code>接口提供了一种不错的方法。每个<code>BindHandler</code>都有<code>onStart</code> ， <code>onSuccess</code> ， <code>onFailure</code>和<code>onFinish</code>方法，可以实现<code>onFinish</code>方法来覆盖行为。</p>
+<p>有时，您可能需要在绑定时实现其他逻辑，并且<code>BindHandler</code>界面提供了一种不错的方法。每<code>BindHandler</code>拥有<code>onStart</code> ， <code>onSuccess</code> ， <code>onFailure</code>和<code>onFinish</code>可以实现以覆盖行为的方法。</p>
 </div>
 <div class="paragraph">
-<p>Spring Boot提供了许多处理程序，主要是为了支持现有的<code>@ConfigurationProperties</code>绑定。例如， <code>ValidationBindHandler</code>可用于将<code>Validator</code>验证应用于绑定的对象。</p>
+<p>Spring Boot提供了许多处理程序，主要是为了支持现有的<code>@ConfigurationProperties</code>捆绑。例如， <code>ValidationBindHandler</code>可以用来申请<code>Validator</code>绑定对象的验证。</p>
 </div>
 </div>
 </div>
@@ -347,7 +353,7 @@ bound.orElseThrow(NoDateOfBirthException::new);</code></pre>
 <h2 id="configurationproperties"><a class="anchor" href="#configurationproperties"></a> @ConfigurationProperties</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>如本博文开头所述， <code>@ConfigurationProperties</code>自开始以来一直是Spring Boot的功能。<code>@ConfigurationProperties</code>很可能将继续成为大多数人执行绑定的方式。</p>
+<p>如本博文开头所述， <code>@ConfigurationProperties</code>从一开始就一直是Spring Boot的功能。最有可能<code>@ConfigurationProperties</code>将继续是大多数人执行绑定的方式。</p>
 </div>
 <div class="paragraph">
 <p>尽管事实上我们已经重写了整个绑定过程，但是大多数人似乎在升级Spring Boot 1.5应用程序时没有太多问题。只要您遵循<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">迁移指南中的建议</a> ，您就会发现一切正常。如果在升级应用程序时确实发现问题，请在<a href="https://github.com/spring-projects/spring-boot/issues">GitHub问题跟踪器</a>上报告它们，并提供一个小样<a href="https://github.com/spring-projects/spring-boot/issues">本来</a>重现该问题。</p>
@@ -358,7 +364,7 @@ bound.orElseThrow(NoDateOfBirthException::new);</code></pre>
 <h2 id="future-work"><a class="anchor" href="#future-work"></a>未来的工作</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>我们计划在Spring Boot 2.1中继续开发<code>Binder</code> ，我们要支持的第一个功能是不变的配置属性。如果当前需要getter和setter的配置属性可以改用基于构造函数的绑定，那就太好了：</p>
+<p>我们计划继续开发<code>Binder</code>在Spring Boot 2.1中，我们要支持的第一个功能是不可变的配置属性。如果当前需要getter和setter的配置属性可以改用基于构造函数的绑定，那就太好了：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -392,13 +398,14 @@ bound.orElseThrow(NoDateOfBirthException::new);</code></pre>
 <p>我们希望您在Spring Boot 2.0中发现有用的新绑定功能，并希望考虑升级现有的Spring Boot应用程序。</p>
 </div>
 <div class="paragraph">
-<p>如果你想一般谈结合，或者如果你有特殊的增强建议或问题，欢迎<a href="https://gitter.im/spring-projects/spring-boot">参加我们的Gitter</a> 。</p>
+<p>如果您想全面讨论绑定问题，或者您有特定的增强建议或问题，请<a href="https://gitter.im/spring-projects/spring-boot">加入Gitter</a> 。</p>
 </div>
 </div>
 </div></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3218;
 
       (function(disqus_shortname, document) {
@@ -412,7 +419,8 @@ bound.orElseThrow(NoDateOfBirthException::new);</code></pre>
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -450,12 +458,14 @@ bound.orElseThrow(NoDateOfBirthException::new);</code></pre>
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

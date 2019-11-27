@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>Spring Cloud Data Flow中的组合功能支持</title>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>Spring Cloud数据流中的组合功能支持</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Composed Function Support in Spring Cloud Data Flow">
-<meta name="twitter:description" content="<p>Spring Cloud Stream has recently added a <a href=" https:="" ="" spring.io="" blog="" 2018="" 08="" 28="" spring-cloud-stream-fishtown-m2-2-1-0-m2-release-announcement#spring-cloud-function-suppor="="></head><body dir="ltr">feature to compose a function definition into an existing Spring Cloud Stream application. In this blog, we’ll see how Spring Cloud Data Flow<br>makes use of this feature to compose functions in Streaming pipelines.
+<meta name="twitter:description" content="<p>Spring Cloud Stream has recently added a <a href=" https:="" ="" spring.io="" blog="" 2018="" 08="" 28="" spring-cloud-stream-fishtown-m2-2-1-0-m2-release-announcement#spring-cloud-function-suppor="="></head><body >feature to compose a function definition into an existing Spring Cloud Stream application. In this blog, we’ll see how Spring Cloud Data Flow<br>makes use of this feature to compose functions in Streaming pipelines.
 <h3><a href="#strong-what-s-different-about-it-strong" class="anchor" name="strong-what-s-different-about-it-strong"></a><strong>What’s different about it?</strong></h3>
 <p>In Spring Cloud Data Flow, streaming data pipelines are comprised of Spring Cloud Stream applications. A developer can pick and choose the out-of-the-box <a href="http://cloud.spring.io/spring-cloud-stream-app-starters/">streaming applications</a>, which cover many common use cases. A developer can also <a href="https://start-scs.cfapps.io/">extend</a> these out-of-the-box applications or create custom applications by using Spring Cloud Stream framework.</p>
 ">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -151,7 +157,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Spring Cloud Data Flow中的组合功能支持</h1>
+<h1 class="blog--title">Spring Cloud数据流中的组合功能支持</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -172,37 +178,254 @@
 </header>
 <div class="blog--post"><p>Spring Cloud Stream最近添加了一项<a href="https://spring.io/blog/2018/08/28/spring-cloud-stream-fishtown-m2-2-1-0-m2-release-announcement#spring-cloud-function-support">功能，</a>以将功能定义组合到现有的Spring Cloud Stream应用程序中。在此博客中，我们将看到Spring Cloud Data Flow如何<br>利用此功能来组成Streaming管道中的功能。</p><h3><a href="#strong-what-s-different-about-it-strong" class="anchor" name="strong-what-s-different-about-it-strong"></a> <strong>有什么不同？</strong></h3>
 <p>在Spring Cloud Data Flow中，流数据管道由Spring Cloud Stream应用程序组成。开发人员可以选择现成的<a href="https://cloud.spring.io/spring-cloud-stream-app-starters/">流应用程序</a> ，该<a href="https://cloud.spring.io/spring-cloud-stream-app-starters/">应用程序</a>涵盖了许多常见的用例。开发人员还可以使用Spring Cloud Stream框架<a href="https://start-scs.cfapps.io/">扩展</a>这些现成的应用程序或创建自定义应用程序。</p>
-<p><a href="https://spring.io/blog/2019/01/08/announcing-general-availability-of-spring-cloud-stream-fishtown-release-2-1-0-release#core">Spring Cloud Stream 2.1.0 GA的发布</a>包含基于<a href="https://cloud.spring.io/spring-cloud-function/">Spring Cloud Function</a>的编程模型的集成，该模型允许将业务逻辑表示为<code>java.util.Function</code> ，一个<code>java.util.Consumer</code>和一个<code>java.util.Supplier</code> ，分别代表<code>Processor</code> ， <code>Sink</code>和<code>Source</code>的角色。有了这种灵活性，Spring Cloud Stream框架现在支持一种简单但功能强大的函数组合方法。在这种情况下，组合可以是将源和处理器组合到一个应用程序中：“新源”。否则，可能是处理器+接收器组合成一个应用程序：“新接收器”。这种灵活性为流应用程序开发人员带来了有趣的新机会。</p>
+<p><a href="https://spring.io/blog/2019/01/08/announcing-general-availability-of-spring-cloud-stream-fishtown-release-2-1-0-release#core">Spring Cloud Stream 2.1.0 GA的发布</a>包含基于<a href="https://cloud.spring.io/spring-cloud-function/">Spring Cloud Function</a>的编程模型的集成，该模型允许将业务逻辑表示为<code>java.util.Function</code> ， 一种<code>java.util.Consumer</code>和<code>java.util.Supplier</code> ，代表<code>Processor</code> ， <code>Sink</code>和<code>Source</code>分别。有了这种灵活性，Spring Cloud Stream框架现在支持一种简单而强大的功能组合方法。在这种情况下，组合可能是将源和处理器组合成一个应用程序：“新源”。否则，可能是处理器+接收器组合成一个应用程序：“新接收器”。这种灵活性为流应用程序开发人员带来了有趣的新机会。</p>
 <p>让我们考虑如何使用三个应用程序创建管道以执行简单的转换，然后看看如何通过使用两个使用功能组合的应用程序将其实现为管道。</p><h3><a href="#strong-streaming-pipeline-with-three-applications-strong" class="anchor" name="strong-streaming-pipeline-with-three-applications-strong"></a> <strong>流管道具有三个应用程序</strong></h3>
 <p>对于第一流，</p>
-<p>我们将使用现成的<code>http-source</code> ， <code>transform-processor</code>和<code>log-sink</code>应用程序。</p>
+<p>我们将使用开箱即用的<code>http-source</code> ， <code>transform-processor</code>和<code>log-sink</code>应用程序。</p>
 <p>第一步，启动Spring Cloud Data Flow <code>local</code>服务器：</p>
 <pre><code class="prettyprint">java -jar spring-cloud-dataflow-server-local-1.7.3.RELEASE.jar
 </code></pre>
 <p>现在，启动Spring Cloud Data Flow <code>shell</code> ：</p>
 <pre><code class="prettyprint">java -jar spring-cloud-dataflow-shell-1.7.3.RELEASE.jar
 </code></pre>
-<p>现在，我们注册使用RabbitMQ绑定器的HTTP源，转换器处理器和日志接收器应用程序：</p>
-<pre><code class="prettyprint">dataflow:>app register --name http --type source --uri https://repo.spring.io/milestone/org/springframework/cloud/stream/app/http-source-rabbit/2.1.0.M2/http-source-rabbit-2.1.0.M2.jar
+<p>现在，让我们注册使用RabbitMQ绑定器的HTTP源，转换器处理器和日志接收器应用程序：</p>
+<pre><code class="prettyprint">dataflow:&gt;app register --name http --type source --uri https://repo.spring.io/milestone/org/springframework/cloud/stream/app/http-source-rabbit/2.1.0.M2/http-source-rabbit-2.1.0.M2.jar
 </code></pre>
-<pre><code class="prettyprint">dataflow:>app register --name transformer --type processor --uri https://repo.spring.io/milestone/org/springframework/cloud/stream/app/transform-processor-rabbit/2.1.0.M2/transform-processor-rabbit-2.1.0.M2.jar
+<pre><code class="prettyprint">dataflow:&gt;app register --name transformer --type processor --uri https://repo.spring.io/milestone/org/springframework/cloud/stream/app/transform-processor-rabbit/2.1.0.M2/transform-processor-rabbit-2.1.0.M2.jar
 </code></pre>
-<pre><code class="prettyprint">dataflow:>app register --name log --type sink --uri https://repo.spring.io/milestone/org/springframework/cloud/stream/app/log-sink-rabbit/2.1.0.M2/log-sink-rabbit-2.1.0.M2.jar
+<pre><code class="prettyprint">dataflow:&gt;app register --name log --type sink --uri https://repo.spring.io/milestone/org/springframework/cloud/stream/app/log-sink-rabbit/2.1.0.M2/log-sink-rabbit-2.1.0.M2.jar
 </code></pre>
 <p>现在我们可以创建一个没有函数组成的简单流：</p>
-<pre><code class="prettyprint">dataflow:>stream create hello --definition "http --server.port=9000 | transformer --expression=(\"Hello \"+payload.toString().toUpperCase()) | log"
+<pre><code class="prettyprint">dataflow:&gt;stream create hello --definition &quot;http --server.port=9000 | transformer --expression=(\&quot;Hello \&quot;+payload.toString().toUpperCase()) | log&quot;
 </code></pre>
 <p>然后我们可以部署流：</p>
-<pre><code class="prettyprint">dataflow:>stream deploy hello --properties "deployer.*.local.inheritLogging=true"
+<pre><code class="prettyprint">dataflow:&gt;stream deploy hello --properties &quot;deployer.*.local.inheritLogging=true&quot;
 </code></pre>
-<pre><code class="prettyprint">dataflow:>http post --data "friend" --target "http://localhost:9000"
+<pre><code class="prettyprint">dataflow:&gt;http post --data &quot;friend&quot; --target &quot;http://localhost:9000&quot;
 POST (text/plain) http://localhost:9000 friend
 202 ACCEPTED
 </code></pre>
-<p>您可以在<code>log</code>应用程序中看到以下日志消息：</p>
+<p>您可以在上看到以下日志消息<code>log</code>应用：</p>
 <pre><code class="prettyprint">[sformer.hello-1] log-sink                                 : Hello FRIEND
 
 </code></pre>
-<p>在此流中，我们将http（源），translator（处理器）和log（sink）应用程序部署为目标平台中的独立应用程序（在本例中为<code>local</code> ）。对于某些用例，对于简单的有效负载转换逻辑，我们可能希望将<code>Processor</code>应用程序与<code>Source</code>或<code>Sink</code>应用程序结合在一起。例如，诸如在源输出数据处屏蔽某些特定用户特定字段之类的转换方案不一定需要部署为单独的独立应用程序。相反，它可以在Source或Sink应用程序中组成。</p>
+<p>在此流中，我们将http（源），translator（处理器）和log（sink）应用程序部署为目标平台中的独立应用程序（在本例中为<code>local</code> ）。对于某些用例，对于简单的有效负载转换逻辑，我们可能希望拥有<code>Processor</code>应用程序与<code>Source</code>要么<code>Sink</code>应用程序。例如，诸如在源输出数据处屏蔽某些特定用户特定字段之类的转换方案不一定需要部署为单独的独立应用程序。相反，它可以在Source或Sink应用程序中组成。</p>
 <p>要将Processor函数组合到Source或Sink应用程序中，我们使用Spring Cloud Stream的函数组合支持。</p>
-<p>Spring Cloud Stream中的功能组合支持基于Spring Cloud Function允许注册<code>java.util.Supplier</code></p><code>java.util.Supplier</code></div><code>java.util.Supplier</code></div><code>java.util.Supplier</code></article><code>java.util.Supplier</code></div><code>java.util.Supplier</code></div><code>java.util.Supplier</code></div><code>java.util.Supplier</code></div><code>java.util.Supplier</code></body></html>
+<p>Spring Cloud Stream中的功能组合支持基于Spring Cloud Function允许注册以下内容的能力<code>java.util.Supplier</code> ， <code>java.util.Consumer</code>和<code>java.util.Function</code>作为春天<code>@Bean</code>定义。这些功能<code>@Bean</code>定义可在运行时用于合成。</p>
+<p>Spring Cloud Stream引入了一个新属性，名为<code>spring.cloud.stream.function.definition</code> ，它对应于Spring Cloud Function中的功能定义DSL。设置此属性后，所需的功能Bean将在运行时自动链接。</p>
+<p>函数组合按以下方式发生：</p>
+<p>当Spring Cloud Stream应用程序为类型<code>Source</code> ，在源之后应用组合函数<code>output</code> 。</p>
+<p>当Spring Cloud Stream应用程序为类型<code>Sink</code> ，组合函数在接收器之前应用<code>input</code> 。</p>
+<p>这样就可以将功能（在Spring Cloud Function DSL中定义）组合到现有的Spring Cloud Stream应用程序中，并随后由Spring Cloud Data Flow在流数据管道中进行编排。</p><h3><a href="#strong-composing-functions-into-a-stream-application-strong" class="anchor" name="strong-composing-functions-into-a-stream-application-strong"></a> <strong>将功能组合到Stream应用程序中</strong></h3>
+<p>让我们创建并部署一个将前面示例的转换器表达式组成的流<code>Source</code>应用程序本身。变压器逻辑通过使用两个完成<code>java.util.Function</code>实现。</p>
+<p>我们将创建一个新的源应用程序，我们将其称为<code>http-transformer</code>这扩展了现成的http源应用程序。可在<a href="https://github.com/ilayaperumalg/sandbox/tree/master/function-composition">此处</a>找到新源应用程序的源。</p>
+<p>的<code>http-transformer</code>应用程序包含<code>upper</code>和<code>concat</code>功能bean，定义如下：</p>
+<pre><code class="prettyprint">@SpringBootApplication
+@Import(org.springframework.cloud.stream.app.http.source.HttpSourceConfiguration.class)
+public class HttpSourceRabbitApplication {
+
+	@Bean
+	public Function&lt;String, String&gt; upper() {
+		return value -&gt; value.toUpperCase();
+	}
+
+	@Bean
+	public Function&lt;String, String&gt; concat() {
+		return value -&gt; &quot;Hello &quot;+ value;
+	}
+
+
+	public static void main(String[] args) {
+		SpringApplication.run(HttpSourceRabbitApplication.class, args);
+	}
+}
+
+</code></pre>
+<p>克隆github <a href="https://github.com/ilayaperumalg/sandbox">repo之后</a> ，您可以使用maven构建应用程序：</p>
+<blockquote>
+<p>cd功能组成/ http转换器<br>./mvnw清洁包</p>
+</blockquote>
+<p>现在注册<code>http-transformer</code>使用数据流外壳程序</p>
+<p><strong>注意</strong></p>
+<blockquote>
+<p>对于以下应用程序注册<code>--uri</code>选项，用适合您系统的值替换工件的目录名称和路径。</p>
+</blockquote>
+<pre><code class="prettyprint">dataflow:&gt;app register --name http-transformer --type source --uri file:///Users/igopinathan/dev/git/ilayaperumalg/sandbox/function-composition/http-transformer/target/http-transformer-2.1.0.BUILD-SNAPSHOT.jar
+</code></pre>
+<p>现在让我们创建流：</p>
+<pre><code class="prettyprint">dataflow:&gt;stream create helloComposed --definition &quot;http-transformer --server.port=9001 | log&quot;
+</code></pre>
+<p>部署流时，我们通过<code>spring.cloud.stream.function.definition</code>属性定义组合功能DSL（如Spring Cloud Function中定义）。在这种情况下，它是：</p>
+<pre><code class="prettyprint">dataflow:&gt;stream deploy helloComposed --properties &quot;app.http-transformer.spring.cloud.stream.function.definition=upper|concat,deployer.*.local.inheritLogging=true&quot;
+
+</code></pre>
+<p>上面的部署组成了<code>upper</code>和<code>concat</code>功能豆入<code>http</code>源应用程序。</p>
+<p>然后我们可以将有效载荷发送到<code>http</code>应用：</p>
+<pre><code class="prettyprint">dataflow:&gt;http post --data &quot;friend&quot; --target &quot;http://localhost:9001&quot;
+&gt; POST (text/plain) http://localhost:9001 friend
+&gt; 202 ACCEPTED
+
+</code></pre>
+<p>然后您可以在<code>log</code>应用为</p>
+<pre><code class="prettyprint">[helloComposed-1] log-sink                                 : Hello FRIEND
+
+</code></pre>
+<p><strong>注意</strong></p>
+<p>请注意，功能组合支持不适用于现成的Spring Cloud Stream <code>Processor</code>应用程序，因为在需要在现有处理器的应用程序逻辑之前还是之后应用该功能存在歧义。</p>
+<p>但是，您可以使用标准的java.util创建使用功能组合的自己的处理器应用程序。函数API，如以下示例所示：</p>
+<pre><code class="prettyprint">@Configuration
+public static class FunctionProcessorConfiguration {
+
+@Bean
+public Function&lt;String, String&gt; upperAndConcat() {
+return upper().andThen(concat());
+}
+
+  @Bean
+  public Function&lt;String, String&gt; upper() {
+     return value -&gt; value.toUpperCase();
+  }
+
+  @Bean
+  public Function&lt;String, String&gt; concat() {
+     return value -&gt; &quot;Hello &quot;+ value;
+  }
+}
+</code></pre>
+<p>然后，您需要使用以下属性进行部署：<code>spring.cloud.stream.function.definition=upperAndConcat</code></p><h3><a href="#strong-kotlin-support-strong" class="anchor" name="strong-kotlin-support-strong"></a> <strong>Kotlin支持</strong></h3>
+<p>另一个有趣的功能是Spring Cloud Function支持Kotlin函数的功能组合。这使我们可以将任何Kotlin函数bean添加到可组合的函数中<code>Source</code>要么<code>Sink</code>应用程序。</p>
+<p>要查看其工作原理，请使用<code>http-transformer-kotlin-processor</code>来自示例github <a href="https://github.com/ilayaperumalg/sandbox">存储库的</a>应用程序。</p>
+<p>Kotlin功能Bean被配置为处理器。在这里，Kotlin函数bean是<code>transform</code>功能定义如下：</p>
+<pre><code class="prettyprint">@Bean
+open fun transform(): (String) -&gt; String {
+   return { &quot;How are you &quot;.plus(it) }
+}
+</code></pre>
+<p>此外，这个专案<code>spring-cloud-function-kotlin</code>作为对Kotlin函数应用函数配置支持的依赖项，定义如下：</p>
+<pre><code class="prettyprint">&lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-function-kotlin&lt;/artifactId&gt;
+      &lt;version&gt;2.0.0.RELEASE&lt;/version&gt;
+    &lt;/dependency&gt;
+</code></pre>
+<blockquote>
+<p>光盘功能组成/ http-transformer-kotlin<br>./mvnw清洁包</p>
+</blockquote>
+<p><strong>注意</strong></p>
+<blockquote>
+<p>对于以下应用程序注册<code>--uri</code>选项，用适合您系统的值替换工件的目录名称和路径。</p>
+</blockquote>
+<pre><code class="prettyprint">dataflow:&gt;app register --name http-transformer-kotlin --type source --uri file:///Users/igopinathan/dev/git/ilayaperumalg/sandbox/function-composition/http-transformer-kotlin/target/http-transformer-kotlin-2.1.0.BUILD-SNAPSHOT.jar
+</code></pre>
+<p>使用此应用程序创建流<code>Source</code> ：</p>
+<pre><code class="prettyprint">dataflow:&gt;stream create helloComposedKotlin --definition &quot;http-transformer-kotlin --server.port=9002 | log&quot;
+
+</code></pre>
+<p>就像我们在<code>http-transformer</code>例如，我们可以使用<code>spring.cloud.stream.function.definition</code>属性，以指定任何有效的组合功能DSL来构造功能组合。在这种情况下，让我们将通过Java配置注册的功能bean与来自Kotlin处理器配置的功能bean结合起来。</p>
+<pre><code class="prettyprint">dataflow:&gt;stream deploy helloComposedKotlin --properties &quot;app.http-transformer-kotlin.spring.cloud.stream.function.definition=upper|transform|concat,deployer.*.local.inheritLogging=true&quot;
+
+</code></pre>
+<p>在这里，函数名称<code>transform</code>对应于Kotlin函数。</p>
+<p>注意：我们可以在Kotlin函数和Java函数之间执行合成，因为Kotlin函数在内部被转换为<code>java.util.Function</code> 。</p>
+<pre><code class="prettyprint">dataflow:&gt;http post --data &quot;friend&quot; --target &quot;http://localhost:9002&quot;
+&gt; POST (text/plain) http://localhost:9002 friend
+&gt; 202 ACCEPTED
+
+</code></pre>
+<p>并且，您可以在<code>log</code>申请为：</p>
+<pre><code class="prettyprint">[omposedKotlin-1] log-sink               : Hello How are you FRIEND
+</code></pre>
+<p>在此示例中， <code>http-transformer</code>还包含函数的源代码。但是，您可以通过在单独的工件中定义功能Bean，使应用程序更具模块化。然后，您可以通过仅向项目添加maven依赖项并设置<code>spring.cloud.stream.function.definition</code>属性。这样，您就可以将大多数业务逻辑编码为一个函数，并且可以在必要时将其与Source或Sink组合在一起。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3444;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

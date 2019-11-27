@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>Spring Framework 3.2 RC1：新的测试功能</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Framework 3.2 RC1: New Testing Features">
-<meta name="twitter:description" title="Juergen Hoeller" content="<p> As <a href=" http:="" ="" blog.springsource.org="" author="" juergenh="" ="=" _blan=" "></head><body dir="ltr">Juergen Hoeller mentioned in his post announcing the <a href="http://blog.springsource.org/2012/11/05/spring-framework-3-2-rc1-released/" title="Spring Framework 3.2 RC1发布" target="_blank">release of Spring Framework 3.2 RC1</a>, the Spring Team has introduced some exciting new features in terms of testing support. Most importantly, we've added first-class support for testing web applications. <em>[1]</em> 
+<meta name="twitter:description" title="Juergen Hoeller" content="<p> As <a href=" http:="" ="" blog.springsource.org="" author="" juergenh="" ="=" _blan=" ">Juergen Hoeller mentioned in his post announcing the <a href="http://blog.springsource.org/2012/11/05/spring-framework-3-2-rc1-released/" title="Spring Framework 3.2 RC1发布" target="_blank">release of Spring Framework 3.2 RC1</a>, the Spring Team has introduced some exciting new features in terms of testing support. Most importantly, we've added first-class support for testing web applications. <em>[1]</em> 
 <p>       Please note: this is a <a href="http://www.swiftmind.com/de/2012/11/07/spring-framework-3-2-rc1-new-testing-features/" title="Spring Framework 3.2 RC1：新的测试功能" target="_blank">cross post</a> from my <a href="http://www.swiftmind.com" title="敏捷思维" target="_blank">Swiftmind</a> company blog. </p>
 <p> In this post we'll first take a look at some of the general new testing features in the Spring Framework, and then we'll go into detail regarding support for testing with a <code>WebApplicationContext</code> as well as <em>request</em> and <em>session</em> scoped beans. We'll close with a look at support for <code>ApplicationContextInitializers</code> and a brief discussion of the road map for testing with application context hierarchies. </p>
 ">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -174,45 +180,45 @@
 </p>
 <p>请注意：这是我的<a href="http://www.swiftmind.com" title="敏捷思维" target="_blank">Swiftmind</a>公司博客的<a href="http://www.swiftmind.com/de/2012/11/07/spring-framework-3-2-rc1-new-testing-features/" title="Spring Framework 3.2 RC1：新的测试功能" target="_blank">交叉文章</a> 。
 </p>
-<p>在本文中，我们将首先查看Spring框架中的一些常规新测试功能，然后再详细介绍如何支持对<code>WebApplicationContext</code>以及<em>请求</em>和<em>会话</em>范围的bean的测试。最后，我们将介绍对<code>ApplicationContextInitializers</code>支持以及对使用应用程序上下文层次结构进行测试的路线图的简短讨论。
+<p>在本文中，我们将首先介绍Spring框架中的一些常规新测试功能，然后再详细介绍如何使用<code>WebApplicationContext</code>以及<em>请求</em>和<em>会话</em>范围的Bean。我们将以对的支持结束<code>ApplicationContextInitializers</code>以及对使用应用程序上下文层次结构进行测试的路线图的简短讨论。
 </p>
 <p>
 <a href="http://blog.springsource.org/author/rstoyanchev/" title="罗森·斯托扬切夫（Rossen Stoyanchev）" target="_blank">Rossen Stoyanchev</a>稍后将详细介绍新的<em>Spring MVC测试</em>框架，该框架为测试Spring MVC应用程序提供了一流的支持。因此，请务必对此保持关注，因为它基于本文稍后讨论的基本Web测试支持。
 </p>
 <p></p><hr><br><br><h1>常规新功能和更新</h1><br><p></p>
-<h2>构建和依赖</h2><p><code>spring-test</code>模块现在针对并支持JUnit 4.10和TestNG 6.5.2，并且<code>spring-test</code>现在依赖于<code>junit:junit-dep</code> Maven工件而不是<code>junit:junit</code> ，这意味着您可以完全控制对Hamcrest的依赖性库（例如<code>hamcrest-core</code> ， <code>hamcrest-all</code>等）。</p>
+<h2>构建和依赖</h2><p>的<code>spring-test</code>该模块现在针对并支持JUnit 4.10和TestNG 6.5.2，并且<code>spring-test</code>现在取决于<code>junit:junit-dep</code> Maven工件而不是<code>junit:junit</code>这意味着您可以完全控制对Hamcrest库的依赖（例如， <code>hamcrest-core</code> ， <code>hamcrest-all</code>等）。</p>
 <h2>通用工厂方法</h2>
 <p>
 <em>泛型工厂方法</em>是使用Java泛型实现<a href="https://en.wikipedia.org/wiki/Factory_method_pattern" title="工厂方法设计模式" target="_blank">工厂方法设计模式的方法</a> 。以下是通用工厂方法的一些示例签名：</p>
-<pre><code class="prettyprint java"><br>public static <T> T mock(Class<T> clazz) { ... }
+<pre><code class="prettyprint java"><br />public static &lt;T&gt; T mock(Class&lt;T&gt; clazz) { ... }
 
-public static <T> T proxy(T obj) { ... }
+public static &lt;T&gt; T proxy(T obj) { ... }
 </code></pre>
-<p>Spring配置中使用<em>通用工厂方法</em>绝不是特定于测试，而是通常使用通用工厂方法，例如<code>EasyMock.createMock(MyService.class)</code>或<code>Mockito.mock(MyService.class)</code>来为Spring Bean创建动态<code>Mockito.mock(MyService.class)</code>在测试应用程序上下文中。例如，在Spring Framework 3.2之前，以下配置可能无法将<code>OrderRepository</code>自动装配到<code>OrderService</code> 。原因是，根据在应用程序上下文中初始化bean的顺序，Spring可能会推断<code>orderRepository</code> bean的类型为<code>java.lang.Object</code>而不是<code>com.example.repository.OrderRepository</code> 。
+<p>在Spring配置中使用<em>通用工厂方法</em>绝不是特定于测试，而是使用通用工厂方法，例如<code>EasyMock.createMock(MyService.class)</code>要么<code>Mockito.mock(MyService.class)</code>通常用于在测试应用程序上下文中为Spring bean创建动态模拟。例如，在Spring Framework 3.2之前，以下配置可能无法自动连接<code>OrderRepository</code>进入<code>OrderService</code> 。原因是，根据在应用程序上下文中初始化bean的顺序，Spring可能会推断出bean类型。 <code>orderRepository</code>豆要<code>java.lang.Object</code>代替<code>com.example.repository.OrderRepository</code> 。
 </p>
-<pre><code class="prettyprint xml"><br><beans>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
 
-  <!-- OrderService is autowired with OrderRepository -->
-  <context:component-scan base-package="com.example.service"/>
+  &lt;!-- OrderService is autowired with OrderRepository --&gt;
+  &lt;context:component-scan base-package=&quot;com.example.service&quot;/&gt;
 
-  <bean id="orderRepository" class="org.easymock.EasyMock"
-      factory-method="createMock"
-      c:_="com.example.repository.OrderRepository" />
+  &lt;bean id=&quot;orderRepository&quot; class=&quot;org.easymock.EasyMock&quot;
+      factory-method=&quot;createMock&quot;
+      c:_=&quot;com.example.repository.OrderRepository&quot; /&gt;
 
-</beans>
+&lt;/beans&gt;
 </code></pre>
-<p>在Spring 3.2中，现在可以正确推断出工厂方法的通用返回类型，并且<em>模拟的按类型自动装配</em>应该可以按预期工作。结果，可能不再需要诸如<code>MockitoFactoryBean</code> ， <code>EasyMockFactoryBean</code>或<a href="https://bitbucket.org/kubek2k/springockito/wiki/Home" title="Springockito" target="_blank">Springockito之</a>类的自定义变通办法。
+<p>在Spring 3.2中，现在可以正确推断出工厂方法的通用返回类型，并且<em>模拟的按类型自动装配</em>应该可以按预期工作。因此，自定义解决方法（例如<code>MockitoFactoryBean</code> ， <code>EasyMockFactoryBean</code> ，或可能不再需要<a href="https://bitbucket.org/kubek2k/springockito/wiki/Home" title="Springockito" target="_blank">Springockito</a> 。
 </p>
 <h2>模拟对象</h2>
-<p>我们已经引入了<code>MockEnvironment</code> ，它对现有的<code>MockPropertySource</code>进行了补充，以完全支持对Spring 3.1中引入的环境和属性源抽象的<code>MockPropertySource</code> 。
+<p>我们介绍了<code>MockEnvironment</code>补充现有的<code>MockPropertySource</code>完成对Spring 3.1中引入的环境和属性源抽象的模拟的支持。
 </p>
-<p>关于对Web组件的单元测试支持，我们向现有的Servlet API <code>MockFilterChain</code>添加了新功能，例如<code>MockServletContext</code> ， <code>MockHttpSession</code> ， <code>MockFilterChain</code>和<code>MockRequestDispatcher</code> ，并且为客户端Web引入了与REST Web服务相关的新<code>MockClientHttpRequest</code> ： <code>MockClientHttpRequest</code>和<code>MockClientHttpResponse</code> 。以及服务器端的<code>MockHttpInputMessage</code>和<code>MockHttpOutputMessage</code> 。
+<p>关于对Web组件的单元测试支持，我们在现有的Servlet API模拟中添加了新功能，例如<code>MockServletContext</code> ， <code>MockHttpSession</code> ， <code>MockFilterChain</code>和<code>MockRequestDispatcher</code> ，并且我们引入了与REST Web服务相关的新模拟： <code>MockClientHttpRequest</code>和<code>MockClientHttpResponse</code>对于客户端以及<code>MockHttpInputMessage</code>和<code>MockHttpOutputMessage</code>用于服务器端。
 </p>
-<h2>JDBC测试支持</h2><p>在Spring 3.2中，我们弃用<code>SimpleJdbcTestUtils</code> ，而使用改进的<code>JdbcTestUtils</code>类，该类除了提供<code>SimpleJdbcTestUtils</code>以前提供的所有功能之外，还提供新的<code>countRowsInTableWhere()</code>和<code>dropTables()</code>实用程序方法。这些更改有助于避免与不推荐使用的<code>SimpleJdbcTemplate</code>的使用相关的编译器警告，并提供了一种方便的方法来使用<code>WHERE</code>子句对表中的行数进行计数并删除表列表。与此类似，已经使用<code>jdbcTemplate</code>实例变量以及委托给<code>JdbcTestUtils</code>的对应对象的<code>countRowsInTableWhere()</code>和<code>dropTables()</code>方法对<code>AbstractTransactionalJUnit4SpringContextTests</code>和<code>AbstractTransactionalTestNGSpringContextTests</code>进行了改进。</p>
+<h2>JDBC测试支持</h2><p>在Spring 3.2中，我们已弃用<code>SimpleJdbcTestUtils</code>赞成改进<code>JdbcTestUtils</code>提供新的类<code>countRowsInTableWhere()</code>和<code>dropTables()</code>实用方法<code>SimpleJdbcTestUtils</code>以前提供的。这些更改有助于避免与不推荐使用的编译器相关的警告<code>SimpleJdbcTemplate</code>并提供一种方便的方法来计算表中的行数<code>WHERE</code>子句，用于删除表列表。类似地， <code>AbstractTransactionalJUnit4SpringContextTests</code>和<code>AbstractTransactionalTestNGSpringContextTests</code>已经加装了<code>jdbcTemplate</code>实例变量以及<code>countRowsInTableWhere()</code>和<code>dropTables()</code>委托给对方的方法<code>JdbcTestUtils</code> 。</p>
 <h2>交易管理器配置</h2>
-<p>如果您熟悉<em>Spring TestContext Framework中</em>对事务集成测试的支持，那么您可能知道用于测试的事务管理器必须按照惯例称为<em>“ transactionManager”</em> 。从Spring 2.5开始，可以通过<code>@TransactionConfiguration</code>annotation（例如， <code>@TransactionConfiguration(transactionManager="txMgr")</code> ） <code>@TransactionConfiguration(transactionManager="txMgr")</code> 。但是，如果应用程序上下文中存在单个<code>PlatformTransactionManger</code> ，则不再需要使用此annotation。换句话说，只要有只有一个在上下文中定义的事务管理器，也不再需要<em>符合</em>什么事务管理器的名称是：如果只有一个，TestContext框架将只使用它。
+<p>如果您熟悉<em>Spring TestContext Framework中</em>对事务集成测试的支持，那么您可能知道用于测试的事务管理器必须按照惯例称为<em>“ transactionManager”</em> 。从Spring 2.5开始，可以通过<code>@TransactionConfiguration</code>注释（例如， <code>@TransactionConfiguration(transactionManager="txMgr")</code> ）;但是，如果只有一个，则不再需要使用此注释<code>PlatformTransactionManger</code>存在于应用程序上下文中。换句话说，只要有只有一个在上下文中定义的事务管理器，也不再需要<em>符合</em>什么事务管理器的名称是：如果只有一个，TestContext框架将只使用它。
 </p>
-<p>Spring 3.1引入了<code>TransactionManagementConfigurer</code>接口，用于在与<code>@EnableTransactionManagement</code>结合使用<code>@Configuration</code>类时以编程方式指定要与<code>@Transactional</code>方法一起使用的事务管理器（即，与使用XML配置和<code><tx:annotation-driven /></code> ）。因此，从Spring 3.2开始，如果您的一个组件（即通常为<code>@Configuration</code>类）实现<code>TransactionManagementConfigurer</code> ，则TestContext框架将使用该组件指定的事务管理器。
+<p>Spring 3.1引入了<code>TransactionManagementConfigurer</code>用于以编程方式指定要与之配合使用的事务管理器的界面<code>@Transactional</code>使用方法<code>@Configuration</code>类与<code>@EnableTransactionManagement</code> （即，与将XML配置与<code><tx:annotation-driven /></code> ）。因此从Spring 3.2开始，如果您的组件之一（即通常是<code>@Configuration</code>类）的工具<code>TransactionManagementConfigurer</code> ，TestContext框架将使用该组件指定的事务管理器。
 </p>
 <p></p><hr><br><br><h1>Spring TestContext框架</h1><br><p></p>
 <p>
@@ -220,24 +226,24 @@ public static <T> T proxy(T obj) { ... }
 </p>
 <p>在Spring 2.5中，我们引入了<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/testing.html#testcontext-framework" title="Spring TestContext框架" target="_blank"><em>Spring TestContext Framework</em></a> ，它提供了注释驱动的集成测试支持，可以与JUnit或TestNG一起使用。这篇文章中的示例将重点介绍基于JUnit的测试，但是此处使用的所有功能也都适用于TestNG。
 </p>
-<p>在Spring 3.1中，我们修订了<em>Spring TestContext Framework</em> ，增加了<a href="http://www.swiftmind.com/de/2011/06/22/spring-3-1-m2-testing-with-configuration-classes-and-profiles/" title="Spring 3.1 M2: Testing with @Configuration Classes and Profiles" target="_blank">对使用<code>@Configuration</code>类和环境配置文件</a>进行<a href="http://www.swiftmind.com/de/2011/06/22/spring-3-1-m2-testing-with-configuration-classes-and-profiles/" title="Spring 3.1 M2：使用@Configuration类和配置文件进行测试" target="_blank">测试的</a>支持。
+<p>在Spring 3.1中，我们修订了<em>Spring TestContext Framework</em> ，增加了对<a href="http://www.swiftmind.com/de/2011/06/22/spring-3-1-m2-testing-with-configuration-classes-and-profiles/" title="Spring 3.1 M2: Testing with @Configuration Classes and Profiles" target="_blank">测试的</a>支持。 <a href="http://www.swiftmind.com/de/2011/06/22/spring-3-1-m2-testing-with-configuration-classes-and-profiles/" title="Spring 3.1 M2：使用@Configuration类和配置文件进行测试" target="_blank"><code>@Configuration</code>课程和环境概况</a> 。
 </p>
 <p></p><hr><br><br><h1>加载WebApplicationContext</h1><br><p></p>
 <ul>
-<li><strong>问题</strong> ：如何告诉TestContext框架加载<code>WebApplicationContext</code> ？
-</li><li><strong>答</strong> ：只需使用<code>@WebAppConfiguration</code>annotation测试类。
+<li><strong>问题</strong> ：如何告诉TestContext框架加载一个<code>WebApplicationContext</code> ？
+</li><li><strong>答</strong> ：只需用以下注释您的测试课<code>@WebAppConfiguration</code> 。
 </li></ul>
-<p>这就是全部。测试类上<code>@WebAppConfiguration</code>的存在指示TestContext框架（TCF）应该为集成测试加载<code>WebApplicationContext</code> （WAC）。TCF在后台确保创建了<code>MockServletContext</code>并将其提供给测试的WAC。默认情况下，您的<code>MockServletContext</code>的基本资源路径将设置为<em>“ src / main / webapp”</em> 。这被解释为相对于JVM根目录的路径（即，通常为项目的路径）。如果您熟悉Maven项目中Web应用程序的目录结构，您将知道<em>“ src / main / webapp”</em>是WAR根目录的默认位置。如果您需要覆盖此默认值，只需提供<code>@WebAppConfiguration</code>annotation的备用路径（例如<code>@WebAppConfiguration("src/test/webapp")</code> ）。如果您希望从类路径而不是文件系统中引用基本资源路径，则只需使用Spring的<em>classpath：</em>前缀即可。
+<p>这就是全部。存在<code>@WebAppConfiguration</code>测试类上的代码指示TestContext框架（TCF） <code>WebApplicationContext</code> （WAC）应该被加载以进行集成测试。TCF在后台确保<code>MockServletContext</code>创建并提供给测试的WAC。默认情况下，您的<code>MockServletContext</code>将设置为<em>“ src / main / webapp”</em> 。这被解释为相对于JVM根目录的路径（即，通常为项目的路径）。如果您熟悉Maven项目中Web应用程序的目录结构，您将知道<em>“ src / main / webapp”</em>是WAR根目录的默认位置。如果您需要覆盖此默认设置，只需提供替代路径即可<code>@WebAppConfiguration</code>注释（例如， <code>@WebAppConfiguration("src/test/webapp")</code> ）。如果您希望从类路径而不是文件系统中引用基本资源路径，则只需使用Spring的<em>classpath：</em>前缀即可。
 </p>
-<p>请注意，Spring对<code>WebApplicationContexts</code>的测试支持与对标准<code>ApplicationContexts</code>支持相当。当与测试<code>WebApplicationContext</code>你可以自由申报或者XML配置文件或<code>@Configuration</code>通过类<code>@ContextConfiguration</code> 。您是当然也可以使用任何其他测试注释，比如<code>@TestExecutionListeners</code> ， <code>@TransactionConfiguration</code> ， <code>@ActiveProfiles</code>等。</p>
+<p>请注意，Spring的测试支持<code>WebApplicationContexts</code>与对标准的支持相当<code>ApplicationContexts</code> 。当用<code>WebApplicationContext</code>您可以自由声明XML配置文件或<code>@Configuration</code>通过类<code>@ContextConfiguration</code> 。您当然也可以自由使用任何其他测试注释，例如<code>@TestExecutionListeners</code> ， <code>@TransactionConfiguration</code> ， <code>@ActiveProfiles</code>等</p>
 <p>让我们看一些例子...
 </p><p><code>Conventions</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 
-// defaults to "file:src/main/webapp"
+// defaults to &quot;file:src/main/webapp&quot;
 @WebAppConfiguration
 
-// detects "WacTests-context.xml" in same package
+// detects &quot;WacTests-context.xml&quot; in same package
 // or static nested @Configuration class
 @ContextConfiguration
 
@@ -245,30 +251,30 @@ public class WacTests {
 	//...
 }
 </code></pre>
-<p>上面的示例演示了TestContext框架<em>对配置约定</em>的支持。如果使用<code>@WebAppConfiguration</code>annotation测试类而未指定资源基本路径，则该资源路径将有效地默认为<em>“ file：src / main / webapp”</em> 。同样，如果您声明<code>@ContextConfiguration</code>未指定资源<code>locations</code> ，带注释的<code>classes</code>或上下文<code>initializers</code> ，则Spring将尝试使用约定（即，与<code>WacTests</code>类位于同一包中的<em>“ WacTests-context.xml”</em>或静态嵌套<code>@Configuration</code>类）。
+<p>上面的示例演示了TestContext框架<em>对配置约定</em>的支持。如果您用注释测试班<code>@WebAppConfiguration</code>在不指定资源基本路径的情况下，资源路径将有效地默认为<em>“ file：src / main / webapp”</em> 。同样，如果您声明<code>@ContextConfiguration</code>没有指定资源<code>locations</code> ，带注释<code>classes</code>或上下文<code>initializers</code> ，Spring将尝试使用约定（即，与包相同的包中的<em>“ WacTests-context.xml”）</em>检测约定是否存在。 <code>WacTests</code>类或静态嵌套<code>@Configuration</code>类）。
 </p><p><code>Default Resource Semantics</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 
 // file system resource
-@WebAppConfiguration("webapp")
+@WebAppConfiguration(&quot;webapp&quot;)
 
 // classpath resource
-@ContextConfiguration("/spring/test-servlet-config.xml")
+@ContextConfiguration(&quot;/spring/test-servlet-config.xml&quot;)
 
 public class WacTests {
 	//...
 }
 </code></pre>
-<p>这个例子演示了如何明确声明与资源基本路径<code>@WebAppConfiguration</code>并用XML资源位置<code>@ContextConfiguration</code> 。这里要注意的重要一点是具有这两个注释的路径的语义不同。默认情况下， <code>@WebAppConfiguration</code>资源路径基于文件系统；而<code>@ContextConfiguration</code>资源位置是基于类路径的。
+<p>此示例演示如何使用以下命令显式声明资源基础路径<code>@WebAppConfiguration</code>和一个XML资源位置<code>@ContextConfiguration</code> 。这里要注意的重要一点是具有这两个注释的路径的语义不同。默认， <code>@WebAppConfiguration</code>资源路径是基于文件系统的；而， <code>@ContextConfiguration</code>资源位置基于类路径。
 </p><p><code>Explicit Resource Semantics</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 
 // classpath resource
-@WebAppConfiguration("classpath:test-web-resources")
+@WebAppConfiguration(&quot;classpath:test-web-resources&quot;)
 
 // file system resource
 @ContextConfiguration(
-    "file:src/main/webapp/WEB-INF/servlet-config.xml")
+    &quot;file:src/main/webapp/WEB-INF/servlet-config.xml&quot;)
 
 public class WacTests {
 	//...
@@ -277,11 +283,11 @@ public class WacTests {
 <p>在第三个示例中，我们看到可以通过指定Spring资源前缀来覆盖两个注释的默认资源语义。将本示例中的注释与上一个示例进行对比。
 </p>
 <p></p><hr><br><br><h1>使用网络模拟</h1><br><p></p>
-<p>为了提供全面的Web测试支持，Spring 3.2引入了一个默认启用的新<code>ServletTestExecutionListener</code> 。当针对测试<code>WebApplicationContext</code>这<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/testing.html#testcontext-key-abstractions" title="TestExecutionListener" target="_blank">TestExecutionListener的</a>通过Spring网络的设置默认的线程局部状态<code>RequestContextHolder</code>各测试方法之前，并创建一个<code>MockHttpServletRequest</code> ， <code>MockHttpServletResponse</code>和<code>ServletWebRequest</code>基于通过配置的基础资源路径上<code>@WebAppConfiguration</code> 。<code>ServletTestExecutionListener</code>还确保可以将<code>MockHttpServletResponse</code>和<code>ServletWebRequest</code>注入到测试实例中，一旦测试完成，它将清除线程本地状态。
+<p>为了提供全面的Web测试支持，Spring 3.2引入了新的<code>ServletTestExecutionListener</code>默认情况下启用。当针对<code>WebApplicationContext</code>这个<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/testing.html#testcontext-key-abstractions" title="TestExecutionListener" target="_blank">TestExecutionListener</a>通过Spring Web的默认本地线程状态<code>RequestContextHolder</code>在每种测试方法之前创建一个<code>MockHttpServletRequest</code> ， <code>MockHttpServletResponse</code>和<code>ServletWebRequest</code>基于通过配置的基本资源路径<code>@WebAppConfiguration</code> 。 <code>ServletTestExecutionListener</code>还可以确保<code>MockHttpServletResponse</code>和<code>ServletWebRequest</code>可以注入到测试实例中，一旦测试完成，它将清除线程本地状态。
 </p>
-<p>在为测试加载了<code>WebApplicationContext</code> ，您可能会发现需要与Web模拟进行交互，例如，设置测试夹具或在调用Web组件后执行声明。下面的示例演示可以将哪些模拟自动连接到您的测试实例。注意， <code>WebApplicationContext</code>和<code>MockServletContext</code>都缓存在测试套件中。而其他<code>ServletTestExecutionListener</code>按测试方法进行管理。
+<p>一旦你有一个<code>WebApplicationContext</code>在为测试加载后，您可能会发现您需要与Web模拟进行交互，例如，设置测试夹具或在调用Web组件后执行声明。以下示例演示了可以将哪些模拟自动连接到您的测试实例。请注意<code>WebApplicationContext</code>和<code>MockServletContext</code>都缓存在测试套件中；而其他模拟则由每个测试方法管理<code>ServletTestExecutionListener</code> 。
 </p><p><code>Injecting Mocks</code></p>
-<pre><code class="prettyprint java"><br>@WebAppConfiguration
+<pre><code class="prettyprint java"><br />@WebAppConfiguration
 @ContextConfiguration
 public class WacTests {
 	
@@ -302,33 +308,33 @@ public class WacTests {
 </code></pre>
 <p></p><hr><br><br><h1>请求和会话范围的Bean</h1><br><p></p>
 <p>
-Spring已经支持了<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/beans.html#beans-factory-scopes-other" title="请求，会话和全局会话范围" target="_blank">请求和会话作用域的bean</a>数年了，但是测试它们一直都是不平凡的。从Spring 3.2开始，通过执行以下步骤来轻松测试请求范围和会话范围的bean：</p>
+Spring已经支持<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/beans.html#beans-factory-scopes-other" title="请求，会话和全局会话范围" target="_blank">请求和会话范围的Bean</a>已有好几年了，但是测试它们一直都不是一件容易的事。从Spring 3.2开始，通过执行以下步骤来轻松测试请求范围和会话范围的bean：</p>
 <ol>
-<li>通过使用<code>@WebAppConfiguration</code>annotation测试类，确保为测试加载<code>WebApplicationContext</code> 。</li>
+<li>确保一个<code>WebApplicationContext</code>通过注释测试类为您的测试加载<code>@WebAppConfiguration</code> 。</li>
 <li>将模拟请求或会话注入到测试实例中，并适当地准备测试夹具。</li>
-<li>调用从配置的<code>WebApplicationContext</code>检索到的Web组件（即，通过依赖注入）。</li>
+<li>调用从配置文件中检索到的Web组件<code>WebApplicationContext</code> （即通过依赖项注入）。</li>
 <li>对模拟执行断言。</li>
 </ol>
-<p>以下代码片段显示了登录用例的XML配置。注意， <code>userService</code> bean与请求范围的<code>loginAction</code> bean有依赖关系。另外， <code>LoginAction</code>使用<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/expressions.html" title="Spring Expression Language" target="_blank">SpEL表达式</a>实例化，该<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/expressions.html" title="春季表达语言" target="_blank">表达式</a>从当前HTTP请求中检索用户名和密码。在我们的测试中，我们将要通过TestContext框架管理的模拟来配置这些请求参数。
+<p>以下代码片段显示了登录用例的XML配置。请注意<code>userService</code> bean对请求范围的依赖<code>loginAction</code>豆。另外， <code>LoginAction</code>使用<a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/expressions.html" title="Spring Expression Language" target="_blank">SpEL表达式</a>实例化该实例， <a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/expressions.html" title="春季表达语言" target="_blank">该表达式</a>从当前HTTP请求中检索用户名和密码。在我们的测试中，我们将要通过TestContext框架管理的模拟来配置这些请求参数。
 </p><p><code>Request-scoped Bean Config</code></p>
-<pre><code class="prettyprint xml"><br><beans>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
 
-  <bean id="userService"
-      class="com.example.SimpleUserService"
-      c:loginAction-ref="loginAction" />
+  &lt;bean id=&quot;userService&quot;
+      class=&quot;com.example.SimpleUserService&quot;
+      c:loginAction-ref=&quot;loginAction&quot; /&gt;
 
-  <bean id="loginAction" class="com.example.LoginAction"
-      c:username="#{request.getParameter('user')}"
-      c:password="#{request.getParameter('pswd')}"
-      scope="request">
-    <aop:scoped-proxy />
-  </bean>
+  &lt;bean id=&quot;loginAction&quot; class=&quot;com.example.LoginAction&quot;
+      c:username=&quot;#{request.getParameter(&#39;user&#39;)}&quot;
+      c:password=&quot;#{request.getParameter(&#39;pswd&#39;)}&quot;
+      scope=&quot;request&quot;&gt;
+    &lt;aop:scoped-proxy /&gt;
+  &lt;/bean&gt;
 	
-</beans>
+&lt;/beans&gt;
 </code></pre>
-<p>在<code>RequestScopedBeanTests</code>我们将<code>UserService</code> （即，正在测试的主题）和<code>MockHttpServletRequest</code>注入到我们的测试实例中。在我们的<code>requestScope()</code>测试方法中，我们通过在提供的<code>MockHttpServletRequest</code>设置请求参数来设置测试装置。当在我们的<code>userService</code>上调用<code>loginUser()</code>方法时，我们可以确保用户服务可以访问当前<code>MockHttpServletRequest</code>的请求范围的<code>loginAction</code> （即，我们刚刚在其中设置参数的那个）。然后，我们可以根据用户名和密码的已知输入对结果进行断言。
+<p>在<code>RequestScopedBeanTests</code>我们注入<code>UserService</code> （即被测对象）和<code>MockHttpServletRequest</code>进入我们的测试实例。在我们内<code>requestScope()</code>测试方法，我们通过在提供的设置请求参数来设置测试夹具<code>MockHttpServletRequest</code> 。当。。。的时候<code>loginUser()</code>方法在我们的<code>userService</code>我们保证用户服务可以访问请求范围<code>loginAction</code>目前<code>MockHttpServletRequest</code> （即我们刚刚在其中设置参数的那个）。然后，我们可以根据用户名和密码的已知输入对结果进行断言。
 </p><p><code>Request-scoped Bean Test</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 @WebAppConfiguration
 public class RequestScopedBeanTests {
@@ -339,8 +345,8 @@ public class RequestScopedBeanTests {
 	@Test
 	public void requestScope() {
 		
-		request.setParameter("user", "enigma");
-		request.setParameter("pswd", "$pr!ng");
+		request.setParameter(&quot;user&quot;, &quot;enigma&quot;);
+		request.setParameter(&quot;pswd&quot;, &quot;$pr!ng&quot;);
 		
 		LoginResults results = userService.loginUser();
 		
@@ -348,26 +354,26 @@ public class RequestScopedBeanTests {
 	}
 }
 </code></pre>
-<p>下面的代码片段类似于上面针对请求范围的Bean看到的代码片段。但是，这一次<code>userService</code> bean与会话范围的<code>userPreferences</code> bean有依赖关系。注意，使用SpEL表达式实例化了<code>UserPreferences</code> bean，该表达式从当前HTTP会话中检索<em>主题</em> 。在我们的测试中，我们将需要在由TestContext框架管理的模拟会话中配置主题。
+<p>下面的代码片段类似于上面针对请求范围的Bean看到的代码片段。但是，这次<code>userService</code> bean对会话范围的依赖<code>userPreferences</code>豆。请注意<code>UserPreferences</code>使用SpEL表达式实例化bean，该表达式从当前HTTP会话中检索<em>主题</em> 。在我们的测试中，我们将需要在由TestContext框架管理的模拟会话中配置主题。
 </p><p><code>Session-scoped Bean Config</code></p>
-<pre><code class="prettyprint xml"><br><beans>
+<pre><code class="prettyprint xml"><br />&lt;beans&gt;
 
-  <bean id="userService"
-      class="com.example.SimpleUserService"
-      c:userPreferences-ref="userPreferences" />
+  &lt;bean id=&quot;userService&quot;
+      class=&quot;com.example.SimpleUserService&quot;
+      c:userPreferences-ref=&quot;userPreferences&quot; /&gt;
 
-  <bean id="userPreferences"
-      class="com.example.UserPreferences"
-      c:theme="#{session.getAttribute('theme')}"
-      scope="session">
-    <aop:scoped-proxy />
-  </bean>
+  &lt;bean id=&quot;userPreferences&quot;
+      class=&quot;com.example.UserPreferences&quot;
+      c:theme=&quot;#{session.getAttribute(&#39;theme&#39;)}&quot;
+      scope=&quot;session&quot;&gt;
+    &lt;aop:scoped-proxy /&gt;
+  &lt;/bean&gt;
 
-</beans>
+&lt;/beans&gt;
 </code></pre>
-<p>在<code>SessionScopedBeanTests</code>我们将<code>UserService</code>和<code>MockHttpSession</code>注入到我们的测试实例中。在<code>sessionScope()</code>测试方法中，我们通过在提供的<code>MockHttpSession</code>设置预期的“ theme”属性来设置测试装置。当在我们的<code>userService</code>上调用<code>processUserPreferences()</code>方法时，我们可以确保用户服务可以访问当前<code>MockHttpSession</code>的会话作用域的<code>userPreferences</code> ，并且我们可以基于配置的主题对结果进行断言。
+<p>在<code>SessionScopedBeanTests</code>我们注入<code>UserService</code>和<code>MockHttpSession</code>进入我们的测试实例。在我们内<code>sessionScope()</code>测试方法，我们通过在提供的设置中设置预期的“主题”属性来设置测试装置<code>MockHttpSession</code> 。当。。。的时候<code>processUserPreferences()</code>方法在我们的<code>userService</code>我们保证用户服务可以访问会话范围的会话<code>userPreferences</code>目前<code>MockHttpSession</code> ，我们可以根据配置的主题对结果进行断言。
 </p><p><code>Session-scoped Bean Test</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 @WebAppConfiguration
 public class SessionScopedBeanTests {
@@ -378,7 +384,7 @@ public class SessionScopedBeanTests {
   @Test
   public void sessionScope() throws Exception {
 
-    session.setAttribute("theme", "blue");
+    session.setAttribute(&quot;theme&quot;, &quot;blue&quot;);
 
     Results results = userService.processUserPreferences();
 
@@ -387,28 +393,28 @@ public class SessionScopedBeanTests {
 }
 </code></pre>
 <p></p><hr><br><br><h1>应用程序上下文初始化器</h1><br><p></p>
-<p>Spring 3.1引入了<code>ApplicationContextInitializer</code>接口，该接口允许以编程方式初始化<code>ConfigurableApplicationContext</code> ，例如，针对Spring <code>Environment</code>抽象注册属性源或激活bean定义配置文件。初始化可被配置<code>web.xml</code>通过指定<code>contextInitializerClasses</code>经由<code>context-param</code>为<code>ContextLoaderListener</code>并通过<code>init-param</code>为<code>DispatcherServlet</code> 。
+<p>Spring 3.1引入了<code>ApplicationContextInitializer</code>允许以编程方式初始化<code>ConfigurableApplicationContext</code> —例如，针对Spring注册属性源或激活bean定义配置文件<code>Environment</code>抽象。可以在以下位置配置初始化程序<code>web.xml</code>通过指定<code>contextInitializerClasses</code>通过一个<code>context-param</code>为了<code>ContextLoaderListener</code>并通过<code>init-param</code>为了<code>DispatcherServlet</code> 。
 </p>
-<p>要在集成测试中使用上下文初始化程序，只需通过Spring 3.2中引入的新的<code>initializers</code>属性在<code>@ContextConfiguration</code>声明初始化程序类。可以通过<code>inheritInitializers</code>属性控制跨测试类层次结构的初始化程序的继承，默认情况下为<code>true</code> 。由于<code>ApplicationContextInitializer</code>提供了一种完全编程的方法来初始化应用程序上下文，因此初始化程序可以选择配置整个上下文。换句话说，如果已经声明了初始化程序，则在通过<code>@ContextConfiguration</code>配置的集成测试中，不再绝对需要XML资源位置或带注释的类。最后但并非最不重要的，上下文初始化基于Spring的<em>订购</em>的<code>Ordered</code>接口或<code>@Order</code>注解。
+<p>要在集成测试中使用上下文初始值设定项，只需在以下位置声明初始值设定项类： <code>@ContextConfiguration</code>通过新<code>initializers</code>在Spring 3.2中引入了属性。跨测试类层次结构的初始值设定项的继承可以通过<code>inheritInitializers</code>属性是<code>true</code>默认。由于一个<code>ApplicationContextInitializer</code>由于提供了一种完全编程的方法来初始化应用程序上下文，因此初始化程序可以选择配置整个上下文。换句话说，在通过以下方式配置的集成测试中，不再绝对需要XML资源位置或带注释的类<code>@ContextConfiguration</code>如果已声明初始化程序。最后但并非最不重要的，上下文的初始化是基于Spring的<em>有序</em> <code>Ordered</code>接口或<code>@Order</code>注解。
 </p>
-<p>以下代码示例演示了可以在集成测试中使用上下文初始化程序的各种方式。第一个显示了如何结合XML资源位置配置单个初始化程序。下一个示例声明了多个上下文初始化器。第三个清单演示了在类层次结构中使用初始化程序，其中<code>ExtendedTest</code>声明的上下文初始化程序列表将与<code>BaseTest</code>声明的初始化项合并。回想一下，初始化程序的调用顺序受Spring的<code>Ordered</code>接口的实现或<code>@Order</code>annotation的影响。第四个例子是相同的不同之处在于第三示例<code>inheritInitializers</code>在属性<code>@ContextConfiguration</code>已被设置为<code>false</code> 。结果是在父类中声明的所有上下文初始化器都将被忽略（即，被覆盖）。最终的上市证明了一个<code>ApplicationContext</code>可以单独从上下文中初始化，无需申报XML资源位置或注释的类加载。
+<p>以下代码示例演示了可以在集成测试中使用上下文初始化程序的各种方式。第一个显示了如何结合XML资源位置配置单个初始化程序。下一个示例声明了多个上下文初始化器。第三个清单演示了在类层次结构中使用初始化程序的情况，其中在<code>ExtendedTest</code>将与在<code>BaseTest</code> 。回想一下，初始化程序的调用顺序受Spring的实现影响<code>Ordered</code>介面或<code>@Order</code>注解。第四个示例与第三个示例相同，除了<code>inheritInitializers</code>归因于<code>@ContextConfiguration</code>已设置为<code>false</code> 。结果是在父类中声明的所有上下文初始化器都将被忽略（即，被覆盖）。最终清单显示了<code>ApplicationContext</code>可以仅从上下文初始化程序加载，而无需声明XML资源位置或带注释的类。
 </p><p><code>Single Initializer</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-    locations = "/app-config.xml",
+    locations = &quot;/app-config.xml&quot;,
     initializers = CustomInitializer.class)
 public class ApplicationContextInitializerTests {}
 </code></pre><p><code>Multiple Initializers</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-  locations = "/app-config.xml",
+  locations = &quot;/app-config.xml&quot;,
   initializers = {
     PropertySourceInitializer.class,
     ProfileInitializer.class
   })
 public class ApplicationContextInitializerTests {}
 </code></pre><p><code>Merged Initializers</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
     classes = BaseConfig.class,
     initializers = BaseInitializer.class)
@@ -420,7 +426,7 @@ public class BaseTest {}
     initializers = ExtendedInitializer.class)
 public class ExtendedTest extends BaseTest {}
 </code></pre><p><code>Overridden Initializers</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
     classes = BaseConfig.class,
     initializers = BaseInitializer.class)
@@ -433,15 +439,15 @@ public class BaseTest {}
     inheritInitializers = false)
 public class ExtendedTest extends BaseTest {}
 </code></pre><p><code>Initializer without Resources</code></p>
-<pre><code class="prettyprint java"><br>// does not declare 'locations' or 'classes'
+<pre><code class="prettyprint java"><br />// does not declare &#39;locations&#39; or &#39;classes&#39;
 @ContextConfiguration(
     initializers = EntireAppInitializer.class)
 public class InitializerWithoutConfigFilesOrClassesTest {}
 </code></pre>
 <p></p><hr><br><br><h1>上下文缓存</h1><br><p></p>
-<p>一旦TestContext框架为测试加载了<code>ApplicationContext</code> ，该上下文将被缓存并重新用于在同一测试套件中声明相同唯一上下文配置的<strong>所有</strong>后续测试。这里要记住的重要一点是， <code>ApplicationContext</code>由其<em>上下文缓存键</em> （即，用于加载它的配置参数的组合）唯一标识。
+<p>一旦TestContext框架加载了<code>ApplicationContext</code>对于一个测试，该上下文将被高速缓存并重新用于<strong>所有</strong>在同一测试套件中声明相同唯一上下文配置的后续测试。这里要记住的重要一点是<code>ApplicationContext</code>由其<em>上下文缓存键</em> （即用于加载它的配置参数的组合）唯一标识。
 </p>
-<p>由于Spring 3.2的<code>ApplicationContextInitializer</code>类还包括<em>上下文高速缓存键</em> 。此外，如果上下文是<code>WebApplicationContext</code>其基本资源路径（通过<code>@WebAppConfiguration</code>定义）也将包含在<em>上下文缓存键中</em> 。有关缓存的更多详细信息，请参考参考手册的“ <a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/testing.html#testcontext-ctx-management-caching" title="上下文缓存" target="_blank">上下文缓存”</a>部分。
+<p>从Spring 3.2开始<code>ApplicationContextInitializer</code>类还包括<em>上下文缓存键</em> 。此外，如果上下文是<code>WebApplicationContext</code>其基本资源路径（通过<code>@WebAppConfiguration</code> ）也将包含在<em>上下文缓存键中</em> 。有关缓存的更多详细信息，请参考参考手册的“ <a href="http://static.springsource.org/spring/docs/3.2.0.RC1/reference/html/testing.html#testcontext-ctx-management-caching" title="上下文缓存" target="_blank">上下文缓存”</a>部分。
 </p>
 <p></p><hr><br><br><h1>应用程序上下文层次结构</h1><br><p></p>
 <p>
@@ -452,53 +458,53 @@ public class InitializerWithoutConfigFilesOrClassesTest {}
 <p>考虑到这一点，Spring团队想引入集成测试支持，以使用父上下文加载测试应用程序上下文，并且理想情况下，将支持以下常见层次结构。
 </p>
 <ul>
-<li>根<code>WebApplicationContext</code> ←调度程序<code>WebApplicationContext</code></li>
-<li>EAR←根<code>WebApplicationContext</code> ←调度程序<code>WebApplicationContext</code></li>
+<li>根<code>WebApplicationContext</code> ←调度员<code>WebApplicationContext</code></li>
+<li>耳←根<code>WebApplicationContext</code> ←调度员<code>WebApplicationContext</code></li>
 </ul>
-<p>目前的建议包括引入新的<code>@ContextHierarchy</code>annotation，将包含嵌套<code>@ContextConfiguration</code>声明加上一个新<code>name</code>的属性<code>@ContextConfiguration</code>可能被用于在上下文结构<em>合并</em>或<em>覆盖</em>已命名的配置。
+<p>当前的提案包括引入新的<code>@ContextHierarchy</code>包含嵌套的注释<code>@ContextConfiguration</code>声明加上新的<code>name</code>归因于<code>@ContextConfiguration</code>可用于<em>合并</em>或<em>覆盖</em>上下文层次结构中的命名配置。
 </p>
-<p>为了阐明该提案，让我们看一些示例...
+<p>为了阐明该建议，让我们看一些示例...
 </p>
 <p>
 <code>AppCtxHierarchyTests</code>演示了在单个测试类中声明的父子上下文上下文层次结构，其中上下文是标准上下文（即非Web）。
 </p><p><code>Single Test with Context Hierarchy</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 
 @ContextHierarchy({
-	@ContextConfiguration("parent.xml"),
-	@ContextConfiguration("child.xml")
+	@ContextConfiguration(&quot;parent.xml&quot;),
+	@ContextConfiguration(&quot;child.xml&quot;)
 })
 public class AppCtxHierarchyTests {}
 </code></pre>
 <p>
-<code>ControllerIntegrationTests</code>演示了在单个测试类中声明的父子上下文层次结构，其中上下文是<code>WebApplicationContexts</code>并为典型的Spring MVC部署建模。
+<code>ControllerIntegrationTests</code>演示在单个测试类中声明的父子上下文层次结构，其中上下文是<code>WebApplicationContexts</code>并为典型的Spring MVC部署建模。
 </p><p><code>Root WAC & Dispatcher WAC</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 
 @WebAppConfiguration
 
 @ContextHierarchy({
     @ContextConfiguration(
-		name = "root",
+		name = &quot;root&quot;,
 		classes = WebAppConfig.class),
     @ContextConfiguration(
-		name = "dispatcher",
-		locations = "/spring/dispatcher-config.xml")
+		name = &quot;dispatcher&quot;,
+		locations = &quot;/spring/dispatcher-config.xml&quot;)
 })
 public class ControllerIntegrationTests {}
 </code></pre>
 <p>以下代码清单演示了如何在测试类层次结构中构建上下文层次结构，其中测试类层次结构中的每个级别都负责在上下文层次结构中配置自己的级别。在这两个子类中执行测试将导致加载（和缓存）三个应用程序上下文以及两个不同的上下文层次结构。
 </p><p><code>Class & Context Hierarchies</code></p>
-<pre><code class="prettyprint java"><br>@RunWith(SpringJUnit4ClassRunner.class)
+<pre><code class="prettyprint java"><br />@RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(
-  "file:src/main/webapp/WEB-INF/applicationContext.xml")
+  &quot;file:src/main/webapp/WEB-INF/applicationContext.xml&quot;)
 public abstract class AbstractWebTests{}
 
-@ContextHierarchy(@ContextConfiguration("/spring/soap-ws-config.xml"))
+@ContextHierarchy(@ContextConfiguration(&quot;/spring/soap-ws-config.xml&quot;))
 public class SoapWebServiceTests extends AbstractWebTests{}
 
-@ContextHierarchy(@ContextConfiguration("/spring/rest-ws-config.xml"))
+@ContextHierarchy(@ContextConfiguration(&quot;/spring/rest-ws-config.xml&quot;))
 public class RestWebServiceTests extends AbstractWebTests{}
 </code></pre>
 <h3>欢迎反馈</h3>
@@ -517,7 +523,8 @@ public class RestWebServiceTests extends AbstractWebTests{}
 <p></p><hr><br><p></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 494;
 
       (function(disqus_shortname, document) {
@@ -531,7 +538,8 @@ public class RestWebServiceTests extends AbstractWebTests{}
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -569,12 +577,14 @@ public class RestWebServiceTests extends AbstractWebTests{}
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

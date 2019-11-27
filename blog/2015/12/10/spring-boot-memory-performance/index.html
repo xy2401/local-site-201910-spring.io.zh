@@ -1,14 +1,18 @@
-<!doctype html><html data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>Spring Boot Memory Performance</title>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport">
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
+<title>春季启动内存性能</title>
+<meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
-<link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css">
+<link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
-<meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification">
+<script>
+      System.import('app/main.js')
+  </script>
+<meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -18,8 +22,8 @@
 
 <link href="/css/blog-92993c3ec6808bded45b277c18d7d621.css" rel="stylesheet" type="text/css">
 
-<meta content="summary" name="twitter:card">
-<meta content="@springcentral" name="twitter:site">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Boot Memory Performance">
 <meta name="twitter:description" content="<p>It has sometimes been suggested that Spring and Spring Boot are “heavyweight”, perhaps just because they allow apps to punch above their weight, providing a lot of features for not very much user code. In this article we concentrate on memory usage and ask if we can quantify the effect of using Spring? Specifically we would like to know more about the real overhead of using Spring compared to other JVM applications. We start by creating a basic application with Spring Boot, and look at a few different ways to measure it when it is running. Then we look at some comparison points: plain Java apps, apps that use Spring but not Spring Boot, an app that uses Spring Boot but no autoconfiguration, and some Ratpack sample apps.</p>
 ">
@@ -32,15 +36,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2015-12-10 17:31:00.0">
-</head>
-<body>
 
-<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" style="display:none;visibility:hidden" width="0"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+
+<noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
+
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -50,16 +56,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -75,9 +81,9 @@
 <div class="search-dropdown--container js-search-dropdown">
 <div class="container-fluid">
 <div class="search-form--container">
-<form action="/search" class="form-inline form-search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
+<form class="form-inline form-search" action="/search" method="get">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
+<button class="search-form--submit" type="submit"></button>
 </form>
 </div>
 </div>
@@ -87,40 +93,30 @@
 <div class="mobile-navigation--wrapper mobile-only">
 <div class="navigation-drawer--container">
 <div class="mobile-search--container">
-<form action="/search" class="form-inline form-search" method="get">
-<button class="search-form--submit" type="submit"><i class="icon-search"></i></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="">
+<form class="form-inline form-search" action="/search" method="get">
+<button class="search-form--submit" type="submit"></button>
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -146,63 +142,62 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Spring Boot Memory Performance</h1>
+<h1 class="blog--title">春季启动内存性能</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&d=mm">
-<a class="author" rel="author" href="/team/dsyer">Dave Syer</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/ae671230e3a1c2a0eefa7604990084f1?s=20&d=mm"> <a class="author" rel="author" href="/team/dsyer">戴夫·瑟</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2015-12-10 17:31:00.0">December 10, 2015</time>
+<time class="date" pubdate="" datetime="2015-12-10 17:31:00.0">2015年12月10日</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
-<a class="comments" data-disqus-identifier="2320" href="/blog/2015/12/10/spring-boot-memory-performance#disqus_thread">
+<a class="comments" href="/blog/2015/12/10/spring-boot-memory-performance#disqus_thread" data-disqus-identifier="2320">
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>It has sometimes been suggested that Spring and Spring Boot are “heavyweight”, perhaps just because they allow apps to punch above their weight, providing a lot of features for not very much user code. In this article we concentrate on memory usage and ask if we can quantify the effect of using Spring? Specifically we would like to know more about the real overhead of using Spring compared to other JVM applications. We start by creating a basic application with Spring Boot, and look at a few different ways to measure it when it is running. Then we look at some comparison points: plain Java apps, apps that use Spring but not Spring Boot, an app that uses Spring Boot but no autoconfiguration, and some Ratpack sample apps.</p><h2><a href="#vanilla-spring-boot-app" class="anchor" name="vanilla-spring-boot-app"></a>Vanilla Spring Boot App</h2>
-<p>As a baseline we build a static app with a few webjars and <code>spring.resources.enabled=true</code>. This is perfectly fine for serving nice-looking static content maybe with a REST endpoint or two. The source code for the app we used to test is <a href="https://github.com/dsyer/spring-boot-memory-blog/blob/master/demo">in github</a>. You can build it with the <code>mvnw</code> wrapper script if you have a JDK 1.8 available and on your path (<code>mvnw package</code>). It can be launched like this:</p>
+<div class="blog--post"><p>有时有人建议Spring和Spring Boot是“重量级”的，也许只是因为它们允许应用程序超出其重量，从而为很多用户代码提供了很多功能。在本文中，我们重点介绍内存使用情况，并询问是否可以量化使用Spring的效果？具体来说，我们想比其他JVM应用程序更多地了解使用Spring的实际开销。我们首先使用Spring Boot创建一个基本应用程序，然后看看几种不同的方法来衡量它的运行情况。然后，我们看一些比较点：简单的Java应用程序，使用Spring但不使用Spring Boot的应用程序，使用Spring Boot但不进行自动配置的应用程序以及一些Ratpack示例应用程序。</p><h2><a href="#vanilla-spring-boot-app" class="anchor" name="vanilla-spring-boot-app"></a>香草弹簧启动应用程序</h2>
+<p>作为基准，我们构建了一个静态应用，其中包含一些webjar和<code>spring.resources.enabled=true</code> 。这对于通过一个或两个REST端点提供美观的静态内容非常合适。我们用来测试的应用程序的源代码<a href="https://github.com/dsyer/spring-boot-memory-blog/blob/master/demo">在github中</a> 。您可以使用<code>mvnw</code>包装器脚本（如果有可用的JDK 1.8，并且在路径上）（ <code>mvnw package</code> ）。可以这样启动：</p>
 <pre><code class="prettyprint">$ java -Xmx32m -Xss256k -jar target/demo-0.0.1-SNAPSHOT.jar
 </code></pre>
-<p>The we add some load, just to warm up the thread pools and force all the code paths to be exercised:</p>
+<p>我们增加了一些负载，只是为了预热线程池并强制执行所有代码路径：</p>
 <pre><code class="prettyprint">$ ab -n 2000 -c 4 http://localhost:8080/
 </code></pre>
-<p>We can try and limit threads a bit in <code>application.properties</code>:</p>
+<p>我们可以尝试限制线程数<code>application.properties</code> ：</p>
 <pre><code class="prettyprint">server.tomcat.max-threads: 4
 </code></pre>
-<p>but in the end it doesn’t make a lot of difference to the numbers. We conclude from the analysis below that it would save at most a MB with the stack size we are using. All the Spring Boot webapps we analyse have this same configuration.</p>
-<p>We might have to worry about how big the classpath is, in order to estimate what happens to the memory. Despite some claims in the internet that the JVM memory maps all jars on the classpath, we actually don’t find any evidence that the size of the classpath has any effect on the running app. For reference, the size of the dependency jars (not including JDK) in the vanilla sample is 18MB:</p>
-<pre><code class="prettyprint">$ jar -tvf  target/demo-0.0.1-SNAPSHOT.jar | grep lib/.*.jar | awk '{tot+=$1;} END {print tot}'
+<p>但是最后，这些数字并没有太大的区别。我们从下面的分析得出结论，与我们使用的堆栈大小相比，它最多可节省MB。我们分析的所有Spring Boot Web应用程序都具有相同的配置。</p>
+<p>为了估计内存发生了什么，我们可能不得不担心类路径的大小。尽管互联网上有人声称JVM内存映射了类路径上的所有jar，但实际上我们找不到任何证据证明类路径的大小对正在运行的应用程序有任何影响。作为参考，原始样本中的依赖罐（不包括JDK）的大小为18MB：</p>
+<pre><code class="prettyprint">$ jar -tvf  target/demo-0.0.1-SNAPSHOT.jar | grep lib/.*.jar | awk &#39;{tot+=$1;} END {print tot}&#39;
 18893563
 </code></pre>
-<p>This includes Spring Boot Web and Actuator starters, plus 3 or 4 webjars for static resources and the webjar locator. A completely minimal Spring Boot application including Spring and some logging but no web server would be around 5MB of jars.</p><h3><a href="#jvm-tools" class="anchor" name="jvm-tools"></a>JVM Tools</h3>
-<p>To measure memory usage there are some tools in the JVM. You can get quite a lot of useful information from JConsole or JVisualVM (with the JConsole plugin so you can inspect MBeans).</p>
-<p>Heap usage for our vanilla app is a saw tooth, bounded above by the heap size and below by the amount of memory used in a quiescent state. The average weighs in at roughly 25MB for an app under load (and 22MB after a manual GC). JConsole also reports 50MB non-heap usage (which is the same as you get from the <code>java.lang:type=Memory</code> MBean). The non-heap usage breaks down as Metaspace: 32MB, Compressed Class Space: 4MB, Code Cache: 13MB (you can get these numbers from the <code>java.lang:type=MemoryPool,name=*</code> MBeans). There are 6200 classes and 25 threads, including a few that are added by the monitoring tool that we use to measure them.</p>
-<p>Here’s a graph of the heap usage from a quiescent app under load,<br>followed by a manual garbage collection (the double nick in the<br>middle) and a new equilibrium with a lower heap usage.</p>
+<p>这包括Spring Boot Web和Actuator启动器，以及用于静态资源的3或4个webjar和webjar定位器。一个完全最小的Spring Boot应用程序（包括Spring和一些日志记录），但没有Web服务器会占用大约5MB的jar。</p><h3><a href="#jvm-tools" class="anchor" name="jvm-tools"></a> JVM工具</h3>
+<p>为了衡量内存使用情况，JVM中有一些工具。您可以从JConsole或JVisualVM（带有JConsole插件，以便检查MBean）中获得很多有用的信息。</p>
+<p>我们的香草应用程序的堆使用情况是一个锯齿，上面是堆大小，下面是静态状态下使用的内存量。对于处于负载状态的应用程序，平均大小约为25MB（在手动GC之后为22MB）。JConsole还报告了50MB的非堆使用情况（与您从<code>java.lang:type=Memory</code> MBean）。非堆的使用情况细分为元空间：32MB，压缩类空间：4MB，代码缓存：13MB（您可以从<code>java.lang:type=MemoryPool,name=*</code> MBean）。有6200个类和25个线程，其中包括一些我们用来测量它们的监视工具添加的线程。</p>
+<p>这是负载下静态应用程序的堆使用情况的图表，<br>然后进行手动垃圾收集（<br>中间）和较低的堆使用率的新平衡。</p>
 <img src="https://raw.githubusercontent.com/dsyer/spring-boot-memory-blog/master/manual-gc-web.png" width="80%">
-<p>Some tools in the JVM other than JConsole might also be<br>interesting. The first is <code>jps</code> which is useful for getting the<br>process id of the app you want to inspect with the other tools:</p>
+<p>JVM中除JConsole以外的一些工具也可能是<br>有趣。首先是<code>jps</code>这对于获取<br>您要使用其他工具检查的应用程序的进程ID：</p>
 <pre><code class="prettyprint">$ jps
 4289 Jps
 4330 demo-0.0.1-SNAPSHOT.jar
 </code></pre>
-<p>Then we have the <code>jmap</code> histogram:</p>
+<p>然后我们有<code>jmap</code>直方图：</p>
 <pre><code class="prettyprint">$ jmap -histo 4330 | head
 
  num     #instances         #bytes  class name
@@ -216,8 +211,8 @@ Training & Certification
    7:          3386         380320  java.lang.Class
 
 </code></pre>
-<p>This data is of limited use because you can’t trace the “big” objects back to their owners. For that you need a more fully featured profiler, like YourKit. YourKit does the aggregation for you and presents a list (although the details of how it does that are rather unclear).</p>
-<p>Classloader statistics might also be revealing, and <code>jmap</code> has a way to inspect the classloaders in an app. It needs to run as root:</p>
+<p>此数据用途有限，因为您无法将“大”对象追溯到其所有者。为此，您需要功能更强大的探查器，例如YourKit。YourKit会为您进行汇总并显示一个列表（尽管不清楚如何进行汇总）。</p>
+<p>类加载器的统计信息也可能会显示出来，并且<code>jmap</code>可以检查应用中的类加载器。它需要以root身份运行：</p>
 <pre><code class="prettyprint">$ sudo ~/Programs/jdk1.8.0/bin/jmap -clstats 4330
 Attaching to process ID 4330, please wait...
 Debugger attached successfully.
@@ -228,28 +223,28 @@ computing per loader stat ..done.
 please wait.. computing liveness....................................liveness analysis may be inaccurate ...
 class_loader  classes  bytes  parent_loader  alive?  type
 
-<bootstrap>	2123	3609965	  null  	live	<internal>
-0x00000000f4b0d730	1	1476	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="74301118111315001d1a133718150707381b1510110634440c4444444444444445444444444d10124c">[email protected]</a>
-0x00000000f5a26120	1	1483	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2266474e474543564b4c45614e4351516e4d4346475062125a1212121212121213121212121b46441a">[email protected]</a>
-0x00000000f52ba3a8	1	1472	  null  	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e5a18089808284918c8b82a689849696a98a84818097a5d59dd5d5d5d5d5d5d5d4d5d5d5d5dc8183dd">[email protected]</a>
-0x00000000f5a30520	1	880	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e4a08188818385908d8a83a788859797a88b85808196a4d49cd4d4d4d4d4d4d4d5d4d4d4d4dd8082dc">[email protected]</a>
-0x00000000f495c890	3972	6362902	0x00000000f495c8f0	dead	org/springframework/boot/loader/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d09cb1a5beb3b8b5b485829c93bcb1a3a39cbfb1b4b5a290e0a8e0e0e0e0e0e0e0e1e0e0e0e6e0e8e2e8">[email protected]</a>
-0x00000000f5b639b0	1	1473	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1753727b727076637e7970547b7664645b787673726557276f2727272727272726272727272e73712f">[email protected]</a>
-0x00000000f4b80a30	1	1473	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2662434a434147524f4841654a4755556a494742435466165e1616161616161617161616161f42401e">[email protected]</a>
+&lt;bootstrap&gt;	2123	3609965	  null  	live	&lt;internal&gt;
+0x00000000f4b0d730	1	1476	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="74301118111315001d1a133718150707381b1510110634440c4444444444444445444444444d10124c">[email&#160;protected]</a>
+0x00000000f5a26120	1	1483	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2266474e474543564b4c45614e4351516e4d4346475062125a1212121212121213121212121b46441a">[email&#160;protected]</a>
+0x00000000f52ba3a8	1	1472	  null  	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e5a18089808284918c8b82a689849696a98a84818097a5d59dd5d5d5d5d5d5d5d4d5d5d5d5dc8183dd">[email&#160;protected]</a>
+0x00000000f5a30520	1	880	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e4a08188818385908d8a83a788859797a88b85808196a4d49cd4d4d4d4d4d4d4d5d4d4d4d4dd8082dc">[email&#160;protected]</a>
+0x00000000f495c890	3972	6362902	0x00000000f495c8f0	dead	org/springframework/boot/loader/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d09cb1a5beb3b8b5b485829c93bcb1a3a39cbfb1b4b5a290e0a8e0e0e0e0e0e0e0e1e0e0e0e6e0e8e2e8">[email&#160;protected]</a>
+0x00000000f5b639b0	1	1473	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1753727b727076637e7970547b7664645b787673726557276f2727272727272726272727272e73712f">[email&#160;protected]</a>
+0x00000000f4b80a30	1	1473	0x00000000f495c890	dead	sun/reflect/<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2662434a434147524f4841654a4755556a494742435466165e1616161616161617161616161f42401e">[email&#160;protected]</a>
 ...
 
 total = 93	6300	10405986	    N/A    	alive=1, dead=92	    N/A
 </code></pre>
-<p>There are loads of “dead” entries, but there is also a warning that the liveness information is not accurate. A manual GC doesn’t get rid of them.</p><h3><a href="#kernel-memory-tools" class="anchor" name="kernel-memory-tools"></a>Kernel Memory Tools</h3>
-<p>You would think that a Linux OS would provide plenty of insight into a running process, and it does, but Java processes are notoriously hard to analyse. This <a href="https://stackoverflow.com/questions/561245/virtual-memory-usage-from-java-under-linux-too-much-memory-used">popular SO link</a> talks about some of the problems in general. Lets have a look at some of the tools that are available and see what they tell us about our app.</p>
-<p>First up is the good old <code>ps</code> (the tool you use to look at processes on the command line). You can get a lot of the same information from <code>top</code>. Here’s our application process:</p>
+<p>有很多“死”条目，但是也有警告，提示生命信息不正确。手动GC不会摆脱它们。</p><h3><a href="#kernel-memory-tools" class="anchor" name="kernel-memory-tools"></a>内核内存工具</h3>
+<p>您可能会认为Linux操作系统可以提供有关正在运行的进程的大量洞察力，并且确实可以，但是众所周知，Java进程很难进行分析。这个<a href="https://stackoverflow.com/questions/561245/virtual-memory-usage-from-java-under-linux-too-much-memory-used">流行的SO链接</a>通常讨论一些问题。让我们看一下一些可用的工具，看看它们告诉我们有关我们应用程序的信息。</p>
+<p>首先是好老<code>ps</code> （用于在命令行上查看进程的工具）。您可以从中获得很多相同的信息<code>top</code> 。这是我们的申请流程：</p>
 <pre><code class="prettyprint">$ ps -au
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 dsyer     4330  2.4  2.1 2829092 169948 pts/5  Sl   18:03   0:37 java -Xmx32m -Xss256k -jar target/demo-0.0.1-SNAPSHOT.jar
 ...
 </code></pre>
-<p>RSS (Resident Set Size) values are in the range 150-190MB according to <code>ps</code>. There is a tool called <code>smem</code> that is supposed to give a more sanitized view, and to accurately reflect non-shared memory, but the values there (for instance of PSS) aren’t that different. Interestingly the PSS values for a non-JVM process are usually ​*significantly*​ lower than RSS, whereas for a JVM they are comparable. The JVM is very jealous of its memory.</p>
-<p>A lower level tool is <code>pmap</code>, where we can look at the memory<br>allocations assigned to a process. Numbers from <code>pmap</code> don’t seem to<br>make much sense either:</p>
+<p>RSS（居民集大小）值在150-190MB范围内，具体取决于<code>ps</code> 。有一个工具叫做<code>smem</code>可以提供更清晰的视图，并准确反映非共享内存，但是那里的值（例如PSS）并没有什么不同。有趣的是，非JVM进程的PSS值通常*显着*比RSS低，而对于JVM，它们是可比的。JVM非常嫉妒它的内存。</p>
+<p>较低级别的工具是<code>pmap</code> ，我们可以在其中查看内存<br>分配给流程的分配。来自的数字<code>pmap</code>似乎不<br>很有道理：</p>
 <pre><code class="prettyprint">$ pmap 4330
 0000000000400000      4K r-x-- java
 0000000000600000      4K rw--- java
@@ -261,21 +256,21 @@ dsyer     4330  2.4  2.1 2829092 169948 pts/5  Sl   18:03   0:37 java -Xmx32m -X
 ffffffffff600000      4K r-x--   [ anon ]
  total          3224668K
 </code></pre>
-<p>i.e. over 3GB for a process that we know is only using 80MB. Just counting the ‘—–’ entries gives you nearly all the 3GB. At least that’s consistent with the VSZ numbers from <code>ps</code>, but not very useful for capacity management.</p>
-<p>Someone commented that the RSS values were accurate on his machine, which is interesting. They definitely didn’t work for me (Ubuntu 14.04 on Lenovo Thinkpad). Also, here’s another interesting article on <a href="https://www.ibm.com/developerworks/community/blogs/kevgrig/entry/linux_glibc_2_10_rhel_6_malloc_may_show_excessive_virtual_memory_usage?lang=en">JVM memory stats in Linux</a>.</p><h3><a href="#scale-up-processes" class="anchor" name="scale-up-processes"></a>Scale up Processes</h3>
-<p>A good test of how much memory is actually being used by a process is to keep launching more of them until the operating system starts to crumple. For example, to launch 40 identical vanilla processes:</p>
-<pre><code class="prettyprint">$ for f in {8080..8119}; do (java -Xmx32m -Xss256k -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=$f 2>&1 > target/$f.log &); done
+<p>也就是说，超过3GB的进程仅占用80MB。仅计算'-'条目即可获得几乎所有3GB内存。至少这与的VSZ编号一致<code>ps</code> ，但对于容量管理不是很有用。</p>
+<p>有人评论说RSS值在他的机器上是准确的，这很有趣。他们肯定对我不起作用（Lenovo Thinkpad上的Ubuntu 14.04）。另外，这是关于<a href="https://www.ibm.com/developerworks/community/blogs/kevgrig/entry/linux_glibc_2_10_rhel_6_malloc_may_show_excessive_virtual_memory_usage?lang=en">Linux中JVM内存状态</a>的另一篇有趣的文章。</p><h3><a href="#scale-up-processes" class="anchor" name="scale-up-processes"></a>扩大流程</h3>
+<p>一个进程实际使用了多少内存的一个很好的测试是继续启动更多的内存，直到操作系统开始崩溃为止。例如，要启动40个相同的原始过程：</p>
+<pre><code class="prettyprint">$ for f in {8080..8119}; do (java -Xmx32m -Xss256k -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=$f 2&gt;&amp;1 &gt; target/$f.log &amp;); done
 </code></pre>
-<p>They are all competing for memory resources so it takes them all a while to start, which is fair enough. Once they all start they serve their home pages quite efficiently (51ms latency over a crappy LAN at 99th percentile). Once they are up and running, stopping and starting one of the processes is relatively quick (a few seconds not a few minutes).</p>
-<p>The VSZ numbers from <code>ps</code> are off the scale (as expected). The RSS numbers look high too:</p>
+<p>他们都在争夺内存资源，因此花了所有时间才能开始，这很公平。一旦他们全部开始，他们就可以非常有效地为其主页提供服务（在低至99％的低劣LAN上具有51毫秒的延迟）。一旦启动并运行，停止和启动其中一个进程就相对较快（几秒钟而不是几分钟）。</p>
+<p>的VSZ编号来自<code>ps</code>超出规模（如预期）。RSS编号也很高：</p>
 <pre><code class="prettyprint">$ ps -au
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 dsyer    27429  2.4  2.1 2829092 169948 pts/5  Sl   18:03   0:37 java -Xmx32m -Xss256k -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=8081
 dsyer    27431  3.0  2.2 2829092 180956 pts/5  Sl   18:03   0:45 java -Xmx32m -Xss256k -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=8082
 ...
 </code></pre>
-<p>RSS values are still in the range 150-190MB. If all 40 processes were indepenently using this much memory that would account for 6.8GB, which would blow my 8GB laptop out of the water. It runs fine, so most of that RSS value is not really independent of other processes.</p>
-<p>The Proportional Shared Size (PSS) from <code>smem</code> might a better estimate we have of actual memory usage, but in fact it is not that different from the RSS values:</p>
+<p>RSS值仍在150-190MB的范围内。如果所有40个进程都独立使用这么多的内存，则将占用6.8GB内存，这将使我的8GB笔记本电脑不堪重负。它运行良好，因此大多数RSS值实际上并不独立于其他进程。</p>
+<p>来自的比例共享大小（PSS） <code>smem</code>也许可以更好地估计我们对实际内存的使用情况，但是实际上它与RSS值并没有什么不同：</p>
 <pre><code class="prettyprint">$ smem
   PID User     Command                         Swap      USS      PSS      RSS
 ...
@@ -287,17 +282,17 @@ dsyer    27431  3.0  2.2 2829092 180956 pts/5  Sl   18:03   0:45 java -Xmx32m -X
 27463 dsyer    java -Xmx32m -Xss256k -jar         0   179592   179915   193224 
 
 </code></pre>
-<p>We can hypothesize that maybe the PSS number is still hugely inflated by shared read-only memory (e.g. mapped jar files).</p>
-<p>The 40 processes pretty much filled up the available memory on my laptop (3.6GB before the apps started), and some paging was happening, but not much. We can turn that into an estimate of the process size: 3.6GB/40 = 90MB. Not far off the JConsole estimate.</p><h2><a href="#do-nothing-plain-java-app" class="anchor" name="do-nothing-plain-java-app"></a>Do Nothing Plain Java App</h2>
-<p>As a useful comparison point, let’s make a really basic Java application that stays alive when we run it so we can meaure its memory consumption:</p>
+<p>我们可以假设，共享的只读内存（例如，映射的jar文件）可能仍大大夸大了PSS的数量。</p>
+<p>40个进程几乎填满了我笔记本电脑上的可用内存（应用程序启动前为3.6GB），并且正在发生一些分页，但数量不多。我们可以将其转换为进程大小的估计值：3.6GB / 40 = 90MB。离JConsole估计不远。</p><h2><a href="#do-nothing-plain-java-app" class="anchor" name="do-nothing-plain-java-app"></a>不做任何普通的Java应用程序</h2>
+<p>作为一个有用的比较点，让我们创建一个真正基本的Java应用程序，该应用程序在运行时仍保持活动状态，以便我们测量其内存消耗：</p>
 <pre><code class="prettyprint">public class Main throws Exception {
   public static void main (String[] args) {
     System.in.read();
   }
 }
 </code></pre>
-<p>Results: heap 6MB, non-heap 14MB (Code Cache 4MB, Compressed Class Space 1MB, Metaspace 9MB), 1500 classes. Hardly any classes loaded so no surprise really.</p><h2><a href="#do-nothing-spring-boot-app" class="anchor" name="do-nothing-spring-boot-app"></a>Do Nothing Spring Boot App</h2>
-<p>Now suppose we do the same thing but load a Spring application context as well:</p>
+<p>结果：堆6MB，非堆14MB（代码缓存4MB，压缩类空间1MB，元空间9MB），1500个类。几乎没有任何类加载，因此确实不足为奇。</p><h2><a href="#do-nothing-spring-boot-app" class="anchor" name="do-nothing-spring-boot-app"></a>什么都不做Spring Boot App</h2>
+<p>现在假设我们做同样的事情，但是也加载一个Spring应用程序上下文：</p>
 <pre><code class="prettyprint java">@SpringBootApplication
 public class MainApplication implements ApplicationRunner {
 
@@ -312,41 +307,41 @@ public class MainApplication implements ApplicationRunner {
 
 }
 </code></pre>
-<p>Heap 12MB (but drops to 6MB after a manual GC), non-heap 26MB (Code Cache 7MB, Compressed Class Space 2MB, Metaspace 17MB), 3200 classes. The graph below shows the heap usage from launching the app to the end state. The big drop in the middle is the manual GC, and you can see that after this the app stabilizes at a different saw tooth.</p>
+<p>堆12MB（但在手动GC后降至6MB），非堆26MB（代码缓存7MB，压缩类空间2MB，元空间17MB），3200个类。下图显示了从启动应用程序到结束状态的堆使用情况。中间最大的下降是手动GC，您可以看到此后该应用程序稳定在另一个锯齿上。</p>
 <img src="https://raw.githubusercontent.com/dsyer/spring-boot-memory-blog/master/manual-gc.png" width="80%">
-<p>Does Spring Boot itself (as opposed to just Spring) add a lot of overhead to this application? For starters, we can test that by removing the <code>@SpringBootApplication</code> annotation. Doing that means that we load a context but don’t do any autoconfiguration. The result is: heap 11MB (drops to 5MB after a manual GC), non-heap 22MB (Code Cache 5MB, Compressed Class Space 2MB, Metaspace 15MB), 2700 classes. The Spring Boot autoconfiguration premium, measured this way, is about 1MB heap and 4MB non-heap.</p>
-<p>Going a step further, we can create a Spring application context manually without using any Spring Boot code at all. Doing this drops the heap usage to 10MB (drops to 5MB after a manual GC), non-heap to 20MB (Code Cache 5MB, Compressed Class Space 2MB, Metaspace 13MB), 2400 classes. The Spring Boot total premium, measured this way, is less than 2MB heap and about 6MB non-heap memory.</p><h2><a href="#ratpack-groovy-app" class="anchor" name="ratpack-groovy-app"></a>Ratpack Groovy App</h2>
-<p>A simple Ratpack groovy app can be created using <a href="https://github.com/pledbrook/lazybones">lazybones</a>:</p>
+<p>Spring Boot本身（而不是Spring本身）会增加此应用程序的大量开销吗？对于初学者，我们可以通过删除<code>@SpringBootApplication</code>注解。这样做意味着我们加载了上下文，但是不执行任何自动配置。结果是：堆11MB（在手动GC后降至5MB），非堆22MB（代码缓存5MB，压缩类空间2MB，元空间15MB），2700类。用这种方法测得的Spring Boot自动配置溢价约为1MB堆和4MB非堆。</p>
+<p>更进一步，我们可以手动创建Spring应用程序上下文，而完全不使用任何Spring Boot代码。这样做会将堆使用量降低到10MB（在手动GC后降低到5MB），将非使用量降低到20MB（代码缓存5MB，压缩类空间2MB，元空间13MB）和2400类。用这种方法测算的Spring Boot总溢价小于2MB堆，大约6MB的非堆内存。</p><h2><a href="#ratpack-groovy-app" class="anchor" name="ratpack-groovy-app"></a> Ratpack Groovy应用程序</h2>
+<p>可以使用<a href="https://github.com/pledbrook/lazybones">懒骨头</a>创建一个简单的Ratpack groovy应用程序：</p>
 <pre><code class="prettyprint">$ lazybones create ratpack .
 $ ./gradlew build
 $ unzip build/distributions/ratpack.zip
-$ JAVA_OPTS='-Xmx32m -Xss256k' ./ratpack/bin/ratpack
+$ JAVA_OPTS=&#39;-Xmx32m -Xss256k&#39; ./ratpack/bin/ratpack
 </code></pre>
-<pre><code class="prettyprint">$ ls -l build/distributions/ratpack/lib/*.jar | awk '{tot+=$5;} END {print tot}'
+<pre><code class="prettyprint">$ ls -l build/distributions/ratpack/lib/*.jar | awk &#39;{tot+=$5;} END {print tot}&#39;
 16277607
 </code></pre>
-<p>The used heap is pretty low to start with (13MB), grows to 22MB over time. Metaspace is about 34MB. JConsole reports 43MB non-heap usage. There are 31 threads.</p><h2><a href="#ratpack-java-app" class="anchor" name="ratpack-java-app"></a>Ratpack Java App</h2>
-<p>Here’s a really basic static app:</p>
+<p>最初使用的堆非常低（13MB），随着时间的推移会增加到22MB。元空间约为34MB。 JConsole报告了43MB的非堆使用情况。有31个线程。</p><h2><a href="#ratpack-java-app" class="anchor" name="ratpack-java-app"></a> Ratpack Java应用程序</h2>
+<p>这是一个非常基本的静态应用程序：</p>
 <pre><code class="prettyprint">import ratpack.server.BaseDir;
 import ratpack.server.RatpackServer;
 
 public class DemoApplication {
 
   public static void main(String[] args) throws Exception {
-    RatpackServer.start(s -> s
-        .serverConfig(c -> c.baseDir(BaseDir.find()))
-        .handlers(chain -> chain
-            .all(ctx -> ctx.render("root handler!"))
+    RatpackServer.start(s -&gt; s
+        .serverConfig(c -&gt; c.baseDir(BaseDir.find()))
+        .handlers(chain -&gt; chain
+            .all(ctx -&gt; ctx.render(&quot;root handler!&quot;))
         )
     );
   }
 
 }
 </code></pre>
-<p>It runs in about 16MB heap, 28MB non-heap as a Spring Boot fat jar. As a regular gradle application it’s a bit lighter on heap (the cached jars aren’t needed) but uses the same non-heap memory. There are 30 threads. Interestingly there is no object that is bigger than 300KB, whereas our Spring Boot apps with Tomcat generally have 10 or more objects above that level.</p><h2><a href="#variations-on-the-vanilla-app" class="anchor" name="variations-on-the-vanilla-app"></a>Variations on the Vanilla App</h2>
-<p>Running from exploded jar shaves up to 6MB off the heap (the difference is cached jar data in the launcher). Also makes startup a bit faster: less than 5s compared to as much as 7s when memory is constrained with the fat jar.</p>
-<p>A slimmed down version of the app with no static resources or webjars runs at 23MB heap and 41MB non-heap as exploded archive (starts in less than 3s). The non-heap usage breaks down as Metaspace: 35MB, Compressed Class Space: 4MB, Code Cache: 4MB. Spring <code>ReflectionUtils</code> jumps to near the top of the memory chart in YourKit with Spring 4.2.3 (2nd only to Tomcat <code>NioEndpoint</code>). The <code>ReflectionUtils</code> should shrink under memory pressure but they don’t in practice so Spring 4.2.4 <a href="https://jira.spring.io/browse/SPR-13783">clears the caches</a> once the context has started, resulting in some memory savings (down to about 20MB heap). <code>DefaultListableBeanFactory</code> drops down to 3rd place and is almost half the size it was with the resource chain (webjars locator) but it won’t shrink any further without removing more features.</p>
-<p>In turns out that the <code>NioEndpoint</code> has a 1MB “oom parachute” that it holds onto until it detects an <code>OutOfMemoryError</code>. You can customize it to zero and forgo the parachute to save an extra MB of heap, e.g:</p>
+<p>作为Spring Boot胖子，它可以在大约16MB的堆中运行，在28MB的非堆中运行。作为常规的gradle应用程序，它在堆上要轻一些（不需要缓存的jar），但使用相同的非堆内存。有30个线程。有趣的是，没有大于300KB的对象，而我们的带有Tomcat的Spring Boot应用程序通常在该级别之上有10个或更多对象。</p><h2><a href="#variations-on-the-vanilla-app" class="anchor" name="variations-on-the-vanilla-app"></a> Vanilla App的变体</h2>
+<p>从爆炸的jar刮胡子运行到堆外最多可减少6MB（区别在于启动器中缓存的jar数据）。同时也使启动速度更快：少于5秒，而内存受胖子限制的情况则只有7秒。</p>
+<p>应用程序的精简版版本没有静态资源或Webjar，但爆炸存档的运行速度为23MB，非堆运行的内存为41MB（启动时间少于3秒）。非堆使用情况细分为元空间：35MB，压缩类空间：4MB，代码缓存：4MB。弹簧<code>ReflectionUtils</code>在Spring 4.2.3中跳到YourKit中的内存图表顶部附近（仅次于Tomcat第二） <code>NioEndpoint</code> ）。的<code>ReflectionUtils</code>应该在内存压力下收缩，但实际上并没有收缩，因此在上下文启动后，Spring 4.2.4会<a href="https://jira.spring.io/browse/SPR-13783">清除缓存</a> ，从而节省了一些内存（减少到约20MB的堆）。 <code>DefaultListableBeanFactory</code>下降到第三位，大小几乎是资源链（webjars定位器）的一半，但是在不删除更多功能的情况下不会进一步缩小。</p>
+<p>事实证明， <code>NioEndpoint</code>拥有一个1MB的“动态降落伞”，直到检测到<code>OutOfMemoryError</code> 。您可以将其自定义为零，然后放弃降落伞以节省额外的MB堆，例如：</p>
 <pre><code class="prettyprint java">@SpringBootApplication
 public class SlimApplication implements EmbeddedServletContainerCustomizer {
 
@@ -354,7 +349,7 @@ public class SlimApplication implements EmbeddedServletContainerCustomizer {
   public void customize(ConfigurableEmbeddedServletContainer container) {
     if (container instanceof TomcatEmbeddedServletContainerFactory) {
       TomcatEmbeddedServletContainerFactory tomcat = (TomcatEmbeddedServletContainerFactory) container;
-      tomcat.addConnectorCustomizers(connector -> {
+      tomcat.addConnectorCustomizers(connector -&gt; {
         ProtocolHandler handler = connector.getProtocolHandler();
         if (handler instanceof Http11NioProtocol) {
           Http11NioProtocol http = (Http11NioProtocol) handler;
@@ -368,99 +363,100 @@ public class SlimApplication implements EmbeddedServletContainerCustomizer {
 
 }
 </code></pre>
-<p>Using Jetty instead of Tomcat makes no difference whatsoever to the overall memory or heap, even though the <code>NioEndpoint</code> is high on the “Biggest objects” list in YourKit (takes about 1MB), and there is no corresponding blip for Jetty. It also doesn’t start up any quicker.</p>
-<p>As an example of a “real” Spring Boot app, Zipkin (Java) runs fine with with <code>-Xmx32m -Xss256k</code>, at least for short periods. It settles with a heap of about 24MB and non-heap about 55MB.</p>
-<p>The <code>spring-cloud-stream</code> sample sink (with Redis transport) also runs fine with <code>-Xmx32m -Xss256k</code> and similar memory usage profile (i.e. roughly 80MB total). The actuator endpoints are active but don’t do much to the memory profile. Slightly slower startup maybe.</p><h2><a href="#tomcat-container" class="anchor" name="tomcat-container"></a>Tomcat Container</h2>
-<p>Instead of using the emedded container in Spring Boot, what if we deploy a traditional war file to a Tomcat container?</p>
+<p>使用Jetty代替Tomcat不会对整体内存或堆产生任何影响，即使<code>NioEndpoint</code>在YourKit的“最大对象”列表中位于“最高”（占用大约1MB），并且Jetty没有相应的提示。它也没有更快地启动。</p>
+<p>作为“真正的” Spring Boot应用程序的示例，Zipkin（Java）与<code>-Xmx32m -Xss256k</code> ，至少是短期的。它的堆空间约为24MB，非堆的空间约为55MB。</p>
+<p>的<code>spring-cloud-stream</code>样品槽（使用Redis运输）也可以正常运行<code>-Xmx32m -Xss256k</code>和类似的内存使用情况配置文件（即总计约80MB）。执行器端点处于活动状态，但对内存配置文件的作用不大。启动速度可能稍慢。</p><h2><a href="#tomcat-container" class="anchor" name="tomcat-container"></a> Tomcat容器</h2>
+<p>如果不将传统的war文件部署到Tomcat容器，该如何使用Spring Boot中的嵌入式容器呢？</p>
 <img src="https://raw.githubusercontent.com/dsyer/spring-boot-memory-blog/master/manual-gc-tomcat.png" width="80%">
-<p>The container starts and warms up a bit and uses of order 50MB heap, and 40MB non-heap. Then we deploy a war of the vanilla Spring Boot app, and there’s a spike in heap usage, which settles down to about 100MB. We do a manual GC and it drops down to below 50MB, and then add some load and it jumps up to about 140MB. A manual GC drops it back down to below 50MB. So we have no reason to believe this app is really using much if any additional heap compared to the container. It uses some when under load, but it can always reclaim it under GC pressure.</p>
-<p>Metaspace, however tells a different story, it goes up from 14MB to 41MB in the single app under load. Total non-heap usage is reported at 59MB in the final state.</p><h3><a href="#deploy-another-application" class="anchor" name="deploy-another-application"></a>Deploy another application</h3>
-<p>If we add another copy of the same application to the Tomcat container, trough heap consumption goes up a bit (above 50MB) and metaspace is up to 55MB. Under load heap usage jumps to 250MB or so, but always seems to be reclaimable.</p>
-<p>Then we add some more apps. With six apps deployed the metaspace is up to 115MB and total non-heap to 161MB. This is consistent with what we saw for a single app: each one costs us about 20MB non-heap memory. Heap usage hits 400MB under load, so this doesn’t go up proportionally (however it is being managed from above, so maybe that’s not surprising). The trough of heap usage is up to about 130MB, so the cumulative effect of adding apps on the heap is visible there (about 15MB per app).</p>
-<p>When we constrain Tomcat to the same amount of heap that the six apps would have in our vanilla embedded launch (<code>-Xmx192m</code>) the heap under load is more or less at its limit (190MB), and the trough after a manual GC is 118MB. Non-heap memory is reported as 154MB. The heap trough and non-heap usage is not identical but consistent with the unconstrained Tomcat instance (which actually had a 1GB heap). Compared to the embedded containers the total memory usage, including the full heap, is a bit smaller because some of the non-heap memory is apparently shared between apps (344MB compared to 492MB). For more realistic apps that require more heap themselves the difference will not be proportionally as big (50MB out of 8GB is negligible). Also any app that manages its own thread pool (not uncommon in real life Spring applications) will incur an additional non-heap memory penalty for the threads it needs.</p><h2><a href="#rule-of-thumb-process-sizes" class="anchor" name="rule-of-thumb-process-sizes"></a>Rule of Thumb Process Sizes</h2>
-<p>A very rough estimate for actual memory usage would be the heap size plus 20 times the stack size (for the 20 threads typical in a servlet container), plus a bit, so maybe 40MB per process in our vanilla app. That estimate is a bit low, given the JConsole numbers (50MB plus the heap, or 82MB). We can observe, though, that the non-heap usage in our apps is roughly proportional to the number of classes loaded. Once you correct for the stack size the correlation improves, so a better rule of thumb might be one that is proportional to the number of classes loaded:</p>
+<p>容器启动并预热一点，并使用50MB堆和40MB非堆的顺序。然后，我们部署了一场普通的Spring Boot应用程序之战，堆使用量激增，下降到大约100MB。我们执行手动GC，它将下降到50MB以下，然后添加一些负载，然后跃升到约140MB。手动GC将其回落到50MB以下。因此，与容器相比，我们没有理由相信此应用程序确实在使用大量堆。它在负载下会使用一些，但始终可以在GC压力下对其进行回收。</p>
+<p>但是，Metaspace讲述了一个不同的故事，在单个应用程序负载下，它从14MB增加到41MB。在最终状态下，报告的总非堆使用量为59MB。</p><h3><a href="#deploy-another-application" class="anchor" name="deploy-another-application"></a>部署另一个应用程序</h3>
+<p>如果将同一应用程序的另一个副本添加到Tomcat容器中，则槽堆的使用量会略有增加（超过50MB），而元空间则达到55MB。在负载下，堆的使用量跃升至250MB左右，但始终可以回收。</p>
+<p>然后，我们添加更多应用程序。部署了六个应用程序后，元空间最大为115MB，总非堆大小为161MB。这与我们在单个应用程序中看到的是一致的：每个应用程序要花费我们大约20MB的非堆内存。负载下的堆使用量达到400MB，因此不会成比例地增加（但是是从上方进行管理的，因此这并不奇怪）。堆使用量的最低谷大约为130MB，因此在那里可以看到在堆上添加应用程序的累积效果（每个应用程序大约15MB）。</p>
+<p>当我们将Tomcat限制为与原始嵌入式启动中的六个应用程序相同的堆数量时（ <code>-Xmx192m</code> ）处于负载状态的堆或多或少处于其上限（190MB），而手动GC后的谷值为118MB。非堆内存报告为154MB。堆槽和非堆的用法并不相同，但与不受约束的Tomcat实例（实际上具有1GB堆）一致。与嵌入式容器相比，包括满堆在内的总内存使用量要少一些，因为某些非堆内存显然是在应用程序之间共享的（344MB与492MB相比）。对于需要更多堆本身的更实际的应用程序，差异不会成比例地变大（8GB中的50MB可以忽略不计）。同样，任何管理自己的线程池的应用程序（在现实生活中的Spring应用程序中并不罕见）都会为其所需的线程带来额外的非堆内存损失。</p><h2><a href="#rule-of-thumb-process-sizes" class="anchor" name="rule-of-thumb-process-sizes"></a>经验法则大小</h2>
+<p>对实际内存使用情况的一个非常粗略的估计是堆大小加上堆栈大小的20倍（对于servlet容器中典型的20个线程），再加上一点，因此在我们的原始应用程序中每个进程可能有40MB。考虑到JConsole的数量（50MB加上堆，即82MB），这个估计值有点低。但是，我们可以观察到，应用程序中的非堆使用情况与加载的类数大致成比例。一旦校正了堆栈大小，相关性就会提高，因此更好的经验法则可能是与加载的类数成比例的规则：</p>
 <pre><code class="prettyprint">memory = heap + non-heap
 
 non-heap = threads x stack + classes x 7/1000 
 </code></pre>
-<p>The vanilla app loads about 6000 classes and the do nothing Java main loads about 1500. The estimate is accurate for the vanilla app and the do nothing Java app.</p>
-<p>Adding Spring Cloud Eureka discovery only loads about another 1500 classes, and uses about 40 threads, so it should use a bit more non-heap memory, but not a lot (and indeed it does use about 70MB with 256KB stacks, where the rule of thumb would predict 63MB).</p>
-<p>The performance of this model for the apps we measured is shown below:</p>
-<img src="https://raw.githubusercontent.com/dsyer/spring-boot-memory-blog/master/non-heap-correlation.png" width="80%"><h2><a href="#summary-of-data" class="anchor" name="summary-of-data"></a>Summary of Data</h2>
+<p>普通应用程序加载约6000个类，而Java不做任何事情主要加载约1500个类。对于普通应用程序和“不执行任何操作” Java应用程序，此估算是准确的。</p>
+<p>添加Spring Cloud Eureka发现仅会加载大约1500个类，并使用大约40个线程，因此它应该使用更多的非堆内存，但不会使用太多内存（实际上，它确实使用了约70MB的内存和256KB的堆栈，这取决于拇指可以预测到63MB）。</p>
+<p>该模型对我们测量的应用程序的性能如下所示：</p>
+<img src="https://raw.githubusercontent.com/dsyer/spring-boot-memory-blog/master/non-heap-correlation.png" width="80%"><h2><a href="#summary-of-data" class="anchor" name="summary-of-data"></a>数据汇总</h2>
 <table>
 <thead>
 <tr>
-<th>Application </th>
-<th>Heap (MB) </th>
-<th>Non Heap (MB) </th>
-<th>Threads </th>
-<th>Classes </th>
+<th>应用</th>
+<th>堆（MB）</th>
+<th>非堆（MB）</th>
+<th>线程数</th>
+<th>班级</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Vanilla </td>
-<td>22 </td>
-<td>50 </td>
-<td>25 </td>
+<td>香草</td>
+<td>22</td>
+<td>50</td>
+<td>25</td>
 <td>6200</td>
 </tr>
 <tr>
-<td>Plain Java </td>
-<td>6 </td>
-<td>14 </td>
-<td>11 </td>
+<td>纯Java</td>
+<td>6</td>
+<td>14</td>
+<td>11</td>
 <td>1500</td>
 </tr>
 <tr>
-<td>Spring Boot </td>
-<td>6 </td>
-<td>26 </td>
-<td>11 </td>
+<td>春季靴</td>
+<td>6</td>
+<td>26</td>
+<td>11</td>
 <td>3200</td>
 </tr>
 <tr>
-<td>No Actuator </td>
-<td>5 </td>
-<td>22 </td>
-<td>11 </td>
+<td>无执行器</td>
+<td>5</td>
+<td>22</td>
+<td>11</td>
 <td>2700</td>
 </tr>
 <tr>
-<td>Spring Only </td>
-<td>5 </td>
-<td>20 </td>
-<td>11 </td>
+<td>仅春季</td>
+<td>5</td>
+<td>20</td>
+<td>11</td>
 <td>2400</td>
 </tr>
 <tr>
-<td>Eureka Client </td>
-<td>80* </td>
-<td>70 </td>
-<td>40 </td>
+<td>尤里卡客户</td>
+<td>80 *</td>
+<td>70</td>
+<td>40</td>
 <td>7600</td>
 </tr>
 <tr>
-<td>Ratpack Groovy </td>
-<td>22 </td>
-<td>43 </td>
-<td>24 </td>
+<td>Ratpack Groovy</td>
+<td>22</td>
+<td>43</td>
+<td>24</td>
 <td>5300</td>
 </tr>
 <tr>
-<td>Ratpack Java </td>
-<td>16 </td>
-<td>28 </td>
-<td>22 </td>
+<td>Ratpack Java</td>
+<td>16</td>
+<td>28</td>
+<td>22</td>
 <td>3000</td>
 </tr>
 </tbody>
 </table>
-<p>* Only the Eureka client has a larger heap: all the others are set<br>explicitly to <code>-Xmx32m</code>.</p><h2><a href="#conclusions" class="anchor" name="conclusions"></a>Conclusions</h2>
-<p>The effect Spring Boot on its own has on a Java application is to use a bit more heap and non-heap memory, mostly because of extra classes it has to load. The difference can be quantified as roughly an extra 2MB heap and 12MB non-heap. In a real application that might consume many times as much for actual business purposes this is pretty insignificant. The difference between vanilla Spring and Spring Boot is a few MB total (neither here nor there really). The Spring Boot team have only just started measuring things in this level of detail so we can probably expect optimizations in the future anyway. When we compare memory usage for apps deployed in a single Tomcat container with the same apps deployed as independent processes, not surprisingly the single container packs the apps more densely in memory. The penalty for a standalone process is mainly related to non-heap usage though, which adds up to maybe 30MB per app when the number of apps is much larger than the number of containers (and less otherwise). We wouldn’t expect this to increase as apps use more heap, so in most real apps it is not significant. The benefits of deploying an app as an independent process following the <a href="http://12factor.net">twelve-factor</a> and Cloud Native principles outweigh the cost of using a bit more memory in our opinion. As a final note, we observe that the native tools in the operating system are not nearly as good as the ones provided by the JVM, when you want to inspect a process and find out about its memory usage.</p></div>
+<p>*仅Eureka客户端具有更大的堆：所有其他客户端均已设置<br>明确地<code>-Xmx32m</code> 。</p><h2><a href="#conclusions" class="anchor" name="conclusions"></a>结论</h2>
+<p>Spring Boot本身对Java应用程序的影响是使用更多的堆和非堆内存，这主要是因为它必须加载额外的类。可以将差异量化为大约2MB的额外堆和12MB的非堆。在实际应用中，出于实际业务目的可能消耗许多倍的时间，这是微不足道的。Vanilla Spring和Spring Boot之间的差异总共为几MB（无论在这里还是那里都没有）。Spring Boot团队才刚刚开始以这种详细程度衡量事物，因此无论如何我们都可以期望将来进行优化。当我们比较部署在单个Tomcat容器中的应用程序的内存使用情况与作为独立进程部署的相同应用程序的内存使用情况时，毫不奇怪，单个容器将应用程序打包在内存中的密度更高。但是，对独立进程的惩罚主要与非堆使用有关，当应用程序的数量远远大于容器的数量（否则更少）时，每个应用程序的总和可能高达30MB。我们不希望随着应用程序使用更多堆而增加这种情况，因此在大多数实际应用程序中，这并不重要。我们认为，遵循<a href="http://12factor.net">十二项</a>原则和Cloud Native原则将应用程序部署为独立流程的好处超过了使用更多内存的代价。最后，我们注意到，当您要检查进程并了解其内存使用情况时，操作系统中的本机工具不如JVM提供的本机工具好。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">var disqus_shortname = 'spring-io';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2320;
 
       (function(disqus_shortname, document) {
@@ -474,14 +470,13 @@ non-heap = threads x stack + classes x 7/1000
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -489,23 +484,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -515,15 +506,17 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>
@@ -537,18 +530,15 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> •
-<a href="https://pivotal.io/privacy-policy">Privacy</a> •
-<a href="/trademarks">Trademark Guidelines</a>
-<div id="teconsent" style="display:inline-block;"></div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>
 </div>

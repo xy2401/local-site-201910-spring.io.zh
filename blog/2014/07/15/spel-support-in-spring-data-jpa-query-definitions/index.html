@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Data JPA @Query定义中的SpEL支持</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="SpEL support in Spring Data JPA @Query definitions">
-<meta name="twitter:description" content="<p>Spring Data JPA allows manually defining the query to be executed by a repository method using the <code>@Query</code> annotation. Unfortunately parameter binding in JPQL is quite limited only allowing you to set a value and providing some type conversion. The latest <a href=" https:="" ="" spring.io="" blog="" 2014="" 07="" 10="" first-milestone-of-spring-data-release-train-evans-availabl="="></head><body dir="ltr">Spring Data JPA M1 release of the Evans release train eases this pain by adding support<br>for using SpEL expressions to use dynamically bound parameters within statements in <code>@Query</code> annotations which provides additional flexibility when defining queries manually. In this blog post, I am going to introduce you to the capabilities of this feature.
+<meta name="twitter:description" content="<p>Spring Data JPA allows manually defining the query to be executed by a repository method using the <code>@Query</code> annotation. Unfortunately parameter binding in JPQL is quite limited only allowing you to set a value and providing some type conversion. The latest <a href=" https:="" ="" spring.io="" blog="" 2014="" 07="" 10="" first-milestone-of-spring-data-release-train-evans-availabl="="></head><body >Spring Data JPA M1 release of the Evans release train eases this pain by adding support<br>for using SpEL expressions to use dynamically bound parameters within statements in <code>@Query</code> annotations which provides additional flexibility when defining queries manually. In this blog post, I am going to introduce you to the capabilities of this feature.
 ">
 <meta name="twitter:creator" content="@thomasdarimont">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/014bb231d48031c2974e4f723cc381b2?s=200">
@@ -37,10 +41,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,10 +172,137 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Spring Data JPA允许使用<code>@Query</code>annotation手动定义要由存储库方法执行的查询。不幸的是，JPQL中的参数绑定非常有限，仅允许您设置值并提供某种类型转换。Evans发行列车的最新<a href="https://spring.io/blog/2014/07/10/first-milestone-of-spring-data-release-train-evans-available">Spring Data JPA M1</a>发行版通过添加支持减轻了这种痛苦<br>使用SpEL表达式在<code>@Query</code>annotation中的语句内使用动态绑定的参数，这在手动定义查询时提供了更大的灵活性。在此博客文章中，我将向您介绍此功能的功能。</p><h2><a href="#method-parameter-expressions" class="anchor" name="method-parameter-expressions"></a>方法参数表达式</h2><p>SpEL支持提供对查询方法参数的访问。这使您可以直接按原样绑定参数，也可以在绑定之前执行其他操作。</p>
-<pre><code class="prettyprint java">@Query("select u from User u where u.age = ?#{[0]}")
-List<User> findUsersByAge(int age);
+<div class="blog--post"><p>Spring Data JPA允许使用存储库方法手动定义要由存储库方法执行的查询<code>@Query</code>注解。不幸的是，JPQL中的参数绑定非常有限，仅允许您设置一个值并提供某种类型转换。Evans发行列车的最新<a href="https://spring.io/blog/2014/07/10/first-milestone-of-spring-data-release-train-evans-available">Spring Data JPA M1</a>发行版通过添加支持减轻了这种痛苦<br>使用SpEL表达式在语句中使用动态绑定的参数<code>@Query</code>注释，在手动定义查询时提供了更大的灵活性。在此博客文章中，我将向您介绍此功能的功能。</p><h2><a href="#method-parameter-expressions" class="anchor" name="method-parameter-expressions"></a>方法参数表达式</h2><p>SpEL支持提供对查询方法参数的访问。这使您可以直接按原样绑定参数，也可以在绑定之前执行其他操作。</p>
+<pre><code class="prettyprint java">@Query(&quot;select u from User u where u.age = ?#{[0]}&quot;)
+List&lt;User&gt; findUsersByAge(int age);
 
-@Query("select u from User u where u.firstname = :#{#customer.firstname}")
-List<User> findUsersByCustomersFirstname(@Param("customer") Customer customer);
-</code></pre><p>通过索引访问（第一种方法中的<code>[0]</code> ）或使用<code>@Param</code>声明的名称公开<code>@Param</code> 。实际的SpEL表达式绑定是由<code>?#</code></p><h2><code>?#</code></h2><p><code>?#</code></p><code>?#</code></div><code>?#</code></div><code>?#</code></article><code>?#</code></div><code>?#</code></div><code>?#</code></div><code>?#</code></div><code>?#</code></body></html>
+@Query(&quot;select u from User u where u.firstname = :#{#customer.firstname}&quot;)
+List&lt;User&gt; findUsersByCustomersFirstname(@Param(&quot;customer&quot;) Customer customer);
+</code></pre><p>公开了用于索引访问的参数（ <code>[0]</code>在第一种方法中）或通过使用声明的名称<code>@Param</code> 。实际的SpEL表达式绑定由以下方式触发<code>?#</code>要么<code>:#</code> 。我们支持这两种类型，以使您与标准JPQL参数绑定（在查询定义中也可能出现）保持一致。<br>特殊类型的参数，例如<code>Sort</code>和` <code>Pageable</code>以其简单的类名作为变量公开。</p><h2><a href="#advanced-spel-expressions" class="anchor" name="advanced-spel-expressions"></a>高级SpEL表达式</h2><p>尽管高级参数绑定是非常有用的功能，但SpEL的真正功能源于以下事实：表达式可以引用框架抽象或其他应用程序组件。SpEL的一个非常常见的情况是安全约束的定义。因此，如果我们可以限制查询以仅返回与当前经过身份验证的用户相关的结果，那将很酷：</p>
+<pre><code class="prettyprint java">@Query(&quot;select u from User u where u.emailAddress = ?#{principal.emailAddress}&quot;)
+List&lt;User&gt; findCurrentUserWithCustomQuery();
+</code></pre><p>如您所见，我们指的是Spring Security的<code>principal</code> 。那么，Spring Data SpEL支持如何与Spring Security集成。</p><h2><a href="#spel-evaluationcontext-extension-model" class="anchor" name="spel-evaluationcontext-extension-model"></a> SpEL EvaluationContext扩展模型</h2><p>Spring Data公开了一个扩展点<code>EvaluationContextExtension</code> 。该接口允许实施者自定义<code>EvaluationContext</code>以非常详细的方式，但为了方便起见，我们提供了<code>EvaluationContextExtensionSupport</code>基类，以方便您仅实现您感兴趣的部分：</p>
+<pre><code class="prettyprint java">class SecurityEvaluationContextExtension extends EvaluationContextExtensionSupport {
+
+  @Override
+  public String getExtensionId() {
+    return &quot;security&quot;;
+  }
+
+  @Override
+  public SecurityExpressionRoot getRootObject() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return new SecurityExpressionRoot(authentication) {};
+  }
+}
+</code></pre><p>对于我们的Spring Security扩展，我们扩展了<code>EvaluationContextExtensionSupport</code>并覆盖<code>getRootObject()</code><br>方法并返回一个新的<code>SecurityExpressionRoot</code>实例，它公开了您从使用中已经知道的所有安全属性和表达式<code>@PreAuthorize</code> 。此步骤还使它们在我们的SpEL表达式中可用<code>@Query</code>注解。</p><p>我们需要采取的最后一步是将安全扩展注册为Bean：</p>
+<pre><code class="prettyprint java">@Configuration
+@EnableJpaRepositories
+class SecurityConfiguration {
+
+    @Bean
+    EvaluationContextExtension securityExtension() {
+        return new SecurityEvaluationContextExtension();
+    }
+}
+</code></pre><p>Spring Data JPA将拾取所有类型的bean <code>EvaluationContextExtension</code>并用它们来准备<code>EvaluationContext</code>用于评估在中定义的SpEL表达式<code>@Query</code> 。</p><p>现在，已有的扩展将使您能够利用Spring Security SpEL函数的全部功能。想象一下，一个存储库查询方法将返回<code>BusinessObject</code>当前用户是或的所有者的s <code>BusinessObject</code>如果当前用户是admin，则为s。查询方法定义如下所示：</p>
+<pre><code class="prettyprint java">interface SecureBusinessObjectRepository extends Repository&lt;BusinessObject,Long&gt;{
+
+    @Query(&quot;select o from BusinessObject o where o.owner.emailAddress like &quot;+
+      &quot;?#{hasRole(&#39;ROLE_ADMIN&#39;) ? &#39;%&#39; : principal.emailAddress}&quot;)
+    List&lt;BusinessObject&gt; findBusinessObjectsForCurrentUser();
+}
+</code></pre><p>您可以在<a href="https://github.com/spring-projects/spring-data-examples/tree/master/jpa/security">Spring-Data-Examples</a>存储库中找到此处的代码片段的工作示例。</p><h2><a href="#sophisticated-use-cases" class="anchor" name="sophisticated-use-cases"></a>复杂的用例</h2><p>通常，新功能提供了一种方法来执行以前无法想到的事情-例如，本机查询中的分页。<br>由于此机制公开了特殊的参数类型，例如<code>Sort</code>要么<code>Pageable</code>同样，我们现在能够<br>在本机查询中使用分页。<br>可以在此处找到一个示例<a href="https://github.com/spring-projects/spring-data-jpa/blob/master/src/test/java/org/springframework/data/jpa/repository/sample/UserRepository.java#L526">UserRepository</a> 。</p><h2><a href="#whats-next" class="anchor" name="whats-next"></a>下一步是什么？</h2><p>当前，我们正在研究将Spring Security更紧密地集成到Spring Data中。<br>我们还在努力为其他Spring Data模块增加对SpEL功能的支持。</p><p>但是，现在轮到您了-请在下面的评论中告诉我们您的想法，在我们的<a href="https://jira.spring.io">JIRA中</a>提出功能请求。</p><h2><a href="#springone-2gx-2014" class="anchor" name="springone-2gx-2014"></a> SpringOne 2GX 2014年</h2><p>SpringOne 2GX 2014即将接近。</p><p>如果您想了解有关Spring Data的更多信息，请确保<a href="https://2014.event.springone2gx.com/register">注册</a>今年的SpringOne会议。<a href="https://2014.event.springone2gx.com/schedule/2014-09-09">日程安排</a>包含许多与数据相关的讲座，向您介绍我们将随Evans一起提供的最新功能。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1686;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+ <div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

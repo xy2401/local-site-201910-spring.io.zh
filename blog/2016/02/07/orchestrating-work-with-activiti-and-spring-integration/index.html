@@ -1,4 +1,4 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>使用Activiti和Spring集成进行编排工作</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
@@ -23,7 +23,7 @@
 <meta name="twitter:title" content="Orchestrating Work with Activiti and Spring Integration">
 <meta name="twitter:description" class="anchor" content="<p>I received an email recently that asked about how to forward control from a wait-state in an Activiti (which is an open-source BPMN2 workflow engine from Alfresco) to a Spring Integration flow and then resume execution of the Activiti workflow process upon completion of some work in Spring Integration.</p>
 <p>To really appreciate why this is useful goal, we need some background.</p>
-<h2><a href=" #what-is-activit="="></head><body dir="ltr">What is Activiti
+<h2><a href=" #what-is-activit="=">What is Activiti
 <p>Activiti is a <em>business process engine</em>. It’s basically a directed graph of nodes (states) that model the states of a complex business process. It keeps track of the progression of work described in a business process. It describe automatic- and human-based actors in a system. It also supports interrogating the business process engine to ask questions about the process instances underway: how many of them are there, which ones are stalled, etc. Business Process Management Systems (BPMS) offer many advantages, some of which are:</p>
 ">
 <meta name="twitter:creator" content="@starbuxman">
@@ -174,106 +174,106 @@
 </header>
 <div class="blog--post"><p>我最近收到一封电子邮件，询问如何将控制从Activiti（这是Alfresco的开源BPMN2工作流引擎）中的等待状态转发到Spring Integration流，然后在完成后恢复Activiti工作流过程的执行Spring Integration中的一些工作。</p>
 <p>要真正理解为什么这是有用的目标，我们需要一些背景知识。</p><h2><a href="#what-is-activiti" class="anchor" name="what-is-activiti"></a>什么是Activiti</h2>
-<p>Activiti的是一个<em>业务流程引擎</em> 。它基本上是对复杂业务流程的状态进行建模的节点（状态）的有向图。它跟踪业务流程中描述的工作进度。它描述了系统中基于自动和基于人的参与者。它还支持询问业务流程引擎，以询问有关正在进行的流程实例的问题：其中有多少实例，哪些实例已停止，等等。业务流程管理系统（BPMS）具有许多优点，其中一些优点是：</p>
+<p>Activiti是<em>业务流程引擎</em> 。它基本上是节点（状态）的有向图，用于建模复杂业务流程的状态。它跟踪业务流程中描述的工作进度。它描述了系统中基于自动和基于人员的参与者。它还支持询问业务流程引擎，以询问有关正在进行的流程实例的问题：其中有多少实例，哪些实例已停止，等等。业务流程管理系统（BPMS）具有许多优点，其中包括：</p>
 <ul>
 <li>使用人员和服务推动更大业务需求的协作过程（想象贷款批准，法律合规，文档修订等）</li>
-<li>它们支持组织中重要业务流程的审核和日记。这在监管环境中是无价的。</li>
-<li>BPM引擎<em>旨在</em>处理长时间运行的进程状态，这意味着您的域模型不再需要像<code>is_enrolled</code>或<code>reset_password_date</code>这样的进程状态特定字段所<code>reset_password_date</code> 。</li>
+<li>它们支持组织中重要业务流程的审核和日记。在监管环境中这是无价的。</li>
+<li>BPM引擎<em>旨在</em>处理长时间运行的流程状态，这意味着您的域模型不再需要充满流程状态特定的字段，例如<code>is_enrolled</code>要么<code>reset_password_date</code> 。</li>
 <li>易于建模的复杂业务流程</li>
 </ul>
 <p>最后一点值得关注：像Activiti这样的优秀BPM引擎支持可视化业务流程建模。UML支持使用活动（步骤）和泳道（涉及满足这些步骤的代理）来直观地描述流程。当然，UML只是一个建模工具。它没有运行时语义。业务流程管理的圣杯一直是拥有一种可以由业务分析师<em>和</em>应用程序开发人员使用的建模符号。<a href="https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation">BPMN 2</a>与我们为实现该目标所做的努力差不多。</p>
-<p>例如，这里是一个<em>非常</em>简单的业务流程的可视模型。</p>
+<p>例如，这里是一个<em>非常</em>简单的业务流程的可视化模型。</p>
 <img src="https://raw.githubusercontent.com/joshlong/meh/master/bpmn-model.png" width="500">
 <p>这是为支持该模型而创建的标准XML标记。这种XML具有执行语义，而<em>不仅仅是</em>建模语义。</p>
-<pre><code class="prettyprint xml"><?xml version="1.0" encoding="UTF-8"?>
-<definitions id="definitions"
-             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:activiti="http://activiti.org/bpmn"
-             typeLanguage="http://www.w3.org/2001/XMLSchema"
-             expressionLanguage="http://www.w3.org/1999/XPath"
-             targetNamespace="http://www.activiti.org/bpmn2.0">
+<pre><code class="prettyprint xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;definitions id=&quot;definitions&quot;
+             xmlns=&quot;http://www.omg.org/spec/BPMN/20100524/MODEL&quot;
+             xmlns:activiti=&quot;http://activiti.org/bpmn&quot;
+             typeLanguage=&quot;http://www.w3.org/2001/XMLSchema&quot;
+             expressionLanguage=&quot;http://www.w3.org/1999/XPath&quot;
+             targetNamespace=&quot;http://www.activiti.org/bpmn2.0&quot;&gt;
 
-    <process id="asyncProcess">
+    &lt;process id=&quot;asyncProcess&quot;&gt;
 
-        <startEvent id="start"/>
+        &lt;startEvent id=&quot;start&quot;/&gt;
 
-          <sequenceFlow
-            id="flow1"
-            sourceRef="start"
-            targetRef="sigw"/>
+          &lt;sequenceFlow
+            id=&quot;flow1&quot;
+            sourceRef=&quot;start&quot;
+            targetRef=&quot;sigw&quot;/&gt;
 
-        <serviceTask 
-            id="sigw"
-           name="Delegate to Spring Integration"
-           activiti:delegateExpression="#{gateway}"/>
+        &lt;serviceTask 
+            id=&quot;sigw&quot;
+           name=&quot;Delegate to Spring Integration&quot;
+           activiti:delegateExpression=&quot;#{gateway}&quot;/&gt;
 
-           <sequenceFlow
-            id="scriptFlow"
-            sourceRef="sigw"
-            targetRef="confirmMovementTask"/>
+           &lt;sequenceFlow
+            id=&quot;scriptFlow&quot;
+            sourceRef=&quot;sigw&quot;
+            targetRef=&quot;confirmMovementTask&quot;/&gt;
 
-        <scriptTask 
-            id="confirmMovementTask"
-            name="Execute script" scriptFormat="groovy">
-            <script>
-                println 'Moving on..'
-            </script>
-        </scriptTask>
+        &lt;scriptTask 
+            id=&quot;confirmMovementTask&quot;
+            name=&quot;Execute script&quot; scriptFormat=&quot;groovy&quot;&gt;
+            &lt;script&gt;
+                println &#39;Moving on..&#39;
+            &lt;/script&gt;
+        &lt;/scriptTask&gt;
 
-          <sequenceFlow
-            id="flow2"
-            sourceRef="confirmMovementTask"
-            targetRef="theEnd"/>
+          &lt;sequenceFlow
+            id=&quot;flow2&quot;
+            sourceRef=&quot;confirmMovementTask&quot;
+            targetRef=&quot;theEnd&quot;/&gt;
 
-        <endEvent id="theEnd"/>
+        &lt;endEvent id=&quot;theEnd&quot;/&gt;
 
-    </process>
+    &lt;/process&gt;
 
-</definitions>
+&lt;/definitions&gt;
 </code></pre>
-<p>Most analysts won’t write this XML by hand. Instead, they’ll use a modeling tool like <a href="https://www.alfresco.com/products/business-process-management" gtc:encodedoriginal="PGEgaHJlZj0iaHR0cHM6Ly93d3cuYWxmcmVzY28uY29tL3Byb2R1Y3RzL2J1c2luZXNzLXByb2Nlc3MtbWFuYWdlbWVudCI-">Alfresco’s Activiti Cloud</a>. The XML artifact, however, is round-trippable: it may be annotated by developers and then revised in the modeling tool.</p>
-<p>On inspection, though, you’ll see that most of this isn’t very complicated. The process has four states:</p>
+<p>大多数分析师不会手工编写此XML。相反，他们将使用<a href="https://www.alfresco.com/products/business-process-management">Alfresco的Activiti Cloud之</a>类的建模工具。但是，XML工件是双向的：开发人员可以对其进行注释，然后在建模工具中对其进行修改。</p>
+<p>但是，在检查中，您会发现其中大多数并不是很复杂。该过程具有四个状态：</p>
 <ul>
-<li><strong><code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTQ5Ij4=">startEvent</code></strong> - where the process starts</li>
-<li><strong><code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTUyIj4=">serviceTask</code></strong> - invoke the Spring bean called <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTUzIj4=">gateway</code> to kick off a bit of processing in Spring Integration (more on this later!)</li>
-<li><strong><code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTU2Ij4=">scriptTask</code></strong> - print out a simple confirmational message using Groovy</li>
-<li><strong><code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTU5Ij4=">endEvent</code></strong> - done</li>
+<li><strong><code>startEvent</code></strong> -过程从哪里开始</li>
+<li><strong><code>serviceTask</code></strong> -调用名为<code>gateway</code>在Spring Integration中启动一些处理（稍后会详细介绍！）</li>
+<li><strong><code>scriptTask</code></strong> -使用Groovy打印出简单的确认消息</li>
+<li><strong><code>endEvent</code></strong> -完成</li>
 </ul>
-<p>The ordering is explicitly spelled out by the various <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTYxIj4=">sequenceFlow</code> elements which connect the nodes.</p>
-<p>Activiti is a great way to keep track of business process state, but it’s not a particularly powerful component model or integration technology. For that we need an integration framework like Spring Integration..</p><h2><a href="#what-is-spring-integration" class="anchor" name="what-is-spring-integration" gtc:encodedoriginal="PGEgaHJlZj0iI3doYXQtaXMtc3ByaW5nLWludGVncmF0aW9uIiBjbGFzcz0iYW5jaG9yIiBuYW1lPSJ3aGF0LWlzLXNwcmluZy1pbnRlZ3JhdGlvbiI-"></a>What is Spring Integration</h2>
-<p>Spring Integration supports the integration of services and data across multiple otherwise incompatible systems. Conceptually, composing an integration flow is similar to composing a pipes-and-filters flow on a UNIX OS with <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTY2Ij4=">stdin</code> and <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTY3Ij4=">stdout</code>:</p>
-<pre gtc:encodedoriginal="PHByZSBkYXRhLW1hcmt4PSIxNjgiPg=="><code class="prettyprint">cat input.txt |  grep ERROR | wc -l > output.txt
+<p>各种命令明确说明了顺序<code>sequenceFlow</code>连接节点的元素。</p>
+<p>Activiti是跟踪业务流程状态的好方法，但是它并不是特别强大的组件模型或集成技术。为此，我们需要像Spring Integration这样的集成框架。</p><h2><a href="#what-is-spring-integration" class="anchor" name="what-is-spring-integration"></a>什么是Spring Integration</h2>
+<p>Spring Integration支持跨多个原本不兼容的系统集成服务和数据。从概念上讲，组成集成流类似于在UNIX OS上通过以下方式组成管道和过滤器流： <code>stdin</code>和<code>stdout</code> ：</p>
+<pre><code class="prettyprint">cat input.txt |  grep ERROR | wc -l &gt; output.txt
 </code></pre>
-<p>In the example, we take data from a source (the file <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTcxIj4=">input.txt</code>), pipe it to the <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTcyIj4=">grep</code> command to filter the results and keep only the lines that contain the token <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTczIj4=">ERROR</code>, and then pipe it to the <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTc0Ij4=">wc</code> utility which we to count how many lines there are. Finally, the final count is written to an output file, <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTc1Ij4=">output.txt</code>. These components - <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTc2Ij4=">cat</code>, <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTc3Ij4=">grep</code>, and <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTc4Ij4=">wc</code> - know nothing of each other. They were not designed with each other in mind. Instead, they know only how to read from <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTc5Ij4=">stdin</code> and write to <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTgwIj4=">stdout</code>. This normalization of data makes it very easy to compose complex solutions from simple atoms. In the example, the act of <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTgxIj4=">cat</code>ing a file turns data into data that any process aware of <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTgyIj4=">stdin</code> can read. It <em>adapts</em> the inbound data into the normalized format, lines of strings. At the end, the redirect (<code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTg0Ij4=">></code>) operator turns the normalized data, lines of strings, into data on the file system. It <em>adapts</em> it. The pipe (<code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTg2Ij4=">|</code>) character is used to signal that the output of one component should flow to the input of another.</p>
-<p>A Spring Integration flow works the same way: data is normalized into <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTg4Ij4=">Message<T></code> instances. Each <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTg5Ij4=">Message<T></code> has a payload and headers - metadata about the payload in a <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTkwIj4=">Map<K,V></code> - that are the input and output of different messaging components. These messaging components are typically provided by Spring Integration, but it’s easy to write and use your own. There are all manner of messaging components supporting all of the <a href="http://www.enterpriseintegrationpatterns.com/" gtc:encodedoriginal="PGEgaHJlZj0iaHR0cDovL3d3dy5lbnRlcnByaXNlaW50ZWdyYXRpb25wYXR0ZXJucy5jb20vIj4=">the Enterprise Application Integration patterns</a> (filters, routers, transformers, adapters, gateways, etc.). The Spring framework <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTkyIj4=">MessageChannel</code> is a named conduit through which <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTkzIj4=">Message<T></code>s flow between messaging components. They’re pipes and, by default, they work sort of like a <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTk0Ij4=">java.util.Queue</code>. Data in, data out.</p>
-<p>Spring Integration inbound adapters <em>adapt</em> data from external systems (message queues like RabbitMQ, Apache Kafka, and JMS, email, Twitter, file system mounts, IoT-devices, and a zillion other systems) into <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTk3Ij4=">Message<T></code>s. Spring Integration outbound adapters do the same, in reverse, taking <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMTk4Ij4=">Message<T></code>s and writing them to an external system (for example, as an e-mail, or a Tweet, or an Apache Kafka message).</p>
-<p>Spring Integration supports <em>event-driven architectures</em> because it can help detect and then respond to events in the external world. For example, you can use Spring Integration to poll a filesystem every 10 seconds and publish a <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjAxIj4=">Message<T></code> whenever a new file appears. You can use Spring Integration to act as a listener to messages delivered to a Apache Kafka topic. The adapter handles responding to the external event and frees you from worrying too much about originating the message and lets you focus on handling the message once it arrives. It’s the integration equivalent of dependency injection! </p>
-<p>Dependency injection leaves component code free of worries about resource initialization and acquisition and leaves it free to focus on writing code with those dependencies. Where did the <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjAzIj4=">javax.sql.DataSource</code> field come from? Who cares! Spring wired it in, and it may have gotten it from a Mock in a test, from JNDI in a classic application server, or from a configured Spring Boot bean. Component code remains ignorant of those details. ~15 years ago, when we first started talking about dependency injection, we would talk about the “Hollywood principal:” “don’t call me, I’ll call you!” This applies even more to Spring Integration!</p>
-<p>Inbound gateways take incoming requests from external systems, process them as <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjA1Ij4=">Message<T></code>s, and send a reply. Outbound gateways take <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjA2Ij4=">Message<T></code>s, forward them to an external system, and await the response from that system. They support request and reply interactions.</p><h2><a href="#an-activiti-and-spring-integration-gateway" class="anchor" name="an-activiti-and-spring-integration-gateway" gtc:encodedoriginal="PGEgaHJlZj0iI2FuLWFjdGl2aXRpLWFuZC1zcHJpbmctaW50ZWdyYXRpb24tZ2F0ZXdheSIgY2xhc3M9ImFuY2hvciIgbmFtZT0iYW4tYWN0aXZpdGktYW5kLXNwcmluZy1pbnRlZ3JhdGlvbi1nYXRld2F5Ij4="></a>An Activiti and Spring Integration Gateway</h2>
-<p>Activiti can be used to describe a complex, long-running process in terms of recorded, auditable, and predictable states, and Spring Integration can be used to, well, <em>integrate</em>! Spring Integration is where we keep the interesting Java code, and Activiti keeps track of the overarching state. This trick was useful 20 years ago and it’s useful today in the massively distributed world of microservices, too, where processing for a single request may span multiple services and nodes. It’s convenient, then, <a href="https://spring.io/blog/2015/03/08/getting-started-with-activiti-and-spring-boot" gtc:encodedoriginal="PGEgaHJlZj0iaHR0cHM6Ly9zcHJpbmcuaW8vYmxvZy8yMDE1LzAzLzA4L2dldHRpbmctc3RhcnRlZC13aXRoLWFjdGl2aXRpLWFuZC1zcHJpbmctYm9vdCI-">that Spring Boot, Spring Integration and Activiti work so well together</a>!</p>
-<p>One common use case is to initiate a BPM process with Activiti and then, on entering a wait-state, delegate handling of that state to Spring Integration which can, of course, spread the work to other systems. Here’s a simple diagram illustrating the flow.</p>
-<img src="https://raw.githubusercontent.com/joshlong/meh/master/activiti-and-si-interaction.jpg" width="500" gtc:encodedoriginal="PGltZyBzcmM9Imh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9qb3NobG9uZy9tZWgvbWFzdGVyL2FjdGl2aXRpLWFuZC1zaS1pbnRlcmFjdGlvbi5qcGciIHdpZHRoPSI1MDAiPg==">
-<p>BPM process states can often involve human agents. For example, a workflow engine may have a state where a document is sent to a human for approval, but the reviewer is on vacation and won’t be back for weeks. It would be wasteful, not to mention dangerous, to keep a thread open with the expectation that whatever confirmation is needed to continue processing will come back within milliseconds or seconds.</p>
-<p>Activiti is smart enough to pause execution, persist execution state to a database during a wait-state, and only resume upon having the process execution <em>signaled</em>. Signalling the process engine rehydrates the process and resumes execution. A simple example might be a new user enrollment business process that delegates to Spring Integration to send an email with a sign up confirmation link. It may take days for the user to click the confirmation link, but on clicking, the system should proceed with the enrollment business process.</p>
-<p>In this post we’re going to look at how to initiate a BPM process that enters a wait-state and then delegates to Spring Integration to do some kind of custom processing and then, in the far flung future, resumes execution of the process.</p>
-<p>We’ll setup two Spring Integration flows: one to handle requests from Activiti into Spring Integration and another that handles eventual replies and triggers the resumption of the process.</p>
-<p>We’ll need something to kick off our process, so here’s a simple REST endpoint (<code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjIwIj4=">http://localhost:8080/start</code>) that launches a new process each time:</p>
-<pre gtc:encodedoriginal="PHByZSBkYXRhLW1hcmt4PSIyMjEiPg=="><code class="prettyprint java">@RestController
+<p>在示例中，我们从源（文件<code>input.txt</code> ），将其通过管道<code>grep</code>命令以过滤结果并仅保留包含令牌的行<code>ERROR</code> ，然后将其通过管道传输到<code>wc</code>实用程序，我们可以计算出多少行。最后，将最终计数写入输出文件， <code>output.txt</code> 。这些组成部分- <code>cat</code> ， <code>grep</code>和<code>wc</code> -彼此一无所知。他们在设计时并没有考虑到彼此。相反，他们只知道如何阅读<code>stdin</code>并写到<code>stdout</code> 。数据的这种标准化使得从简单原子组成复杂解变得非常容易。在该示例中， <code>cat</code>处理文件会将数据转换为任何进程都可以识别的数据<code>stdin</code>可以阅读。它将入站数据<em>调整</em>为标准化格式，即字符串行。最后，重定向（ <code>></code> ）运算符将规范化的数据（字符串行）转换为文件系统上的数据。它<em>适应</em>它。管道（ <code>|</code> ）字符用于表示一个组件的输出应流向另一个组件的输入。</p>
+<p>Spring Integration流的工作方式相同：将数据标准化为<code>Message<T></code>实例。每<code>Message<T></code>具有有效负载和标头-有关有效负载的元数据<code>Map<K,V></code> -是不同消息传递组件的输入和输出。这些消息传递组件通常由Spring Integration提供，但是很容易编写和使用自己的消息传递组件。有各种各样的消息传递组件都支持所有<a href="http://www.enterpriseintegrationpatterns.com/">企业应用程序集成模式</a> （过滤器，路由器，转换器，适配器，网关等）。Spring框架<code>MessageChannel</code>是一个命名管道，通过该管道<code>Message<T></code>消息传递组件之间的流。它们是管道，默认情况下，它们的工作方式类似于<code>java.util.Queue</code> 。数据输入，数据输出。</p>
+<p>Spring Integration入站适配器<em>将</em>来自外部系统（RabbitMQ，Apache Kafka和JMS的消息队列，电子邮件，Twitter，文件系统挂载，IoT设备以及不计其数的其他系统）的数据适配到<code>Message<T></code> s。相反，Spring Integration出站适配器做同样的事情， <code>Message<T></code>并将它们写入外部系统（例如，作为电子邮件，Tweet或Apache Kafka消息）。</p>
+<p>Spring Integration支持<em>事件驱动的架构，</em>因为它可以帮助检测并响应外部事件。例如，您可以使用Spring Integration每10秒轮询一次文件系统并发布一个<code>Message<T></code>每当出现新文件时。您可以使用Spring Integration充当传递给Apache Kafka主题的消息的侦听器。适配器处理对外部事件的响应，使您不必过多担心始发消息，并让您专注于消息到达后的处理。这相当于依赖注入的集成！</p>
+<p>依赖注入使组件代码无需担心资源初始化和获取，并可以专注于编写具有这些依赖关系的代码。在哪里<code>javax.sql.DataSource</code>场从何而来？谁在乎！Spring连接了它，它可能是从测试中的Mock，经典应用程序服务器中的JNDI或已配置的Spring Boot bean中获得的。组件代码仍然不了解这些细节。大约15年前，当我们第一次开始谈论依赖注入时，我们会谈论“好莱坞负责人”：“不要打电话给我，我会打电话给您！”这更适用于Spring Integration！</p>
+<p>入站网关接收来自外部系统的传入请求，将它们作为<code>Message<T></code> ，然后发送回复。出站网关<code>Message<T></code> s，将它们转发到外部系统，并等待该系统的响应。他们支持请求和回复交互。</p><h2><a href="#an-activiti-and-spring-integration-gateway" class="anchor" name="an-activiti-and-spring-integration-gateway"></a> Activiti和Spring集成网关</h2>
+<p>Activiti可用于根据记录的，可审核的和可预测的状态来描述一个复杂的，长期运行的过程，而Spring Integration可以用来进行<em>集成</em> ！Spring Integration是我们保留有趣的Java代码的地方，而Activiti则跟踪总体状态。这个技巧在20年前很有用，今天在微服务的大规模分布世界中也很有用，因为单个请求的处理可能跨越多个服务和节点。那么，方便的是， <a href="https://spring.io/blog/2015/03/08/getting-started-with-activiti-and-spring-boot">Spring Boot，Spring Integration和Activiti可以很好地协同工作</a> ！</p>
+<p>一种常见的用例是使用Activiti启动BPM流程，然后在进入等待状态时将该状态的处理委托给Spring Integration，后者当然可以将工作分散到其他系统。这是说明流程的简单图。</p>
+<img src="https://raw.githubusercontent.com/joshlong/meh/master/activiti-and-si-interaction.jpg" width="500">
+<p>BPM流程状态通常可能涉及人员。例如，工作流引擎可能处于一种状态，在该状态下，文档已发送给人类以供批准，但是审阅者正在休假，并且不会在几周后回来。保持线程开放，以期望继续处理所需的任何确认将在毫秒或秒之内返回，这是浪费的，更不用说是危险的了。</p>
+<p>Activiti足够聪明，可以暂停执行，在等待状态期间将执行状态持久保存到数据库，并且仅在<em>发出</em>执行<em>信号</em>后才恢复执行。发信号通知流程引擎使流程重新水化并恢复执行。一个简单的示例可能是一个新的用户注册业务流程，该流程委派给Spring Integration以发送带有注册确认链接的电子邮件。用户单击确认链接可能需要几天时间，但是单击后，系统应继续进行注册业务流程。</p>
+<p>在本文中，我们将研究如何启动进入等待状态的BPM流程，然后委派给Spring Integration进行某种自定义处理，然后在不久的将来恢复该流程的执行。</p>
+<p>我们将设置两个Spring Integration流：一个用于处理从Activiti到Spring Integration的请求，另一个用于处理最终的回复并触发流程的恢复。</p>
+<p>我们需要一些东西来启动我们的流程，因此这是一个简单的REST端点（ <code>http://localhost:8080/start</code> ），每次都会启动一个新流程：</p>
+<pre><code class="prettyprint java">@RestController
 class ProcessStartingRestController {
 
  @Autowired
  private ProcessEngine processEngine;
 
- @RequestMapping(method = RequestMethod.GET, value = "/start")
- Map<String, String> launch() {
+ @RequestMapping(method = RequestMethod.GET, value = &quot;/start&quot;)
+ Map&lt;String, String&gt; launch() {
   ProcessInstance asyncProcess = this.processEngine.getRuntimeService()
-    .startProcessInstanceByKey("asyncProcess");
-  return Collections.singletonMap("executionId", asyncProcess.getId());
+    .startProcessInstanceByKey(&quot;asyncProcess&quot;);
+  return Collections.singletonMap(&quot;executionId&quot;, asyncProcess.getId());
  }
 }
 </code></pre>
-<p>Messages will flow across two <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjI0Ij4=">MesssageChannel</code>s that we’ll create in a <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjI1Ij4=">@Configuration</code> class: <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjI2Ij4=">requests</code> and <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjI3Ij4=">replies</code>.</p>
-<pre gtc:encodedoriginal="PHByZSBkYXRhLW1hcmt4PSIyMjgiPg=="><code class="prettyprint java">@Configuration
+<p>消息将流经两个<code>MesssageChannel</code>我们将在<code>@Configuration</code>类： <code>requests</code>和<code>replies</code> 。</p>
+<pre><code class="prettyprint java">@Configuration
 class MessageChannels {
 
  @Bean
@@ -287,25 +287,25 @@ class MessageChannels {
  }
 }
 </code></pre>
-<p>The nice thing about using a <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjMxIj4=">@Configuration</code> class is that it is itself a Spring component and can be injected anywhere. We can dereference the channels by invoking the <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjMyIj4=">@Bean</code> provider methods directly. The alternative is to use <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjMzIj4=">@Qualifier</code> everytime we inject a reference to one of the channels, e.g.:</p>
-<pre gtc:encodedoriginal="PHByZSBkYXRhLW1hcmt4PSIyMzQiPg=="><code class="prettyprint java"><br>public static final String REPLIES_CHANNEL_NAME = "replies";
+<p>关于使用a的好处<code>@Configuration</code>类是它本身就是一个Spring组件，可以在任何地方注入。我们可以通过调用<code>@Bean</code>直接提供程序方法。替代方法是使用<code>@Qualifier</code>每次我们对其中一个渠道注入参考时，例如：</p>
+<pre><code class="prettyprint java"><br />public static final String REPLIES_CHANNEL_NAME = &quot;replies&quot;;
 
 @Autowired
 @Qualifier(REPLIES_CHANNEL_NAME)
 private MessageChannel replies;
 </code></pre>
-<p>Our BPMN is pretty straightforward, but we’ll use an Activiti-specific namespace attribute, <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjM4Ij4=">activiti:delegateExpression="#{gateway}"</code>, to tell Activiti to call a bean named <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjM5Ij4=">gateway</code> that’s registered in Spring. Activiti knows to do this because this application uses the Activiti auto-configuration for Spring Boot which, among many other things, exposes Spring-managed beans to the Activiti expression-language. The <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjQwIj4=">gateway</code> is an Activiti-based bean of type <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjQxIj4=">ReceiveTaskActivityBehavior</code>. Spring Boot has auto-configurations for both Spring Integration and Activiti so 90% of the tedious setup goes out the window.</p>
-<p>Let’s look at our simple <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjQzIj4=">gateway</code> component, an implementation of Activiti’s <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjQ0Ij4=">ActivityBehavior</code> interface that acts as a callback where we can send a <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjQ1Ij4=">Message<T></code> into the <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjQ2Ij4=">requests</code> channel and kick off our Spring Integration flow. The important thing here is that we’ve captured the <code gtc:encodedoriginal="PGNvZGUgZGF0YS1tYXJreD0iMjQ3Ij4=">executionId</code> which we’ll need later to <em>resume</em> or <em>signal</em> the process.</p>
-<pre gtc:encodedoriginal="PHByZSBkYXRhLW1hcmt4PSIyNTAiPg=="><code class="prettyprint java">@Bean
+<p>BPMN非常简单，但是我们将使用Activiti特定的名称空间属性， <code>activiti:delegateExpression="#{gateway}"</code> ，告诉Activiti调用一个名为的bean <code>gateway</code>在春天注册的。Activiti知道这样做是因为该应用程序对Spring Boot使用Activiti自动配置，该配置除其他外，将Spring管理的bean暴露给Activiti表达式语言。的<code>gateway</code>是基于Activiti的Bean类型<code>ReceiveTaskActivityBehavior</code> 。Spring Boot具有针对Spring Integration和Activiti的自动配置，因此90％的乏味设置无法使用。</p>
+<p>让我们看看我们的简单<code>gateway</code>组件，Activiti的实现<code>ActivityBehavior</code>充当回调的接口，我们可以在其中发送<code>Message<T></code>进入<code>requests</code>引导我们的Spring Integration流程。重要的是，我们已经捕获了<code>executionId</code>我们稍后需要<em>恢复</em>或<em>通知</em>该过程。</p>
+<pre><code class="prettyprint java">@Bean
 ActivityBehavior gateway(MessageChannels channels) {
   return new ReceiveTaskActivityBehavior() {
 
     @Override
     public void execute(ActivityExecution execution) throws Exception {
 
-      Message<?> executionMessage = MessageBuilder
+      Message&lt;?&gt; executionMessage = MessageBuilder
           .withPayload(execution)
-          .setHeader("executionId", execution.getId())
+          .setHeader(&quot;executionId&quot;, execution.getId())
           .build();
 
       channels.requests().send(executionMessage);
@@ -313,27 +313,27 @@ ActivityBehavior gateway(MessageChannels channels) {
   };
 }
 </code></pre>
-<p><code>Message<T></code>会弹出<code>requests</code> <code>MessageChannel</code>的另一端，需要进行一些处理。在一个复杂的示例中，将请求转换为有意义的消息然后将其转发到其他系统（例如电子邮件）将是微不足道的。在这里，我们仅打印出标题，以便我们可以记录<code>executionId</code>并在以后使用。</p>
+<p>的<code>Message<T></code>会弹出另一面<code>requests</code><code>MessageChannel</code>并且需要一些东西来处理它。在一个复杂的示例中，将请求转换为有意义的消息然后将其转发到其他系统（例如电子邮件）将是微不足道的。在这里，我们仅打印出标题，以便我们注意<code>executionId</code>以后再用</p>
 <pre><code class="prettyprint java">@Bean
 IntegrationFlow requestsFlow(MessageChannels channels) {
  return IntegrationFlows.from(channels.requests())
-   .handle(msg -> msg.getHeaders().entrySet()
-     .forEach(e -> log.info(e.getKey() + '=' + e.getValue())))
+   .handle(msg -&gt; msg.getHeaders().entrySet()
+     .forEach(e -&gt; log.info(e.getKey() + &#39;=&#39; + e.getValue())))
    .get();
 }
 </code></pre>
-<p>此时，工作流定义将被保留，并且没有活动的流程实例。我们需要以某种方式异步发出信号。我们将使用REST端点<code>http://localhost:8080/resume/{executionId}</code> 。REST很容易理解，但是实际上我们可以使用Spring Integration知道的任何来自外部系统的事件来实现这种效果。唯一要确保的是，无论外部事件如何，我们都可以通过某种方式发送<code>executionId</code> ，就像我们通过在URI中捕获它一样。</p>
-<pre><code class="prettyprint java"><br>@RestController
+<p>此时，工作流定义将被保留，并且没有活动的流程实例。我们需要以某种方式异步发出信号。我们将使用REST端点进行操作， <code>http://localhost:8080/resume/{executionId}</code> 。REST很容易理解，但是实际上我们可以使用Spring Integration知道的任何来自外部系统的事件来实现这种效果。唯一要确保的是，无论外部事件如何，我们都能以某种方式发送<code>executionId</code>就像我们通过在URI中捕获它一样。</p>
+<pre><code class="prettyprint java"><br />@RestController
 class ProcessResumingRestController {
 
  @Autowired
  private MessageChannels messageChannels;
 
- @RequestMapping(method = RequestMethod.GET, value = "/resume/{executionId}")
+ @RequestMapping(method = RequestMethod.GET, value = &quot;/resume/{executionId}&quot;)
  void resume(@PathVariable String executionId) {
 
-  Message<String> build = MessageBuilder.withPayload(executionId)
-    .setHeader("executionId", executionId)
+  Message&lt;String&gt; build = MessageBuilder.withPayload(executionId)
+    .setHeader(&quot;executionId&quot;, executionId)
     .build();
 
   this.messageChannels.replies().send(build);
@@ -341,18 +341,18 @@ class ProcessResumingRestController {
 }
 
 </code></pre>
-<p>当<code>Message<T></code>流经<code>replies</code> <code>MessageChannel</code> ，它将弹出另一端，同样，需要进行一些处理。在这里，我们将使用另一个Spring Integration流，它接收传入的<code>Message<T></code>并表示该过程已恢复。一旦执行了该流程，您将看到该过程的下一步，即<code>scriptTask</code> ，评估后的单词和“继续前进”。打印到控制台。</p>
+<p>当。。。的时候<code>Message<T></code>流经<code>replies</code><code>MessageChannel</code> ，它将弹出另一端，同样，需要进行一些处理。在这里，我们将使用另一个Spring Integration流，该流将传入<code>Message<T></code>并表示该过程已恢复。执行完此流程后，您将看到流程的下一步，即<code>scriptTask</code> ，评估后加上“继续前进”字样。打印到控制台。</p>
 <pre><code class="prettyprint java">@Bean
 IntegrationFlow repliesFlow(MessageChannels channels,
        ProcessEngine engine) {
  return IntegrationFlows.from(channels.replies())
-   .handle(msg -> engine.getRuntimeService().signal(
-     String.class.cast(msg.getHeaders().get("executionId"))))
+   .handle(msg -&gt; engine.getRuntimeService().signal(
+     String.class.cast(msg.getHeaders().get(&quot;executionId&quot;))))
    .get();
 }
 </code></pre><h2><a href="#next-steps" class="anchor" name="next-steps"></a>下一步</h2>
-<p>我们已经介绍了很多！我们<em>同时</em>涉及到BPM引擎和集成框架来处理处理，并且我理解正确使用两者的交集是一个小众话题。这篇文章的目标是在适当的情况下充分有效地使用两者。 BPM为简单的集成增加了相当多的<a href="https://en.wikipedia.org/wiki/Cognitive_load"><em>认知负担</em></a> ，但是当业务流程描述必须对模型和业务分析师友好时，BPM会提供<em>很多</em>价值。一个普遍的误解是，一旦涉及BPM，开发人员就不得不放弃增强系统的能力。不是这样！多亏了Spring Boot和Activiti团队的辛勤工作，Activiti可以与整个Spring完美协作。</p>
-<p>真正的强大功能是使用BPM来协调复杂的处理逻辑：想象一下在BPM流程中达到某个状态，然后调用Spring Batch作业，或在Spring Cloud中使用功能区负载均衡的<code>RestTemplate</code>调用REST服务，或转发<code>Message<T></code>进入Spring Cloud Data Flow流流程。Spring Cloud Data Flow是我最喜欢的数据处理方法之一，因为它建立在Spring Cloud Stream的基础上，而Spring Cloud Stream又建立在Spring Integration的基础上： <code>MessageChannel</code>一直存在！</p>
+<p>我们已经介绍了很多！我们<em>同时</em>涉及到BPM引擎和集成框架来处理处理，并且我理解正确使用两者的交集是一个小众话题。这篇文章的目标是有效地充分利用这两种方法。 BPM为简单的集成增加了相当多的<a href="https://en.wikipedia.org/wiki/Cognitive_load"><em>认知负担</em></a> ，但是当业务流程描述必须对模型和业务分析师友好时，BPM会提供<em>很多</em>价值。一个普遍的误解是，一旦涉及到BPM，开发人员就不得不放弃增强系统的能力。不是这样！多亏了Spring Boot和Activiti团队的辛勤工作，Activiti可以与整个Spring完美协作。</p>
+<p>真正的强大功能是使用BPM来协调复杂的处理逻辑：想象一下在BPM流程中达到某个状态，然后调用Spring Batch作业，或在功能区负载平衡的情况下调用REST服务<code>RestTemplate</code>在Spring Cloud中，或转发<code>Message<T></code>进入Spring Cloud Data Flow流流程。Spring Cloud Data Flow是我最喜欢的数据处理方法之一，因为它基于Spring Cloud Stream构建，而Cloud Cloud Stream又基于Spring Integration： <code>MessageChannel</code>一路下滑！</p>
 <p>该<a href="https://github.com/joshlong/activiti-examples/tree/master/async-activiti-integration">示例</a>的代码<a href="https://github.com/joshlong/activiti-examples/tree/master/async-activiti-integration">在线</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>

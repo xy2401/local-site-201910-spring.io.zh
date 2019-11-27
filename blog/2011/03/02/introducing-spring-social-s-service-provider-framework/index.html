@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>介绍Spring Social的服务提供商框架</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,26 +25,28 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Introducing Spring Social's Service Provider Framework">
-<meta name="twitter:creator" content="@habuma" http:="" ="" blog.springsource.com="" 2010="" 11="" 03="" socializing-spring-applications="" ="="></meta>previous post, I introduced you to Spring Social's Java bindings to popular Software-as-a-Service (SaaS) APIs such as Twitter, Facebook, LinkedIn, and TripIt. In addition to providing simple, strongly-typed Java methods for common API operations, these bindings ensure each HTTP request includes the credentials required to authorize your application to invoke the API on behalf of a user.
+<meta name="twitter:creator" content="@habuma" http:="" ="" blog.springsource.com="" 2010="" 11="" 03="" socializing-spring-applications="" ="=">previous post, I introduced you to Spring Social's Java bindings to popular Software-as-a-Service (SaaS) APIs such as Twitter, Facebook, LinkedIn, and TripIt. In addition to providing simple, strongly-typed Java methods for common API operations, these bindings ensure each HTTP request includes the credentials required to authorize your application to invoke the API on behalf of a user.
 <p>What my first post did not address was: <em>how do we manage the credentials required to invoke service APIs on behalf of users?</em> I'm pleased to say that we now have answers to that question.</p>
 " > <meta>
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200">
 
 <meta property="og:title" content="Introducing Spring Social's Service Provider Framework">
 <meta property="og:image" content="https://gravatar.com/avatar/52fd524c733cc1098c2eeeae38ea8a20?s=200">
-<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2010="" 11="" 03="" socializing-spring-applications="" ="="></meta>previous post, I introduced you to Spring Social's Java bindings to popular Software-as-a-Service (SaaS) APIs such as Twitter, Facebook, LinkedIn, and TripIt. In addition to providing simple, strongly-typed Java methods for common API operations, these bindings ensure each HTTP request includes the credentials required to authorize your application to invoke the API on behalf of a user.
+<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2010="" 11="" 03="" socializing-spring-applications="" ="=">previous post, I introduced you to Spring Social's Java bindings to popular Software-as-a-Service (SaaS) APIs such as Twitter, Facebook, LinkedIn, and TripIt. In addition to providing simple, strongly-typed Java methods for common API operations, these bindings ensure each HTTP request includes the credentials required to authorize your application to invoke the API on behalf of a user.
 <p>What my first post did not address was: <em>how do we manage the credentials required to invoke service APIs on behalf of users?</em> I'm pleased to say that we now have answers to that question.</p>
 " > <meta>
 <meta property="og:article:published_time" content="2011-03-02 22:20:00.0">
 </head>
-<body>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -167,7 +173,7 @@
 </div>
 </header>
 <div class="blog--post"><p>在<a href="http://blog.springsource.com/2010/11/03/socializing-spring-applications/">上</a>一篇<a href="http://blog.springsource.com/2010/11/03/socializing-spring-applications/">文章中</a> ，我向您介绍了Spring Social与流行的软件即服务（SaaS）API（例如Twitter，Facebook，LinkedIn和TripIt）的Java绑定。这些绑定除了为常见的API操作提供简单的强类型Java方法外，还确保每个HTTP请求都包括授权您的应用程序代表用户调用API所需的凭据。</p>
-<p>我的第一篇文章没有提到的是： <em>我们如何管理代表用户调用服务API所需的凭据？</em> 我很高兴地说，我们现在对该问题有了答案。</p>
+<p>我的第一篇文章没有<em>谈到的</em>是： <em>我们如何管理代表用户调用服务API所需的凭据？</em> 我很高兴地说，我们现在对该问题有了答案。</p>
 <p>本周初，我们宣布发布Spring Social项目的第二个里程碑。Spring Social 1.0.0中最重要的新功能。M2是服务提供商“连接”框架的引入。今天，我想向您介绍此框架，并向您展示如何使用它来管理与SaaS提供程序的“连接”。</p>
 <p>本文中的示例来自<a href="https://github.com/SpringSource/spring-social-samples">Spring Social Showcase</a> 。要继续进行，请克隆存储库并按照自述文件来构建和部署示例应用程序。</p>
 <h3>春季社交</h3>
@@ -184,50 +190,50 @@
 <li><b>spring-social-test-</b>支持测试服务提供商的实现和API绑定。</li>
 </ul>
 <p>根据您的需求，您不一定需要所有这些模块。至少，您需要核心模块。您可以使用以下条目将其添加到Maven构建的项目中：</p>
-<pre><code class="prettyprint xml"><br><dependency>
-    <groupId>org.springframework.social</groupId>
-    <artifactId>spring-social-core</artifactId>
-    <version>1.0.0.M2</version>
-</dependency>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.social&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-social-core&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.M2&lt;/version&gt;
+&lt;/dependency&gt;
 </code></pre>
 <p>如果很可能在Web应用程序中使用Spring Social，则还需要Web模块：</p>
-<pre><code class="prettyprint xml"><br><dependency>
-    <groupId>org.springframework.social</groupId>
-    <artifactId>spring-social-web</artifactId>
-    <version>1.0.0.M2</version>
-</dependency>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.social&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-social-web&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.M2&lt;/version&gt;
+&lt;/dependency&gt;
 </code></pre>
 <p>然后，您需要添加一个或多个提供程序模块。在我们的示例中，我们将讨论向应用程序添加Twitter连接，因此我们需要twitter模块：</p>
-<pre><code class="prettyprint xml"><br><dependency>
-    <groupId>org.springframework.social</groupId>
-    <artifactId>spring-social-twitter</artifactId>
-    <version>1.0.0.M2</version>
-</dependency>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.social&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-social-twitter&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0.M2&lt;/version&gt;
+&lt;/dependency&gt;
 </code></pre>
 <p>由于我们是基于Spring Social的里程碑版本构建的，因此我们需要将Spring的里程碑存储库添加到pom.xml文件中：</p>
-<pre><code class="prettyprint xml"><br><repository>
-	<id>org.springframework.maven.milestone</id>
-	<name>Spring Maven Milestone Repository</name>
-	<url>http://maven.springframework.org/milestone</url>
-	<snapshots><enabled>false</enabled></snapshots>
-</repository>
+<pre><code class="prettyprint xml"><br />&lt;repository&gt;
+	&lt;id&gt;org.springframework.maven.milestone&lt;/id&gt;
+	&lt;name&gt;Spring Maven Milestone Repository&lt;/name&gt;
+	&lt;url&gt;http://maven.springframework.org/milestone&lt;/url&gt;
+	&lt;snapshots&gt;&lt;enabled&gt;false&lt;/enabled&gt;&lt;/snapshots&gt;
+&lt;/repository&gt;
 </code></pre>
 <p>注意，尽管Spring Social 1.0.0。M2在Spring Framework 3.1上具有编译时依赖性，Spring Social在Spring Framework 3.0.x上也可以正常工作。</p>
 <p>有了我们构建中解决的依赖关系，我们就可以向应用程序添加Twitter连接。</p>
 <h3>与Twitter连接</h3>
 <p>为了帮助理解Spring Social的服务提供商“连接”框架带来的好处，让我们快速浏览展示应用程序。</p>
 <p>登录到展示样本后，您将看到的第一件事是展示支持与之连接的服务提供商的列表：Twitter，Facebook和TripIt。它们都应显示您的帐户尚未连接到任何一个。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase11.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase11.png" alt="" title="展示柜1" width="666" height="424" class="alignnone size-full wp-image-8146"></a></p>
-<p>如果单击Twitter链接，您将被重定向到连接状态页面，并有机会“与Twitter连接”。您还将看到一个复选框，如果选中，将在连接到Twitter后发布有关Spring Social Showcase的推文。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase21.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase21.png" alt="" title="展示柜2" width="689" height="447" class="alignnone size-full wp-image-8147"></a></p>
+<p>如果单击Twitter链接，您将被重定向到连接状态页面，并有机会“与Twitter连接”。您还将看到一个复选框，如果选中该复选框，则在连接到Twitter后将发布有关Spring Social Showcase的推文。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase21.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase21.png" alt="" title="展示柜2" width="689" height="447" class="alignnone size-full wp-image-8147"></a></p>
 <p>单击“使用Twitter连接”按钮（我将让您决定是否选中“发布推文...”复选框）后，您将被重定向到Twitter的授权页面，该页面应如下所示：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase31.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase31.png" alt="" title="3" width="844" height="584" class="alignnone size-full wp-image-8148"></a></p>
 <p>如果您已经登录Twitter，则不会显示用户名和密码字段。但是，无论哪种情况，您都将有机会拒绝或允许展示示例获得在Twitter上访问和更新数据的权利。当您单击“允许”按钮授予权限时，Twitter将重定向回展示应用程序，并且将在展示帐户和您的Twitter个人资料之间创建连接。您将看到一个连接状态页面，这一次表明存在连接。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase41.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase41.png" alt="" title="展示柜4" width="692" height="439" class="alignnone size-full wp-image-8149"></a></p>
 <p>此时，您可以根据需要选择与Twitter断开连接。但是现在，返回主页，您将看到已经连接到Twitter。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase51.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase51.png" alt="" title="展示柜5" width="692" height="439" class="alignnone size-full wp-image-8150"></a></p>
 <p>如果单击“ Twitter”链接（具有可用的连接），您将被带到Twitter Showcase页面，该页面除其他外显示您的个人资料图像，Twitter显示名称和Twitter屏幕名称。您还可以选择从此处连接另一个Twitter帐户（您可以将多个提供商帐户连接到一个应用程序帐户），与Twitter断开连接或发布推文。</p><p><a href="http://blog.springsource.com/wp-content/uploads/2011/03/showcase61.png"><img src="http://blog.springsource.com/wp-content/uploads/2011/03/showcase61.png" alt="" title="展示柜6" width="851" height="723" class="alignnone size-full wp-image-8151"></a></p>
 <h3>服务提供商“连接”框架</h3>
-<p>当您首次单击展示样本中的“ Twitter”链接时，将显示Twitter的状态连接页面。该页面由Spring Social的<code>ConnectController</code> 。<code>ConnectController</code>是一个处理授权过程的Spring MVC控制器。对于Twitter，这就是OAuth 1授权流程。对于OAuth 1， <code>ConnectController</code>支持以下流程：</p>
+<p>当您首次单击展示样本中的“ Twitter”链接时，将显示Twitter的状态连接页面。此页面由Spring Social的<code>ConnectController</code> 。 <code>ConnectController</code>是处理授权过程的Spring MVC控制器。对于Twitter，这就是OAuth 1授权流程。对于OAuth 1， <code>ConnectController</code>支持以下流程：</p>
 <ul>
 <li><b>GET / connect / {提供商ID}</b> -显示带有连接状态的页面。</li>
 <li><b>POST / connect / {提供者ID}</b> -启动连接流程，向提供者请求请求令牌，然后重定向到提供者的授权页面。</li>
-<li><b>GET / connect / {提供商ID}？oauth_token = {request令牌}＆oauth_verifier = {verifier}</b> -授权后处理回调，将请求令牌和验证程序交换为访问令牌，并创建连接。</li>
+<li><b>GET / connect / {提供商ID}？oauth_token = {请求令牌}＆oauth_verifier = {验证者}</b> -授权后处理回调，将请求令牌和验证者交换为访问令牌，并创建连接。</li>
 <li><b>删除/ connect / {提供商ID}</b> -与提供商断开连接。</li>
 </ul>
 <p><code>ConnectController</code>还支持OAuth 2的授权流程。当针对基于OAuth 2的提供商（例如Facebook）进行授权时， <code>ConnectController</code>的流程略有不同：</p>
@@ -237,20 +243,20 @@
 <li><b>GET / connect / {提供商ID}？code = {code}</b> -处理来自提供者的授权回调，将代码交换为访问令牌，并创建连接。</li>
 <li><b>删除/ connect / {提供商ID}</b> -与提供商断开连接</li>
 </ul>
-<p>可以在Spring MVC应用程序中配置<code>ConnectController</code> ，就像添加以下内容一样简单<code><bean></code>元件：</p>
-<pre><code class="prettyprint xml"><br><bean class="org.springframework.social.web.connect.ConnectController">
-    <constructor-arg value="${application.url}" />
-</bean>
+<p><code>ConnectController</code>可以在Spring MVC应用程序中进行配置，就像添加以下命令一样简单<code><bean></code>元件：</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.social.web.connect.ConnectController&quot;&gt;
+    &lt;constructor-arg value=&quot;${application.url}&quot; /&gt;
+&lt;/bean&gt;
 </code></pre>
-<p>但是，如果您查看样例示例中<code>ConnectController</code>的配置方式，则会看到它具有一个<code>interceptors</code>属性，该属性注入了一系列拦截器bean。连接拦截器使您可以将自定义功能注入连接流。这些拦截器之一<code>TweetAfterConnectInterceptor</code>负责在您与Twitter连接后发布一条推文。（有关连接拦截器的更多信息，请参见<a href="http://static.springsource.org/spring-social/docs/1.0.0.M2/reference/html/connecting.html#connect-interceptors">参考文档</a> 。）</p>
-<p>当请求发送到<code>ConnectController</code> ，它与服务提供者类一起处理与服务的幕后交互。对于Twitter，该提供程序类为<code>TwitterServiceProvider</code>并在Spring中进行如下配置：</p>
-<pre><code class="prettyprint xml"><br><bean class="org.springframework.social.twitter.connect.TwitterServiceProvider">
-    <constructor-arg value="${twitter.appId}" />
-    <constructor-arg value="${twitter.appSecret}" />
-    <constructor-arg ref="connectionRepository" />
-</bean>
+<p>如果你看如何<code>ConnectController</code>是在展示样本中配置的，但是您会看到它具有一个<code>interceptors</code>该属性注入了拦截器bean列表。连接拦截器使您可以将自定义功能注入连接流。这些拦截器之一<code>TweetAfterConnectInterceptor</code> ，负责在您与Twitter连接后发布一条推文。（有关连接拦截器的更多信息，请参见<a href="http://static.springsource.org/spring-social/docs/1.0.0.M2/reference/html/connecting.html#connect-interceptors">参考文档</a> 。）</p>
+<p>当请求转到<code>ConnectController</code> ，它与服务提供者类一起使用来处理与服务的幕后交互。对于Twitter，该提供程序类为<code>TwitterServiceProvider</code>并在Spring中这样配置：</p>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.social.twitter.connect.TwitterServiceProvider&quot;&gt;
+    &lt;constructor-arg value=&quot;${twitter.appId}&quot; /&gt;
+    &lt;constructor-arg value=&quot;${twitter.appSecret}&quot; /&gt;
+    &lt;constructor-arg ref=&quot;connectionRepository&quot; /&gt;
+&lt;/bean&gt;
 </code></pre>
-<p>像Spring的所有服务提供者实现一样， <code>TwitterServiceProvider</code>也使用以下参数构造：</p>
+<p><code>TwitterServiceProvider</code>像Spring的所有服务提供者实现一样，都使用以下参数构造：</p>
 <ul>
 <li>应用程序的ID或使用者密钥。</li>
 <li>应用程序的机密或消费者的机密。</li>
@@ -258,47 +264,48 @@
 </ul>
 <p>向服务提供商注册应用程序时，会获得该应用程序的使用者密钥和机密。要在Twitter上注册应用程序，请访问<a href="https://dev.twitter.com/apps/new">https://dev.twitter.com/apps/new</a>并填写表格。完成后，Twitter将以一个页面进行响应，该页面显示有关您的应用程序的详细信息，包括消费者密钥和消费者秘密。</p>
 <p>在这种情况下，应用程序的Twitter应用程序ID和密码表示为占位符变量，由属性占位符配置程序解析。建议您将这些详细信息外部化，因为生产部署所使用的ID /秘密对可能与测试和开发环境所使用的ID /秘密对不同。</p>
-<p>Spring的每个服务提供程序类都有一个提供程序ID（从其<code>getId()</code>方法返回，并且不同于其Spring bean ID）。<code>ConnectController</code>将使用URL路径中指定的ID来选择创建连接时将使用的服务提供商。对于<code>TwitterServiceProvider</code> ，提供者ID为“ twitter”。将此ID映射到<code>ConnectController</code>的请求映射，我们得到以下流程：</p>
+<p>Spring的每个服务提供程序类都有一个提供程序ID（从其返回<code>getId()</code>方法，并不同于其Spring bean ID）。 <code>ConnectController</code>将使用URL路径中指定的ID来选择创建连接时将使用的服务提供商。对于<code>TwitterServiceProvider</code> ，提供者ID为“ twitter”。将此ID映射到<code>ConnectController</code>的请求映射，我们得到以下流程：</p>
 <ul>
 <li><b>GET / connect / twitter-</b>显示用户与Twitter的连接状态。</li>
 <li><b>POST / connect / twitter-</b>从Twitter检索请求令牌，然后将其重定向到Twitter的授权页面。单击“连接到Twitter”按钮后，流程即转到此处。</li>
-<li><b>获取/连接/推特？oauth_token = {request令牌}＆oauth_verifier = {verifier}</b> -授权后处理回调，将请求令牌和验证程序交换为访问令牌，并创建连接。</li>
+<li><b>获取/连接/推特？oauth_token = {请求令牌}＆oauth_verifier = {验证者}</b> -授权后处理回调，将请求令牌和验证者交换为访问令牌，并创建连接。</li>
 <li><b>删除/ connect / twitter-</b>与Twitter断开连接。单击“断开连接”按钮时，就会发生这种情况。</li>
 </ul>
-<p>建立连接后，将其存储起来以备将来使用很重要，这样您就不必反复要求用户重新授权您的应用程序。因此， <code>TwitterServiceProvider</code>依赖于连接存储库来保留连接信息。Spring Social提供了<code>JdbcConnectionRepository</code> ，它将连接细节保留在关系数据库中。<code>JdbcConnectionRepository</code> bean的配置如下：</p>
-<pre><code class="prettyprint xml"><br><bean id="connectionRepository" class="org.springframework.social.connect.jdbc.JdbcConnectionRepository">
-    <constructor-arg ref="dataSource" />
-    <constructor-arg ref="textEncryptor" />
-</bean>
+<p>建立连接后，将其存储起来以备将来使用很重要，这样您就不必反复要求用户重新授权您的应用程序。因此， <code>TwitterServiceProvider</code>依靠连接存储库来保留连接信息。Spring Social提供<code>JdbcConnectionRepository</code> ，它将连接详细信息保留在关系数据库中。的<code>JdbcConnectionRepository</code> bean的配置如下：</p>
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;connectionRepository&quot; class=&quot;org.springframework.social.connect.jdbc.JdbcConnectionRepository&quot;&gt;
+    &lt;constructor-arg ref=&quot;dataSource&quot; /&gt;
+    &lt;constructor-arg ref=&quot;textEncryptor&quot; /&gt;
+&lt;/bean&gt;
 </code></pre>
-<p><code>JdbcConnectionRepository</code>依赖于它将通过其访问数据库的数据源以及Spring Security 3.1的<code>TextEncryptor</code>接口的实例。当将连接凭据存储在数据库中时，它将使用文本加密器来加密连接凭据（例如，访问令牌和密码）。作为一个示例应用程序，Spring Security的加密需求相当轻，因此它与无操作文本加密器连接在一起：</p>
-<pre><code class="prettyprint xml"><br><bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" 
-      factory-method="noOpText" />
+<p>的<code>JdbcConnectionRepository</code>取决于它将通过其访问数据库的数据源以及Spring Security 3.1的实例<code>TextEncryptor</code>接口。当将连接凭据存储在数据库中时，它将使用文本加密器来加密连接凭据（例如，访问令牌和密码）。作为一个示例应用程序，Spring Security的加密需求相当轻，因此它与无操作文本加密器连接在一起：</p>
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;textEncryptor&quot; class=&quot;org.springframework.security.crypto.encrypt.Encryptors&quot; 
+      factory-method=&quot;noOpText&quot; /&gt;
 </code></pre>
 <p>（对于生产级加密，请考虑Spring Security的<a href="http://static.springsource.org/spring-security/site/docs/3.1.x/apidocs/org/springframework/security/crypto/encrypt/Encryptors.html">Encryptors</a>静态工厂类提供的其他加密器之一。）</p>
 <h3>使用连接</h3>
-<p>当您首次登录Spring Social Showcase时，它会显示一个服务提供商列表，并指示您未与任何服务提供商建立联系。经过与Twitter的连接过程并返回到该页面后，它表明已建立连接。</p>
-<p>展示应用程序的<code>HomeController</code>通过调用它们的<code>isConnected()</code>方法来确定与每个提供程序的连接状态：</p>
-<pre><code class="prettyprint java"><br>for (ServiceProvider<?> serviceProvider : serviceProviders) {
+<p>首次登录Spring Social Showcase时，它会显示一个服务提供商列表，并指示您未与任何服务提供商建立联系。经过与Twitter的连接过程并返回到该页面后，它表明已建立连接。</p>
+<p>展示应用程序的<code>HomeController</code>通过调用每个提供商来确定与每个提供商的连接状态<code>isConnected()</code>方法：</p>
+<pre><code class="prettyprint java"><br />for (ServiceProvider&lt;?&gt; serviceProvider : serviceProviders) {
 	boolean connected = serviceProvider.isConnected(currentUser.getName());
-	model.addAttribute(serviceProvider.getId() + "_status", connected ? "Yes" : "No");
+	model.addAttribute(serviceProvider.getId() + &quot;_status&quot;, connected ? &quot;Yes&quot; : &quot;No&quot;);
 }
 </code></pre>
-<p>如果给定帐户与服务提供商之间存在一个或多个连接，则<code>isConnected()</code>方法将返回true。</p>
-<p>您还可以通过调用提供程序的<code>getConnections()</code>方法来请求提供程序提供连接列表：</p>
-<pre><code class="prettyprint java"><br>List<ServiceProviderConnection<TwitterApi>> connections = twitterProvider.getConnections(currentUser.getName());
+<p>的<code>isConnected()</code>如果给定帐户与服务提供商之间存在一个或多个连接，则该方法将返回true。</p>
+<p>您也可以通过调用提供商的连接列表来询问提供商<code>getConnections()</code>方法：</p>
+<pre><code class="prettyprint java"><br />List&lt;ServiceProviderConnection&lt;TwitterApi&gt;&gt; connections = twitterProvider.getConnections(currentUser.getName());
 </code></pre>
-<p>从这些连接中的任何一个，您都可以检索服务API。例如，要从第一个连接获取<code>TwitterApi</code>的实例：</p>
-<pre><code class="prettyprint java"><br>TwitterApi twitter = connections.get(0).getServiceApi();
+<p>从这些连接中的任何一个，您都可以检索服务API。例如，获取<code>TwitterApi</code>从第一个连接：</p>
+<pre><code class="prettyprint java"><br />TwitterApi twitter = connections.get(0).getServiceApi();
 </code></pre>
-<p>使用该<code>TwitterApi</code>对象，您可以与Twitter进行交互，获取时间轴条目，发布推文或<code>TwitterApi</code>界面中定义的任何其他操作。</p>
+<p>接着就，随即<code>TwitterApi</code>您可能与Twitter互动的对象，获取时间轴条目，发布推文或在其中定义的任何其他操作<code>TwitterApi</code>接口。</p>
 <p>这里要注意的关键一点是，应用程序代码在任何时候都不需要直接处理访问令牌和机密以便与服务进行交互。服务提供商框架在幕后处理了这些细节。</p>
 <h3>摘要</h3>
-<p>春季社交1.0.0。M2将服务提供者框架引入表中，该框架极大地简化了应用程序在代表用户访问服务的授权以及将用户的本地应用程序帐户连接到其在提供者帐户上的角色。向Spring应用程序添加连接功能包括在Spring应用程序上下文中将服务提供程序配置为Bean，并在Spring Social的<code>ConnectController</code>以处理授权过程。<a href="http://static.springsource.org/spring-social/docs/1.0.0.M2/reference/html/serviceprovider.html" target="_blank">参考文档</a>提供了有关使用Spring Social的服务提供商框架的更多信息。</p>
+<p>春季社交1.0.0。M2将服务提供程序框架引入表中，该框架极大地简化了应用程序在代表用户访问服务的授权以及将用户的本地应用程序帐户连接到其在提供程序上的帐户的角色。向Spring应用程序添加连接功能涉及在Spring应用程序上下文中将服务提供者配置为Bean，而Spring Social的<code>ConnectController</code>处理授权过程。<a href="http://static.springsource.org/spring-social/docs/1.0.0.M2/reference/html/serviceprovider.html" target="_blank">参考文档</a>提供了有关使用Spring Social的服务提供商框架的更多信息。</p>
 <p>虽然春季社交1.0.0。M2仅为6个提供程序（Facebook，Twitter，LinkedIn，TripIt，GitHub和Gowalla）提供服务提供程序实现，该框架易于扩展。在后续文章中，我将向您展示编写自定义服务提供程序实现的过程，使您能够对需要连接到的任何提供程序使用Spring Social的连接支持。</p><p></p><p>与往常一样，我们非常希望听到您的反馈。我们鼓励您与我们在<a href="http://forum.springsource.org/forumdisplay.php?f=82" target="_blank">论坛中</a>合作或通过在<a href="http://jira.springsource.org/browse/SOCIAL" target="_blank">问题跟踪中</a>提交增强请求来与我们合作。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 401;
 
       (function(disqus_shortname, document) {
@@ -312,7 +319,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -350,12 +358,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

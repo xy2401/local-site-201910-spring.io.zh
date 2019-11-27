@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>使用Grails简化Spring安全性</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Simplified Spring Security with Grails">
-<meta name="twitter:description" content="<p>Spring Security is a powerful library for securing your applications that comes with a bewildering number of options. Based on Spring, it can be readily integrated into a Grails application. But why not save the hassle and use the <a href=" http:="" ="" grails.org="" plugin="" spring-security-cor="="></head><body dir="ltr">new improved Grails plugin?
+<meta name="twitter:description" content="<p>Spring Security is a powerful library for securing your applications that comes with a bewildering number of options. Based on Spring, it can be readily integrated into a Grails application. But why not save the hassle and use the <a href=" http:="" ="" grails.org="" plugin="" spring-security-cor="=">new improved Grails plugin?
 <p>The plugin has gone through several evolutionary stages that started with the Acegi plugin. Its most recent incarnation is a complete rewrite for Spring Security 3 and Spring 3. One of the results of this is that the plugin will only work with Grails 1.2.2 and above. Another significant change is that there is no longer just one Spring Security plugin: some features have been broken out into optional plugins. So now you only include the features you need in your application.</p>
 ">
 
@@ -36,10 +40,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -179,9 +185,9 @@
 <td>[caption id =“ attachment_5510” align =“ center” width =“ 250” caption =“ Spring Security插件-AJAX”] <a href="https://www.youtube.com/watch?v=H_mGgZddXx8"><img src="http://blog.springsource.com/wp-content/uploads/2010/08/front-slides-for-spring-security-cast-2-thumbnail.png" alt="" title="Spring Security插件截屏2" width="200" height="150" class="wp-image-5510"></a> [/字幕]</td>
 </tr>
 </tbody></table>
-<h2>设定</h2><p>与大多数插件一样，您的第一步将是安装Spring Security插件。当然，您需要一个项目来安装它，对于本文，我<a href="https://people.apache.org/~pledbrook/hubbub.zip">提供</a>了一个名为Hubbub的简单Twitter克隆（基于Grails in Action的示例应用程序）。您也可以从<a href="https://people.apache.org/~pledbrook/hubbub-finished.zip">这里</a>获得完成的项目。</p><p>因此，从您的项目中运行：<br></p><pre><br> grails install-plugin spring-security-core<br></pre><p></p><p>如果查看插件安装生成的输出，您将看到它提供了一些命令。其中最重要的是<tt>s2-quickstart</tt> ，它将帮助您以最少的麻烦来启动和运行。它既生成存储用户信息所需的基本域类，又生成处理身份验证的控制器。</p><p>在运行命令之前，您可能需要做出决定。如果您已经有一个“用户”域类，则必须决定如何将其与插件生成的域类集成。一种选择是替换现有的域类，然后简单地将您的自定义应用于替换。另一种方法是使自己的域类扩展插件的域类。</p><p>哪个更好？我更喜欢后者，因为如果模板更改，它可以让您轻松地更新生成的用户域类。这也意味着您不会过度使用Spring Security细节来污染您的域模型。不利的一面是，尽管成本很小，但您必须处理域类继承。</p><p>对于Hubbub，我们将使用户域类扩展所生成的域，这意味着我们应使用与现有域名不冲突的域名：<br></p><pre><br> grails s2-quickstart org.example SecUser SecRole<br></pre><p></p><p>这将为我们创建三个域类：<br></p><ul><br><li><tt>org.example。安全用户</tt></li><br><li><tt>org.example。秘密角色</tt></li><br><li><tt>org.example。SecUserSecRole-</tt>将用户链接到角色</li><br></ul><br>和两个控制器：<br><ul><br><li><tt>LoginController</tt></li><br><li><tt>注销控制器</tt></li><br></ul><br>加上它们的相关视图。仅用两个命令，我们就拥有了开始保护应用程序所需的一切！<p></p><p>该示例应用程序确实还需要进行另一项更改：其URL映射意味着无法访问登录和注销控制器。通过将以下两行添加到<tt>UrlMappings.groovy中，</tt>可以<tt>轻松修复此问题</tt> ：</p>
-<pre><code class="prettyprint groovy">"/login/$action?"(controller: "login")
-"/logout/$action?"(controller: "logout")
+<h2>设定</h2><p>与大多数插件一样，您的第一步将是安装Spring Security插件。当然，您需要一个项目来安装它，在本文中，我<a href="https://people.apache.org/~pledbrook/hubbub.zip">提供</a>了一个名为Hubbub的简单Twitter克隆（基于Grails in Action的示例应用程序）。您也可以从<a href="https://people.apache.org/~pledbrook/hubbub-finished.zip">这里</a>获得完成的项目。</p><p>因此，从您的项目中运行：<br></p><pre><br /> grails install-plugin spring-security-core<br /></pre><p></p><p>如果查看插件安装生成的输出，您将看到它提供了一些命令。其中最重要的是<tt>s2-quickstart</tt> ，它将帮助您以最少的麻烦来启动和运行。它既生成存储用户信息所需的基本域类，又生成处理身份验证的控制器。</p><p>在运行命令之前，您可能需要做出决定。如果您已经拥有一个“用户”域类，则必须决定如何将其与该插件生成的域类集成在一起。一种选择是替换现有的域类，然后简单地将您的自定义应用于替换。另一种方法是使自己的域类扩展插件的域类。</p><p>哪个更好？我更喜欢后者，因为如果模板更改，它可以让您轻松地更新生成的用户域类。这也意味着您不会过度使用Spring Security细节来污染您的域模型。不利的一面是，尽管成本很小，但您必须处理域类继承。</p><p>对于Hubbub，我们将使用户域类扩展所生成的域，这意味着我们应使用与现有域名不冲突的域名：<br></p><pre><br /> grails s2-quickstart org.example SecUser SecRole<br /></pre><p></p><p>这将为我们创建三个域类：<br></p><ul><br><li><tt>org.example。安全用户</tt></li><br><li><tt>org.example。秘密角色</tt></li><br><li><tt>org.example。SecUserSecRole-</tt>将用户链接到角色</li><br></ul><br>和两个控制器：<br><ul><br><li><tt>LoginController</tt></li><br><li><tt>注销控制器</tt></li><br></ul><br>加上它们的相关视图。仅用两个命令，我们就拥有了开始保护应用程序所需的一切！<p></p><p>该示例应用程序确实还需要进行另一项更改：其URL映射意味着无法访问登录和注销控制器。通过将以下两行添加到<tt>UrlMappings.groovy中，</tt>可以<tt>轻松修复此问题</tt> ：</p>
+<pre><code class="prettyprint groovy">&quot;/login/$action?&quot;(controller: &quot;login&quot;)
+&quot;/logout/$action?&quot;(controller: &quot;logout&quot;)
 </code></pre><p>如果您不进行更改，则登录页面将生成404错误！现在让我们开始讨论保护应用程序的业务。</p>
 <h2>添加访问控制</h2><p>此练习的全部目的是限制对应用程序某些部分的访问。对于Web应用程序，这通常意味着保护特定页面，或更具体地说是URL。对于Hubbub，我们有以下要求：</p>
 <ul>
@@ -190,7 +196,7 @@
 <li>只有具有“用户”角色的用户才能访问自己的时间轴- <tt>/ timeline</tt></li>
 <li>跟随另一个用户也是如此- <tt>/ post / followAjax</tt></li>
 <li>只有具有“用户”角色的经过完全身份验证的用户才能发布新消息- <tt>/ post / addPostAjax</tt></li>
-</ul><p>使用Spring Security插件可以轻松实现，尽管您必须决定要使用三种机制中的哪一种。您可以采用以控制器为中心的方法并注释操作。静态URL工作规则<tt>Config.groovy中</tt> ;或使用请求映射在数据库中定义运行时规则。</p>
+</ul><p>使用Spring Security插件可以轻松实现，尽管您必须决定要使用三种机制中的哪一种。您可以采用以控制器为中心的方法并注释操作。使用<tt>Config.groovy中的</tt>静态URL规则；或使用请求映射在数据库中定义运行时规则。</p>
 <h3>注解</h3><p>对于以控制器为中心的方法，您无法击败插件提供的<tt>@Secured</tt>注释。在最简单的化身中，您传递了一系列基本规则，这些规则定义了谁可以访问相应的操作。在这里，我通过发布控制器上的注释应用Hubbub的访问控制规则：</p>
 <pre><code class="prettyprint groovy">package org.example
 
@@ -198,18 +204,18 @@ import grails.plugins.springsecurity.Secured
 
 class PostController {
     ...
-    @Secured(['ROLE_USER'])
+    @Secured([&#39;ROLE_USER&#39;])
     def followAjax = { ... }
 
-    @Secured(['ROLE_USER', 'IS_AUTHENTICATED_FULLY'])
+    @Secured([&#39;ROLE_USER&#39;, &#39;IS_AUTHENTICATED_FULLY&#39;])
     def addPostAjax = { ... }
 
     def global = { ... }
 
-    @Secured(['ROLE_USER'])
+    @Secured([&#39;ROLE_USER&#39;])
     def timeline = { ... }
 
-    @Secured(['IS_AUTHENTICATED_REMEMBERED'])
+    @Secured([&#39;IS_AUTHENTICATED_REMEMBERED&#39;])
     def personal = { ... }
 }
 </code></pre><p><tt>IS_AUTHENTICATED_ *</tt>规则内置于Spring Security中，但是<tt>ROLE_USER</tt>是数据库中必须存在的角色-我们尚未做的事情。另外，如果您在列表中指定了多个规则，则当前用户通常只需要满足其中一个规则即可-如用户指南中所述。<tt>IS_AUTHENTICATED_FULLY</tt>是一种特殊情况：如果指定，则<em>除了</em>列表中的其他规则<em>外</em> ，还必须满足它。</p><p>内置规则如下：<br></p><ul><br><li>IS_AUTHENTICATED_ANONYMOUSLY-任何人都可以访问；无需用户登录</li><br><li>IS_AUTHENTICATED_REMEMBERED-仅允许已登录或从先前会话中记住的已知用户访问</li><br><li>IS_AUTHENTICATED_FULLY-用户必须登录才能获得访问权限，即使上次选中“记住我”</li><br></ul><br>其中的前两个区分已知用户和未知用户，其中已知用户是在“用户”数据库表中具有条目的用户。通常在用户访问特别敏感的信息（例如银行帐户或信用卡数据）的情况下应用后一种方法。毕竟，其他人可能会使用前一个用户的“记住我” cookie来访问您的应用程序。<p></p><p>您还可以将注释应用于控制器类本身，这将导致所有操作继承其定义的规则。如果一个动作具有自己的注释，则它将覆盖类级别的注释。注释不仅限于这样的规则列表：请查看<a href="https://burtbeckwith.github.com/grails-spring-security-core/docs/manual/guide/5 Configuring Request Mappings to Secure URLs.html#5.4 Using Expressions to Create Descriptive, Fine-Grained Rules">用户指南，</a>以了解如何使用表达式对规则进行更好的控制。</p>
@@ -218,33 +224,33 @@ class PostController {
 ...
 grails.plugins.springsecurity.securityConfigType = SecurityConfigType.InterceptUrlMap
 grails.plugins.springsecurity.interceptUrlMap = [
-    '/timeline':         ['ROLE_USER'],
-    '/person/*':         ['IS_AUTHENTICATED_REMEMBERED'],
-    '/post/followAjax':  ['ROLE_USER'],
-    '/post/addPostAjax': ['ROLE_USER', 'IS_AUTHENTICATED_FULLY'],
-    '/**':               ['IS_AUTHENTICATED_ANONYMOUSLY']
+    &#39;/timeline&#39;:         [&#39;ROLE_USER&#39;],
+    &#39;/person/*&#39;:         [&#39;IS_AUTHENTICATED_REMEMBERED&#39;],
+    &#39;/post/followAjax&#39;:  [&#39;ROLE_USER&#39;],
+    &#39;/post/addPostAjax&#39;: [&#39;ROLE_USER&#39;, &#39;IS_AUTHENTICATED_FULLY&#39;],
+    &#39;/**&#39;:               [&#39;IS_AUTHENTICATED_ANONYMOUSLY&#39;]
 ]
-</code></pre><p>请注意，最一般的规则是如何排在最后的？那是因为顺序很重要：Spring Security遍历规则并应用<em>与当前URL匹配的第一个</em>规则。因此，如果首先使用“ / **”规则，则由于所有URL都将与之匹配，因此您的应用程序实际上将不受保护。还要注意，您必须通过<tt>grails.plugins.springsecurity.securityConfigType</tt>设置明确告诉插件使用地图。</p>
+</code></pre><p>注意最普遍的规则是如何排在最后的？那是因为顺序很重要：Spring Security遍历规则并应用<em>与当前URL匹配的第一个</em>规则。因此，如果首先使用“ / **”规则，则由于所有URL都将与之匹配，因此您的应用程序实际上将不受保护。还要注意，您必须通过<tt>grails.plugins.springsecurity.securityConfigType</tt>设置明确告诉插件使用地图。</p>
 <h3>动态请求图</h3><p>是否要在运行时更新URL规则而不重启应用程序？如果是这种情况，您可能要使用请求映射，该请求映射基本上是存储在数据库中的URL规则。要启用此机制，请将以下内容添加到<tt>Config.groovy中</tt> ：</p>
 <pre><code class="prettyprint groovy">import grails.plugins.springsecurity.SecurityConfigType
 ...
 grails.plugins.springsecurity.securityConfigType = SecurityConfigType.Requestmap
 </code></pre><p>然后，您要做的就是创建<tt>Requestmap</tt>域类的实例，例如在<tt>BootStrap.groovy中</tt> ：</p>
-<pre><code class="prettyprint groovy">new Requestmap(url: '/timeline', configAttribute: 'ROLE_USER').save()
-new Requestmap(url: '/person/*', configAttribute: 'IS_AUTHENTICATED_REMEMBERED').save()
-new Requestmap(url: '/post/followAjax', configAttribute: 'ROLE_USER').save()
-new Requestmap(url: '/post/addPostAjax', configAttribute: 'ROLE_USER,IS_AUTHENTICATED_FULLY').save()
-new Requestmap(url: '/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save()
-</code></pre><p>当然，这种方法会涉及性能，因为它涉及数据库，但是通过使用缓存可以将其最小化。看看的<a href="https://burtbeckwith.github.com/grails-spring-security-core/docs/manual/guide/5 Configuring Request Mappings to Secure URLs.html#5.3 Requestmap Instances Stored in the Database">用户指南</a>以获取更多的信息。另外，在这种情况下，您不必担心规则的顺序，因为插件会选择与当前URL匹配的最具体的URL模式。</p><p>您应使用以下哪种方法？这取决于您的应用程序的设置方式以及对访问控制的看法。在每个控制器适用规则且控制器具有不同的URL的地方，注释是有意义的。如果您倾向于将控制器组合在一个URL下，例如<tt>/ admin /，</tt>或者只是想将所有规则都放在一个位置，那么最好使用<tt>Config.groovy中</tt>定义的静态规则。第三种机制是请求映射，仅当您想在运行时添加，更改或删除规则时才有意义。您可能要执行此操作的经典示例是在CMS应用程序中，URL本身是动态定义的。</p><p>无论采用哪种方法，一旦执行了规则，您的应用程序<em>就会</em>受到保护。例如，如果您此时尝试访问Hubbub中的<tt>/ timeline</tt>页面，您将被重定向到标准登录页面：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2010/08/spring-security-login-page.png"><img src="http://blog.springsource.com/wp-content/uploads/2010/08/spring-security-login-page.png" alt="" title="春季安全登录页面" width="786" height="491" class="aligncenter size-full wp-image-5396"></a></p><p>大！但是，您将以谁身份登录？用户如何注销？保护您的页面只是第一步。您还需要确保您具有相关的安全数据（用户和角色）以及具有安全意识的用户界面。</p>
-<h2>下一步</h2><p>设置好访问控制后，您需要查看用户体验。您是否真的要用户单击他们无权访问的链接？您在访问控制中使用的那些角色呢？它们何时创建？现在让我们回答这些问题。</p>
+<pre><code class="prettyprint groovy">new Requestmap(url: &#39;/timeline&#39;, configAttribute: &#39;ROLE_USER&#39;).save()
+new Requestmap(url: &#39;/person/*&#39;, configAttribute: &#39;IS_AUTHENTICATED_REMEMBERED&#39;).save()
+new Requestmap(url: &#39;/post/followAjax&#39;, configAttribute: &#39;ROLE_USER&#39;).save()
+new Requestmap(url: &#39;/post/addPostAjax&#39;, configAttribute: &#39;ROLE_USER,IS_AUTHENTICATED_FULLY&#39;).save()
+new Requestmap(url: &#39;/**&#39;, configAttribute: &#39;IS_AUTHENTICATED_ANONYMOUSLY&#39;).save()
+</code></pre><p>当然，这种方法会涉及性能，因为它涉及数据库，但是通过使用缓存可以将其最小化。请参阅<a href="https://burtbeckwith.github.com/grails-spring-security-core/docs/manual/guide/5 Configuring Request Mappings to Secure URLs.html#5.3 Requestmap Instances Stored in the Database">用户指南</a>以获取有关此信息的更多信息。另外，在这种情况下，您不必担心规则的顺序，因为插件会选择与当前URL匹配的最具体的URL模式。</p><p>您应使用以下哪种方法？这取决于您的应用程序的设置方式以及对访问控制的看法。在每个控制器适用规则且控制器具有不同的URL的地方，注释是有意义的。如果您倾向于将控制器分组在一个URL下（例如<tt>/ admin /），</tt>或者只是想将所有规则都放在一个位置，那么最好使用<tt>Config.groovy中</tt>定义的静态规则。第三种机制，请求映射，仅当您要在运行时添加，更改或删除规则时才有意义。您可能要执行此操作的经典示例是在CMS应用程序中，URL本身是动态定义的。</p><p>无论采用哪种方法，一旦执行了规则，您的应用程序<em>就会</em>受到保护。例如，如果此时尝试访问Hubbub的<tt>/ timeline</tt>页面，您将被重定向到标准登录页面：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2010/08/spring-security-login-page.png"><img src="http://blog.springsource.com/wp-content/uploads/2010/08/spring-security-login-page.png" alt="" title="春季安全登录页面" width="786" height="491" class="aligncenter size-full wp-image-5396"></a></p><p>大！但是，您将以谁身份登录？用户如何注销？保护您的页面只是第一步。您还需要确保您具有相关的安全性数据（用户和角色）以及具有安全意识的用户界面。</p>
+<h2>下一步</h2><p>使用访问控制后，您需要查看用户体验。您是否真的希望用户单击他们无权访问的链接？您在访问控制中使用的那些角色呢？它们何时创建？现在让我们回答这些问题。</p>
 <h3>安全资料</h3><p>某些应用程序仅关心是否知道用户，在这种情况下，您无需担心角色，因为<tt>IS_AUTHENTICATED_ *</tt>规则已足够。但是，如果您的应用程序需要更多控制谁有权访问什么，则将需要角色。这些通常是在应用程序生命周期的早期定义的，并且对应于不变的参考数据。这使<tt>BootStrap</tt>成为创建它们的理想场所。对于Hubbub，我们添加“用户”和“管理员”角色，如下所示：</p>
 <pre><code class="prettyprint groovy">import org.example.SecRole
 
 class BootStrap {
     def init = {
         ...
-        def userRole = SecRole.findByAuthority('ROLE_USER') ?: new SecRole(authority: 'ROLE_USER').save(failOnError: true)
-        def adminRole = SecRole.findByAuthority('ROLE_ADMIN') ?: new SecRole(authority: 'ROLE_ADMIN').save(failOnError: true)
+        def userRole = SecRole.findByAuthority(&#39;ROLE_USER&#39;) ?: new SecRole(authority: &#39;ROLE_USER&#39;).save(failOnError: true)
+        def adminRole = SecRole.findByAuthority(&#39;ROLE_ADMIN&#39;) ?: new SecRole(authority: &#39;ROLE_ADMIN&#39;).save(failOnError: true)
         ...
     }
 }
@@ -256,9 +262,9 @@ class BootStrap {
 
     def init = {
         ...
-        def adminUser = SecUser.findByUsername('admin') ?: new SecUser(
-                username: 'admin',
-                password: springSecurityService.encodePassword('admin'),
+        def adminUser = SecUser.findByUsername(&#39;admin&#39;) ?: new SecUser(
+                username: &#39;admin&#39;,
+                password: springSecurityService.encodePassword(&#39;admin&#39;),
                 enabled: true).save(failOnError: true)
 
         if (!adminUser.authorities.contains(adminRole)) {
@@ -272,15 +278,15 @@ class BootStrap {
 <pre><code class="prettyprint groovy">class PostController {
     def springSecurityService
     ...
-    @Secured(['ROLE_USER'])
+    @Secured([&#39;ROLE_USER&#39;])
     def timeline = {
         def user = SecUser.get(springSecurityService.principal.id)
 
         def posts = []
         if (user.following) {
             posts = Post.withCriteria {
-                'in'("user", user.following)
-                order("createdOn", "desc")
+                &#39;in&#39;(&quot;user&quot;, user.following)
+                order(&quot;createdOn&quot;, &quot;desc&quot;)
             }
         }
         [ posts: posts, postCount: posts.size() ]
@@ -288,14 +294,14 @@ class BootStrap {
     ...
 }
 </code></pre><p>如您所见，我们需要做的就是再次注入安全服务，并使用它来获取主体。除非您创建了<tt>UserDetailsService</tt>的自定义版本（如果您之前从未遇到过，请不用担心），否则委托人将是<tt>org.codehaus.groovy.grails.plugins.springsecurity的实例<tt>。GrailsUser，</tt>其<tt>id</tt>属性包含相应的“用户”域实例的ID。</tt></p><p><tt>您需要注意的一件事：如果当前用户是匿名身份验证的，即他尚未登录并且未被记住，则<tt>Principal</tt>属性将返回一个字符串。因此，如果未经身份验证的用户可以访问某个操作，请确保在使用它之前检查主体的类型！</tt></p><p><tt>如何确保用户只能看到他们应该看到的内容？为此，该插件在<tt>sec</tt>名称空间中提供了一组丰富的GSP标签。假设我们要向Hubbub添加几个导航链接，但是我们只想在用户未登录时显示其中一个，而仅在用户具有<tt>ROLE_USER</tt>角色时显示另一个：</tt></p><tt>
-<pre><code class="prettyprint html"><sec:ifNotLoggedIn>
-  <g:link controller="login" action="auth">Login</g:link>
-</sec:ifNotLoggedIn>
-<sec:ifAllGranted roles="ROLE_USER">
-  <g:link class="create" controller="post" action="timeline">My Timeline</g:link>
-</sec:ifAllGranted>
-</code></pre><p>里面的标记<tt><sec:if*></sec:if*></tt>标签将仅在满足条件的情况下呈现到页面。该插件提供了其他几个相似的标签，它们的行为都一致。有关更多信息，请参见<a href="https://burtbeckwith.github.com/grails-spring-security-core/docs/manual/guide/6 Helper Classes.html#6.1 SecurityTagLib">用户指南</a> 。</p><p>上面的示例还向您展示了如何创建登录页面的链接。同样，允许用户注销也很简单。Hubbub提供了一个侧面板，除其他功能外，它还显示登录用户的名称以及注销链接：</p>
-<pre><code class="prettyprint html"><sec:username /> (<g:link controller="logout">sign out</g:link>)
+<pre><code class="prettyprint html">&lt;sec:ifNotLoggedIn&gt;
+  &lt;g:link controller=&quot;login&quot; action=&quot;auth&quot;&gt;Login&lt;/g:link&gt;
+&lt;/sec:ifNotLoggedIn&gt;
+&lt;sec:ifAllGranted roles=&quot;ROLE_USER&quot;&gt;
+  &lt;g:link class=&quot;create&quot; controller=&quot;post&quot; action=&quot;timeline&quot;&gt;My Timeline&lt;/g:link&gt;
+&lt;/sec:ifAllGranted&gt;
+</code></pre><p>里面的标记<tt><sec:if*></sec:if*></tt>标签将仅在满足条件的情况下呈现到页面。该插件提供了其他几个相似的标签，它们的行为都一致。有关更多信息，请参见<a href="https://burtbeckwith.github.com/grails-spring-security-core/docs/manual/guide/6 Helper Classes.html#6.1 SecurityTagLib">用户指南</a> 。</p><p>上面的示例还向您展示了如何创建登录页面的链接。同样，允许用户注销也很简单。Hubbub提供了一个侧面板，该面板除其他外显示已登录用户的名称和注销链接：</p>
+<pre><code class="prettyprint html">&lt;sec:username /&gt; (&lt;g:link controller=&quot;logout&quot;&gt;sign out&lt;/g:link&gt;)
 </code></pre><p>简单！这些标签和安全服务的结合应该足以将您的用户界面与Spring Security集成在一起。只需记住要使您的用户界面元素与访问控制规则保持同步：您不希望看到一些UI导致“未经授权的用户”错误。</p><p>现在，我已经介绍了Spring Security插件的所有基本元素，但是仍然有两个功能会影响大量用户：AJAX请求和自定义登录表单。</p>
 <h2>最后的难题</h2><p>现在有多少Web应用程序在某种程度上<em>不</em>使用AJAX？到底有多少人真正希望在其申请中使用股票登录表格？可以在内部使用，但是我不建议将其用于任何面向客户的情况。让我们从AJAX开始。</p>
 <h3>保护AJAX请求</h3><p>基于AJAX的动态用户界面给访问控制带来了一系列新问题。处理需要身份验证的标准请求非常容易：只需将用户重定向到登录页面，然后在身份验证成功后将他们重定向回目标页面。但是，这样的重定向在AJAX中效果不佳。所以你会怎么做？</p><p>该插件为您提供了一种与普通请求不同的处理AJAX请求的方法。当AJAX请求需要认证时，Spring Security会重定向到<tt>LoginController中</tt>的<tt>authAjax</tt>操作，而不是<tt>auth</tt> 。但是，等等，这仍然是重定向吗？是的，但是您可以实现<tt>authAjax</tt>来发送错误状态或呈现<tt>JSON-</tt>基本上是客户端Javascript代码可以处理的任何事情。</p><p>不幸的是，插件提供的<tt>LoginController</tt>暂时不实现<tt>authAjax</tt> ，因此您必须自己添加它：</p>
@@ -309,42 +315,43 @@ class LoginController {
     ...
 }
 </code></pre><p>这是一个非常简单的实现，它返回401 HTTP状态代码。我们如何应对这种反应？这取决于您在浏览器中用于实现AJAX的方式。Hubbub应用程序示例使用自适应AJAX标签，因此我将使用它来演示您可以做的事情。这是用于发布新消息的GSP模板的一部分：</p>
-<pre><code class="prettyprint html"><g:form action="ajaxAdd">
-    <g:textArea id='postContent' name="content" rows="3" cols="50" onkeydown="updateCounter()" /><br/>
-    <g:submitToRemote value="Post"
-                 url="[controller: 'post', action: 'addPostAjax']"
-                 update="[success: 'firstPost']"
-                 onSuccess="clearPost(e)"
-                 onLoading="showSpinner(true)"
-                 onComplete="showSpinner(false)"
-                 on401="showLogin();"/>
-</g:form>
+<pre><code class="prettyprint html">&lt;g:form action=&quot;ajaxAdd&quot;&gt;
+    &lt;g:textArea id=&#39;postContent&#39; name=&quot;content&quot; rows=&quot;3&quot; cols=&quot;50&quot; onkeydown=&quot;updateCounter()&quot; /&gt;&lt;br/&gt;
+    &lt;g:submitToRemote value=&quot;Post&quot;
+                 url=&quot;[controller: &#39;post&#39;, action: &#39;addPostAjax&#39;]&quot;
+                 update=&quot;[success: &#39;firstPost&#39;]&quot;
+                 onSuccess=&quot;clearPost(e)&quot;
+                 onLoading=&quot;showSpinner(true)&quot;
+                 onComplete=&quot;showSpinner(false)&quot;
+                 on401=&quot;showLogin();&quot;/&gt;
+&lt;/g:form&gt;
 </code></pre><p>如您所见，它具有<tt>on401</tt>属性，该属性指定当AJAX提交返回401状态代码时应执行的Javascript。例如，那段Javascript可以显示动态的客户端登录表单，以供用户进行身份验证。Hubbub使用插件的<a href="https://burtbeckwith.github.com/grails-spring-security-core/docs/manual/guide/9 Authentication.html#9.4 Ajax Authentication">用户指南中</a>提供的客户端代码来完成此操作。</p><p><b>注意</b>插件的版本1.1将带有<tt>authAjax</tt>操作的默认实现。</p><p>您还可以自定义<tt>ajaxSuccess</tt>和<tt>ajaxDenied</tt>操作以发送回所需的任何响应。如您所见，服务器端AJAX处理非常简单且易于定制。真正的工作必须在客户端代码中完成。</p>
-<h3>自定义登录表单</h3><p>将整个页面专用于登录表单已不再流行。如今，应用程序更可能具有内容丰富的主页，该主页上有离散的登录表单，也许只有某些Javascript魔术才能使它可见。提供您自己的专用登录页面非常简单（只需在<tt>LoginController中</tt>编辑<tt>auth</tt>操作及其相关的GSP视图即可），但是登录面板呢？</p><p>这并不像您想的那么难。首先，您需要确定在需要身份验证时应将用户重定向到的位置。正如您可能已经收集到的，默认情况下这是<tt>/ login / auth</tt> 。更改默认值就像将设置添加到<tt>Config.groovy</tt>一样容易：</p>
-<pre><code class="prettyprint groovy">grails.plugins.springsecurity.auth.loginFormUrl = '/'
+<h3>自定义登录表单</h3><p>将整个页面专用于登录表单已不再流行。如今，应用程序更可能具有内容丰富的主页，该主页上有离散的登录表单，也许只有某些Javascript魔术才能使它可见。提供您自己的专用登录页面非常容易（只需在<tt>LoginController中</tt>编辑<tt>auth</tt>操作及其相关的GSP视图即可），但是登录面板又如何呢？</p><p>这并不像您想的那么难。首先，您需要确定在需要身份验证时应将用户重定向到的位置。正如您可能已经收集到的，默认情况下这是<tt>/ login / auth</tt> 。更改默认值就像将设置添加到<tt>Config.groovy</tt>一样容易：</p>
+<pre><code class="prettyprint groovy">grails.plugins.springsecurity.auth.loginFormUrl = &#39;/&#39;
 </code></pre><p>此行告诉插件每当需要身份验证时便重定向到主页。然后您需要做的就是在首页上添加一个登录面板。这是可能在此类面板中使用的示例GSP表单：</p>
-<pre><code class="prettyprint html"><form method="POST" action="${resource(file: 'j_spring_security_check')}">
-  <table>
-    <tr>
-      <td>Username:</td><td><g:textField name="j_username"/></td>
-    </tr>
-    <tr>
-      <td>Password:</td><td><input name="j_password" type="password"/></td>
-    </tr>
-    <tr>
-      <td colspan="2"><g:submitButton name="login" value="Login"/></td>
-    </tr>
-    <tr>
-      <td colspan="2">try "glen" or "peter" with "password"</td>
-    </tr>
-  </table>				
-</form>
-</code></pre><p>这里的关键点是：<br></p><ol><br><li>表格必须使用POST方法；</li><br><li>表格必须提交给<context>/ j_spring_security_check;</context></li><br><li>用户名字段必须具有名称“ j_username”；</li><br><li>密码字段必须具有名称“ j_password”；和</li><br><li>任何“记住我”字段都必须具有名称“ _spring_security_remember_me”。</li><br></ol><br>只要满足这些要求，登录表单就可以正常工作。好吧，不是很完美。如果通过登录表单的身份验证失败，您将发现自己已重定向回旧的登录页面。幸运的是，可以通过添加另一个配置设置来快速纠正此问题：<p></p>
-<pre><code class="prettyprint groovy">grails.plugins.springsecurity.failureHandler.defaultFailureUrl = '/'
-</code></pre><p>这就是功能全面的登录表单所需要的！还有许多其他选项可以用来微调行为，但是现在您已经有了构建的基础知识。</p><p>本文实际上仅涉及了Spring Security插件的表面。我没有提到HTTP基本和摘要式身份验证，事件，加盐密码等。甚至不包括提供额外功能的其他插件，例如替代身份验证机制和访问控制列表（ACL）。但是，到目前为止，您所阅读的内容将使您能够立即启动一个完整运行的访问控制系统，并开始运行。然后，您将能够根据需要扩展和自定义，因为Spring Security具有比您可能需要的更多的功能。</p></tt></div><tt>
+<pre><code class="prettyprint html">&lt;form method=&quot;POST&quot; action=&quot;${resource(file: &#39;j_spring_security_check&#39;)}&quot;&gt;
+  &lt;table&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Username:&lt;/td&gt;&lt;td&gt;&lt;g:textField name=&quot;j_username&quot;/&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Password:&lt;/td&gt;&lt;td&gt;&lt;input name=&quot;j_password&quot; type=&quot;password&quot;/&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td colspan=&quot;2&quot;&gt;&lt;g:submitButton name=&quot;login&quot; value=&quot;Login&quot;/&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td colspan=&quot;2&quot;&gt;try &quot;glen&quot; or &quot;peter&quot; with &quot;password&quot;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/table&gt;				
+&lt;/form&gt;
+</code></pre><p>这里的关键点是：<br></p><ol><br><li>表格必须使用POST方法；</li><br><li>表格必须提交给<context>/ j_spring_security_check;</context></li><br><li>用户名字段必须具有名称“ j_username”；</li><br><li>密码字段必须具有名称“ j_password”；和</li><br><li>任何“记住我”字段都必须具有名称“ _spring_security_remember_me”。</li><br></ol><br>只要满足这些要求，登录表单就可以正常工作。好吧，不是很完美。如果通过登录表单的身份验证失败，您将发现自己已重定向回到旧的登录页面。幸运的是，可以通过添加另一个配置设置来快速纠正此问题：<p></p>
+<pre><code class="prettyprint groovy">grails.plugins.springsecurity.failureHandler.defaultFailureUrl = &#39;/&#39;
+</code></pre><p>这就是功能全面的登录表格所需要的！还有许多其他选项可以用来微调行为，但是现在您已经有了构建的基础知识。</p><p>本文实际上仅涉及了Spring Security插件的表面。我没有提到HTTP基本和摘要式身份验证，事件，加盐密码等。甚至不包括提供额外功能的其他插件，例如替代身份验证机制和访问控制列表（ACL）。但是，到目前为止，您所阅读的内容将使您能够立即启动一个完整运行的访问控制系统，并开始运行。然后，您将能够根据需要扩展和自定义，因为Spring Security具有比您可能需要的更多的功能。</p></tt></div><tt>
 </tt></div><tt>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 348;
 
       (function(disqus_shortname, document) {
@@ -358,7 +365,8 @@ class LoginController {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -396,12 +404,14 @@ class LoginController {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

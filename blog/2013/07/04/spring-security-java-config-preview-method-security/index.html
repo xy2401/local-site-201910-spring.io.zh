@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Security Java配置预览：方法安全</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Security Java Config Preview: Method Security">
-<meta name="twitter:description" class="anchor" content="<h1><a href=" #updat="="></head><body dir="ltr">Update
+<meta name="twitter:description" class="anchor" content="<h1><a href=" #updat="="></head><body >Update
 <p>Users should refer to the <a href="http://docs.spring.io/spring-security/site/docs/3.2.0.RC2/reference/htmlsingle/#jc">Spring Security Reference</a> which contains more up to date information.</p>
 <h1><a href="#original-blog-post" class="anchor" name="original-blog-post"></a>Original Blog Post</h1>
 <p>This is the third installment of a four part blog series. In my <a href="http://blog.springsource.org/2013/07/02/spring-security-java-config-preview-introduction/">first post</a>, I introduced Spring Security Java configuration and discussed some of the logistics of the project. In <a href="http://blog.springsource.org/2013/07/03/spring-security-java-config-preview-web-security/">my previous post</a>, we walked through a few examples of configuring web based security.</p>
@@ -45,10 +49,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -175,20 +181,20 @@
 </div>
 </header>
 <div class="blog--post"><h1><a href="#update" class="anchor" name="update"></a>更新资料</h1><p>用户应参考<a href="https://docs.spring.io/spring-security/site/docs/3.2.0.RC2/reference/htmlsingle/#jc">Spring Security Reference</a> ，其中包含更多最新信息。</p><h1><a href="#original-blog-post" class="anchor" name="original-blog-post"></a>原始博客文章</h1><p>这是一个由四部分组成的博客系列的第三部分。在我的<a href="http://blog.springsource.org/2013/07/02/spring-security-java-config-preview-introduction/">第一篇文章中</a> ，我介绍了Spring Security Java配置并讨论了该项目的一些后勤工作。在<a href="http://blog.springsource.org/2013/07/03/spring-security-java-config-preview-web-security/">我以前的文章中</a> ，我们逐步介绍了一些配置基于Web的安全性的示例。</p><p>在本文中，我将讨论如何使用Spring Security Java配置来配置基于方法的安全性。像我们之前的文章一样，我们将从一个非常基本的示例开始，然后再执行一个进行一些自定义的示例。</p><h3><a href="#methodsecurityservice" class="anchor" name="methodsecurityservice"></a> MethodSecurityService</h3><p>尽管不是很有趣，但是假设我们有一个名为MethodSecurityService的服务，如下所示：</p>
-<pre><code class="prettyprint java"><br>public interface MethodSecurityService {
-    @PreAuthorize("hasRole('ROLE_USER')")
+<pre><code class="prettyprint java"><br />public interface MethodSecurityService {
+    @PreAuthorize(&quot;hasRole(&#39;ROLE_USER&#39;)&quot;)
     String requiresUserRole();
 }
-</code></pre><p>我们的实现很简单，但是可以确保我们专注于Spring Security而不是我们的服务。</p>
-<pre><code class="prettyprint java"><br>public class MethodSecurityServiceImpl implements 
+</code></pre><p>我们的实现很简单，但是将确保我们专注于Spring Security而不是我们的服务。</p>
+<pre><code class="prettyprint java"><br />public class MethodSecurityServiceImpl implements 
       MethodSecurityService {
     
     public String requiresUserRole() {
-        return "You have ROLE_USER";
+        return &quot;You have ROLE_USER&quot;;
     }
 }
-</code></pre><h3><a href="#hello-method-security" class="anchor" name="hello-method-security"></a>你好方法安全</h3><p>通过使用<code>@EnableGlobalMethodSecurity</code>我们可以轻松地使用Java配置保护方法。请注意， <code>methodSecurityService</code>实际上并不是我们安全性配置的一部分，但是我们必须使用Spring创建我们的<code>MethodSecurityService</code>以便可以对其应用安全性。</p>
-<pre><code class="prettyprint java"><br>@Configuration
+</code></pre><h3><a href="#hello-method-security" class="anchor" name="hello-method-security"></a>你好方法安全</h3><p>通过使用<code>@EnableGlobalMethodSecurity</code>我们可以通过Java配置轻松保护我们的方法。注意<code>methodSecurityService</code>并不是我们安全配置的真正组成部分，但是我们必须创建我们的<code>MethodSecurityService</code>使用Spring，以便可以对其应用安全性。</p>
+<pre><code class="prettyprint java"><br />@Configuration
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class HelloMethodSecurityConfig {
   @Bean
@@ -200,22 +206,22 @@ public class HelloMethodSecurityConfig {
   public void registerGlobal(AuthenticationManagerBuilder auth) throws Exception {
     auth
         .inMemoryAuthentication()
-          .withUser("user").password("password").roles("USER").and()
-          .withUser("admin").password("password").roles("USER", "ADMIN");
+          .withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).and()
+          .withUser(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;, &quot;ADMIN&quot;);
     }
 }
 </code></pre><p>此配置与以下XML配置非常相似：</p>
-<pre><code class="prettyprint xml"><br><global-method-security pre-post-annotations="enabled"/>
-<authentication-manager>
-  <authentication-provider>
-    <user-service>
-      <user name="user" password="password" authorities="ROLE_USER"/>
-    </user-service>
-  </authentication-provider>
-</authentication-manager>
-<beans:bean id="methodSecuriytService" class="MethodSecurityServiceImpl"/>
-</code></pre><p>通过我们的配置，对methodSecurityService bean的requireUserRole（）的调用将要求使用角色“ ROLE_USER”对当前用户进行身份验证。如果用户未经身份验证或没有角色“ ROLE_USER”，则将引发AccessDeniedException。</p><h4><a href="#custom-method-security" class="anchor" name="custom-method-security"></a>自定义方法安全</h4><p>@EnableWebSecurityannotation中还有许多其他属性，但是如果您希望以更高级的方式自定义方法安全性，则需要扩展GlobalMethodSecurityConfiguration。下面是一个我们自定义PermissionEvaluator的示例：</p>
-<pre><code class="prettyprint java"><br>@Configuration
+<pre><code class="prettyprint xml"><br />&lt;global-method-security pre-post-annotations=&quot;enabled&quot;/&gt;
+&lt;authentication-manager&gt;
+  &lt;authentication-provider&gt;
+    &lt;user-service&gt;
+      &lt;user name=&quot;user&quot; password=&quot;password&quot; authorities=&quot;ROLE_USER&quot;/&gt;
+    &lt;/user-service&gt;
+  &lt;/authentication-provider&gt;
+&lt;/authentication-manager&gt;
+&lt;beans:bean id=&quot;methodSecuriytService&quot; class=&quot;MethodSecurityServiceImpl&quot;/&gt;
+</code></pre><p>通过我们的配置，对methodSecurityService bean的requireUserRole（）的调用将要求使用角色“ ROLE_USER”对当前用户进行身份验证。如果用户未经身份验证或没有角色“ ROLE_USER”，则将引发AccessDeniedException。</p><h4><a href="#custom-method-security" class="anchor" name="custom-method-security"></a>自定义方法安全</h4><p>@EnableWebSecurity批注上有许多其他属性，但是如果您希望以更高级的方式自定义方法安全性，则需要扩展GlobalMethodSecurityConfiguration。下面是我们自定义PermissionEvaluator的示例：</p>
+<pre><code class="prettyprint java"><br />@Configuration
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class CustomPermissionEvaluatorWebSecurityConfig extends GlobalMethodSecurityConfiguration {
   @Bean
@@ -234,31 +240,32 @@ public class CustomPermissionEvaluatorWebSecurityConfig extends GlobalMethodSecu
   public void registerGlobal(AuthenticationManagerBuilder auth) throws Exception {
     auth
         .inMemoryAuthentication()
-          .withUser("user").password("password").roles("USER").and()
-          .withUser("admin").password("password").roles("USER", "ADMIN");
+          .withUser(&quot;user&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;).and()
+          .withUser(&quot;admin&quot;).password(&quot;password&quot;).roles(&quot;USER&quot;, &quot;ADMIN&quot;);
     }
 }
 </code></pre><p>这与以下XML配置非常相似：</p>
-<pre><code class="prettyprint xml"><br><global-method-security pre-post-annotations="enabled">
-  <expression-handler ref="expressionHandler"/>
-</global-method-security>
-<authentication-manager>
-  <authentication-provider>
-    <user-service>
-      <user name="user" password="password" authorities="ROLE_USER"/>
-    </user-service>
-  </authentication-provider>
-</authentication-manager>
-<beans:bean id="methodSecuriytService" class="MethodSecurityServiceImpl"/>
-<beans:bean id="expressionHandler" class="CustomExpressionHandler"/>
-</code></pre><h4><a href="#additional-method-samples" class="anchor" name="additional-method-samples"></a>附加方法样品</h4><p>我们给出了一些示例，说明如何使用Spring Security Java Configuration通过方法级安全性保护您的应用程序。您可以在spring-security-javaconfig项目的github存储库中找到其他示例。</p>
+<pre><code class="prettyprint xml"><br />&lt;global-method-security pre-post-annotations=&quot;enabled&quot;&gt;
+  &lt;expression-handler ref=&quot;expressionHandler&quot;/&gt;
+&lt;/global-method-security&gt;
+&lt;authentication-manager&gt;
+  &lt;authentication-provider&gt;
+    &lt;user-service&gt;
+      &lt;user name=&quot;user&quot; password=&quot;password&quot; authorities=&quot;ROLE_USER&quot;/&gt;
+    &lt;/user-service&gt;
+  &lt;/authentication-provider&gt;
+&lt;/authentication-manager&gt;
+&lt;beans:bean id=&quot;methodSecuriytService&quot; class=&quot;MethodSecurityServiceImpl&quot;/&gt;
+&lt;beans:bean id=&quot;expressionHandler&quot; class=&quot;CustomExpressionHandler&quot;/&gt;
+</code></pre><h4><a href="#additional-method-samples" class="anchor" name="additional-method-samples"></a>附加方法样品</h4><p>我们提供了一些示例，说明如何使用Spring Security Java Configuration通过方法级安全性保护您的应用程序。您可以在spring-security-javaconfig项目的github存储库中找到其他示例。</p>
 <ul>
 <li><a href="https://github.com/SpringSource/spring-security-javaconfig/blob/master/samples-method.md">方法样本</a></li>
 <li><a href="https://github.com/SpringSource/spring-security-javaconfig/tree/master/samples">完整的Web应用程序（也有一些演示方法安全性演示）</a></li>
 </ul><h3><a href="#feedback-please" class="anchor" name="feedback-please"></a>反馈请</h3><p>如果您遇到错误，有改进的想法等，请随时提出来！我们希望听到您的想法，因此我们可以确保在代码普遍可用之前就正确处理了。尽早尝试新功能是回馈社区的一种好方法。这也可以确保所需的功能可以按您认为的方式显示和运行。</p><p>请将任何问题或功能请求记录到“ Java Config”类别下的<a href="https://jira.springsource.org/browse/SEC">Spring Security JIRA</a> 。登录JIRA后，我们鼓励（但不要求）您在请求请求中提交更改。您可以在<a href="https://github.com/SpringSource/spring-security/blob/master/CONTRIBUTING.md">贡献者指南中</a>阅读更多有关如何执行此操作的信息。</p><p>如果您对如何做有疑问，请使用<a href="http://forum.springsource.org/forumdisplay.php?33-Security">Spring Security论坛</a>或<a href="https://stackoverflow.com/questions/tagged/spring-security">带有Spring-security标签的Stack Overflow</a> （我将对其进行密切监视）。如果您对此博客有特定的评论问题，请随时发表评论。使用适当的工具将有助于使每个人都更容易。</p><h4><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h4><p>现在，您应该了解如何使用Spring Security Java配置支持来配置基于方法的安全性。<a href="http://blog.springsource.org/2013/07/05/spring-security-java-config-preview-oauth/">在下一篇文章中</a> ，我们将通过遍历OAuth Java Configuration概念证明来演示Spring Security是如何设计用于扩展的。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 527;
 
       (function(disqus_shortname, document) {
@@ -272,7 +279,8 @@ public class CustomPermissionEvaluatorWebSecurityConfig extends GlobalMethodSecu
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -310,12 +318,14 @@ public class CustomPermissionEvaluatorWebSecurityConfig extends GlobalMethodSecu
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

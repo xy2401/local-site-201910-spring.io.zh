@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Reactor-JVM上异步应用程序的基础</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Reactor - a foundation for asynchronous applications on the JVM">
-<meta name="twitter:description" content="<p>We’re pleased to announce that, after a long period of internal incubation, we’re releasing a foundational framework for asynchronous applications on the JVM which we’re calling <em>Reactor</em>. It provides abstractions for Java, Groovy and other JVM languages to make building event and data-driven applications easier. It’s also really fast. On modest hardware, it’s possible to process over 15,000,000 events per second with the fastest non-blocking <code>Dispatcher</code>. Other dispatchers are available to provide the developer with a range of choices from thread-pool style, long-running task execution to non-blocking, high-volume task dispatching. The GitHub repo is here <a href=" https:="" ="" github.com="" reactor="" reacto="="></head><body dir="ltr"><a href="https://github.com/reactor/reactor">https://github.com/reactor/reactor</a>.
+<meta name="twitter:description" content="<p>We’re pleased to announce that, after a long period of internal incubation, we’re releasing a foundational framework for asynchronous applications on the JVM which we’re calling <em>Reactor</em>. It provides abstractions for Java, Groovy and other JVM languages to make building event and data-driven applications easier. It’s also really fast. On modest hardware, it’s possible to process over 15,000,000 events per second with the fastest non-blocking <code>Dispatcher</code>. Other dispatchers are available to provide the developer with a range of choices from thread-pool style, long-running task execution to non-blocking, high-volume task dispatching. The GitHub repo is here <a href=" https:="" ="" github.com="" reactor="" reacto="="></head><body ><a href="https://github.com/reactor/reactor">https://github.com/reactor/reactor</a>.
 ">
 <meta name="twitter:creator" content="@j_brisbin">
 <meta name="twitter:image:src" content="http://gravatar.com/avatar/5500b5cf634f9a3921e4619778a1425f?s=200">
@@ -37,10 +41,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,45 +172,45 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>我们很高兴地宣布，经过长时间的内部培养，我们为JVM上的异步应用程序发布了一个基础框架，我们将其称为<em>Reactor</em> 。它提供了Java，Groovy和其他JVM语言的抽象，使构建事件和数据驱动的应用程序更加容易。这也真的很快。在适度的硬件上，使用最快的非阻塞<code>Dispatcher</code>每秒可以处理超过15,000,000个事件。其他调度程序可用于为开发人员提供一系列选择，从线程池样式，长时间运行的任务执行到无阻塞的大批量任务调度。GitHub仓库在这里<a href="https://github.com/reactor/reactor"></a> <a href="https://github.com/reactor/reactor">https://github.com/reactor/reactor</a> 。</p><p>顾名思义，反应堆受到<a href="https://en.wikipedia.org/wiki/Reactor_pattern" target="_blank">众所周知的反应堆设计模式的</a>严重影响。但是，它还受到其他事件驱动的设计实践以及多年来开发的一些基于JVM的出色解决方案的影响。Reactor的目标是将这些思想和模式浓缩为一个简单且可重用的基础，以使事件驱动的编程变得更加容易。</p><p>反应堆的抽象为开发人员提供了一套工具，而不仅仅是开发，但<em>撰写</em>应用程序更有效地利用系统资源，这在运行云和减少或消除嵌套回调的意大利面条（适当命名时特别重要的方式<a href="http://callbackhell.com/" target="_blank">“回调地狱”</a> ）是迄今为止最沉重异步应用程序。</p>
-<h3>Reactor有什么用处？</h3><p>尽管您可以凭借其固有的灵活性使Reactor做很多事情，但它实际上是为在执行相当小的无状态异步处理块时需要高吞吐量的应用程序设计的基础框架。在现代应用程序中，非人为生成的数据量巨大，可以轻松超越传统的单线程，阻塞设计模型。从生成位置信息流的移动应用程序到将大量几何数据发送到大数据应用程序的计算机化制造机器，到挖掘实时日志以生成业务指标的大数据应用程序：与传统技术相比，现代数据驱动型应用程序需要更高的资源利用率和更高的吞吐量势在必行，阻止应用程序通常可以提供。</p><p>这就是为什么<a href="http://blog.springsource.org/2013/04/23/introducing-spring-xd/" target="_blank">Spring XD项目</a> （以及其他几个Spring生态系统项目，例如Spring Integration和Spring Batch）打算利用Reactor的原因。将Reactor的异步调度与Spring Integration中基于NIO的TCP适配器相结合以提供高吞吐量的syslog和MQTT接收只是一个示例。</p>
-<h3>选择者，消费者和事件</h3><p>Reactor的反应堆核心模块中最基本的三个组件是<code>Selector</code> ， <code>Consumer</code>和<code>Event</code> 。可以使用<code>Selector</code>将<code>Consumer</code>分配给<code>Reactor</code> ， <code>Selector</code>是一种简单的抽象，可以在找到要为<code>Event</code>调用的<code>Consumers</code>时提供灵活性。一系列默认选择器可用。从纯字符串到正则表达式再到Spring MVC风格的URL模板</p>
+<div class="blog--post"><p>我们很高兴地宣布，经过长时间的内部培养，我们为JVM上的异步应用程序发布了一个基础框架，我们将其称为<em>Reactor</em> 。它提供了Java，Groovy和其他JVM语言的抽象，使构建事件和数据驱动的应用程序更加容易。这也真的很快。在适度的硬件上，每秒可以处理超过15,000,000个事件，并且具有最快的非阻塞性<code>Dispatcher</code> 。其他调度程序可用于为开发人员提供一系列选择，从线程池样式，长时间运行的任务执行到无阻塞的大批量任务调度。GitHub仓库在这里<a href="https://github.com/reactor/reactor"></a> <a href="https://github.com/reactor/reactor">https://github.com/reactor/reactor</a> 。</p><p>顾名思义，反应堆受到<a href="https://en.wikipedia.org/wiki/Reactor_pattern" target="_blank">众所周知的反应堆设计模式的</a>严重影响。但是，它还受到其他事件驱动的设计实践以及这些年来开发的一些基于JVM的出色解决方案的影响。Reactor的目标是将这些思想和模式浓缩为一个简单且可重用的基础，以使事件驱动的编程变得更加容易。</p><p>反应堆的抽象为开发人员提供了一套工具，而不仅仅是开发，但<em>撰写</em>应用程序更有效地利用系统资源，这在运行云和减少或消除嵌套回调的意大利面条（适当命名时特别重要的方式<a href="http://callbackhell.com/" target="_blank">“回调地狱”</a> ）是迄今为止最沉重异步应用程序。</p>
+<h3>Reactor有什么用处？</h3><p>尽管您可以凭借其固有的灵活性使Reactor做很多事情，但它实际上是为在执行相当小的无状态异步处理块时需要高吞吐量的应用程序设计的基础框架。在现代应用程序中，非人为生成的数据量巨大，可以轻松超越传统的单线程，阻塞设计模型。从生成位置信息流的移动应用程序到将大量几何数据发送到大数据应用程序的计算机化制造机器，到挖掘实时日志以生成业务指标的大数据应用程序：与传统技术相比，现代数据驱动型应用程序要求更高的资源利用率和更高的吞吐量势在必行，阻止应用程序通常可以提供。</p><p>这就是为什么<a href="http://blog.springsource.org/2013/04/23/introducing-spring-xd/" target="_blank">Spring XD项目</a> （以及其他几个Spring生态系统项目，例如Spring Integration和Spring Batch）打算利用Reactor的原因。将Reactor的异步调度与Spring Integration中基于NIO的TCP适配器相结合以提供高吞吐量的syslog和MQTT接收只是一个示例。</p>
+<h3>选择者，消费者和事件</h3><p>反应堆堆芯模块中最基础的三个组件是<code>Selector</code> ， <code>Consumer</code>和<code>Event</code> 。一种<code>Consumer</code>可以分配给<code>Reactor</code>通过使用<code>Selector</code> ，这是一个简单的抽象，可在查找以下内容时提供灵活性<code>Consumers</code>呼吁<code>Event</code> 。一系列默认选择器可用。从纯字符串到正则表达式再到Spring MVC风格的URL模板</p>
 <p>以下是一些示例代码，展示了使用Reactor创建事件驱动的应用程序有多么容易：</p>
-<pre><code class="prettyprint java"><br>// This helper method is like jQuery’s.
+<pre><code class="prettyprint java"><br />// This helper method is like jQuery’s.
 // It creates a Selector instance so you don’t have 
-// to construct one using 'new Selector("parse")'
+// to construct one using &#39;new Selector(&quot;parse&quot;)&#39;
 import static reactor.Fn.$;
 
 Reactor reactor = R.create();
 
-// Register interest in events published to key "parse"
-reactor.on($("parse"), new Consumer<Event<String>>() {
-  public void call(Event<String> ev) {
+// Register interest in events published to key &quot;parse&quot;
+reactor.on($(&quot;parse&quot;), new Consumer&lt;Event&lt;String&gt;&gt;() {
+  public void call(Event&lt;String&gt; ev) {
     service.handleEvent(ev);
   }
 });
 
 // Send an event to this Reactor and trigger all actions 
 // that match the given Selector
-reactor.notify("parse", Fn.event("Hello World!"));
+reactor.notify(&quot;parse&quot;, Fn.event(&quot;Hello World!&quot;));
  
 </code></pre>
-<h3>用爱致Groovy</h3><p>Reactor发行版中包含一个称为<code>reactor-groovy</code>的模块。它包含一个Groovy绑定，该绑定提供了一种表达语法，使用<code>@CompileStatic</code>编译时检查，将<code>Closure</code>隐式转换为<code>Consumer</code>以及其他特定于Groovy的时间<code>@CompileStatic</code>程序。</p>
-<pre><code class="prettyprint java"><br>// Assign a Closure as a Consumer
-reactor.on($('hello')) { Event<String> ev ->
-  if(ev.headers['specialHeader']) { // Events can have metadata
+<h3>用爱致Groovy</h3><p>Reactor发行版中包含一个名为<code>reactor-groovy</code> 。它包括一个Groovy绑定，该绑定提供了一种表达性的语法，通过<code>@CompileStatic</code> ，的隐式转换<code>Closure</code>入<code>Consumer</code>以及其他特定于Groovy的时间节省程序。</p>
+<pre><code class="prettyprint java"><br />// Assign a Closure as a Consumer
+reactor.on($(&#39;hello&#39;)) { Event&lt;String&gt; ev -&gt;
+  if(ev.headers[&#39;specialHeader&#39;]) { // Events can have metadata
     doSomethingWith(ev.data)
   }
 }
 
 // Use Groovy helpers for notify
-reactor.notify for: 'hello', data: 'Hello World!', specialHeader: 'specialValue'
+reactor.notify for: &#39;hello&#39;, data: &#39;Hello World!&#39;, specialHeader: &#39;specialValue&#39;
  
 </code></pre><p>最棒的是：我们不必为了达到目标而牺牲性能。相同的JVM优化适用于适用于Java代码的Groovy代码。我们一直（有人会说“过分地”）对发布代码进行微基准测试，以使其尽可能快，并为Java和Groovy用户提供尽可能高的吞吐量。</p>
 <h3>准备好使用Java 8</h3><p>Reactor还设计为与<a href="https://www.jcp.org/en/jsr/detail?id=335" target="_blank">Java SE 8的lambda表达式</a>友好，并且Reactor中的许多组件都可以用lambda代替，以使您的Java代码更加简洁。我们还发现，使用Java 8 lambda（和方法引用）可以提高吞吐量。当Java 8进入GA时，您无需等待Reactor支持它。它将正常工作（tm）。</p>
-<pre><code class="prettyprint java"><br>// Use a POJO as an event handler
+<pre><code class="prettyprint java"><br />// Use a POJO as an event handler
 class Service {
-  public <T> void handleEvent(Event<T> ev) {
+  public &lt;T&gt; void handleEvent(Event&lt;T&gt; ev) {
     // handle the event data
   }
 }
@@ -212,41 +218,42 @@ class Service {
 @Inject
 Service service;
 
-// Use a method reference to create a Consumer<Event<T>>
-reactor.on($("parse"), service::handleEvent);
+// Use a method reference to create a Consumer&lt;Event&lt;T&gt;&gt;
+reactor.on($(&quot;parse&quot;), service::handleEvent);
 
-// Notify consumers of the 'parse' topic that data is ready
-// by passing a Supplier<Event<T>> in the form of a lambda
-reactor.notify("parse", () -> {
+// Notify consumers of the &#39;parse&#39; topic that data is ready
+// by passing a Supplier&lt;Event&lt;T&gt;&gt; in the form of a lambda
+reactor.notify(&quot;parse&quot;, () -&gt; {
   slurpNextEvent()
 });
  
 </code></pre>
-<h3>功能性，命令式，回调或承诺：您选择</h3><p>执行程序，事件循环，演员，分布式–事件驱动编程中最重要的用例之一有多种形式：任务分配。Reactor支持多种样式的事件驱动编程。除了传统的面向回调的<code>Consumer</code>接口之外，Reactor还<a href="https://github.com/promises-aplus/promises-spec" target="_blank">对Promises / A +规范</a>进行了解释，这使得处理递延值和消费者非常容易。</p><p>嵌套回调虽然在Java之类的命令性语言中简单易用，但随着应用程序复杂性的增加，变得难以维护。Reactor的<code>Composable</code>和<code>Promise</code>都是关于动作的简单组合。您可以将<code>Composable</code>到一系列的操作中，这些操作可以转换值，将内容保存到数据存储区，汇总值等。由于它们是可链接的，因此您可以使用类型安全的纯Java语言来完成所有这些操作。这是一个使用<code>Composable</code>轻松链接一系列异步执行任务的快速示例，这些任务在数据流通过<code>Composable</code>对数据流执行转换和过滤：</p>
-<pre><code class="prettyprint java"><br>Composable<Integer> c = new Composable<>()
-  .map(new Function<Integer, Integer>() {
+<h3>功能性，命令式，回调或承诺：您选择</h3><p>执行程序，事件循环，演员，分布式–事件驱动编程中最重要的用例之一有多种形式：任务分派。Reactor支持多种样式的事件驱动编程。除了传统的面向回调<code>Consumer</code>界面上，Reactor <a href="https://github.com/promises-aplus/promises-spec" target="_blank">对Promises / A +规范</a>进行了解释，这使得处理递延值和使用方变得非常容易。</p><p>嵌套回调虽然在像Java这样的命令性语言中简单易用，但随着应用程序复杂性的增加，变得难以维护。反应堆<code>Composable</code>和<code>Promise</code>都是关于动作的简单组合。您可以将一个<code>Composable</code>转换为一系列值，将内容保存到数据存储区，汇总值等操作。由于它们是可链接的，因此您可以使用类型安全的纯Java语言来完成所有这些操作。这是使用<code>Composable</code>轻松链接一系列异步执行的任务，这些任务在数据流通过时对它们进行转换和过滤<code>Composable</code> ：</p>
+<pre><code class="prettyprint java"><br />Composable&lt;Integer&gt; c = new Composable&lt;&gt;()
+  .map(new Function&lt;Integer, Integer&gt;() {
     public Integer apply(Integer i) {
       return i % 2;
     }
   })
-  .filter(new Function<Integer, Boolean>() {
+  .filter(new Function&lt;Integer, Boolean&gt;() {
     public Boolean apply(Integer i) {
       return i == 0;
     }
   })
-  .consume(new Consumer<Integer>() {
+  .consume(new Consumer&lt;Integer&gt;() {
     public void accept(Integer eveni) {
       // work with only even numbers here
     }
   });
  
-</code></pre><p><code>Composable</code>每个步骤都是潜在的异步任务。当上一步中的值可用时，调用<code>map</code> ， <code>filter</code>和<code>consume</code>分配任务以执行-无需回调地狱。</p>
-<h3>派遣</h3><p>没有任何调度问题的灵丹妙药。由于每个异步应用程序在应用程序的不同部分具有不同的调度需求，因此Reactor提供了不同的<code>Dispatcher</code>样式。例如，在摄取数据的潮汐时， <code>Reactor</code>将希望使用基于<a href="https://github.com/lmax-exchange/disruptor" target="_blank">古老的Disruptor RingBuffer</a>的高速无阻塞<code>Dispatcher</code> <a href="https://github.com/lmax-exchange/disruptor" target="_blank">器</a> 。但是，如果<code>Reactor</code>向数据库服务器发出阻塞调用或在S3中存储数据块，则它将希望利用吞吐量较低的工作池<code>Dispatcher</code> 。Reactor提供了多个选项，因此您可以选择适合该工作的工具。</p><p>如果内置的<code>Dispatcher</code>实现不符合您的需求，那么Reactor提供了坚实的基础，您可以在此基础上构建自己的<code>Dispatcher</code> ，以针对您的问题领域量身定制。</p>
-<h3>Grails，见面事件，事件，见面Grails</h3><p><a href="http://www.grails.org" target="_blank">Grails</a>是用于JVM的全栈Web应用程序框架。凭借蓬勃发展的社区支持的成熟代码库，Grails仍面临着<a href="http://grails.io/day/2013/04/22" target="_blank">新的架构挑战</a> 。通过<a href="https://grailsrocks.github.io/grails-platform-core/guide/events.html" target="_blank">平台核心插件</a>将事件引入了Grails中。但是事件是如此强大，以至于该功能真正属于核心。因此，从2.3版开始，Grails应用程序将具有一个内置的，功能强大但易于使用的，基于约定的Events API，该API与平台核心插件中的当前实现非常相似。此事件API将在Reactor基础上构建。</p><p>将事件集成到Grails中的目的是针对新型开发，尤其是“实时Web”和大规模，无阻塞的应用程序开发。结合使用异步GORM功能，Events API将证明是一个强大的盟友。访问大数据存储区的复杂查询（需要花费很长时间进行处理）可以在结果准备好后做出反应，将其直接推送到浏览器即可。</p>
-<h3>一个充满激情的社区至关重要</h3><p>在接下来的几个月中，我们将努力为<a href="http://www.springone2gx.com/conference/santa_clara/2013/09/home" target="_blank">SpringOne</a>做准备，我们的许多大型，快速，可扩展数据解决方案将在其中发挥第一作用。如果您还没有计划参加， <a href="https://springone2gx.com/conference/santa_clara/2013/09/register" target="_blank">那么绝对应该</a> ！我们将<a href="http://www.springone2gx.com/conference/santa_clara/2013/09/session?id=29395" target="_blank">举行一个关于Reactor的会议，</a>以及如何使用它来创建大规模，高吞吐量的事件驱动的应用程序。</p><p>但是没有你我们就做不到！仅当您帮助我们为JVM上的大型，快速，事件驱动的应用程序开发创建热情，活跃的社区时，这项工作才会成功。如果您有兴趣，请查看<a href="https://github.com/reactor/reactor">GitHub上的源代码，在</a> <a href="https://stackoverflow.com/questions/tagged/reactor">react</a> <a href="https://github.com/reactor/reactor-quickstart">-quickstart中</a>查看一些示例代码， <a href="https://github.com/reactor/reactor/issues">报告任何发现的</a>问题， <a href="https://stackoverflow.com/questions/tagged/reactor">使用标签#reactor</a>在StackOverflow上询问有关Reactor的问题，加入有关<a href="https://stackoverflow.com/questions/tagged/reactor">react</a> <a href="https://groups.google.com/forum/?fromgroups#!forum/reactor-framework">-framework Google</a>的讨论<a href="https://groups.google.com/forum/?fromgroups#!forum/reactor-framework">对电子邮件列表进行分组</a> ，或<a href="https://help.github.com/articles/fork-a-repo" target="_blank">分叉存储库</a>以帮助添加功能，进行调整以提高吞吐量并提出新的想法。</p><p>我们很乐意在那里见您！</p></div>
+</code></pre><p>每一步<code>Composable</code>是潜在的异步任务。致电<code>map</code> ， <code>filter</code>和<code>consume</code>分配上一步中的值可用时要执行的任务-无需回调地狱。</p>
+<h3>派遣</h3><p>没有任何调度问题的灵丹妙药。Reactor提供了不同的样式<code>Dispatcher</code>因为每个异步应用程序在应用程序的不同部分都有不同的调度需求。例如，在摄取数据潮汐时， <code>Reactor</code>想要使用高速无阻塞<code>Dispatcher</code>基于<a href="https://github.com/lmax-exchange/disruptor" target="_blank">令人尊敬的Disruptor RingBuffer</a> 。但是如果一个<code>Reactor</code>正在向数据库服务器发出阻塞调用或在S3中存储数据块，它将希望利用低吞吐量的工作池<code>Dispatcher</code> 。Reactor提供了多个选项，因此您可以选择适合该工作的工具。</p><p>如果内置<code>Dispatcher</code>实现无法满足您的需求，那么Reactor提供了坚实的基础，您可以在此基础上构建自己的<code>Dispatcher</code>根据您的问题领域量身定制。</p>
+<h3>Grails，见面事件，事件，见面Grails</h3><p><a href="http://www.grails.org" target="_blank">Grails</a>是用于JVM的全栈Web应用程序框架。凭借蓬勃发展的社区支持的成熟代码库，Grails仍面临着<a href="http://grails.io/day/2013/04/22" target="_blank">新的架构挑战</a> 。通过<a href="https://grailsrocks.github.io/grails-platform-core/guide/events.html" target="_blank">平台核心插件</a>将事件引入了Grails中。但是事件是如此强大，以至于该功能真正属于核心。因此从2.3版开始，Grails应用程序将具有内置的，功能强大但易于使用的基于约定的Events API，该API与平台核心插件中的当前实现非常相似。此事件API将在Reactor基础上构建。</p><p>将事件集成到Grails中的目标是针对新型开发，尤其是“实时Web”和大规模，无阻塞的应用程序开发。结合使用异步GORM功能，Events API将证明是一个强大的盟友。访问大数据存储区的复杂查询（需要花费很长时间进行处理）可以在结果准备好后做出反应，将其直接推送到浏览器即可。</p>
+<h3>一个充满激情的社区至关重要</h3><p>在接下来的几个月中，我们将努力为<a href="http://www.springone2gx.com/conference/santa_clara/2013/09/home" target="_blank">SpringOne</a>做准备，我们的许多大型，快速和可扩展数据解决方案将在其中发挥首要作用。如果您还没有计划参加， <a href="https://springone2gx.com/conference/santa_clara/2013/09/register" target="_blank">那么绝对应该</a> ！我们将<a href="http://www.springone2gx.com/conference/santa_clara/2013/09/session?id=29395" target="_blank">举行一个关于Reactor的会议，</a>以及如何使用它来创建大规模，高吞吐量的事件驱动的应用程序。</p><p>但是没有你我们就做不到！仅当您帮助我们为JVM上的大型，快速，事件驱动的应用程序开发创建热情，活跃的社区时，这项工作才会成功。如果您有兴趣，请<a href="https://github.com/reactor/reactor">在GitHub上</a>查看<a href="https://github.com/reactor/reactor">源代码，在</a> <a href="https://stackoverflow.com/questions/tagged/reactor">react</a> <a href="https://github.com/reactor/reactor-quickstart">-quickstart中</a>查看一些示例代码， <a href="https://github.com/reactor/reactor/issues">报告任何发现的</a>问题， <a href="https://stackoverflow.com/questions/tagged/reactor">使用#reactor标签</a>在StackOverflow上询问有关Reactor的问题，加入有关<a href="https://stackoverflow.com/questions/tagged/reactor">react</a> <a href="https://groups.google.com/forum/?fromgroups#!forum/reactor-framework">-framework Google</a>的讨论<a href="https://groups.google.com/forum/?fromgroups#!forum/reactor-framework">对电子邮件列表进行分组</a> ，或<a href="https://help.github.com/articles/fork-a-repo" target="_blank">分叉存储库</a>以帮助添加功能，进行调整以提高吞吐量并提出新的想法。</p><p>我们很乐意在那见到你！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 519;
 
       (function(disqus_shortname, document) {
@@ -260,7 +267,8 @@ reactor.notify("parse", () -> {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -298,12 +306,14 @@ reactor.notify("parse", () -> {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

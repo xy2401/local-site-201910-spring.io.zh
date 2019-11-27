@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>在Spring MVC中使用混合注释和XML方法进行请求映射</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,15 +38,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2008-03-24 00:38:00.0">
-
-
+</head>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,18 +174,18 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在Spring 2.5中，可以使用annotation来配置Web应用程序的所有部分。在Web层中，看到应用的注释特别有趣，在Web层中，开发人员传统上依赖SimpleFormController和MultiActionController进行表单页面处理。注释的引入创建了第三个选项，该选项不需要基类，同时仍提供了先前方法的灵活性。</p><p>尽管可以很容易地看到使用带注释的POJO来实现Controller的优雅之处，但是在URL到Controller的映射中，好处并不明显。使用注释定义所有URL映射规则会是什么样？确实，对于Spring MVC应用程序的开发人员来说，集中式配置在这一领域非常有效。</p><p>让我们回顾一下Spring 2.0的URL到Controller映射选项：</p>
+<div class="blog--post"><p>在Spring 2.5中，可以使用批注来配置Web应用程序的所有部分。在Web层中，看到应用的注释特别有趣，在Web层中，开发人员传统上依赖SimpleFormController和MultiActionController进行表单页面处理。注释的引入创建了第三个选项，该选项不需要基类，同时仍提供了先前方法的灵活性。</p><p>尽管可以很容易地看到使用带注释的POJO来实现Controller的优雅之处，但是在URL到Controller的映射中，好处并不明显。使用注释定义所有URL映射规则会是什么样？确实，对于Spring MVC应用程序的开发人员来说，集中式配置在这一领域非常有效。</p><p>让我们回顾一下Spring 2.0的URL到Controller映射选项：</p>
 <ol>
 <li>Bean名称方法（BeanNameUrlHandlerMapping）。每个bean的名称都包含它服务的路径。尽管它很简单，但是如果与粗粒度的servlet映射（例如“ / browse / *”，“ / order / *”，“ / reports / *”等）结合使用，这种方法就可以扩展。</li>
 <li>集中化方法（SimpleUrlHandlerMapping）。查看URL模式和控制器映射的中心位置。</li>
 <li>配置方法上的约定（ClassNameUrlHandlerMapping）。将URL路径与类名匹配。因此，“ / accounts / *”被映射到类型为AccountsController的MultiActionController。不需要显式映射。</li>
 </ol><p>Spring 2.5以@RequestMapping注释的形式添加了第四个选项，可以将其放置在类或方法上。当两者都放在方法级映射上时，将缩小类级映射。</p><p>这是一个SimpleFormController样式的工作流，其中通过请求方法缩小了方法级别的映射：</p>
-<pre><code class="prettyprint java"><br>@Controller 
-@RequestMapping("/editAccount")
+<pre><code class="prettyprint java"><br />@Controller 
+@RequestMapping(&quot;/editAccount&quot;)
 public class EditAccountController {
 
     @RequestMapping(method=RequestMethod.GET)
-    public Account setupForm(@RequestParam("id") Long id) {
+    public Account setupForm(@RequestParam(&quot;id&quot;) Long id) {
         ...
         return account;
     }
@@ -187,50 +193,51 @@ public class EditAccountController {
     @RequestMapping(method=RequestMethod.POST)
     public String processSubmit(Account account) {
         ...
-        return "redirect:/success.htm";
+        return &quot;redirect:/success.htm&quot;;
     }
 }
 </code></pre><p>这是一个MultiActionController样式的委派，其中通过请求方法和相对路径来缩小方法级映射：</p>
-<pre><code class="prettyprint java"><br>@Controller 
-@RequestMapping("/accounts/*")
+<pre><code class="prettyprint java"><br />@Controller 
+@RequestMapping(&quot;/accounts/*&quot;)
 public class AccountsController {
 
     @RequestMapping(method=RequestMethod.GET)
-    public List<Account> list() {...}
+    public List&lt;Account&gt; list() {...}
 
     @RequestMapping(method=RequestMethod.GET)
-    public Account show(@RequestParam("id") Long id) {...}
+    public Account show(@RequestParam(&quot;id&quot;) Long id) {...}
 
     @RequestMapping(method=RequestMethod.POST)
     public String create(Account account) {...}
     ... 
 }
 </code></pre><p>如您所见，由于代码中嵌入了“ / accounts / *”映射，因此很难为Controller映射实施应用程序范围的约定。至少并非没有严格的纪律。幸运的是，有一种方法可以将外部HandlerMapping与方法级别的@RequestMapping注释结合在一起。以下是说明此方法如何工作的示例：</p>
-<pre><code class="prettyprint xml"><br><bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-    <property name="mappings">
-        <value>
+<pre><code class="prettyprint xml"><br />&lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleUrlHandlerMapping&quot;&gt;
+    &lt;property name=&quot;mappings&quot;&gt;
+        &lt;value&gt;
             /accounts/*=accountsController
-        </value>
-    <property>
-</bean>
+        &lt;/value&gt;
+    &lt;property&gt;
+&lt;/bean&gt;
 </code></pre>
-<pre><code class="prettyprint java"><br>@Controller
+<pre><code class="prettyprint java"><br />@Controller
 public class AccountsController {
 
     @RequestMapping(method=RequestMethod.GET)
-    public List<Account> list() {...}
+    public List&lt;Account&gt; list() {...}
 
     @RequestMapping(method=RequestMethod.GET)
-    public Account show(@RequestParam("id") Long id) {...}
+    public Account show(@RequestParam(&quot;id&quot;) Long id) {...}
 
     @RequestMapping(method=RequestMethod.POST)
     public String create(Account account) {...}
     ... 
 }
-</code></pre><p>此处，控制器映射位于基于XML的中央映射中，而操作方法映射则通过注释指定。这种方法可以描述为具有基于注释的方法分派的POJO MultiActionController。实际上，在SpringSource的最近一次通信中，Juergen指出，为MultiActionController提供基于注释的替代方法是一个明确的Spring 2.5设计目标，因此我想在那里并不奇怪！此外，正在进行的工作允许您将方法级别的@RequestMapping注释与ControllerClassNameHandlerMapping约定结合起来（请参阅<a href="http://jira.springframework.org/browse/SPR-4129">SPR-4129</a> ）。</p><p>那么这一切的意义何在？</p><p>一种基于XML的用于配置Web层的方法可能会比较吵杂，但集中化的外部化配置确实有其用途。从具有深层继承层次结构的特定于框架的基类扩展来实现控制逻辑也会带来噪音，我们通常认为，如果可以帮助的话，应该避免这样做。在Spring MVC 2.5中，注释可以通过将方法映射规则封装在Controller类中来帮助解决这两个问题，并且还允许您将Controllers实现为POJO。此外，上面的混合方法显示了如何充分利用外部化配置和基于注释的配置。</p></div>
+</code></pre><p>此处，控制器映射位于基于XML的中央映射中，而操作方法映射则通过注释指定。这种方法可以描述为具有基于注释的方法分派的POJO MultiActionController。实际上，在SpringSource的最近一次通信中，Juergen指出，为MultiActionController提供基于注释的替代方法是一个明确的Spring 2.5设计目标，因此我想在那里并不奇怪！此外，正在进行的工作允许您将方法级别的@RequestMapping批注与ControllerClassNameHandlerMapping约定结合起来（请参阅<a href="http://jira.springframework.org/browse/SPR-4129">SPR-4129</a> ）。</p><p>那么这一切的意义何在？</p><p>一种基于XML的用于配置Web层的方法可能会比较吵杂，但集中化的外部化配置确实有其用途。从具有深层继承层次结构的特定于框架的基类扩展来实现控制逻辑也会带来噪音，我们通常认为，如果可以帮助的话，应该避免这样做。在Spring MVC 2.5中，注释可以通过将方法映射规则封装在Controller类中来解决这些问题，并且还允许您将Controllers实现为POJO。此外，上述混合方法显示了如何充分利用外部化配置和基于注释的配置。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 141;
 
       (function(disqus_shortname, document) {
@@ -244,7 +251,8 @@ public class AccountsController {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -282,12 +290,14 @@ public class AccountsController {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

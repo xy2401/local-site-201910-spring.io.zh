@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>扩展Spring Cloud</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Extending Spring Cloud">
-<meta name="twitter:description" content="<p>One of the most interesting capabilities of Spring Cloud is its extensibility. You can extend it to support additional clouds, enhance already supported clouds, support new services, new service connectors–all without modifying the Spring Cloud code itself. In this blog, we explore this capability. If you haven’t done so already, please read the <a href=" https:="" ="" spring.io="" blog="" 2014="" 06="" 03="" introducing-spring-clou="="></head><body dir="ltr">first and <a href="https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically">second</a> blog in this series to acquire sufficient background.
+<meta name="twitter:description" content="<p>One of the most interesting capabilities of Spring Cloud is its extensibility. You can extend it to support additional clouds, enhance already supported clouds, support new services, new service connectors–all without modifying the Spring Cloud code itself. In this blog, we explore this capability. If you haven’t done so already, please read the <a href=" https:="" ="" spring.io="" blog="" 2014="" 06="" 03="" introducing-spring-clou="="></head><body >first and <a href="https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically">second</a> blog in this series to acquire sufficient background.
 <h1><a href="#the-three-axes-of-extensibility" class="anchor" name="the-three-axes-of-extensibility"></a>The three axes of extensibility</h1>
 <p>Spring Cloud provides extensibility along three orthogonal directions. You may extend it in one of these directions and orthogonality ensures that you continue to benefit from the others.</p>
 ">
@@ -40,10 +44,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -174,10 +180,113 @@
 <li><p><strong>云平台</strong> ：虽然Spring Cloud支持Cloud Foundry，Heroku和Local Config云（以在类似云的环境中进行本地测试），但是您不受这些选择的限制。您可以添加自己的云平台并利用Spring Cloud的其余功能，例如Spring Java Config。</p></li>
 <li><p><strong>云服务</strong> ：云平台提供了从关系数据库到消息传递的各种服务。每个云平台提供的服务差异很大，即使对于同一平台的多个安装也是如此。对于诸如Cloud Foundry之类的PaaS产品而言尤其如此，其中Cloud Foundry的私有实例往往具有特定于每个安装的服务。Spring Cloud提供了一种扩展其核心产品之外的服务的简便方法。就像云平台的可扩展性一样，您无需更改Spring Cloud代码即可将其扩展到新服务，而您将继续利用其他部分的优势。</p></li>
 <li><p><strong>框架</strong> ：Spring Cloud当前通过<a href="https://github.com/spring-projects/spring-cloud/tree/master/spring-cloud-spring-service-connector">spring-service-connector</a>模块支持Spring框架。但是，除了该模块之外，Spring Cloud中的任何内容都不依赖于Spring。这样，您应该能够使用任何基于JVM的框架中的其他部分，或者通过添加新模块将其扩展为框架。</p></li>
-</ol><p>在<a href="https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically">上一篇博客中</a> ，我们介绍了如何使用<code>CloudFactory</code>和<code>Cloud</code>以编程方式使用Spring Cloud。当涉及到可扩展性时，您将不会使用其中任何一个。相反，您将在核心模块中实现其他类型。让我们看看它们。</p><h1><a href="#cloud-platform-extensibility" class="anchor" name="cloud-platform-extensibility"></a>云平台可扩展性</h1><p>将Spring Cloud扩展到新的云平台时，您需要熟悉的主要类型是<code>CloudConnector</code> ，它是一个简单的三方法界面：</p>
+</ol><p>在上<a href="https://spring.io/blog/2014/07/29/using-spring-cloud-programmatically">一个博客中</a> ，我们研究了您将如何使用<code>CloudFactory</code>和<code>Cloud</code>以编程方式使用Spring Cloud。当涉及到可扩展性时，您将不会使用其中任何一个。相反，您将在核心模块中实现其他类型。让我们看看它们。</p><h1><a href="#cloud-platform-extensibility" class="anchor" name="cloud-platform-extensibility"></a>云平台可扩展性</h1><p>将Spring Cloud扩展到新的云平台时，您需要熟悉的主要类型是<code>CloudConnector</code> ，这是一个简单的三方法界面：</p>
 <pre><code class="prettyprint java">public interface CloudConnector {
 	boolean isInMatchingCloud();
 	ApplicationInstanceInfo getApplicationInstanceInfo();
-	List<ServiceInfo> getServiceInfos();
+	List&lt;ServiceInfo&gt; getServiceInfos();
 }
-</code></pre><p><code>isInMatchingCloud()</code>方法应检查其环境，以确定它是否在正确的环境中运行。例如，Cloud Foundry连接器检查<code>VCAP_APPLICATION</code>环境变量的存在，而Heroku连接器寻找<code>DYNO</code>环境变量的存在。<code>getApplicationInstanceInfo()</code>方法返回有关当前应用程序实例的信息（应用程序名称，主机，端口和应用程序属性）。最有趣的方法<code>getServiceInfos()</code>返回一个列表，其中每个元素包含足够的信息，以便应用程序知道如何连接到每个服务。每个<code>ServiceInfo</code>对象中包含的确切信息将留给每个实现（因此<code>ServiceInfo</code>仅定义一个方法： <code>getId()</code> ）。</p><p>创建<code>CloudConnector</code>的实现后，您需要使Spring Cloud意识到这一点。对于所有扩展点，Spring Cloud使用基于<a href="https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html">ServiceLoader</a>的统一机制。应用于Spring Cloud进行平台扩展时，它归结为包含一个名为<code>/META-INF/services/org.springframework.cloud.CloudConnector</code></p><h1><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></h1><p><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></p><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></div><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></div><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></article><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></div><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></div><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></div><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></div><code>/META-INF/services/org.springframework.cloud.CloudConnector</code></body></html>
+</code></pre><p>的<code>isInMatchingCloud()</code>方法应检查其环境，以确定其是否在正确的环境中运行。例如，Cloud Foundry连接器检查是否存在<code>VCAP_APPLICATION</code>环境变量，而Heroku连接器将查找环境变量的存在<code>DYNO</code>环境变量。的<code>getApplicationInstanceInfo()</code>方法返回有关当前应用程序实例的信息（应用程序名称，主机，端口和应用程序属性）。最有趣的方法<code>getServiceInfos()</code>返回一个列表，其中每个元素包含足够的信息，以便应用程序知道如何连接到每个服务。每个中包含的确切信息<code>ServiceInfo</code>对象留给每个实现（ <code>ServiceInfo</code>因此，仅定义了一种方法： <code>getId()</code> ）。</p><p>一旦创建了<code>CloudConnector</code> ，您需要使Spring Cloud意识到这一点。对于所有扩展点，Spring Cloud使用基于<a href="https://docs.oracle.com/javase/7/docs/api/java/util/ServiceLoader.html">ServiceLoader</a>的统一机制。应用于Spring Cloud进行平台扩展时，它归结为包含名为<code>/META-INF/services/org.springframework.cloud.CloudConnector</code>带有实现类全限定名称的条目。通常，您会将文件与实现和支持类一起捆绑在一起。然后，应用程序要做的就是将这个jar包含在类路径中。</p><h1><a href="#service-extensibility" class="anchor" name="service-extensibility"></a>服务扩展性</h1><p>的<code>ServiceInfoCreator</code>接口提供了与新服务一起使用的扩展点。</p>
+<pre><code class="prettyprint java">public interface ServiceInfoCreator&lt;SI extends ServiceInfo, SD&gt; {
+    public boolean accept(SD serviceData);
+    public SI createServiceInfo(SD serviceData);
+}
+</code></pre><p>通用参数<code>SI</code>定义了<code>ServiceInfo</code>它会创建，而<code>SD</code>参数定义了可以使用的原始服务数据类型。原始服务数据类型取决于云平台。例如，在Cloud Found中，它将是<code>Map</code>根据<code>VCAP_SERVICES</code>环境变量，而在Heroku中，它将是一对，包含特定于服务的环境变量及其值。由于原始数据类型取决于平台，因此实现也是如此<code>ServiceInfoCreator</code> 。的<code>accept()</code>方法检查服务数据并确定是否可以处理。例如，它可以查看URL方案并确定它是否可以使用该服务数据。如果可以， <code>createServiceInfo()</code>必须返回一个<code>ServiceInfo</code>宾语。如果这是一项全新的服务，则可能还需要实施<code>ServiceInfo</code>为此，您可以使用现有的其中之一。</p><p>一旦实施了<code>ServiceInfoCreator</code> ，则必须让Spring Cloud知道。这遵循了前面讨论的云平台可扩展性相同的想法。在这种情况下，您使用的文件名是<code>CloudConnector</code>依赖。对于Cloud Foundry，它是<code>/META-INF/services/org.springframework.cloud.cloudfoundry.CloudFoundryServiceInfoCreator</code> （理论上， <code>CloudConnector</code>实施可能会决定使用其他扩展机制，但Spring Cloud不建议这样做）。</p><p>如前博客所述，云应用程序开发人员可以决定直接与<code>ServiceInfo</code>宾语。因此，如果您只是实施一个<code>ServiceInfoCreator</code> ，您已经提供了一些好处。但是，使用原始<code>ServiceInfo</code>许多专注于开发应用程序的开发人员可能不喜欢该对象，因此您还将实现下一个扩展。</p><h1><a href="#framework-extensibility" class="anchor" name="framework-extensibility"></a>框架可扩展性</h1><p>最后一个扩展点是<code>ServiceConnectorCreator</code> 。它的工作是转变<code>ServiceInfo</code>插入适合在应用程序正在使用的框架中使用的服务连接器。例如，它可以转变<code>MysqlServiceInfo</code>变成一个<code>DataSource</code>宾语。开箱即用，Spring Cloud支持用于<code>DataSource</code>以及一些<a href="https://projects.spring.io/spring-data">Spring Data</a>和<a href="https://projects.spring.io/spring-amqp">Spring AMQP</a>类型。如果您希望将Spring Cloud扩展到其他框架，或者想要支持Spring Cloud尚不直接支持的其他Spring Data类型（例如Neo4J，Elasticsearch，Cassandra）或与Spring兼容的类型（例如S3），则可以使用您需要的扩展点。</p>
+<pre><code class="prettyprint java">public interface ServiceConnectorCreator&lt;SC, SI extends ServiceInfo&gt; {
+    SC create(SI serviceInfo, ServiceConnectorConfig serviceConnectorConfig);
+    ...
+}
+</code></pre><p>还有更多方法。但是，您通常会扩展<code>AbstractServiceConnectorCreator</code>负责执行这些。</p><p>的<code>SC</code>通用参数<code>ServiceConnectorCreator</code>绑定到它将创建的连接器的类型，例如<code>DataSource</code> ，而<code>SI</code>参数表示类型<code>ServiceInfo</code>它可以工作。</p><p>的<code>create()</code>该方法随附<code>ServiceInfo</code>对象和配置对象，其中包含特定于服务的信息，例如池参数。它需要使用这些参数来创建适当的连接器。</p><p>准备好实现后，只需将其放入一个名为<code>/META-INF/services/org.springframework.cloud.service.ServiceConnectorCreator</code> 。Spring Cloud将使用前面所述的Service Loader机制。</p><h1><a href="#summary" class="anchor" name="summary"></a>摘要</h1><p>如您所见，Spring Cloud在云平台，服务和框架轴上提供了实质性的可扩展性。下次，您将遇到一种新的方法，您应该能够扩展Spring Cloud以便与它们一起使用。如果您将扩展程序开源，请告诉我们，以便我们向其他人展示它以使您受益。如果这是足够常见的扩展，请考虑发出拉取请求。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 1697;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

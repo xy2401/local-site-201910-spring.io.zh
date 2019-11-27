@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Spring Boot 2.0测试自动配置</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,14 +38,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2018-03-07 16:30:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -167,46 +173,47 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>自动配置是Spring Boot最强大的功能之一。自动配置类的测试通常遵循相同的模式。大多数测试会使用受测试的自动配置类来启动<code>ApplicationContext</code> ，并且根据测试，还会加载其他配置来模拟用户行为。这种模式的重复出现会在代码库中增加很多重复。</p>
-<p>Spring Boot 2.0提供了一套新的测试助手，可以轻松配置<code>ApplicationContext</code>来模拟自动配置测试场景。以下示例将<code>ApplicationContextRunner</code>配置为测试<code>UserServiceAutoConfiguration</code> ：</p>
+<div class="blog--post"><p>自动配置是Spring Boot最强大的功能之一。自动配置类的测试通常遵循相同的模式。大多数测试启动<code>ApplicationContext</code>在测试中的自动配置类中（取决于测试），还可以加载其他配置来模拟用户行为。这种模式的重复出现会在代码库中增加很多重复。</p>
+<p>Spring Boot 2.0提供了一套新的测试帮助程序，可轻松配置<code>ApplicationContext</code>模拟自动配置测试方案。以下示例配置了<code>ApplicationContextRunner</code>测试<code>UserServiceAutoConfiguration</code> ：</p>
 <pre><code class="prettyprint java">private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
     .withConfiguration(AutoConfigurations.of(UserServiceAutoConfiguration.class));
 </code></pre>
-<p>由于在测试类份额类似的配置大多数测试中， <code>ApplicationContextRunner</code>是最好的，因为它被设置了一些常见的配置测试类的领域。</p>
-<p>每个测试都可以使用所需的配置和属性进一步自定义<code>ApplicationContext</code> 。</p>
+<p>由于测试类别中的大多数测试共享相似的配置， <code>ApplicationContextRunner</code>最好用作通过某些常用配置设置的测试类的字段。</p>
+<p>每个测试都可以进一步自定义<code>ApplicationContext</code>具有所需的配置和属性。</p>
 <pre><code class="prettyprint java">@Test
 public void someTest() {
     this.contextRunner
-        .withPropertyValues("user.my.property=test")
+        .withPropertyValues(&quot;user.my.property=test&quot;)
 	    .withUserConfiguration(MyConfiguration.class)
 	    .run(...);
 }
 </code></pre>
-<p>除了调用<code>UserServiceAutoConfiguration</code> ，上面的示例还注册<code>MyConfiguration</code>并将<code>user.my.property</code>属性设置为<code>test</code> 。</p>
-<p><code>ApplicationContextRunner</code>透明地复制Spring Boot使用的配置初始化顺序（先扫描用户配置，然后根据定义的顺序自动配置）。</p>
-<p>支持<code>AssertableApplicationContext</code> ，它在<code>ApplicationContext</code>上提供AssertJ样式的断言。您还可以链接多个断言，如以下示例所示：</p>
+<p>除了调用<code>UserServiceAutoConfiguration</code> ，上面的示例注册<code>MyConfiguration</code>并设置<code>user.my.property</code>财产<code>test</code> 。</p>
+<p><code>ApplicationContextRunner</code>透明地复制Spring Boot使用的配置初始化顺序（首先扫描用户配置，然后根据其定义的顺序自动配置）。</p>
+<p>有支持<code>AssertableApplicationContext</code>它在上提供AssertJ样式的断言<code>ApplicationContext</code> 。您还可以链接多个断言，如以下示例所示：</p>
 <pre><code class="prettyprint java">@Test
 public void someTest() {
-    this.contextRunner.run((context) -> {
+    this.contextRunner.run((context) -&gt; {
         assertThat(context).hasSingleBean(MyBean.class);
         assertThat(context).getBeanNames(UserRule.class).hasSize(2);
     });
 }
 </code></pre>
-<p>断言也可以在未能开始检查失败原因的<code>ApplicationContext</code>上使用。无论如何，上下文的生命周期不再需要由测试来管理，即上下文自动关闭。</p>
-<p>对于需要<code>WebApplicationContext</code>测试，可以使用<code>WebApplicationContextRunner</code>或<code>ReactiveWebApplicationContextRunner</code> 。</p>
-<p>使用<code>@ConditionalOnClass</code>annotation的类路径上是否存在特定的<code>Class</code> ，也会影响自动配置。<code>ApplicationContextRunner</code> ，您可以测试在运行时不存在给定<code>Class</code>时发生的情况。Spring Boot附带有<code>FilteredClassLoader</code> ，跑步者可以轻松使用。在以下示例中，我们断言，如果不存在<code>UserService</code> ，则会自动禁用自动配置：</p>
+<p>断言也可以用于<code>ApplicationContext</code>未能开始检查失败原因。无论如何，上下文的生命周期不再需要由测试来管理，即上下文自动关闭。</p>
+<p>对于需要<code>WebApplicationContext</code> ， <code>WebApplicationContextRunner</code>要么<code>ReactiveWebApplicationContextRunner</code>可以使用。</p>
+<p>自动配置还可能会受到特定配置文件的影响<code>Class</code>在类路径上使用<code>@ConditionalOnClass</code>注解。 <code>ApplicationContextRunner</code>让您测试在给定的情况下会发生什么<code>Class</code>在运行时不存在。Spring Boot随附一个<code>FilteredClassLoader</code>跑步者可以轻松使用。在以下示例中，我们断言<code>UserService</code>不存在时，将自动禁用自动配置：</p>
 <pre><code class="prettyprint java">@Test
 public void serviceIsIgnoredIfLibraryIsNotPresent() {
     this.contextRunner
         .withClassLoader(new FilteredClassLoader(UserService.class))
-        .run((context) -> assertThat(context)
-                .doesNotHaveBean("userService"));
+        .run((context) -&gt; assertThat(context)
+                .doesNotHaveBean(&quot;userService&quot;));
 }
 </code></pre></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3134;
 
       (function(disqus_shortname, document) {
@@ -220,7 +227,8 @@ public void serviceIsIgnoredIfLibraryIsNotPresent() {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -258,12 +266,14 @@ public void serviceIsIgnoredIfLibraryIsNotPresent() {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

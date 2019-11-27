@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>Spring Batch 2.0新功能概要</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -69,10 +73,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -200,60 +206,61 @@
 </header>
 <div class="blog--post"><p>在本文中，我们概述了<a href="http://www.springframework.org/spring-batch">Spring Batch</a> 2.0的主要主题，并重点介绍了1.x的更改。新版本的开发工作正在进行中，上周发布了M2版本，引起了我们的极大兴趣，因此现在似乎是个提供一些建议的好时机。</p>
 <h3>Spring Batch 2.0主题</h3><p>新版本的四个主要主题是<br></p><ul><br><li>Java 5和Spring 3.0</li><br><li>非顺序执行</li><br><li>可扩展性</li><br><li>配置：注释和XML名称空间</li><br></ul><br>因此，我们将分别涵盖每个领域，并描述它们的含义以及更改对Spring Batch现有用户的影响。以下是已经实现的功能的更多详细信息，这些功能主要属于第一类，而其他领域则具有一些启用的功能。<p></p><p>在Spring Batch 2.0.0中，项目的物理布局没有任何变化。M2（相同的旧下载，Java包的基本布局相同）。我们尚未删除任何功能，但已利用这次机会修改了几个API，对于从1.x更新项目的人们也做了一些小的更改。Spring Batch尚不成熟，我们添加了一些非常重要的功能，因此我们认为对主要版本进行更改是一个很好的机会，可以进行一些清理。我们不希望任何人在升级方面遇到任何困难，如果您是现有用户，那么本文将帮助您评估更改的程度。</p>
-<h3>Java 5和Spring 3.0</h3><p>如您所知，Spring 3.0将是专门针对Java 5的Spring的第一个主要版本（我将把它留给Juergen和Arjen进行更详细地说明）。现在，Sun已经把一个“ <a href="http://java.dzone.com/articles/rip%E2%80%A6jdk-14">服务寿命结束</a> ”邮票上的JDK 1.4中，似乎是适当的，并有春3.0一些伟大的新功能，我们要好好把握。</p>
+<h3>Java 5和Spring 3.0</h3><p>如您所知，Spring 3.0将是专门针对Java 5的Spring的第一个主要版本（我将把它留给Juergen和Arjen进行更详细地说明）。现在，Sun在JDK 1.4上贴了“ <a href="http://java.dzone.com/articles/rip%E2%80%A6jdk-14">服务终止</a> ”标记，这似乎是适当的，并且Spring 3.0有一些重要的新功能可供我们利用。</p>
 <h4>类型安全</h4><p>大部分工作都在2.0.0中进行。Spring Batch的M1版本致力于将现有代码转换为Java 5，并尽可能利用泛型和参数化类型。这为框架的用户提供了更好的编程经验，允许检查编译时的类型安全性并最终减少使用Spring Batch的项目的维护成本。例如，在<tt>ItemReader中</tt> ，Spring Batch的中央界面和用户扩展点之一，我们现在有了一个类型安全的<tt>读取</tt>方法：</p>
-<pre><code class="prettyprint java"><br>public interface ItemReader<S> {
+<pre><code class="prettyprint java"><br />public interface ItemReader&lt;S&gt; {
     S read();
 }
-</code></pre><p>在此还要注意的一点是，旧的（1.x）框架回调<tt>mark（）</tt>和<tt>reset（）</tt>已从该接口删除，这使其对最终用户更加友好，并防止了对该框架的要求和时间的误解。现在，在框架提供的<tt>Step</tt>实施中内部处理相同的问题（或标记和重置）。</p>
+</code></pre><p>在此还要注意的一点是，旧的（1.x）框架回调<tt>mark（）</tt>和<tt>reset（）</tt>已从该接口删除，这使其对最终用户更加友好，并防止了对该框架的要求和时间的误解。现在，在框架提供的<tt>Step</tt>实现中内部处理了相同的问题（或标记和重置）。</p>
 <h4>块处理</h4><p>在伙伴<tt>ItemWriter</tt>界面中也发生了类似的变化，并且稍有改变，该框架用于写入数据：</p>
-<pre><code class="prettyprint java"><br>public interface ItemWriter<T> {
-    void write(List<? extends T> items);
+<pre><code class="prettyprint java"><br />public interface ItemWriter&lt;T&gt; {
+    void write(List&lt;? extends T&gt; items);
 }
 </code></pre><p>这个接口也删除了<tt>flush（）</tt>和<tt>clear（）</tt>的旧框架回调，为了弥补这一点， <tt>write（）</tt>方法具有一个新的签名。最重要的是，我们已经在框架内部转移到了面向块的处理范例。实际上，在批处理框架中，这比旧的面向项目的方法更为自然，因为出于性能原因，我们经常需要缓冲和刷新，而旧的界面使用户感到尴尬。现在，您可以在<tt>write（）</tt>方法中进行所有需要的批处理。</p>
-<h4>步骤工厂Bean更改</h4><p>面向块的方法进行处理的副作用是步骤工厂bean实现的更改。旧的<tt>SkipLimitStepFactoryBean</tt>已重命名为<tt>FaultTolerantStepFactoryBean</tt> ，并且它仍可用于大多数常见用例，以替代旧的工厂bean。默认情况下，它创建一个分步实现，以跨回滚缓冲输入项，以便新的<tt>ItemReader</tt>和<tt>ItemWriter</tt>接口可以与非事务性输入源（例如文件）一起正常使用。对于在回滚后重新显示项目的输入源，客户端必须在工厂bean中设置一个标志（ <tt>isReaderTransactional</tt>是M2时标志的名称） <tt>-JmsItemReader</tt>是框架中唯一相关的阅读器，并且没有多少项目使用所以这不是一个大变化。</p>
+<h4>步骤工厂Bean更改</h4><p>面向块的方法进行处理的副作用是步骤工厂bean实现的更改。旧的<tt>SkipLimitStepFactoryBean</tt>已重命名为<tt>FaultTolerantStepFactoryBean</tt> ，它仍可用于大多数常见用例，以替代旧的工厂bean。默认情况下，它创建一个分步实现，以跨回滚缓冲输入项，以便新的<tt>ItemReader</tt>和<tt>ItemWriter</tt>接口可与非事务性输入源（如文件）一起正常使用。对于在回滚后重新显示项目的输入源，客户端必须在工厂bean中设置一个标志（ <tt>isReaderTransactional</tt>是M2时标志的名称） <tt>-JmsItemReader</tt>是框架中唯一相关的阅读器，并且没有多少项目使用所以这不是一个大变化。</p>
 <h4>业务处理</h4><p>一个相关的新功能是，以<tt>ItemProcessor</tt>的形式在块上有一个新孩子：</p>
-<pre><code class="prettyprint java"><br>public interface ItemProcessor<S,T> {
+<pre><code class="prettyprint java"><br />public interface ItemProcessor&lt;S,T&gt; {
     T process(S item);
 }
 </code></pre><p>在1.x中，必须将<tt>S</tt>类型的输入项和<tt>T</tt>类型的输出项之间的转换隐藏在其他参与者之一（通常是<tt>ItemWriter</tt> ）中。现在，我们已经将此关注点<tt>归纳</tt>为通用，并将其在框架中与其同级项<tt>ItemReader</tt>和<tt>ItemWriter</tt>置于相同的重要性级别。1.x的用户可能会在此处识别旧的<tt>ItemTransformer</tt>接口的痕迹，该接口现已被删除。</p>
-<h4>更有用的Tasklet界面</h4><p>许多人看着Spring Batch 1.x问道：“我的业务逻辑是否不读写？该怎么办？”为了更令人满意地回答这个问题，我们修改了<tt>Tasklet</tt>接口。在Spring Batch 1.x中，它相当乏味-实际上只不过是一个<tt>Callable</tt> ，但在2.0中，我们赋予了它更多的灵活性，并将其更多地放入了框架的主流中（例如，现在面向中央块的步骤实现了）实现为<tt>Tasklet</tt> ）。这是新界面：</p>
-<pre><code class="prettyprint java"><br>public interface Tasklet {
+<h4>更有用的Tasklet界面</h4><p>许多人看着Spring Batch 1.x问道：“我的业务逻辑是否不读写？该怎么办？”为了更令人满意地回答这个问题，我们修改了<tt>Tasklet</tt>接口。在Spring Batch 1.x中，它相当乏味-实际上只不过是一个<tt>Callable</tt> ，但在2.0中，我们赋予了它更多的灵活性，并将其更多地放入了框架的主流中（例如，现在面向中心块的步骤实现了）实现为<tt>Tasklet</tt> ）。这是新界面：</p>
+<pre><code class="prettyprint java"><br />public interface Tasklet {
     ExitStatus execute(StepContribution contribution, 
         AttributeAccessor attributes);
 }
 </code></pre><p>这个想法是，小任务现在可以对封闭步骤做出更多贡献，这使它成为实现业务逻辑的更加灵活的平台。<tt>StepContribution</tt>已经是1.x API的一部分，但是它并不是很公开。它的作用是收集对当前<tt>StepExecution的</tt>更新，而程序员不必担心另一个线程中的并发修改。这也告诉我们<tt>Tasklet</tt>将被重复调用（而不是1.x框架中的每个步骤仅调用一次），因此可以用来执行更大范围的业务处理任务。<tt>AttributeAccessor</tt>是一个大范围的键值对包。Tasklet可以使用它来存储中间结果，这些结果将在回滚期间保留。</p>
 <h4>作业和步骤属性的后期绑定</h4><p>到目前为止（直到M2），我们还无法利用任何新的Spring 3.0功能，因为还没有发布Spring 3.0。但是从下一个里程碑（M3）开始，我们将使用新的Spring EL（表达语言）功能来实现<tt>JobParameters</tt>和<tt>ExecutionContext</tt>属性到步骤组件的后期绑定。这是一个非常需要的功能，对于1.x中的特殊情况，我们有一些变通办法，例如用于绑定到文件名作为作业输入参数的<tt>StepExecutionResourceProxy</tt> 。Spring Batch 2.0中可用的更通用的解决方案是通过在适当的Spring范围内定义它们，从而将这些步骤属性绑定到任意组件，例如</p>
-<pre><code class="prettyprint xml"><br><bean id="step1" parent="simpleStep">
-  <property name="itemReader">
-    <bean class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
-        <property value="#{jobParameters[inputFile]}" />
+<pre><code class="prettyprint xml"><br />&lt;bean id=&quot;step1&quot; parent=&quot;simpleStep&quot;&gt;
+  &lt;property name=&quot;itemReader&quot;&gt;
+    &lt;bean class=&quot;org.springframework.batch.item.file.FlatFileItemReader&quot; scope=&quot;step&quot;&gt;
+        &lt;property value=&quot;#{jobParameters[inputFile]}&quot; /&gt;
         ...
-    </bean>
-  </property>
+    &lt;/bean&gt;
+  &lt;/property&gt;
   ...
-</bean>
-</code></pre><p>项目阅读器需要绑定到仅在运行时可用的文件名。为此，我们将其声明为scope =“ step”，并使用Spring EL绑定模式<tt>＃{…}</tt>绑定到job参数中。相同的模式将适用于步骤和作业级别执行上下文属性。</p><p>在夜间快照中可以使用<tt>StepScope</tt> ，但我们仍在使用Spring 2.5.5，因此EL绑定尚不可用。逐步作用域的bean也是解决旧的Spring Batch问题的好方法，该问题是如何使您的步骤线程安全的。如果某个步骤依赖于诸如<tt>FlatFileItemReader之</tt>类的有状态组件，则只需将该组件定义为scope =“ step”，框架便会为其创建一个延迟初始化代理，并且将在每个步骤执行时根据需要创建一次。目前仍然指出错误与创建为每个作业的执行，这是在1.x中保持线程工作间的碰撞当前最佳实践新<tt>的ApplicationContext。</tt>但是现在步骤范围为您提供了另一种选择，对于大多数Spring用户来说，这可能更容易掌握。</p>
+&lt;/bean&gt;
+</code></pre><p>项目阅读器需要绑定到仅在运行时可用的文件名。为此，我们将其声明为scope =“ step”，并使用Spring EL绑定模式<tt>＃{…}</tt>绑定到job参数中。相同的模式将适用于步骤和作业级别执行上下文属性。</p><p>在夜间快照中可以使用<tt>StepScope</tt> ，但我们仍在使用Spring 2.5.5，因此EL绑定尚不可用。逐步作用域的bean也是解决旧的Spring Batch问题（如何使您的步骤线程保持安全）的一个很好的解决方案。如果某个步骤依赖于诸如<tt>FlatFileItemReader之</tt>类的有状态组件，则只需将该组件定义为scope =“ step”，框架便会为其创建一个延迟初始化代理，并且将在每个步骤执行时根据需要创建一次。为每个作业执行创建一个新的<tt>ApplicationContext</tt>仍然存在错误，这是1.x中当前的最佳做法，可防止线程在各个作业之间发生冲突。但是现在步骤范围为您提供了另一种选择，对于大多数Spring用户来说，这可能更容易掌握。</p>
 <h3>非顺序执行</h3><p>在1.x中，作业的模型始终是线性的步骤序列，如果一个步骤失败，则该作业失败。尽管许多工作仍然适合这种模式，但它并没有消失，但在2.0中，我们通过引入一些新功能来解除这种限制。这些是针对M3版本计划的，因此实现细节可能会发生变化，但是我们的想法是支持三个功能：<br></p><ul><br><li>有条件的执行：根据最后一个的<tt>ExitStatus</tt>分支到另一个步骤。这包括分支到“失败”状态的能力，这意味着单步失败不再是一项致命的工作。</li><br><li>暂停执行并等待显式指令继续执行。例如，在有一个业务规则强制手动干预以检查业务关键数据的有效性的情况下，这很有用。</li><br><li>并行执行多个步骤。在步骤独立的情况下，用户可以指定可以并行执行的分支。</li><br></ul><br>截止本文撰写之日，每夜快照都包含一个<tt>ConditionalJob</tt> ，它支持上述第一个用例。<p></p>
 <h3>可扩展性</h3><p>Spring Batch 1.x始终旨在作为单个VM，可能是多线程模型，但是我们在其中内置了许多功能，这些功能支持在多个进程中并行执行。许多项目已经成功地依靠Spring Batch的服务质量特性实现了可扩展的解决方案，以确保仅按正确的顺序进行处理。在2.0版中，我们计划更明确地公开这些功能。有两种方法可扩展，我们将同时支持这两种方法：远程分块和分区。</p>
-<h4>远程分块</h4><p>远程分块是一种无需明确了解数据结构即可分步工作的技术。通过在单个进程中读取输入源（按照1.x中的常规方法）并将条目作为块发送到远程工作进程，可以动态拆分任何输入源。远程进程实现一个侦听器模式，响应请求，处理数据并发送异步答复。请求和答复的传输必须持久且保证交付和单个使用者，并且这些功能可以在任何JMS实现中轻松使用。但是Spring Batch是在<a href="javascript:void(0);" http:="" ="" www.springframework.org="" spring-integratio="=">http://www.springframework.org/spring-integration</a> Spring Integration的基础上构建远程分块功能的，因此实际上它与消息中间件的实际实现无关。</p>
-<h4>分区</h4><p>分区是一种替代方法，相反，它取决于对输入数据的结构有一定了解，例如一系列主键或要处理的文件名。这种模型的优势在于，分区中每个元素的处理器都可以像正常Spring Batch作业中的单个步骤一样工作。他们不必实施任何特殊或新的模式，这使得它们易于配置和测试。原则上，分区比远程组块更具可伸缩性，因为在一个位置读取所有输入数据不会引起序列化瓶颈。</p><p>在Spring Batch 2.0中，两个接口支持分区： <tt>PartitionHandler</tt>和<tt>StepExecutionSplitter</tt> 。<tt>PartitionHandler</tt>是一个了解执行结构的人-它必须将请求传输到远程步骤，并使用任何可用的网格或远程技术来收集结果。<tt>PartitionHandler</tt>是SPI，我们提供了一个开箱即用的实现，可以通过<tt>TaskExecutor</tt>本地执行。对于我们已经看到的许多需要并行处理大量IO绑定任务的项目，这将立即有用，因为在这种情况下，远程执行只会使部署复杂化，并且不一定会对性能有所帮助。其他实现将特定于执行结构，例如网格提供程序之一（IBM，Oracle，Terracotta，Appistry等），并且我们不想暗示在Spring Batch中相对于其他任何实现都优先。</p><p>SpringSource正在计划一个Enterprise Batch产品，它将为分区和远程分块以及管理和调度问题提供完整的运行时解决方案。观看此空间以了解有关它如何形成的更多详细信息，或者来参加“ <a href="http://americas.springone.com/">春季第一美洲”</a></p>
-<h3>配置：注释和XML名称空间</h3><p>使用annotation实现批处理逻辑的想法与Spring @MVC类似。最终的结果是，您不必注释和注册一堆接口（读取器，写入器，处理器，侦听器等），而只需注释一个POJO并将其插入步骤即可。有对应于各种接口的方法级别注释，以及对应于作业，步骤和块级别属性的参数级别注释和工厂方法（有点像Spring @MVC中的<tt>@ModelParameter</tt>和<tt>@RequestParameter</tt> 。</p><p>Spring Batch的XML名称空间使普通事物的配置更加容易。例如，我们上面提到的<tt>ConditionalJob</tt>具有XML配置选项，因此简单的条件执行可能看起来像这样：</p>
-<pre><code class="prettyprint xml"><br><job>
-  <step name="gamesLoad" next="playerLoad"/>
-  <step name="playerLoad">
-    <next on="*" to="summarize"/>
-    <next on="FAILED" to="compensate"/>
-  </step>
-  <step name="compensate"/>
-  <step name="summarize"/>
-</job>
+<h4>远程分块</h4><p>远程分块是一种无需明确了解数据结构即可分步工作的技术。通过在单个进程中读取它（按1.x中的常规方法）并将条目作为块发送到远程工作进程，可以动态拆分任何输入源。远程进程实现一个侦听器模式，响应请求，处理数据并发送异步答复。请求和答复的传输必须持久且保证交付和单个使用者，并且这些功能可以在任何JMS实现中轻松使用。但是Spring Batch是在<a href="javascript:void(0);" http:="" ="" www.springframework.org="" spring-integratio="=">http://www.springframework.org/spring-integration</a> Spring Integration的基础上构建远程分块功能的，因此实际上它与消息中间件的实际实现无关。</p>
+<h4>分区</h4><p>分区是一种替代方法，相反，它取决于对输入数据的结构有一定了解，例如一系列主键或要处理的文件名。这种模型的优势在于，分区中每个元素的处理器都可以像正常Spring Batch作业中的单个步骤一样工作。他们不必实施任何特殊或新的模式，这使得它们易于配置和测试。原则上，分区比远程组块更具可伸缩性，因为在一个位置读取所有输入数据不会引起序列化瓶颈。</p><p>在Spring Batch 2.0中，两个接口支持分区： <tt>PartitionHandler</tt>和<tt>StepExecutionSplitter</tt> 。<tt>PartitionHandler</tt>是一个了解执行结构的人-它必须将请求传输到远程步骤并使用任何可用的网格或远程技术来收集结果。<tt>PartitionHandler</tt>是SPI，我们提供了一个开箱即用的实现，可以通过<tt>TaskExecutor</tt>本地执行。对于我们已经看到的许多需要并行处理大量IO绑定任务的项目，这将立即有用，因为在这种情况下，远程执行只会使部署复杂化，并且不一定会对性能有所帮助。其他实现将特定于执行结构，例如网格提供程序之一（IBM，Oracle，Terracotta，Appistry等），并且我们不想暗示在Spring Batch中相对于其他任何实现都优先。</p><p>SpringSource正在计划一个Enterprise Batch产品，它将为分区和远程分块以及管理和调度问题提供完整的运行时解决方案。观看此空间以了解有关它如何形成的更多详细信息，或者来参加“ <a href="http://americas.springone.com/">春季第一美洲”</a></p>
+<h3>配置：注释和XML名称空间</h3><p>使用批注实现批处理逻辑的想法与Spring @MVC类似。最终的结果是，您不必注释和注册一堆接口（读取器，写入器，处理器，侦听器等），而只需注释一个POJO并将其插入步骤即可。有对应于各种接口的方法级别注释，以及对应于作业，步骤和块级别属性的参数级别注释和工厂方法（有点像Spring @MVC中的<tt>@ModelParameter</tt>和<tt>@RequestParameter</tt> 。</p><p>Spring Batch的XML名称空间使普通事物的配置更加容易。例如，我们上面提到的<tt>ConditionalJob</tt>具有XML配置选项，因此简单的条件执行可能看起来像这样：</p>
+<pre><code class="prettyprint xml"><br />&lt;job&gt;
+  &lt;step name=&quot;gamesLoad&quot; next=&quot;playerLoad&quot;/&gt;
+  &lt;step name=&quot;playerLoad&quot;&gt;
+    &lt;next on=&quot;*&quot; to=&quot;summarize&quot;/&gt;
+    &lt;next on=&quot;FAILED&quot; to=&quot;compensate&quot;/&gt;
+  &lt;/step&gt;
+  &lt;step name=&quot;compensate&quot;/&gt;
+  &lt;step name=&quot;summarize&quot;/&gt;
+&lt;/job&gt;
 </code></pre><p>第一步（“ gamesLoad”）后面紧跟着“ playerLoad”，但是如果失败，那么我们可以转到另一个步骤（“ compensate”），而不是通常通过“ summary”步骤来完成工作。<tt><step>< /tt="">XML中元素</step><></tt>的name =属性<tt><step>< /tt="">是bean引用，因此<tt>Step</tt>的实现在其他地方定义（可能通过注释）。</step><></tt></p>
-<h3>数据库架构更改</h3><p>元数据模式中有一些整理任务和对数据模型的扩展。我们将为从1.x到2.0的任何人提供更新脚本，因此它们不会引起任何问题，并且肯定会使得导航和与元数据进行交互变得更加容易。对于那些刚接触Spring Batch的人来说，该框架的一些关键好处是服务质量特性，例如可重新启动性和幂等性（仅处理一次业务数据）。我们通过关系数据库中的共享状态来实现这些功能（在大多数情况下），并且该数据库中数据模型的定义在2.0中有所变化。</p><p>主要的变化是与存储<tt>的ExecutionContext</tt>的，它使用在一个表中，以集中，即使上下文可以与一个<tt>StepExecution</tt>或<tt>JobExecution</tt>相关联的事。新模型将在DBA中更受欢迎，因为它使DDL中的关系更加透明。我们还开始将上下文值存储在JSON中，以使它们更易于为人类用户阅读和跟踪（单个实体的上下文全部存储在表的一行中，而不是很多行中）。</p><p>我们还增加了一些统计信息，用于统计和统计已执行和已跳过的项目，并在每个阶段为读取，处理和写入的项目总数进行计数。对于不将执行划分为读取，处理，写入的步骤（或小任务），此过程比所需的更为全面，但是对于大多数用例而言，它比仅存储整个项目计数更为合适。</p>
-<h3>结束语</h3><p>希望本文激发了您对Spring Batch 2.0的胃口，并且您将有时间下载快照或里程碑并进行尝试。我们从社区获得了很好的反馈，如果没有您的帮助和支持，该产品的质量将不及一半。如果我错过了您感兴趣的内容，或者没有提供足够详细的信息，我表示歉意，但是我需要将其压缩为合理的博客大小。如果有人感兴趣，我可以写更多-只是问问。</p><p>如果您想了解更多信息，那么您将有极大的机会了解团队在今年<a href="http://americas.springone.com/">Spring One Americas上的</a> Spring Batch 2.0和所有其他SpringSource活动。卢卡斯·沃德（Lucas Ward）将在一个会议上展示Spring Batch 2.0功能，而我将更详细地展示可伸缩性功能。另外，请查看<a href="http://forum.springframework.org/forumdisplay.php?f=41">论坛</a>上的<a href="http://forum.springframework.org/forumdisplay.php?f=41">讨论</a> ，或转到<a href="http://www.springframework.org/spring-batch">此处</a>的主页。</p></div>
+<h3>数据库架构更改</h3><p>元数据模式中有一些整理任务和对数据模型的扩展。我们将为从1.x到2.0的任何人提供更新脚本，因此它们不会引起任何问题，并且肯定会使得导航和与元数据进行交互变得更加容易。对于那些刚接触Spring Batch的人来说，该框架的一些关键好处是服务质量特性，例如可重新启动性和幂等性（仅处理一次业务数据）。我们通过关系数据库中的共享状态来实现这些功能（在大多数情况下），并且该数据库中数据模型的定义在2.0中已稍有变化。</p><p>主要的变化是与存储<tt>的ExecutionContext</tt>的，它使用在一个表中，以集中，即使上下文可以与一个<tt>StepExecution</tt>或<tt>JobExecution</tt>相关联的事。新模型将在DBA中更受欢迎，因为它使DDL中的关系更加透明。我们还开始将上下文值存储在JSON中，以使它们更易于为人类用户阅读和跟踪（单个实体的上下文全部存储在表的一行中，而不是很多行中）。</p><p>我们还增加了一些统计信息，用于统计和统计已执行和已跳过的项目，并在每个阶段将读取，处理和写入的项目总数进行计数。对于不将执行划分为读取，处理，写入的步骤（或小任务），此过程比所需的更为全面，但是对于大多数用例而言，它比仅存储整个项目计数更为合适。</p>
+<h3>结束语</h3><p>希望本文激发了您对Spring Batch 2.0的胃口，并且您将有时间下载快照或里程碑并进行尝试。我们从社区获得了很好的反馈，如果没有您的帮助和支持，该产品的质量将不及一半。如果我错过了您感兴趣的内容，或者没有提供足够详细的信息，我表示歉意，但是我需要将其压缩为合理的博客大小。如果有人感兴趣，我可以写更多-只是问问。</p><p>如果您想了解更多信息，那么您将有极大的机会了解团队在今年<a href="http://americas.springone.com/">Spring One Americas上的</a> Spring Batch 2.0和所有其他SpringSource活动。卢卡斯·沃德（Lucas Ward）将在一个环节中介绍Spring Batch 2.0功能，而我将更详细地展示可伸缩性功能。另外，请查看<a href="http://forum.springframework.org/forumdisplay.php?f=41">论坛</a>上的<a href="http://forum.springframework.org/forumdisplay.php?f=41">讨论</a> ，或转到<a href="http://www.springframework.org/spring-batch">此处</a>的主页。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 183;
 
       (function(disqus_shortname, document) {
@@ -267,7 +274,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -305,12 +313,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

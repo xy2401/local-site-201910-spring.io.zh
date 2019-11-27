@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>将作业配置上传到Spring Batch Admin</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Uploading Job Configurations to Spring Batch Admin">
-<meta name="twitter:description" content="<p>An interesting problem that has no universal good solution is: how do I change the configuration of a running Spring application? <a href=" http:="" ="" www.springframework.org="" spring-batch-admi="=">Spring Batch Admin 1.0.0.M3 was released recently, and it has a configuration upload feature that solves this problem in a particular way. Someone asked for this feature at the recent S2GForum in Munich (if you missed that sign up for events in <a href="http://bit.ly/dlCWT6">London</a> and <a href="http://bit.ly/cSb48k">Amsterdam</a> in May), and I was happy to tell him that it already existed, so maybe it deserves a bit more air time…
+<meta name="twitter:description" content="<p>An interesting problem that has no universal good solution is: how do I change the configuration of a running Spring application? <a href=" http:="" ="" www.springframework.org="" spring-batch-admi="="></head><body >Spring Batch Admin 1.0.0.M3 was released recently, and it has a configuration upload feature that solves this problem in a particular way. Someone asked for this feature at the recent S2GForum in Munich (if you missed that sign up for events in <a href="http://bit.ly/dlCWT6">London</a> and <a href="http://bit.ly/cSb48k">Amsterdam</a> in May), and I was happy to tell him that it already existed, so maybe it deserves a bit more air time…
 <h2>Screenshots of the Basic Use Case</h2>
 ">
 <meta name="twitter:creator" content="@david_syer">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -169,13 +175,14 @@
 </div>
 </header>
 <div class="blog--post"><p>一个没有通用好的解决方案的有趣问题是：如何更改正在运行的Spring应用程序的配置？<a href="http://www.springframework.org/spring-batch-admin">Spring Batch管理员</a> 1.0.0。M3是最近发布的，它具有配置上传功能，可以通过特定方式解决此问题。有人在最近的慕尼黑S2GForum上要求此功能（如果您错过了5月份在<a href="https://bit.ly/dlCWT6">伦敦</a>和<a href="https://bit.ly/cSb48k">阿姆斯特丹</a>举行的活动的报名），我很高兴告诉他它已经存在，因此也许应该花更多的时间……</p>
-<h2>基本用例的屏幕截图</h2><p><img src="http://blog.springsource.com/wp-content/uploads/2010/04/jobs-view-before.jpg" alt="上传之前查看工作" width="75%"><br>我们首先看一下应用程序中的Jobs视图。它显示了可由Web应用程序启动或监视的作业列表。</p><p>现在，计划是上传新的<it>Job</it>配置并查看此视图更改。因此，我们从顶部导航中的“文件”菜单开始，然后单击“配置”。这提供了上传文件的简单表格。如果我们指向一个Spring XML配置文件，则视图如下所示：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2010/04/configuration-view.jpg" alt="配置视图" width="75%"><br>我们按下“上传”按钮，配置被上传并解析，上传文件中的<it>Job</it>实例被注册以启动：<br><img src="http://blog.springsource.com/wp-content/uploads/2010/04/jobs-view-after.jpg" alt="上传后查看工作" width="75%"></p><p>您可以在作业注册表中看到一个新条目（“ test-job”），该条目可以在进程中启动，因为该应用程序具有对<it>Job</it>的引用。（无法启动的作业已在进程外执行，但其<it>JobRepository</it>使用了相同的数据库，因此它们在UI中显示其执行情况。）</p>
-<h2>基本用例的变体</h2><p>基本上传用例的一个常见变体是上传对现有<it>Job</it>配置的修改，而不是全新的。这是很常见的，因为经常需要调整运行时参数，尤其是在性能测试时。例如，我们可以在<it>Job的</it>其中一个<it>步骤</it>中更改<a href="http://static.springsource.org/spring-batch/trunk/reference/html/configureStep.html#commitInterval">提交间隔</a> ，以便将更多（或更少）的项目分组为一个块，并在重复的项目处理<it>步骤中</it>一起提交。这可能会影响性能，并且<it>作业</it>可能会整体运行得更快，因为可以更有效地使用事务性资源。我们可以通过从应用程序中启动<it>Job</it>并检查结果来直接进行测量和验证（由于Web界面是面向资源的，因此也可以使用基于<it>curl</it>的简单shell脚本来自动执行此操作）。</p>
+<h2>基本用例的屏幕截图</h2><p><img src="http://blog.springsource.com/wp-content/uploads/2010/04/jobs-view-before.jpg" alt="上传之前查看工作" width="75%"><br>我们首先看一下应用程序中的Jobs视图。它显示了可由Web应用程序启动或监视的作业列表。</p><p>现在，计划是上传新的<it>Job</it>配置并查看此视图更改。因此，我们从顶部导航中的“文件”菜单开始，然后单击“配置”。这提供了上传文件的简单表格。如果我们指向一个Spring XML配置文件，则视图如下所示：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2010/04/configuration-view.jpg" alt="配置视图" width="75%"><br>我们按下“上传”按钮，配置被上传并解析，并且上传文件中的<it>Job</it>实例被注册以启动：<br><img src="http://blog.springsource.com/wp-content/uploads/2010/04/jobs-view-after.jpg" alt="上传后查看工作" width="75%"></p><p>您可以在作业注册表中看到一个新条目（“ test-job”），该条目可以在进程中启动，因为该应用程序引用了<it>Job</it> 。（无法启动的作业已在进程外执行，但其<it>JobRepository</it>使用了相同的数据库，因此它们在UI中显示其执行情况。）</p>
+<h2>基本用例的变体</h2><p>基本上传用例的一个常见变体是上传对现有<it>Job</it>配置的修改，而不是全新的。这是很常见的，因为经常需要调整运行时参数，尤其是在性能测试时。例如，我们可以在<it>Job的</it>其中一个<it>步骤</it>中更改<a href="http://static.springsource.org/spring-batch/trunk/reference/html/configureStep.html#commitInterval">提交间隔</a> ，以便将更多（或更少）的项目分组为一个块，并在重复的项目处理<it>步骤中</it>一起提交。这可能会影响性能，并且<it>作业</it>可能会整体运行得更快，因为可以更有效地使用事务性资源。通过从应用程序中启动<it>Job</it>并检查结果，我们将能够直接进行测量和验证（因为Web界面是面向资源的，因此也可以使用基于<it>curl</it>的简单shell脚本来自动执行此操作）。</p>
 <h2>它是如何工作的？</h2><p>实现此用例的秘密在于，将<it>Job</it>配置文件解析为单独的Spring <it>ApplicationContext</it>实例，并按其文件名对其进行跟踪。应用程序将执行环境（ <it>JobLauncher</it> ，事务管理器， <it>DataSource</it>等）作为父上下文提供，而<it>Jobs</it>都生活在该环境的子上下文中。这意味着它们可能是易失的，并且其生命周期可以由应用程序中的服务来管理。有问题的服务碰巧是由Spring Integration（通过我在上一篇<a href="http://blog.springsource.com/2010/02/15/practical-use-of-spring-batch-and-spring-integration/">文章中</a>描述的方式）通过包装<it>JobLoader</it>的服务激活器激活的， <it>JobLoader</it>是Spring Batch的标准组件。</p>
-<h2>接下来是什么？</h2><p>请访问<a href="http://www.springframework.org/spring-batch-admin/spring-batch-integration">Batch Admin</a>网站以获取更多信息，并找出在何处获取代码以进行操作。记住5月在<a href="https://bit.ly/dlCWT6">伦敦</a>和<a href="https://bit.ly/cSb48k">阿姆斯特丹</a>举行的S2GForum事件，Spring Batch和Spring Integration负责人（Dave Syer和Mark Fisher）将在会议中讨论和演示该应用程序。</p></div>
+<h2>接下来是什么？</h2><p>请访问<a href="http://www.springframework.org/spring-batch-admin/spring-batch-integration">Batch Admin</a>网站以获取更多信息，并找到在哪里使用代码。记住5月在<a href="https://bit.ly/dlCWT6">伦敦</a>和<a href="https://bit.ly/cSb48k">阿姆斯特丹</a>举行的S2GForum事件，Spring Batch和Spring Integration负责人（Dave Syer和Mark Fisher）将在会议中讨论和演示该应用程序。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 315;
 
       (function(disqus_shortname, document) {
@@ -189,7 +196,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -227,12 +235,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

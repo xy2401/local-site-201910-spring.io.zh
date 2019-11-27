@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>React.js和Spring Data REST：第3部分-条件操作</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="React.js and Spring Data REST: Part 3 - Conditional Operations">
 <meta name="twitter:description" content="<div id=" preambl="="> 
- </head><body dir="ltr"><div class="sectionbody"> 
+ </head><body ><div class="sectionbody"> 
   <div class="admonitionblock note"> 
    <table> 
     <tbody> 
@@ -75,10 +79,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -220,7 +226,7 @@
 <p>在<a href="https://spring.io/blog/2015/09/15/react-js-and-spring-data-rest-part-2-hypermedia">上一课中</a> ，您了解了如何打开Spring Data REST的超媒体控件，如何使UI通过分页导航以及如何根据更改页面大小来动态调整大小。您添加了创建和删除员工以及调整页面的功能。但是，要考虑到其他用户对您当前正在编辑的相同数据进行的更新，还没有一个完整的解决方案。</p>
 </div>
 <div class="paragraph">
-<p>随时从该存储库中<a href="https://github.com/gregturn/react-and-spring-data-rest/tree/master/conditional">获取代码</a>并继续。该会话基于上一会话的应用程序，并添加了其他内容。</p>
+<p>随意<a href="https://github.com/gregturn/react-and-spring-data-rest/tree/master/conditional">抓取代码</a>从这个仓库，并按照沿。该会话基于上一会话的应用程序，并添加了其他内容。</p>
 </div>
 </div>
 </div>
@@ -268,4 +274,432 @@ public class Employee {
 <div class="ulist">
 <ul>
 <li>
-<p><strong>版本</strong>字段使用<code>javax.persistence.Version</code></p><code>javax.persistence.Version</code></li><code>javax.persistence.Version</code></ul><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></div></article><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></div><code>javax.persistence.Version</code></body></html>
+<p><strong>版本</strong>字段用注释<code>javax.persistence.Version</code> 。每次插入和更新行时，它都会自动存储和更新值。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>当获取单个资源（不是集合资源）时，Spring Data REST将自动添加带有该字段值的<a href="https://tools.ietf.org/html/rfc7232#section-2.3">ETag响应标头</a> 。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fetching_individual_resources_and_their_headers">获取单个资源及其标头</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>在上<a href="https://spring.io/blog/2015/09/15/react-js-and-spring-data-rest-part-2-hypermedia">一个会话中，</a>您使用了收集资源来收集数据并填充UI的HTML表。使用Spring Data REST， <strong>已将_embedded</strong>数据集视为数据的预览。尽管对于浏览数据很有用，但要获取诸如ETags的标头，您需要单独获取每个资源。</p>
+</div>
+<div class="paragraph">
+<p>在这个版本中<code>loadFromServer</code>更新以获取集合，然后使用URI检索每个单独的资源。</p>
+</div>
+<div class="listingblock">
+<div class="title">src / main / resources / static / app.jsx-获取每个资源</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">loadFromServer: function (pageSize) {
+    follow(client, root, [
+        {rel: 'employees', params: {size: pageSize}}]
+    ).then(employeeCollection =&gt; {
+        return client({
+            method: 'GET',
+            path: employeeCollection.entity._links.profile.href,
+            headers: {'Accept': 'application/schema+json'}
+        }).then(schema =&gt; {
+            this.schema = schema.entity;
+            this.links = employeeCollection.entity._links;
+            return employeeCollection;
+        });
+    }).then(employeeCollection =&gt; {
+        return employeeCollection.entity._embedded.employees.map(employee =&gt;
+                client({
+                    method: 'GET',
+                    path: employee._links.self.href
+                })
+        );
+    }).then(employeePromises =&gt; {
+        return when.all(employeePromises);
+    }).done(employees =&gt; {
+        this.setState({
+            employees: employees,
+            attributes: Object.keys(this.schema.properties),
+            pageSize: pageSize,
+            links: this.links
+        });
+    });
+},</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>的<code>follow()</code>功能转到<strong>员工</strong>收集资源。
+</li>
+<li>的<code>then(employeeCollection ⇒ …​)</code>子句创建调用以获取JSON模式数据。它有一个sub-then子句，用于将元数据和导航链接存储在<code><App/></code>零件。
+<div class="ulist">
+<ul>
+<li>请注意，此嵌入的承诺将返回employeeCollection。这样，可以将集合传递到下一个调用，同时让您沿途获取元数据。
+</li>
+</ul>
+</div>
+</li>
+<li>第二<code>then(employeeCollection ⇒ …​)</code>子句将雇员集合转换为GET承诺数组，以获取每个单独的资源。<strong>这是为每个员工获取ETag标头所需的内容。</strong>
+</li>
+<li>的<code>then(employeePromises ⇒ …​)</code>子句采用GET诺言数组，并将它们合并为一个诺言<code>when.all()</code> ，在所有GET Promise都解决后解决。
+</li>
+<li>
+<code>loadFromServer</code>结束<code>done(employees ⇒ …​)</code>使用此数据合并来更新UI状态。
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>该链也在其他地方实现。例如， <code>onNavigate()</code> ，用于跳转到不同的页面，已更新为获取单个资源。由于它与上面显示的内容基本相同，因此已被排除在本次会议之外。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_updating_existing_resources">更新现有资源</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>在此会话中，您将添加一个<code>UpdateDialog</code>反应组件以编辑现有员工记录。</p>
+</div>
+<div class="listingblock">
+<div class="title">src / main / resources / static / app.jsx-UpdateDialog组件</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var UpdateDialog = React.createClass({
+
+    handleSubmit: function (e) {
+        e.preventDefault();
+        var updatedEmployee = {};
+        this.props.attributes.forEach(attribute =&gt; {
+            updatedEmployee[attribute] = React.findDOMNode(this.refs[attribute]).value.trim();
+        });
+        this.props.onUpdate(this.props.employee, updatedEmployee);
+        window.location = "#";
+    },
+
+    render: function () {
+        var inputs = this.props.attributes.map(attribute =&gt;
+                &lt;p key={this.props.employee.entity[attribute]}&gt;
+                    &lt;input type="text" placeholder={attribute}
+                           defaultValue={this.props.employee.entity[attribute]}
+                           ref={attribute} className="field" /&gt;
+                &lt;/p&gt;
+        );
+
+        var dialogId = "updateEmployee-" + this.props.employee.entity._links.self.href;
+
+        return (
+            &lt;div key={this.props.employee.entity._links.self.href}&gt;
+                &lt;a href={"#" + dialogId}&gt;Update&lt;/a&gt;
+                &lt;div id={dialogId} className="modalDialog"&gt;
+                    &lt;div&gt;
+                        &lt;a href="#" title="Close" className="close"&gt;X&lt;/a&gt;
+
+                        &lt;h2&gt;Update an employee&lt;/h2&gt;
+
+                        &lt;form&gt;
+                            {inputs}
+                            &lt;button onClick={this.handleSubmit}&gt;Update&lt;/button&gt;
+                        &lt;/form&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        )
+    }
+
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>这个新组件既有<code>handleSubmit()</code>功能和预期的一样<code>render()</code>功能，类似于<code><CreateDialog /></code>零件。</p>
+</div>
+<div class="paragraph">
+<p>让我们以相反的顺序深入研究这些功能，然后首先看一下<code>render()</code>功能。</p>
+</div>
+<div class="sect2">
+<h3 id="_rendering">渲染图</h3>
+<div class="paragraph">
+<p>该组件使用与CSS / HTML相同的策略来显示和隐藏对话框。 <code><CreateDialog /></code>来自上一届会议。</p>
+</div>
+<div class="paragraph">
+<p>它将JSON Schema属性数组转换为HTML输入数组，并包装在段落元素中以进行样式设置。这也和<code><CreateDialog /></code>唯一的区别是：字段已加载<strong>this.props.employee</strong> 。在CreateDialog组件中，这些字段为空。</p>
+</div>
+<div class="paragraph">
+<p><strong>id</strong>字段的构建方式不同。整个UI上只有一个CreateDialog链接，但显示的每一行都有一个单独的UpdateDialog链接。因此， <strong>id</strong>字段基于<strong>自身</strong>链接的URI。这在两个</p><div>元素的React <strong>键</strong>以及HTML锚标记和隐藏的弹出窗口。
+</div>
+</div>
+<div class="sect2">
+<h3 id="_handling_user_input">处理用户输入</h3>
+<div class="paragraph">
+<p>提交按钮链接到组件的<code>handleSubmit()</code>功能。方便使用<code>React.findDOMNode()</code>使用<a href="https://facebook.github.io/react/docs/more-about-refs.html">React refs</a>提取弹出窗口的详细信息。</p>
+</div>
+<div class="paragraph">
+<p>提取输入值并将其加载到<code>updatedEmployee</code>对象，顶层<code>onUpdate()</code>方法被调用。这延续了React的单向绑定样式，其中要调用的函数从上层组件推送到下层组件。这样，状态仍在顶部进行管理。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conditional_put">有条件的PUT</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>因此，您已经花了所有力气将版本控制嵌入到数据模型中。Spring Data REST已将该值用作ETag响应标头。在这里，您可以充分利用它！</p>
+</div>
+<div class="listingblock">
+<div class="title">src / main / resources / static / app.jsx-onUpdate函数</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">onUpdate: function (employee, updatedEmployee) {
+    client({
+        method: 'PUT',
+        path: employee.entity._links.self.href,
+        entity: updatedEmployee,
+        headers: {
+            'Content-Type': 'application/json',
+            'If-Match': employee.headers.Etag
+        }
+    }).done(response =&gt; {
+        this.loadFromServer(this.state.pageSize);
+    }, response =&gt; {
+        if (response.status.code === 412) {
+            alert('DENIED: Unable to update ' +
+                employee.entity._links.self.href + '. Your copy is stale.');
+        }
+    });
+},</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>具有<a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24">If-Match请求标头的</a> PUT使Spring Data REST根据当前版本检查该值。如果传入的<strong>If-Match</strong>值与数据存储的版本值不匹配，则Spring Data REST将失败，并显示<strong>HTTP 412 Precondition Failed</strong> 。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tbody><tr>
+<td class="icon">
+<div class="title">注意</div>
+</td>
+<td class="content"><a href="https://promisesaplus.com/">Promises / A +</a>的规范实际上将其API定义为<code>then(successFunction, errorFunction)</code> 。到目前为止，您仅看到它与成功功能一起使用。在上面的代码片段中，有两个功能。成功函数调用<code>loadFromServer</code>而错误功能则显示有关过时数据的浏览器警报。
+</td>
+</tr>
+</tbody></table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_putting_it_all_together">放在一起</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>和你的<code>UpdateDialog</code>已定义React组件并与顶级组件很好地链接<code>onUpdate</code>功能，最后一步是将其连接到现有的组件布局中。</p>
+</div>
+<div class="paragraph">
+<p>的<code>CreateDialog</code>在上一个会话中创建的内容放在了顶部<code>EmployeeList</code>因为只有一个实例。然而， <code>UpdateDialog</code>与特定员工直接相关。这样您就可以看到它已插入下面的<code>Employee</code>反应组件：</p>
+</div>
+<div class="listingblock">
+<div class="title">src / main / resources / static / app.jsx-具有UpdateDialog的员工</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">var Employee = React.createClass({
+    handleDelete: function () {
+        this.props.onDelete(this.props.employee);
+    },
+    render: function () {
+        return (
+            &lt;tr&gt;
+                &lt;td&gt;{this.props.employee.entity.firstName}&lt;/td&gt;
+                &lt;td&gt;{this.props.employee.entity.lastName}&lt;/td&gt;
+                &lt;td&gt;{this.props.employee.entity.description}&lt;/td&gt;
+                &lt;td&gt;
+                    &lt;UpdateDialog employee={this.props.employee}
+                                  attributes={this.props.attributes}
+                                  onUpdate={this.props.onUpdate}/&gt;
+                &lt;/td&gt;
+                &lt;td&gt;
+                    &lt;button onClick={this.handleDelete}&gt;Delete&lt;/button&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        )
+    }
+})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>在此会话中，您将从使用收集资源切换为单个资源。现在可以在以下位置找到员工记录的字段<code>this.props.employee.entity</code> 。它使我们能够访问<code>this.props.employee.headers</code>在这里可以找到ETag。</p>
+</div>
+<div class="paragraph">
+<p>Spring Data REST支持的其他标头（如<a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.29">Last-Modified</a> ）也不属于本系列。因此，以这种方式构造数据非常方便。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tbody><tr>
+<td class="icon">
+<div class="title">重要</div>
+</td>
+<td class="content">的结构<code>.entity</code>和<code>.headers</code>仅在将<a href="https://github.com/cujojs/rest">rest.js</a>用作REST库时才有意义。如果使用其他库，则必须根据需要进行调整。
+</td>
+</tr>
+</tbody></table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_seeing_things_in_action">看到实际情况</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>启动应用程序（ <code>./mvnw spring-boot:run</code> ）。
+</li>
+<li>打开一个选项卡，然后浏览至<a href="http://localhost:8080" class="bare">http：// localhost：8080</a> 。<div class="imageblock">
+<div class="content">
+<img src="https://github.com/gregturn/react-and-spring-data-rest/raw/master/conditional/images/conditional-1.png" alt="有条件的1">
+</div>
+</div>
+</li>
+<li>上拉Frodo的编辑对话框。
+</li>
+<li>在浏览器中打开另一个选项卡，并拉出相同的记录。
+</li>
+<li>在第一个选项卡中更改记录。
+</li>
+<li>尝试在第二个选项卡中进行更改。
+<div class="imageblock">
+<div class="content">
+<img src="https://github.com/gregturn/react-and-spring-data-rest/raw/master/conditional/images/conditional-2.png" alt="有条件的2">
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://github.com/gregturn/react-and-spring-data-rest/raw/master/conditional/images/conditional-3.png" alt="有条件的3">
+</div>
+</div>
+<div class="paragraph">
+<p>使用这些mod，可以避免冲突，从而提高了数据完整性。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_review">评论</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>在此会话中：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>您使用<code>@Version</code>基于JPA的乐观锁定的字段。
+</li>
+<li>您调整了前端以获取单个资源。
+</li>
+<li>您将ETag标头从单个资源插入到<strong>If-Match</strong>请求标头中，以使PUT有条件。
+</li>
+<li>您为列表中显示的每个员工编码了一个新的UpdateDialog。
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>插入此插件后，很容易避免与其他用户发生冲突，或者只是覆盖他们的编辑内容。</p>
+</div>
+<div class="paragraph">
+<p>有问题吗？</p>
+</div>
+<div class="paragraph">
+<p>很高兴知道何时编辑不良记录。但是，最好等到您单击“提交”才能找到答案吗？</p>
+</div>
+<div class="paragraph">
+<p>两者中获取资源的逻辑非常相似<code>loadFromServer</code>和<code>onNavigate</code> 。您看到避免重复代码的方法了吗？</p>
+</div>
+<div class="paragraph">
+<p>您充分利用了JSON模式元数据来构建<code>CreateDialog</code>和<code>UpdateDialog</code>输入。您是否看到其他地方可以使用元数据使事情变得更通用？假设您想再添加五个字段<code>Employee.java</code> 。更新用户界面需要什么？</p>
+</div>
+</div>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2243;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</div></article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+ <li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

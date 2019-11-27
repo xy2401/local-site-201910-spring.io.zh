@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring 3.1 M2：使用@Configuration类和配置文件进行测试</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring 3.1 M2: Testing with @Configuration Classes and Profiles">
-<meta name="twitter:description" title="Spring Framework 3.1 M2 released" content="<p>As Jürgen Höller mentioned in his post announcing the <a href=" http:="" ="" bit.ly="" jpg8a="=" _blan=""></head><body dir="ltr">release of Spring 3.1 M2, the <a href="http://bit.ly/m3UHhv" title="Spring TestContext框架" target="_blank">Spring TestContext Framework</a>(*) has been overhauled to provide first-class testing support for <code>@Configuration</code> classes and environment profiles.
+<meta name="twitter:description" title="Spring Framework 3.1 M2 released" content="<p>As Jürgen Höller mentioned in his post announcing the <a href=" http:="" ="" bit.ly="" jpg8a="=" _blan=""></head><body >release of Spring 3.1 M2, the <a href="http://bit.ly/m3UHhv" title="Spring TestContext框架" target="_blank">Spring TestContext Framework</a>(*) has been overhauled to provide first-class testing support for <code>@Configuration</code> classes and environment profiles.
 <p>In this post I’ll first walk you through some examples that demonstrate these new testing features. I’ll then cover some of the new extension points in the TestContext framework that make these new features possible.</p>
 <p>      Please note: this is a cross post from my company blog <a href="http://bit.ly/ixacQb" title="敏捷思维" target="_blank">www.swiftmind.com</a>.</p>
 ">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -170,25 +176,25 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>正如JürgenHöller在<a href="https://bit.ly/jPg8az" title="Spring Framework 3.1 M2发布" target="_blank">发布Spring 3.1 M2的</a>帖子中提到的那样，对<a href="https://bit.ly/m3UHhv" title="Spring TestContext框架" target="_blank">Spring TestContext Framework</a> （*）进行了全面改进，以为<code>@Configuration</code>类和环境配置文件提供一流的测试支持。</p><p>在本文中，我将首先引导您通过一些示例来演示这些新的测试功能。然后，我将介绍TestContext框架中的一些新扩展点，这些扩展点使这些新功能成为可能。</p><p>请注意：这是我公司博客<a href="https://bit.ly/ixacQb" title="敏捷思维" target="_blank">www.swiftmind.com</a>的交叉发布。</p>
-<h2>背景</h2><p>在Spring 2.5中，我们引入了<em>Spring TestContext Framework</em> ，它提供了注释驱动的集成测试支持，可以与JUnit或TestNG一起使用。本博客中的示例将重点介绍基于JUnit的测试，但此处使用的所有功能也适用于TestNG。</p><p>TestContext框架的核心是，您可以使用<code>@ContextConfiguration</code>annotation测试类，以指定用于加载测试的<code>ApplicationContext</code>配置文件。默认情况下， <code>ApplicationContext</code>使用加载<code>GenericXmlContextLoader</code>它加载的XML Spring配置文件的上下文。然后，您可以使用@ <code>@Autowired</code> ， <code>@Resource</code>或<code>@Inject</code>annotation测试类中的字段，从而从<code>ApplicationContext</code>访问bean。</p><p>Spring 3.0通过<code>@Configuration</code>类引入了对基于Java的配置的支持，但到目前为止，TestContext框架尚未提供适当的<code>ContextLoader</code>来支持测试中的<code>@Configuration</code>类。Spring 3.1 M2为此引入了一个新的<code>AnnotationConfigContextLoader</code> ，并且<code>@ContextConfiguration</code>annotation已更新，以支持通过新的<code>classes</code>属性声明<code>@Configuration</code>类。</p><p>现在让我们看一些示例。</p>
-<h2>基于XML的配置的集成测试</h2><p>该<a href="https://bit.ly/m3UHhv" target="_blank">测试</a>的春天参考手册章提供的使用XML配置文件如何配置集成测试的例子不胜枚举，但是我们在这里有一个例子作为一个快速的介绍。</p><p><em>如果您已经熟悉Spring TestContext Framework，请随时跳到下一部分。</em></p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="UTF-8"?>
-<beans ...>
+<div class="blog--post"><p>正如JürgenHöller在宣布<a href="https://bit.ly/jPg8az" title="Spring Framework 3.1 M2发布" target="_blank">发布Spring 3.1 M2的</a>帖子中所提到的那样，对<a href="https://bit.ly/m3UHhv" title="Spring TestContext框架" target="_blank">Spring TestContext Framework</a> （*）进行了全面改进，以提供对的一流测试支持。 <code>@Configuration</code>类和环境配置文件。</p><p>在本文中，我将首先向您介绍一些示例，以演示这些新的测试功能。然后，我将介绍TestContext框架中的一些新扩展点，这些扩展点使这些新功能成为可能。</p><p>请注意：这是我公司博客<a href="https://bit.ly/ixacQb" title="敏捷思维" target="_blank">www.swiftmind.com</a>的交叉发布。</p>
+<h2>背景</h2><p>在Spring 2.5中，我们引入了<em>Spring TestContext Framework</em> ，它提供了注释驱动的集成测试支持，可以与JUnit或TestNG一起使用。本博客中的示例将重点介绍基于JUnit的测试，但此处使用的所有功能也适用于TestNG。</p><p>TestContext框架的核心是，您可以使用<code>@ContextConfiguration</code>指定要使用哪些配置文件来加载<code>ApplicationContext</code>供您测试。默认情况下<code>ApplicationContext</code>使用加载<code>GenericXmlContextLoader</code>它从XML Spring配置文件加载上下文。然后，您可以从<code>ApplicationContext</code>通过在测试类中注释字段<code>@Autowired</code> ， <code>@Resource</code> ， 要么<code>@Inject</code> 。</p><p>Spring 3.0通过以下方式引入了对基于Java的配置的支持<code>@Configuration</code>类，但TestContext框架未提供适当的<code>ContextLoader</code>支持<code>@Configuration</code>直到现在仍在测试中。Spring 3.1 M2引入了新的<code>AnnotationConfigContextLoader</code>为此， <code>@ContextConfiguration</code>批注已更新，以支持声明<code>@Configuration</code>通过新课程<code>classes</code>属性。</p><p>现在让我们看一些示例。</p>
+<h2>基于XML的配置的集成测试</h2><p>Spring参考手册的“ <a href="https://bit.ly/m3UHhv" target="_blank">测试”</a>一章提供了许多有关如何使用XML配置文件来配置集成测试的示例，但是在此我们将作为一个快速入门示例。</p><p><em>如果您已经熟悉Spring TestContext Framework，请随时跳到下一部分。</em></p>
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans ...&gt;
 
-    <!-- this bean will be injected into the OrderServiceTest class -->
-    <bean id="orderService" class="com.example.OrderServiceImpl">
-        <!-- set properties, etc. -->
-    </bean>
+    &lt;!-- this bean will be injected into the OrderServiceTest class --&gt;
+    &lt;bean id=&quot;orderService&quot; class=&quot;com.example.OrderServiceImpl&quot;&gt;
+        &lt;!-- set properties, etc. --&gt;
+    &lt;/bean&gt;
     
-    <!-- other beans -->
+    &lt;!-- other beans --&gt;
 
-</beans>
+&lt;/beans&gt;
 </code></pre>
-<pre><code class="prettyprint java"><br>package com.example;
+<pre><code class="prettyprint java"><br />package com.example;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-// ApplicationContext will be loaded from "classpath:/com/example/OrderServiceTest-context.xml"
+// ApplicationContext will be loaded from &quot;classpath:/com/example/OrderServiceTest-context.xml&quot;
 @ContextConfiguration
 public class OrderServiceTest {
 
@@ -200,9 +206,9 @@ public class OrderServiceTest {
         // test the orderService
     }
 }
-</code></pre><p>在前面的示例中，我们将JUnit配置为使用<code>SpringJUnit4ClassRunner</code>来运行我们的测试。我们使用JUnit的<code>@RunWith</code>annotation执行此操作。我们还使用Spring的<code>@ContextConfiguration</code>annotation对测试类进行注释，而不指定任何属性。在这种情况下，将使用默认的<code>GenericXmlContextLoader</code> ，并且按照<em>约定优于配置</em>的原则，Spring将从<code>classpath:/com/example/OrderServiceTest-context.xml</code>加载我们的<code>ApplicationContext</code> 。在<code>testOrderService()</code>方法中，我们可以使用<code>@Autowired</code>直接测试注入到测试实例中的<code>OrderService</code> 。请注意， <code>orderService</code>在<code>OrderServiceTest-context.xml</code>定义为bean。</p>
-<h2>@Configuration类的集成测试</h2><p>Spring 3.1 M2对使用<code>@Configuration</code>类进行集成测试的支持类似于上述基于XML的示例。因此，让我们重新编写该示例以使用<code>@Configuration</code>类和新的<code>AnnotationConfigContextLoader</code> 。</p>
-<pre><code class="prettyprint java"><br>package com.example;
+</code></pre><p>在前面的示例中，我们将JUnit配置为使用<code>SpringJUnit4ClassRunner</code>运行我们的测试。我们使用JUnit的<code>@RunWith</code>注解。我们还用Spring的注释我们的测试课<code>@ContextConfiguration</code>不指定任何属性的注释。在这种情况下，默认<code>GenericXmlContextLoader</code>将使用，并遵循<em>约定优于配置</em>的原则，Spring将加载<code>ApplicationContext</code>从<code>classpath:/com/example/OrderServiceTest-context.xml</code> 。内<code>testOrderService()</code>我们可以直接测试的方法<code>OrderService</code>使用以下命令注入到我们的测试实例中<code>@Autowired</code> 。请注意<code>orderService</code>被定义为<code>OrderServiceTest-context.xml</code> 。</p>
+<h2>@Configuration类的集成测试</h2><p>Spring 3.1 M2对集成测试的支持<code>@Configuration</code>类类似于上面的基于XML的示例。因此，让我们重新整理该示例以使用<code>@Configuration</code>类和新<code>AnnotationConfigContextLoader</code> 。</p>
+<pre><code class="prettyprint java"><br />package com.example;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 // ApplicationContext will be loaded from the static inner ContextConfiguration class
@@ -232,10 +238,10 @@ public class OrderServiceTest {
 </code></pre><p>此示例与基于XML的示例之间存在一些显着差异：</p>
 <ol>
 <li>没有XML文件。</li>
-<li>使用静态内部<code>ContextConfiguration</code>类中的<code>@Configuration</code>和<code>@Bean</code>将bean定义从XML转换为Java。</li>
-<li><code>AnnotationConfigContextLoader</code>已通过<code>@ContextConfiguration</code>的<code>loader</code>属性指定。</li>
-</ol><p>否则，测试的配置和实施保持不变。</p><p>那么，Spring如何知道使用静态内部<code>ContextConfiguration</code>类来加载<code>ApplicationContext</code>呢？答案是<em>约定胜于配置</em> 。默认情况下，如果未明确声明任何类，则<code>AnnotationConfigContextLoader</code>将在名为<code>ContextConfiguration</code>的测试类中查找静态内部类。根据<code>@Configuration</code>类的要求，此静态内部类必须是非最终且非私有的。</p><p><em>注意：从Spring 3.1 M2开始，默认配置类必须精确命名为<code>ContextConfiguration</code> 。但是，从Spring 3.1 RC1开始，已取消了命名限制。换句话说，从RC1开始，您可以随意命名默认配置类，但其他要求仍然适用。</em></p><p>在下面的示例中，我们将看到如何声明显式配置类。</p>
-<pre><code class="prettyprint java"><br>package com.example;
+<li>使用以下命令将bean定义从XML转换为Java： <code>@Configuration</code>和<code>@Bean</code>在静态内部<code>ContextConfiguration</code>类。</li>
+<li>的<code>AnnotationConfigContextLoader</code>已通过指定<code>loader</code>的属性<code>@ContextConfiguration</code> 。</li>
+</ol><p>否则，测试的配置和实施保持不变。</p><p>那么，Spring如何知道使用静态内部<code>ContextConfiguration</code>类加载<code>ApplicationContext</code> ？答案是<em>约定胜于配置</em> 。默认情况下，如果未明确声明任何类， <code>AnnotationConfigContextLoader</code>将寻找名为的测试类的静态内部类<code>ContextConfiguration</code> 。根据要求<code>@Configuration</code>类，此静态内部类必须是非最终且非私有的。</p><p><em>注意：从Spring 3.1 M2开始，默认配置类必须准确命名<code>ContextConfiguration</code> 。但是，从Spring 3.1 RC1开始，已取消了命名限制。换句话说，从RC1开始，您可以随意命名默认配置类，但其他要求仍然适用。</em></p><p>在下面的示例中，我们将看到如何声明显式配置类。</p>
+<pre><code class="prettyprint java"><br />package com.example;
 
 @Configuration
 public class OrderServiceConfig {
@@ -249,7 +255,7 @@ public class OrderServiceConfig {
     }
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package com.example;
+<pre><code class="prettyprint java"><br />package com.example;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 // ApplicationContext will be loaded from the OrderServiceConfig class
@@ -264,44 +270,44 @@ public class OrderServiceTest {
         // test the orderService
     }
 }
-</code></pre><p>现在，我们已将静态内部<code>ContextConfiguration</code>类提取到名为<code>OrderServiceConfig</code>的顶级类中。为了指示<code>AnnotationConfigContextLoader</code>使用此配置类而不是依赖默认配置类，我们只需通过<code>@ContextConfiguration</code>的新<code>classes</code>属性声明<code>OrderServiceConfig.class</code> <code>@ContextConfiguration</code> 。就像<code>@ContextConfiguration</code>的资源位置的<code>locations</code>属性一样，我们可以通过向<code>classes</code>属性提供Class []数组来声明多个配置类-例如： <code>@ContextConfiguration(classes={Config1.class, Config2.class}, … )</code> 。</p><p>这样就结束了<code>@Configuration</code>类的集成测试。现在让我们看一下Spring对环境配置文件的测试支持。</p>
-<h2>与环境配置文件的集成测试</h2><p>正如克里斯·比姆斯（Chris Beams）在针对<a href="https://bit.ly/g8Eiv6" title="Spring Framework 3.1 M1发布" target="_blank">Spring 3.1 M1的</a>发布公告和其后续博客<a href="https://bit.ly/mbOdHa" title="Spring 3.1 M1：介绍@Profile" target="_blank">Introducing @Profile中所讨论的那样</a> ，Spring 3.1在框架中为环境和配置文件（又名<em>bean定义配置文件</em> ）概念引入了一流的支持。从Spring 3.1 M2开始，集成测试还可以配置为针对各种测试场景激活特定的bean定义配置文件。这可以通过使用新的<code>@ActiveProfiles</code>annotation注释测试类并提供在加载测试的<code>ApplicationContext</code>时应激活的配置文件列表来实现。</p><p><em>注意： <code>@ActiveProfiles</code>可以与新<code>SmartContextLoader</code> SPI的任何实现一起使用（请参阅稍后的讨论），但较简单的<code>ContextLoader</code> SPI的实现<strong>不</strong>支持<code>@ActiveProfiles</code> 。</em></p><p>让我们看一些XML配置和<code>@Configuration</code>类的示例。</p>
-<pre><code class="prettyprint xml"><br><beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
-	xmlns:jee="http://www.springframework.org/schema/jee"
-	xsi:schemaLocation="...">
+</code></pre><p>现在，我们提取了静态内部<code>ContextConfiguration</code>类转换为名为<code>OrderServiceConfig</code> 。指示<code>AnnotationConfigContextLoader</code>要使用此配置类而不是依赖默认值，我们只需声明<code>OrderServiceConfig.class</code>通过新<code>classes</code>的属性<code>@ContextConfiguration</code> 。与<code>@ContextConfiguration</code>的<code>locations</code>资源位置的属性，我们可以通过提供Class []数组来声明多个配置类<code>classes</code>属性-例如： <code>@ContextConfiguration(classes={Config1.class, Config2.class}, … )</code> 。</p><p>这样就结束了集成测试的范围<code>@Configuration</code>类。现在让我们看一下Spring对环境配置文件的测试支持。</p>
+<h2>与环境配置文件的集成测试</h2><p>正如克里斯·比姆斯（Chris Beams）在针对<a href="https://bit.ly/g8Eiv6" title="Spring Framework 3.1 M1发布" target="_blank">Spring 3.1 M1的</a>发布公告和其后续博客<a href="https://bit.ly/mbOdHa" title="Spring 3.1 M1：介绍@Profile" target="_blank">Introducing @Profile中所讨论的那样</a> ，Spring 3.1在框架中为环境和配置文件（又名<em>bean定义配置文件</em> ）概念引入了一流的支持。从Spring 3.1 M2开始，集成测试还可以配置为针对各种测试场景激活特定的bean定义配置文件。这是通过使用新的注释测试类来实现的<code>@ActiveProfiles</code>注释，并提供加载配置文件时应激活的配置文件列表<code>ApplicationContext</code>进行测试。</p><p><em>注意： <code>@ActiveProfiles</code>可以与新的任何实现一起使用<code>SmartContextLoader</code> SPI（请参阅后面的讨论），但是<code>@ActiveProfiles</code>更简单的实现<strong>不</strong>支持<code>ContextLoader</code> SPI。</em></p><p>让我们看一些有关XML配置和<code>@Configuration</code>类。</p>
+<pre><code class="prettyprint xml"><br />&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+	xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;
+	xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;
+	xsi:schemaLocation=&quot;...&quot;&gt;
 
-	<bean id="transferService" class="com.bank.service.internal.DefaultTransferService">
-		<constructor-arg ref="accountRepository"/>
-		<constructor-arg ref="feePolicy"/>
-	</bean>
+	&lt;bean id=&quot;transferService&quot; class=&quot;com.bank.service.internal.DefaultTransferService&quot;&gt;
+		&lt;constructor-arg ref=&quot;accountRepository&quot;/&gt;
+		&lt;constructor-arg ref=&quot;feePolicy&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="accountRepository" class="com.bank.repository.internal.JdbcAccountRepository">
-		<constructor-arg ref="dataSource"/>
-	</bean>
+	&lt;bean id=&quot;accountRepository&quot; class=&quot;com.bank.repository.internal.JdbcAccountRepository&quot;&gt;
+		&lt;constructor-arg ref=&quot;dataSource&quot;/&gt;
+	&lt;/bean&gt;
 
-	<bean id="feePolicy" class="com.bank.service.internal.ZeroFeePolicy"/>
+	&lt;bean id=&quot;feePolicy&quot; class=&quot;com.bank.service.internal.ZeroFeePolicy&quot;/&gt;
 
-	<beans profile="dev">
-		<jdbc:embedded-database id="dataSource">
-			<jdbc:script location="classpath:com/bank/config/sql/schema.sql"/>
-			<jdbc:script location="classpath:com/bank/config/sql/test-data.sql"/>
-		</jdbc:embedded-database>
-	</beans>
+	&lt;beans profile=&quot;dev&quot;&gt;
+		&lt;jdbc:embedded-database id=&quot;dataSource&quot;&gt;
+			&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/schema.sql&quot;/&gt;
+			&lt;jdbc:script location=&quot;classpath:com/bank/config/sql/test-data.sql&quot;/&gt;
+		&lt;/jdbc:embedded-database&gt;
+	&lt;/beans&gt;
 
-	<beans profile="production">
-		<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/datasource"/>
-	</beans>
+	&lt;beans profile=&quot;production&quot;&gt;
+		&lt;jee:jndi-lookup id=&quot;dataSource&quot; jndi-name=&quot;java:comp/env/jdbc/datasource&quot;/&gt;
+	&lt;/beans&gt;
 
-</beans>
+&lt;/beans&gt;
 </code></pre>
-<pre><code class="prettyprint java"><br>package com.bank.service;
+<pre><code class="prettyprint java"><br />package com.bank.service;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-// ApplicationContext will be loaded from "classpath:/app-config.xml"
-@ContextConfiguration("/app-config.xml")
-@ActiveProfiles("dev")
+// ApplicationContext will be loaded from &quot;classpath:/app-config.xml&quot;
+@ContextConfiguration(&quot;/app-config.xml&quot;)
+@ActiveProfiles(&quot;dev&quot;)
 public class TransferServiceTest {
 
     @Autowired
@@ -312,33 +318,33 @@ public class TransferServiceTest {
         // test the transferService
     }
 }
-</code></pre><p>当<code>TransferServiceTest</code>运行时，其<code>ApplicationContext</code>将从加载<code>app-config.xml</code>在类路径的根配置文件。如果检查<code>app-config.xml</code> ，你会发现， <code>accountRepository</code> bean有一个依赖<code>dataSource</code>豆;但是， <code>dataSource</code>没有定义为顶级bean。相反， <code>dataSource</code>定义了两次：一次在<em>生产</em>配置文件中，一次在<em>开发</em>配置文件中。</p><p>通过使用<code>@ActiveProfiles(“dev”)</code>annotation<code>TransferServiceTest</code> ，我们指示Spring TestContext Framework加载具有设置为{“ dev”}的活动配置文件的<code>ApplicationContext</code> 。其结果是，嵌入式数据库将被创建，并<code>accountRepository</code>豆将在发展DataSource的引用接线。这可能就是我们在集成测试中想要的！</p><p>以下代码清单演示了如何使用<code>@Configuration</code>类而不是XML来实现相同的配置和集成测试。</p>
-<pre><code class="prettyprint java"><br>@Configuration
-@Profile("dev")
+</code></pre><p>什么时候<code>TransferServiceTest</code>运行，其<code>ApplicationContext</code>将从加载<code>app-config.xml</code>配置文件位于类路径的根目录中。如果您检查<code>app-config.xml</code>您会注意到<code>accountRepository</code> Bean依赖于<code>dataSource</code>豆;然而， <code>dataSource</code>未定义为顶级bean。代替， <code>dataSource</code>定义了两次：一次在<em>生产资料中</em> ，一次在<em>开发</em>资料中。</p><p>通过注释<code>TransferServiceTest</code>与<code>@ActiveProfiles(“dev”)</code>我们指示Spring TestContext Framework加载<code>ApplicationContext</code>活动配置文件设置为{“ dev”}。结果，将创建一个嵌入式数据库，并且<code>accountRepository</code> bean将与对开发数据源的引用进行连接。这可能就是我们在集成测试中想要的！</p><p>以下代码清单演示了如何实施相同的配置和集成测试，但使用<code>@Configuration</code>类而不是XML。</p>
+<pre><code class="prettyprint java"><br />@Configuration
+@Profile(&quot;dev&quot;)
 public class StandaloneDataConfig {
 
 	@Bean
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder()
 			.setType(EmbeddedDatabaseType.HSQL)
-			.addScript("classpath:com/bank/config/sql/schema.sql")
-			.addScript("classpath:com/bank/config/sql/test-data.sql")
+			.addScript(&quot;classpath:com/bank/config/sql/schema.sql&quot;)
+			.addScript(&quot;classpath:com/bank/config/sql/test-data.sql&quot;)
 			.build();
 	}
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>@Configuration
-@Profile("production")
+<pre><code class="prettyprint java"><br />@Configuration
+@Profile(&quot;production&quot;)
 public class JndiDataConfig {
 
 	@Bean
 	public DataSource dataSource() throws Exception {
 		Context ctx = new InitialContext();
-		return (DataSource) ctx.lookup("java:comp/env/jdbc/datasource");
+		return (DataSource) ctx.lookup(&quot;java:comp/env/jdbc/datasource&quot;);
 	}
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>@Configuration
+<pre><code class="prettyprint java"><br />@Configuration
 public class TransferServiceConfig {
 
 	@Autowired DataSource dataSource;
@@ -359,12 +365,12 @@ public class TransferServiceConfig {
 	}
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>package com.bank.service;
+<pre><code class="prettyprint java"><br />package com.bank.service;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader=AnnotationConfigContextLoader.class,
     classes={TransferServiceConfig.class, StandaloneDataConfig.class, JndiDataConfig.class})
-@ActiveProfiles("dev")
+@ActiveProfiles(&quot;dev&quot;)
 public class TransferServiceTest {
 
     @Autowired
@@ -377,24 +383,25 @@ public class TransferServiceTest {
 }
 </code></pre><p>在此变体中，我们将XML配置分为三个独立的<code>@Configuration</code>类：</p>
 <ul>
-<li><code>TransferServiceConfig</code> ：使用<code>@Autowired</code>通过依赖注入获取<code>dataSource</code></li>
-<li><code>StandaloneDataConfig</code> ：为适合开发人员测试的嵌入式数据库定义<code>dataSource</code></li>
-<li><code>JndiDataConfig</code> ：定义在生产环境中从JNDI检索的<code>dataSource</code></li>
-</ul><p>与基于XML的配置示例一样，我们仍然使用<code>@ActiveProfiles(“dev”)</code>annotation<code>TransferServiceTest</code> ，但是这次我们通过<code>@ContextConfiguration</code>annotation指定<code>AnnotationConfigContextLoader</code>和所有三个配置类。测试类的主体本身保持完全不变。</p><p>有关如何简化上述<code>@Configuration</code>类的详细信息，请参阅<a href="https://bit.ly/mbOdHa" title="Spring 3.1 M1: Introducing @Profile" target="_blank">Spring 3.1 M1：@Profile</a>博客文章<a href="https://bit.ly/mbOdHa" title="Spring 3.1 M1：介绍@Profile" target="_blank">简介</a> 。</p>
-<h2>ApplicationContext缓存</h2><p>从Spring 2.5开始， <em>Spring TestContext Framework</em>已基于从给定测试的所有合并上下文资源位置生成的密钥<a href="https://bit.ly/jzG3Ie" title="Context management and caching" target="_blank">缓存了用于集成测试</a>的<a href="https://bit.ly/jzG3Ie" title="上下文管理和缓存" target="_blank"><code>ApplicationContexts</code></a> 。由于<code>ContextLoader</code> SPI仅支持位置，因此此密钥生成算法足以唯一标识用于加载<code>ApplicationContext</code>的配置。但是，由于增加了对配置类和配置文件的支持，旧算法已不再足够。</p><p>结果，上下文缓存密钥生成算法在Spring 3.1 M2中进行了更新，以包括以下所有内容：</p>
+<li><code>TransferServiceConfig</code> ：获得一个<code>dataSource</code>通过使用依赖注入<code>@Autowired</code></li>
+<li><code>StandaloneDataConfig</code> ：定义一个<code>dataSource</code>适用于开发人员测试的嵌入式数据库</li>
+<li><code>JndiDataConfig</code> ：定义一个<code>dataSource</code>在生产环境中从JNDI检索到的</li>
+</ul><p>与基于XML的配置示例一样，我们仍然注释<code>TransferServiceTest</code>与<code>@ActiveProfiles(“dev”)</code> ，但这一次我们指定<code>AnnotationConfigContextLoader</code>以及所有三个配置类<code>@ContextConfiguration</code>注解。测试类的主体本身保持完全不变。</p><p>有关如何简化以上内容的详细信息<code>@Configuration</code>有关类的信息，请参阅<a href="https://bit.ly/mbOdHa" title="Spring 3.1 M1: Introducing @Profile" target="_blank">Spring 3.1 M1：@Profile</a>博客文章<a href="https://bit.ly/mbOdHa" title="Spring 3.1 M1：介绍@Profile" target="_blank">简介</a> 。</p>
+<h2>ApplicationContext缓存</h2><p>从Spring 2.5开始， <em>Spring TestContext Framework</em>已<a href="https://bit.ly/jzG3Ie" title="Context management and caching" target="_blank">缓存<code>ApplicationContexts</code>用于</a>基于从给定测试的所有合并上下文资源位置生成的密钥的<a href="https://bit.ly/jzG3Ie" title="上下文管理和缓存" target="_blank">集成测试</a> 。自从<code>ContextLoader</code> SPI仅支持位置，此密钥生成算法足以唯一标识用于加载配置文件的配置。 <code>ApplicationContext</code> 。但是，由于增加了对配置类和配置文件的支持，旧算法已不再足够。</p><p>因此，上下文缓存密钥生成算法已在Spring 3.1 M2中进行了更新，以包括以下所有内容：</p>
 <ul>
 <li>位置<em>（来自<code>@ContextConfiguration</code> ）</em></li>
 <li>类<em>（来自<code>@ContextConfiguration</code> ）</em></li>
 <li>contextLoader <em>（来自<code>@ContextConfiguration</code> ）</em></li>
-<li><em><code>@ActiveProfiles</code> （来自<code>@ActiveProfiles</code> ）</em></li>
-</ul><p>对于开发人员来说，这意味着您可以实现一个基础测试类，该类声明一组特定的资源位置或配置类。然后，如果要针对具有不同活动配置文件的基本配置运行测试，则可以扩展该基础测试类，并使用<code>@ActiveProfiles</code>annotation每个具体的子类， <code>@ActiveProfiles</code>为每个子类提供不同的配置文件集以进行激活。因此，这些子类中的每个子类都将定义一组唯一的配置属性，这将导致加载和缓存不同的<code>ApplicationContexts</code> 。</p>
-<h2>SmartContextLoader取代ContextLoader SPI</h2><p>正如本文前面所暗示的那样，Spring 3.1 M2引入了一个新的<code>SmartContextLoader</code> SPI，它取代了现有的<code>ContextLoader</code> SPI。如果您打算开发或已经开发了自己的自定义<code>ContextLoader</code> ，则可能需要仔细研究新的<a href="https://bit.ly/m4Yg73" title="FishEye中的SmartContextLoader.java" target="_blank"><code>SmartContextLoader</code></a>接口。与旧的<code>ContextLoader</code>接口相反， <code>SmartContextLoader</code>可以处理资源位置和配置类。此外， <code>SmartContextLoader</code>可以在其加载的上下文中设置活动的bean定义配置文件。</p><p>将会继续支持<code>ContextLoader</code> ，并且该SPI的任何现有实现应继续按<em>原样运行</em> ；但是，如果要在自定义加载程序中支持配置类或环境配置文件，则需要实现<code>SmartContextLoader</code> 。</p>
-<h2>委派SmartContextLoader</h2><p>如果您一直在关注到目前为止提供的示例，则可能已经注意到，在使用配置类时，我们总是必须为<code>@ContextConfiguration</code>的<code>loader</code>属性显式声明<code>AnnotationConfigContextLoader.class</code> 。但是，当我们指定XML配置文件（或依赖于配置约定）时，默认情况下使用<code>GenericXmlContextLoader</code> 。</p><p><em>如果Spring可以仅注意到我们是在使用配置类还是XML资源位置，然后自动选择正确的<code>ContextLoader</code>来加载应用程序上下文，那不是很好吗？</em></p><p>是的，我们也这样认为！;）</p><p>因此，对于Spring 3.1 RC1，我们计划引入<code>DelegatingSmartContextLoader</code> ，该<code>GenericXmlContextLoader</code>将委派给候选<code>SmartContextLoaders</code>的列表（即<code>GenericXmlContextLoader</code>和<code>AnnotationConfigContextLoader</code> ），以确定哪种上下文加载器适合给定测试类的配置。然后，获胜的候选人将用于实际加载上下文。</p><p>这项工作完成后， <code>DelegatingSmartContextLoader</code>将取代<code>GenericXmlContextLoader</code>作为默认加载器。随时关注JIRA中此开发的进展： <a href="https://bit.ly/l5eKWS" title="SPR-8387：引入了DelegatingSmartContextLoader" target="_blank">SPR-8387</a> 。</p>
-<h2>摘要</h2><p>Spring 3.1为<code>@Configuration</code>类和环境配置文件提供了一流的测试支持，我们建议您尽快尝试这些功能。M2是3.1版本中的最后一个里程碑。因此，如果您发现任何错误或有任何改进建议，现在<a href="https://jira.springsource.org/browse/SPR" title="Spring JIRA问题追踪器" target="_blank">就该采取行动</a> ！</p>
-<hr><p><em>（*）参考手册尚未更新以反映对<code>@Configuration</code>类和环境配置文件的测试支持，但是Spring 3.1 RC1或GA肯定会很好地记录这些功能。同时，每个新类和注释的JavaDoc可以作为一个很好的起点。</em></p></div>
+<li>activeProfiles <em>（来自<code>@ActiveProfiles</code> ）</em></li>
+</ul><p>对于开发人员来说，这意味着您可以实现一个基础测试类，该类声明一组特定的资源位置或配置类。然后，如果要针对该基本配置但使用不同的活动配置文件运行测试，则可以扩展该基本测试类，并使用以下方法注释每个具体的子类： <code>@ActiveProfiles</code> ，提供了一组不同的配置文件来激活每个子类。因此，这些子类中的每个子类都将定义一组唯一的配置属性，从而导致不同的<code>ApplicationContexts</code>正在加载和缓存。</p>
+<h2>SmartContextLoader取代ContextLoader SPI</h2><p>正如本文前面所暗示的，Spring 3.1 M2引入了一个新的<code>SmartContextLoader</code>取代现有的SPI <code>ContextLoader</code> SPI。如果您打算开发或已经开发了自己的习惯<code>ContextLoader</code> ，您可能会想仔细看看新的<a href="https://bit.ly/m4Yg73" title="FishEye中的SmartContextLoader.java" target="_blank"><code>SmartContextLoader</code></a>接口。与旧的对比<code>ContextLoader</code>界面，一个<code>SmartContextLoader</code>可以处理资源位置和配置类。此外， <code>SmartContextLoader</code>可以在加载的上下文中设置活动的bean定义配置文件。</p><p><code>ContextLoader</code>将继续得到支持，并且该SPI的任何现有实现应继续按<em>原样</em>工作；但是，如果要在自定义加载程序中支持配置类或环境配置文件，则需要实现<code>SmartContextLoader</code> 。</p>
+<h2>委派SmartContextLoader</h2><p>如果您一直在关注到目前为止提供的示例，您可能已经注意到我们总是必须明确声明<code>AnnotationConfigContextLoader.class</code>对于<code>@ContextConfiguration</code>的<code>loader</code>使用配置类时的属性。但是，当我们指定XML配置文件（或依赖配置约定）时， <code>GenericXmlContextLoader</code>默认情况下使用。</p><p><em>如果Spring可以仅注意到我们是在使用配置类还是XML资源位置，然后自动选择合适的位置，那不是很好吗？ <code>ContextLoader</code>加载我们的应用程序上下文？</em></p><p>是的，我们也这样认为！;）</p><p>因此，对于Spring 3.1 RC1，我们计划引入<code>DelegatingSmartContextLoader</code>将委托给候选人列表<code>SmartContextLoaders</code> （即<code>GenericXmlContextLoader</code>和<code>AnnotationConfigContextLoader</code> ），以确定哪种上下文加载程序适合给定测试类的配置。然后，获胜的候选人将用于实际加载上下文。</p><p>这项工作完成后， <code>DelegatingSmartContextLoader</code>将取代<code>GenericXmlContextLoader</code>作为默认加载程序。随时关注JIRA中此开发的进展： <a href="https://bit.ly/l5eKWS" title="SPR-8387：引入了DelegatingSmartContextLoader" target="_blank">SPR-8387</a> 。</p>
+<h2>摘要</h2><p>Spring 3.1为提供了一流的测试支持<code>@Configuration</code>类和环境配置文件，我们建议您尽快尝试这些功能。M2是3.1版本中的最后一个里程碑。因此，如果您发现任何错误或有任何改进建议，现在<a href="https://jira.springsource.org/browse/SPR" title="Spring JIRA问题追踪器" target="_blank">就该采取行动</a> ！</p>
+<hr><p><em>（*）参考手册尚未更新，以反映对以下产品的测试支持<code>@Configuration</code>类和环境配置文件，但是Spring 3.1 RC1或GA肯定会很好地记录这些功能。同时，每个新类和注释的JavaDoc可以作为一个很好的起点。</em></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 423;
 
       (function(disqus_shortname, document) {
@@ -408,7 +415,8 @@ public class TransferServiceTest {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -446,12 +454,14 @@ public class TransferServiceTest {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>Spring框架和BIRT</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -23,7 +27,7 @@
 <meta name="twitter:title" content="Spring Framework & BIRT">
 <meta name="twitter:description" content="<p>By Jason Weathersby and Josh Long</p>
 <div style=" float:right;border:1px="" solid="" black;margin:="" 10px;padding:10p="="> 
- </head><body dir="ltr"><h2 style="font-size:smaller">Table of Contents </h2>
+ <h2 style="font-size:smaller">Table of Contents </h2>
  <p> <a href="#intro">Introduction</a><br> <a href="#thesamplecode">The Sample Code</a><br> <a href="#frommvc">Calling the BIRT Engine from Spring MVC</a><br> <a href="#birtviewer">Accessing Spring Beans from the BIRT Viewer</a><br> <a href="#remotebeansfrombirt">Using Remoting to Access Beans from a BIRT Report</a><br> <a href="#conclusion">Conclusion</a><br> <a href="#attachments">Attachments</a></p> 
  <h2 style="font-size:smaller">Downloads</h2>
  <p><a href="http://www.springsource.org/files/birt/SpringandBirtCoreJar.zip">SpringandBirtCoreJar.zip</a><br><a href="http://www.springsource.org/files/birt/SpringBirtArticleSamples.zip">SpringBirtArticleSamples.zip</a><br></p>
@@ -55,10 +59,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -190,7 +196,8 @@
 <h2 style="font-size:smaller">资料下载</h2><p><a href="http://www.springsource.org/files/birt/SpringandBirtCoreJar.zip">SpringandBirtCoreJar.zip</a><br><a href="http://www.springsource.org/files/birt/SpringBirtArticleSamples.zip">SpringBirtArticleSamples.zip</a><br></p></div><p></p>
 <h2 name="intro">介绍</h2><p>Eclipse的商业智能和报告工具（BIRT）项目是基于流行的Eclipse IDE的开源项目。 BIRT项目于2005年夏季首次发布重要版本，自成立以来已获得超过一千万的下载量。该项目由Actuate Corporation启动，该公司使用BIRT作为其许多商业产品的基础。<a href="https://www.eclipse.org/birt" target="_blank">BIRT项目的站点</a>包括简介，教程，下载和使用BIRT的示例。</p><p>开发人员使用BIRT在Java / Java EE环境中构建和部署报告。在BIRT 3.7中，提供了一个新的基于POJO的运行时环境，该环境使BIRT引擎的部署更加简单。本文讨论了一些使用Spring Framework中组件的BIRT集成方案。</p><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_6002ca03.png" align="bottom" width="576" height="315" border="0"><br>图1 – BIRT拼贴</p><p>BIRT项目包括以下关键组件：<br></p><ul><br><li>BIRT Designer-用于设计报告的开发人员工具。</li><br><li>Web Viewer-用于部署报告的示例Java Web应用程序。该查看器包含一个JSP标签库，可以方便地与现有Web应用程序集成。</li><br><li>BIRT引擎-用于构建，运行和呈现BIRT报告的设计和报告引擎。</li><br><li>BIRT Charts-支持构建和运行高度复杂的交互式图表的软件包。</li><br></ul><p></p><p>Spring框架是流行的体系结构和实现方法的集合，可简化企业Java开发。该框架的核心部分是依赖注入和面向方面的编程。利用这些功能是为了减少应用程序特定于基础结构的部分与其主要目标业务功能之间的耦合。Spring框架由VMware内的SpringSource业务部门以开源方式开发（原始SpingSource公司于2009年被VMware收购）。它在Java开发人员社区中得到了广泛的使用，并在所有平台上执行，包括VMware支持的Tomcat（称为tcServer）。</p><p>尽管Spring框架提供了许多有用的功能，但是与BIRT集成有关的大多数问题都围绕着报告中的Spring MVC和Spring bean访问。本文介绍了三种方案：<br></p><ul><br><li>在Spring MVC中集成BIRT引擎</li><br><li>从BIRT Viewer访问Spring bean</li><br><li>使用Spring Remoting从BIRT报表访问Spring Bean</li><br></ul><p></p><p>本文假定读者具有BIRT和Spring框架的编程知识。要了解有关Spring框架的更多信息，请查看<a href="http://blog.springsource.org/category/green-beans/">“ Green Beans”博客系列</a> 。</p><p>每个方案都有与本文关联的关联示例，该示例是使用以下组件构建和测试的：<br></p><ul><br><li><a href="http://www.springsource.org/download">Spring Framework 3.1.0</a> </li><br><li><a href="http://download.eclipse.org/birt/downloads/">BIRT 3.7.1</a></li><br><li><a href="https://ant.apache.org/bindownload.cgi">Apache Ant 1.7.1</a></li><br><li><a href="https://tomcat.apache.org/download-60.cgi">Apache Tomcat 6.0.20</a></li><br></ul><p></p><p>这些示例仅用于说明目的，几乎不包含任何错误检查。</p>
 <h2><a name="thesamplecode">样例代码</a></h2><p>在整个本文中，不同的集成方案是指将数据提供给BIRT报告的通用Spring bean。Spring框架包含许多复杂的数据访问组件，但是这个简单的示例对于更复杂的场景是有用的学习工具。在示例代码中，有两个包： <em>org.eclipse.birt.spring.example</em>和<em>org.eclipse.birt.spring.core</em> 。示例程序包包含简单的代码，可以用您自己的数据访问对象替换它们。核心软件包包括用于运行和呈现BIRT报告的Spring View，将URL中输入的报告参数转换为适当的BIRT报告参数类型的参数转换器类，以及将报告引擎提供给其他bean的BIRT引擎工厂。示例类如下所示，并在本文中使用。下一节将介绍核心类。</p><p>我们从一个简单的POJO开始，它将在我们的BIRT报告中使用。它名为Car，包含用于描述汽车的简单属性。</p>
-<pre>package org.eclipse.birt.spring.example;
+<pre> 
+package org.eclipse.birt.spring.example;
 
 public class Car{
 	private String make;
@@ -223,15 +230,15 @@ public class Car{
 	public String getCarString(){
 		return( this.toString() );
 	}
-}</pre><p>该示例提供了一个服务类来加载多个Car POJO，以用于报告目的。</p>
-<pre>package org.eclipse.birt.spring.example;
+}
+</pre><p>该示例提供了一个服务类来加载多个Car POJO，以用于报告目的。</p>
+<pre> 
+package org.eclipse.birt.spring.example;
 import java.util.*;
 
 public class CarServiceImpl implements CarService {
 
-	public List
-<carpojo>
-  getAllCars (){
+	public List<CarPojo> getAllCars (){
 		Car car1 = new Car();
 		car1.setYear("2000");
 		car1.setMake("Chevrolet");
@@ -244,18 +251,15 @@ public class CarServiceImpl implements CarService {
 		car3.setYear("2002");
 		car3.setMake("Ford");
 		car3.setModel("Mustang GT");
-		List
- <car>
-   cars = Arrays.asList(  car1, car2, car3 ) ;
+		List<Car> cars = Arrays.asList(  car1, car2, car3 ) ;
 		return cars ; 
 		
 
 	}
 }
-
- </car>
-</carpojo></pre><p>为了使该服务在Spring Context中可用，我们使用一个简单的类，该类配置了Spring Annotations。</p>
-<pre>package org.eclipse.birt.spring.example;
+</pre><p>为了使该服务在Spring Context中可用，我们使用一个简单的类，该类配置了Spring Annotations。</p>
+<pre> 
+package org.eclipse.birt.spring.example;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -269,9 +273,11 @@ public class BirtDataServiceConfiguration {
 		return new CarServiceImpl(); 
 
 	}
-}</pre>
-<h2><a name="frommvc">从Spring MVC调用BIRT引擎</a></h2><p>有多种方法可以将BIRT引擎集成到Spring中，尤其是Spring MVC。在此示例中，我们实现了一个Spring View，该Spring View使用参数来确定用户所需的报告和输出格式。BIRT报表引擎被注入到View中，以实际运行和呈现报表。</p><p>BIRT引擎可以被多个线程使用，但是启动通常很昂贵。理想情况下，我们只希望在应用程序的生命周期内一次启动BIRT引擎。我们还希望在应用程序关闭时正确关闭引擎。考虑到这一点，我们首先创建作为一个工厂类可以被其他的bean可以使用返回BIRT报表引擎的一个实例<b>BirtEngineFactory</b>类。在Spring中， <b>FactoryBean</b>接口是用于复杂对象的智能构造函数。它有一个重要的约定：从其<b>getObject</b>方法返回一个现成的对象。</p>
-<pre>package org.eclipse.birt.spring.core;
+} 
+</pre>
+<h2><a name="frommvc">从Spring MVC调用BIRT引擎</a></h2><p>有多种方法可以将BIRT引擎集成到Spring中，尤其是Spring MVC。在此示例中，我们实现了一个Spring View，该Spring View使用参数来确定用户所需的报告和输出格式。BIRT报表引擎被注入到View中，以实际运行和呈现报表。</p><p>BIRT引擎可以被多个线程使用，但是启动通常很昂贵。理想情况下，我们只希望在应用程序的生命周期内一次启动BIRT引擎。我们还希望在应用程序关闭时正确关闭引擎。考虑到这一点，我们首先创建一个<b>BirtEngineFactory</b>类，该类充当工厂bean，其他bean可以使用它来返回BIRT报告引擎的实例。在Spring中， <b>FactoryBean</b>接口是用于复杂对象的智能构造函数。它有一个重要的约定：从其<b>getObject</b>方法返回一个现成的对象。</p>
+<pre> 
+package org.eclipse.birt.spring.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -292,9 +298,7 @@ import org.springframework.util.Assert;
 /**
 Factory bean for the instance of the {@link IReportEngine report engine}.
  */
-public class BirtEngineFactory implements FactoryBean
-<ireportengine>
- , ApplicationContextAware, DisposableBean {  
+public class BirtEngineFactory implements FactoryBean<IReportEngine>, ApplicationContextAware, DisposableBean {  
 
 	public boolean isSingleton(){ return true ; } 
 
@@ -368,12 +372,12 @@ public class BirtEngineFactory implements FactoryBean
 		return IReportEngine.class;
 	}
 }
-
-</ireportengine></pre><p>此类还实现<b>DisposableBean</b>接口，以便在应用程序关闭时可以正确关闭引擎。当Spring ApplicationContext关闭时，Spring将在实现DisposableBean的所有bean上调用<b>DisposableBean＃destroy</b>方法。我们的实现称为destroy方法。最后，此类实现<b>ApplicationContextAware</b>接口以接收Spring <b>ApplicationContext</b>的实例。我们存储ApplicationContext，然后使用以下代码将其传递给BIRT报告引擎：<br></p><pre><br> EngineConfig config = new EngineConfig();<p></p>
+</pre><p>此类还实现<b>DisposableBean</b>接口，以便在应用程序关闭时可以正确关闭引擎。当Spring ApplicationContext关闭时，Spring将在实现DisposableBean的所有bean上调用<b>DisposableBean＃destroy</b>方法。我们的实现称为destroy方法。最后，此类实现<b>ApplicationContextAware</b>接口以接收Spring <b>ApplicationContext</b>的实例。我们存储ApplicationContext，然后使用以下代码将其传递给BIRT报告引擎：<br></p><pre><br /> EngineConfig config = new EngineConfig();</p>
 <pre><code class="prettyprint">    //This line injects the Spring Context into the BIRT Context
-    config.getAppContext().put("spring", this.context );
+    config.getAppContext().put(&quot;spring&quot;, this.context );
 </code></pre><p></p></pre><p></p><p>该代码将允许在BIRT脚本和表达式中访问Spring Context对象。</p><p>接下来，我们创建一个运行并呈现报告的Spring View。此视图期望将注入BIRT报告引擎。视图在请求中搜索ReportName和ReportFormat参数，以确定要运行的报告以及所需的格式。还可以在请求中搜索报告参数名称。如果找到，则将这些报告参数设置为适当的值。该视图的一部分显示如下。有关更多信息，请参见示例代码。</p>
-<pre>/**
+<pre> 
+/**
  * BirtView is used to run and render BIRT reports.
  * This class expects the request to contain a ReportName and ReportFormat
  * parameter. In addition Report parameters are automatically searched for in the
@@ -458,8 +462,10 @@ public class BirtView extends AbstractView {
 		this.birtEngine = birtEngine;
 	}
 .
-.</pre><p>要设置Spring MVC（并在我们的应用程序中使用此新View），我们需要使用@EnableWebMVC注释创建一个Spring @Configuration类。要覆盖Spring MVC机制的各个部分，我们可以简单地扩展基类-WebMvcConfigurerAdapter-并挂钩到适当的回调方法。此类是常规的Spring @Configuration类，如我们在配置服务时所见。我们使用@ComponentScanannotation告诉Spring将我们两个包中的带注释的Bean注册到Spring上下文中。接下来，我们重写<b>addViewControllers</b>方法以告知Spring应该将以“ / reports”结尾的URL委派给新的Birt Spring MVC <b>View</b> 。将birtView和BIRT引擎创建为bean，并设置BirtView bean的<b>birtEngine</b>属性。</p>
-<pre>package org.eclipse.birt.spring.example;
+.
+</pre><p>要设置Spring MVC（并在我们的应用程序中使用此新View），我们需要使用@EnableWebMVC注释创建一个Spring @Configuration类。要覆盖Spring MVC机制的各个部分，我们可以简单地扩展基类-WebMvcConfigurerAdapter-并挂钩到适当的回调方法。此类是常规的Spring @Configuration类，如我们在配置服务时所见。我们使用@ComponentScan批注告诉Spring将我们两个包中的带注释的Bean注册到Spring上下文中。接下来，我们重写<b>addViewControllers</b>方法以告诉Spring应该将以“ / reports”结尾的URL委派给新的Birt Spring MVC <b>View</b> 。将birtView和BIRT引擎创建为bean，并设置BirtView bean的<b>birtEngine</b>属性。</p>
+<pre> 
+package org.eclipse.birt.spring.example;
 
 import org.eclipse.birt.spring.core.BirtEngineFactory;
 import org.eclipse.birt.spring.core.BirtView;
@@ -507,17 +513,22 @@ public class BirtWebConfiguration  extends WebMvcConfigurerAdapter  {
 	}
 
 
-}</pre><p>如前所述，当描述BIRT引擎工厂类时，我们从BIRT上下文提供了对Spring <b>ApplicationContext</b>的引用。BIRT上下文对象不过是BIRT引擎可用于下游进程（例如BIRT表达式，BIRT事件处理程序等）的对象映射。BIRT使用Rhino JavaScript引擎处理BIRT表达式并评估JavaScript事件处理程序。BIRT上下文与Rhino引擎对象一起预加载到脚本环境中。该对象允许报表开发人员使用以下语法检索Spring bean并将其用于表达式或事件脚本中：</p>
-<pre>var mypojo = spring.getBean("carService");
-mypojo.getAllCars() ().get(0);</pre><p>如果您不想将Spring上下文注入到BIRT应用程序上下文中，则可以始终使用类似于以下代码的JavaScript来访问BIRT表达式和JavaScript事件处理程序中的Spring bean：</p>
-<pre>importPackage(Packages.org.springframework.context);
+}
+</pre><p>如前所述，当描述BIRT引擎工厂类时，我们从BIRT上下文中提供了对Spring <b>ApplicationContext</b>的引用。BIRT上下文对象不过是BIRT引擎可用于下游进程（例如BIRT表达式，BIRT事件处理程序等）的对象映射。BIRT使用Rhino JavaScript引擎处理BIRT表达式并评估JavaScript事件处理程序。BIRT上下文与Rhino引擎对象一起预加载到脚本环境中。该对象允许报表开发人员使用以下语法检索Spring bean并将其用于表达式或事件脚本中：</p>
+<pre> 
+var mypojo = spring.getBean("carService");
+mypojo.getAllCars() ().get(0);
+</pre><p>如果您不想将Spring上下文注入到BIRT应用程序上下文中，则可以始终使用类似于以下代码的JavaScript来访问BIRT表达式和JavaScript事件处理程序中的Spring bean：</p>
+<pre> 
+importPackage(Packages.org.springframework.context);
 importPackage(Packages.org.springframework.web.context.support );
 //ServletContext
 var sc = reportContext.getHttpServletRequest().getSession().getServletContext();
 //ApplicationContext 
 var spring = WebApplicationContextUtils.getWebApplicationContext(sc);
 var mypojo = spring.getBean("carService");
-this.text = mypojo.getAllCars().get(0).getMake();</pre><p>要运行此Web应用程序，请将下载的BIRT 3.7.1运行时的bir-runtime-3_7_1 \ ReportEngine \ lib目录中的JAR文件添加到Webapp的WEB-INF / lib中。您还将需要从WEB-INF / lib下载的Spring Framework中的以下JAR文件：</p>
+this.text = mypojo.getAllCars().get(0).getMake();
+</pre><p>要运行此Web应用程序，请将下载的BIRT 3.7.1运行时的bir-runtime-3_7_1 \ ReportEngine \ lib目录中的JAR文件添加到Webapp的WEB-INF / lib中。您还将需要从WEB-INF / lib下载的Spring Framework中的以下JAR文件：</p>
 <ul>
 <li>cglib-nodep-2.2.2.jar</li>
 <li>org.springframework.aop-3.1.0。RELEASE.jar</li>
@@ -530,62 +541,67 @@ this.text = mypojo.getAllCars().get(0).getMake();</pre><p>要运行此Web应用�
 <li>org.springframework.web.servlet-3.1.0。RELEASE.jar</li>
 <li>org.springframework.web-3.1.0。RELEASE.jar</li>
 </ul><p>本文附带的示例具有以下web.xml：</p>
-<pre><?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
-    "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
-<web-app>
+<pre>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
+    "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"&gt;
+&lt;web-app&gt;
 
- <servlet>
-   <servlet-name>springandbirt</servlet-name>
-   <servlet-class>
+ &lt;servlet>
+   &lt;servlet-name&gt;springandbirt&lt;/servlet-name&gt;
+   &lt;servlet-class&gt;
      org.springframework.web.servlet.DispatcherServlet
-   </servlet-class>
-   <init-param>
-     <param-name>contextClass</param-name>
-     <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-   </init-param>   
-   <init-param>
-     <param-name>contextConfigLocation</param-name>
-     <param-value>org.eclipse.birt.spring.example.BirtWebConfiguration</param-value>
-   </init-param>
-   <load-on-startup>1</load-on-startup>
- </servlet>
+   &lt;/servlet-class&gt;
+   &lt;init-param&gt;
+     &lt;param-name&gt;contextClass&lt;/param-name&gt;
+     &lt;param-value&gt;org.springframework.web.context.support.AnnotationConfigWebApplicationContext&lt;/param-value&gt;
+   &lt;/init-param&gt;   
+   &lt;init-param&gt;
+     &lt;param-name>contextConfigLocation&lt;/param-name&gt;
+     &lt;param-value>org.eclipse.birt.spring.example.BirtWebConfiguration&lt;/param-value&gt;
+   &lt;/init-param&gt;
+   &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+ &lt;/servlet&gt;
 
- <servlet-mapping>
-   <servlet-name>springandbirt</servlet-name>
-   <url-pattern>/reports</url-pattern>
- </servlet-mapping>
+ &lt;servlet-mapping&gt;
+   &lt;servlet-name&gt;springandbirt&lt;/servlet-name&gt;
+   &lt;url-pattern&gt;/reports&lt;/url-pattern&gt;
+ &lt;/servlet-mapping&gt;
 
-  <welcome-file-list>
-    <welcome-file>
+  &lt;welcome-file-list&gt;
+    &lt;welcome-file&gt;
       index.jsp
-    </welcome-file>
-  </welcome-file-list>
-</web-app></pre><p>所有/ reports URL都被路由到Spring DispatcherServlet。index.jsp有两个链接可以运行两个报告示例。一个报告使用BIRT Sample Derby数据库，另一个报告访问Car Service bean，如以下代码所示：</p>
-<pre><html>
-<head>
-</head>
-<body>
-<h1>BIRT Report</h1>
-<p>
-<a href="http://localhost:8080/springandbirt/reports?ReportName=TopNPercent.rptdesign">click here to run BIRT Report</a><br>
-<a href="http://localhost:8080/springandbirt/reports?ReportName=SampleSpring.rptdesign">click here to run BIRT Report that calls a Spring Bean</a>
-</p>
-<%= new java.util.Date() %>
-</body>
-</html></pre><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_53710ab3.png" align="bottom" width="576" height="359" border="0"><br>图1 –查看BIRT Spring MVC示例输出</p>
+    &lt;/welcome-file&gt;
+  &lt;/welcome-file-list&gt;
+&lt;/web-app&gt;
+
+</pre><p>所有/ reports URL都被路由到Spring DispatcherServlet。index.jsp有两个链接可以运行两个报告示例。一个报告使用BIRT Sample Derby数据库，另一个报告访问Car Service bean，如以下代码所示：</p>
+<pre>&lt;html&gt;
+&lt;head&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1>BIRT Report&lt;/h1&gt;
+&lt;p&gt;
+&lt;a href="http://localhost:8080/springandbirt/reports?ReportName=TopNPercent.rptdesign"&gt;click here to run BIRT Report&lt;/a&gt;&lt;br&gt;
+&lt;a href="http://localhost:8080/springandbirt/reports?ReportName=SampleSpring.rptdesign"&gt;click here to run BIRT Report that calls a Spring Bean&lt;/a&gt;
+&lt;/p&gt;
+&lt;%= new java.util.Date() %&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_53710ab3.png" align="bottom" width="576" height="359" border="0"><br>图1 –查看BIRT Spring MVC示例输出</p>
 <h2><a name="birtviewer">从BIRT Viewer访问Spring Bean</a></h2><p>在许多情况下，BIRT用户希望将Spring IOC容器添加到BIRT Viewer。Viewer是基于AJAX的Java Web应用程序，用于运行和呈现报告。Viewer支持分页，目录以及导出为其他格式（如PDF）。以这种方式进行部署时，开发人员需要访问Spring容器中的bean才能进行报告。这种情况很容易实现。</p><p>从BIRT网站下载并提取BIRT运行时。BIRT Viewer位于运行时下载的WebViewerExample目录中。要将Viewer部署到Tomcat，用户只需将WebViewerExample目录复制到tomcatinstall / webapps目录即可。大多数用户将此文件夹重命名为更相关的名称，例如BirtViewer。BIRT网站提供了有关将查看器部署到其他应用程序服务器的更多详细信息。安装查看器后，可以将Spring ContextLoaderListener添加到查看器的web.xml中。为此，请将以下侦听器条目在上下文参数下方添加到web.xml中：</p>
-<pre><listener>
-	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-</listener></pre><p>您还可以指定一个上下文参数以指向Spring Context类，如以下代码所示：</p>
-<pre><context-param>
-     <param-name>contextClass</param-name>
-     <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-   </context-param>   
-   <context-param>
-     <param-name>contextConfigLocation</param-name>
-     <param-value>org.eclipse.birt.spring.webviewer.example.BirtDataServiceConfiguration</param-value>
-   </context-param></pre><p>在这种情况下，我们不需要BirtWebConfiguration类，因此我们将contextConfigLocation指向BirtDataServiceConfiguration类。</p><p>此处使用本文第一部分中描述的相同POJO类（只是一个不同的包名称），它们需要放在WEB-INF / classes目录中，或者该包需要放在JAR文件中并放在WEB-查看器的INF / lib目录。最后，将Spring Framework下载中的以下JAR文件添加到WebViewer的WEB-INF / lib目录中：</p>
+<pre>&lt;listener&gt;
+	&lt;listener-class>org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
+&lt;/listener&gt;
+</pre><p>您还可以指定一个上下文参数以指向Spring Context类，如以下代码所示：</p>
+<pre>   &lt;context-param&gt;
+     &lt;param-name&gt;contextClass&lt;/param-name&gt;
+     &lt;param-value&gt;org.springframework.web.context.support.AnnotationConfigWebApplicationContext&lt;/param-value&gt;
+   &lt;/context-param&gt;   
+   &lt;context-param&gt;
+     &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+     &lt;param-value&gt;org.eclipse.birt.spring.webviewer.example.BirtDataServiceConfiguration&lt;/param-value&gt;
+   &lt;/context-param&gt;
+</pre><p>在这种情况下，我们不需要BirtWebConfiguration类，因此我们将contextConfigLocation指向BirtDataServiceConfiguration类。</p><p>此处使用本文第一部分中描述的相同POJO类（只是一个不同的包名称），它们需要放在WEB-INF / classes目录中，或者该包需要放在JAR文件中并放在WEB-查看器的INF / lib目录。最后，将Spring Framework下载中的以下JAR文件添加到WebViewer的WEB-INF / lib目录中：</p>
 <ul>
 <li>cglib-nodep-2.2.2.jar</li>
 <li>org.springframework.aop-3.1.0。RELEASE.jar</li>
@@ -598,19 +614,24 @@ this.text = mypojo.getAllCars().get(0).getMake();</pre><p>要运行此Web应用�
 <li>org.springframework.web.servlet-3.1.0。RELEASE.jar</li>
 <li>org.springframework.web-3.1.0。RELEASE.jar</li>
 </ul><p>要在BIRT表达式内或从BIRT JavaScript事件处理程序访问carService bean，请使用以下语法：</p>
-<pre>//BIRT label report item onCreate Script
+<pre> 
+//BIRT label report item onCreate Script
 importPackage(Packages.org.springframework.context);
 importPackage(Packages.org.springframework.web.context.support );
 var sc = reportContext.getHttpServletRequest().getSession().getServletContext();
 //ApplicationContext 
 spring = WebApplicationContextUtils.getWebApplicationContext(sc);
 var mypojo = spring.getBean("carService");
-this.Text = mypojo.getAllCars().get(0).getMake();</pre><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_d1a7e98.png" align="bottom" width="576" height="472" border="0"><br>图2-构建BIRT表达式</p><p>在设计器中预览报表时，BIRT表达式或脚本失败。为防止失败，将表达式或脚本包装在“ if”语句中，如以下代码所示：</p>
-<pre>if( !reportContext.getHttpServletRequest().getAttribute("attributeBean").isDesigner()){
+this.Text = mypojo.getAllCars().get(0).getMake();
+</pre><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_d1a7e98.png" align="bottom" width="576" height="472" border="0"><br>图2-构建BIRT表达式</p><p>在设计器中预览报表时，BIRT表达式或脚本失败。为防止失败，将表达式或脚本包装在“ if”语句中，如以下代码所示：</p>
+<pre> 
+if( !reportContext.getHttpServletRequest().getAttribute("attributeBean").isDesigner()){
 //Access Bean 
-}</pre><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_4f65ce7d.png" align="bottom" width="576" height="420" border="0"><br>图3 –在BIRT Viewer中显示Spring bean输出</p>
-<h2><a name="remotebeansfrombirt">使用远程处理从BIRT报表访问Bean</a></h2><p>本文的前两部分着重于将BIRT引擎和Viewer与Spring框架集成在一起。虽然这些方法很好用，但是假设您需要访问位于单独上下文或另一台机器上的Spring bean。Spring Remoting可用于实现此功能。</p><p>尽管任何一种Spring Remoting技术或其他机制（例如SOAP或REST）都可以使用，但本节将介绍如何使用Spring的基于HTTP Invoker的服务导出器。为了实现此示例，我们首先构建一个示例Web应用程序，其中包含一个Car Service bean，该bean将Car POJO提供给远程客户端。</p><p>为了进行远程处理，我们首先定义Car POJO，如以下代码所示：</p>
-<pre>package org.eclipse.birt.spring.remoting.example;
+} 
+</pre><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_4f65ce7d.png" align="bottom" width="576" height="420" border="0"><br>图3 –在BIRT Viewer中显示Spring bean输出</p>
+<h2><a name="remotebeansfrombirt">使用远程处理从BIRT报表访问Bean</a></h2><p>本文的前两部分着重于将BIRT引擎和Viewer与Spring框架集成在一起。虽然这些方法很好用，但是假设您需要访问位于单独上下文或另一台机器上的Spring bean。Spring Remoting可用于实现此功能。</p><p>尽管任何一种Spring Remoting技术或其他机制（例如SOAP或REST）都可以使用，但本节介绍了如何使用基于Spring Introker的基于HTTP Invoker的服务导出器。为了实现此示例，我们首先构建一个示例Web应用程序，其中包含一个Car Service bean，该bean将Car POJO提供给远程客户端。</p><p>为了进行远程处理，我们首先定义Car POJO，如以下代码所示：</p>
+<pre> 
+package org.eclipse.birt.spring.remoting.example;
 
 public class Car implements ICar{
 
@@ -644,8 +665,10 @@ public class Car implements ICar{
 	public String toString(){
 		return "Make:--"+this.make+" Model:--"+this.model+" Year:--"+this.year;
 	}
-}</pre><p>接下来，我们实施汽车服务。</p>
-<pre>package org.eclipse.birt.spring.remoting.example;
+}
+</pre><p>接下来，我们实施汽车服务。</p>
+<pre> 
+package org.eclipse.birt.spring.remoting.example;
 import java.util.Arrays;
 import java.util.List;
 
@@ -653,9 +676,7 @@ import org.eclipse.birt.spring.remoting.example.Car;
 import org.eclipse.birt.spring.remoting.example.CarService;
 public class CarServiceImpl implements CarService{
 
-public List
-<car>
-  getAllCars(){
+public List<Car> getAllCars(){
 	Car car1 = new Car();
 	car1.setYear("2000");
 	car1.setMake("Chevrolet");
@@ -668,19 +689,16 @@ public List
 	car3.setYear("2002");
 	car3.setMake("Ford");
 	car3.setModel("Mustang GT");
-	List
- <car>
-   cars = Arrays.asList(  car1, car2, car3 ) ;
+	List<Car> cars = Arrays.asList(  car1, car2, car3 ) ;
 	return cars ; 
 
 	
 }
 }
 
-
- </car>
-</car></pre><p>最后，我们实现BirtDataServiceConfiguration文件来处理Spring上下文的Java配置。</p>
-<pre>package org.eclipse.birt.spring.remoting.example;
+</pre><p>最后，我们实现BirtDataServiceConfiguration文件来处理Spring上下文的Java配置。</p>
+<pre> 
+package org.eclipse.birt.spring.remoting.example;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -712,11 +730,7 @@ public class BirtDataServiceConfiguration {
 	public SimpleUrlHandlerMapping myUrlMapping(){
 
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();         
-		Map
-<string, object>
-  urlMap = new HashMap
- <string, object>
-  ();         
+		Map<String, Object> urlMap = new HashMap<String, Object>();         
 		urlMap.put("/carService", myServiceExporter());                  
 		mapping.setUrlMap(urlMap);         
 		mapping.setAlwaysUseFullPath(true);         
@@ -725,42 +739,41 @@ public class BirtDataServiceConfiguration {
 
 
 }
+</pre><p>此类仅将/ carService URL映射到HttpInvokerServiceExporter对象，该对象将carService bean暴露给远程客户端。</p><p>接下来，我们可以为使用Spring DispatcherServlet的该应用程序创建一个web.xml，如以下代码所示：</p>
+<pre>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
+    "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"&gt;
+&lt;web-app&gt;
 
- </string,>
-</string,></pre><p>此类仅将/ carService URL映射到HttpInvokerServiceExporter对象，该对象将carService bean暴露给远程客户端。</p><p>接下来，我们可以为使用Spring DispatcherServlet的该应用程序创建一个web.xml，如以下代码所示：</p>
-<pre><?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
-    "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
-<web-app>
-
- <servletgt;
-   <servlet-name>springandbirt</servlet-name>
-   <servlet-class>
+ &lt;servletgt;
+   &lt;servlet-name&gt;springandbirt&lt;/servlet-name&gt;
+   &lt;servlet-class&gt;
      org.springframework.web.servlet.DispatcherServlet
-   </servlet-class>
-   <init-param>
-     <param-namegt;contextClass</param-name>
-     <param-valuegt;org.springframework.web.context.support.AnnotationConfigWebApplicationContextlt;/param-value>
-   </init-param>   
-   <init-param>
-     <param-name>contextConfigLocation</param-name>
-     <param-value>org.eclipse.birt.spring.remoting.example.BirtDataServiceConfiguration</param-value>
-   </init-param>
-   <load-on-startup>1</load-on-startup>
- </servlet>
+   &lt;/servlet-class&gt;
+   &lt;init-param&gt;
+     &lt;param-namegt;contextClass&lt;/param-name&gt;
+     &lt;param-valuegt;org.springframework.web.context.support.AnnotationConfigWebApplicationContextlt;/param-value&gt;
+   &lt;/init-param&gt;   
+   &lt;init-param&gt;
+     &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+     &lt;param-value&gt;org.eclipse.birt.spring.remoting.example.BirtDataServiceConfiguration&lt;/param-value&gt;
+   &lt;/init-param&gt;
+   &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+ &lt;/servlet&gt;
 
- <servlet-mapping>
-   <servlet-name>springandbirt</servlet-name>
-   <url-pattern>/carService</url-pattern>
- </servlet-mapping>
+ &lt;servlet-mapping&gt;
+   &lt;servlet-name>springandbirt&lt;/servlet-name&gt;
+   &lt;url-pattern&gt;/carService&lt;/url-pattern&gt;
+ &lt;/servlet-mapping&gt;
 
-  <welcome-file-list>
-    <welcome-file>
+  &lt;welcome-file-list&gt;
+    &lt;welcome-file&gt;
       index.jsp
-    </welcome-file>
-  </welcome-file-list>
+    &lt;/welcome-file&gt;
+  &lt;/welcome-file-list&gt;
 
-</web-app></pre><p>Web应用程序需要Spring框架中WEB-INF / lib目录中的以下JAR文件：</p>
+&lt;/web-app&gt;
+</pre><p>Web应用程序需要Spring框架中WEB-INF / lib目录中的以下JAR文件：</p>
 <ul>
 <li>cglib-nodep-2.2.2.jar</li>
 <li>org.springframework.aop-3.1.0。RELEASE.jar</li>
@@ -773,7 +786,8 @@ public class BirtDataServiceConfiguration {
 <li>org.springframework.web.servlet-3.1.0。RELEASE.jar</li>
 <li>org.springframework.web-3.1.0。RELEASE.jar</li><li>aopalliance.jar（春季依赖）</li>
 </ul><p>现在可以构建和部署该应用程序。</p><p>接下来，我们需要构建一个远程客户端来访问以前构建的应用程序。在此示例中，它只是一个JAR文件，我们可以将其包含在BIRT Viewer中，以对carService进行单独的上下文访问。</p><p>客户端jar应包含CarService接口和CarPojo / ICarPojo类/接口。除了这三个类，我们还需要一个配置类来处理Spring Context的Java配置。</p><p>此类使用AnnotationConfigApplicationContext类来指定Java类来处理Spring Context的配置。下面提供了ContextConfig类，该类使用HttpInvokerProxyFactoryBean连接到服务器并检索汽车服务bean。</p>
-<pre>package org.eclipse.birt.spring.remoting.client.example;
+<pre> 
+package org.eclipse.birt.spring.remoting.client.example;
 
 import org.eclipse.birt.spring.remoting.example.CarService;
 import org.springframework.context.annotation.Bean;
@@ -791,27 +805,33 @@ public class ContextConfig {
 		return proxy;
 	} 
 
-}</pre><p>此配置文件定义一个充当HTTP调用程序代理的bean。服务URL定义了我们前面定义的远程服务器的位置，服务接口定义了返回的对象。要构建客户端JAR文件，请将为服务器添加的相同JAR文件添加到类路径。</p><p>要从BIRT查看器调用汽车服务，请在BIRT Expression Builder或JavaScript事件处理程序中使用以下JavaScript代码段，如以下代码所示：</p>
-<pre>importPackage(Packages.org.springframework.context);
+}
+</pre><p>此配置文件定义一个充当HTTP调用程序代理的bean。服务URL定义了我们前面定义的远程服务器的位置，服务接口定义了返回的对象。要构建客户端JAR文件，请将为服务器添加的相同JAR文件添加到类路径。</p><p>要从BIRT查看器调用汽车服务，请在BIRT Expression Builder或JavaScript事件处理程序中使用以下JavaScript代码段，如以下代码所示：</p>
+<pre> 
+importPackage(Packages.org.springframework.context);
 importPackage(Packages.org.springframework.web.context.support );
 var sc = reportContext.getHttpServletRequest().getSession().getServletContext();
 //ApplicationContext 
 var spring = WebApplicationContextUtils.getWebApplicationContext(sc);
 var mypojo = spring.getBean("client");
-mypojo.getAllCars().get(0).getMake();</pre><p>将关于构建远程服务器的部分中描述的所有jar添加到BIRT Viewer的WEB-INF / lib中。另外，将远程客户端jar添加到BIRT Viewer的WEB-INF / lib中。最后，将以下内容添加到已部署查看器的web.xml中。在本文的BIRT Viewer中访问Spring Beans部分中讨论了这些设置。请注意，contextConfigLocation更改为ContextConfig类。</p>
-<pre><listener>
-	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-</listener>
+mypojo.getAllCars().get(0).getMake();
+</pre><p>将关于构建远程服务器的部分中描述的所有jar添加到BIRT Viewer的WEB-INF / lib中。此外，将远程客户端jar添加到BIRT Viewer的WEB-INF / lib中。最后，将以下内容添加到已部署查看器的web.xml中。在本文的BIRT Viewer中访问Spring Beans部分中讨论了这些设置。请注意，contextConfigLocation更改为ContextConfig类。</p>
+<pre>&lt;listener&gt;
+	&lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
+&lt;/listener&gt;
 
-   <context-param>
-     <param-name>contextClass</param-name>
-     <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
-   </context-param>   
-   <context-param>
-     <param-name>contextConfigLocation</param-name>
-     <param-value>org.eclipse.birt.spring.webviewer.example.ContextConfig</param-value>
-   </context-param></pre><p>这种方法允许现有的已部署BIRT Viewer访问单独的机器/上下文来访问远程bean。最后一点，如果您正在使用中间Java类来访问远程Bean，请使用以下代码。</p>
-<pre>.
+   &lt;context-param&gt;
+     &lt;param-name&gt;contextClass&lt;/param-name&gt;
+     &lt;param-value&gt;org.springframework.web.context.support.AnnotationConfigWebApplicationContext&lt;/param-value&gt;
+   &lt;/context-param&gt;   
+   &lt;context-param&gt;
+     &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+     &lt;param-value&gt;org.eclipse.birt.spring.webviewer.example.ContextConfig&lt;/param-value&gt;
+   &lt;/context-param&gt;
+
+</pre><p>这种方法允许现有的已部署BIRT Viewer访问单独的机器/上下文来访问远程bean。最后，如果您使用中间Java类访问远程Bean，请使用以下代码。</p>
+<pre> 
+.
 .
 private final CarService carPojoService;
 
@@ -819,12 +839,15 @@ private final CarService carPojoService;
 		final ApplicationContext context = new AnnotationConfigApplicationContext( ContextConfig.class);      
 		this.carPojoService = (CarService) context.getBean("client");   
 .
-.</pre>
+.
+
+</pre>
 <h2><a name="conclusion">结论</a></h2><p>Spring和BIRT框架在Java社区中非常流行。BIRT技术的许多用户也将Spring功能用作其企业应用程序代码的一部分，以处理诸如采购数据，报告表示和访问控制之类的功能。这些只是将Spring Framework与BIRT结合使用的一些好处。本文介绍如何集成BIRT和Spring。尽管确实存在其他情况，但本文可以作为学习工具，让您开始同时使用这两种技术。</p>
-<h2><a name="attachments">附件</a></h2><p>希望利用本文介绍的集成类的开发人员可以使用下面的<code>SpringandBirtCoreJar.zip</code>下载。有关示例，请参见<code>SpringBirtArticleSamples.zip</code>下载。</p><p><a href="http://www.springsource.org/files/birt/SpringandBirtCoreJar.zip">SpringandBirtCoreJar.zip</a><br><a href="http://www.springsource.org/files/birt/SpringBirtArticleSamples.zip">SpringBirtArticleSamples.zip</a></p></div>
+<h2><a name="attachments">附件</a></h2><p>希望利用本文描述的集成类的开发人员可以使用<code>SpringandBirtCoreJar.zip</code>在下面下载。有关示例，请参见<code>SpringBirtArticleSamples.zip</code>下载。</p><p><a href="http://www.springsource.org/files/birt/SpringandBirtCoreJar.zip">SpringandBirtCoreJar.zip</a><br><a href="http://www.springsource.org/files/birt/SpringBirtArticleSamples.zip">SpringBirtArticleSamples.zip</a></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 534;
 
       (function(disqus_shortname, document) {
@@ -838,7 +861,8 @@ private final CarService carPojoService;
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -876,12 +900,14 @@ private final CarService carPojoService;
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

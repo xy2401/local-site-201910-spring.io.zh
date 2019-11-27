@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>创建一个Spring 2.0命名空间？使用Spring的AbstractBeanDefintionParser层次结构。</title>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
+<title>创建Spring 2.0命名空间？使用Spring的AbstractBeanDefintionParser层次结构。</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Creating a Spring 2.0 namespace?  Use Spring's AbstractBeanDefintionParser hierarchy.">
-<meta name="twitter:description" content="<p>Lately it seems like I’ve been focusing on creating Spring XML namespaces. It’s been a lot of trial and error (both on the XSD and Spring side) to get a good pattern for creating parsers. One of the biggest confusions that I ran into was the <span style=" font-family:courie="="></head><body dir="ltr">AbstractBeanDefinitionParser hierarchy. At this point it isn’t documented especially well (but there is a JIRA for it, so it’ll be fixed before GA), so I’ll give you a rundown of your choices, what they’re good for and how to use them.
+<meta name="twitter:description" content="<p>Lately it seems like I’ve been focusing on creating Spring XML namespaces. It’s been a lot of trial and error (both on the XSD and Spring side) to get a good pattern for creating parsers. One of the biggest confusions that I ran into was the <span style=" font-family:courie="="></head><body >AbstractBeanDefinitionParser hierarchy. At this point it isn’t documented especially well (but there is a JIRA for it, so it’ll be fixed before GA), so I’ll give you a rundown of your choices, what they’re good for and how to use them.
 <h2><span style="font-family:courier">AbstractBeanDefinitionParser</span> choices</h2>
 ">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/329c22b36844c1d9c698d5e9b6709dc5?s=200">
@@ -38,10 +42,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -148,7 +154,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">创建一个Spring 2.0命名空间？使用Spring的AbstractBeanDefintionParser层次结构。</h1>
+<h1 class="blog--title">创建Spring 2.0命名空间？使用Spring的AbstractBeanDefintionParser层次结构。</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -167,11 +173,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>最近，似乎我一直在专注于创建Spring XML名称空间。为了获得创建解析器的良好模式，已经进行了大量的尝试和错误（在XSD和Spring方面）。我遇到的最大困惑之一是<span style="font-family:courier">AbstractBeanDefinitionParser</span>层次结构。到目前为止，它的文档还不够好（但是有一个JIRA，因此它将在GA之前得到修复），因此，我将简要介绍您的选择，它们的优点以及如何选择使用它们。</p>
-<h2><span style="font-family:courier">AbstractBeanDefinitionParser</span>选择</h2><p>Spring提供了三个主要的<span style="font-family:courier">BeanDefinitionParser</span> ，以帮助您解析XML名称空间。<br></p><ul><br><li><a href="#AbstractBeanDefinitionParser" style="font-family:courier">AbstractBeanDefinitionParser</a><br> <ul><br> <li><a href="#AbstractSingleBeanDefinitionParser" style="font-family:courier">AbstractSingleBeanDefinitionParser</a><br> <ul><br> <li><a href="#AbstractSimpleBeanDefinitionParser" style="font-family:courier">AbstractSimpleBeanDefinitionParser</a><br> </li></ul><br> </li></ul><br></li></ul><p></p><p>我将从最具体的地方开始，朝最一般的方向努力，以展示如何在需要时获得更多动力。如果您想跳过示例并查看摘要，请<a href="#summary">点击此处</a> 。</p><p><a name="AbstractSimpleBeanDefinitionParser"></a></p><h2 style="font-family:courier">AbstractSimpleBeanDefinitionParser</h2><br>该<span style="font-family:courier">AbstractSimpleBeanDefinitionParser</span>是的<span style="font-family:courier">AbstractBeanDefinitionParser</span> S中的最specfic。当标签上的属性与bean上的属性之间存在关联时，可以使用此类。因此，请看以下示例：<p></p>
-<pre><code class="prettyprint xml"><br><util:properties location="..." />
+<div class="blog--post"><p>最近，似乎我一直在专注于创建Spring XML名称空间。为了获得创建解析器的良好模式，已经进行了大量的反复试验（在XSD和Spring方面）。我遇到的最大困惑之一是<span style="font-family:courier">AbstractBeanDefinitionParser</span>层次结构。到目前为止，它的文档还不够好（但是有一个JIRA，因此它将在GA之前得到修复），因此，我将简要介绍您的选择，它们的优点以及如何选择使用它们。</p>
+<h2><span style="font-family:courier">AbstractBeanDefinitionParser</span>选择</h2><p>Spring提供了三个主要的<span style="font-family:courier">BeanDefinitionParser</span> ，以帮助您解析XML名称空间。<br></p><ul><br><li><a href="#AbstractBeanDefinitionParser" style="font-family:courier">AbstractBeanDefinitionParser</a><br> <ul><br> <li><a href="#AbstractSingleBeanDefinitionParser" style="font-family:courier">AbstractSingleBeanDefinitionParser</a><br> <ul><br> <li><a href="#AbstractSimpleBeanDefinitionParser" style="font-family:courier">AbstractSimpleBeanDefinitionParser</a><br> </li></ul><br> </li></ul><br></li></ul><p></p><p>我将从最具体的地方开始，朝最一般的方向努力，以展示如何在需要时获得更多动力。如果要跳过示例并查看摘要，请<a href="#summary">在此处</a>检查。</p><p><a name="AbstractSimpleBeanDefinitionParser"></a></p><h2 style="font-family:courier">AbstractSimpleBeanDefinitionParser</h2><br>该<span style="font-family:courier">AbstractSimpleBeanDefinitionParser</span>是的<span style="font-family:courier">AbstractBeanDefinitionParser</span> S中的最specfic。当标签上的属性与bean上的属性之间存在关联时，可以使用此类。因此，请看以下示例：<p></p>
+<pre><code class="prettyprint xml"><br />&lt;util:properties location=&quot;...&quot; /&gt;
 </code></pre>
-<pre><code class="prettyprint java"><br>public class PropertiesFactoryBean extends PropertiesLoaderSupport
+<pre><code class="prettyprint java"><br />public class PropertiesFactoryBean extends PropertiesLoaderSupport
 		implements FactoryBean, InitializingBean {
     ...
     public void setLocation(Resource location) {
@@ -180,20 +186,20 @@
     ...
 }
 </code></pre><p>您会注意到<span style="font-family:courier">util：properties</span>标记上的<span style="font-family:courier">location</span>属性与<span style="font-family:courier">PropertiesFactoryBean</span>类型上的java bean属性匹配。<span style="font-family:courier">AbstractSimpleBeanDefinitionParser</span>自动提取属性并将其映射到该属性。要获得此行为，您只需实现一个方法<span style="font-family:courier">getBeanClass（）即可</span> 。因此，此示例的实现如下所示：</p>
-<pre><code class="prettyprint java"><br>public class PropertiesBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
+<pre><code class="prettyprint java"><br />public class PropertiesBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
     protected Class getBeanClass(Element element) {
         return PropertiesFactoryBean.class;
     }
 }
 </code></pre><p>与所有抽象解析器一样，隐藏在幕后的框架代码采用创建的bean定义，并将其注册到应用程序上下文中。</p><p><a name="AbstractSingleBeanDefinitionParser"></a></p><h2 style="font-family:courier">AbstractSingleBeanDefinitionParser</h2><br><span style="font-family:courier">AbstractSingleBeanDefinitionParser</span>更为通用，我认为它将是最常用的抽象解析器。此类使您能够创建将在上下文中自动注册的任何单个bean定义。在这种情况下，bean定义可能不是简单的属性映射，它可能具有复杂的嵌套结构，但仅创建一个bean定义。因此，例如：<p></p>
-<pre><code class="prettyprint xml"><br><tx:advice>
-    <tx:attributes>
-        <tx:method name="get*" read-only="false" />
-    </tx:attributes>
-</tx:advice>
+<pre><code class="prettyprint xml"><br />&lt;tx:advice&gt;
+    &lt;tx:attributes&gt;
+        &lt;tx:method name=&quot;get*&quot; read-only=&quot;false&quot; /&gt;
+    &lt;/tx:attributes&gt;
+&lt;/tx:advice&gt;
 </code></pre>
-<pre><code class="prettyprint java"><br>public class TransactionInterceptor extends TransactionAspectSupport
+<pre><code class="prettyprint java"><br />public class TransactionInterceptor extends TransactionAspectSupport
     implements MethodInterceptor, Serializable {
     ...
     public void setTransactionAttributes(Properties transactionAttributes) {
@@ -204,7 +210,7 @@
     ...
 }
 </code></pre><p>正如您所看到的<span style="font-family:courier">tx：advice</span>复杂的嵌套结构一样，我们前面不会看到一对一的映射。但是，使用<span style="font-family:courier">AbstractSingleBeanDefinitionParser</span>可以对DOM结构进行任意遍历，如下所示：</p>
-<pre><code class="prettyprint java"><br>class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+<pre><code class="prettyprint java"><br />class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
     ...
     protected void doParse(Element element, BeanDefinitionBuilder builder) {
         // Set the transaction manager property.
@@ -212,8 +218,8 @@
             element.getAttribute(TxNamespaceUtils.TRANSACTION_MANAGER_ATTRIBUTE));
 
         List txAttributes = DomUtils.getChildElementsByTagName(element, ATTRIBUTES);
-        if (txAttributes.size() > 1) {
-            throw new IllegalStateException("Element 'attributes' is allowed at most once inside element 'advice'");
+        if (txAttributes.size() &gt; 1) {
+            throw new IllegalStateException(&quot;Element &#39;attributes&#39; is allowed at most once inside element &#39;advice&#39;&quot;);
         }
         else if (txAttributes.size() == 1) {
             // Using attributes source.
@@ -228,9 +234,9 @@
     ...
 }
 </code></pre><p>您可以在这里看到我们正在检查DOM，并基于它对bean定义做出复杂的决定。如前所述，我认为这将是进行bean定义解析的最常用的支持类之一。</p><p><a name="AbstractBeanDefinitionParser"></a></p><h2 style="font-family:courier">AbstractBeanDefinitionParser</h2><br>现在是最可定制的选择，而无需实际为您自己实现接口。基本上，这个特定的类不仅允许您创建bean定义，而且还为您提供了足够的知识来创建多个bean定义。以机智：<p></p>
-<pre><code class="prettyprint xml"><br><tx:annotation-driven />
+<pre><code class="prettyprint xml"><br />&lt;tx:annotation-driven /&gt;
 </code></pre><p>那些熟悉Spring 2.0及其新名称空间的人应该将此标记识别为一种标签，它将自动检测<span style="font-family:courier">@Transactional</span>注释并代理它们所包含的类。现在，将在<span style="font-family:courier">后台</span>创建与您在Spring 1.2.8中为<span style="font-family:courier">DefaultAutoProxyCreator</span>样式行为创建的Bean定义相同的集合。总共4颗豆。那么，这种行为的例子是什么样的呢？</p>
-<pre><code class="prettyprint java"><br>class AnnotationDrivenBeanDefinitionParser extends AbstractBeanDefinitionParser {
+<pre><code class="prettyprint java"><br />class AnnotationDrivenBeanDefinitionParser extends AbstractBeanDefinitionParser {
     ...
 protected BeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
@@ -263,7 +269,8 @@ protected BeanDefinition parseInternal(Element element, ParserContext parserCont
 <hr><p><i>上一节中更新了错字</i><br><i>更新了文本中一致的拼写错误</i></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 21;
 
       (function(disqus_shortname, document) {
@@ -277,7 +284,8 @@ protected BeanDefinition parseInternal(Element element, ParserContext parserCont
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -315,12 +323,14 @@ protected BeanDefinition parseInternal(Element element, ParserContext parserCont
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

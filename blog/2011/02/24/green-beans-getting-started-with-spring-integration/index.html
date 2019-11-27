@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>绿豆：Spring集成入门</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,15 +174,195 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>应用程序不是凭空存在的。他们需要与客户和其他应用程序进行通信。应用程序集成与启用此通信有关。集成使应用程序可以彼此共享服务和数据，并且集成可以像通常那样帮助应用程序与其用户连接。</p><p>Spring Integration提供了一个框架来构建集成解决方案，以简化此类解决方案。Spring Integration解决方案描述了通过管道的数据流。数据作为消息进入处理管道。消息通过命名管道（称为通道）向前移动，这些管道将数据路由到不同的组件（称为端点）。您可以根据需要将任意数量的端点和通道串在一起。</p><p>此模型的简单性与Unix命令行非常相似。以以下Unix咒语为例：</p>
-<pre><code class="prettyprint shell">cat spring.txt |grep spring |cut -f1 -d, | sort | uniq > spring_cleaning.txt
-</code></pre><p>在此命令中，来自外部资源（名为<code>spring.txt</code>的文件）的数据被传递到<code>grep</code>命令行中。 <code>grep</code>筛选结果，找到与单词“ spring”匹配的所有行并将其作为输出发送。<code>grep</code>命令的输出作为<code>cut</code>命令的输入发送，该命令将解析结果并以逗号分隔每个行（“，”），并且仅保留第一列数据（丢弃第一个“，”之后的所有其他内容） ）。该中继继续进行到最后，最后将输出写回到另一个名为<code>spring_cleaning.txt.</code>外部资源<code>spring_cleaning.txt.</code> 在此命令中，我们使用Unix“管道”（“ |”）将一个命令的输出连接到另一个命令的输入。我们通过专门编写来读取，清理，过滤，转换和写入数据。将单独关注的命令放入管道中。这种方法称为管道和过滤器模型，使用Spring Integration，您可以使用同一简单模型思考更大的问题。在Spring Integration中，通道是管道，端点是过滤器。<br></p><h2>Spring Integration随附电池</h2><br>Spring Integration支持许多不同的用例。这是一些常见的：<br><ul><br> <li><strong>转换数据</strong> ：转换器端点可能将有效负载的类型从一类更改为另一类，或者删除，添加或更改消息头。</li><br> <li> <strong>路由数据</strong> ：路由器端点提供自定义路由逻辑–也许应该将来自输入通道的数据传递到多个输出通道？</li><br> <li> <strong>过滤数据</strong> ：也许输入数据不适合继续进行，应该清除掉。您可以使用过滤器端点有条件地停止处理数据。</li><br> <li> <strong>使不同的系统适应Spring Integration</strong> ：适配器使数据能够进入和退出Spring Integration解决方案。</li><br> <li> <strong>拆分数据</strong> ：有效负载过大或打算将其分割为较小的数据时。一个示例可能是应该拆分为行的单个文件。</li><br> <li> <strong>聚合数据</strong> ：这是拆分功能的逆向：聚合器逐个等待消息到达，然后收集消息直到满足某种条件为止。然后，它将所有聚合消息作为一条消息发送。</li><br></ul><br>这些是Spring Integration开发人员工具箱中的工具。Spring Integration的核心只是一个具有通用抽象和接口的Maven依赖项。<p></p>
-<pre><code class="prettyprint xml"><br><dependency>
-    <groupId>org.springframework.integration</groupId>
-    <artifactId>spring-integration-core</artifactId>
-    <version>2.0.3.RELEASE</version>
-</dependency>
-</code></pre><p>Spring Integration提供了许多现成的模块，每个模块都具有适合特定类型需求的支持（例如：XML处理或Web服务集成）。例如，文件名称空间提供了入站适配器和出站适配器，以分别从文件系统读取文件和将文件写入文件系统。该<code>file:inbound-channel-adapter</code>相适应的文件系统-它可以监控您的规格的目录和，每当一个新的文件出现，有型的paylod所产生的消息<code>java.io.File</code>的有效载荷为新文件。一个常见的用例是从<code>java.io.File</code>到文件内容的表示形式<code>String</code>或<code>byte</code>数组（ <code>byte[]</code> ）。由于这是很常见的，文件命名空间提供既<code>file:file-to-string-transformer</code>端点以及一个<code>file:file-to-bytes-transformer</code> 。最后，一个常见的场景是人们想要将<code>String</code>或<code>byte</code>数组数据写入文件系统。为此， <code>file</code>名称空间提供了<code>file:outbound-channel-adapter</code>适配器。这些都是之前描述的基本端点的简单的面向文件IO的实现，例如，适配器和转换器。</p><p>Spring Integration附带了许多预包装的模块，这些模块在这些非常相同的终结点类型上支持广泛的功能。Spring Integration 2.0附带的一些模块包括文件IO，JDBC，RSS / ATOM，FTP / FTPS，SFTP，TCP / IP，RMI，HTTP，JMX，电子邮件，IO流，Twitter，XMPP，Web服务，HTTP / REST，XML和JMS。尽管此列表很广泛，但并不完整。即将提供或作为其他其他Spring产品组合项目的一部分提供的支持，包括Gemfire支持，AMQP支持，基于Activiti BPMN 2业务流程管理项目完成的工作流系统集成，基于Ajax / Comet的支持， Flex BlazeDS基于消息传递的支持等等。<br></p><h3>一个简单的例子</h3><br>让我们看一个简单的示例-假设的在线零售商的示例（“电子零售商”！）负责处理网站上的交易，并招募多家第三方公司来帮助完成订单。特别是，我们将研究从网站上的购买点到运输公司的数据流。集成由从服务发送的JMS消息触发。货运公司与电子零售商无关，并且希望所有订单都通过其Web服务端点提交，因此必须使用触发器JMS消息来调用Web服务端点。最后，所有提交给第三方（在本例中为运输公司）的工作都需要进行审核，因此信息应记录在我们数据库中面向报告的审核表中。<p></p>
+<div class="blog--post"><p>应用程序不是凭空存在的。他们需要与客户和其他应用程序进行通信。应用程序集成与启用此通信有关。集成使应用程序可以彼此共享服务和数据，并且集成可以像通常那样帮助应用程序与其用户连接。</p><p>Spring Integration提供了一个框架来构建集成解决方案，以简化此类解决方案。Spring Integration解决方案描述了通过管道的数据流。数据作为消息进入处理管道。消息通过命名管道（称为通道）向前移动，这些管道将数据路由到不同的组件（称为端点）。您可以根据需要将尽可能多的端点和通道串在一起。</p><p>此模型的简单性与Unix命令行非常相似。以以下Unix咒语为例：</p>
+<pre><code class="prettyprint shell">cat spring.txt |grep spring |cut -f1 -d, | sort | uniq &gt; spring_cleaning.txt
+</code></pre><p>在此命令中，来自外部资源的数据（名为<code>spring.txt</code> ）传递到<code>grep</code>命令行。 <code>grep</code>筛选结果，找到与单词“ spring”匹配的所有行并将其作为输出发送。来自的输出<code>grep</code>命令作为输入发送到<code>cut</code>命令，它将分析结果并以逗号（“，”）分隔每一行，并且仅保留第一列数据（丢弃第一个“，”之后的所有其他内容）。该中继将继续进行到最后，最后将输出写回到另一个称为<code>spring_cleaning.txt.</code>在此命令中，我们使用Unix“管道”（“ |”）将一个命令的输出连接到另一个命令的输入。我们通过专门编写来读取，清理，过滤，转换和写入数据。将单独关注的命令放入管道中。这种方法称为管道和过滤器模型，使用Spring Integration，您可以使用同一简单模型思考更大的问题。在Spring Integration中，通道是管道，端点是过滤器。<br></p><h2>Spring Integration随附电池</h2><br>Spring Integration支持许多不同的用例。这是一些常见的：<br><ul><br> <li><strong>转换数据</strong> ：转换器端点可能将有效负载的类型从一类更改为另一类，或者删除，添加或更改消息头。</li><br> <li> <strong>路由数据</strong> ：路由器端点提供自定义路由逻辑–也许应该将来自输入通道的数据传递到多个输出通道？</li><br> <li> <strong>过滤数据</strong> ：也许输入数据不适合继续进行，应该清除掉。您可以使用过滤器端点有条件地停止处理数据。</li><br> <li> <strong>使不同的系统适应Spring Integration</strong> ：适配器使数据能够进入和退出Spring Integration解决方案。</li><br> <li> <strong>拆分数据</strong> ：有效负载过大或打算将其分割为较小的数据时。一个示例可能是应该拆分为行的单个文件。</li><br> <li> <strong>聚合数据</strong> ：这是拆分功能的逆向：聚合器逐个等待消息到达，然后收集消息直到满足某种条件为止。然后，它将所有聚合消息作为一条消息发送。</li><br></ul><br>这些是Spring Integration开发人员工具箱中的工具。Spring Integration的核心只是一个具有通用抽象和接口的Maven依赖项。<p></p>
+<pre><code class="prettyprint xml"><br />&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.integration&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-integration-core&lt;/artifactId&gt;
+    &lt;version&gt;2.0.3.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><p>Spring Integration提供了许多现成的模块，每个模块都具有适合特定类型需求的支持（例如：XML处理或Web服务集成）。例如，文件名称空间提供了入站适配器和出站适配器，以分别从文件系统读取文件和将文件写入文件系统。的<code>file:inbound-channel-adapter</code>适应文件系统–它监视您指定的目录，并且每当出现新文件时，都会生成带有类型为Paylod的消息<code>java.io.File</code>新文件的有效负载。一个常见的用例是从<code>java.io.File</code>表示文件内容-一个<code>String</code>或<code>byte</code>数组（ <code>byte[]</code> ）。由于这种情况非常普遍，因此文件名称空间既提供了<code>file:file-to-string-transformer</code>端点以及<code>file:file-to-bytes-transformer</code> 。最后，一个常见的情况是人们想写<code>String</code>要么<code>byte</code>将数据数组化到文件系统。为此， <code>file</code>命名空间提供了<code>file:outbound-channel-adapter</code>适配器。这些都是之前描述的基本端点的简单的面向文件IO的实现，例如，适配器和转换器。</p><p>Spring Integration附带了许多预包装的模块，这些模块在这些非常相同的终结点类型上支持广泛的功能。Spring Integration 2.0附带的一些模块包括文件IO，JDBC，RSS / ATOM，FTP / FTPS，SFTP，TCP / IP，RMI，HTTP，JMX，电子邮件，IO流，Twitter，XMPP，Web服务，HTTP / REST，XML和JMS。尽管此列表很广泛，但并不完整。即将提供或作为其他其他Spring产品组合项目的一部分提供的支持，包括Gemfire支持，AMQP支持，基于Activiti BPMN 2业务流程管理项目完成的工作流系统集成，基于Ajax / Comet的支持， Flex BlazeDS基于消息传递的支持等等。<br></p><h3>一个简单的例子</h3><br>让我们看一个简单的示例-假设的在线零售商的示例（“电子零售商”！）负责处理网站上的交易，并招募多家第三方公司来帮助完成订单。特别是，我们将研究从网站上的购买点到运输公司的数据流。集成由从服务发送的JMS消息触发。货运公司与电子零售商无关，并且希望所有订单都通过其Web服务端点提交，因此必须使用触发器JMS消息来调用Web服务端点。最后，所有提交给第三方（在本例中为运输公司）的工作都需要进行审核，因此信息应记录在我们数据库中面向报告的审核表中。<p></p>
 <div align="center">
 <a href="http://blog.springsource.com/wp-content/uploads/2011/02/SpringIntegration600x233.png"><img title="SpringIntegration600x233" src="http://blog.springsource.com/wp-content/uploads/2011/02/SpringIntegration600x233.png" alt="Spring集成示例过程" width="600" height="233"></a> <em>示例集成解决方案的图表-该图表是由SpringSource Tool Suite生成的</em>
-</div><p><strong>处理JMS消息</strong> ：第一步是从JMS代理接收消息。我们将使用Spring Integration入站适配器（一个从JMS代理接收消息的端点），以一种简单的声明性方式将JMS代理连接到我们的应用程序代码。</p><p>Spring Integration使您可以处理包装在<code>org.springframework.integration.core.Message</code></p><code>org.springframework.integration.core.Message</code></div><code>org.springframework.integration.core.Message</code></div><code>org.springframework.integration.core.Message</code></article><code>org.springframework.integration.core.Message</code></div><code>org.springframework.integration.core.Message</code></div><code>org.springframework.integration.core.Message</code></div><code>org.springframework.integration.core.Message</code></div><code>org.springframework.integration.core.Message</code></body></html>
+</div><p><strong>处理JMS消息</strong> ：第一步是从JMS代理接收消息。我们将使用Spring Integration入站适配器（一个从JMS代理接收消息的端点），以一种简单的声明性方式将JMS代理连接到我们的应用程序代码。</p><p>通过Spring Integration，您可以处理包装在表格中的单个数据块<code>org.springframework.integration.core.Message</code> 。数据不仅要显示，还必须来自某个地方。为了使数据进出Spring Integration，分别使用入站适配器和出站适配器。适配器是一种特殊的终结点，可以告诉您外部系统何时发生了有趣的事情，并且告诉您外部系统中发生了什么。因为适配器仅接收或发送数据，所以它们是<em>单向的</em> 。</p>
+<pre><code class="prettyprint xml"><br />    &lt;int-jms:message-driven-channel-adapter
+      channel=&quot;partnerNotifications&quot;
+      connection-factory=&quot;connectionFactory&quot;
+      transaction-manager=&quot;jmsTransactionManager&quot;
+      acknowledge=&quot;transacted&quot;
+       destination-name=&quot;${jms.partnernotifications.destination}&quot;
+    /&gt;
+
+    &lt;int:channel id=&quot;partnerNotifications&quot;/&gt;
+</code></pre><p>我们不会涵盖<code>connectionFactory</code>和<code>jmsTransactionManager</code> bean，因为它们是标准的基于Spring JMS的bean，可以在源代码中进行检查。每当JMS代理上出现一条消息时（在JMS中<code>destination</code> ），Spring Integration将发布一个<code>org.springframework.integration.Message</code>在名为频道上<code>partnerNotifications</code>在哪里可以消费。</p><p><strong>调用合作伙伴</strong> Web服务：消息有效负载是字符串中的XML文档。我们将在短期内介绍它是如何获得的，但是只要说它已经是供零售商的合作伙伴使用的通用XML格式就足够了。下一步是拨打货运公司的Web服务电话。流程是这样的：消息来自JMS适配器，其有效负载用作Web服务调用的有效负载。它已排入<code>partnerNotifications</code>从JMS适配器接收到该通道之后，以及在作为Web服务调用发送出去之前。</p><p>这代表了一种不同类型的终结点，类似于适配器，称为网关。网关是双向的，并且处理请求/答复方案。出站网关向外部系统发送请求，并等待来自该外部系统的答复，该答复作为入站消息传递给您（请求者）。Web服务调用会为每个请求生成一个响应。回复数据作为Spring Integration消息发送到<code>partnerXmlShippingReplies</code>渠道。</p><p><strong>更新审核表</strong> ：收到来自webservice调用的成功答复后，我们需要更新审核表。该审计表是面向数据仓库的表；它包含非规范化记录，可用于跟踪通过履行系统进行的订单进度以及推动报告和分析。来自Web服务的回复消息是一个简单的XML文档，其中包含我们需要输入到审计表中的信息。</p><p>消息有两个重要部分：消息头和有效负载。在Spring Integration中，有效载荷可以是任何类型的对象。邮件标头基本上是一系列的键/值对<code>java.util.Map</code> 。标头键是<code>String</code> s，但值可以是任何类型。标头通常携带有关端点在处理有效负载时可以依赖的有效负载的元数据。</p><p>在我们的示例中，我们需要提取显着的XML属性，并将它们用作消息头，可以将其提供给JDBC查询以更新表。我们将使用Spring Integration的<code>xml:xpath-header-enricher</code>根据Web服务的响应评估XPath表达式，并将解析出的表达式提取为消息标头的值。在下面的示例中，我们创建三个标题： <code>customerId</code> ， <code>purchaseId</code>和<code>date</code> 。</p>
+<pre><code class="prettyprint xml"><br />    &lt;int-xml:xpath-header-enricher input-channel=&quot;partnerXmlShippingReplies&quot; output-channel=&quot;partnerShippingReplies&quot;&gt;
+        &lt;int-xml:header name=&quot;purchaseId&quot; xpath-expression=&quot;//@purchase-id&quot;/&gt;
+        &lt;int-xml:header name=&quot;customerId&quot; xpath-expression=&quot;//@customer-id&quot;/&gt;
+        &lt;int-xml:header name=&quot;date&quot; xpath-expression=&quot;//@confirmation-date&quot;/&gt;
+    &lt;/int-xml:xpath-header-enricher&gt;
+
+   &lt;int:channel id=&quot;partnerShippingReplies&quot;/&gt;
+</code></pre><p>的<code>xml:xpath-header-enricher</code>是一个变压器端点：该消息以<code>Message</code>带有XML文档有效负载和标头，并保留为<code>Message</code>具有相同的XML文档有效负载和三个新的标头，以及已经存在的标头。在此示例中，输出发布在<code>partnerShippingReplies</code>渠道。</p><p>接下来，我们将消息和新标题发送到<code>jdbc:outbound-channel-adapter</code>用于执行JDBC插入的位置。</p>
+<pre><code class="prettyprint xml"><br />    &lt;int-jdbc:outbound-channel-adapter
+        data-source=&quot;dataSource&quot;
+        channel=&quot;partnerShippingReplies&quot; &gt;
+        &lt;int-jdbc:query&gt;
+INSERT INTO purchase_fulfillment_log(
+    PURCHASE_ID, CUSTOMER_ID, EVENT_DATE, EVENT)
+VALUES( :headers[purchaseId], :headers[customerId],
+               :headers[date], &#39;SHIPPED&#39; )
+        &lt;/int-jdbc:query&gt;
+    &lt;/int-jdbc:outbound-channel-adapter&gt;
+</code></pre><p>这是一个完整的，有效的集成。我们使用基于Java的配置来配置所有必需的bean，但是不需要Java来处理任何业务逻辑本身–所有实际的处理逻辑都位于25条左右的Spring Integration名称空间元素行之内，并依赖于您所使用的技术比可能已经熟悉的更多。例如，Spring Integration JMS适配器建立在核心Spring中对JMS的支持之上。出站Web服务网关构建Spring Web Services堆栈（就像出站HTTP网关构建在Spring Web Services堆栈上一样）。 <code>RestTemplate</code> ）。通常，XML支持基于Spring OXM支持。最后，出站JDBC适配器建立在Spring JDBC支持的基础上（在示例中，我们可以提供一个Spring的JdbcTemplate实例， <code>javax.sql.DataSource</code> ， 例如）。<br></p><h2>Spring Integration中的错误处理</h2><br><strong>事务</strong>在该示例中，我们使用来自JMS的消息，通过Web服务发送消息，然后转换响应，并将其写入数据库。这里有很多活动的部分，如果出现问题，您应该了解各种处理错误的机制。使用JMS和JDBC，通常的直觉是在发生某种故障时使用事务回滚。在里面<code>jms:message-driven-channel-adapter</code>在示例中使用的<code>transaction-manager</code> reference是可选的，但可以在运行时按预期使用：与事务相同的线程中的任何异常都将导致JMS消息接收回滚。线程本地事务扩展到Spring Integration中在同一线程中执行的所有组件，在此解决方案的情况下，它包含所有内容。<p></p><p>要尝试尝试，请关闭数据库，然后再次运行解决方案–它将尝试使用来自JMS代理的消息，调用Web服务，转换答复，然后访问数据库，该数据库将引发异常，这将导致JMS接收回滚操作并最终在JMS代理中重新排队（默认情况下，在ActiveMQ中，消息最终在<code>ActiveMQ.DLQ</code>队列，即死信队列）。</p><p><strong>在您的体系结构中建立一致性</strong>因此，事务是处理错误情况的一种方法，但是对于不适合事务的资源（如Web服务）却无济于事。一种无需事务的工作方式是在实现级别解决问题。例如，可以使Web服务调用或数据库调用成为幂等：如果可能，具有相同输入的多次调用应产生相同的输出而没有副作用。例如，用相同的值更新数据库中的一行是幂等的：您可能会运行同一条语句100次，而最糟糕的情况是您得到的结果与运行更新1次的结果相同（正确） 。<br>处理错误的另一种方法是实现补偿逻辑。如果消息的生产者和使用者都在同一线程中，则在出现问题时将使用常规的Java错误处理逻辑：抛出异常，发送者可以（适当地）对其进行处理。但是，如果生产者和消费者位于不同的线程中，则正常规则不适用。在这些情况下，没有消费者将异常反馈回去。默认情况下，Spring Integration捕获异常并将其作为消息转发，并将异常作为其有效负载转发到一个著名的自动创建的通道，该通道称为<code>errorChannel</code> 。您可以通过使用键指定消息头来指定将错误转发到的备用渠道<code>MessageHeaders.ERROR_CHANNEL</code>在您的代码中。您可以使用该渠道中的消息并对消息做出适当的反应。<br></p><h2>Spring集成组件模型</h2><br>到目前为止，我们已经依靠实现我们目标的现成支持来构建所有内容。您通常会发现这是真的-Spring Integration确实是一个很好的工具箱。就像一盒乐高积木一样，您可以将看似无限的模块组合在一起，以解决大多数问题。但是，这并不意味着每个问题都已解决。例如，Spring Integration不知道您的域模型的细节，也不知道您的业务逻辑和服务的细节。有时，您希望使用Java，然后插入正确的行为。<p></p><p>为了支持自定义逻辑，Spring Integration支持所有核心组件的通用，可插入（在核心名称空间中）实现（ <code>transformers</code> ， <code>splitters</code> ， <code>routers</code> ， <code>adapters</code> ， <code>aggregators</code>等等），并期望您将提供自定义Java逻辑来履行组件的职责。此外，Spring Integration还提供了<code>service-activator</code>组件，它是一个转义填充组件：无论该代码的用途是什么，您都可以使用它来坚持自定义Java处理逻辑。您可以使用<code>service-activator</code>用于您想要的任何内容–也许您只是想使用iText将PDF写入文件系统或执行某种内在的业务计算？所有这些自定义组件均允许POJO实现。它们都是通过在您指定的bean上调用方法来工作的。由于Spring Integration非常灵活，因此没有严格的方法规则和形式规则。但是，通常，您应该想象组件将位于其他组件之间，因此必须既接受入站消息作为参数，又必须产生出站消息作为其返回类型。消息传入，消息传出。</p><p>方法规范往往会根据组件的类型而有所不同：转换器可能会接收一种类型的消息，并产生完全不同的转换类型的出站消息（自然！）。拆分器接收单个消息，并生成消息集合作为其返回类型。聚合器的工作方式相反：聚合器将消息的集合作为输入参数，并将单个聚合消息作为输出返回。列表继续，并且详细信息当然可以在文档中找到。对于我们的示例，让我们看一下servce-activator来演示方法映射中的灵活性。要使用服务激活器，我们必须首先在XML DSL中声明它，如下所示：</p>
+<pre><code class="prettyprint xml"><br /> &lt;service-activator
+      input-channel = &quot;in&quot;
+      ref = &quot;helloWorldServiceActivator&quot; method = &quot;sayHello&quot;
+      output-channel = &quot;out&quot; /&gt;
+</code></pre><p>这个例子很典型：输入通道产生一条消息，组件对其进行处理，然后在输出通道上发送处理结果。但是，在这里，处理逻辑取决于您。的<code>ref</code>属性指定应使用哪个bean来转换入站消息。它还规定了使用哪种方法。如果所讨论的Bean仅具有方法，或者该Bean具有多个方法但仅具有Spring Integration注释的方法<code>@ServiceActivator</code>注释，那么就不需要像我们在此处那样在XML中规定特定的方法。让我们来看看这样的<code>service-activator</code> 。</p>
+<pre><code class="prettyprint java"><br />@Component
+public class HelloWorldServiceActivator {
+
+ public Message&lt;String&gt; sayHello( Message&lt;String&gt; inboundMessage) {
+ Map&lt;String,Object&gt; headers = inboundMessage.getHeaders();
+ String payload = inboundMessage.getPayload();
+ System.out.println( &quot;In the sayHello method, printing out the  &quot;+
+ &quot;payload of the inbound message: &quot;+payload + &quot;. Also, there are &quot; +
+ headers.size() + &quot; headers.&quot; ) ;
+ return MessageBuilder.withPayload( inboundMessage.getPayload() )            .copyHeadersIfAbsent( inboundMessage.getHeaders() )            .build();
+ }
+}
+</code></pre><p>Bean很简单：它是一个简单的POJO，并声明一个方法，该方法接收Spring Integration消息并返回其输入作为输出。但是，如果您不想，则不必依赖Spring Integration的消息类型。Spring Integration具有一些巧妙的启发式功能，在许多情况下可以自动为您做正确的事情。让我们对该方法的代码进行一些修改，使其在有效载荷方面起作用，而不是在消息包装类中起作用：</p>
+<pre><code class="prettyprint java"><br />  public String sayHello( String inboundPayload) {
+    //  ... same as before
+  }
+</code></pre><p>此代码的工作原理与以前相同，只是现在它仅取决于代码的类型。 <code>Message</code>有效载荷。标头将自动为您复制。您还可以为Spring Integration声明放置消息标头的位置（这些标头位于<code>java.util.Map<String,Object></code> ），如果您喜欢这样的话：</p>
+<pre><code class="prettyprint java"><br />  public String sayHello( Map&lt;String,Object&gt; headers, String inboundPayload) {
+    // ... same as before
+  }
+</code></pre><p>如果您想对放置在什么地方进行更多控制，或者为了避免歧义，可以使用Spring Integration的注释。让我们使用注释重做上一个示例：</p>
+<pre><code class="prettyprint java"><br />  public String sayHello( @Headers Map&lt;String,Object&gt; headers, @Payload String inboundPayload) {
+    // ... same as before
+  }
+</code></pre><p>还有一个注释- <code>@Header</code> -在这里特别有用，它告诉Spring Integration您只希望将一个特定标头的值注入到您的方法中：</p>
+<pre><code class="prettyprint java"><br />  public String sayHello( @Header(&quot;id&quot;) UUID idHeaderValue, @Payload String inboundPayload) {
+    // ... same as before
+  }
+</code></pre><p>这降低了代码的复杂性，并允许您编写表达性集成代码。所有其他组件都支持此动态映射功能，就像<code>@ServiceActivator</code>和<code>service-activator</code> ： <code>@Transformer</code>和<code>transformer</code> ， <code>@Splitter</code>和<code>splitter</code> ， <code>@Aggregator</code>和<code>aggregator</code> ， <code>@Router</code>和<code>router</code>等<br></p><h2>使用服务中的Spring集成</h2><br>Spring Integration解决方案不需要总是由适配器启动。您可以从Java代码启动它们。前面的示例是由JMS消息启动的-每当消耗JMS消息时便开始处理。<p></p><p>让我们看一下交换的另一面-JMS消息的产生者。在前面的示例中，我们查看了当客户在在线电子零售商中签出购物车时发送的消息处理过程。<br>使用Spring Integration API在这一部分中，我们将研究如何从购物车中产生该消息，将其转换为XML，然后将其发送到JMS代理，上一个示例正在等待该代理进行处理。</p>
+<pre><code class="prettyprint java"><br />  @Autowired @Qualifier(&quot;partnerNotifications&quot;)
+  private MessageChannel messageChannel ;
+
+  @Override
+  @Transactional
+  public void checkout(long purchaseId) {
+    Purchase purchase = getPurchaseById(purchaseId);
+
+    if (purchase.isFrozen())
+      throw new RuntimeException(&quot;you can&#39;t check out Purchase(#&quot; + purchase.getId() + &quot;) that&#39;s already been checked out!&quot;);
+
+    Date purchasedDate = new Date();
+    Set&lt;LineItem&gt; lis = purchase.getLineItems();
+    for (LineItem lineItem : lis) {
+      lineItem.setPurchasedDate(purchasedDate);
+      entityManager.merge(lineItem);
+    }
+    purchase.setFrozen(true);
+    entityManager.merge(purchase);
+
+    Message&lt;Purchase&gt; msg = MessageBuilder.withPayload(purchase).build();
+    this.messageChannel.send(msg);
+  }
+</code></pre><p>大部分代码是典型的服务层代码–我们唯一感兴趣的部分是使用<code>MessageChannel</code> 。 <code>MessageChannel</code>是我们在XML中配置的各种Spring Integration通道类型的运行时基本类型。一旦您引用了<code>MessageChannel</code> ，这只是通过它发送消息的问题。您可以使用<code>MessageChannel</code>并直接与之交互以发送和接收消息，就像您可能使用低级JMS和AMQP API来发送和接收消息一样。</p><p><code>Message</code> Spring Integration中的对象是不可变的-您不创建<code>Message</code>直接对象。而是使用<code>MessageBuilder</code>类及其静态方法来构建Message。的<code>MessageBuilder</code>该类包含一些方法，这些方法可以基于现有的有效负载和现有的Headers映射来构造新的Message。该API是可变的-方法调用可以链接在一起。在此示例中，我们使用<code>MessageBuilder</code>类以基于<code>Purchase</code>对象（在购物车域模型本地的JPA实体）。</p><p>通过使用Spring Integration，我们为自己提供了一些间接性：我们以后可以在Spring Integration中自由更改消息的过程。服务代码无需更改，因为它仅与Spring Integration交互。</p><p>JMS使用者（我们在第一个示例中建立的使用者）速度较慢，因为它需要进行昂贵的Web服务调用。通过将通知发送给JMS，然后让其他一些进程外集成来处理Web服务调用，我们为自己买了两件事：结帐服务更快，并且可以独立于服务扩展缓慢的处理。例如，结帐服务可能会在每台计算机上一次部署在Web应用程序中。另一方面，调用Web服务的通知处理只是一个简单的过程<code>main(String[])</code>类，并且可以在同一个盒子上多次运行而不会遇到负担。<br></p><h2>摘要</h2><br>我们探索了广泛的集成世界，并学习了如何使用Spring Integration以干净，灵活的方式将不同的系统联系在一起。我们已经探索了Spring Integration如何从其在Spring核心核心框架中的地位中受益-对于寻求解决集成问题的Spring开发人员来说，这是自然而然的下一步。在本文中，我们还探讨了Spring Integration友好的基于Spring XML DSL的以及基于POJO的编程模型。用户可以在我们<a href="http://git.springsource.org/spring-community-examples/spring-community-examples/trees/master">基于Git的社区示例项目</a> “ <a href="http://git.springsource.org/spring-community-examples/spring-community-examples/trees/master/spring-integration/getting-started-with-spring-integration">Spring Integration入门”文件夹</a>下找到此源代码以及所有其他“ Green Beans”帖子<a href="http://git.springsource.org/spring-community-examples/spring-community-examples/trees/master/spring-integration/getting-started-with-spring-integration">。</a><p></p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 399;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

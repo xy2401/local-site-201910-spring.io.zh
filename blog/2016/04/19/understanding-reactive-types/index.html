@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>了解反应型</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Understanding Reactive types">
-<meta name="twitter:description" content="<p>Following previous <a href=" https:="" ="" spring.io="" blog="" 2016="" 02="" 09="" reactive-sprin="="></head><body dir="ltr">Reactive Spring and <a href="https://spring.io/blog/2016/03/11/reactor-core-3-0-becomes-a-unified-reactive-foundation-on-java-8">Reactor Core 3.0</a> blog posts, I would like to explain why Reactive types are useful and how they compare to other asynchronous types, based on what we have learned while working on the Spring Framework 5 upcoming Reactive support.
+<meta name="twitter:description" content="<p>Following previous <a href=" https:="" ="" spring.io="" blog="" 2016="" 02="" 09="" reactive-sprin="="></head><body >Reactive Spring and <a href="https://spring.io/blog/2016/03/11/reactor-core-3-0-becomes-a-unified-reactive-foundation-on-java-8">Reactor Core 3.0</a> blog posts, I would like to explain why Reactive types are useful and how they compare to other asynchronous types, based on what we have learned while working on the Spring Framework 5 upcoming Reactive support.
 <h2><a href="#why-using-reactive-types" class="anchor" name="why-using-reactive-types"></a>Why using Reactive types?</h2>
 <p>Reactive types are not intended to allow you to process your requests or data faster, in fact they will introduce a small overhead compared to regular blocking processing. Their strength lies in their capacity to serve more request concurrently, and to handle operations with latency, such as requesting data from a remote server, more efficiently. They allow you to provide a better quality of service and a predictable capacity planning by dealing natively with time and latency without consuming more resources. Unlike traditional processing that blocks the current thread while waiting a result, a Reactive API that waits costs nothing, requests only the amount of data it is able to process and bring new capabilities since it deals with stream of data, not only with individual elements one by one.</p>
 ">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -170,33 +176,135 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在先前的<a href="https://spring.io/blog/2016/02/09/reactive-spring">Reactive Spring</a>和<a href="https://spring.io/blog/2016/03/11/reactor-core-3-0-becomes-a-unified-reactive-foundation-on-java-8">Reactor Core 3.0</a>博客文章之后，我想根据我们在处理Spring Framework 5即将到来的Reactive支持时所学到的知识，来解释为什么Reactive类型很有用，以及它们与其他异步类型的比较。</p><h2><a href="#why-using-reactive-types" class="anchor" name="why-using-reactive-types"></a>为什么要使用反应型？</h2>
-<p>响应类型并非旨在让您更快地处理请求或数据，实际上，与常规阻止处理相比，它们会带来较小的开销。它们的优势在于能够更有效地并发处理更多请求，并能更有效地处理具有延迟的操作，例如从远程服务器请求数据。它们通过本机处理时间和延迟，而无需消耗更多资源，从而使您能够提供更好的服务质量和可预测的容量计划。与等待结果的同时阻塞当前线程的传统处理不同，等待的Reactive API无需花费任何成本，仅请求它能够处理的数据量并带来新的功能，因为它处理数据流，而不仅仅是处理单个元素。一个。</p><h2><a href="#before-java-8" class="anchor" name="before-java-8"></a>在Java 8之前</h2>
-<p>在Java 8之前，由于至少两个原因，实现异步非阻塞行为并不明显。第一个原因是基于回调的API需要冗长的匿名类，并且不容易链接。第二个原因是<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html"><code>Future</code></a>类型是异步的， <strong>但是</strong>当您尝试使用<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html#get--"><code>get()</code></a>方法获取结果时会阻塞当前线程，直到计算完成。这就是为什么Spring Framework 4.0引入了<a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/concurrent/ListenableFuture.html"><code>ListenableFuture</code></a> ，这是<code>Future</code>实现，它添加了非阻塞的基于回调的功能。</p><h2><a href="#lambdas-completablefuture-and-stream" class="anchor" name="lambdas-completablefuture-and-stream"></a> Lambdas，CompletableFuture和Stream</h2>
-<p>然后Java 8引入了lambdas和<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html"><code>CompletableFuture</code></a> 。Lambdas允许编写简洁的回调，而<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionStage.html"><code>CompletionStage</code></a>接口和<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html"><code>CompletableFuture</code></a>类最终允许以非阻塞方式和基于推送的方式处理未来，同时提供链接此类延迟结果处理的功能。</p>
-<p>Java 8还引入了<a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html"><code>Stream</code></a> ， <a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html"><code>Stream</code></a>旨在有效处理无需延迟或延迟很小的数据流（包括原始类型）。它是基于拉的，只能使用一次，缺少与时间相关的操作，并且可以执行并行计算，但无法指定要使用的线程池。正如<a href="https://stackoverflow.com/questions/17960656/is-it-possible-to-use-java-8-streams-api-for-asynchronous-processing/18826615#comment36545451_18826615">Brian Goetz</a>解释的那样，<br>它尚未设计为处理具有延迟的操作，例如I / O操作。这就是诸如Reactor或RxJava之类的Reactive API出现的地方。</p><h2><a href="#reactive-apis" class="anchor" name="reactive-apis"></a>反应性API</h2>
-<p>诸如<a href="https://projectreactor.io/">Reactor之</a>类的<a href="https://projectreactor.io/">反应</a>性API也提供了像Java 8 Stream这样的运算符，但是它们更广泛地适用于任何流序列（不仅是Collections），并且由于使用方便，可以定义转换操作的流水线，该转换操作将应用于通过它的数据API和使用lambda。它们旨在处理同步或异步操作，并允许您对数据进行缓冲，合并，串联或应用各种转换。</p>
+<div class="blog--post"><p>在先前的<a href="https://spring.io/blog/2016/02/09/reactive-spring">Reactive Spring</a>和<a href="https://spring.io/blog/2016/03/11/reactor-core-3-0-becomes-a-unified-reactive-foundation-on-java-8">Reactor Core 3.0</a>博客文章之后，我想根据我们在处理Spring Framework 5即将到来的Reactive支持时所学到的知识，来解释为什么Reactive类型很有用，以及它们如何与其他异步类型进行比较。</p><h2><a href="#why-using-reactive-types" class="anchor" name="why-using-reactive-types"></a>为什么要使用反应型？</h2>
+<p>响应类型并非旨在让您更快地处理请求或数据，实际上，与常规阻止处理相比，它们会带来较小的开销。它们的优势在于能够更有效地并发处理更多请求，并能更有效地处理具有延迟的操作，例如从远程服务器请求数据。它们通过本机处理时间和延迟，而无需消耗更多资源，从而使您能够提供更好的服务质量和可预测的容量计划。与等待结果的同时阻塞当前线程的传统处理不同，等待的Reactive API不花费任何成本，仅请求它能够处理的数据量并带来新的功能，因为它处理数据流，而不仅仅是处理单个元素。一个。</p><h2><a href="#before-java-8" class="anchor" name="before-java-8"></a>在Java 8之前</h2>
+<p>在Java 8之前，由于至少两个原因，实现异步非阻塞行为并不明显。第一个原因是基于回调的API需要冗长的匿名类，并且不容易链接。第二个原因是<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html"><code>Future</code></a> type是异步的， <strong>但是会</strong>阻塞当前线程，直到您尝试使用<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html#get--"><code>get()</code></a>方法。这就是为什么引入Spring Framework 4.0 <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/concurrent/ListenableFuture.html"><code>ListenableFuture</code></a> ， 一种<code>Future</code>实现添加了非阻塞的基于回调的功能。</p><h2><a href="#lambdas-completablefuture-and-stream" class="anchor" name="lambdas-completablefuture-and-stream"></a> Lambdas，CompletableFuture和Stream</h2>
+<p>然后Java 8引入了lambda和<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html"><code>CompletableFuture</code></a> 。Lambda允许编写简洁的回调，而<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionStage.html"><code>CompletionStage</code></a>接口和<a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html"><code>CompletableFuture</code></a>类最终允许以非阻塞方式和基于推送的方式处理未来，同时提供链接此类延迟结果处理的功能。</p>
+<p>Java 8也引入了<a href="https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html"><code>Stream</code></a> ，旨在将其有效地处理无需延迟或延迟很小的数据流（包括原始类型）。它是基于拉的，只能使用一次，缺少与时间相关的操作，并且可以执行并行计算，但无法指定要使用的线程池。正如<a href="https://stackoverflow.com/questions/17960656/is-it-possible-to-use-java-8-streams-api-for-asynchronous-processing/18826615#comment36545451_18826615">Brian Goetz</a>解释的那样，<br>它尚未设计为处理具有延迟的操作，例如I / O操作。这就是诸如Reactor或RxJava之类的Reactive API出现的地方。</p><h2><a href="#reactive-apis" class="anchor" name="reactive-apis"></a>反应性API</h2>
+<p>诸如<a href="https://projectreactor.io/">Reactor之</a>类的<a href="https://projectreactor.io/">反应</a>性API也提供了像Java 8 Stream这样的运算符，但是它们更广泛地适用于任何流序列（不仅是Collections），并且由于使用了方便的流利性，允许定义转换操作的流水线，该转换操作将应用于通过它的数据API和使用lambda。它们旨在处理同步或异步操作，并允许您对数据进行缓冲，合并，串联或应用各种转换。</p>
 <p>最初，Reactive API仅设计用于处理数据流，即N个元素，例如，使用Reactor的<a href="http://projectreactor.io/core/docs/api/reactor/core/publisher/Flux.html"><code>Flux</code></a> ：</p>
 <pre><code class="prettyprint java">reactiveService.getResults()
     .mergeWith(Flux.interval(100))
     .doOnNext(serviceA::someObserver)
-    .map(d -> d * 2)
+    .map(d -&gt; d * 2)
     .take(3)
     .onErrorResumeWith(errorHandler::fallback)
     .doAfterTerminate(serviceM::incrementTerminate)
     .consume(System.out::println);
 </code></pre>
-<p>但是在我们关于Spring Framework 5的工作中，很明显有必要区分1个元素或N个元素的流，这就是为什么Reactor提供<a href="http://projectreactor.io/core/docs/api/reactor/core/publisher/Mono.html"><code>Mono</code></a>类型的原因。<code>Mono</code>是<code>CompletableFuture</code>类型的Reactive等效项，并允许提供一致的API以Reactive方式处理单个和多个元素。</p>
+<p>但是在我们关于Spring Framework 5的工作中，很明显，显然需要区分1个元素或N个元素的流，这就是为什么Reactor提供<a href="http://projectreactor.io/core/docs/api/reactor/core/publisher/Mono.html"><code>Mono</code></a>类型。 <code>Mono</code>是等效的<code>CompletableFuture</code>类型，并允许提供一致的API，以便以响应方式处理单个和多个元素。</p>
 <pre><code class="prettyprint java">Mono.any(reactiveServiceA.findRecent(time), reactiveServiceB.findRecent(time)
     .timeout(Duration.ofSeconds(3), errorHandler::fallback)
-    .doOnSuccess(r -> reactiveServiceC.incrementSuccess())
+    .doOnSuccess(r -&gt; reactiveServiceC.incrementSuccess())
     .consume(System.out::println);
 </code></pre>
-<p>如果您对<a href="http://projectreactor.io/core/docs/api/reactor/core/publisher/Flux.html"><code>Flux</code></a>和<a href="http://projectreactor.io/core/docs/api/reactor/core/publisher/Mono.html"><code>Mono</code></a>有更深入的了解，您会注意到这些类型实现了Reactive Streams规范中的<code>Publisher</code>接口。</p><h2><a href="#reactive-streams" class="anchor" name="reactive-streams"></a>反应流</h2>
-<p>Reactor建立在<a href="http://www.reactive-streams.org">反应流</a>规范的基础上。Reactive Streams由<a href="http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/">4个简单的Java接口</a> （ <code>Publisher</code> <code>Subscriber</code> ， <code>Subscription</code> <code>Subscriber</code> ， <code>Subscription</code>和<code>Processor</code> ）， <a href="https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.0/README.md#specification">文本规范</a>和<a href="http://www.reactive-streams.org/reactive-streams-tck-1.0.0-javadoc/">TCK组成</a> 。它是每个现代Reactive库的基石，并且是互操作性所必需的。</p>
+<p>如果您有更深入的了解<a href="http://projectreactor.io/core/docs/api/reactor/core/publisher/Flux.html"><code>Flux</code></a>和<a href="http://projectreactor.io/core/docs/api/reactor/core/publisher/Mono.html"><code>Mono</code></a> ，您会注意到这些类型实现了<code>Publisher</code> Reactive Streams规范中的接口。</p><h2><a href="#reactive-streams" class="anchor" name="reactive-streams"></a>反应流</h2>
+<p>Reactor建立在<a href="http://www.reactive-streams.org">反应流</a>规范的基础上。反应性流由<a href="http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/">4个简单的Java接口</a> （ <code>Publisher</code> ， <code>Subscriber</code> ， <code>Subscription</code>和<code>Processor</code> ）， <a href="https://github.com/reactive-streams/reactive-streams-jvm/blob/v1.0.0/README.md#specification">文字说明</a>和<a href="http://www.reactive-streams.org/reactive-streams-tck-1.0.0-javadoc/">TCK</a> 。它是每个现代Reactive库的基石，并且是互操作性所必需的。</p>
 <p>反应流的核心问题是处理背压。简而言之，背压是一种机制，它允许接收器询问要从发射器接收多少数据。它允许：</p>
 <ul>
 <li>接收器仅在准备好处理数据时才开始接收数据</li>
 <li>控制飞行中的数据量</li>
 <li>有效处理慢速发射器/快速接收器或快速发射器/慢速接收器用例</li>
-<li>如果请求“ <code>Long.MAX_VALUE</code></li><code>Long.MAX_VALUE</code></ul><code>Long.MAX_VALUE</code></div><code>Long.MAX_VALUE</code></div><code>Long.MAX_VALUE</code></article><code>Long.MAX_VALUE</code></div><code>Long.MAX_VALUE</code></div><code>Long.MAX_VALUE</code></div><code>Long.MAX_VALUE</code></div><code>Long.MAX_VALUE</code></body></html>
+<li>如果需要，从动态推挽策略切换到仅基于推挽策略<code>Long.MAX_VALUE</code>元素</li>
+</ul>
+<p>乍一看， <a href="http://www.reactive-streams.org/reactive-streams-1.0.0-javadoc/org/reactivestreams/Publisher.html"><code>Publisher</code></a>接口似乎非常容易实现；但是要完全符合规范进行操作非常困难，并且用户无法使用原始方法做任何事情<code>Publisher</code>除了订阅！这就是为什么通常依赖Reactive Streams实现（例如Reactor）来帮助您解决问题的一个更好的主意。</p>
+<p>请注意，Java 9 <a href="http://cs.oswego.edu/pipermail/concurrency-interest/2015-January/013641.html">将</a>在<code>java.util.concurrent.Flow</code>容器类，进一步显示了JDK中的Reactive Streams的相关性。</p>
+<p>还需要注意的是，向反应式流和<a href="https://github.com/reactor/reactor-core/tree/master/src/main/java/reactor/core/converter">Reactor转换功能的</a>融合允许在运行时从一种反应式类型轻松有效地转换为另一种。</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h2>
+<p>我希望这篇博客文章能帮助您更好地了解反应式类型。</p>
+<p>我们正在使用像Reactor这样的类型进行响应式支持<code>Mono</code>和<code>Flux</code> Spring框架，Spring Boot，Spring Data，Spring Security和Spring Cloud等各种Spring项目中。</p>
+<p>但是您即将推出的Reactive应用程序也将直接使用这些类型，例如在<code>@Repository</code> ， <code>@Service</code>要么<code>@Controller</code>方法级别，因为构建Reactive应用程序意味着使用Reactive语义，您必须在其中处理延迟或流（我们还将提供一些有关集成阻塞API的指导）。</p>
+<p>在接下来的几个月中，我们将发布其他响应式博客文章。随时熟悉<a href="https://github.com/reactor/lite-rx-api-hands-on/">此测试驱动的Lite Rx API动手操作</a> ，它将教您如何使用<code>Flux</code>和<code>Mono</code> ，和往常一样，欢迎您提供反馈！</p>
+<p>如果您恰好在五月中旬在巴塞罗那（无论如何都不会错过巴塞罗那！），不要错过参加<a href="http://www.springio.net/">Spring I / O会议</a>的机会。另外， <a href="http://springoneplatform.io/">SpringOne平台</a> （8月初，拉斯维加斯）的注册最近已经开放，以防您想从早鸟票价格中受益。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2450;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

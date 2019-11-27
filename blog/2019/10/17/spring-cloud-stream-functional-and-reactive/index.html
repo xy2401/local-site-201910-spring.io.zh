@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Cloud Stream-功能和反应</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Cloud Stream - functional and reactive">
-<meta name="twitter:description" content="<p>In the <a href=" https:="" ="" spring.io="" blog="" 2019="" 10="" 14="" spring-cloud-stream-demystified-and-simplifie="="></head><body dir="ltr">previous post, I tried to provide justification for our shift to a functional programming model in <a href="https://spring.io/projects/spring-cloud-stream">Spring Cloud Stream</a> (SCSt). It’s <strong><em>less code</em></strong>, <strong><em>less configuration</em></strong>. Most importantly, though, your code is completely <strong><em>decoupled and independent</em></strong> from the internals of SCSt. 
+<meta name="twitter:description" content="<p>In the <a href=" https:="" ="" spring.io="" blog="" 2019="" 10="" 14="" spring-cloud-stream-demystified-and-simplifie="="></head><body >previous post, I tried to provide justification for our shift to a functional programming model in <a href="https://spring.io/projects/spring-cloud-stream">Spring Cloud Stream</a> (SCSt). It’s <strong><em>less code</em></strong>, <strong><em>less configuration</em></strong>. Most importantly, though, your code is completely <strong><em>decoupled and independent</em></strong> from the internals of SCSt. 
 <p>In this post, I’ll dig a little deeper and summarize the core features of our functional support, specifically around its reactive features.</p>
 <blockquote> 
  <p>IMPORTANT: <em>Anything you can do with <code>@StreamListener/@EnableBinding</code> you can also do without it. In other words, the functional support is now feature-compatible with the annotation-based support.</em></p> 
@@ -45,10 +49,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -177,29 +183,29 @@
 <div class="blog--post"><p>在<a href="https://spring.io/blog/2019/10/14/spring-cloud-stream-demystified-and-simplified">上</a>一篇<a href="https://spring.io/blog/2019/10/14/spring-cloud-stream-demystified-and-simplified">文章中</a> ，我试图为我们转向<a href="https://spring.io/projects/spring-cloud-stream">Spring Cloud Stream</a> （SCSt）中的功能编程模型提供理由。<strong><em>更少的代码</em></strong> ， <strong><em>更少的配置</em></strong> 。不过，最重要的是，您的代码是完全<strong><em>分离的，并且</em></strong>与SCSt的内部结构无关。</p>
 <p>在本文中，我将进行更深入的探讨并总结功能支持的核心功能，尤其是围绕其响应功能。</p>
 <blockquote>
-<p>重要说明： <em>使用<code>@StreamListener/@EnableBinding</code>可以执行的所有操作也可以不使用它。换句话说，功能支持现在与基于注释的支持在功能上兼容。</em></p>
+<p>重要提示： <em>您可以做的任何事情<code>@StreamListener/@EnableBinding</code>您也可以不用它。换句话说，功能支持现在与基于注释的支持在功能上兼容。</em></p>
 </blockquote>
-<p>虽然下面描述的所有功能都是SCSt的依赖项<a href="https://spring.io/projects/spring-cloud-function">Spring Cloud Function</a> （SCF）的<a href="https://spring.io/projects/spring-cloud-function">功能</a> ，但是在理解SCSt上下文中功能的附加含义时，您必须意识到某些细微差别。</p><h3><a href="#supplier-function-and-consumer" class="anchor" name="supplier-function-and-consumer"></a>供应商，职能和消费者</h3>
-<p>类型的任何豆<code>Supplier</code> ， <code>Function</code> ，或<code>Consumer</code>或可以映射到任何豆<code>Supplier</code> ， <code>Function</code> ，或<code>Consumer</code> （如POJO功能，科特林lambda表达式，等等）是通过SCST视为<em>消息处理程序</em> （ <code>Function</code>或<code>Consumer</code> ）或<em>消息来源</em> （ <code>Supplier</code> ）。根据使用的功能策略的类型，使用以下命名约定自动生成输入和输出绑定<code><function-name>-<in/out>-<index></code> 。</p>
+<p>尽管下面描述的所有功能都是SCSt的依赖项<a href="https://spring.io/projects/spring-cloud-function">Spring Cloud Function</a> （SCF）的<a href="https://spring.io/projects/spring-cloud-function">功能</a> ，但是在理解SCSt上下文中功能的附加含义时，您必须意识到某些细微差别。</p><h3><a href="#supplier-function-and-consumer" class="anchor" name="supplier-function-and-consumer"></a>供应商，职能和消费者</h3>
+<p>任何类型的豆<code>Supplier</code> ， <code>Function</code> ， 要么<code>Consumer</code>或任何可以映射到的bean <code>Supplier</code> ， <code>Function</code> ， 要么<code>Consumer</code> （例如POJO函数，Kotlin lambdas等）被SCSt视为<em>消息处理程序</em> （ <code>Function</code>要么<code>Consumer</code> ）或<em>消息来源</em> （ <code>Supplier</code> ）。根据使用的功能策略的类型，使用以下命名约定自动生成输入和输出绑定<code><function-name>-<in/out>-<index></code> 。</p>
 <p>考虑以下示例：</p>
 <pre><code class="prettyprint">@SpringBootApplication
 public class SampleApplication  {
     @Bean
-    public Function<String, String> uppercase() {
-        return value -> value.toUpperCase();
+    public Function&lt;String, String&gt; uppercase() {
+        return value -&gt; value.toUpperCase();
     }
 }
 </code></pre>
-<p>前面的函数被视为消息处理程序，该消息处理程序从<code>uppercase-in-0</code>消耗<code>uppercase-in-0</code>送到<code>uppercase-out-0</code>绑定。现有流属性的其余部分可以像以前一样使用。例如<code>--spring.cloud.stream.bindings.uppercase-in-0.content-type=text/plain</code> 。</p>
+<p>前面的函数被当作消息处理程序，从<code>uppercase-in-0</code>并发送到<code>uppercase-out-0</code>绑定。现有流属性的其余部分可以像以前一样使用。例如<code>--spring.cloud.stream.bindings.uppercase-in-0.content-type=text/plain</code> 。</p>
 <p>单击<a href="https://github.com/spring-cloud/spring-cloud-stream/blob/master/docs/src/main/asciidoc/spring-cloud-stream.adoc#spring_cloud_function">此处</a>了解更多详细信息和配置选项。</p><h3><a href="#imperative-or-reactive" class="anchor" name="imperative-or-reactive"></a>命令式或反应式</h3>
-<p>功能可以是<em>命令</em> <em>性的</em>也可以是<em>反应性的</em> 。命令性函数在每个单独的事件上触发，而反应性函数仅触发一次，将引用传递给<a href="https://projectreactor.io">Project Reactor</a>提供的整个事件流抽象（例如<code>Flux</code>和<code>Mono</code> ）。</p>
+<p>功能可以是<em>命令</em> <em>性的</em>也可以是<em>反应性的</em> 。命令式函数在每个单独的事件上触发，而反应式函数仅触发一次，将引用传递给整个事件流抽象（例如<code>Flux</code>和<code>Mono</code> ）由<a href="https://projectreactor.io">Project Reactor</a>提供。</p>
 <p>请考虑以下示例：</p>
 <p><strong><em>当务之急：</em></strong></p>
 <pre><code class="prettyprint">@SpringBootApplication
 public class SampleApplication  {
     @Bean
-    public Function<String, String> uppercase() {
-        return value -> value.toUpperCase();
+    public Function&lt;String, String&gt; uppercase() {
+        return value -&gt; value.toUpperCase();
     }
 }
 </code></pre>
@@ -207,24 +213,120 @@ public class SampleApplication  {
 <pre><code class="prettyprint">@SpringBootApplication
 public class SampleApplication  {
     @Bean
-    public Function<Flux<String>, Flux<String>> uppercase() {
-        return flux -> flux.map(value -> value.toUpperCase());
+    public Function&lt;Flux&lt;String&gt;, Flux&lt;String&gt;&gt; uppercase() {
+        return flux -&gt; flux.map(value -&gt; value.toUpperCase());
     }
 }
 </code></pre>
-<p>除了为您提供不同的（单例）编程样式来处理事件（可以将其作为喜好轻松地看待）之外，反应式编程还为某些用例增加了附加值，否则实现起来会相当复杂。尽管本文不讨论这些用例或反应模式的详细信息，但仍然值得一提的是状态管理用例（例如<em>窗口，聚合和分组</em> ），以及<em>拆分</em>流或用例的情况。 <em>合并</em>多个流，这将在下一节中讨论。</p>
+<p>除了为您提供不同的（单例）编程样式来处理事件（可以将其作为喜好轻松地看待）之外，反应式编程还为某些用例增加了附加值，否则实现起来将非常复杂。尽管本文不讨论这些用例或反应模式的详细信息，但仍然值得一提的是状态管理用例（例如<em>窗口，聚合和分组</em> ）以及<em>拆分</em>流或用例的情况。 <em>合并</em>多个流，这将在下一节中讨论。</p>
 <p>关于反应式功能的绑定和命名规则，它们与上一节中说明的相同。</p>
 <blockquote>
-<p>注意：虽然前面的示例使用<code>Function</code>作为示例，但相同的规则适用于<code>Supplier</code>和<code>Consumer</code> 。用户指南的<a href="https://github.com/spring-cloud/spring-cloud-stream/blob/master/docs/src/main/asciidoc/spring-cloud-stream.adoc#spring_cloud_function">Spring Cloud Function支持</a>部分以及<a href="https://projectreactor.io/docs">Reactor文档</a>提供了更多详细信息。</p>
+<p>注意：虽然前面的示例使用<code>Function</code>例如，相同的规则适用于<code>Supplier</code>和<code>Consumer</code> 。用户指南的<a href="https://github.com/spring-cloud/spring-cloud-stream/blob/master/docs/src/main/asciidoc/spring-cloud-stream.adoc#spring_cloud_function">Spring Cloud Function支持</a>部分以及<a href="https://projectreactor.io/docs">Reactor文档</a>提供了更多详细信息。</p>
 </blockquote><h3><a href="#function-arity" class="anchor" name="function-arity"></a>功能性</h3>
-<p>有时候，需要对数据流进行分类和组织。例如，考虑一个经典的大数据用例，即处理包含“订单”和“发票”的无组织数据，并且您希望每个人都进入一个单独的数据存储中。<br>在这里发挥功能支持（具有多个输入和输出的功能）的支持。</p>
+<p>有时需要对数据流进行分类和组织。例如，考虑一个经典的大数据用例，即处理包含“订单”和“发票”的无组织数据，并且您希望每个都进入一个单独的数据存储中。<br>在这里发挥功能支持（具有多个输入和输出的功能）的支持。</p>
 <p>让我们看一个这样的函数的示例（ <a href="https://github.com/spring-cloud/spring-cloud-stream/blob/master/spring-cloud-stream/src/test/java/org/springframework/cloud/stream/function/MultipleInputOutputFunctionTests.java#L342">此处</a>提供<a href="https://github.com/spring-cloud/spring-cloud-stream/blob/master/spring-cloud-stream/src/test/java/org/springframework/cloud/stream/function/MultipleInputOutputFunctionTests.java#L342">了</a>完整的实现细节），</p>
 <pre><code class="prettyprint">@Bean
-public Function<Flux<Integer>, Tuple2<Flux<String>, Flux<String>>> organise() {
-	return flux -> ...;
+public Function&lt;Flux&lt;Integer&gt;, Tuple2&lt;Flux&lt;String&gt;, Flux&lt;String&gt;&gt;&gt; organise() {
+	return flux -&gt; ...;
 }
 </code></pre>
-<p>鉴于Project Reactor是SCF的核心依赖项，我们将使用其Tuple库。元组通过向我们传达<em>基数</em>和<em>类型</em>信息而给我们带来了独特的优势。两者对于SCSt而言都是极其重要的。基数让我们知道需要创建多少个输入和输出绑定并将其绑定到函数的相应输入和输出。知道类型信息可确保正确的类型转换。</p>
-<p>同样，这是绑定名称命名约定的“索引”部分起作用的地方，因为在此函数中，两个输出绑定名称分别为<code>organise-out-0</code>和<code>organise-out-1</code> 。</p>
+<p>鉴于Project Reactor是SCF的核心依赖项，我们将使用其Tuple库。元组通过向我们传达<em>基数</em>和<em>类型</em>信息而给我们带来了独特的优势。两者对于SCSt而言都是极其重要的。基数让我们知道需要创建多少个输入和输出绑定并将其绑定到一个函数的相应输入和输出。知道类型信息可确保正确的类型转换。</p>
+<p>同样，这是绑定名称命名约定的“索引”部分起作用的地方，因为在此函数中，两个输出绑定名称是<code>organise-out-0</code>和<code>organise-out-1</code> 。</p>
 <blockquote>
-<p>重要提示：目前，仅针对以<em>复杂事件处理</em>为中心的反应性函数（ <code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></p><div class="mobile-only"><code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></div><code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></blockquote></div></div></article><code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></div><code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></div><code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></div><code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></div><code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code></body></html>
+<p>重要提示：目前，仅对反应式功能（ <code>Function<TupleN<Flux<?>...>, TupleN<Flux<?>...>></code> ）以<em>复杂事件处理</em>为中心，其中对事件融合的评估和计算通常需要查看事件流，而不是单个事件。</p>
+</blockquote>
+<p>有关最新信息，请阅读用户指南中的“ <a href="https://github.com/spring-cloud/spring-cloud-stream/blob/master/docs/src/main/asciidoc/spring-cloud-stream.adoc#functions-with-multiple-input-and-output-arguments">具有多个输入和输出参数的函数”</a>部分。</p>
+</div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3837;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

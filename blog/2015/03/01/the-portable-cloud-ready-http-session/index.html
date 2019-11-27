@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>可移植的，支持云的HTTP会话</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="The Portable, Cloud-Ready HTTP Session">
-<meta name="twitter:description" class="anchor" content="<h2><a href=" #a-framework-for-all-seasons-and-architecture="="></head><body dir="ltr">A Framework for all Seasons (and Architectures)
+<meta name="twitter:description" class="anchor" content="<h2><a href=" #a-framework-for-all-seasons-and-architecture="="></head><body >A Framework for all Seasons (and Architectures)
 <p>Spring walks an interesting line. It provides a lot of value no matter where you run it, and - because it’s built on dependency injection layer - it offers a natural piece of indirection between the underlying layer and the applications that run on top of it. This indirection promotes code portability through decoupling: your application code is ignorant of where the <code>javax.sql.DataSource</code> (or whatever) handle it’s using comes from, be it a JNDI lookup, environment variables, or a simple new’d-up bean provided by Spring. This decoupling and the rich toolbox of features on top of Spring supporting all manner of use cases - batch processing, integration, stream processing, web services, microservices, operations, web applications, security, etc. - have made Spring a logical choice for developers deploying to (sometimes-embedded) web containers like Apache Tomcat or Eclipse Jetty, to application servers like WebSphere and WildFly, and to cloud runtimes like Google App Engine, Heroku, OpenShift, and (my personal favorite these days) Cloud Foundry. This portability is <em>also</em> what makes it easy to forklift most (reasonably-written!) applications from the application servers into lighter web containers and, ultimately, into the cloud.</p>
 ">
 <meta name="twitter:creator" content="@starbuxman">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,11 +174,238 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><h2><a href="#a-framework-for-all-seasons-and-architectures" class="anchor" name="a-framework-for-all-seasons-and-architectures"></a>适用于所有季节的框架（和体系结构）</h2><p>春天走了一条有趣的路线。无论它在哪里运行，它都提供了很多价值；而且-因为它是建立在依赖注入层上的，所以它在基础层和在其之上运行的应用程序之间提供了自然的间接。这种间接方式通过解耦来提高代码的可移植性：您的应用程序代码不知道<code>javax.sql.DataSource</code> （或其他）句柄来自JNDI查找，环境变量或Spring提供的简单的new-d-up bean。Spring的这种脱钩和丰富的功能工具箱支持各种用例（批处理，集成，流处理，Web服务，微服务，操作，Web应用程序，安全性等），这使Spring成为开发人员的合理选择部署到（有时是嵌入式的）Web容器（例如Apache Tomcat或Eclipse Jetty），应用程序服务器（例如WebSphere和WildFly）以及云运行时（例如Google App Engine，Heroku，OpenShift和（今天我个人最喜欢的）Cloud Foundry）。这种便携性<em>也</em>使叉车最容易（合理编写！）从应用程序服务器到轻量级的Web容器，最终到云中的应用程序。</p><h2><a href="#the-stateful-fly-in-the-ointment" class="anchor" name="the-stateful-fly-in-the-ointment"></a>美中不足的是</h2><p>所以有什么问题？为什么要写这个博客呢？</p><p>但是，对于使用HTTP会话的应用程序来说，情况并不理想。扩展HTTP会话才是问题所在，请原谅HTTP会话术语“ pun- <em>sticky”</em> 。您将看到应用程序扩展HTTP会话需要完成两件事：会话亲和力和会话复制。会话相似性（或<em>粘性会话</em> ）意味着对集群Web应用程序的请求将被路由到最初发出HTTP会话cookie的节点。如果该应用程序实例应脱机，则会话复制可确保相关状态在另一个节点上可用。客户端可以无缝路由到那里，保留所有对话状态的概念。这并不是<em>说</em>很难在流行的容器配置HTTP会话复制。这是有关<a href="https://tomcat.apache.org/tomcat-6.0-doc/cluster-howto.html">使用Apache Tomcat</a>进行设置的页面，以及有关如何使用<a href="https://www.eclipse.org/jetty/documentation/9.2.3.v20140905/session-clustering-jdbc.html">Jetty</a>进行设置的页面。典型的会话复制策略涉及使用多播网络通知群集状态更改中的其他节点。在只有几个节点的小型环境中，会话亲和力和会话复制效果很好。除非您使用嵌入式Web容器，否则配置HTTP会话复制是需要在容器中配置的另一件事，而不是应用程序的控制范围。</p><h2><a href="#that-rsquo-s-ok-the-cloud-rsquo-ll-fix-it-right" class="anchor" name="that-rsquo-s-ok-the-cloud-rsquo-ll-fix-it-right"></a>没关系，云将修复它，对吧？</h2><p>您可能会认为-将应用程序移至云中后，这种配置（如果没有其他设置）将变得更容易且更可预测，但实际上可能会更加痛苦！在包括Amazon Web Services在内的大多数云环境中，组播网络都是不容错过的。即使在像Heroku或Cloud Foundry这样的更高级别，更以应用程序为中心的平台即服务环境中，会话复制也不是那么容易。例如，Heroku <a href="https://devcenter.heroku.com/articles/intro-for-java-developers">不提供会话亲缘关系，也不提供会话复制</a> 。这种限制是可以理解的：除了多播网络的限制外，应用程序应（尽可能）使服务器端状态最小化。请记住，Heroku将应用程序的RAM限制为512MB！如果您不尝试将备用RAM视为数据库或持久层，这已绰绰有余！就Cloud Foundry而言，它为更大的开发人员社区提供服务，并在各种数据中心内本地运行，因此它必须更加实用。例如，Pivotal Web服务（运行<a href="http://cloudfoundry.org">Cloud Foundry</a> ）为应用程序提供1GB的RAM，并且它已经提供了几年的会话亲和力。直到去年下半年，当对buildpack的更改启用了对<a href="https://blog.pivotal.io/cloud-foundry-pivotal/products/session-replication-on-cloud-foundry-2">部署到Apache Tomcat Web服务器的默认独立配置的</a>任何基于<code>.war</code>的Web应用程序的会话复制时，它才提供会话复制。但是，此支持不使用多播网络。相反，它使用配置任何绑定的Redis备份服务以与Tomcat容器的会话复制策略结合使用的约定。实际上，使用像Redis这样的支持服务，或者也许是一些共享文件系统，实际上是在云中进行会话复制的唯一明智的方法。</p><p>所有这些方法都有不同的权衡：</p>
+<div class="blog--post"><h2><a href="#a-framework-for-all-seasons-and-architectures" class="anchor" name="a-framework-for-all-seasons-and-architectures"></a>适用于所有季节的框架（和体系结构）</h2><p>春天走了一条有趣的路线。无论它在哪里运行，它都提供了很多价值；而且-因为它是建立在依赖注入层上的，所以它在基础层和在其之上运行的应用程序之间提供了自然的间接。这种间接关系通过解耦来提高代码的可移植性：您的应用程序代码不知道<code>javax.sql.DataSource</code> （或其他）它使用的句柄来自JNDI查找，环境变量或Spring提供的简单的new-d-up bean。Spring的这种脱钩和丰富的功能工具箱支持各种用例（批处理，集成，流处理，Web服务，微服务，操作，Web应用程序，安全性等），这使Spring成为开发人员的合理选择部署到（有时是嵌入式的）Web容器（如Apache Tomcat或Eclipse Jetty），应用程序服务器（如WebSphere和WildFly）以及云运行时（如Google App Engine，Heroku，OpenShift和（如今我个人最喜欢的）Cloud Foundry）。这种便携性<em>也</em>使叉车最容易（合理编写！）从应用程序服务器到轻量级的Web容器，最终到云中的应用程序。</p><h2><a href="#the-stateful-fly-in-the-ointment" class="anchor" name="the-stateful-fly-in-the-ointment"></a>美中不足的是</h2><p>所以有什么问题？为什么要写这个博客呢？</p><p>但是，对于使用HTTP会话的应用程序来说，情况并不理想。扩展HTTP会话才是问题所在，请原谅HTTP会话术语“ pun- <em>sticky”</em> 。您将看到应用程序扩展HTTP会话需要完成两件事：会话亲和力和会话复制。会话相似性（或<em>粘性会话</em> ）意味着对集群Web应用程序的请求将被路由到最初发出HTTP会话cookie的节点。如果该应用程序实例应脱机，则会话复制可确保相关状态在另一个节点上可用。客户端可以无缝路由到那里，保留所有对话状态的概念。这并不是<em>说</em>很难在流行的容器配置HTTP会话复制。这是有关<a href="https://tomcat.apache.org/tomcat-6.0-doc/cluster-howto.html">使用Apache Tomcat</a>进行设置的页面，以及有关如何使用<a href="https://www.eclipse.org/jetty/documentation/9.2.3.v20140905/session-clustering-jdbc.html">Jetty</a>进行设置的页面。典型的会话复制策略涉及使用多播网络通知群集状态更改中的其他节点。在只有几个节点的小型环境中，会话亲和力和会话复制效果很好。除非您使用嵌入式Web容器，否则配置HTTP会话复制是需要在容器中配置的另一件事，而不是应用程序的控制范围。</p><h2><a href="#that-rsquo-s-ok-the-cloud-rsquo-ll-fix-it-right" class="anchor" name="that-rsquo-s-ok-the-cloud-rsquo-ll-fix-it-right"></a>没关系，云将修复它，对吧？</h2><p>您可能会认为-将应用程序移至云中后，这种配置（如果没有其他设置）将变得更容易且更可预测，但实际上可能会更加痛苦！在包括Amazon Web Services在内的大多数云环境中，组播网络都是不容错过的。即使在像Heroku或Cloud Foundry这样的更高级别，更以应用程序为中心的平台即服务环境中，会话复制也不是那么容易。例如，Heroku <a href="https://devcenter.heroku.com/articles/intro-for-java-developers">不提供会话亲缘关系，也不提供会话复制</a> 。这种限制是可以理解的：除了多播网络的限制外，应用程序应（尽可能）使服务器端状态最小化。请记住，Heroku将应用程序的RAM限制为512MB！如果您不尝试将备用RAM视为数据库或持久层，那么这绰绰有余！就Cloud Foundry而言，它为更大的开发人员社区提供服务，并在各种数据中心内本地运行，因此它必须更加实用。例如，Pivotal Web服务（运行<a href="http://cloudfoundry.org">Cloud Foundry</a> ）为应用程序提供1GB的RAM，并且它已经提供了几年的会话亲和力。直到去年下半年，当buildpack的更改启用了任何版本的会话复制时，它才提供会话复制。 <code>.war</code>基于Web的Web应用程序<a href="https://blog.pivotal.io/cloud-foundry-pivotal/products/session-replication-on-cloud-foundry-2">部署到Apache Tomcat Web服务器的默认独立配置</a> 。但是，此支持不使用多播网络。相反，它使用配置任何绑定的Redis备份服务以与Tomcat容器的会话复制策略结合使用的约定。实际上，使用像Redis这样的支持服务，或者也许是一些共享文件系统，实际上是在云中进行会话复制的唯一明智的方法。</p><p>所有这些方法都有不同的权衡：</p>
 <ul>
 <li>有些是特定于容器的，这意味着它们不会轻易从一种环境迁移到另一种环境。</li>
 <li>他们可能会增加操作的复杂性（如果您仍然有该团队！）这在应用程序和生产之间引入了更多的摩擦</li>
 <li>他们可能会使用在云环境中无法正常运行的mutlicast网络</li>
-<li>他们可能依赖Cloud Foundry Java buildpack之类的<em>魔术</em> ，该<em>魔术</em>只知道部署到独立Apache Tomcat的<code>.war</code> ，而不是嵌入式<code>.jar</code>或实际上其他网络容器（如Jetty）。</li>
+<li>他们可能依赖像Cloud Foundry Java buildpack这样的<em>魔术</em> ，它只知道<code>.war</code>部署到独立的Apache Tomcat（未嵌入式） <code>.jar</code>或其他网络容器（如Jetty）。</li>
 <li>所有其他这些点的隐含限制是持久性策略不可插入。组播不适合您吗？太好了，使用Redis。Redis是否不适合您，并且想使用Memcache或其他不易获得的支持？哦…</li>
-</ul><h2><a href="#enter-spring-session" class="anchor" name="enter-spring-session"></a>进入春季会议</h2><p>Spring Session为所有这些问题提供了一个非常好的解决方案。它是标准Servlet HTTP会话抽象的包装。轻松插入任何应用程序，无论它们是否基于Spring。它充当HTTP会话前面的代理，将请求转发到策略实现。开箱即用，有一个支持使用<code>java.util.Map<K,V></code>以及与Redis直接兼容的另一个。使用<code>java.util.Map<K,V></code></p><p><code>java.util.Map<K,V></code></p><p><code>java.util.Map<K,V></code></p><code>java.util.Map<K,V></code></div><code>java.util.Map<K,V></code></div><code>java.util.Map<K,V></code></article><code>java.util.Map<K,V></code></div><code>java.util.Map<K,V></code></div><code>java.util.Map<K,V></code></div><code>java.util.Map<K,V></code></div><code>java.util.Map<K,V></code></body></html>
+</ul><h2><a href="#enter-spring-session" class="anchor" name="enter-spring-session"></a>进入春季会议</h2><p>Spring Session为所有这些问题提供了一个非常好的解决方案。它是标准Servlet HTTP会话抽象的包装。轻松插入任何应用程序，无论它们是否基于Spring。它充当HTTP会话前面的代理，将请求转发到策略实现。开箱即用，有一个支持与<code>java.util.Map<K,V></code>以及与Redis直接兼容的另一个。使用的实现<code>java.util.Map<K,V></code>最初听起来并没有那么有趣，但是请记住，所有您喜欢的分布式数据网格（Pivotal GemFire，Hazelcast，Oracle Coherence等）都可以为您提供参考<code>Map</code>由数据网格内存支持的实现。</p><p>如果可用，特定于Redis的实现将利用Redis的一些效率。让我们看一下使用Redis设置一个简单的Spring Session应用程序。为什么选择Redis？因为它是合法的“网络扩展”- <a href="http://highscalability.com/blog/2014/9/8/how-twitter-uses-redis-to-scale-105tb-ram-39mm-qps-10000-ins.html">请在<em>High Scalability</em>博客上查看有关Twitter如何使用Twitter将其扩展到105TB RAM，39MM QPS和10,000多个实例的信息</a> ！</p><p>为了使该示例正常工作，我将以下Maven依赖项添加到<a href="https://start.spring.io">一个简单的Spring Boot项目中</a> 。</p>
+<ul>
+<li><code>org.springframework.boot</code> ： <code>spring-boot-starter-redis</code> ：<code>1.2.0.RELEASE</code></li>
+<li><code>org.springframework.boot</code> ： <code>spring-boot-starter-web</code> ：<code>1.2.0.RELEASE</code></li>
+<li><code>org.springframework.session</code> ： <code>spring-session-data-redis</code> ：<code>1.0.0.RELEASE</code></li>
+</ul><p>这是一个简单的示例应用程序：</p>
+<pre><code class="prettyprint java">package demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpSession;
+import java.util.UUID;
+
+
+@EnableRedisHttpSession 
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+}
+
+@RestController
+class HelloRestController {
+
+	@RequestMapping(&quot;/&quot;)
+	String uid(HttpSession session) {
+		UUID uid = (UUID) session.getAttribute(&quot;uid&quot;);
+		if (uid == null) {
+			uid = UUID.randomUUID();
+		}
+		session.setAttribute(&quot;uid&quot;, uid);
+		return uid.toString();
+	}
+}
+</code></pre><p>在运行它之前，请确保将干净的Redis数据库专用于此应用程序。例如，您可以使用以下命令重置当前数据库： <code>FLUSHDB</code> 。Spring Boot Redis启动器会自动连接到运行于<code>localhost</code> 。如果您想将其指向特定位置，请使用<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/redis/RedisProperties.java">各种<code>spring.redis.*</code>属性</a> 。</p><p>该示例尽可能最小：仅确认数据已写入Redis后备存储中。打开你的<code>redis-cli</code>与Web应用程序交互后的实用程序<code>localhost:8080/</code>在您的浏览器中。第一个请求将触发一个唯一的会话，该会话将用于缓存<code>uid</code>值。同一浏览器会话的后续请求将看到相同的值。输入<code>keys *</code>在里面<code>redis-cli</code>看看有什么坚持。</p><h2><a href="#deploying-to-cloudfoundry" class="anchor" name="deploying-to-cloudfoundry"></a>部署到CloudFoundry</h2><p>迁移到此云可能会有些棘手。如果您将此部署到Cloud Foundry，则Cloud Foundry buildpack将自动替换自动配置的Spring Boot <code>RedisConnectionFactory</code>与一个<code>RedisConnectionFactory</code>指向绑定到应用程序的Redis实例。<em>如果</em>您使用正确的buildpack在Cloud Foundry上运行，并且没有多个组件，则此方法有效<code>RedisConnectionFactory</code>在您的应用程序中。</p><p>我将使用Cloud Foundry <code>manifest.yml</code>描述该应用程序在部署到Cloud Foundry时的外观。在这种情况下，至少需要一个名为<code>redis-session</code>支持Redis数据库。我已将此文件放在我Maven旁边的项目根目录中<code>pom.xml</code> 。注意这个<code>manifest.yml</code>贡献一个环境变量， <code>SPRING_PROFILES_ACTIVE</code> ，这将激活<code>cloud</code>弹簧轮廓。我们稍后将使用它。</p>
+<pre><code class="prettyprint yml"><br />---
+applications:
+- name: connectors
+  memory: 512M
+  instances: 1
+  host: connectors-${random-word}
+  domain: cfapps.io
+  path: target/connectors.jar
+  services:
+    - redis-session
+  env:
+    SPRING_PROFILES_ACTIVE: cloud
+    DEBUG: &quot;true&quot;
+    debug: &quot;true&quot;
+
+</code></pre><p>您需要在推送应用程序之前创建Redis实例。我使用以下命令创建了一个简单的Redis实例（称为<code>redis-session</code> ，我们在<code>manifest.yml</code> ）在Pivotal Web Services上，然后推送应用程序。</p>
+<pre><code class="prettyprint bash">cf create-service rediscloud  25mb redis-session
+cf push
+</code></pre><p>我可以按原样部署应用程序，并且在此示例中事情应该可以正常工作，只有一个绑定的后备服务和一个已知类型的bean。</p><p>您可以使用Spring Cloud PaaS连接器来简化显式配置和使用云托管的Redis支持服务的工作。在这种新的安排中，我们将使用Spring配置文件来使配置保持明确，以便在Cloud Foundry上运行。添加Spring Cloud PaaS连接器，如下所示：</p>
+<ul>
+<li><code>org.springframework.cloud</code> ： <code>spring-boot-starter-cloud-connectors</code> ：<code>1.2.0.RELEASE</code></li>
+</ul><p>这样就可以使Spring Boot自动为其知道的每种绑定后备服务类型的实例进行装配。如果存在带有服务ID的Redis数据库<code>redis-session</code>然后可以使用常规的Spring限定符注入它，如下所示：</p>
+<pre><code class="prettyprint java">   // ..
+   @Autowired
+   @Qualifier(&quot;redis-session&quot;)
+   RedisConnectionFactory rcf;
+
+</code></pre><p>这种方法是最简单的，这就是您仅添加Spring Cloud入门依赖项所得到的。如果要显式配置服务，请通过在Spring Boot中添加以下属性来禁用Spring Boot启动程序<code>src/main/resources/application.properties</code> ：</p>
+<pre><code class="prettyprint properties">spring.cloud.enabled=false
+</code></pre><p>然后，显式使用Spring Cloud PaaS连接器。Bean定义<em>仅</em>在<code>cloud</code>弹簧轮廓已激活。否则，Spring Boot自动配置将启动（这是在本地运行时所需的配置）。</p>
+<pre><code class="prettyprint java">package demo;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.Cloud;
+import org.springframework.cloud.CloudFactory;
+import org.springframework.cloud.service.common.RedisServiceInfo;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpSession;
+import java.lang.reflect.Field;
+import java.util.UUID;
+
+@EnableRedisHttpSession
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+
+	@Bean
+	@Profile(&quot;cloud&quot;)
+	RedisConnectionFactory redisConnectionFactory() {
+		CloudFactory cloudFactory = new CloudFactory();
+		Cloud cloud = cloudFactory.getCloud();
+		RedisServiceInfo redisServiceInfo = (RedisServiceInfo) cloud.getServiceInfo(&quot;redis-session&quot;);
+		return cloud.getServiceConnector(redisServiceInfo.getId(),
+                     RedisConnectionFactory.class, null);
+	}
+}
+
+@RestController
+class HelloRestController {
+
+	@RequestMapping(&quot;/&quot;)
+	String hello(HttpSession session) {
+		UUID uid = (UUID) session.getAttribute(&quot;uid&quot;);
+		if (uid == null) {
+			uid = UUID.randomUUID();
+		}
+		session.setAttribute(&quot;uid&quot;, uid);
+		return uid.toString();
+	}
+}
+</code></pre><h2><a href="#but-wait-there-rsquo-s-more" class="anchor" name="but-wait-there-rsquo-s-more"></a>但是等等，还有更多..</h2><p>这篇文章的重点是研究如何在本地环境或云中轻松获得适用于Spring应用程序的可扩展HTTP会话。我<em>不</em>建议您再次开始使用JSF页面图填充HTTP会话！如果您需要一个即将到期的，可扩展的，短暂的，用于轻量级业务状态的商店（例如安全令牌），那么Spring Session可以为您提供帮助。由于Spring Session位于您的应用程序和HTTP会话之间，因此它可以提供Servlet之外的其他一些有用的抽象<code>HttpSession</code> 。<a href="https://spring.io/team/rwinch">Spring Security和Spring Session的负责人Rob Winch</a>做了出色的工作，在文档和其他博客文章中谈论了其中一些其他用例，因此我将在这里进行回顾：</p>
+<ul>
+<li>您可以轻松<a href="https://github.com/joshlong/bootiful-sessions/tree/master/users">实现“切换用户”</a>功能（类似于Google帐户）。<a href="https://docs.spring.io/spring-session/docs/current/reference/html5/guides/users.html">在文档中</a>查看<a href="https://docs.spring.io/spring-session/docs/current/reference/html5/guides/users.html">惊人的文章，以了解更多信息</a> 。</li>
+<li>Spring Session知道您的Spring Websocket流量，并将正确地延续HTTP会话。这避免<a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=54738">了</a> <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-175">websocket标准</a> <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=54738">的问题</a> ， <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-175">因为</a>没有实际的方法可以使HTTP会话从websocket流量中永久保留。<a href="https://docs.spring.io/spring-session/docs/current/reference/html5/guides/websocket.html">在文档中</a>查看<a href="https://docs.spring.io/spring-session/docs/current/reference/html5/guides/websocket.html">惊人的文章，以了解更多信息</a> 。</li>
+<li>您可以使用所有工具，包括将客户端请求与服务器端会话状态关联的机制： <a href="https://github.com/joshlong/bootiful-sessions/tree/master/rest">HTTP标头</a> ？饼干？还有吗标头方法非常酷，可以<a href="https://spring.io/blog/2015/01/20/the-resource-server-angular-js-and-spring-security-part-iii">与Spring Security一起使用</a>以保护REST服务，从而为您提供<a href="https://spring.io/blog/2015/01/20/the-resource-server-angular-js-and-spring-security-part-iii">一种穷人的OAuth访问令牌</a> 。<a href="https://docs.spring.io/spring-session/docs/current/reference/html5/guides/rest.html">在文档中</a>查看惊人的文章<a href="https://docs.spring.io/spring-session/docs/current/reference/html5/guides/rest.html">，以了解更多信息</a> 。</li>
+</ul><p>我很幸运在上周的春季会议上进行了网络研讨会。<a href="https://spring.io/team/rwinch">罗布</a>给了我一些事情， <em>可能</em>会在未来版本的411：</p>
+<ul>
+<li>会话并发控制（“使我退出其他帐户”）</li>
+<li>Spring Batch和Spring Integration索赔检查支持</li>
+<li>支持帐户管理-优化的持久性（超越Java序列化），</li>
+<li>更智能，可注入的Bean（与作为众所周知的请求属性公开但可以通过其他方式用作Spring MVC参数等的Bean相对）</li>
+</ul><p>谢谢，罗布，感谢您提供的所有宝贵信息。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 2002;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

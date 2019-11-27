@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Scala的Spring Security配置</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,24 +25,26 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Security Configuration with Scala">
-<meta name="twitter:creator" content="@tekul" http:="" ="" blog.springsource.com="" 2010="" 03="" 06="" behind-the-spring-security-namespace="" ="="></meta>Behind the Spring Security Namespace, I talked about how the Spring Security namespace has been very successful in providing a simple alternative to plain Spring bean configuration, but how there is still a steep learning curve when you want to start customizing its behaviour. Behind the XML elements and attributes, various filters and helper strategies are created and wired together, but, short of reading the code which handles the XML parsing, there is no easy way of working out which classes are involved or the details of how they interact.
+<meta name="twitter:creator" content="@tekul" http:="" ="" blog.springsource.com="" 2010="" 03="" 06="" behind-the-spring-security-namespace="" ="=">Behind the Spring Security Namespace, I talked about how the Spring Security namespace has been very successful in providing a simple alternative to plain Spring bean configuration, but how there is still a steep learning curve when you want to start customizing its behaviour. Behind the XML elements and attributes, various filters and helper strategies are created and wired together, but, short of reading the code which handles the XML parsing, there is no easy way of working out which classes are involved or the details of how they interact.
 " > <meta>
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/91c15183d9efc15c30ff1e65f084314d?s=200">
 
 <meta property="og:title" content="Spring Security Configuration with Scala">
 <meta property="og:image" content="https://gravatar.com/avatar/91c15183d9efc15c30ff1e65f084314d?s=200">
-<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2010="" 03="" 06="" behind-the-spring-security-namespace="" ="="></meta>Behind the Spring Security Namespace, I talked about how the Spring Security namespace has been very successful in providing a simple alternative to plain Spring bean configuration, but how there is still a steep learning curve when you want to start customizing its behaviour. Behind the XML elements and attributes, various filters and helper strategies are created and wired together, but, short of reading the code which handles the XML parsing, there is no easy way of working out which classes are involved or the details of how they interact.
+<meta property="og:type" content="article" http:="" ="" blog.springsource.com="" 2010="" 03="" 06="" behind-the-spring-security-namespace="" ="=">Behind the Spring Security Namespace, I talked about how the Spring Security namespace has been very successful in providing a simple alternative to plain Spring bean configuration, but how there is still a steep learning curve when you want to start customizing its behaviour. Behind the XML elements and attributes, various filters and helper strategies are created and wired together, but, short of reading the code which handles the XML parsing, there is no easy way of working out which classes are involved or the details of how they interact.
 " > <meta>
 <meta property="og:article:published_time" content="2011-08-01 18:18:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -164,17 +170,17 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在上一篇文章<a href="http://blog.springsource.com/2010/03/06/behind-the-spring-security-namespace/">“ Spring Security命名空间的背后”中</a> ，我谈到了Spring Security命名空间如何非常成功地提供了简单的Spring Bean配置替代方案，但是当您要开始对其自定义其进行定制时，学习曲线仍然很艰难行为。在XML元素和属性的背后，创建了各种过滤器和帮助程序策略并将其连接在一起，但是，缺少阅读处理XML解析的代码的方法，没有简单的方法可以确定涉及哪些类或它们如何交互的细节。 。</p><p>一段时间以来，我们一直在尝试使用<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">Spring的<code>@Configuration</code>类提供</a>基于Java的替代解决方案，该解决方案保留了XML名称空间的简单性，但也使基础行为更加透明并且更易于自定义。尽管从理论上讲是可能的，但主要由于Spring Security中可用的选项范围广泛，似乎没有基于Java的解决方案能够满足我们设定的目标。</p><p>在本文中，我将概述Scala如何提供一种优雅的解决方案，其语法对于已经熟悉XML名称空间的人来说非常容易理解。该代码可在<a href="https://github.com/tekul/scalasec/">github上获得</a> ，这是一个正在进行的工作，我仍然是Scala的新手，因此，欢迎来自专家的任何反馈或建议。</p><p>这里对Spring Security的引用适用于即将发布的3.1版本。另外，如果您以前没有使用过Spring的基于Java的配置，那么您可能想看看Chris Beams的<a href="http://blog.springsource.com/2009/12/22/configuration-simplifications-in-spring-3-0/">这篇博客文章</a> 。</p>
+<div class="blog--post"><p>在上一篇文章<a href="http://blog.springsource.com/2010/03/06/behind-the-spring-security-namespace/">“ Spring Security命名空间的背后”中</a> ，我谈到了Spring Security命名空间如何非常成功地提供了简单的Spring Bean配置替代方案，但是当您要开始对其自定义其进行定制时，学习曲线仍然很艰难行为。在XML元素和属性的背后，创建了各种过滤器和帮助程序策略并将其连接在一起，但是，缺少阅读处理XML解析的代码的方法，没有简单的方法可以确定涉及哪些类或它们如何交互的细节。 。</p><p>一段时间以来，我们一直在尝试使用<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">Spring的</a>基于Java的替代解决方案<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java"><code>@Configuration</code>类</a>既保留了XML名称空间的简单性，又使基础行为更加透明并且更易于自定义。尽管从理论上讲是可能的，但主要由于Spring Security中可用的选项范围广泛，似乎没有基于Java的解决方案能够满足我们设定的目标。</p><p>在本文中，我将概述Scala如何提供一种优雅的解决方案，其语法对于已经熟悉XML名称空间的人来说非常容易理解。该代码可在<a href="https://github.com/tekul/scalasec/">github上获得</a> ，这是一个正在进行的工作，我仍然是Scala的新手，因此，欢迎来自专家的任何反馈或建议。</p><p>这里对Spring Security的引用适用于即将发布的3.1版本。另外，如果您以前没有使用过Spring的基于Java的配置，那么您可能想看看Chris Beams的<a href="http://blog.springsource.com/2009/12/22/configuration-simplifications-in-spring-3-0/">这篇博客文章</a> 。</p>
 <h2>问题</h2><p>让我们首先简要介绍名称空间配置的工作原理，重点介绍最复杂的Web部件。假设我们的配置包含以下内容：</p>
-<pre><code class="prettyprint xml"><br>    <http use-expressions="true">
-        <intercept-url pattern="/secure/extreme/**" access="hasRole('Admin')" />
-        <intercept-url pattern="/**" access="hasRole('User')" />
-        <form-login />
-        <logout  />
-    </http>
-</code></pre><p><code>http</code>元素创建一个<code>SecurityFilterChain</code> ，用于配置Spring Security的<code>FilterChainProxy</code> （在我们的<code>web.xml</code>文件中通常称为“ springSecurityFilterChain”的目标bean）的实例。</p><p><code>http</code>本身会创建几个标准过滤器（包括<code>SecurityContextPeristenceFilter</code> ， <code>ExceptionTranslationFilter</code>和<code>FilterSecurityInterceptor</code> ）。<code>intercept-url</code>元素描述了访问规则， <code>FilterSecurityInterceptor</code>使用该规则来决定是否应为特定请求授予访问权限。</p><p>当我们添加其他XML元素时，其他功能将“混合”到过滤器链中。<code>form-login</code>元素添加一个<code>UsernamePasswordAuthenticationFilter</code>而<code>logout</code>添加一个<code>LogoutFilter</code> 。如果添加了<code>RememberMeAuthenticationFilter</code> <code>remember-me</code>元素，则将获得一个<code>RememberMeAuthenticationFilter</code>和<code>RememberMeServices</code>实现，其具体类型取决于所使用的其他XML属性。</p><p>在Spring Security 3.1中，您将可以使用多个<code>http</code>元素来创建多个过滤器链。每个链处理应用程序内的不同路径，例如URL <code>/rest/**</code>下的无状态API和所有其他请求的有状态Web应用程序配置。</p><p>因此，命名空间提供了许多不同的可能性。我们如何使用<code>@Configuration</code>模型实现这样的目标，同时保持XML混合方法的简单性，但将底层实现公开为语法的一部分？</p>
+<pre><code class="prettyprint xml"><br />    &lt;http use-expressions=&quot;true&quot;&gt;
+        &lt;intercept-url pattern=&quot;/secure/extreme/**&quot; access=&quot;hasRole(&#39;Admin&#39;)&quot; /&gt;
+        &lt;intercept-url pattern=&quot;/**&quot; access=&quot;hasRole(&#39;User&#39;)&quot; /&gt;
+        &lt;form-login /&gt;
+        &lt;logout  /&gt;
+    &lt;/http&gt;
+</code></pre><p>的<code>http</code>元素创建一个<code>SecurityFilterChain</code>用于配置Spring Security的实例<code>FilterChainProxy</code> （我们通常将目标Bean称为“ springSecurityFilterChain” <code>web.xml</code>文件）。</p><p>通过它自己， <code>http</code>创建几个标准过滤器（包括一个<code>SecurityContextPeristenceFilter</code> ， <code>ExceptionTranslationFilter</code>和<code>FilterSecurityInterceptor</code> ）。的<code>intercept-url</code>元素描述了由<code>FilterSecurityInterceptor</code>决定是否应授予特定请求访问权限。</p><p>当我们添加其他XML元素时，其他功能将“混合”到过滤器链中。的<code>form-login</code>元素添加一个<code>UsernamePasswordAuthenticationFilter</code>和<code>logout</code>添加一个<code>LogoutFilter</code> 。如果您添加了<code>remember-me</code>元素，你会得到一个<code>RememberMeAuthenticationFilter</code>和<code>RememberMeServices</code>实现，具体类型取决于所使用的其他XML属性。</p><p>在Spring Security 3.1中，您将可以使用多个<code>http</code>元素以创建多个过滤器链。每个链处理应用程序内的不同路径，例如URL下的无状态API <code>/rest/**</code>以及针对所有其他请求的有状态Web应用程序配置。</p><p>因此，名称空间提供了许多不同的可能性。我们如何使用<code>@Configuration</code>模型，保留了XML混合方法的简单性，但将底层实现公开为语法的一部分？</p>
 <h2>Scala特性作为配置混合</h2><p>理想情况下，我们希望能够编写如下内容：</p>
-<pre><code class="prettyprint scala"><br>@Configuration
+<pre><code class="prettyprint scala"><br />@Configuration
 class SecurityConfiguration {
 
   @Bean
@@ -183,16 +189,16 @@ class SecurityConfiguration {
   @Bean
   def formLoginFilterChain = 
     new FilterChain with FormLogin with Logout {
-      interceptUrl("/secure/**", hasRole("Admin"))
-      interceptUrl("/**", hasRole("User"))
+      interceptUrl(&quot;/secure/**&quot;, hasRole(&quot;Admin&quot;))
+      interceptUrl(&quot;/**&quot;, hasRole(&quot;User&quot;))
     }
 }
-</code></pre><p>我们可以在代码编辑器中检查<code>FormLogin</code>和<code>Logout</code>是类型的类型，以查看它们的作用。事实证明，通过使用Scala，我们可以做到这一点。上面的配置代码段是100％纯的Scala代码，除了一些较小的要求（例如<code>AuthenticationManager</code>的需要）之外，它可以直接在现有的Java Web应用程序中使用。</p><p>我们在这里使用了<a href="https://www.scala-lang.org/node/126">Scala特性</a> ，将表单登录和注销行为混合到一个基本的过滤器链类中（请参见上面的片段中的突出显示的行）。在Java中，我们仅限于单一继承和接口的使用。特性有点像接口，但可以包含方法的实现，甚至可以包含其他字段，这些字段将成为混合它们的类的一部分，因此它们可以轻松地封装特定功能所需的功能。它们还可以覆盖类的内置行为（或其他混合特性）。特质一开始可能需要花些时间。我建议阅读<a href="http://www.artima.com/shop/programming_in_scala_2ed">Scala编程中</a>的traits一章，作为一个很好的介绍。</p><p>这里的<code>FilterChain</code>类类似于XML名称空间中的<code>http</code>元素，提供了可以将特征混合到其中的基本配置。它扩展了一个基类<code>StatelessFilterChain</code> ，它提供了裸配置来处理无状态请求，然后<code>FilterChain</code>用适合于使用<code>HttpSession</code>有状态请求的bean和过滤器覆盖和增强它。当然，您可以直接在配置中覆盖或操纵任何引用（来自类或混合特性）。您可以<a href="https://github.com/tekul/scalasec/wiki">在github上</a>的<a href="https://github.com/tekul/scalasec/wiki">项目Wiki中</a>找到有关这些类如何协同工作的更多详细信息。</p><p>Scala方法的主要优点是您可以立即找出每个特征的作用。由于Scala具有静态类型，因此Eclipse和IntelliJ IDEA都可以让您直接导航到实现：</p>
+</code></pre><p>哪里<code>FormLogin</code>和<code>Logout</code>我们可以在代码编辑器中检查的类型，以查看它们的作用。事实证明，通过使用Scala，我们可以做到这一点。上面的配置代码段是100％纯Scala代码，除了一些次要要求（例如， <code>AuthenticationManager</code> ），可以直接在现有的Java Web应用程序中使用。</p><p>我们在这里使用了<a href="https://www.scala-lang.org/node/126">Scala特性</a> ，将表单登录和注销行为混合到一个基本的过滤器链类中（请参见上面的片段中的突出显示的行）。在Java中，我们仅限于单一继承和接口的使用。特性有点像接口，但是可以包含方法的实现，甚至可以包含其他字段，这些字段将成为混合它们的类的一部分，因此它们可以轻松地封装特定功能所需的功能。它们还可以覆盖类的内置行为（或其他混合特性）。特质一开始可能需要花些时间。我建议阅读<a href="http://www.artima.com/shop/programming_in_scala_2ed">Scala编程中</a>的traits一章，作为一个很好的介绍。</p><p>的<code>FilterChain</code>这里的类类似于<code>http</code> XML名称空间中的元素，提供了可以将特征混合到其中的基本配置。它扩展了一个基类， <code>StatelessFilterChain</code>它提供了裸配置来处理无状态请求，并且<code>FilterChain</code>然后使用适用于有状态请求的Bean和过滤器覆盖并增强它， <code>HttpSession</code> 。当然，您可以直接在配置中覆盖或操纵任何引用（来自类或混合特性）。您可以<a href="https://github.com/tekul/scalasec/wiki">在github上</a>的<a href="https://github.com/tekul/scalasec/wiki">项目Wiki中</a>找到有关这些类如何协同工作的更多详细信息。</p><p>Scala方法的主要优点是您可以立即找出每个特征的作用。由于Scala具有静态类型，因此Eclipse和IntelliJ IDEA都可以让您直接导航到实现：</p>
 <div id="attachment_9112" class="aligncenter wp-caption" style="margin:auto">
 <img class="centered size-full wp-image-2129" title="注销特征的语法突出显示" src="http://blog.springsource.com/wp-content/uploads/2011/07/scalaConfigFormLogin.png" alt="IDE高亮显示的图像" width="471" height="169">
 <p class="wp-caption-text">注销特征的语法突出显示</p>
-</div><p>因此，例如，您可以导航至<code>FormLogin</code>特性，并查看它必须混入<code>StatelessFilterChain</code>实例（“ extends”子句）中，并且添加了对<code>UsernamePasswordAuthenticationFilter</code>的引用：</p>
-<pre><code class="prettyprint scala"><br>trait FormLogin extends StatelessFilterChain with LoginPage with FilterChainAuthenticationManager {
+</div><p>因此，例如，您可以导航到<code>FormLogin</code>特质，并且必须将其混入<code>StatelessFilterChain</code>实例（“ extends”子句），并且添加了对<code>UsernamePasswordAuthenticationFilter</code> ：</p>
+<pre><code class="prettyprint scala"><br />trait FormLogin extends StatelessFilterChain with LoginPage with FilterChainAuthenticationManager {
   lazy val formLoginFilter = {
     val filter = new UsernamePasswordAuthenticationFilter
     filter.setAuthenticationManager(authenticationManager)
@@ -202,21 +208,21 @@ class SecurityConfiguration {
 
   ...
 }
-</code></pre><p>您还可以看到它还融合了其他一些特征。对于代码<code>LoginPage</code>是：</p>
-<pre><code class="prettyprint scala"><br>private[scalasec] trait LoginPage extends StatelessFilterChain {
+</code></pre><p>您还可以看到它还融合了其他一些特征。的代码<code>LoginPage</code>是：</p>
+<pre><code class="prettyprint scala"><br />private[scalasec] trait LoginPage extends StatelessFilterChain {
   val loginPage: String
 
   override def entryPoint : AuthenticationEntryPoint = {
     new LoginUrlAuthenticationEntryPoint(loginPage)
   }
 }
-</code></pre><p>因此，这将添加一个名为<code>loginPage</code>的<em>抽象</em>值，并使用它来覆盖<code>StatelessFilterChain</code>定义的<code>AuthenticationEntryPoint</code> 。<code>FilterChainAuthenticationManager</code>特征还定义了一个抽象值，称为<code>authenticationManager</code> 。回顾上面的代码突出显示示例，您可能想知道为什么“ <code>FilterChain</code> ”用红色下划线。实际上，此代码无法按现状进行编译。</p>
+</code></pre><p>因此，这增加了一个<em>抽象</em>值，称为<code>loginPage</code>并使用它覆盖<code>AuthenticationEntryPoint</code>在中定义<code>StatelessFilterChain</code> 。的<code>FilterChainAuthenticationManager</code>特质还定义了一个抽象值，称为<code>authenticationManager</code> 。回顾上面的代码突出显示示例，您可能想知道为什么“ <code>FilterChain</code>用红色下划线。实际上，此代码无法按现状进行编译。</p>
 <pre><code class="prettyprint source">error] value loginPage in trait LoginPage of type String is not defined
 [error] value authenticationManager in trait FilterChainAuthenticationManager of type org.springframework.security.authentication.AuthenticationManager is not defined
 [error]     new FilterChain with FormLogin with Logout {
 [error]         ^
-</code></pre><p>因此，除非为抽象值<code>loginPage</code>和<code>authenticationManager</code>提供值，否则在尝试运行应用程序之前，我们都会收到错误<code>loginPage</code> 。一个有效的配置将是：</p>
-<pre><code class="prettyprint scala"><br>@Configuration
+</code></pre><p>因此，除非我们为抽象值提供值，否则在尝试运行应用程序之前，我们都会收到错误消息<code>loginPage</code>和<code>authenticationManager</code> 。一个有效的配置将是：</p>
+<pre><code class="prettyprint scala"><br />@Configuration
 class SecurityConfiguration {
 
   @Bean
@@ -225,32 +231,33 @@ class SecurityConfiguration {
   @Bean
   def formLoginFilterChain = {
     new FilterChain with FormLogin with Logout {
-      override val loginPage = "/login.jsp"
+      override val loginPage = &quot;/login.jsp&quot;
       override val authenticationManager = testAuthenticationManager
-      interceptUrl("/secure/extreme/**", hasRole("Admin"))
-      interceptUrl("/**", hasRole("User"))
+      interceptUrl(&quot;/secure/extreme/**&quot;, hasRole(&quot;Admin&quot;))
+      interceptUrl(&quot;/**&quot;, hasRole(&quot;User&quot;))
     }
   }
 
   @Bean
   def testAuthenticationManager = new TestAuthenticationManager()
 }
-</code></pre><p>我们已经使用标准<code>@Bean</code>语法定义了<code>AuthenticationManager</code>实例。在实际的应用程序中，您很可能会使用注入了<code>AuthenticationProvider</code>列表的Spring Security的<code>ProviderManager</code>实例。</p>
+</code></pre><p>我们已经定义了<code>AuthenticationManager</code>使用标准实例<code>@Bean</code>句法。在实际的应用程序中，您很可能会使用Spring Security的实例<code>ProviderManager</code>注入列表<code>AuthenticationProvider</code> s。</p>
 <h2>Scala函数可替代表达式语言（EL）</h2><p>Spring Security 3.0引入了对EL表达式的访问控制支持。但是，由于Scala支持一流的函数，为什么当您可以直接传递函数时为什么要使用无类型的字符串呢？如果您以前从未看过，这是需要习惯一些的其他内容。我建议阅读一下Scala对部分功能的支持，并<a href="https://www.scala-lang.org/node/135">仔细</a>了解它是如何工作的。</p><p>考虑这一行：</p>
-<pre><code class="prettyprint scala"><br>     interceptUrl("/**", hasRole("User"))
-</code></pre><p><code>interceptUrl</code>方法的第二个参数是类型为<code>(Authentication, HttpServletRequest) => Boolean</code>的函数，这意味着它必须接受<code>Authentication</code>对象和<code>HttpServletRequest</code>并返回布尔值。当接收到一个与此规则匹配的请求时，该函数将被调用，并传入用户的<code>Authentication</code>对象和请求。这与使用EL规则完全相同，但是功能更强大，并且也是静态类型的。您可以使用此签名传递任何函数，因此您可以直接在Scala中编写所有访问规则的代码，并轻松地对它们进行单独的单元测试。该示例代码具有一些模仿当前EL支持的功能。同样，您可以直接导航到IDE中的实现：</p>
-<pre><code class="prettyprint scala"><br>  def permitAll(a: Authentication, r: HttpServletRequest) = true
+<pre><code class="prettyprint scala"><br />     interceptUrl(&quot;/**&quot;, hasRole(&quot;User&quot;))
+</code></pre><p>第二个论点<code>interceptUrl</code>方法是类型的函数<code>(Authentication, HttpServletRequest) => Boolean</code> ，这意味着它必须接受<code>Authentication</code>对象和<code>HttpServletRequest</code>并返回一个布尔值。当收到符合此规则的请求时，该函数将被调用，并传入用户的<code>Authentication</code>对象和请求。这与使用EL规则完全相同，但功能更强大，并且也是静态类型的。您可以使用此签名传递任何函数，因此您可以直接在Scala中编写所有访问规则的代码，并轻松地对它们进行单独的单元测试。该示例代码具有一些模仿当前EL支持的功能。同样，您可以直接导航到IDE中的实现：</p>
+<pre><code class="prettyprint scala"><br />  def permitAll(a: Authentication, r: HttpServletRequest) = true
 
   def denyAll(a: Authentication, r: HttpServletRequest) = false
 
   def hasRole(role: String)(a: Authentication, r: HttpServletRequest) = a.getAuthorities.exists(role == _.getAuthority)
 
   ...
-</code></pre><p>请注意， <code>hasRole</code>具有两个参数组（另一个Scala功能），这使我们能够根据需要的类型使用<code>hasRole(“someRole”)</code>传递给<code>interceptUrl</code>方法。这只是对可能性的非常基本的说明。您可以编写任何所需的功能，然后直接使用它，而无需任何额外的配置要求。</p>
-<h2>结论</h2><p>总体而言，Scala给我留下了深刻的印象，而且不需要特殊的DSL，特质的使用如何很好地适合了这个问题。直接在Scala中编写<code>@Configuration</code>类非常容易，并且只需进行一些简单的隐式转换和使用traits，其语法就和XML名称空间一样简明，但是没有后者遭受的混淆问题。当使用预定义的特征和过滤器链类进行编码时，您将远离构成该配置并可以轻松修改或替换它们的Spring Security对象，因此您具有传统Spring bean配置的所有功能，但是却没有冗长。作为EL的替代品，能够直接将Scala函数用作安全访问规则也是一项非常不错的好处。</p><p>这实际上只是概述而不是深入讨论。我鼓励您看一下github上的代码，并尝试不同的配置。尽管配置特征及其支持类的一些实现细节最初对于初学者来说可能有些棘手，但是您不需要了解很多Scala即可使用它们来构建配置。github项目也是一个简单的webapp，它使用<code>@Configuration</code>类<a href="https://github.com/tekul/scalasec/blob/master/src/main/scala/sample/config/ScalaSecurityConfiguration.scala">ScalaSecurityConfiguration.scala</a> 。这是一个很好的起点，因为它包含几个示例配置。</p><p>IDE中对Scala的支持一直在改善。STS用户可以从STS扩展选项卡安装Scala支持（我在STS 2.7.1中对此进行了测试）。在使用它时，您还可以安装Gradle支持并将<a href="http://static.springsource.org/sts/docs/2.7.0.M1/reference/html/gradle/gradle-sts-tutorial.html#import">该项目作为gradle构建导入</a> 。导入后，只需将Scala性质添加到项目中即可。Intellij IDEA <a href="http://blog.jetbrains.com/scala/">Scala插件</a>的最新版本也非常有用，尽管您可能想尝试每晚进行一次构建以获取最新功能和修复。</p></div>
+</code></pre><p>注意<code>hasRole</code>有两个参数组（另一个Scala功能），这使我们可以使用<code>hasRole(“someRole”)</code>根据所需类型传递给<code>interceptUrl</code>方法。这只是对可能性的非常基本的说明。您可以编写任何所需的功能，然后直接使用它，而无需任何额外的配置要求。</p>
+<h2>结论</h2><p>总体而言，Scala给我留下了深刻的印象，而且不需要特殊的DSL，特质的使用如何很好地适合了这个问题。编写起来很容易<code>@Configuration</code>语法直接在Scala中进行分类，并通过一些简单的隐式转换和使用traits，其语法与XML名称空间一样简洁，但没有后者遭受的混淆问题。当使用预定义的特征和过滤器链类进行编码时，您将远离构成该配置并可以轻松修改或替换它们的Spring Security对象，因此您具有传统Spring bean配置的所有功能，但是却没有冗长。作为EL的替代品，能够直接将Scala函数用作安全访问规则也是一项非常不错的好处。</p><p>这实际上只是概述而不是深入讨论。我鼓励您看一下github上的代码，并尝试不同的配置。尽管配置特征及其支持类的一些实现细节最初对于初学者来说可能有些棘手，但是您不需要了解很多Scala即可使用它们来构建配置。github项目也是一个简单的webapp，它使用<code>@Configuration</code>类<a href="https://github.com/tekul/scalasec/blob/master/src/main/scala/sample/config/ScalaSecurityConfiguration.scala">ScalaSecurityConfiguration.scala</a> 。这是一个很好的起点，因为它包含几个示例配置。</p><p>IDE中对Scala的支持一直在改善。STS用户可以从STS扩展选项卡安装Scala支持（我在STS 2.7.1中对此进行了测试）。在使用它时，您还可以安装Gradle支持并将<a href="http://static.springsource.org/sts/docs/2.7.0.M1/reference/html/gradle/gradle-sts-tutorial.html#import">该项目作为gradle构建导入</a> 。导入后，只需将Scala性质添加到项目中即可。Intellij IDEA <a href="http://blog.jetbrains.com/scala/">Scala插件</a>的最新版本也非常有用，尽管您可能想尝试每晚进行一次构建以获取最新功能和修复。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 425;
 
       (function(disqus_shortname, document) {
@@ -264,7 +271,8 @@ class SecurityConfiguration {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -302,12 +310,14 @@ class SecurityConfiguration {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

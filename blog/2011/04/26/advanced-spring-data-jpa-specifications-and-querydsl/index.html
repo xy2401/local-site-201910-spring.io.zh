@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>高级Spring数据JPA-规格和Querydsl</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Advanced Spring Data JPA - Specifications and Querydsl">
-<meta name="twitter:description" content="<p>In my <a href=" http:="" ="" blog.springsource.com="" 2011="" 02="" 10="" getting-started-with-spring-data-jp="="></head><body dir="ltr">last blog post I introduced the basic feature set of Spring Data JPA. In this post I’d like to dive into some more features and how they can help you simplify data access layer implementation even further. The Spring Data repository abstraction consists of an interface based programming model, some factory classes and a Spring namespace to easily configure the infrastructure. A typical repository interface looks something like this:
+<meta name="twitter:description" content="<p>In my <a href=" http:="" ="" blog.springsource.com="" 2011="" 02="" 10="" getting-started-with-spring-data-jp="="></head><body >last blog post I introduced the basic feature set of Spring Data JPA. In this post I’d like to dive into some more features and how they can help you simplify data access layer implementation even further. The Spring Data repository abstraction consists of an interface based programming model, some factory classes and a Spring namespace to easily configure the infrastructure. A typical repository interface looks something like this:
 <pre><code class="prettyprint java">public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
   Customer findByEmailAddress(String emailAddress);
@@ -55,10 +59,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -172,7 +178,7 @@
 <a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/977c74bb044a9d4fa90b305824eda390?s=20&d=mm"> <a class="author" rel="author" href="/team/ogierke">奥利弗·德罗博姆（Oliver Drotbohm）</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/977c74bb044a9d4fa90b305824eda390?s=20&d=mm"> <a class="author" rel="author" href="/team/ogierke">奥利弗·德罗博姆</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
@@ -194,7 +200,7 @@
   Page<Customer> findByFirstname(String firstname, Pageable pageable);
 }
 </code></pre>
-<p>第一种方法只是希望找到具有给定电子邮件地址的单个客户，第二种方法返回具有给定姓氏的所有客户，并将给定的<code>Sort</code>应用于结果，而第三种方法则返回客户<code>Page</code> 。有关详细信息，请查看<a href="http://blog.springsource.com/2011/02/10/getting-started-with-spring-data-jpa">以前的博客文章</a> 。</p>
+<p>第一种方法只是希望找到具有给定电子邮件地址的单个客户，第二种方法则返回具有给定姓氏的所有客户并应用给定的<code>Sort</code>返回结果，而第三个方法返回一个<code>Page</code>客户。有关详细信息，请查看<a href="http://blog.springsource.com/2011/02/10/getting-started-with-spring-data-jpa">以前的博客文章</a> 。</p>
 <p>尽管此方法确实非常方便（您甚至不必编写一行实现代码即可执行查询），但它有两个缺点：首先，由于-，对于较大的应用程序，查询方法的数量可能会增加-这就是第二点-查询定义了一组固定的条件。为避免这两个缺点，如果您能提出一组可以动态组合以构建查询的原子谓词，这不是很酷吗？</p>
 <p>如果您是JPA的长期用户，您可能会回答：这不是Criteria API的目的吗？正确，让我们看一下使用JPA Criteria API的示例业务需求实现的外观。这是用例：在他们生日那天，我们想向所有长期客户发送优惠券。我们如何检索匹配的？</p>
 <p>谓词几乎包括两个部分：生日以及我们所谓的长期客户。假设后者意味着客户帐户至少在两年前创建。这是使用JPA 2.0 Criteria API实现的样子。</p>
@@ -209,9 +215,9 @@ Predicate isLongTermCustomer = builder.lessThan(root.get(Customer_.createdAt), t
 query.where(builder.and(hasBirthday, isLongTermCustomer));
 em.createQuery(query.select(root)).getResultList();
 </code></pre>
-<p>我们有什么在这里？为了方便起见，我们创建了一个新的<code>LocalDate</code> ，然后继续进行三行样板工作以设置必要的JPA基础结构实例。然后，我们用两行代码构建谓词，一行连接两个谓词，最后一行执行实际查询。我们正在使用由JPA 2.0引入并由Annotation Processing API生成的元模型类。此代码的主要问题在于谓词不易于外部化和重用，因为您需要先设置<code>CriteriaBuilder</code> ， <code>CriteriaQuery</code>和<code>Root</code> 。而且，代码的可读性很差，因为乍一看很难快速推断出代码的意图。</p>
+<p>我们有什么在这里？我们创建一个新的<code>LocalDate</code>为了方便起见，请继续使用三行样板来设置必要的JPA基础结构实例。然后，我们用两行代码构建谓词，一行连接两个谓词，最后一行执行实际查询。我们正在使用由JPA 2.0引入并由Annotation Processing API生成的元模型类。此代码的主要问题在于，谓词不易于外部化和重用，因为您需要设置谓词<code>CriteriaBuilder</code> ， <code>CriteriaQuery</code>和<code>Root</code>第一。而且，代码的可读性很差，因为乍一看很难快速推断出代码的意图。</p>
 <h3>技术指标</h3>
-<p>为了能够定义可重用的<code>Predicate</code>我们引入了<code>Specification</code>接口，该接口源于Eric Evans的《 <a href="http://www.infoq.com/minibooks/domain-driven-design-quickly">域驱动设计》</a>一书中介绍的概念。它将规范定义为实体的谓词，这正是<code>Specification</code>接口所表示的。实际上仅包含一个方法：</p>
+<p>能够定义可重用<code>Predicate</code> s我们介绍了<code>Specification</code>接口是从Eric Evans的《 <a href="http://www.infoq.com/minibooks/domain-driven-design-quickly">域驱动设计》</a>一书中引入的概念衍生而来的。它将规范定义为实体的谓词，这正是我们的<code>Specification</code>接口代表。实际上仅包含一个方法：</p>
 <pre><code class="prettyprint java">public interface Specification<T> {
   Predicate toPredicate(Root<T> root, CriteriaQuery query, CriteriaBuilder cb);
 }
@@ -236,7 +242,7 @@ em.createQuery(query.select(root)).getResultList();
   }
 }
 </code></pre>
-<p>诚然，这不是世界上最漂亮的代码，但它可以很好地满足我们的初始要求：我们可以引用一组原子规范。下一个问题是：我们将如何执行这些规范？为此，您只需在存储库接口中扩展<code>JpaSpecificationExecutor</code> ，然后“拉入” API以执行<code>Specification</code> ：</p>
+<p>诚然，这不是世界上最漂亮的代码，但它可以很好地满足我们的初始要求：我们可以引用一组原子规范。下一个问题是：我们将如何执行这些规范？为此，您只需扩展<code>JpaSpecificationExecutor</code>在您的存储库界面中，从而“插入”一个API来执行<code>Specification</code> s：</p>
 <pre><code class="prettyprint java">public interface CustomerRepository extends JpaRepository<Customer>, JpaSpecificationExecutor {
   // Your query methods here
 }
@@ -245,14 +251,14 @@ em.createQuery(query.select(root)).getResultList();
 <pre><code class="prettyprint java">customerRepository.findAll(hasBirthday());
 customerRepository.findAll(isLongTermCustomer());
 </code></pre>
-<p>基本的存储库实现将为您准备<code>CriteriaQuery</code> ， <code>Root</code>和<code>CriteriaBuilder</code> ，应用由给定<code>Specification</code>创建的<code>Predicate</code>并执行查询。但是我们不能仅仅创建简单的查询方法来实现这一目标吗？正确，但请记住我们的第二个初始要求。我们希望能够自由地组合原子<code>Specification</code>来即时创建新的<code>Specification</code> 。为此，我们有一个帮助程序类<code>Specifications</code> <code>and(…)</code> <code>Specifications</code> ，该类提供<code>and(…)</code>和<code>or(…)</code>方法来连接原子<code>Specification</code> 。还有一个<code>where(…)</code>提供一些语法糖，以使表达式更易读。我一开始想出的用例示例如下所示：</p>
+<p>基本的存储库实施将准备<code>CriteriaQuery</code> ， <code>Root</code>和<code>CriteriaBuilder</code>为你，申请<code>Predicate</code>由给定创建<code>Specification</code>并执行查询。但是我们不能仅仅创建简单的查询方法来实现这一目标吗？正确，但请记住我们的第二个初始要求。我们希望能够自由组合原子<code>Specification</code>即时创建新的。为此，我们有一个帮助班<code>Specifications</code>提供<code>and(…)</code>和<code>or(…)</code>原子级联的方法<code>Specification</code> s。还有一个<code>where(…)</code>提供一些语法糖以使表达式更易读。我一开始想出的用例示例如下所示：</p>
 <pre><code class="prettyprint java">customerRepository.findAll(where(customerHasBirthday()).and(isLongTermCustomer()));
 </code></pre>
-<p>与仅使用JPA Criteria API相比，它读起来很流利，提高了可读性并提供了更多的灵活性。这里唯一需要注意的是，提出<code>Specification</code>实现需要相当多的编码工作。</p>
+<p>与仅使用JPA Criteria API相比，它读起来很流利，提高了可读性并提供了更多的灵活性。这里唯一需要注意的是<code>Specification</code>实现需要相当多的编码工作。</p>
 <a name="querydsl"></a>
 <h3>查询查询</h3>
 <p>为了<a href="http://www.querydsl.com">消除</a>这种痛苦，一个名为<a href="http://www.querydsl.com">Querydsl</a>的开源项目提出了一种非常相似但又不同的方法。就像JPA Criteria API一样，它使用Java 6注释处理器来生成元模型对象，但会生成更易于接近的API。关于该项目的另一个很酷的事情是，它不仅支持JPA，而且还允许查询Hibernate，JDO，Lucene，JDBC甚至普通集合。</p>
-<p>因此，要启动并运行它，请将Querydsl添加到<code>pom.xml</code>并相应地配置APT插件。</p>
+<p>因此，要启动并运行它，请将Querydsl添加到您的<code>pom.xml</code>并相应地配置APT插件。</p>
 <pre><code class="prettyprint xml"><plugin>
   <groupId>com.mysema.maven</groupId>
   <artifactId>maven-apt-plugin</artifactId>
@@ -271,13 +277,13 @@ customerRepository.findAll(isLongTermCustomer());
   </executions>
 </plugin>
 </code></pre>
-<p>这将导致您的构建在本例中的同一包内创建特殊的查询类<code>QCustomer</code> 。</p>
+<p>这将导致您的版本创建特殊的查询类- <code>QCustomer</code>在我们的情况下，在相同的包装内</p>
 <pre><code class="prettyprint java">QCustomer customer = QCustomer.customer;
 LocalDate today = new LocalDate();
 BooleanExpression customerHasBirthday = customer.birthday.eq(today);
 BooleanExpression isLongTermCustomer = customer.createdAt.lt(today.minusYears(2));
 </code></pre>
-<p>这不仅开箱即用，而且几乎不流利的英语，而且<code>BooleanExpression</code>甚至可以在不进行进一步包装的情况下重新使用，这使我们摆脱了额外的（而且实施起来有点难看） <code>Specification</code>包装器。还有一个好处是，您可以在分配的右侧每个点获得IDE代码完成，因此， <code>customer. + CTRL + SPACE</code>将列出所有属性。 <code>customer.birthday. + CTRL + SPACE</code>将列出所有可用的关键字，依此类推。要执行Querydsl谓词，您只需让您的存储库扩展<code>QueryDslPredicateExecutor</code> ：</p>
+<p>这不仅开箱即用，流利的英语<code>BooleanExpression</code>甚至可以在不进行进一步包装的情况下重复使用s，这使我们摆脱了额外的包装（实现起来有点难看） <code>Specification</code>包装纸。另一个优点是，您可以在分配的右侧的每个点处获得IDE代码完成，因此<code>customer. + CTRL + SPACE</code>将列出所有属性。 <code>customer.birthday. + CTRL + SPACE</code>会列出所有可用的关键字，依此类推。要执行Querydsl谓词，您只需让您的存储库扩展<code>QueryDslPredicateExecutor</code> ：</p>
 <pre><code class="prettyprint java">public interface CustomerRepository extends JpaRepository<Customer>, QueryDslPredicateExecutor {
   // Your query methods here
 }
@@ -293,7 +299,8 @@ customerRepository.findAll(customerHasBirthday.and(isLongTermCustomer));
 <p>关于Querydsl方法的另一件很酷的事情是，它不仅可用于我们的JPA存储库，而且也可用于我们的MongoDB支持。该功能已包含在Spring Data MongoDB的刚刚发布的M2版本中。除此之外， <a href="http://www.cloudfoundry.com/">CloudFoundry</a>平台还支持Spring Data的Mongo和JPA模块。请参阅<a href="https://github.com/SpringSource/cloudfoundry-samples/wiki">cloudfoundry-samples Wiki</a> ，以了解Spring Data和CloudFoundry的入门。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 412;
 
       (function(disqus_shortname, document) {
@@ -307,7 +314,8 @@ customerRepository.findAll(customerHasBirthday.and(isLongTermCustomer));
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -345,12 +353,14 @@ customerRepository.findAll(customerHasBirthday.and(isLongTermCustomer));
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

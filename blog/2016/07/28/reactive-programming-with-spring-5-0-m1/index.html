@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring 5.0 M1的反应式编程</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Reactive Programming with Spring 5.0 M1">
-<meta name="twitter:description" content="<p>As Juergen mentioned in his Spring Framework 5 M1 <a href=" https:="" ="" spring.io="" blog="" 2016="" 07="" 28="" spring-framework-5-0-m1-release="="></head><body dir="ltr">release announcement our Spring Reactive initiative has been merged into Spring Framework proper preserving all contributions and its full history over more than a year.
+<meta name="twitter:description" content="<p>As Juergen mentioned in his Spring Framework 5 M1 <a href=" https:="" ="" spring.io="" blog="" 2016="" 07="" 28="" spring-framework-5-0-m1-release="="></head><body >release announcement our Spring Reactive initiative has been merged into Spring Framework proper preserving all contributions and its full history over more than a year.
 <h2><a href="#what-is-it" class="anchor" name="what-is-it"></a>What is it?</h2>
 <p>In a nutshell reactive programming is about non-blocking, event-driven applications that scale with a small number of threads with backpressure as a key ingredient that aims to ensure producers do not overwhelm consumers. The <a href="https://github.com/reactive-streams/reactive-streams-jvm">Reactive Streams specification</a> (also adopted in Java 9) enables the ability to communicate demand across layers and libraries from different providers. For example an HTTP connection writing to a client can communicate its availability to write all the way upstream to a data repository fetching data from a database so that given a slow HTTP client the repository can slow down too or even pause. For a more extensive introduction to reactive programming check Dave Syer’s multipart series <a href="https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape">“Notes on Reactive Programming”</a>.</p>
 ">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -172,28 +178,29 @@
 </header>
 <div class="blog--post"><p>正如Juergen在他的Spring Framework 5 M1 <a href="https://spring.io/blog/2016/07/28/spring-framework-5-0-m1-released">发布公告中</a>提到的那样，我们的Spring Reactive计划已被合并到Spring Framework中，以保留所有的贡献和超过一年的全部历史。</p><h2><a href="#what-is-it" class="anchor" name="what-is-it"></a>它是什么？</h2>
 <p>简而言之，反应式编程是关于无阻塞，事件驱动的应用程序，该应用程序以少量线程进行扩展，并带有背压作为关键成分，旨在确保生产者不会压倒消费者。<a href="https://github.com/reactive-streams/reactive-streams-jvm">Reactive Streams规范</a> （也在Java 9中采用）使能够跨不同提供商的层和库传达需求。例如，写给客户端的HTTP连接可以传达其可用性，以一直向上游写入数据存储库，从而从数据库中获取数据，从而在HTTP客户端速度慢的情况下，存储库也可能变慢甚至暂停。有关反应式编程的更广泛介绍，请参阅Dave Syer的多部分系列文章<a href="https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape">“关于反应式编程的说明”</a> 。</p>
-<p>从命令式逻辑切换到非阻塞式逻辑时的一个实际挑战是组合异步逻辑的能力，而又不会迷失在“回调地狱”中。我们需要的那种API的一个很好的例子是Java 8中的<code>CompletionStage</code>和<code>Stream</code> API。但是， <code>Stream</code>实际上是为Collections构建的，并不适合无限或延迟敏感的序列，例如我们在非阻塞I / O和事件驱动的应用程序中经常遇到的序列。<a href="https://projectreactor.io/">Reactor</a>及其即将发布的3.0 GA版本是Reactive Streams实现的一种，它扩展了具有<code>Flux</code>和<code>Mono</code> API类型的Reactive Streams <code>Publisher</code> ，提供了类似于Java 8 Stream的声明性成分API，但与<a href="http://reactivex.io/">ReactiveX</a>模式更广泛且更具可比性。有关此内容的更多信息，请参见Sebastien Deleuze的<a href="https://spring.io/blog/2016/04/19/understanding-reactive-types">“了解反应类型”</a> 。</p><h2><a href="#what-rsquo-s-in-the-box" class="anchor" name="what-rsquo-s-in-the-box"></a>这箱子里有什么东西？</h2>
-<p>Spring Framework 5包含响应式流和Reactor，以用于其自身的响应式使用以及其许多核心API。 M1版本提供与JSON（Jackson）和XML（JAXB）之间的反应性序列化和反序列化，支持<code>@Controller</code>编程模型的反应性Web框架和反应性<code>WebClient</code> 。支持微服务，分散/收集，数据摄取等的输入和输出流方案变得容易。</p>
+<p>从命令式逻辑切换到非阻塞式逻辑时的一个实际挑战是组合异步逻辑的能力，而又不会迷失在“回调地狱”中。我们需要的API的一个很好的例子是<code>CompletionStage</code>和<code>Stream</code> Java 8中的API。然而<code>Stream</code>是真正为Collections构建的，不适用于无限或延迟敏感的序列，例如我们在非阻塞I / O和事件驱动的应用程序中经常遇到的序列。<a href="https://projectreactor.io/">Reactor</a>及其即将发布的3.0 GA版本是Reactive Streams的实现，它扩展了Reactive Streams <code>Publisher</code>与<code>Flux</code>和<code>Mono</code> API类型提供了类似于Java 8 Stream的声明性成分API，但功能更广泛，与<a href="http://reactivex.io/">ReactiveX</a>模式更可比。有关此内容的更多信息，请参见Sebastien Deleuze的<a href="https://spring.io/blog/2016/04/19/understanding-reactive-types">“了解反应类型”</a> 。</p><h2><a href="#what-rsquo-s-in-the-box" class="anchor" name="what-rsquo-s-in-the-box"></a>这箱子里有什么东西？</h2>
+<p>Spring Framework 5包含响应式流和Reactor，以用于其自身的响应式使用以及其许多核心API。 M1版本提供与JSON（Jackson）和XML（JAXB）之间的反应性序列化和反序列化，该反应性Web框架支持<code>@Controller</code>编程模型和反应式<code>WebClient</code> 。支持微服务，分散/收集，数据摄取等的输入和输出流方案变得容易。</p>
 <p>下面是一个控制器，该控制器以完全非阻塞和反应性的方式从远程服务器获取并传输数据：</p>
-<pre><code class="prettyprint java">@GetMapping("/accounts/{id}/alerts")
-public Flux<Alert> getAccountAlerts(@PathVariable Long id) {
+<pre><code class="prettyprint java">@GetMapping(&quot;/accounts/{id}/alerts&quot;)
+public Flux&lt;Alert&gt; getAccountAlerts(@PathVariable Long id) {
 
   return this.repository.getAccount(id)
-      .flatMap(account ->
+      .flatMap(account -&gt;
           this.webClient
-              .perform(get("/alerts/{key}", account.getKey()))
+              .perform(get(&quot;/alerts/{key}&quot;, account.getKey()))
               .extract(bodyStream(Alert.class)));
 }
 </code></pre>
-<p>什么是支持此的反应堆？Spring Web Reactive生活在现有（并很受欢迎！）旁边的新<code>spring-web-reactive</code>模块中。<code>spring-webmvc</code>在<code>spring-webmvc</code>模块中的Spring Web MVC。这两个模块共享许多算法和机制，但实际上不能共享任何代码。这是因为Spring Web Reactive在Reactive Streams HTTP适配器层上运行，该适配器层在HTTP运行时一直是完全非阻塞和反应式的。因此，虽然Spring MVC是为Servlet容器构建并运行的，但Spring Web Reactive也可以在非Servlet运行时（例如Netty和Undertow）上运行</p><h2><a href="#spring-web-reactive-vs-spring-web-mvc" class="anchor" name="spring-web-reactive-vs-spring-web-mvc"></a> Spring Web反应式与Spring Web MVC</h2>
-<p>此时，Spring框架团队如何看待您可能想知道的这两个框架，我们建议您使用什么？首先，我们的目标是在理性范围内保持最大的一致性。<code>@Controller</code>编程模型和反应方式之间根本没有不兼容的地方。这是所有关于什么情况下支持该模型，以便在表面上有不同的实现无功类型，如全面支持没有区别<code>Flux</code>和<code>Mono</code>和<code>Observable</code>和<code>Single</code>从RxJava无论是输入和输出。</p>
+<p>什么是支持此的反应堆？Spring Web Reactive生活在新环境中<code>spring-web-reactive</code>现有的模块旁边（并很受欢迎！）驻留在<code>spring-webmvc</code>模块。这两个模块共享许多算法和机制，但实际上不能共享任何代码。这是因为Spring Web Reactive在Reactive Streams HTTP适配器层上运行，该适配器层在HTTP运行时一直是完全非阻塞和反应式的。因此，尽管Spring MVC是为Servlet容器构建并运行的，但Spring Web Reactive也可以在非Servlet运行时（例如Netty和Undertow）上运行</p><h2><a href="#spring-web-reactive-vs-spring-web-mvc" class="anchor" name="spring-web-reactive-vs-spring-web-mvc"></a> Spring Web反应式与Spring Web MVC</h2>
+<p>此时，Spring框架团队如何看待您可能想知道的这两个框架，我们建议您使用什么？首先，我们的目标是在理性范围内保持最大的一致性。两者之间没有什么根本不兼容的地方<code>@Controller</code>编程模型和反应方式。这是关于在支持该模型的情况下发生的一切的原因，因此在表面上除了完全支持诸如<code>Flux</code>和<code>Mono</code>和<code>Observable</code>和<code>Single</code>来自RxJava的输入和输出。</p>
 <p>Spring Web Reactive是否比Spring MVC更好？Spring Framework反应式支持的最大价值主张以及我们独特的定位是，我们不会将现有的应用程序抛在后面。在Spring 5中，传统的Spring MVC可以在任何Servlet 3.1堆栈上运行，包括Java EE 7服务器。对于Spring Web Reactive，我们毫不妥协地支持Tomcat，Jetty，Undertow和Netty，并且还可以适应任何Servlet 3.1容器。我们计划在共享算法和机制方面继续Spring MVC和Spring Web Reactive之间的协同作用，以支持相同的编程模型。Spring MVC方面的改进请求或错误报告将使Spring Web Reactive受益，反之亦然。</p>
-<p>这意味着开发人员可以选择更适合您目的的东西。如果有人告诉你同步或阻塞是邪恶的，那就换种方式。并非如此，实际上这是一个权衡。命令式逻辑易于编写且易于调试。当然，它不能很好地扩展规模或效率，但这就是权衡的地方。在很多情况下，当务之急是必须满足当务之急，而在其他情况下则必须采用反应性和非阻塞性。在微服务场景中，您甚至可以为每个服务选择实现样式，所有这些都在相同的一致编程模型内进行。</p><h2><a href="#giving-it-a-try" class="anchor" name="giving-it-a-try"></a>试试看</h2>
+<p>这意味着开发人员可以根据自己的目的选择更好的选择。如果有人告诉你同步或阻塞是邪恶的，那就换种方式。并非如此，实际上这是一个权衡。命令式逻辑易于编写且易于调试。当然，它不能很好地扩展规模或效率，但这就是权衡的地方。在很多情况下，当务之急是必须满足当务之急，而在其他情况下则必须采用反应性和非阻塞性。在微服务场景中，您甚至可以为每个服务选择实现样式，所有这些都在相同的一致编程模型内进行。</p><h2><a href="#giving-it-a-try" class="anchor" name="giving-it-a-try"></a>试试看</h2>
 <p>有关更多详细信息和入门，请参阅Spring Boot <a href="https://github.com/bclozel/spring-boot-web-reactive">反应式Web入门</a>和参考文档中的<a href="https://docs.spring.io/spring/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/htmlsingle/#web-reactive">新章节</a> 。</p>
 <p>最后但并非最不重要的一点是，我希望您能加入我们在<a href="https://springoneplatform.io/">SpringOne Platform 2016</a>上的活动，在该会议上我们将进行主题演讲并就此主题进行许多会议。拉斯维加斯见！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2573;
 
       (function(disqus_shortname, document) {
@@ -207,7 +214,8 @@ public Flux<Alert> getAccountAlerts(@PathVariable Long id) {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -245,12 +253,14 @@ public Flux<Alert> getAccountAlerts(@PathVariable Long id) {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

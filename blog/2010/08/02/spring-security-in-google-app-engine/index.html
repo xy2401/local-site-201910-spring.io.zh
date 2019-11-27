@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Google App Engine中的Spring Security</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -63,14 +67,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2010-08-02 09:58:00.0">
 </head>
-<body>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -196,11 +202,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Spring Security以高度可定制性而闻名，因此，在我第一次尝试使用Google App Engine时，我决定创建一个简单的应用程序，该应用程序将通过实现一些核心Spring Security接口来探索GAE功能的使用。在本文中，我们将看到如何：<br></p><ul><br> <li>使用Google帐户进行身份验证。</li><br> <li>用户访问安全资源时，实施“按需”身份验证。</li><br> <li>使用特定于应用程序的角色补充来自Google帐户的信息。</li><br> <li>使用本机API将用户帐户数据存储在App Engine数据存储区中。</li><br> <li>根据分配给用户的角色设置访问控制限制。</li><br> <li>禁用特定用户的帐户以阻止访问。</li><br></ul><p></p><p>您应该已经熟悉将应用程序部署到GAE。建立基本应用程序并不需要花费太多时间，您可以在<a href="https://code.google.com/appengine">GAE网站</a>上找到许多指导。</p>
-<h3>样品申请</h3><p>该应用程序非常简单，是使用Spring MVC构建的。在应用程序根目录中部署了一个欢迎页面，您可以进入“主页”，但只有在对应用程序进行身份验证和注册之后。您可以在<a href="https://gaespringsec.appspot.com/">此处</a>试用在GAE中部署的版本。</p><p>注册用户存储为GAE数据存储实体。首次认证时，新用户将被重定向到注册页面，他们可以在其中输入其名称。注册后，用户帐户可以在数据存储区中标记为“已禁用”，即使通过GAE进行了身份验证，也将不允许用户使用该应用程序。</p>
+<div class="blog--post"><p>Spring Security以高度可定制性而闻名，因此，在我第一次尝试使用Google App Engine时，我决定创建一个简单的应用程序，该应用程序将通过实现一些核心Spring Security接口来探索GAE功能的使用。在本文中，我们将看到如何：<br></p><ul><br> <li>使用Google帐户进行身份验证。</li><br> <li>用户访问安全资源时，实施“按需”身份验证。</li><br> <li>使用特定于应用程序的角色补充来自Google帐户的信息。</li><br> <li>使用本机API将用户帐户数据存储在App Engine数据存储区中。</li><br> <li>根据分配给用户的角色设置访问控制限制。</li><br> <li>禁用特定用户的帐户以阻止访问。</li><br></ul><p></p><p>您应该已经熟悉将应用程序部署到GAE。建立基本应用程序并不需要花费太多时间，您可以在<a href="https://code.google.com/appengine">GAE网站</a>上找到很多指导。</p>
+<h3>样品申请</h3><p>该应用程序非常简单，是使用Spring MVC构建的。在应用程序根目录中部署了一个欢迎页面，您可以进入“主页”，但只有在对应用程序进行身份验证和注册后才能进入。您可以在<a href="https://gaespringsec.appspot.com/">此处</a>试用在GAE中部署的版本。</p><p>注册用户存储为GAE数据存储实体。首次验证时，新用户将被重定向到注册页面，他们可以在其中输入其名称。注册后，用户帐户可以在数据存储区中标记为“已禁用”，即使通过GAE进行了身份验证，也将不允许用户使用该应用程序。</p>
 <h3>春季安全背景</h3><p>我们假设您已经熟悉Spring Security的名称空间配置，并且理想情况下对核心接口及其交互方式有所了解。基本内容在参考手册的“ <a href="http://static.springsource.org/spring-security/site/docs/3.1.x/reference/technical-overview.html">技术概述”</a>一章中介绍。如果您还熟悉Spring Security的内部知识，那么您将知道Web身份验证机制（例如基于表单的登录）是使用Servlet <tt>Filter</tt>和<tt>AuthenticationEntryPoint实现的</tt> 。当匿名用户尝试访问安全资源并且过滤器从后续请求（例如，提交登录表单）中提取身份验证信息，对用户进行身份验证并为用户会话建立安全上下文时， <tt>AuthenticationEntryPoint会</tt>驱动身份验证过程。</p><p>过滤器将身份验证决策委派给<tt>AuthenticationManager</tt> ，后者配置了<tt>AuthenticationProvider</tt> bean列表，其中任何一个都可以对用户进行身份验证，或者在身份验证失败时引发异常。</p><p>对于基于表单的登录， <tt>AuthenticationEntryPoint</tt>只是将用户重定向到登录页面。身份验证过滤器（在这种情况下为<tt>UsernamePasswordAuthenticationFilter</tt> ）从提交的POST请求中提取用户名和密码。它们存储在<tt>Authentication</tt>对象中，并传递给<tt>AuthenticationProvider</tt> ，后者通常会将用户的密码与存储在数据库或LDAP服务器中的密码进行比较。</p><p>这是组件之间的基本交互。这如何适用于GAE应用程序？</p>
-<h2>Google帐户验证</h2><p>当然，没有什么可以阻止您在GAE中部署标准的Spring Security应用程序（当然没有JDBC支持），但是如果您想利用GAE提供的API来允许用户通过其通常的Google登录名进行身份验证，该怎么办？这实际上非常简单，并且大部分工作由GAE的<a href="https://code.google.com/appengine/docs/java/javadoc/com/google/appengine/api/users/UserService.html">UserService</a>处理，该服务具有一种用于生成外部登录URL的方法。您提供了一个目的地，用户通过身份验证后将返回该目的地，从而使他们能够继续使用该应用程序。我们可以使用它在网页中呈现登录链接，但是我们也可以在自定义<tt>AuthenticationEntryPoint中</tt>直接重定向到它：</p>
-<pre><code class="prettyprint java"><br>import com.google.appengine.api.users.UserService;
+<h2>Google帐户验证</h2><p>当然，没有什么可以阻止您在GAE中部署标准的Spring Security应用程序（当然没有JDBC支持），但是如果您想利用GAE提供的API来允许用户通过其通常的Google登录名进行身份验证，该怎么办？这实际上非常简单，大部分工作由GAE的<a href="https://code.google.com/appengine/docs/java/javadoc/com/google/appengine/api/users/UserService.html">UserService</a>处理，该服务具有一种用于生成外部登录URL的方法。您提供了一个目的地，用户通过身份验证后将返回该目的地，从而使他们能够继续使用该应用程序。我们可以使用它来呈现网页中的登录链接，但是我们也可以在自定义<tt>AuthenticationEntryPoint中</tt>直接重定向到它：</p>
+<pre><code class="prettyprint java"><br />import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 public class GoogleAccountsAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -212,23 +218,23 @@ public class GoogleAccountsAuthenticationEntryPoint implements AuthenticationEnt
   }
 }
 </code></pre><p>如果我们使用Spring Security名称空间为此目的提供的特定钩子将其添加到配置中，我们将具有以下内容：</p>
-<pre><code class="prettyprint xml"><br><b:beans xmlns="http://www.springframework.org/schema/security"
-        xmlns:b="http://www.springframework.org/schema/beans"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+<pre><code class="prettyprint xml"><br />&lt;b:beans xmlns=&quot;http://www.springframework.org/schema/security&quot;
+        xmlns:b=&quot;http://www.springframework.org/schema/beans&quot;
+        xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+        xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd&quot;&gt;
 
-    <http use-expressions="true" entry-point-ref="gaeEntryPoint">
-        <intercept-url pattern="/" access="permitAll" />
-        <intercept-url pattern="/**" access="hasRole('USER')" />
-    </http>
+    &lt;http use-expressions=&quot;true&quot; entry-point-ref=&quot;gaeEntryPoint&quot;&gt;
+        &lt;intercept-url pattern=&quot;/&quot; access=&quot;permitAll&quot; /&gt;
+        &lt;intercept-url pattern=&quot;/**&quot; access=&quot;hasRole(&#39;USER&#39;)&quot; /&gt;
+    &lt;/http&gt;
 
-    <b:bean id="gaeEntryPoint" class="samples.gae.security.GoogleAccountsAuthenticationEntryPoint" />
+    &lt;b:bean id=&quot;gaeEntryPoint&quot; class=&quot;samples.gae.security.GoogleAccountsAuthenticationEntryPoint&quot; /&gt;
     ...
-</b:beans>
-</code></pre><p>在这里，我们将所有URL配置为要求具有“ USER”角色，但webapp根目录除外。首次尝试访问任何其他页面时，用户将被重定向到Google帐户登录屏幕：<br></p><p style="text-align:center"><img class="aligncenter" src="http://blog.springsource.com/wp-content/uploads/2010/07/gaelogin.jpg" alt="Google App Engine登录页面" width="609" height="520" align="center" style="border:1px solid lightgray"></p><br>现在，我们需要添加filter bean，当通过GAE登录Google帐户将用户重定向回我们的网站时，该bean将设置安全上下文。这是认证过滤器代码：<p></p>
-<pre><code class="prettyprint java"><br>public class GaeAuthenticationFilter extends GenericFilterBean {
-  private static final String REGISTRATION_URL = "/register.htm";
+&lt;/b:beans&gt;
+</code></pre><p>在这里，我们配置了所有URL以要求具有“ USER”角色，但webapp根目录除外。首次尝试访问任何其他页面时，用户将被重定向到Google帐户登录屏幕：<br></p><p style="text-align:center"><img class="aligncenter" src="http://blog.springsource.com/wp-content/uploads/2010/07/gaelogin.jpg" alt="Google App Engine登录页面" width="609" height="520" align="center" style="border:1px solid lightgray"></p><br>现在，我们需要添加filter bean，当通过GAE登录Google帐户将用户重定向回我们的网站时，该bean将设置安全上下文。这是认证过滤器代码：<p></p>
+<pre><code class="prettyprint java"><br />public class GaeAuthenticationFilter extends GenericFilterBean {
+  private static final String REGISTRATION_URL = &quot;/register.htm&quot;;
   private AuthenticationDetailsSource ads = new WebAuthenticationDetailsSource();
   private AuthenticationManager authenticationManager;
   private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
@@ -237,7 +243,7 @@ public class GoogleAccountsAuthenticationEntryPoint implements AuthenticationEnt
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     if (authentication == null) {
-      // User isn't authenticated. Check if there is a Google Accounts user
+      // User isn&#39;t authenticated. Check if there is a Google Accounts user
       User googleUser = UserServiceFactory.getUserService().getCurrentUser();
 
       if (googleUser != null) {
@@ -273,27 +279,27 @@ public class GoogleAccountsAuthenticationEntryPoint implements AuthenticationEnt
     this.failureHandler = failureHandler;
   }
 }
-</code></pre><p>我们从头开始实现了过滤器，使其更易于理解，并避免了从现有类继承的复杂性。如果当前未经身份验证的用户（从Spring Security的角度来看），则过滤器会检查是否存在GAE用户（再次使用GAE <tt>UserService</tt> ）。如果找到一个，则将其打包到合适的身份验证令牌对象中（为方便起见，此处使用Spring Security的<tt>PreAuthenticatedAuthenticationToken</tt> ），并将其传递给<tt>AuthenticationManager</tt> ，以由Spring Security进行身份验证。此时，新用户将重定向到注册页面。</p>
+</code></pre><p>我们从头开始实现了过滤器，使其更易于理解，并避免了从现有类继承的复杂性。如果用户当前未经身份验证（从Spring Security的角度来看），则过滤器将检查GAE用户的存在（再次使用GAE <tt>UserService</tt> ）。如果找到一个，则将其打包到合适的身份验证令牌对象中（为方便起见，此处使用Spring Security的<tt>PreAuthenticatedAuthenticationToken</tt> ），并将其传递给<tt>AuthenticationManager</tt> ，以由Spring Security进行身份验证。此时，新用户将重定向到注册页面。</p>
 <h4>自定义身份验证提供程序</h4><p>在这种情况下，我们不是按照传统的方式来确定用户身份，即确定他们是否是他们声称的身份。Google帐户已经解决了这一问题。从应用程序的角度来看，我们仅对检查用户是否为有效用户感兴趣。这种情况类似于将Spring Security与单点登录系统（如CAS或OpenID）一起使用。身份验证提供程序需要检查用户的帐户状态并加载任何其他信息（例如，特定于应用程序的角色）。在我们的示例中，我们还具有以前未使用过该应用程序的“未注册”用户的概念。如果应用程序未知用户，则将为他们分配一个临时的“ NEW_USER”角色，该角色仅允许他们访问注册URL。注册后，将为他们分配“用户”角色。</p><p><tt>AuthenticationProvider</tt>实现与<tt>UserRegistry</tt>进行交互，以存储和检索<tt>GaeUser</tt>对象（均针对此示例）：</p>
-<pre><code class="prettyprint java"><br>public interface UserRegistry {
+<pre><code class="prettyprint java"><br />public interface UserRegistry {
   GaeUser findUser(String userId);
   void registerUser(GaeUser newUser);
   void removeUser(String userId);
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>public class GaeUser implements Serializable {
+<pre><code class="prettyprint java"><br />public class GaeUser implements Serializable {
   private final String userId;
   private final String email;
   private final String nickname;
   private final String forename;
   private final String surname;
-  private final Set<AppRole> authorities;
+  private final Set&lt;AppRole&gt; authorities;
   private final boolean enabled;
 
 // Constructors and accessors omitted
 ...
 </code></pre><p><tt>userId</tt>是Google帐户分配的唯一ID。电子邮件和昵称也可以从GAE用户那里获得。在注册表格中输入姓氏和姓氏。除非已通过GAE数据存储区管理控制台直接对其进行了修改，否则将启用标志设置为“ true”。<tt>AppRole</tt>是Spring Security的<tt>GrantedAuthority</tt>作为枚举的实现：</p>
-<pre><code class="prettyprint java"><br>public enum AppRole implements GrantedAuthority {
+<pre><code class="prettyprint java"><br />public enum AppRole implements GrantedAuthority {
     ADMIN (0),
     NEW_USER (1),
     USER (2);
@@ -309,7 +315,7 @@ public class GoogleAccountsAuthenticationEntryPoint implements AuthenticationEnt
     }
 }
 </code></pre><p>如上所述分配角色。然后， <tt>AuthenticationProvider</tt>如下所示：</p>
-<pre><code class="prettyprint java"><br>public class GoogleAccountsAuthenticationProvider implements AuthenticationProvider {
+<pre><code class="prettyprint java"><br />public class GoogleAccountsAuthenticationProvider implements AuthenticationProvider {
     private UserRegistry userRegistry;
 
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -323,13 +329,13 @@ public class GoogleAccountsAuthenticationEntryPoint implements AuthenticationEnt
         }
 
         if (!user.isEnabled()) {
-            throw new DisabledException("Account is disabled");
+            throw new DisabledException(&quot;Account is disabled&quot;);
         }
 
         return new GaeUserAuthentication(user, authentication.getDetails());
     }
 
-    public final boolean supports(Class<?> authentication) {
+    public final boolean supports(Class&lt;?&gt; authentication) {
         return PreAuthenticatedAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
@@ -339,19 +345,19 @@ public class GoogleAccountsAuthenticationEntryPoint implements AuthenticationEnt
 }
 </code></pre><p><tt>GaeUserAuthentication</tt>类是Spring Security的<tt>Authentication</tt>接口的非常简单的实现，该接口以<tt>GaeUser</tt>对象为主体。<br>如果您之前已经自定义了Spring Security，您可能想知道为什么我们在这里一点都没有实现<tt>UserDetailsService</tt> ，以及为什么委托人不是<tt>UserDetails</tt>实例。简单的答案是您不必-Spring Security通常不介意对象的类型是什么，在这里我们选择直接将<tt>AuthenticationProvider</tt>接口作为最简单的选项来实现。</p>
 <h3>GAE数据源用户注册表</h3><p>现在，我们需要使用GAE数据存储区的<tt>UserRegistry</tt>的实现。</p>
-<pre><code class="prettyprint java"><br>import com.google.appengine.api.datastore.*;
+<pre><code class="prettyprint java"><br />import com.google.appengine.api.datastore.*;
 import org.springframework.security.core.GrantedAuthority;
 import samples.gae.security.AppRole;
 import java.util.*;
 
 public class GaeDatastoreUserRegistry implements UserRegistry {
-    private static final String USER_TYPE = "GaeUser";
-    private static final String USER_FORENAME = "forename";
-    private static final String USER_SURNAME = "surname";
-    private static final String USER_NICKNAME = "nickname";
-    private static final String USER_EMAIL = "email";
-    private static final String USER_ENABLED = "enabled";
-    private static final String USER_AUTHORITIES = "authorities";
+    private static final String USER_TYPE = &quot;GaeUser&quot;;
+    private static final String USER_FORENAME = &quot;forename&quot;;
+    private static final String USER_SURNAME = &quot;surname&quot;;
+    private static final String USER_NICKNAME = &quot;nickname&quot;;
+    private static final String USER_EMAIL = &quot;email&quot;;
+    private static final String USER_ENABLED = &quot;enabled&quot;;
+    private static final String USER_AUTHORITIES = &quot;authorities&quot;;
 
     public GaeUser findUser(String userId) {
         Key key = KeyFactory.createKey(USER_TYPE, userId);
@@ -361,10 +367,10 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
             Entity user = datastore.get(key);
 
             long binaryAuthorities = (Long)user.getProperty(USER_AUTHORITIES);
-            Set<AppRole> roles = EnumSet.noneOf(AppRole.class);
+            Set&lt;AppRole&gt; roles = EnumSet.noneOf(AppRole.class);
 
             for (AppRole r : AppRole.values()) {
-                if ((binaryAuthorities & (1 << r.getBit())) != 0) {
+                if ((binaryAuthorities &amp; (1 &lt;&lt; r.getBit())) != 0) {
                     roles.add(r);
                 }
             }
@@ -381,7 +387,7 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
             return gaeUser;
 
         } catch (EntityNotFoundException e) {
-            logger.debug(userId + " not found in datastore");
+            logger.debug(userId + &quot; not found in datastore&quot;);
             return null;
         }
     }
@@ -395,12 +401,12 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
         user.setProperty(USER_SURNAME, newUser.getSurname());
         user.setUnindexedProperty(USER_ENABLED, newUser.isEnabled());
 
-        Collection<? extends GrantedAuthority> roles = newUser.getAuthorities();
+        Collection&lt;? extends GrantedAuthority&gt; roles = newUser.getAuthorities();
 
         long binaryAuthorities = 0;
 
         for (GrantedAuthority r : roles) {
-            binaryAuthorities |= 1 << ((AppRole)r).getBit();
+            binaryAuthorities |= 1 &lt;&lt; ((AppRole)r).getBit();
         }
 
         user.setUnindexedProperty(USER_AUTHORITIES, binaryAuthorities);
@@ -418,7 +424,7 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
 }
 </code></pre><p>正如我们已经提到的，该示例对应用程序角色使用一个枚举。分配给用户的角色（权限）存储为<tt>EnumSet</tt> 。<tt>EnumSet</tt>的资源利用率很高，并且用户的角色可以存储为单个<tt>long</tt>值，从而可以更轻松地与数据存储区API进行交互。为此，我们为每个角色分配了单独的“位”属性。</p>
 <h3>用户注册</h3><p>用户注册控制器包含以下方法，用于处理注册表单的提交。</p>
-<pre><code class="prettyprint java"><br>    @Autowired
+<pre><code class="prettyprint java"><br />    @Autowired
     private UserRegistry registry;
 
     @RequestMapping(method = RequestMethod.POST)
@@ -429,7 +435,7 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         GaeUser currentUser = (GaeUser)authentication.getPrincipal();
-        Set<AppRole> roles = EnumSet.of(AppRole.USER);
+        Set&lt;AppRole&gt; roles = EnumSet.of(AppRole.USER);
 
         if (UserServiceFactory.getUserService().isUserAdmin()) {
             roles.add(AppRole.ADMIN);
@@ -443,37 +449,38 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
         // Update the context with the full authentication
         SecurityContextHolder.getContext().setAuthentication(new GaeUserAuthentication(user, authentication.getDetails()));
 
-        return "redirect:/home.htm";
+        return &quot;redirect:/home.htm&quot;;
     }
 </code></pre><p>使用提供的姓氏和姓氏创建用户，并创建一组新的角色。如果GAE指示当前用户是该应用程序的管理员，则该名称也可能包含“ ADMIN”角色。然后将其存储在用户注册表中，并用更新的<tt>Authentication</tt>对象填充安全上下文，以确保Spring Security知道新的角色信息并相应地应用其访问控制约束。</p>
 <h2>最终应用程序配置</h2><p>现在，安全应用程序上下文如下所示：</p>
-<pre><code class="prettyprint xml"><br>    <http use-expressions="true" entry-point-ref="gaeEntryPoint">
-        <intercept-url pattern="/" access="permitAll" />
-        <intercept-url pattern="/register.htm*" access="hasRole('NEW_USER')" />
-        <intercept-url pattern="/**" access="hasRole('USER')" />
-        <custom-filter position="PRE_AUTH_FILTER" ref="gaeFilter" />
-    </http>
+<pre><code class="prettyprint xml"><br />    &lt;http use-expressions=&quot;true&quot; entry-point-ref=&quot;gaeEntryPoint&quot;&gt;
+        &lt;intercept-url pattern=&quot;/&quot; access=&quot;permitAll&quot; /&gt;
+        &lt;intercept-url pattern=&quot;/register.htm*&quot; access=&quot;hasRole(&#39;NEW_USER&#39;)&quot; /&gt;
+        &lt;intercept-url pattern=&quot;/**&quot; access=&quot;hasRole(&#39;USER&#39;)&quot; /&gt;
+        &lt;custom-filter position=&quot;PRE_AUTH_FILTER&quot; ref=&quot;gaeFilter&quot; /&gt;
+    &lt;/http&gt;
 
-    <b:bean id="gaeEntryPoint" class="samples.gae.security.GoogleAccountsAuthenticationEntryPoint" />
+    &lt;b:bean id=&quot;gaeEntryPoint&quot; class=&quot;samples.gae.security.GoogleAccountsAuthenticationEntryPoint&quot; /&gt;
 
-    <b:bean id="gaeFilter" class="samples.gae.security.GaeAuthenticationFilter">
-        <b:property name="authenticationManager" ref="authenticationManager"/>
-    </b:bean>
+    &lt;b:bean id=&quot;gaeFilter&quot; class=&quot;samples.gae.security.GaeAuthenticationFilter&quot;&gt;
+        &lt;b:property name=&quot;authenticationManager&quot; ref=&quot;authenticationManager&quot;/&gt;
+    &lt;/b:bean&gt;
 
-    <authentication-manager alias="authenticationManager">
-        <authentication-provider ref="gaeAuthenticationProvider"/>
-    </authentication-manager>
+    &lt;authentication-manager alias=&quot;authenticationManager&quot;&gt;
+        &lt;authentication-provider ref=&quot;gaeAuthenticationProvider&quot;/&gt;
+    &lt;/authentication-manager&gt;
 
-    <b:bean id="gaeAuthenticationProvider" class="samples.gae.security.GoogleAccountsAuthenticationProvider">
-        <b:property name="userRegistry" ref="userRegistry" />
-    </b:bean>
+    &lt;b:bean id=&quot;gaeAuthenticationProvider&quot; class=&quot;samples.gae.security.GoogleAccountsAuthenticationProvider&quot;&gt;
+        &lt;b:property name=&quot;userRegistry&quot; ref=&quot;userRegistry&quot; /&gt;
+    &lt;/b:bean&gt;
 
-    <b:bean id="userRegistry" class="samples.gae.users.GaeDatastoreUserRegistry" />
+    &lt;b:bean id=&quot;userRegistry&quot; class=&quot;samples.gae.users.GaeDatastoreUserRegistry&quot; /&gt;
 </code></pre><p>您可以看到我们已经使用<tt>custom-filter</tt>名称空间元素插入了过滤<tt>器</tt> ，声明了提供者和用户注册表，并将它们全部连接起来。我们还为注册控制器添加了一个URL，新用户可以访问该URL。</p>
 <h2>结论</h2><p>多年来，Spring Security已经证明了它足够灵活，可以在许多不同的场景中增加价值，并且在Google App Engine中进行部署也不例外。还应该记住，与尝试使用不太合适的现有类相比，亲自实现某些接口（如我们在此处所做的）通常是更好的方法。您可能最终会得到更符合您要求的更清洁的解决方案。</p><p>这里的重点是如何在启用Spring Security的应用程序中使用Google App Engine API。我们还没有介绍应用程序如何工作的所有其他细节，但是我鼓励您看一下代码，亲自看看。如果您是GAE专家，那么总是欢迎提出改进建议！</p><p>该示例代码已经在3.1代码库中，因此您可以从<a href="http://static.springsource.org/spring-security/site/build.html">我们的git repository中</a>检出它。Spring Security 3.1的第一个里程碑也应该在本月晚些时候发布。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 343;
 
       (function(disqus_shortname, document) {
@@ -487,7 +494,8 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -525,12 +533,14 @@ public class GaeDatastoreUserRegistry implements UserRegistry {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

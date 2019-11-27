@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring 3.0中的配置简化</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Configuration Simplifications in Spring 3.0">
-<meta name="twitter:description" content="<p>Second in a series of posts on “Spring 3 Simplifications” started yesterday by <a href=" http: ="" blog.springsource.com="" 2009="" 12="" 21="" mvc-simplifications-in-spring-3-0="" ="="></meta>Keith, I’d like to provide a very brief and hands-on introduction to Spring’s new <a href=" static.springsource.org spring docs 3.0.x javadoc-api org springframework context annotation Configuration.html"></head><body dir="ltr">@Configuration annotation and related support.
+<meta name="twitter:description" content="<p>Second in a series of posts on “Spring 3 Simplifications” started yesterday by <a href=" http: ="" blog.springsource.com="" 2009="" 12="" 21="" mvc-simplifications-in-spring-3-0="" ="=">Keith, I’d like to provide a very brief and hands-on introduction to Spring’s new <a href=" static.springsource.org spring docs 3.0.x javadoc-api org springframework context annotation Configuration.html"></head><body >@Configuration annotation and related support.
 <p>As those that followed the Spring JavaConfig project will know, a @Configuration-annotated class serves much the same role as a Spring XML file. It provides a code-centric way of declaring Spring bean definitions using nothing more than methods and annotations. You might call it <em>Plain Old Configuration*</em> :) This means that for simple situations, no XML will be required!</p>
 ">
 <meta name="twitter:creator" content="@cbeams">
@@ -29,7 +33,7 @@
 
 <meta property="og:title" content="Configuration Simplifications in Spring 3.0">
 <meta property="og:image" content="https://gravatar.com/avatar/1e63dcf15fa29bebc0c68bc4d28b87e6?s=200">
-<meta property="og:description" content="<p>Second in a series of posts on “Spring 3 Simplifications” started yesterday by <a href=" http: ="" blog.springsource.com="" 2009="" 12="" 21="" mvc-simplifications-in-spring-3-0="" ="="></meta>Keith, I’d like to provide a very brief and hands-on introduction to Spring’s new <a href=" static.springsource.org spring docs 3.0.x javadoc-api org springframework context annotation Configuration.html">@Configuration annotation and related support.
+<meta property="og:description" content="<p>Second in a series of posts on “Spring 3 Simplifications” started yesterday by <a href=" http: ="" blog.springsource.com="" 2009="" 12="" 21="" mvc-simplifications-in-spring-3-0="" ="=">Keith, I’d like to provide a very brief and hands-on introduction to Spring’s new <a href=" static.springsource.org spring docs 3.0.x javadoc-api org springframework context annotation Configuration.html">@Configuration annotation and related support.
 <p>As those that followed the Spring JavaConfig project will know, a @Configuration-annotated class serves much the same role as a Spring XML file. It provides a code-centric way of declaring Spring bean definitions using nothing more than methods and annotations. You might call it <em>Plain Old Configuration*</em> :) This means that for simple situations, no XML will be required!</p>
 ">
 <meta content="article" property="og:type">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,8 +174,8 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在昨天由<a href="http://blog.springsource.com/2009/12/21/mvc-simplifications-in-spring-3-0/">Keith</a>发表的有关“ Spring 3 Simplifications”的系列文章中的第二篇，我想对Spring的新<a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/context/annotation/Configuration.html">@Configuration</a>annotation和相关支持进行非常简短的动手介绍。</p><p>正如跟随Spring JavaConfig项目的人们所知道的那样，带有@Configuration注释的类的作用与Spring XML文件几乎相同。它提供了一种以代码为中心的方式声明Spring bean定义，仅使用方法和注释。您可能将其称为“ <em>普通旧配置” *</em> :)这意味着在简单情况下，不需要XML！</p><p>让我们开始吧。为了演示@Configuration功能，我在新的spring-samples SVN存储库中创建了一个<a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk">非常简单的项目</a> 。您可能需要立即进行同步并进行构建。您将需要Subversion客户端和最新版本的Maven。</p><p><code><br>svn co <a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk">https://src.springframework.org/svn/spring-samples/configuration-basic/trunk</a> configuration-basic<br>cd configuration-basic<br>mvn clean test<br>[…]<br>Tests run: 1, Failures: 0, Errors: 0, Skipped: 0</code></p><p><code>[INFO] ————————————————————————<br>[INFO] BUILD SUCCESSFUL<br>[INFO] ————————————————————————<br></code></p><p>结帐中还包括Eclipse .classpath和.project元数据，因此您可以使用<a href="http://www.springsource.com/products/sts">SpringSource Tool Suite</a>或安装了<a href="http://m2eclipse.sonatype.org/">m2eclipse插件的</a>任何最新版本的Eclipse导入项目。无论哪种情况，都可以使用文件->导入->现有项目进入工作区。</p><p>首先，让我们看一下<a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk/src/main/java/org/springframework/samples/config/basic/account/AppConfig.java">AppConfig.java</a> 。带有@Configuration注释的类的作用与基于XML的Spring应用程序中的app-config.xml相同。在审查项目时，这是一个很好的起点，因为它是对象实例在运行时如何连接和管理的“蓝图”。</p>
-<pre><code class="prettyprint java"><br>@Configuration
+<div class="blog--post"><p>在昨天由<a href="http://blog.springsource.com/2009/12/21/mvc-simplifications-in-spring-3-0/">Keith</a>发表的有关“ Spring 3 Simplifications”的系列文章中的第二篇，我想对Spring的新<a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/context/annotation/Configuration.html">@Configuration</a>注释和相关支持进行非常简短的动手介绍。</p><p>正如跟随Spring JavaConfig项目的人们所知道的那样，带有@Configuration注释的类的作用与Spring XML文件几乎相同。它提供了一种以代码为中心的方式声明Spring bean定义，仅使用方法和注释。您可能将其称为“ <em>普通旧配置” *</em> :)这意味着在简单情况下，不需要XML！</p><p>让我们开始吧。为了演示@Configuration功能，我在新的spring-samples SVN存储库中创建了一个<a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk">非常简单的项目</a> 。您可能需要立即进行同步并进行构建。您将需要Subversion客户端和最新版本的Maven。</p><p><code><br>svn co <a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk">https://src.springframework.org/svn/spring-samples/configuration-basic/trunk</a> configuration-basic<br>cd configuration-basic<br>mvn clean test<br>[…]<br>Tests run: 1, Failures: 0, Errors: 0, Skipped: 0</code></p><p><code>[INFO] ————————————————————————<br>[INFO] BUILD SUCCESSFUL<br>[INFO] ————————————————————————<br></code></p><p>结帐中还包括Eclipse .classpath和.project元数据，因此您可以使用<a href="http://www.springsource.com/products/sts">SpringSource Tool Suite</a>或安装了<a href="http://m2eclipse.sonatype.org/">m2eclipse插件的</a>任何最新版本的Eclipse导入项目。无论哪种情况，都可以使用文件->导入->现有项目进入工作区。</p><p>首先，让我们看一下<a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk/src/main/java/org/springframework/samples/config/basic/account/AppConfig.java">AppConfig.java</a> 。带有@Configuration注释的类与基于XML的Spring应用程序中的app-config.xml担当相同的角色。在审查项目时，这是一个很好的起点，因为它是对象实例在运行时如何连接和管理的“蓝图”。</p>
+<pre><code class="prettyprint java"><br />@Configuration
 public class AppConfig {
 
     public @Bean TransferService transferService() {
@@ -181,42 +187,43 @@ public class AppConfig {
     }
 
 }
-</code></pre><p>当然，这是一个琐碎的应用程序示例，甚至没有真正的JDBC DataSource。没关系，本文的目的只是传达基本概念。上面的@Bean方法将在适当的时候被Spring容器识别并调用，返回的对象将像其他任何bean一样在Spring容器中进行管理。您可以看到，bean之间的依赖关系可以简单地表示为从一个bean方法到另一个bean方法的调用。TransferServiceImpl需要一个AccountRepository构造函数参数，因此只需调用accountRepository（）方法即可。</p><p>精明的Spring用户将研究这种情况，并问“关于bean范围界定的问题”？这是一个好问题。您可能知道，所有Spring Bean都有一个作用域。默认情况下，bean的作用域是'singleton'的作用域，这意味着每个Spring容器将只有一个bean实例。看一下上面的代码，似乎如果我们多次调用accountRepository（），我们实际上将创建多个实例，但是实际上并非如此！在运行时处理@Configuration类时，将动态子类化（使用CGLIB），并增强@Bean方法的子类实现以确保遵循范围定义语义。</p><p>如您所见，定义@Bean方法非常简单。现在，让我们引导容器并使用这些对象。</p><p>看一下<a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk/src/test/java/org/springframework/samples/config/basic/account/TransferServiceTest.java">TransferServiceTest</a> JUnit系统测试及其transfer100Dollars（）@Test方法。您会注意到的第一件事是<a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html">AnnotationConfigApplicationContext</a>的使用。Spring 3中已添加了此新的ApplicationContext实现，以支持直接使用@Configuration类实例化Spring容器。使用AppConfig.class作为构造函数参数创建上下文，然后使用<a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/context/support/AbstractApplicationContext.html#getBean%28java.lang.Class%29">getBean（Class <t>）</t></a>方法按类型检索TransferService和AccountRepository Bean。该方法的其余部分只是行使TransferService和AccountRepository API的标准JUnit断言，以确保一切正常。</p>
-<pre><code class="prettyprint java"><br>public class TransferServiceTest {
+</code></pre><p>当然，这是一个琐碎的应用程序示例，甚至没有真正的JDBC DataSource。没关系，本文的目的只是传达基本概念。上面的@Bean方法将在适当的时候被Spring容器识别并调用，返回的对象将像其他任何bean一样在Spring容器中进行管理。您可以看到，bean之间的依赖关系可以简单地表示为从一个bean方法到另一个bean方法的调用。TransferServiceImpl需要一个AccountRepository构造函数参数，因此只需调用accountRepository（）方法即可。</p><p>精明的Spring用户将研究这种情况，并问“关于bean范围界定的问题”？这是一个好问题。您可能知道，所有Spring Bean都有一个作用域。默认情况下，bean的作用域是'singleton'的作用域，这意味着每个Spring容器将只有一个bean实例。看一下上面的代码，似乎如果我们多次调用accountRepository（），我们实际上将创建多个实例，但是实际上并非如此！在运行时处理@Configuration类时，将动态子类化（使用CGLIB），并增强@Bean方法的子类实现以确保遵循范围定义语义。</p><p>如您所见，定义@Bean方法非常简单。现在，让我们引导容器并使用这些对象。</p><p>看一下<a href="https://src.springframework.org/svn/spring-samples/configuration-basic/trunk/src/test/java/org/springframework/samples/config/basic/account/TransferServiceTest.java">TransferServiceTest</a> JUnit系统测试及其transfer100Dollars（）@Test方法。您会注意到的第一件事是<a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/context/annotation/AnnotationConfigApplicationContext.html">AnnotationConfigApplicationContext</a>的使用。Spring 3中添加了此新的ApplicationContext实现，以支持直接使用@Configuration类实例化Spring容器。使用AppConfig.class作为构造函数参数创建上下文，然后使用<a href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/context/support/AbstractApplicationContext.html#getBean%28java.lang.Class%29">getBean（Class <t>）</t></a>方法按类型检索TransferService和AccountRepository Bean。该方法的其余部分只是行使TransferService和AccountRepository API的标准JUnit断言，以确保一切正常。</p>
+<pre><code class="prettyprint java"><br />public class TransferServiceTest {
 
     @Test
     public void transfer100Dollars() {
         // create the spring container using the AppConfig @Configuration class
         ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
 
-        // retrieve the beans we'll use during testing
+        // retrieve the beans we&#39;ll use during testing
         AccountRepository accountRepository = ctx.getBean(AccountRepository.class);
         TransferService transferService = ctx.getBean(TransferService.class);
 
         // create accounts to test against
-        accountRepository.add(new Account("A123", 1000.00));
-        accountRepository.add(new Account("C456", 0.00));
+        accountRepository.add(new Account(&quot;A123&quot;, 1000.00));
+        accountRepository.add(new Account(&quot;C456&quot;, 0.00));
 
         // check account balances before transfer
-        assertThat(accountRepository.findById("A123").getBalance(), equalTo(1000.00));
-        assertThat(accountRepository.findById("C456").getBalance(), equalTo(0.00));
+        assertThat(accountRepository.findById(&quot;A123&quot;).getBalance(), equalTo(1000.00));
+        assertThat(accountRepository.findById(&quot;C456&quot;).getBalance(), equalTo(0.00));
 
         // perform transfer
-        transferService.transfer(100.00, "A123", "C456");
+        transferService.transfer(100.00, &quot;A123&quot;, &quot;C456&quot;);
 
         // check account balances after transfer
-        assertThat(accountRepository.findById("A123").getBalance(), equalTo(900.00));
-        assertThat(accountRepository.findById("C456").getBalance(), equalTo(100.00));
+        assertThat(accountRepository.findById(&quot;A123&quot;).getBalance(), equalTo(900.00));
+        assertThat(accountRepository.findById(&quot;C456&quot;).getBalance(), equalTo(100.00));
     }
 
 }
-</code></pre><p>而已！简单的纯Java类型安全配置。我们希望您会发现它是对Spring核心依赖注入支持的便捷而强大的补充。</p><p>当然，今天我们才刚刚开始。@Configuration类可以完成更多工作，我们将在以后的文章中探讨这些功能。但是，请不要等我-您可以立即阅读<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">Spring 3参考文档</a>的<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">@Configuration部分，</a>自行检查所有<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">内容</a> 。<strong>我鼓励每个人都使用此示例项目作为起点，从中您可以快速路测此新支持的其余部分</strong> 。</p><p>期待您的反馈。享受@Configuration和Spring 3的所有新功能，祝您假期愉快！</p>
+</code></pre><p>而已！简单的纯Java类型安全配置。我们希望您会发现它是对Spring核心依赖注入支持的便捷而强大的补充。</p><p>当然，今天我们才刚刚开始。@Configuration类可以完成更多工作，我们将在以后的文章中探讨这些功能。但是，请不要等我-您现在可以阅读<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">Spring 3参考文档</a>的<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">@Configuration部分，</a>自行检查所有<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#beans-java">内容</a> 。<strong>我鼓励每个人都使用此示例项目作为起点，从中您可以快速路测此新支持的其余部分</strong> 。</p><p>期待您的反馈。享受@Configuration和Spring 3的所有新功能，祝您假期愉快！</p>
 <ul>
-<li><em>感谢Erich Eichinger（开玩笑地）创造了“ Plain Old Configuration”一词。你可以看看他和Spring.NET团队与他们相似的“CodeConfig”项目所做的工作<a href="https://eeichinger.blogspot.com/2009/12/merry-xmlless-codeconfig-for-springnet.html">在这里</a> 。</em></li>
+<li><em>感谢Erich Eichinger（开玩笑地）创造了短语“ Plain Old Configuration”。你可以看看他和Spring.NET团队与他们相似的“CodeConfig”项目所做的工作<a href="https://eeichinger.blogspot.com/2009/12/merry-xmlless-codeconfig-for-springnet.html">在这里</a> 。</em></li>
 </ul></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 296;
 
       (function(disqus_shortname, document) {
@@ -230,7 +237,8 @@ public class AppConfig {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -268,12 +276,14 @@ public class AppConfig {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

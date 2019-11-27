@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Sagan项目：客户端架构</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Project Sagan: client-side architecture">
-<meta name="twitter:description" content="<p>Now that we <a href=" https:="" ="" spring.io="" blog="" 2014="" 04="" 11="" javascript-modularity-without-the-buzzword="="></head><body dir="ltr">know a bit more about JavaScript modules, we’re ready to dive into the client-side architecture of the Sagan application.
+<meta name="twitter:description" content="<p>Now that we <a href=" https:="" ="" spring.io="" blog="" 2014="" 04="" 11="" javascript-modularity-without-the-buzzword="="></head><body >know a bit more about JavaScript modules, we’re ready to dive into the client-side architecture of the Sagan application.
 <blockquote>
  <p><em><strong>Note</strong>: If you haven’t read previous blog posts on the <a href="https://github.com/spring-io/sagan">Sagan project</a>, you should know that this is the Spring reference application that powers this blog and everything else at <a href="http://spring.io">spring.io</a>. Previous posts <a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">showed out to run this application</a>, <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">how we do zero downtime deployments</a> and also <a href="https://spring.io/blog/2014/04/18/project-sagan-upgrading-to-jdk-8">how we upgraded Sagan to use the latest JDK8 features</a>.</em></p> 
 </blockquote>
@@ -45,10 +49,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -175,12 +181,12 @@
 </div>
 </header>
 <div class="blog--post"><p>现在我们<a href="https://spring.io/blog/2014/04/11/javascript-modularity-without-the-buzzwords">对JavaScript模块有了更多的了解</a> ，我们已经准备好深入研究Sagan应用程序的客户端体系结构。</p>
-<blockquote><p><em><strong>注意</strong> ：如果您以前没有阅读过有关<a href="https://github.com/spring-io/sagan">Sagan项目的</a>博客文章，则应该知道，这是Spring参考应用程序，可为<a href="https://spring.io">spring.io</a>和其他博客提供支持。以前的文章<a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">展示了如何运行此应用程序</a> ， <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">如何进行零停机部署</a>以及<a href="https://spring.io/blog/2014/04/18/project-sagan-upgrading-to-jdk-8">如何将Sagan升级为使用最新的JDK8功能</a> 。</em></p>
+<blockquote><p><em><strong>注意</strong> ：如果您以前没有阅读过有关<a href="https://github.com/spring-io/sagan">Sagan项目的</a>博客文章，则应该知道这是Spring参考应用程序，可为<a href="https://spring.io">spring.io</a>和其他博客提供支持。以前的文章<a href="https://spring.io/blog/2014/03/27/project-sagan-open-sourcing-spring-io">展示了如何运行此应用程序</a> ， <a href="https://spring.io/blog/2014/04/04/project-sagan-zero-downtime-deployments">如何进行零停机部署</a>以及<a href="https://spring.io/blog/2014/04/18/project-sagan-upgrading-to-jdk-8">如何将Sagan升级为使用最新的JDK8功能</a> 。</em></p>
 </blockquote><p>在这篇文章中，我想遍历Sagan应用程序中客户端体系结构的基础知识：</p>
 <ol>
-<li>为什么客户端应用程序在单独的<code>sagan-client</code>项目模块中？</li>
-<li>它与<code>sagan-site</code>模块如何关联？</li>
-<li>什么是<a href="https://www.npmjs.org/">npm</a> ， <a href="https://bower.io">凉亭</a>和<a href="http://gulpjs.com">口香糖</a> ？</li>
+<li>为什么将客户端应用程序放在单独的位置<code>sagan-client</code>项目模块？</li>
+<li>它与<code>sagan-site</code>模块？</li>
+<li>什么是<a href="https://www.npmjs.org/">npm</a> ， <a href="https://bower.io">bower</a>和<a href="http://gulpjs.com">gulp</a> ？</li>
 <li>这些工具如何一起工作以制作客户端应用程序？</li>
 </ol><p>为了说明所有这些，下面的截屏视频不仅会向您展示如何添加新的Bower依赖关系并编写一个小的新功能（网站上的键盘快捷键！），而且还将介绍如何增强gulp构建（优化图像！）。</p>
 <iframe src="//player.vimeo.com/video/92961329" width="640" height="360" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen></iframe>
@@ -189,7 +195,8 @@
 <hr><h3><a href="#springone-2gx-2014-is-around-the-corner" class="anchor" name="springone-2gx-2014-is-around-the-corner"></a> SpringOne 2GX 2014指日可待</h3><p>今年的<a href="http://www.springone2gx.com">SpringOne将于</a> 9月8日至11日<a href="http://www.springone2gx.com">在得克萨斯州的达拉斯举行，</a> <a href="https://2014.event.springone2gx.com/register">超级早起的鸟儿报名现已开始</a> 。我们希望看到你在那里！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1544;
 
       (function(disqus_shortname, document) {
@@ -203,7 +210,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -241,12 +249,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

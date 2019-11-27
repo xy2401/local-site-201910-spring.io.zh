@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>REST在春季3：@MVC</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -33,14 +37,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2009-03-08 22:20:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -166,52 +172,53 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在过去的几年中，REST已经成为基于SOAP / WSDL / WS- *的分布式体系结构的一种令人信服的替代方案。因此，当我们开始计划在Spring的下一个主要版本（版本3.0）中进行工作时，对我们来说很清楚，我们必须专注于简化“ RESTful” Web服务和应用程序的开发。现在，什么是“ RESTful”和什么不是“ RESTful”可能是一个全新帖子的主题。在本文中，我将采用一种更实用的方法，并重点介绍我们添加到Spring MVC的@Controller模型中的功能。<br></p><h2>一点背景</h2><br><em>好吧，我撒谎：首先有一些背景。如果您真的想了解新功能，请随时跳到<a href="#features">下一部分</a> 。</em><p></p><p>对我来说，REST的工作大约在两年前开始，就在读了Leonard Richardson和Sam Ruby强烈推荐的O'Reilly的<a href="https://oreilly.com/catalog/9780596529260/index.html">RESTful Web Services</a>一书之后。最初，我在考虑为<a href="http://www.springsource.org/spring-ws">Spring Web Services</a>添加REST支持，但是在开发了几周的原型后，对我来说很明显这不是一个很好的选择。特别是，我发现必须将大多数逻辑从Spring-MVC <tt>DispatcherServlet</tt>复制到Spring-WS。显然，这不是前进的道路。</p><p>大约在同一时间，我们介绍了<a href="http://blog.springsource.com/2007/11/14/annotated-web-mvc-controllers-in-spring-25/">Spring MVC的基于注释的模型</a> 。该模型显然是对以前基于继承的模型的改进。当时的另一个有趣的发展是<a href="https://jcp.org/en/jsr/detail?id=311">JAX-RS</a>规范的发展。我的下一个尝试是尝试合并这两个模型：尝试将@MVC注释与JAX-RS注释合并，并能够在<tt>DispatcherServlet</tt>内运行JAX-RS应用程序。尽管我确实从这项工作中得到了一个可行的原型，但结果并不令人满意。有很多技术问题我不会让您感到厌烦，但是最重要的是，对于已经习惯使用Spring MVC 2.5的开发人员来说，这种方法“笨拙”且不自然。</p><p>最后，我们决定将RESTful功能添加到Spring MVC本身的功能中。显然，这将意味着与JAX-RS会有一些重叠，但是至少对于Spring MVC开发人员（现有的和新的），编程模型都将是令人满意的。另外，已经有三个提供Spring支持的JAX-RS实现（ <a href="https://jersey.dev.java.net/">Jersey</a> ， <a href="http://www.jboss.org/resteasy/">RESTEasy</a>和<a href="http://www.restlet.org/">Restlet</a> ）。在此列表中添加四分之一似乎并没有很好地利用我们的宝贵时间。<br></p><h2><a name="features">Spring MVC 3.0中的RESTful功能</a></h2><br>现在，有足够的背景知识，让我们看一下功能！<br><h3>URI模板</h3><br>URI模板是类似于URI的字符串，包含一个或多个变量名。当这些变量代替值时，模板将成为URI。有关更多信息，请参见<a href="http://bitworking.org/projects/URI-Templates/">建议的RFC</a> 。<p></p><p>在Spring 3.0 M1中，我们通过<tt>@PathVariable</tt>注释介绍了URI模板的使用。例如：</p>
-<pre><code class="prettyprint java"><br>@RequestMapping("/hotels/{hotelId}")
+<div class="blog--post"><p>在过去的几年中，REST已经成为基于SOAP / WSDL / WS- *的分布式体系结构的一种令人信服的替代方案。因此，当我们开始计划在Spring的下一个主要版本（版本3.0）中进行工作时，对我们来说很清楚，我们必须专注于简化“ RESTful” Web服务和应用程序的开发。现在，什么是“ RESTful”和什么不是“ RESTful”可能是一个全新帖子的主题。在本文中，我将采用一种更实用的方法，并重点介绍我们添加到Spring MVC的@Controller模型中的功能。<br></p><h2>一点背景</h2><br><em>好吧，我撒谎：首先有一些背景。如果您真的想了解新功能，请随时跳到<a href="#features">下一部分</a> 。</em><p></p><p>对我来说，REST的工作大约在两年前开始，就在读了Leonard Richardson和Sam Ruby强烈推荐的O'Reilly的<a href="https://oreilly.com/catalog/9780596529260/index.html">RESTful Web Services</a>一书之后。最初，我在考虑为<a href="http://www.springsource.org/spring-ws">Spring Web Services</a>添加REST支持，但是在开发了几周的原型后，对我来说很明显这不是一个很好的选择。特别是，我发现必须将大多数逻辑从Spring-MVC <tt>DispatcherServlet</tt>复制到Spring-WS。显然，这不是前进的道路。</p><p>大约在同一时间，我们介绍了<a href="http://blog.springsource.com/2007/11/14/annotated-web-mvc-controllers-in-spring-25/">Spring MVC的基于注释的模型</a> 。该模型显然是对以前基于继承的模型的改进。当时的另一个有趣的发展是<a href="https://jcp.org/en/jsr/detail?id=311">JAX-RS</a>规范的发展。我的下一个尝试是尝试合并这两个模型：尝试将@MVC注释与JAX-RS注释合并，并能够在<tt>DispatcherServlet中</tt>运行JAX-RS应用程序。尽管我确实从这项工作中得到了一个可行的原型，但结果并不令人满意。有很多技术问题我不会让您感到厌烦，但是最重要的是，对于已经习惯使用Spring MVC 2.5的开发人员来说，这种方法“笨拙”且不自然。</p><p>最后，我们决定将RESTful功能添加到Spring MVC本身的功能中。显然，这将意味着与JAX-RS会有一些重叠，但是至少对于Spring MVC开发人员（现有的和新的），编程模型都将是令人满意的。另外，已经有三个提供Spring支持的JAX-RS实现（ <a href="https://jersey.dev.java.net/">Jersey</a> ， <a href="http://www.jboss.org/resteasy/">RESTEasy</a>和<a href="http://www.restlet.org/">Restlet</a> ）。在此列表中添加四分之一似乎并没有很好地利用我们的宝贵时间。<br></p><h2><a name="features">Spring MVC 3.0中的RESTful功能</a></h2><br>现在，有足够的背景知识，让我们看一下功能！<br><h3>URI模板</h3><br>URI模板是类似于URI的字符串，包含一个或多个变量名。当这些变量代替值时，模板将成为URI。有关更多信息，请参见<a href="http://bitworking.org/projects/URI-Templates/">建议的RFC</a> 。<p></p><p>在Spring 3.0 M1中，我们通过<tt>@PathVariable</tt>注释介绍了URI模板的使用。例如：</p>
+<pre><code class="prettyprint java"><br />@RequestMapping(&quot;/hotels/{hotelId}&quot;)
 public String getHotel(@PathVariable String hotelId, Model model) {
-    List<Hotel> hotels = hotelService.getHotels();
-    model.addAttribute("hotels", hotels);
-    return "hotels";
+    List&lt;Hotel&gt; hotels = hotelService.getHotels();
+    model.addAttribute(&quot;hotels&quot;, hotels);
+    return &quot;hotels&quot;;
 }
-</code></pre><p>当请求<tt>/ hotels / 1时</tt> ，该1将绑定到<tt>hotelId</tt>参数。您可以选择指定参数绑定到的变量名，但是在启用调试的情况下编译代码时，则不必要：我们从参数名推断出路径变量名。</p><p>您还可以具有多个路径变量，如下所示：</p>
-<pre><code class="prettyprint java"><br>@RequestMapping(value="/hotels/{hotel}/bookings/{booking}", method=RequestMethod.GET)
-public String getBooking(@PathVariable("hotel") long hotelId, @PathVariable("booking") long bookingId, Model model) {
+</code></pre><p>当请求<tt>/ hotels / 1时</tt> ，该1将绑定到<tt>hotelId</tt>参数。您可以选择指定参数绑定到的变量名称，但是在启用调试的情况下编译代码时，则不必要：我们从参数名称推断出路径变量名称。</p><p>您还可以具有多个路径变量，如下所示：</p>
+<pre><code class="prettyprint java"><br />@RequestMapping(value=&quot;/hotels/{hotel}/bookings/{booking}&quot;, method=RequestMethod.GET)
+public String getBooking(@PathVariable(&quot;hotel&quot;) long hotelId, @PathVariable(&quot;booking&quot;) long bookingId, Model model) {
     Hotel hotel = hotelService.getHotel(hotelId);
     Booking booking = hotel.getBooking(bookingId);
-    model.addAttribute("booking", booking);
-    return "booking";
+    model.addAttribute(&quot;booking&quot;, booking);
+    return &quot;booking&quot;;
 }
 </code></pre><p>例如，这将匹配<tt>/ hotels / 1 / bookings / 2之</tt>类的请求。</p><p>您还可以结合使用Ant样式的路径和路径变量，如下所示：</p>
-<pre><code class="prettyprint java"><br>@RequestMapping(value="/hotels/*/bookings/{booking}", method=RequestMethod.GET)
-public String getBooking(@PathVariable("booking") long bookingId, Model model) {
+<pre><code class="prettyprint java"><br />@RequestMapping(value=&quot;/hotels/*/bookings/{booking}&quot;, method=RequestMethod.GET)
+public String getBooking(@PathVariable(&quot;booking&quot;) long bookingId, Model model) {
     ...
 }
 </code></pre><p>您也可以使用数据绑定：</p>
-<pre><code class="prettyprint java"><br>@InitBinder
+<pre><code class="prettyprint java"><br />@InitBinder
 public void initBinder(WebDataBinder binder) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
     binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
 }
 
-@RequestMapping("/hotels/{hotel}/dates/{date}")
-public void date(@PathVariable("hotel") String hotel, @PathVariable Date date) {
+@RequestMapping(&quot;/hotels/{hotel}/dates/{date}&quot;)
+public void date(@PathVariable(&quot;hotel&quot;) String hotel, @PathVariable Date date) {
     ...
 }
-</code></pre><p>例如，上面的代码将匹配<tt>/ hotels / 1 / dates / 2008-12-18</tt> 。<br></p><h3>内容协商</h3><br>在2.5版本中，Spring的MVC让@Controller决定哪个视图显示出给定的要求，通过它<tt>查看</tt> ，视图名称， <tt>视图解析器的</tt>抽象。在RESTful场景中，通常让客户端通过<tt>Accept</tt> HTTP标头确定可接受的表示形式。服务器通过<tt>Content-Type</tt>标头响应传递的表示形式。此过程称为<a href="https://en.wikipedia.org/wiki/Content_negotiation">内容协商</a> 。<p></p><p><tt>Accept</tt>标头的一个问题是不可能在Web浏览器中以HTML更改它。例如，在Firefox中，它已固定为<br><code><br>Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8<br></code><br>那么，如果要链接到特定资源的PDF版本怎么办？查看文件扩展名是一个不错的解决方法。例如， <tt><a href="http://example.com/hotels.pdf">http://example.com/hotels.pdf</a></tt>检索酒店列表的PDF观点一样， <tt><a href="http://example.com/hotels">http://example.com/hotels</a></tt>与<tt>应用/ PDF</tt>的Accept头。</p><p>这就是<tt>ContentNegotiatingViewResolver的</tt>作用：它包装一个或多个其他<tt>ViewResolver</tt> ，查看<tt>Accept</tt>标头或文件扩展名，并解析<tt>与之</tt>对应的视图。在即将发表的博客文章中，Alef Arendsen将向您展示如何使用<tt>ContentNegotiatingViewResolver</tt> 。<br></p><h3>观看次数</h3><br>我们还为Spring MVC添加了一些新的视图，特别是：<br><ul><br> <li><a href="http://static.springsource.org/spring/docs/3.0.0.M1/javadoc-api/org/springframework/web/servlet/view/feed/AbstractAtomFeedView.html"><tt>AbstractAtomFeedView</tt></a>和<a href="http://static.springsource.org/spring/docs/3.0.0.M1/javadoc-api/org/springframework/web/servlet/view/feed/AbstractRssFeedView.html"><tt>AbstractRssFeedView</tt></a> ，可用于返回Atom和RSS提要，</li><br> <li><a href="http://static.springframework.org/spring/docs/3.0.0.M2/javadoc-api/org/springframework/web/servlet/view/xml/MarshallingView.html"><tt>MarshallingView</tt></a> ，可用于返回XML表示形式。该视图基于对象/ XML映射模块，该模块已从Spring Web Services项目复制而来。该模块包装了XML编组技术，例如JAXB，Castor，JiBX等，并使在Spring应用程序上下文中配置这些技术更加容易，</li><br> <li><tt>JacksonJsonView</tt> ，用于模型中对象的JSON表示形式。该视图实际上是Spring JavaScript项目的一部分，我们将在以后的博客文章中讨论更多内容。</li><br></ul><br>显然，将它们与<tt>ContentNegotiatingViewResolver</tt>结合使用<tt>非常好</tt> ！<br><h3>HTTP方法转换</h3><br>REST的另一个关键原则是使用统一接口。基本上，这意味着可以使用相同的四个HTTP方法来操纵所有资源（URL）：GET，PUT，POST和DELETE。对于每种方法，HTTP规范都定义了确切的语义。例如，GET应该始终是安全的操作，这意味着没有副作用，而PUT或DELETE应该是幂等的，这意味着您可以一遍又一遍地重复这些操作，但是最终结果应该相同。<p></p><p>虽然HTTP定义了这四种方法，但HTML仅支持两种：GET和POST。幸运的是，有两种可能的解决方法：您可以使用JavaScript进行PUT或DELETE操作，或者仅使用“ real”方法作为附加参数进行POST（在HTML表单中建模为隐藏的输入字段）。后一个技巧就是<tt>HiddenHttpMethodFilter的</tt>作用。这个过滤器是在Spring 3.0 M1中引入的，它是一个普通的Servlet过滤器。这样，它可以与任何Web框架（不仅仅是Spring MVC）结合使用。只需将此过滤器添加到您的<tt>web.xml中</tt> ，带有隐藏<tt>_method</tt>参数的POST将转换为相应的HTTP方法请求。</p><p>作为额外的奖励，我们还在Spring MVC表单标签中添加了对方法转换的支持。例如，以下摘录自更新的Petclinic示例：</p>
-<pre><code class="prettyprint html"><br><form:form method="delete">
-    <p class="submit"><input type="submit" value="Delete Pet"/></p>
-</form:form>
+</code></pre><p>例如，上面的代码将匹配<tt>/ hotels / 1 / dates / 2008-12-18</tt> 。<br></p><h3>内容协商</h3><br>在2.5版中，Spring-MVC允许@Controller通过其<tt>View</tt> ，视图名称和<tt>ViewResolver</tt>抽象来决定为给定请求呈现哪个视图。在RESTful场景中，通常让客户端通过<tt>Accept</tt> HTTP标头确定可接受的表示形式。服务器通过<tt>Content-Type</tt>标头响应传递的表示形式。此过程称为<a href="https://en.wikipedia.org/wiki/Content_negotiation">内容协商</a> 。<p></p><p><tt>Accept</tt>标头的一个问题是不可能在Web浏览器中以HTML更改它。例如，在Firefox中，它已固定为<br><code><br>Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8<br></code><br>那么，如果要链接到特定资源的PDF版本怎么办？查看文件扩展名是一个不错的解决方法。例如， <tt><a href="http://example.com/hotels.pdf">http://example.com/hotels.pdf</a></tt>检索酒店列表的PDF视图， <tt><a href="http://example.com/hotels">http：//example.com/hotels</a></tt>带有<tt>application / pdf</tt>的Accept标头。</p><p>这就是<tt>ContentNegotiatingViewResolver的</tt>作用：它包装一个或多个其他<tt>ViewResolver</tt> ，查看<tt>Accept</tt>标头或文件扩展名，并解析<tt>与之</tt>对应的视图。在即将发表的博客文章中，Alef Arendsen将向您展示如何使用<tt>ContentNegotiatingViewResolver</tt> 。<br></p><h3>观看次数</h3><br>我们还为Spring MVC添加了一些新的视图，特别是：<br><ul><br> <li><a href="http://static.springsource.org/spring/docs/3.0.0.M1/javadoc-api/org/springframework/web/servlet/view/feed/AbstractAtomFeedView.html"><tt>AbstractAtomFeedView</tt></a>和<a href="http://static.springsource.org/spring/docs/3.0.0.M1/javadoc-api/org/springframework/web/servlet/view/feed/AbstractRssFeedView.html"><tt>AbstractRssFeedView</tt></a> ，可用于返回Atom和RSS提要，</li><br> <li><a href="http://static.springframework.org/spring/docs/3.0.0.M2/javadoc-api/org/springframework/web/servlet/view/xml/MarshallingView.html"><tt>MarshallingView</tt></a> ，可用于返回XML表示形式。该视图基于对象/ XML映射模块，该模块已从Spring Web Services项目复制而来。该模块包装了XML编组技术，例如JAXB，Castor，JiBX等，并使在Spring应用程序上下文中配置这些技术更加容易，</li><br> <li><tt>JacksonJsonView</tt> ，用于模型中对象的JSON表示形式。该视图实际上是Spring JavaScript项目的一部分，我们将在以后的博客文章中讨论更多内容。</li><br></ul><br>显然，将它们与<tt>ContentNegotiatingViewResolver</tt>结合使用<tt>非常好</tt> ！<br><h3>HTTP方法转换</h3><br>REST的另一个关键原则是使用统一接口。基本上，这意味着可以使用相同的四个HTTP方法来操纵所有资源（URL）：GET，PUT，POST和DELETE。对于每种方法，HTTP规范都定义了确切的语义。例如，GET应该始终是安全的操作，这意味着没有副作用，而PUT或DELETE应该是幂等的，这意味着您可以一遍又一遍地重复这些操作，但是最终结果应该相同。<p></p><p>虽然HTTP定义了这四种方法，但HTML仅支持两种：GET和POST。幸运的是，有两种可能的解决方法：您可以使用JavaScript进行PUT或DELETE操作，或者仅使用“ real”方法作为附加参数进行POST（在HTML表单中建模为隐藏的输入字段）。后一个技巧就是<tt>HiddenHttpMethodFilter的</tt>作用。这个过滤器是在Spring 3.0 M1中引入的，它是一个普通的Servlet过滤器。这样，它可以与任何Web框架（不仅仅是Spring MVC）结合使用。只需将此过滤器添加到您的<tt>web.xml中</tt> ，带有隐藏<tt>_method</tt>参数的POST将转换为相应的HTTP方法请求。</p><p>作为额外的奖励，我们还在Spring MVC表单标签中添加了对方法转换的支持。例如，以下摘录自更新的Petclinic示例：</p>
+<pre><code class="prettyprint html"><br />&lt;form:form method=&quot;delete&quot;&gt;
+    &lt;p class=&quot;submit&quot;&gt;&lt;input type=&quot;submit&quot; value=&quot;Delete Pet&quot;/&gt;&lt;/p&gt;
+&lt;/form:form&gt;
 </code></pre><p>实际上将执行HTTP POST，并将“真实” DELETE方法隐藏在请求参数后面，由<tt>HiddenHttpMethodFilter</tt>拾取。因此，相应的@Controller方法为：</p>
-<pre><code class="prettyprint java"><br>@RequestMapping(method = RequestMethod.DELETE)
+<pre><code class="prettyprint java"><br />@RequestMapping(method = RequestMethod.DELETE)
 public String deletePet(@PathVariable int ownerId, @PathVariable int petId) {
     this.clinic.deletePet(petId);
-    return "redirect:/owners/" + ownerId;
+    return &quot;redirect:/owners/&quot; + ownerId;
 }
 </code></pre>
 <h3>ETag支持</h3><p><a href="https://en.wikipedia.org/wiki/HTTP_ETag">ETag</a> （实体标签）是由HTTP / 1.1兼容的Web服务器返回的HTTP响应标头，用于确定给定URL的内容更改。可以认为它是<tt>Last-Modified</tt>标头的更复杂的后继者。当服务器返回带有ETag标头的表示形式时，客户端可以在<tt>If-None-Match</tt>标头中的后续GET中使用此标头。如果内容未更改，则服务器将返回<tt>304：Not Modified</tt> 。</p><p>在Spring 3.0 M1中，我们引入了<tt>ShallowEtagHeaderFilter</tt> 。这是一个普通的Servlet过滤器，因此可以与任何Web框架结合使用。顾名思义，过滤器会创建所谓的<em>浅层</em> ETag（与深层ETag相对，稍后会详细介绍）。它的工作方式非常简单：过滤器仅缓存呈现的JSP的内容（或其他内容），在其上生成MD5哈希，然后将其作为<tt>ETag</tt>标头返回。客户端下一次发送对相同资源的请求时，它将使用该哈希作为<tt>If-None-Match</tt>值。过滤器注意到这一点，再次渲染视图，并比较两个哈希。如果它们相等，则返回304。重要的是要注意，此滤镜不会节省处理能力，因为视图仍在渲染。它保存的唯一内容是<strong>bandwith</strong> ，因为渲染的响应不会通过电线发送回去。</p><p><em>深度</em> ETag有点复杂。在这种情况下，ETag基于基础域对象，RDMBS表等。使用此方法，除非基础数据已更改，否则不会生成任何内容。不幸的是，以通用方式实现此方法比浅层ETag困难得多。我们可能会通过依赖JPA的@Version注释或例如AspectJ方面在Spring的更高版本中添加对深层ETag的支持。<br></p><h2>和更多！</h2><br>在接下来的文章中，我将结束我的RESTful旅程，并讨论<tt>RestTemplate</tt> ，它也是在Spring 3.0 M2中引入的。该类使您可以以类似于<tt>JdbcTemplate</tt> ， <tt>JmsTemplate</tt>等的方式在客户端访问RESTful资源。<p></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 202;
 
       (function(disqus_shortname, document) {
@@ -225,7 +232,8 @@ public String deletePet(@PathVariable int ownerId, @PathVariable int petId) {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -263,12 +271,14 @@ public String deletePet(@PathVariable int ownerId, @PathVariable int petId) {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

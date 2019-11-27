@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>容器中的Spring Boot</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Boot in a Container">
 <meta name="twitter:description" content="<div class=" paragrap="="> 
- </head><body dir="ltr"><p>Many people are using containers to wrap their Spring Boot applications, and building containers is not a simple thing to do. This is an article for developers of Spring Boot applications, and containers are not always a good abstraction for developers - they force you to learn about and think about very low level concerns - but you will on occasion be called on to create or use a container, so it pays to understand the building blocks. Here we aim to show you some of the choices you can make if you are faced with the prospect of needing to create your own container.</p> 
+ <p>Many people are using containers to wrap their Spring Boot applications, and building containers is not a simple thing to do. This is an article for developers of Spring Boot applications, and containers are not always a good abstraction for developers - they force you to learn about and think about very low level concerns - but you will on occasion be called on to create or use a container, so it pays to understand the building blocks. Here we aim to show you some of the choices you can make if you are faced with the prospect of needing to create your own container.</p> 
 
 ">
 <meta name="twitter:creator" content="@david_syer">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -174,7 +180,7 @@
 <p>许多人正在使用容器包装他们的Spring Boot应用程序，而构建容器并不是一件容易的事。这是一篇针对Spring Boot应用程序开发人员的文章，容器对于开发人员而言并不总是一个很好的抽象-它们迫使您学习和思考非常低级的问题-但是有时您会被要求创建或使用容器，因此有必要了解这些基本要素。在这里，我们旨在向您展示一些您需要创建自己的容器时可以做出的选择。</p>
 </div>
 <div class="paragraph">
-<p>我们将假定您知道如何创建和构建基本的Spring Boot应用程序。如果你不这样做，去到一个<a href="https://spring.io/guides">入门指南</a> ，例如关于构建一个<a href="https://spring.io/guides/gs/rest-service/">REST服务</a> 。从此处复制代码，并使用以下一些想法进行练习。在<a href="https://spring.io/guides/gs/spring-boot-docker">Docker</a>上也有一个入门指南，这也是一个很好的起点，但是它没有涵盖我们在此所做的选择范围，也没有详细介绍。</p>
+<p>我们将假定您知道如何创建和构建基本的Spring Boot应用程序。如果不这样做，请转到<a href="https://spring.io/guides">入门指南之一</a> ，例如有关构建<a href="https://spring.io/guides/gs/rest-service/">REST服务的指南</a> 。从那里复制代码，并使用以下一些想法进行练习。在<a href="https://spring.io/guides/gs/spring-boot-docker">Docker</a>上也有一个入门指南，这也是一个很好的起点，但是它没有涵盖我们在此所做的选择范围，也没有详细介绍。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -190,7 +196,7 @@
 <h2 id="a-basic-dockerfile"><a class="anchor" href="#a-basic-dockerfile"></a>基本的Dockerfile</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Spring Boot应用程序很容易转换为可执行的JAR文件。所有<a href="https://spring.io/guides">入门指南</a>都这样做，从<a href="https://start.spring.io">Spring Initializr</a>下载的每个应用程序都将具有一个构建步骤来创建可执行的JAR。使用Maven可以<code>./mvnw install</code> ，使用Gradle可以<code>./mvnw install</code> <code>./gradlew build</code> 。然后，在项目的顶层，运行该JAR的基本Dockerfile如下所示：</p>
+<p>Spring Boot应用程序很容易转换为可执行的JAR文件。所有<a href="https://spring.io/guides">入门指南</a>都这样做，从<a href="https://start.spring.io">Spring Initializr</a>下载的每个应用程序都将具有一个创建可执行JAR的构建步骤。有了Maven，您<code>./mvnw install</code>和Gradle一起<code>./gradlew build</code> 。然后，在项目的顶层，运行该JAR的基本Dockerfile如下所示：</p>
 </div>
 <div class="paragraph">
 <p><code>Dockerfile</code></p>
@@ -205,7 +211,7 @@ ENTRYPOINT ["java","-jar","/app.jar"]</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>所述<code>JAR_FILE</code>可以在作为的一部分被传递<code>docker</code>命令（这将是Maven和摇篮不同）。例如Maven：</p>
+<p>的<code>JAR_FILE</code>可以作为<code>docker</code>命令（Maven和Gradle会有所不同）。例如Maven：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -221,7 +227,7 @@ ENTRYPOINT ["java","-jar","/app.jar"]</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>当然，一旦选择了构建系统，就不需要<code>ARG</code>您只需对jar位置进行硬编码即可。例如Maven：</p>
+<p>当然，一旦选择了构建系统，就不需要<code>ARG</code> -您可以对罐子位置进行硬编码。例如Maven：</p>
 </div>
 <div class="paragraph">
 <p><code>Dockerfile</code></p>
@@ -263,7 +269,7 @@ Nov 06, 2018 2:45:16 PM org.springframework.boot.SpringApplication logStartupPro
 </div>
 </div>
 <div class="paragraph">
-<p>请注意，基本映像为<code>openjdk:8-jdk-alpine</code> 。<code>alpine</code>映像比<a href="https://hub.docker.com/_/openjdk/">Dockerhub</a>的标准<code>openjdk</code>库映像<a href="https://hub.docker.com/_/openjdk/">小</a> 。尚无Java 11的正式高山图像（AdoptOpenJDK已有一段时间，但不再出现在其<a href="https://hub.docker.com/r/adoptopenjdk/openjdk11/">Dockerhub页面上</a> ）。</p>
+<p>请注意，基本图片是<code>openjdk:8-jdk-alpine</code> 。的<code>alpine</code>图像小于标准<code>openjdk</code>来自<a href="https://hub.docker.com/_/openjdk/">Dockerhub的</a>库映像。尚无Java 11的正式高山图像（AdoptOpenJDK已有一段时间，但不再出现在其<a href="https://hub.docker.com/r/adoptopenjdk/openjdk11/">Dockerhub页面上</a> ）。</p>
 </div>
 <div class="paragraph">
 <p>如果要在图像内部四处浏览，可以像这样打开其中的外壳（基本图像没有<code>bash</code> ）：</p>
@@ -278,7 +284,7 @@ bin      etc      lib      mnt      root     sbin     sys      usr
 </div>
 </div>
 <div class="paragraph">
-<p>到目前为止，docker配置非常简单，并且生成的映像不是很有效。docker映像只有一个文件系统层，其中包含胖子罐，我们对应用程序代码进行的每一次更改都会更改该层，该层可能为10MB或更多（对于某些应用程序甚至可能为50MB）。我们可以通过将JAR分为多个层来改善这一点。</p>
+<p>到目前为止，docker配置非常简单，并且生成的映像不是很有效。docker映像只有一个文件系统层，其中包含胖子罐，我们对应用程序代码进行的每一次更改都会更改该层，该层可能为10MB或更大（某些应用程序甚至多达50MB）。我们可以通过将JAR分为多个层来改善这一点。</p>
 </div>
 </div>
 </div>
@@ -286,7 +292,7 @@ bin      etc      lib      mnt      root     sbin     sys      usr
 <h2 id="a-better-dockerfile"><a class="anchor" href="#a-better-dockerfile"></a>更好的Dockerfile</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>由于罐子本身的包装方式，Spring Boot胖子罐子自然具有“层”。如果我们先拆包，它将已经分为内部和外部依赖关系。为了在Docker构建中一步一步做到这一点，我们需要首先解压jar。例如（坚持使用Maven，但Gradle版本非常相似）：</p>
+<p>由于罐子本身的包装方式，Spring Boot胖子罐子自然具有“层”。如果我们先拆包，它将已经分为内部和外部依赖关系。要在docker构建中一步一步做到这一点，我们需要先解压jar。例如（坚持使用Maven，但Gradle版本非常相似）：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -296,7 +302,7 @@ $ docker build -t myorg/myapp .</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>与此<code>Dockerfile</code></p>
+<p>有了这个<code>Dockerfile</code></p>
 </div>
 <div class="paragraph">
 <p><code>Dockerfile</code></p>
@@ -313,7 +319,7 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>现在有3层，所有应用程序资源都位于后面的2层中。如果应用程序依存关系不变，那么第一层（来自<code>BOOT-INF/lib</code> ）将不会改变，因此构建会更快，因此只要基础层已经存在，容器在运行时的启动也将更快已缓存。</p>
+<p>现在有3层，所有应用程序资源都位于后面的2层中。如果应用程序依存关系不变，则第一层（来自<code>BOOT-INF/lib</code> ）不会更改，因此构建会更快，只要基础层已被缓存，容器在运行时的启动也会随之改变。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -321,7 +327,7 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 <td class="icon">
 <i class="fa icon-note" title="注意"></i>
 </td>
-<td class="content">我们使用了硬编码的主应用程序类<code>hello.Application</code> 。对于您的应用程序，这可能会有所不同。如果需要，可以使用另一个<code>ARG</code>对其进行参数化。您还可以将Spring Boot胖子<code>JarLauncher</code>复制到映像中，然后使用它来运行应用程序-它可以工作，并且您不需要指定主类，但是启动时会慢一些。
+<td class="content">我们使用了硬编码的主应用程序类<code>hello.Application</code> 。对于您的应用程序，这可能会有所不同。您可以使用另一个参数<code>ARG</code>如果您想要的话。您也可以复制Spring Boot的脂肪<code>JarLauncher</code>进入映像并使用它来运行应用程序-它可以工作，并且您不需要指定主类，但是启动时会慢一些。
 </td>
 </tr>
 </tbody></table>
@@ -332,12 +338,12 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 <h2 id="tweaks"><a class="anchor" href="#tweaks"></a>调整</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>如果您想尽快启动应用程序（大多数人都这样做），则可以考虑一些调整。这里有一些想法：</p>
+<p>如果您想尽快启动您的应用程序（大多数人都这样做），则可以考虑一些调整。这里有一些想法：</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>使用<code>spring-context-indexer</code> （ <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#beans-scanning-index">链接到docs</a> ）。对于小型应用程序而言，它不会增加太多，但对您有所帮助。</p>
+<p>使用<code>spring-context-indexer</code> （ <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#beans-scanning-index">链接到文档</a> ）。对于小型应用程序而言，它不会增加太多，但对您有所帮助。</p>
 </li>
 <li>
 <p>如果负担不起，请不要使用<a href="https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready">执行器</a> 。</p>
@@ -346,13 +352,13 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 <p>使用Spring Boot 2.1和Spring 5.1。</p>
 </li>
 <li>
-<p>使用<code>spring.config.location</code> （命令行参数或System属性等）修复<a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config-application-property-files">Spring Boot配置文件</a>的位置。</p>
+<p>使用以下命令修复<a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-external-config-application-property-files">Spring Boot配置文件</a>的位置<code>spring.config.location</code> （命令行参数或系统属性等）。</p>
 </li>
 <li>
-<p>使用<code>spring.jmx.enabled=false</code>关闭JMX-您可能不需要在容器中使用它</p>
+<p>关闭JMX-您可能不需要在容器中使用-<code>spring.jmx.enabled=false</code></p>
 </li>
 <li>
-<p>使用<code>-noverify</code>运行JVM。还要考虑<code>-XX:TieredStopAtLevel=1</code> （这将在以后降低JIT速度，但会节省启动时间）。</p>
+<p>使用以下命令运行JVM <code>-noverify</code> 。还考虑<code>-XX:TieredStopAtLevel=1</code> （这将在以后减慢JIT速度，但会节省启动时间）。</p>
 </li>
 <li>
 <p>使用Java 8的容器内存提示： <code>-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap</code> 。对于Java 11，默认情况下是自动的。</p>
@@ -360,7 +366,7 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>您的应用程序在运行时可能不需要完整的CPU，但需要多个CPU才能尽快启动（至少2、4个更好）。如果您不介意启动速度较慢，则可以将CPU速度控制在4以下。</p>
+<p>您的应用在运行时可能不需要完整的CPU，但需要多个CPU才能尽快启动（至少2、4个更好）。如果您不介意启动速度较慢，则可以将CPU速度控制在4以下。</p>
 </div>
 </div>
 </div>
@@ -368,7 +374,7 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 <h2 id="multi-stage-build"><a class="anchor" href="#multi-stage-build"></a>多阶段构建</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>上面的<code>Dockerfile</code>假设胖JAR已在命令行上构建。您也可以使用多阶段构建在Docker中执行此步骤，将结果从一个映像复制到另一个映像。使用Maven的示例：</p>
+<p>的<code>Dockerfile</code>以上假设胖JAR已在命令行上构建。您也可以使用多阶段构建在Docker中执行此步骤，将结果从一个映像复制到另一个映像。使用Maven的示例：</p>
 </div>
 <div class="paragraph">
 <p><code>Dockerfile</code></p>
@@ -384,7 +390,7 @@ COPY pom.xml .
 COPY src src
 
 RUN ./mvnw install -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+RUN mkdir -p target/dependency &amp;&amp; (cd target/dependency; jar -xf ../*.jar)
 
 FROM openjdk:8-jdk-alpine
 VOLUME /tmp
@@ -399,10 +405,10 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 <p>第一个图像标记为“ build”，它用于运行Maven并构建胖罐，然后解压缩它。拆包也可以由Maven或Gradle完成（这是《入门指南》中采用的方法）-确实没有太大区别，只是必须编辑构建配置并添加插件。</p>
 </div>
 <div class="paragraph">
-<p>请注意，源代码已分为4层。后面的层包含构建配置和应用程序的源代码，而前面的层包含构建系统本身（Maven包装器）。这是一个很小的优化，这也意味着我们不必将<code>target</code>目录复制到Docker映像，即使是用于构建的临时目录也是如此。</p>
+<p>请注意，源代码已分为4层。后面的层包含构建配置和应用程序的源代码，而前面的层包含构建系统本身（Maven包装器）。这是一个很小的优化，也意味着我们不必复制<code>target</code>目录到docker映像，甚至是用于构建的临时映像。</p>
 </div>
 <div class="paragraph">
-<p>因为必须在第一个<code>RUN</code>部分中重新创建Maven缓存，所以每个更改源代码的构建都会很慢。但是您拥有一个完全独立的构建，只要拥有docker，任何人都可以运行它来使您的应用程序运行。在某些环境中，例如在需要与不懂Java的人共享代码的环境中，这很有用。</p>
+<p>源代码更改的每个构建都将变慢，因为必须在第一个构建中重新创建Maven缓存。 <code>RUN</code>部分。但是您拥有一个完全独立的构建，只要拥有docker，任何人都可以运行它来使您的应用程序运行。在某些环境中，例如在需要与不懂Java的人共享代码的环境中，这很有用。</p>
 </div>
 </div>
 </div>
@@ -410,12 +416,12 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 <h2 id="build-plugins"><a class="anchor" href="#build-plugins"></a>构建插件</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>如果您不想直接在构建中调用<code>docker</code> ，则可以使用Maven和Gradle丰富的插件集来为您工作。这里仅仅是少数。</p>
+<p>如果你不想打电话<code>docker</code>直接在您的构建中，有相当丰富的Maven和Gradle插件集可以为您工作。这里仅仅是少数。</p>
 </div>
 <div class="sect2">
 <h3 id="spotify-maven-plugin"><a class="anchor" href="#spotify-maven-plugin"></a> Spotify Maven插件</h3>
 <div class="paragraph">
-<p><a href="https://github.com/spotify/dockerfile-maven">Spotify Maven插件</a>是一个受欢迎的选择。它需要应用程序开发人员编写<code>Dockerfile</code> ，然后运行<code>docker</code>为你，就好像你在做它的命令行上。docker image标签和其他内容有一些配置选项，但它使应用程序中的<code>Dockerfile</code>知识集中在<code>Dockerfile</code> ，这是许多人喜欢的。</p>
+<p><a href="https://github.com/spotify/dockerfile-maven">Spotify Maven插件</a>是一个受欢迎的选择。它要求应用程序开发人员编写一个<code>Dockerfile</code>然后运行<code>docker</code>对您来说，就像您在命令行上一样。docker image标签和其他内容有一些配置选项，但它使您应用程序中的docker知识集中在<code>Dockerfile</code> ，很多人都喜欢。</p>
 </div>
 <div class="paragraph">
 <p>对于真正的基本用法，它无需额外配置即可直接使用：</p>
@@ -438,7 +444,7 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>这将构建一个匿名docker镜像。我们现在可以在命令行上使用<code>docker</code>对其进行标记，或者使用Maven配置将其设置为<code>repository</code> 。示例（不更改<code>pom.xml</code> ）：</p>
+<p>这将构建一个匿名docker镜像。我们可以用<code>docker</code>现在在命令行上，或使用Maven配置将其设置为<code>repository</code> 。示例（不更改<code>pom.xml</code> ）：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -453,28 +459,28 @@ ENTRYPOINT ["java","-cp","app:app/lib/*","hello.Application"]</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code><build>
-    <plugins>
-        <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>dockerfile-maven-plugin</artifactId>
-            <version>1.4.8</version>
-            <configuration>
-                <repository>myorg/${project.artifactId}</repository>
-            </configuration>
-        </plugin>
-    </plugins>
-</build></code></pre>
+<pre class="prettyprint highlight"><code>&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;com.spotify&lt;/groupId&gt;
+            &lt;artifactId&gt;dockerfile-maven-plugin&lt;/artifactId&gt;
+            &lt;version&gt;1.4.8&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;repository&gt;myorg/${project.artifactId}&lt;/repository&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="palantir-gradle-plugin"><a class="anchor" href="#palantir-gradle-plugin"></a> Palantir Gradle插件</h3>
 <div class="paragraph">
-<p>该<a href="https://github.com/palantir/gradle-docker">真知晶球摇篮插件</a>工作与<code>Dockerfile</code> ，它也能产生<code>Dockerfile</code>你，然后它运行<code>docker</code> ，如果你是在命令行中运行它。</p>
+<p><a href="https://github.com/palantir/gradle-docker">Palantir Gradle插件</a>可与<code>Dockerfile</code>而且还可以生成一个<code>Dockerfile</code>为你，然后它运行<code>docker</code>就像在命令行上运行它一样。</p>
 </div>
 <div class="paragraph">
-<p>首先，您需要将插件导入到<code>build.gradle</code> ：</p>
+<p>首先，您需要将插件导入到您的<code>build.gradle</code> ：</p>
 </div>
 <div class="paragraph">
 <p><code>build.gradle</code></p>
@@ -520,19 +526,19 @@ docker {
 </div>
 </div>
 <div class="paragraph">
-<p>在此示例中，我们选择在<code>build</code>目录中的特定位置解压缩Spring Boot胖子罐，该目录是docker构建的根目录。然后，上面的多层（不是多阶段） <code>Dockerfile</code>将起作用。</p>
+<p>在此示例中，我们选择将Spring Boot胖子罐解压缩到<code>build</code>目录，这是docker构建的根目录。然后是多层（不是多阶段） <code>Dockerfile</code>从上面会工作。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="jib-maven-and-gradle-plugins"><a class="anchor" href="#jib-maven-and-gradle-plugins"></a> Jib Maven和Gradle插件</h3>
 <div class="paragraph">
-<p>Google有一个名为<a href="https://github.com/GoogleContainerTools/jib">Jib的</a>开源工具，它相对较新，但出于多种原因却很有趣。可能最有趣的事情是您不需要docker来运行它-它使用与从<code>docker build</code>获得的相同的标准输出来构建映像，但是除非您要求，否则不使用<code>docker</code>因此它可以在以下环境中工作没有安装docker（在构建服务器中并不罕见）。您也不需要<code>Dockerfile</code> （无论如何都会被忽略）或<code>pom.xml</code>任何内容来获取在Maven中构建的映像（Gradle要求您至少将插件安装在<code>build.gradle</code> ）。</p>
+<p>Google有一个名为<a href="https://github.com/GoogleContainerTools/jib">Jib的</a>开源工具，它相对较新，但出于多种原因却很有趣。可能最有趣的是您不需要docker来运行它-它使用与从中获得的相同标准输出来构建映像<code>docker build</code>但不使用<code>docker</code>除非您要求-否则它可以在未安装docker的环境中运行（在构建服务器中并不罕见）。您也不需要<code>Dockerfile</code> （无论如何都会被忽略），或者您的任何内容<code>pom.xml</code>以获得在Maven中构建的图像（Gradle需要您至少在以下位置安装插件<code>build.gradle</code> ）。</p>
 </div>
 <div class="paragraph">
-<p>Jib的另一个有趣的功能是，它对层有<code>Dockerfile</code> ，并且以与上面创建的多层<code>Dockerfile</code>稍有不同的方式优化了它们。就像在胖子罐中一样，Jib将本地应用程序资源与依赖项分离开来，但它走得更远，而且还将快照依赖项放入一个单独的层中，因为它们更容易发生变化。有一些配置选项可用于进一步自定义布局。</p>
+<p>Jib的另一个有趣特征是，它对层有看法，并且以与多层略有不同的方式优化了层<code>Dockerfile</code>在上面创建。就像在胖子罐中一样，Jib将本地应用程序资源与依赖项分离开来，但它走得更远，而且还将快照依赖项放入一个单独的层中，因为它们很可能会发生变化。有一些配置选项可用于进一步自定义布局。</p>
 </div>
 <div class="paragraph">
-<p>Maven的示例（不更改<code>pom.xml</code> ）：</p>
+<p>Maven示例（不更改<code>pom.xml</code> ）：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -540,25 +546,25 @@ docker {
 </div>
 </div>
 <div class="paragraph">
-<p>要运行上述命令，您将需要具有在<code>myorg</code>存储库前缀下推送到Dockerhub的权限。如果您有认证<code>docker</code>在命令行上，将从您的本地工作<code>~/.docker</code>配置。您也可以在<code>~/.m2/settings.xml</code> （重要的信息库ios的<code>id</code>中<code>~/.m2/settings.xml</code> Maven“服务器”身份验证：</p>
+<p>要运行以上命令，您将需要具有在以下位置推送到Dockerhub的权限： <code>myorg</code>存储库前缀。如果您已通过<code>docker</code>在命令行上，它将在本地运行<code>~/.docker</code>组态。您还可以在您的服务器中设置Maven“服务器”身份验证<code>~/.m2/settings.xml</code> （ <code>id</code>存储库ios的有效数量）：</p>
 </div>
 <div class="paragraph">
 <p><code>settings.xml</code></p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>    <server>
-      <id>registry.hub.docker.com</id>
-      <username>myorg</username>
-      <password>...</password>
-    </server></code></pre>
+<pre class="prettyprint highlight"><code>    &lt;server&gt;
+      &lt;id&gt;registry.hub.docker.com&lt;/id&gt;
+      &lt;username&gt;myorg&lt;/username&gt;
+      &lt;password&gt;...&lt;/password&gt;
+    &lt;/server&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>还有其他的选择，比如，你可以对一个码头工人守护本地构建（就像跑<code>docker</code>在命令行），使用<code>dockerBuild</code>目标，而不是<code>build</code> 。还支持其他容器注册表，对于每个容器注册表，您将需要通过docker或Maven设置来设置本地身份验证。</p>
+<p>还有其他选项，例如，您可以针对docker守护程序在本地进行构建（例如运行<code>docker</code>在命令行上），使用<code>dockerBuild</code>目标而不是<code>build</code> 。还支持其他容器注册表，对于每个容器注册表，您将需要通过docker或Maven设置来设置本地身份验证。</p>
 </div>
 <div class="paragraph">
-<p>该插件的Gradle也有类似的功能，一旦你拥有了它在你<code>build.gradle</code> ，如</p>
+<p>一旦您将gradle插件包含在其中，它便具有类似的功能<code>build.gradle</code> ，例如</p>
 </div>
 <div class="paragraph">
 <p><code>build.gradle</code></p>
@@ -602,7 +608,7 @@ docker {
 </div>
 </div>
 <div class="paragraph">
-<p>由于与Maven构建，如果已经使用认证<code>docker</code>在命令行上，图像推将从本地认证<code>~/.docker</code>配置。</p>
+<p>与Maven构建一样，如果您已通过<code>docker</code>在命令行上，图像推送将从您本地的身份验证<code>~/.docker</code>组态。</p>
 </div>
 </div>
 </div>
@@ -614,7 +620,7 @@ docker {
 <p>如今（或应该如此），自动化已成为每个应用程序生命周期的一部分。人们用来实现自动化的工具往往非常擅长从源代码调用构建系统。因此，如果您得到一个docker映像，并且构建代理中的环境与开发人员自己的环境充分对齐，则可能就足够了。向Docker注册表进行身份验证可能是最大的挑战，但是所有自动化工具中都有一些功能可以帮助实现这一点。</p>
 </div>
 <div class="paragraph">
-<p>但是，有时最好将容器创建完全留给自动化层，在这种情况下，可能不需要污染用户的代码。容器创建非常棘手，开发人员有时并不真正在意它。如果用户代码更干净，则其他工具更有可能“做正确的事”，应用安全修复程序，优化缓存等。有多种自动化选项，并且这些天它们都具有与容器相关的某些功能。我们只看几个。</p>
+<p>但是，有时最好将容器创建完全留给自动化层，在这种情况下，可能不需要污染用户的代码。容器创建非常棘手，开发人员有时并不真正在意它。如果用户代码更简洁，则其他工具更有可能“做正确的事”，应用安全修复程序，优化缓存等。有多种自动化选项，并且这些天它们都将具有与容器相关的某些功能。我们只看几个。</p>
 </div>
 <div class="sect2">
 <h3 id="concourse"><a class="anchor" href="#concourse"></a>大堂</h3>
@@ -622,7 +628,7 @@ docker {
 <p><a href="https://concourse-ci.org">Concourse</a>是基于管道的自动化平台，可用于CI和CD。它在Pivotal内部大量使用，该项目的主要作者在那里工作。除CLI外，Concourse中的所有内容都是无状态的，并且所有内容都在容器中运行。由于运行容器是自动化管道的主要业务顺序，因此很好地支持创建容器。如果它是容器映像，则<a href="https://github.com/concourse/docker-image-resource">Docker Image Resource</a>负责使构建的输出状态保持最新。</p>
 </div>
 <div class="paragraph">
-<p>这是一个示例管道，为上面的示例构建一个docker映像，假设它位于<code>myorg/myapp</code> github中，并且在根目录下有一个<code>Dockerfile</code> ，并且在<code>src/main/ci/build.yml</code>具有一个构建任务声明：</p>
+<p>这是为上面的示例构建docker映像的示例管道，假设它位于github上<code>myorg/myapp</code>并有一个<code>Dockerfile</code>在根处，并在其中创建任务<code>src/main/ci/build.yml</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -659,7 +665,7 @@ jobs:
 <div class="sect2">
 <h3 id="jenkins"><a class="anchor" href="#jenkins"></a>詹金斯</h3>
 <div class="paragraph">
-<p><a href="https://jenkins.io">Jenkins</a>是另一种流行的自动化服务器。它具有广泛的功能，但此处最接近其他自动化示例的功能是<a href="https://jenkins.io/doc/book/pipeline/docker/">管道</a>功能。这是一个<code>Jenkinsfile</code> ，它使用Maven构建Spring Boot项目，然后使用<code>Dockerfile</code>构建映像并将其推送到存储库：</p>
+<p><a href="https://jenkins.io">Jenkins</a>是另一种流行的自动化服务器。它具有广泛的功能，但在此处与其他自动化示例最接近的功能是<a href="https://jenkins.io/doc/book/pipeline/docker/">管道</a>功能。这是一个<code>Jenkinsfile</code>使用Maven构建Spring Boot项目，然后使用<code>Dockerfile</code>构建图像并将其推送到存储库：</p>
 </div>
 <div class="paragraph">
 <p><code>Jenkinsfile</code></p>
@@ -674,7 +680,7 @@ jobs:
 </div>
 </div>
 <div class="paragraph">
-<p>对于需要在构建服务器验证的（现实的）泊坞窗库，你可以添加凭据<code>docker</code>使用上述目的<code>docker.withCredentials(…​)</code></p>
+<p>对于需要在构建服务器中进行身份验证的（现实的）泊坞库，您可以将凭证添加到<code>docker</code>上面使用的对象<code>docker.withCredentials(…​)</code> 。</p>
 </div>
 </div>
 </div>
@@ -683,13 +689,13 @@ jobs:
 <h2 id="buildpacks"><a class="anchor" href="#buildpacks"></a>构建包</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a href="https://www.cloudfoundry.org/">Cloud Foundry</a>多年来一直在内部使用容器，用于将用户代码转换为容器的技术的一部分是Build Packs，该思想最初是从<a href="https://www.heroku.com/">Heroku</a>借来的。当前的buildpacks（v2）生成通用二进制输出，该输出由平台组装到容器中。<a href="https://buildpacks.io/">新一代的buildpack</a> （v3）是Heroku与其他公司（包括Pivotal）之间的合作，可以直接且显式地构建容器映像。这对于开发人员和运营商来说非常有趣。开发人员不需要太在乎如何构建容器的细节，但是如果需要，他们可以轻松地创建一个容器。Buildpacks还具有许多用于缓存生成结果和依赖项的功能，因此，Buildpack的运行速度要比本地Docker构建快得多。操作员可以扫描容器以审核其内容并进行转换以修补它们以进行安全更新。您可以在本地（例如，在开发人员机器上或在CI服务中）或在Cloud Foundry之类的平台上运行构建包。</p>
+<p><a href="https://www.cloudfoundry.org/">Cloud Foundry</a>多年来一直在内部使用容器，用于将用户代码转换为容器的技术的一部分是Build Packs，该思想最初是从<a href="https://www.heroku.com/">Heroku</a>借来的。当前的buildpacks（v2）生成通用二进制输出，该输出由平台组装到容器中。<a href="https://buildpacks.io/">新一代的buildpack</a> （v3）是Heroku与其他公司（包括Pivotal）之间的合作，可以直接且显式地构建容器映像。这对于开发人员和运营商来说非常有趣。开发人员不需要太在乎如何构建容器的细节，但是如果需要，他们可以轻松地创建一个容器。Buildpacks还具有许多用于缓存构建结果和依赖项的功能，因此，Buildpack的运行速度比本地Docker构建要快得多。操作员可以扫描容器以审核其内容，并对其进行转换以修补它们以进行安全更新。您可以在本地（例如，在开发人员机器上或在CI服务中）或在Cloud Foundry之类的平台上运行构建包。</p>
 </div>
 <div class="paragraph">
-<p>buildpack生命周期的输出是一个容器映像，但是您不需要<code>Dockerfile</code>或<code>Dockerfile</code> ，因此它是CI和自动化友好的。输出映像中的文件系统层由buildpack控制，通常，将进行许多优化而无需开发人员知道或关心它们。在较低层（如包含操作系统的基础映像）与较高层（如包含中间件和特定于语言的依赖关系）之间还有一个<a href="https://en.wikipedia.org/wiki/Application_binary_interface">应用程序二进制接口</a> 。如果存在安全更新，则Cloud Foundry这样的平台可以修补较低的层，而不会影响应用程序的完整性和功能。</p>
+<p>buildpack生命周期的输出是一个容器映像，但是您不需要docker或<code>Dockerfile</code> ，因此对CI和自动化友好。输出映像中的文件系统层由buildpack控制，通常，将进行许多优化，而无需开发人员知道或关心它们。在较低层（如包含操作系统的基础映像）与较高层（如包含中间件和特定于语言的依赖关系）之间还有一个<a href="https://en.wikipedia.org/wiki/Application_binary_interface">应用程序二进制接口</a> 。如果存在安全更新，则Cloud Foundry这样的平台可以修补较低的层，而不会影响应用程序的完整性和功能。</p>
 </div>
 <div class="paragraph">
-<p>为了让您了解buildpack的功能，这里是从命令行使用<a href="https://github.com/buildpack/pack">Pack CLI</a>的示例（它将与本文中使用的示例应用程序一起使用，不需要<code>Dockerfile</code>或任何特殊的构建配置） ：</p>
+<p>为了让您了解buildpack的功能，这里是一个从命令行使用<a href="https://github.com/buildpack/pack">Pack CLI</a>的示例（它将与本文中使用的示例应用程序一起使用，不需要<code>Dockerfile</code>或任何特殊的构建配置）：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -701,19 +707,19 @@ jobs:
 2018/11/07 09:54:52 Group: Cloud Foundry OpenJDK Buildpack: pass | Cloud Foundry Build System Buildpack: pass | Cloud Foundry JVM Application Buildpack: pass
 *** ANALYZING: Reading information from previous image for possible re-use
 *** BUILDING:
------> Cloud Foundry OpenJDK Buildpack 1.0.0-BUILD-SNAPSHOT
------> OpenJDK JDK 1.8.192: Reusing cached dependency
------> OpenJDK JRE 1.8.192: Reusing cached launch layer
+-----&gt; Cloud Foundry OpenJDK Buildpack 1.0.0-BUILD-SNAPSHOT
+-----&gt; OpenJDK JDK 1.8.192: Reusing cached dependency
+-----&gt; OpenJDK JRE 1.8.192: Reusing cached launch layer
 
------> Cloud Foundry Build System Buildpack 1.0.0-BUILD-SNAPSHOT
------> Using Maven wrapper
+-----&gt; Cloud Foundry Build System Buildpack 1.0.0-BUILD-SNAPSHOT
+-----&gt; Using Maven wrapper
        Linking Maven Cache to /home/pack/.m2
------> Building application
+-----&gt; Building application
        Running /workspace/app/mvnw -Dmaven.test.skip=true package
 ...
----> Running in e6c4a94240c2
----> 4f3a96a4f38c
----> 4f3a96a4f38c
+---&gt; Running in e6c4a94240c2
+---&gt; 4f3a96a4f38c
+---&gt; 4f3a96a4f38c
 Successfully built 4f3a96a4f38c
 Successfully tagged myorg/myapp:latest
 $ docker run -p 8080:8080 myorg/myapp
@@ -730,7 +736,7 @@ $ docker run -p 8080:8080 myorg/myapp
 </div>
 </div>
 <div class="paragraph">
-<p><code>--builder</code>是运行buildpack生命周期的<code>--builder</code>映像-通常，它将是所有开发人员或单个平台上所有开发人员的共享资源。这是Ben Hale的工作，Ben Hale为Cloud Foundry维护了较旧的构建包，现在正在开发新一代产品。在这种情况下，输出将发送到本地docker守护程序，但是在自动化平台中，它可能是docker注册表。<code>pack</code> CLI稳定发布后，默认的构建器可能会做同样的事情。</p>
+<p>的<code>--builder</code>是运行buildpack生命周期的docker映像-通常，它将是所有开发人员或单个平台上所有开发人员的共享资源。这是Ben Hale的工作，Ben Hale为Cloud Foundry维护了较旧的buildpack，现在正在开发新一代产品。在这种情况下，输出将发送到本地docker守护程序，但是在自动化平台中，它可能是docker注册表。一旦<code>pack</code> CLI达到了稳定的发行版，默认生成器可能会做同样的事情。</p>
 </div>
 </div>
 </div>
@@ -738,7 +744,7 @@ $ docker run -p 8080:8080 myorg/myapp
 <h2 id="knative"><a class="anchor" href="#knative"></a>基尼特语</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>容器和平台领域的另一个新项目是<a href="https://cloud.google.com/knative/">Knative</a> 。Knative有很多东西，但是如果您不熟悉Knative，则可以将其视为构建无服务器平台的基础。它基于<a href="https://kubernetes.io">Kubernetes</a>构建，因此最终它会使用容器映像，并在平台上将它们转换为应用程序或“服务”。但是，它的主要功能之一是能够使用源代码并为您构建容器，从而使其对开发人员和操作员更友好。<a href="https://github.com/knative/build">Knative Build</a>是执行此操作的组件，它本身就是一个将用户代码转换为容器的灵活平台-您几乎可以按照自己喜欢的任何方式进行操作。一些模板提供了常见的模式，例如Maven和Gradle构建，以及使用<a href="https://github.com/GoogleContainerTools/kaniko">Kaniko的</a>多阶段<a href="https://github.com/GoogleContainerTools/kaniko">docker</a>构建。还有一个使用<a href="https://github.com/knative/build-templates/tree/master/buildpack">Buildpacks</a>的模板，这对我们来说很有趣，因为buildpacks一直对Spring Boot具有良好的支持。Knative上的Buildpack也是<a href="https://projectriff.io">Riff</a>和<a href="https://pivotal.io/platform/pivotal-function-service">Pivotal Function Service的</a>明智选择，用于将用户功能转换为正在运行的无服务器应用程序。</p>
+<p>容器和平台领域的另一个新项目是<a href="https://cloud.google.com/knative/">Knative</a> 。Knative有很多东西，但是如果您不熟悉Knative，则可以将其视为构建无服务器平台的基础。它基于<a href="https://kubernetes.io">Kubernetes</a>构建，因此最终它会使用容器映像，并将它们转换为平台上的应用程序或“服务”。但是，它的主要功能之一是能够使用源代码并为您构建容器，从而使其对开发人员和操作员更友好。<a href="https://github.com/knative/build">Knative Build</a>是执行此操作的组件，它本身就是一个将用户代码转换为容器的灵活平台-您几乎可以按照自己喜欢的任何方式进行操作。一些模板提供了通用模式，例如Maven和Gradle构建，以及使用<a href="https://github.com/GoogleContainerTools/kaniko">Kaniko的</a>多阶段<a href="https://github.com/GoogleContainerTools/kaniko">docker</a>构建。还有一个使用<a href="https://github.com/knative/build-templates/tree/master/buildpack">Buildpacks</a>的模板，这对我们来说很有趣，因为buildpacks一直对Spring Boot具有良好的支持。Knative上的Buildpack也是<a href="https://projectriff.io">Riff</a>和<a href="https://pivotal.io/platform/pivotal-function-service">Pivotal Function Service的</a>明智选择，用于将用户功能转换为正在运行的无服务器应用程序。</p>
 </div>
 </div>
 </div>
@@ -746,13 +752,14 @@ $ docker run -p 8080:8080 myorg/myapp
 <h2 id="closing"><a class="anchor" href="#closing"></a>闭幕</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>本文介绍了许多用于为Spring Boot应用程序构建容器映像的选项。所有这些都是完全有效的选择，现在由您决定需要哪一个。您的第一个问题应该是“我真的需要构建容器映像吗？如果答案是“是”，那么您的选择可能会受到效率和可缓存性以及关注点分离的影响。您是否希望使开发人员不必过多地了解如何创建容器映像？当需要修补操作系统和中间件漏洞时，是否要让开发人员负责更新映像？也许开发人员需要对整个过程进行完全控制，并且他们拥有所需的所有工具和知识。</p>
+<p>本文介绍了许多用于为Spring Boot应用程序构建容器映像的选项。所有这些都是完全有效的选择，现在由您决定需要哪一个。您的第一个问题应该是“我真的需要构建容器映像吗？“如果答案是“是”，那么您的选择可能会受到效率和可缓存性以及关注点分离的影响。您是否希望使开发人员不必过多地了解如何创建容器映像？当需要修补操作系统和中间件漏洞时，是否要让开发人员负责更新映像？也许开发人员需要对整个过程进行完全控制，并且他们拥有所需的所有工具和知识。</p>
 </div>
 </div>
 </div></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3468;
 
       (function(disqus_shortname, document) {
@@ -766,7 +773,8 @@ $ docker run -p 8080:8080 myorg/myapp
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -804,12 +812,14 @@ $ docker run -p 8080:8080 myorg/myapp
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

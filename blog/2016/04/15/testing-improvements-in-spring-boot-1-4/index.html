@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>测试Spring Boot 1.4中的改进</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -33,14 +37,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2016-04-15 18:37:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -167,9 +173,9 @@
 </div>
 </header>
 <div class="blog--post"><p>为Pivotal工作的好处之一是，他们拥有一个强大的敏捷开发部门，称为Pivotal Labs。实验室中的团队大力支持精益和XP软件方法论，例如结对编程和测试驱动的开发。他们对测试的热爱对Spring Boot 1.4产生了特别的影响，因为我们已经开始就可以改进的方面获得大量反馈。这篇博客文章重点介绍了最新的M2版本中已经包含的一些新测试功能。</p><h2><a href="#testing-without-spring" class="anchor" name="testing-without-spring"></a>无弹簧测试</h2>
-<p>对任何Spring <code>@Component</code>进行单元测试的最简单方法是完全不涉及Spring！始终最好尝试构造代码，以便可以直接实例化和测试类。通常，这归结为几件事：</p>
+<p>对任何Spring进行单元测试的最简单方法<code>@Component</code>根本不涉及Spring！始终最好尝试构造代码，以便可以直接实例化和测试类。通常，这归结为几件事：</p>
 <ul>
-<li>用清晰的关注点分离结构代码，以便可以对各个部分进行单元测试。TDD是实现此目标的好方法。</li>
+<li>用清晰的关注点分离结构化代码，以便可以对各个部分进行单元测试。TDD是实现此目标的好方法。</li>
 <li>使用构造函数注入以确保可以直接实例化对象。不要使用字段注入，因为这只会使您的测试难以编写。</li>
 </ul>
 <p>使用Spring Framework 4.3，编写使用构造函数注入的组件非常容易，因为您不再需要使用<code>@Autowired</code> 。只要您只有一个构造函数，Spring就会隐式地将其视为自动装配目标：</p>
@@ -184,7 +190,7 @@ public class MyComponent {
 
 } 
 </code></pre>
-<p>现在，测试<code>MyComponent</code>就像直接创建它并调用一些方法一样简单：</p>
+<p>测试中<code>MyComponent</code>现在就像直接创建它并调用一些方法一样简单：</p>
 <pre><code class="prettyprint java">@Test
 public void testSomeMethod() {
     SomeService service = mock(SomeService.class);
@@ -192,8 +198,8 @@ public void testSomeMethod() {
     // setup mock and class component methods
 }
 </code></pre><h2><a href="#spring-boot-1-3-recap" class="anchor" name="spring-boot-1-3-recap"></a> Spring Boot 1.3回顾</h2>
-<p>当然，通常您需要将堆栈往上移一点，并开始编写<em>确实</em>涉及Spring的集成测试。幸运的是，Spring Framework在这里有<code>spring-test</code>模块可以提供帮助，但不幸的是，Spring Boot 1.3有很多不同的方式来使用它。</p>
-<p>您可能将<code>@ContextConfiguration</code>annotation与<code>SpringApplicationContextLoader</code>结合使用：</p>
+<p>当然，通常您需要将堆栈往上移一点，并开始编写<em>确实</em>涉及Spring的集成测试。幸运的是，Spring Framework具有<code>spring-test</code>模块在这里提供帮助，不幸的是，在Spring Boot 1.3中有很多不同的方法可以使用它。</p>
+<p>您可能正在使用<code>@ContextConfiguration</code>注释与<code>SpringApplicationContextLoader</code> ：</p>
 <pre><code class="prettyprint java">@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=MyApp.class, loader=SpringApplicationContextLoader.class)
 public class MyTest {
@@ -211,7 +217,7 @@ public class MyTest {
 
 }
 </code></pre>
-<p>您可能已经将它们之一与<code>@IntegrationTest</code>结合了：</p>
+<p>您可能将它们中的任何一个与<code>@IntegrationTest</code> ：</p>
 <pre><code class="prettyprint java">@RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(MyApp.class)
 @IntegrationTest
@@ -221,7 +227,7 @@ public class MyTest {
 
 }
 </code></pre>
-<p>或使用<code>@WebIntegrationTest</code> （或可能使用<code>@IntegrationTest</code> + <code>@WebAppConfiguration</code> ）</p>
+<p>或搭配<code>@WebIntegrationTest</code> （或可能<code>@IntegrationTest</code> + <code>@WebAppConfiguration</code> ）</p>
 <pre><code class="prettyprint java">@RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(MyApp.class)
 @WebIntegrationTest
@@ -231,9 +237,9 @@ public class MyTest {
 
 }
 </code></pre>
-<p>您还可以在随机端口（ <code>@WebIntegrationTest(randomPort=true)</code> ）上运行服务器并添加属性（使用<code>@IntegrationTest("myprop=myvalue")</code>或<code>@TestPropertySource(properties="myprop=myvalue")</code> ）进行混合</p>
+<p>您还可以加入在随机端口上运行服务器的组合（ <code>@WebIntegrationTest(randomPort=true)</code> ）并添加属性（使用<code>@IntegrationTest("myprop=myvalue")</code>要么<code>@TestPropertySource(properties="myprop=myvalue")</code> ）</p>
 <p>有很多选择！</p><h2><a href="#spring-boot-1-4-simplifications" class="anchor" name="spring-boot-1-4-simplifications"></a> Spring Boot 1.4的简化</h2>
-<p>使用Spring Boot 1.4，事情应该变得更简单。有一个<code>@SpringBootTest</code>annotation用于常规测试，还有一些用于测试应用程序片段的特殊变体（稍后会详细介绍）。</p>
+<p>使用Spring Boot 1.4，事情应该变得更简单。有一个<code>@SpringBootTest</code>用于常规测试的批注，以及用于测试应用程序切片的一些特殊变体（稍后会详细介绍）。</p>
 <p>典型的Spring Boot 1.4集成测试如下所示：</p>
 <pre><code class="prettyprint java">@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
@@ -245,12 +251,12 @@ public class MyTest {
 </code></pre>
 <p>这是正在发生的事情的分解：</p>
 <ul>
-<li><code>@RunWith(SpringRunner.class)</code>告诉JUnit使用Spring的测试支持运行。<code>SpringRunner</code>是新的名称<code>SpringJUnit4ClassRunner</code> ，这是对眼睛更容易只是有点。</li>
-<li><code>@SpringBootTest</code>说的是“具有Spring Boot支持的引导<code>application.properties</code> ”（例如，加载<code>application.properties</code>并给我所有Spring Boot的好处）</li>
-<li><code>webEnvironment</code>属性允许为测试配置特定的“ Web环境”。您可以使用<code>MOCK</code> servlet环境或运行在<code>RANDOM_PORT</code>或<code>DEFINED_PORT</code>上的真实HTTP服务器启动测试。</li>
-<li>如果要加载特定的配置，可以使用<code>@SpringBootTest</code>的<code>classes</code>属性。在此示例中，我们省略了<code>classes</code> ，这意味着测试将首先尝试从任何内部类中加载<code>@Configuration</code> ，如果失败，它将搜索您的主要<code>@SpringBootApplication</code>类。</li>
+<li><code>@RunWith(SpringRunner.class)</code>告诉JUnit使用Spring的测试支持运行。 <code>SpringRunner</code>是的新名称<code>SpringJUnit4ClassRunner</code> ，在眼睛上就容易多了。</li>
+<li><code>@SpringBootTest</code>说“在Spring Boot的支持下进行引导”（例如，加载<code>application.properties</code>并给我所有的Spring Boot天赋）</li>
+<li>的<code>webEnvironment</code>属性允许为测试配置特定的“网络环境”。您可以使用<code>MOCK</code> Servlet环境或运行在<code>RANDOM_PORT</code>或<code>DEFINED_PORT</code> 。</li>
+<li>如果要加载特定的配置，可以使用<code>classes</code>的属性<code>@SpringBootTest</code> 。在这个例子中，我们省略了<code>classes</code>这意味着测试将首先尝试加载<code>@Configuration</code>从任何内部类中获取，如果失败，它将搜索您的主要类<code>@SpringBootApplication</code>类。</li>
 </ul>
-<p><code>@SpringBootTest</code>annotation还具有一个<code>properties</code>属性，该属性可用于指定应在<code>Environment</code>定义的任何其他属性。现在，属性的加载方式与Spring的常规<code>@TestPropertySource</code>annotation<code>@TestPropertySource</code> 。</p>
+<p>的<code>@SpringBootTest</code>注释也有一个<code>properties</code>可用于指定应在中定义的任何其他属性的属性<code>Environment</code> 。现在，属性的加载方式与Spring的常规加载方式完全相同<code>@TestPropertySource</code>注解。</p>
 <p>下面是一个更具体的示例，它实际上达到了真正的REST端点：</p>
 <pre><code class="prettyprint java">@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
@@ -262,14 +268,14 @@ public class MyTest {
     @Test
     public void test() {
         this.restTemplate.getForEntity(
-            "/{username}/vehicle", String.class, "Phil");
+            &quot;/{username}/vehicle&quot;, String.class, &quot;Phil&quot;);
     }
 
 }
 </code></pre>
-<p>注意，无论何时使用<code>@SpringBootTest</code> ， <code>TestRestTemplate</code>现在都可以作为bean使用。它已预先配置为解析到<code>http://localhost:${local.server.port}</code>相对路径。我们还可以使用<code>@LocalServerPort</code>annotation将服务器正在运行的实际端口注入到测试字段中。</p><h2><a href="#mocking-and-spying" class="anchor" name="mocking-and-spying"></a>模拟和间谍</h2>
-<p>当您开始测试实际系统时，通常会发现模拟特定的bean很有帮助。常见的模拟方案包括模拟运行测试时无法使用的服务，或测试难以在实时系统中触发的失败方案。</p>
-<p>使用Spring Boot 1.4，您可以轻松创建一个Mockito模拟，该模拟可以替换现有的bean，也可以创建一个新的bean：</p>
+<p>注意<code>TestRestTemplate</code>现在可以作为bean使用<code>@SpringBootTest</code>用来。它已预先配置为解析相对路径<code>http://localhost:${local.server.port}</code> 。我们也可以使用<code>@LocalServerPort</code>注解，将服务器正在运行的实际端口注入测试字段。</p><h2><a href="#mocking-and-spying" class="anchor" name="mocking-and-spying"></a>模拟和间谍</h2>
+<p>当您开始测试实际系统时，通常会发现模拟特定的bean很有帮助。常见的模拟场景包括模拟运行测试时无法使用的服务，或测试难以在实时系统中触发的失败场景。</p>
+<p>使用Spring Boot 1.4，您可以轻松创建一个Mockito模拟，该模拟可以替换现有的bean，或者创建一个新的bean：</p>
 <pre><code class="prettyprint java">@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class SampleTestApplicationWebIntegrationTests {
@@ -283,36 +289,36 @@ public class SampleTestApplicationWebIntegrationTests {
     @Before
     public void setup() {
         given(this.vehicleDetailsService.
-            getVehicleDetails("123")
+            getVehicleDetails(&quot;123&quot;)
         ).willReturn(
-            new VehicleDetails("Honda", "Civic"));
+            new VehicleDetails(&quot;Honda&quot;, &quot;Civic&quot;));
     }
 
     @Test
     public void test() {
-        this.restTemplate.getForEntity("/{username}/vehicle", 
-            String.class, "sframework");
+        this.restTemplate.getForEntity(&quot;/{username}/vehicle&quot;, 
+            String.class, &quot;sframework&quot;);
     }
 
 }
 </code></pre>
 <p>在此示例中，我们是：</p>
 <ul>
-<li>为<code>VehicleDetailsService</code>创建一个Mockito模拟。</li>
-<li>将其作为bean注入<code>ApplicationContext</code>中。</li>
+<li>为创建一个Mockito模拟<code>VehicleDetailsService</code> 。</li>
+<li>注入到<code>ApplicationContext</code>作为豆。</li>
 <li>将其注入测试中的字段。</li>
-<li><code>setup</code>方法中的存根行为。</li>
+<li>存根行为<code>setup</code>方法。</li>
 <li>触发将最终调用模拟的东西。</li>
 </ul>
 <p>模拟会在测试之间自动重置。它们也构成了Spring Test使用的缓存键的一部分（因此无需添加<code>@DirtiesContext</code> ）</p>
-<p>间谍的工作方式与此类似。只需使用<code>@SpyBean</code>annotation一个测试字段， <code>@SpyBean</code>对<code>ApplicationContext</code>中的任何现有bean进行间谍包装。</p><h2><a href="#json-assertions" class="anchor" name="json-assertions"></a> JSON断言</h2>
-<p>如果使用<code>spring-boot-starter-test</code> POM导入测试依赖项，那么从1.4开始，您将获得出色的<a href="https://joel-costigliola.github.io/assertj/">AssertJ</a>库。AssertJ提供了一个流畅的断言API，该API替代了JUnit的基本<code>org.junit.Assert</code>类。如果您之前从未看过，则基本的AssertJ调用看起来像这样：</p>
-<pre><code class="prettyprint java">assertThat(library.getName()).startsWith("Spring").endsWith("Boot");
+<p>间谍的工作方式与此类似。只需使用以下注释注释测试字段<code>@SpyBean</code>让间谍将现有的Bean包装在<code>ApplicationContext</code> 。</p><h2><a href="#json-assertions" class="anchor" name="json-assertions"></a> JSON断言</h2>
+<p>如果您使用<code>spring-boot-starter-test</code> POM导入测试依赖项，从1.4开始，您将获得出色的<a href="https://joel-costigliola.github.io/assertj/">AssertJ</a>库。AssertJ提供了一个流畅的断言API，该API取代了JUnit的一些基本功能<code>org.junit.Assert</code>类。如果您之前从未看过，则基本的AssertJ调用看起来像这样：</p>
+<pre><code class="prettyprint java">assertThat(library.getName()).startsWith(&quot;Spring&quot;).endsWith(&quot;Boot&quot;);
 </code></pre>
 <p>Spring Boot 1.4提供了扩展的断言，可用于检查JSON编组和解编组。JSON测试器可用于Jackson和Gson。</p>
 <pre><code class="prettyprint java">public class VehicleDetailsJsonTests {
 
-    private JacksonTester<VehicleDetails> json;
+    private JacksonTester&lt;VehicleDetails&gt; json;
 
     @Before
     public void setup() {
@@ -324,41 +330,41 @@ public class SampleTestApplicationWebIntegrationTests {
     @Test
     public void serializeJson() {
         VehicleDetails details = 
-            new VehicleDetails("Honda", "Civic");
+            new VehicleDetails(&quot;Honda&quot;, &quot;Civic&quot;);
 
         assertThat(this.json.write(details))
-            .isEqualToJson("vehicledetails.json");
+            .isEqualToJson(&quot;vehicledetails.json&quot;);
 
         assertThat(this.json.write(details))
-            .hasJsonPathStringValue("@.make");
+            .hasJsonPathStringValue(&quot;@.make&quot;);
 
         assertThat(this.json.write(details))
-            .extractingJsonPathStringValue("@.make")
-            .isEqualTo("Honda");
+            .extractingJsonPathStringValue(&quot;@.make&quot;)
+            .isEqualTo(&quot;Honda&quot;);
     }
 
     @Test
     public void deserializeJson() {
-        String content = "{\"make\":\"Ford\",\"model\":\"Focus\"}";
+        String content = &quot;{\&quot;make\&quot;:\&quot;Ford\&quot;,\&quot;model\&quot;:\&quot;Focus\&quot;}&quot;;
 
         assertThat(this.json.parse(content))
-            .isEqualTo(new VehicleDetails("Ford", "Focus"));
+            .isEqualTo(new VehicleDetails(&quot;Ford&quot;, &quot;Focus&quot;));
 
         assertThat(this.json.parseObject(content).getMake())
-            .isEqualTo("Ford");
+            .isEqualTo(&quot;Ford&quot;);
     }
 
 }
 
 </code></pre>
-<p>JSON比较实际上是使用<a href="https://github.com/skyscreamer/JSONassert">JSONassert进行的</a> ，因此仅需要匹配JSON的逻辑结构。您还可以在上面的示例中看到如何使用<a href="https://github.com/jayway/JsonPath">JsonPath</a>表达式测试或提取数据。</p><h2><a href="#testing-application-slices" class="anchor" name="testing-application-slices"></a>测试应用程序片</h2>
+<p>JSON比较实际上是使用<a href="https://github.com/skyscreamer/JSONassert">JSONassert</a>执行的，因此仅需要匹配JSON的逻辑结构。您还可以在上面的示例中看到如何使用<a href="https://github.com/jayway/JsonPath">JsonPath</a>表达式测试或提取数据。</p><h2><a href="#testing-application-slices" class="anchor" name="testing-application-slices"></a>测试应用程序片</h2>
 <p>Spring Boot的自动配置功能非常适合配置应用程序需要运行的所有内容。不幸的是，对于测试而言，全自动配置有时可能有点过大。有时您只想配置应用程序的“切片” – Jackson的配置正确吗？我的MVC控制器返回正确的状态代码吗？我的JPA查询会运行吗？</p>
 <p>使用Spring Boot 1.4，现在可以轻松测试这些常见方案。我们也使构建仅应用所需的自动配置类的注释变得更加容易。</p><h3><a href="#testing-the-jpa-slice" class="anchor" name="testing-the-jpa-slice"></a>测试JPA片</h3>
-<p>要测试应用程序的JPA分片（Hibernate + Spring Data），可以使用<code>@DataJpaTest</code>annotation。<code>@DataJpaTest</code>将：</p>
+<p>要测试应用程序的JPA分片（Hibernate + Spring Data），可以使用<code>@DataJpaTest</code>注解。一种<code>@DataJpaTest</code>将：</p>
 <ul>
 <li>配置内存数据库。</li>
 <li>自动配置Hibernate，Spring Data和DataSource。</li>
-<li>执行一个<code>@EntityScan</code> 。</li>
+<li>执行<code>@EntityScan</code> 。</li>
 <li>开启SQL记录</li>
 </ul>
 <p>典型的测试如下所示：</p>
@@ -374,20 +380,20 @@ public class UserRepositoryTests {
 
     @Test
     public void findByUsernameShouldReturnUser() {
-        this.entityManager.persist(new User("sboot", "123"));
-        User user = this.repository.findByUsername("sboot");
+        this.entityManager.persist(new User(&quot;sboot&quot;, &quot;123&quot;));
+        User user = this.repository.findByUsername(&quot;sboot&quot;);
         
-        assertThat(user.getUsername()).isEqualTo("sboot");
-        assertThat(user.getVin()).isEqualTo("123");
+        assertThat(user.getUsername()).isEqualTo(&quot;sboot&quot;);
+        assertThat(user.getVin()).isEqualTo(&quot;123&quot;);
     }
 
 }
 </code></pre>
-<p>上面的测试中的<code>TestEntityManager</code>由Spring Boot提供。它是标准JPA <code>EntityManager</code>的替代方法，后者提供了编写测试时常用的方法。</p><h3><a href="#testing-the-spring-mvc-slice" class="anchor" name="testing-the-spring-mvc-slice"></a>测试Spring MVC Slice</h3>
-<p>要测试应用程序的Spring MVC切片，可以使用<code>@WebMvcTest</code>annotation。这会：</p>
+<p>的<code>TestEntityManager</code>在上面的测试中是由Spring Boot提供的。它是标准JPA的替代方案<code>EntityManager</code>提供编写测试时常用的方法。</p><h3><a href="#testing-the-spring-mvc-slice" class="anchor" name="testing-the-spring-mvc-slice"></a>测试Spring MVC Slice</h3>
+<p>要测试应用程序的Spring MVC分片，您可以使用<code>@WebMvcTest</code>注解。这会：</p>
 <ul>
 <li>自动配置Spring MVC，Jackson，Gson，消息转换器等</li>
-<li>加载相关组件（ <code>@Controller</code> <code>@RestController</code> ， <code>@Controller</code> <code>@RestController</code> ， <code>@Controller</code> <code>@JsonComponent</code>等）</li>
+<li>加载相关组件（ <code>@Controller</code> ， <code>@RestController</code> ， <code>@JsonComponent</code>等等）</li>
 <li>配置MockMVC</li>
 </ul>
 <p>这是一个测试单个控制器的典型示例：</p>
@@ -403,47 +409,48 @@ public class UserVehicleControllerTests {
 
     @Test
     public void getVehicleShouldReturnMakeAndModel() {
-        given(this.userVehicleService.getVehicleDetails("sboot"))
-            .willReturn(new VehicleDetails("Honda", "Civic"));
+        given(this.userVehicleService.getVehicleDetails(&quot;sboot&quot;))
+            .willReturn(new VehicleDetails(&quot;Honda&quot;, &quot;Civic&quot;));
 
-        this.mvc.perform(get("/sboot/vehicle")
+        this.mvc.perform(get(&quot;/sboot/vehicle&quot;)
             .accept(MediaType.TEXT_PLAIN))
             .andExpect(status().isOk())
-            .andExpect(content().string("Honda Civic"));
+            .andExpect(content().string(&quot;Honda Civic&quot;));
     }
 
 }
 </code></pre>
-<p>如果您更喜欢HtmlUnit，还可以使用<code>WebClient</code>代替<code>MockMvc</code> 。如果您更喜欢硒，则可以切换到<code>WebDriver</code> 。</p><h3><a href="#testing-the-json-slice" class="anchor" name="testing-the-json-slice"></a>测试JSON切片</h3>
+<p>如果您更喜欢HtmlUnit，也可以使用<code>WebClient</code>代替<code>MockMvc</code> 。如果硒更适合您，您可以切换到<code>WebDriver</code> 。</p><h3><a href="#testing-the-json-slice" class="anchor" name="testing-the-json-slice"></a>测试JSON切片</h3>
 <p>如果您需要测试JSON序列化是否按预期工作，则可以使用<code>@JsonTest</code> 。这会：</p>
 <ul>
 <li>自动配置Jackson和/或Gson</li>
-<li>添加您已定义的任何<code>Module</code>或<code>@JsonComponent</code> bean</li>
-<li>任何的触发初始化<code>JacksonTester</code>或<code>GsonTester</code>领域</li>
+<li>添加任何<code>Module</code>要么<code>@JsonComponent</code>您定义的bean</li>
+<li>触发任何初始化<code>JacksonTester</code>要么<code>GsonTester</code>领域</li>
 </ul>
 <p>这是一个例子：</p>
 <pre><code class="prettyprint java">@RunWith(SpringRunner.class)
 @JsonTest
 public class VehicleDetailsJsonTests {
 
-    private JacksonTester<VehicleDetails> json;
+    private JacksonTester&lt;VehicleDetails&gt; json;
 
     @Test
     public void serializeJson() {
         VehicleDetails details = new VehicleDetails(
-            "Honda", "Civic");
+            &quot;Honda&quot;, &quot;Civic&quot;);
 
         assertThat(this.json.write(details))
-            .extractingJsonPathStringValue("@.make")
-            .isEqualTo("Honda");
+            .extractingJsonPathStringValue(&quot;@.make&quot;)
+            .isEqualTo(&quot;Honda&quot;);
     }
 
 }
 </code></pre><h2><a href="#summary" class="anchor" name="summary"></a>摘要</h2>
-<p>如果您想尝试Spring Boot 1.4中的新测试功能，可以从<a href="https://repo.spring.io/snapshot/">http://repo.spring.io/snapshot/</a>获取M2。 <a href="https://github.com/spring-projects/spring-boot/tree/v1.4.0.M2/spring-boot-samples/spring-boot-sample-test">GitHub上</a>还有一个示例项目以及<a href="https://docs.spring.io/spring-boot/docs/1.4.0.M2/reference/htmlsingle/#boot-features-testing">更新的文档</a> 。如果您对我们应该支持的其他“切片”有任何建议，或者您希望看到任何进一步的改进， <a href="https://github.com/spring-projects/spring-boot/issues/new">请提出问题</a> 。</p></div>
+<p>如果您想尝试Spring Boot 1.4中的新测试功能，可以从<a href="https://repo.spring.io/snapshot/">http://repo.spring.io/snapshot/</a>获取M2。 <a href="https://github.com/spring-projects/spring-boot/tree/v1.4.0.M2/spring-boot-samples/spring-boot-sample-test">GitHub上</a>还有一个示例项目以及<a href="https://docs.spring.io/spring-boot/docs/1.4.0.M2/reference/htmlsingle/#boot-features-testing">更新的文档</a> 。如果您对我们应该支持的其他“切片”有任何建议，或者希望得到进一步的改进， <a href="https://github.com/spring-projects/spring-boot/issues/new">请提出问题</a> 。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2471;
 
       (function(disqus_shortname, document) {
@@ -457,7 +464,8 @@ public class VehicleDetailsJsonTests {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -495,12 +503,14 @@ public class VehicleDetailsJsonTests {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

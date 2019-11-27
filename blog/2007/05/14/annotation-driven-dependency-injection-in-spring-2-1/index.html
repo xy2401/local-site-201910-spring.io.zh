@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring 2.1中的注释驱动依赖注入</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -25,7 +29,7 @@
 <table> 
  <tbody>
   <tr> 
-   <th><a href=" http:="" ="" static.springframework.org="" spring="" docs="" 2.0.x="" api="" org="" springframework="" transaction="" annotation="" transactional.htm="="></head><body dir="ltr">@Transactional 
+   <th><a href=" http:="" ="" static.springframework.org="" spring="" docs="" 2.0.x="" api="" org="" springframework="" transaction="" annotation="" transactional.htm="="></head><body >@Transactional 
    <table><tbody><tr><td>for demarcating and configuring transaction definitions</td> 
    
   </tr><tr> 
@@ -77,10 +81,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -227,7 +233,7 @@
 <p></p>
 <p>在Spring 2.1中，注释驱动配置的主题已得到显着扩展，并将随着我们向RC1版本的发展而继续发展。实际上，现在可以通过注释来驱动Spring的依赖项注入。此外，Spring可以<em>发现</em>需要在应用程序上下文中配置的bean。
 </p>
-<p>该博客条目将以10个易于遵循的步骤，以教程形式介绍基本功能。我将在本周晚些时候跟进一些更高级的功能和自定义选项的信息。如果您对替代配置选项感兴趣，还应该查看<a href="http://www.springframework.org/javaconfig">Spring Java Configuration</a>项目和<a href="http://blog.interface21.com/main/2006/11/28/a-java-configuration-option-for-spring/">此博客</a> 。
+<p>该博客文章将以10个易于遵循的步骤，以教程式的形式介绍基本功能。我将在本周晚些时候跟进一些更高级的功能和自定义选项的信息。如果您对替代配置选项感兴趣，还应该查看<a href="http://www.springframework.org/javaconfig">Spring Java Configuration</a>项目和<a href="http://blog.interface21.com/main/2006/11/28/a-java-configuration-option-for-spring/">此博客</a> 。
 </p>
 <p>本教程至少需要Java 5，并且建议使用Java 6（否则，在步骤1的末尾只有一个要求）。
 </p>
@@ -241,11 +247,11 @@
 <li>log4j / log4j-1.2.14.jar</li>
 </ul>（注意：如果您未在Java 6上运行，则还需要添加j2ee / common-annotations.jar）<p></p>
 <h2>第2步：</h2><p>提供示例的接口和类。我试图使它尽可能简单，但能够演示主要功能。我将所有代码和配置都包含在一个“博客”包中。我鼓励遵循相同的准则，以使示例按原样工作。否则，请确保进行必要的修改。首先， <em>GreetingService</em>接口：</p>
-<pre><code class="prettyprint java"><br>public interface GreetingService {
+<pre><code class="prettyprint java"><br />public interface GreetingService {
     String greet(String name);
 }
 </code></pre><p>然后，一个简单的实现：</p>
-<pre><code class="prettyprint java"><br>public class GreetingServiceImpl implements GreetingService {
+<pre><code class="prettyprint java"><br />public class GreetingServiceImpl implements GreetingService {
     private MessageRepository messageRepository;
 
     public void setMessageRepository(MessageRepository messageRepository) {
@@ -255,20 +261,20 @@
     public String greet(String name) {
         Locale locale = Locale.getDefault();
         String message = messageRepository.getMessage(locale.getDisplayLanguage());
-        return message + " " + name;
+        return message + &quot; &quot; + name;
     }
 }
 </code></pre><p>由于服务依赖于<em>MessageRepository</em> ，因此接下来请定义该接口：</p>
-<pre><code class="prettyprint java"><br>public interface MessageRepository {
+<pre><code class="prettyprint java"><br />public interface MessageRepository {
     String getMessage(String language);
 }
 </code></pre><p>现在，存根实现：</p>
-<pre><code class="prettyprint java"><br>public class StubMessageRepository implements MessageRepository {
-    Map<String,String> messages = new HashMap<String,String>();
+<pre><code class="prettyprint java"><br />public class StubMessageRepository implements MessageRepository {
+    Map&lt;String,String&gt; messages = new HashMap&lt;String,String&gt;();
 
     public void initialize() {
-        messages.put("English", "Welcome");
-        messages.put("Deutsch", "Willkommen");
+        messages.put(&quot;English&quot;, &quot;Welcome&quot;);
+        messages.put(&quot;Deutsch&quot;, &quot;Willkommen&quot;);
     }
 
     public String getMessage(String language) {
@@ -277,7 +283,7 @@
 }
 </code></pre><p></p><p></p>
 <h2>第三步：</h2>
-<p>为Spring应用程序上下文定义bean。注意，我包含了一个新的'context'名称空间（注意：'aop'名称空间也包含在这里，将在最后一步中使用）：```xml <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xsi:schemalocation="http://www.springframework.org/schema/beans
+<p>为Spring应用程序上下文定义bean。注意，我包括了一个新的'context'名称空间（注意：'aop'名称空间也包括在这里，将在最后一步中使用）：```xml <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xsi:schemalocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
@@ -285,7 +291,7 @@
            http://www.springframework.org/schema/context/spring-context-2.1.xsd"><bean class="blog.GreetingServiceImpl"></bean><bean class="blog.StubMessageRepository"></bean></beans>显然，这种配置有点稀疏。您可能会猜到，“上下文”名称空间将很快发挥作用。
 </p>
 <h2>第四步：</h2><p>利用Spring的基础支持类提供一个简单的测试用例：</p>
-<pre><code class="prettyprint java"><br>public class GreetingServiceImplTests extends AbstractDependencyInjectionSpringContextTests {
+<pre><code class="prettyprint java"><br />public class GreetingServiceImplTests extends AbstractDependencyInjectionSpringContextTests {
     private GreetingService greetingService;
 
     public void setGreetingService(GreetingService greetingService) {
@@ -294,54 +300,54 @@
 
     @Override
     protected String[] getConfigLocations() {
-        return new String[] { "/blog/applicationContext.xml" };
+        return new String[] { &quot;/blog/applicationContext.xml&quot; };
     }
 
     public void testEnglishWelcome() {
         Locale.setDefault(Locale.ENGLISH);
-        String name = "Spring Community";
+        String name = &quot;Spring Community&quot;;
         String greeting = greetingService.greet(name);
-        assertEquals("Welcome " + name, greeting);
+        assertEquals(&quot;Welcome &quot; + name, greeting);
     }
 
     public void testGermanWelcome() {
         Locale.setDefault(Locale.GERMAN);
-        String name = "Spring Community";
+        String name = &quot;Spring Community&quot;;
         String greeting = greetingService.greet(name);
-        assertEquals("Willkommen " + name, greeting);
+        assertEquals(&quot;Willkommen &quot; + name, greeting);
     }
 }
 </code></pre><p>尝试运行测试，请注意测试失败，并显示NullPointerException。这是可以预期的，因为尚未为GreetingServiceImpl提供MessageRepository。在接下来的两个步骤中，您将添加注释以分别驱动依赖项注入和初始化。<br></p><p></p>
-<h2>步骤5：</h2><p>在GreetingServiceImpl的setter方法上提供@Autowiredannotation，例如：</p>
-<pre><code class="prettyprint java"><br>@Autowired
+<h2>步骤5：</h2><p>在GreetingServiceImpl的setter方法上提供@Autowired批注，例如：</p>
+<pre><code class="prettyprint java"><br />@Autowired
 public void setMessageRepository(MessageRepository messageRepository) {
     this.messageRepository = messageRepository;
 }
 </code></pre><p>然后，将“ annotation-config”元素（来自新的“ context”名称空间）添加到您的配置中：</p>
-<pre><code class="prettyprint xml"><br><beans ... >
+<pre><code class="prettyprint xml"><br />&lt;beans ... &gt;
     
-    <context:annotation-config/>
+    &lt;context:annotation-config/&gt;
 
-    <bean class="blog.GreetingServiceImpl"/>
+    &lt;bean class=&quot;blog.GreetingServiceImpl&quot;/&gt;
 
-    <bean class="blog.StubMessageRepository"/>
+    &lt;bean class=&quot;blog.StubMessageRepository&quot;/&gt;
 
-</beans> 
+&lt;/beans&gt; 
 </code></pre><p>重新运行测试。它们仍然会失败，但是如果您仔细观察，那将是一个新问题。断言失败，因为返回的消息为空。这意味着，“messageRepository”属性被<em>设置</em>在问候的服务！现在，只需要初始化StubMessageRepository。<br></p><p></p>
 <h2>步骤6：</h2><p>Spring为初始化回调提供了两个选项：Spring的InitializingBean接口或XML中的“ init-method”声明。从Spring 2.1开始，支持JSR-250注释-提供了另一个选项：@PostConstruct（和@PreDestroy注释可用于销毁回调，正如您很快就会看到的那样）。在StubMessageRepository中，将注释添加到<em>initialize</em>方法中：</p>
-<pre><code class="prettyprint java"><br>@PostConstruct
+<pre><code class="prettyprint java"><br />@PostConstruct
 public void initialize() {
-    messages.put("English", "Welcome");
-    messages.put("Deutsch", "Willkommen");
+    messages.put(&quot;English&quot;, &quot;Welcome&quot;);
+    messages.put(&quot;Deutsch&quot;, &quot;Willkommen&quot;);
 }
 </code></pre><p>重新运行测试。这次他们应该通过！<br></p><p></p>
 <h2>步骤7：</h2>
-<p>@Autowiredannotation还可用于基于构造函数的注入。如果您想尝试该选项，请从GreetingServiceImpl中删除setter方法，然后添加此构造函数（然后重新运行测试）： }```如果愿意，您甚至可以使用场注入。删除构造函数，将注释直接添加到字段中，然后重新运行测试。代码应如下所示：```java @Autowired private MessageRepository messageRepository; ```</p>
+<p>@Autowired批注还可用于基于构造函数的注入。如果您想尝试该选项，请从GreetingServiceImpl中删除setter方法，然后添加此构造函数（然后重新运行测试）： }```如果愿意，您甚至可以使用场注入。删除构造函数，将注释直接添加到字段中，然后重新运行测试。代码应如下所示：```java @Autowired private MessageRepository messageRepository; ```</p>
 <h2>步骤8：</h2>
-<p>添加MessageRepository的基于JDBC的存储库实现：Java公用类JdbcMessageRepository实现MessageRepository {private SimpleJdbcTemplate jdbcTemplate; @PostConstruct public void setUpDatabase（）{jdbcTemplate.update（“创建表消息（语言varchar（20），消息varchar（100））”）； jdbcTemplate.update（“插入消息（语言，消息）值（'英语'，'欢迎'）”）； jdbcTemplate.update（“插入消息（语言，消息）值（'Deutsch'，'Willkommen'）”）； } @PreDestroy public void tearDownDatabase（）{jdbcTemplate.update（“删除表消息”）; } public String getMessage（String language）{return jdbcTemplate.queryForObject（“从消息中选择消息，其中language =？“，String.class，language）;}}```注意，除了@PostConstruct进行初始化外，它还使用@PreDestroy标记要在销毁时调用的方法。此实现尚不清楚一件事：如何提供SimpleJdbcTemplate？一种选择是为模板提供bean定义。另一个选择是以某种方式为模板的构造函数提供DataSource实现。添加以下（带注释）方法：```java @Autowired public void createTemplate（DataSource dataSource）{this.jdbcTemplate = new SimpleJdbcTemplate（dataSource）; }```这说明了依赖项注入可以使用任意方法（不是传统的“ setter”）进行工作。下一步将对此进行测试。
+<p>添加MessageRepository的基于JDBC的存储库实现：Java公用类JdbcMessageRepository实现MessageRepository {private SimpleJdbcTemplate jdbcTemplate; @PostConstruct public void setUpDatabase（）{jdbcTemplate.update（“创建表消息（语言varchar（20），消息varchar（100））”）； jdbcTemplate.update（“插入消息（语言，消息）值（'英语'，'欢迎'）”）； jdbcTemplate.update（“插入消息（语言，消息）值（'Deutsch'，'Willkommen'）”）； } @PreDestroy public void tearDownDatabase（）{jdbcTemplate.update（“删除表消息”）; } public String getMessage（String language）{return jdbcTemplate.queryForObject（“从消息中选择消息，其中language =？“，String.class，language）;}}```注意，除了@PostConstruct进行初始化外，它还使用@PreDestroy标记要在销毁时调用的方法。此实现尚不清楚一件事：如何提供SimpleJdbcTemplate？一种选择是为模板提供bean定义。另一个选择是以某种方式为模板的构造函数提供DataSource实现。添加以下（带注释）方法：```java @Autowired public void createTemplate（DataSource dataSource）{this.jdbcTemplate = new SimpleJdbcTemplate（dataSource）; }```这说明了依赖项注入可以通过任意方法（不是传统的“ setter”）来工作。下一步将对此进行测试。
 </p>
 <h2>步骤9：</h2>
-<p>在Spring 2.1中，甚至可以发现“候选” bean，而不是如上所述在XML中明确提供。默认情况下会识别某些注释。这包括@Repositoryannotation以及新的@Componentannotation。将这两个注释分别添加到JdbcMessageRepository和GreetingServiceImpl：```java @Repository公共类JdbcMessageRepository实现MessageRepository {...}``````java @Component公共类GreetingServiceImpl实现GreetingService {...}然后通过删除现有的显式bean定义并仅添加<em>组件扫描</em>标签来修改XML文件： <beans ...=""><context:component-scan base-package="blog"></context:component-scan></beans>然后，仅添加DataSource bean定义和用于配置属性占位符的新标记：XML <beans ...=""><context:component-scan base-package="blog"></context:component-scan><context:property-placeholder location="classpath:blog/jdbc.properties"></context:property-placeholder> <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"><property name="driverClassName" value="${jdbc.driver}"></property><property name="url" value="${jdbc.url}"></property><property name="username" value="${jdbc.username}"></property><property name="password" value="${jdbc.password}"></property></bean></beans>以及jdbc.properties文件本身：java的jdbc.driver = org.hsqldb.jdbcDriver jdbc.url = jdbc：hsqldb：mem：blog jdbc.username = sa jdbc.password =重新运行测试，即使仅在XML中定义了数据源，您也应该看到绿色的条。</p>
+<p>在Spring 2.1中，甚至可以发现“候选” bean，而不是如上所述在XML中明确提供。默认情况下会识别某些注释。这包括@Repository批注以及新的@Component批注。将这两个注释分别添加到JdbcMessageRepository和GreetingServiceImpl：```java @Repository公共类JdbcMessageRepository实现MessageRepository {...}``````java @Component公共类GreetingServiceImpl实现GreetingService {...}然后通过删除现有的显式bean定义并仅添加<em>组件扫描</em>标签来修改XML文件： <beans ...=""><context:component-scan base-package="blog"></context:component-scan></beans>然后，仅添加DataSource bean定义和用于配置属性占位符的新标记：XML <beans ...=""><context:component-scan base-package="blog"></context:component-scan><context:property-placeholder location="classpath:blog/jdbc.properties"></context:property-placeholder> <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"><property name="driverClassName" value="${jdbc.driver}"></property><property name="url" value="${jdbc.url}"></property><property name="username" value="${jdbc.username}"></property><property name="password" value="${jdbc.password}"></property></bean></beans>以及jdbc.properties文件本身：java的jdbc.driver = org.hsqldb.jdbcDriver jdbc.url = jdbc：hsqldb：mem：blog jdbc.username = sa jdbc.password =重新运行测试，即使只在XML中定义了数据源，您也应该看到绿色的条。</p>
 <h2>步骤10：</h2>
 <p>最后，添加一个方面（默认情况下也会自动检测@Aspect注释）：```java @Aspect public class ServiceInvocationLogger {private int invocationCount; @Pointcut（“ execution（* Blog。*服务+。*（..））“）公共无效serviceInvocation（）{} @Before（” serviceInvocation（）“）public void log（）{invocationCount ++; System.out.println（” service invocation＃“ + invocationCount）;}}`为了激活自动代理生成，只需在xml中添加以下标签： <aop:aspectj-autoproxy></aop:aspectj-autoproxy>重新运行测试，您应该会看到日志消息！
 </p>
@@ -351,7 +357,8 @@ public void initialize() {
 </p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 74;
 
       (function(disqus_shortname, document) {
@@ -365,7 +372,8 @@ public void initialize() {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -403,12 +411,14 @@ public void initialize() {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

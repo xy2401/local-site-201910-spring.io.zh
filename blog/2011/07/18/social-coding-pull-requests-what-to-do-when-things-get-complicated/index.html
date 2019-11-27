@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>社交编码：拉取请求-事情变得复杂时该怎么办</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -43,14 +47,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2011-07-18 11:02:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -183,9 +189,9 @@
 <li>要求项目负责人将您的更改与主代码库合并</li>
 </ol>
 <p><a href="http://blog.springsource.com/2010/12/21/social-coding-in-spring-projects">Keith Donald</a>在<a href="http://blog.springsource.com/2010/12/21/social-coding-in-spring-projects">博客中</a>很好地介绍了此基本工作流程。</p>
-<p>当主代码库在派生时间与发送请求请求的时间之间发生更改时，或者（更糟的）您要针对不同功能或错误修正发送多个请求请求时，需要进行单独处理，因此，项目所有者会感到麻烦可以单独处理。本教程旨在帮助您使用git浏览并发症。</p>
+<p>当主代码库在派生时间与发送请求请求之间的时间之间发生变化时，或者（更糟糕的）您要针对不同功能或错误修正发送多个请求请求时（需要将它们分开），就会引起复杂化可以单独处理。本教程旨在帮助您使用git浏览并发症。</p>
 <p>这里的描述使用github域语言（“ pull request”，“ fork”，“ merge”等），但是相同的原理也适用于其他公共git服务。出于本教程的目的，我们假定公共项目正在其master分支上接受拉取请求。大多数Spring项目都以这种方式工作，但其他一些公共项目则没有。您可以在下面用正确的分支名称替换“ master”一词，并且相同的示例都应该大致正确。</p>
-<p>为了帮助您了解本地情况，可以将以下以“ $”开头的shell命令提取到脚本中，并按照出现的顺序运行。端点应该是名为“ work”的目录中的本地存储库，该目录的原始链接到其主分支（模拟远程公共项目），并且在私有fork上有两个分支。这两个分支的内容相同，但提交历史不同（根据底部的ASCII图）。</p>
+<p>为了帮助您了解本地情况，可以将以下以“ $”开头的shell命令提取到脚本中，并按照出现的顺序运行。端点应该是名为“ work”的目录中的本地存储库，该目录的原始链接到其主分支（模拟远程公共项目），并在私有fork上有两个分支。这两个分支的内容相同，但提交历史不同（根据底部的ASCII图）。</p>
 <h2>两个远程存储库</h2>
 <p>如果要发送拉取请求，则混合中有两个远程存储库：主公共项目和将更改推入其中的fork。</p>
 <p>在某种程度上，这是一个品味问题，但是我想做的是使主项目成为我的工作副本的远程“原点”，并将我的fork用作另一个名为“ fork”的远程对象。这样就可以轻松跟踪主项目中发生的事情，因为我要做的就是</p>
@@ -203,9 +209,9 @@
 <p>让我们创建一个简单的“远程”存储库以在沙箱中使用。我们将不使用git服务提供者，而只是在您的文件系统中进行本地处理（以UN * X命令为例）。</p>
 <pre><code>$ rm -rf repo fork work
 $ git init repo
-$ (cd repo; echo foo > foo; git add .; git commit -m "initial"; git checkout `git rev-parse HEAD`)
+$ (cd repo; echo foo &gt; foo; git add .; git commit -m "initial"; git checkout `git rev-parse HEAD`)
 </code></pre>
-<p>（最后一次检出是将存储库保留为独立的头部状态，因此我们以后可以从克隆存储库中推送到该存储库。）从现在开始，假装“ repo”是一个公共的github项目（例如<code>git://github.com/SpringSource/repo.git</code> ）。</p>
+<p>（最后一次检查是使存储库处于分离的头部状态，因此我们以后可以从克隆存储库中推送到该存储库。）从现在开始，假装“ repo”是一个公共的github项目（例如<code>git://github.com/SpringSource/repo.git</code> ）。</p>
 <p>此克隆命令中的“ fork” URL类似于<code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="395e504d795e504d514c5b175a5654">[email protected]</a>/myuserid/repo.git</code> 。现在，我们将创建叉子。这等效于当您要求它派生存储库时github所做的工作：</p>
 <pre><code>$ git clone repo fork
 $ (cd fork; git checkout `git rev-parse HEAD`)
@@ -220,7 +226,7 @@ $ git checkout origin/master
 $ git fetch fork
 $ git push fork
 </code></pre>
-<p>现在，本地存储库只有一个提交，并且在<code>gitk</code> （或您最喜欢的git visiualization工具）中看起来像这样：</p>
+<p>现在，本地存储库只有一个提交，并且看起来像这样<code>gitk</code> （或您最喜欢的git visiualization工具）：</p>
 <pre><code>A (origin/master, fork/master, master)
 </code></pre>
 <p>在此图中，“ A”是提交标签，在括号中，我们列出了与提交相关联的分支。</p>
@@ -238,8 +244,8 @@ $ git push fork
 <pre><code>$ git checkout -b mynewstuff
 </code></pre>
 <p>进行更改，测试等：</p>
-<pre><code>$ echo bar > bar
-$ echo myfoo > foo
+<pre><code>$ echo bar &gt; bar
+$ echo myfoo &gt; foo
 $ git add .
 $ git commit -m "Added bar, edited foo"
 </code></pre>
@@ -248,10 +254,10 @@ $ git commit -m "Added bar, edited foo"
 </code></pre>
 <p>如果原点没有任何变化，则可以从原点发送拉取请求。</p>
 <h2>如果原产地改变怎么办？</h2>
-<p>出于本教程的目的，我们模拟原点的更改，如下所示：</p>
+<p>出于本教程的目的，我们模拟了这样的原点变化：</p>
 <pre><code>$ cd ../repo
 $ git checkout master
-$ echo spam > spam; git add .; git commit -m "add spam"
+$ echo spam &gt; spam; git add .; git commit -m "add spam"
 $ git checkout `git rev-parse HEAD`
 $ cd ../work
 </code></pre>
@@ -265,7 +271,7 @@ $ git push fork
  \
   -- D (master, fork/master, origin/master)
 </code></pre>
-<p>请注意，您的新东西是如何没有<code>origin/master</code>作为直接祖先的（它在另一个分支上）。这使得项目所有者合并您的更改很尴尬。您可以自己在本地完成一些工作，然后在发送拉取请求之前将其向上推到前叉，从而使其变得更容易。</p>
+<p>注意您的新东西是如何没有的<code>origin/master</code>作为直接祖先（位于另一个分支）。这使得项目所有者合并您的更改很尴尬。您可以自己在本地完成一些工作，然后在发送拉取请求之前将其向上推到前叉，从而使其变得更容易。</p>
 <h3>在分支机构上重写历史记录</h3>
 <p>如果您不与分支机构中的任何人进行协作，那么可以很好地基于远程仓库中的最新更改并强制执行推送：</p>
 <pre><code># git checkout mynewstuff
@@ -279,10 +285,10 @@ $ git push fork
 <p>在任何情况下（即使重新部署顺利进行），如果您已经推送到分叉，则由于它已经重写了历史记录（假设远程仓库已更改），您将需要强制执行下一次推送。</p>
 <pre><code># git push --force fork mynewstuff
 </code></pre>
-<p>现在，本地存储库看起来像这样（ <code>B</code>提交实际上与以前的版本并不相同，但是区别在这里并不重要）：</p>
+<p>现在，本地存储库如下所示（ <code>B</code> commit实际上与先前的版本并不相同，但此处的区别并不重要）：</p>
 <pre><code>A -- D (master, fork/master, origin/master) -- B (mynewstuff, fork/mynewstuff)
 </code></pre>
-<p>您的新分支机构有一个直接的祖先，即祖先<code>origin/master</code>祖先，所以每个人都很高兴。然后，您准备进入github UI并针对<code>repo:master</code>向分支发送拉取请求。</p>
+<p>您的新分支机构的直接祖先是<code>origin/master</code>所以每个人都很高兴。然后您就可以进入github UI并发送分支的拉取请求了<code>repo:master</code> 。</p>
 <h3>如果我想保持本地承诺怎么办？</h3>
 <p>如果您在多个步骤中本地提交了更改，也许您想保留所有少量的提交，并且仍然将您的拉取请求作为一次提交提交给remore存储库。没关系，您可以为此创建一个新分支并从那里发送拉取请求。如果您<em>正在</em>与功能分支上的某人<em>进行</em>协作并且不想强制进行推送，那么这也是一件好事。</p>
 <p>首先，我们将新内容推送到派生仓库中，以便我们的协作者可以看到它（如果您想将更改保留在本地，则没有必要）：</p>
@@ -301,30 +307,30 @@ $ git push fork mypullrequest
  \
   -- D (master, fork/master, origin/master) -- E (mypullrequest, fork/mypullrequest)
 </code></pre>
-<p>您可以这样做，并且您的新分支有一个直接祖先，该祖先是<code>origin/master</code>因此合并起来很简单。</p>
-<p>如果您不在<code>mynewstuff</code>分支上进行协作，那么您甚至可以在此时放弃它。我经常这样做以保持叉子清洁：</p>
+<p>您很高兴这样做，而您的新分支机构有一个直接的祖先<code>origin/master</code>因此合并将变得微不足道。</p>
+<p>如果您不合作<code>mynewstuff</code>分支，此时您甚至可以将其丢弃。我经常这样做以保持叉子清洁：</p>
 <pre><code># git branch -D mynewstuff
 # git push fork :mynewstuff
 </code></pre>
-<p>这是本地回购协议，与两个远程站点完全同步：</p>
+<p>这是本地仓库，与它的两个遥控器完全同步：</p>
 <pre><code>A -- D (master, fork/master, origin/master) -- E (mypullrequest, fork/mypullrequest)
 </code></pre>
 <h2>继续研究您的新资料</h2>
 <p>假设您的拉取请求被拒绝，项目所有者希望您进行一些更改，或者新内容变成更有趣的内容，并且您需要对此做更多的工作。</p>
 <p>如果您没有在上方将其删除，则可以继续在细粒度分支上工作...</p>
 <pre><code>$ git checkout mynewstuff
-$ echo yetmore > foo; git commit -am "yet more"
+$ echo yetmore &gt; foo; git commit -am "yet more"
 $ git push fork
 </code></pre>
 <p>然后在准备好之后将更改移到请求请求分支</p>
 <pre><code>$ git rebase --onto mypullrequest master mynewstuff
 </code></pre>
-<p>我们现在想要的所有更改都已经到位，但是分支的提交错误。正如您在下面看到的那样， <code>mynewstuff</code>是我想要的<code>mypullrequest</code>所在的位置，并且远程<code>fork/mynewstuff</code>没有相应的本地分支：</p>
+<p>我们现在想要的所有更改都已经到位，但是分支的提交错误。如下所示， <code>mynewstuff</code>是我想要的地方<code>mypullrequest</code>和远程<code>fork/mynewstuff</code>没有相应的本地分支：</p>
 <pre><code>A -- B -- C (fork/mynewstuff)
  \
   -- D (master, fork/master, origin/master) -- E (mypullrequest, fork/mypullrequest) -- F (mynewstuff)
 </code></pre>
-<p>我们可以使用<code>git reset</code>将两个分支切换到我们想要的位置（如果愿意，您可以通过图形用户界面来实现）：</p>
+<p>我们可以用<code>git reset</code>将两个分支切换到我们想要的位置（如果愿意，您可以执行以下操作：图形用户界面）：</p>
 <pre><code>$ git checkout mypullrequest
 $ git reset --hard mynewstuff
 $ git checkout mynewstuff
@@ -344,17 +350,18 @@ $ git push fork
  \
   -- D (master, fork/master, origin/master) -- E -- F (mypullrequest, fork/mypullrequest)
 </code></pre>
-<p>或者，我们可以重新设置它的基础，以将提交压缩在一起，然后强制进行推送：</p>
+<p>或者，我们可以重新设置它的基础，以将提交压缩在一起，然后以硬性方式强制推送：</p>
 <pre><code># git rebase -i HEAD~2
 ...
 # git push --force fork
 </code></pre>
-<p>因为<code>origin/master</code>是<code>fork/mypullrequest</code>的直接祖先， <code>fork/mypullrequest</code>我知道我的请求请求将很容易合并。</p>
+<p>因为<code>origin/master</code>是...的直接祖先<code>fork/mypullrequest</code>我知道合并请求很简单。</p>
 <h2>包起来</h2>
-<p>希望本教程为您提供了足够的git弹药，可以继续进行您喜欢的开源项目的一些更改，并确信合并将很容易。请记住，总是有不止一种方法来执行此操作，而git是一种功能强大的低级工具，因此您的工作量可能会有所不同，并且根据您的更改，您可能会发现上述方法的变体更可取甚至是必要的。</p></div>
+<p>希望本教程为您提供了足够的git弹药，可以继续进行您喜欢的开源项目的一些更改，并确信合并会很容易。请记住，总是有不止一种方法来执行此操作，而git是一个功能强大的低级工具，因此您的工作量可能会有所不同，并且根据您的更改，您可能会发现上述方法的变体更可取甚至是必要的。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" data-cfasync="false"></script><script type="text/javascript">var disqus_shortname = 'spring-io';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 426;
 
       (function(disqus_shortname, document) {
@@ -368,7 +375,8 @@ $ git push fork
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -406,12 +414,14 @@ $ git push fork
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

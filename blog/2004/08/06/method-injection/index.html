@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>方法注入</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Method Injection">
-<meta name="twitter:description" content="<p>A couple of months ago, in the days before I had a blog, there was a discussion by <a href=" http:="" ="" www.beust.com="" weblog="" archives="" 000132.htm="="></head><body dir="ltr">Cedric and <a href="http://today.java.net/cs/user/print/au/152?x-t=full.view">Bob </a>about “Getter Injection.”
+<meta name="twitter:description" content="<p>A couple of months ago, in the days before I had a blog, there was a discussion by <a href=" http:="" ="" www.beust.com="" weblog="" archives="" 000132.htm="="></head><body >Cedric and <a href="http://today.java.net/cs/user/print/au/152?x-t=full.view">Bob </a>about “Getter Injection.”
 <p>The basic concept is that the IoC container can override abstract or concrete methods on managed objects on deployment. The container is injecting a method, such as a getter method, rather than a reference or primitive as in Setter Injection. As it happened, I was already working on a container method override mechanism for Spring 1.1, which has since been released in Spring 1.1 RC1. It’s an interesting concept, and definitely part of a complete IoC container. However, I believe that the concept is more general and needs a more general name. Also, that it should only be used in a fairly narrow range of scenarios.</p>
 ">
 
@@ -36,10 +40,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,10 +171,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>几个月前，在我写博客之前的几天里， <a href="http://www.beust.com/weblog/archives/000132.html">塞德里克（Cedric）</a>和<a href="http://today.java.net/cs/user/print/au/152?x-t=full.view">鲍勃（Bob）进行了</a>有关“ Getter Injection”的讨论。</p><p>基本概念是，IoC容器可以在部署时覆盖托管对象上的抽象或具体方法。容器正在注入一种方法，例如吸气剂方法，而不是像Setter注入中那样引用或基元。碰巧的是，我已经在为Spring 1.1开发容器方法重写机制，此机制已在Spring 1.1 RC1中发布。这是一个有趣的概念，并且绝对是完整IoC容器的一部分。但是，我认为这个概念更笼统，需要一个更笼统的名称。另外，它仅应在相当狭窄的场景中使用。</p><p>你为什么想做这个？Cedric的动机是，setter方法是“无用的”，并且“在Java对象中拥有永远不会调用的方法是Design Smell”。他认为，对象中最重要的方法实际上是<em>getter</em> ，它们通常返回保存在setter中的对象引用。因此，他建议让容器实现getter方法，并取消setter方法。实际上，这意味着容器实际上将覆盖作为应用程序代码的一部分定义的getter方法，否则将无法使用它们。因此，该容器最终将使用与CMP 2.x类似的机制来实现它（尽管希望任何相似之处都将在那里结束）。</p><p>我并不是真的购买“无用方法”参数，因为设置器<em>将由</em> IoC容器使用依赖注入来调用，并且<em>将</em>在单元测试中被调用，而<em>根本</em>没有任何容器。如果在容器外部使用对象，则将由应用程序代码调用它们。此外，如果您不选择配置要调用的一个或多个设置程序，则使用getter / setter组合是建立默认值的好方法：如果需要，可以使用设置程序。虽然我可以看到Cedric的动机，但这里有一个折衷：如果我们摆脱了所谓的无用的二传手，我们将剩下不完整的类。如果吸气剂是抽象的，我们将回到需要测试抽象对象的CMP 2.x测试场景。如果吸气剂是具体的，我们将定期编写在运行时将被覆盖的方法。在我看来，这确实是无用的代码。（通常，我不喜欢覆盖具体方法，请尽可能避免使用。我想我首先阅读了《 <em>UML参考手册》</em>中的建议，这很有意义。）“设置注入”中还包含一个魔术元素。如果我可以有一个简单的POJO，而没有精美的容器子类，则我更喜欢它。正如塞德里克本人在去年5月在TSSS的一次小组讨论中所说的那样，“只有在科学失败时才使用魔术”。</p><p>我认为该概念应重命名为“ <strong>方法注入”</strong> ，并且对于其他一些不太常见的场景，它的价值更大。</p><p>在使用依赖注入的对象的典型配置中，我不会将其用作设置器或构造器注入的替代方法。设置方法和构造方法是纯Java结构，可以在容器中很好地工作，但不依赖于容器。非常好。IoC容器提供的魔术方法更加依赖于容器，尽管当然仍然可以在容器外部对对象进行子类化，尽管它们仍然只是Java。</p><p>从本质上讲，在某些极端情况下，我将方法注入视为子类的替代方法，在这种情况下，应将超类与容器依赖项隔离开来，并且容器比常规子类更容易实现必要的行为。所讨论的方法不必是getter方法（就像在Setter Injection getter中一样），尽管通常它将是一个返回某些内容的方法。</p><p>我看到容器实现方法的三种主要情况：</p><p>他们可以将容器依赖项移出应用程序代码。<br>他们可以依靠直到部署才知道的基础架构。<br>他们可以为运行时环境自定义旧代码的行为。但是，普通的旧子类化在这里也很有意义。<br>容器子类也比常规子类更具动态性。我们可以采用一个基类并以不同的方式部署它，而无需管理多个以上类的源代码。但是，由于它的魔商比常规子类，Strategy接口或各种替代产品的魔商高，所以我认为方法注入不应太急切。</p><p>方法注入对我的主要吸引力在于摆脱了使用Spring 1.0有时不得不产生的容器依赖性，并且这种方法将适用于支持“非单一对象”或“原型”对象概念的任何容器。（也就是说，根据配置，您可以根据需要选择一个容器来获取IoC管理对象的共享实例或新实例。）我喜欢使用Spring，但我讨厌必须导入Spring API进行配置。</p><p>导致我实施此操作的特定用例是，通过Spring配置的一个“单例”对象需要创建非单例对象的实例（例如，单线程，一次性使用的处理对象）却希望该对象使用Dependency Injection进行配置，而不仅仅是使用new。例如，假设ThreadSafeService需要创建一个SingleShotHelper实例，该实例本身是通过依赖注入配置的。在Spring 1.0.x中，ThreadSafeService必须实现BeanFactoryAware生命周期接口，保存BeanFactory引用并调用</p><p><code>(SingleShotHelper) beanFactory.getBean(“singleShotHelper”)</code></p><p>每次需要创建一个助手时。效果很好，测试起来也不太困难（BeanFactory是一个简单的接口，因此很容易模拟），但是它是Spring的依赖项，因此使它更接近一个完美的非侵入性框架是理想的。类型转换也略显优雅，尽管没什么大不了的。</p><p>我通常会在10堂课中遇到一种情况。我有时会重构它来提取方法，如下所示：</p><p><code>protected SingleShotHelper createSingleShotHelper() { return (SingleShotHelper) context.getBean(“singleShotHelper”); }</code><br>我现在可以通过子类来实现它，并将Spring依赖项排除在超类之外，但这似乎有点过分。</p><p>这种方法是由容器而不是应用程序开发人员实现的理想选择。它返回容器知道的对象；实际上，在配置中，整个过程可以比代码更简洁地表示（当您允许保存BeanFactory引用所需的少量代码时）。</p><p>借助Spring 1.1中引入的新方法注入功能，可以使用摘要<br>（或具体）方法，例如：</p><p><code>protected abstract SingleShotHelper createSingleShotHelper();</code> </p><p>并告诉容器在部署时重写该方法，以从同一工厂或父工厂返回特定的bean，如下所示：</p><p><code><lookup-method name=“createSingleShotHelper” bean=“singleShotHelper” ></code></p><p>该方法可以被保护或公开。可以覆盖任何数量的方法。 <lookup-method>元素可以在bean定义元素中使用，就像property或Constructor-arg元素一样。</lookup-method></p><p>我看到方法注入最引人注目的情况是返回查找由容器管理的命名对象的结果。（当然这不是特定于Spring的：任何容器都可以实现这一点。）查找通常是非单个Bean（以Spring的说法）。</p><p>这样，Spring或任何其他IoC容器上的应用程序代码中就不会存在依赖关系。无需导入Spring API，即可关闭角落案例。就像我说的那样，此功能是由我正在从事的客户项目中的需求直接驱动的，并且在实践中证明是有用的。</p><p>查找方法可以与Setter注入或构造器注入结合使用。他们不接受参数，因此方法重载不是问题。</p><p>该实现使用CGLIB对该类进行子类化。（仅当CGLIB在类路径上时才可用，以避免使Spring核心容器依赖于CGLIB。）</p><p>Spring进了一步，使您可以为重写的方法定义任意行为，而不仅仅是bean查找。例如，您可能想要执行此操作以使用基于运行时基础结构的一般行为，例如使用Spring TransactionInterceptor类进行事务回滚。（当然，通常应使用回滚规则来避免这种情况。）或可能存在令人信服的通用替换行为案例，例如“如果有活动事务，则返回事务数据源DS1，否则返回非事务数据源DS2”。同样，如果我们可以从应用程序代码中隐藏这种逻辑，那将是一次胜利。在这里，我们超出了纯粹的“获取器”的范围：例如，我们可以重写方法来发布事件。</p><p>通常可以使用替代方法来替代任意容器，例如，以常规方式（科学而非魔术）继承类并重写方法，或使用AOP。如示例中所示，在进行bean查找的情况下，容器进行重写有明显的好处，因为它消除了对Spring API的依赖。用XML进行描述也要简单得多。对于更一般的情况，有必要一种解决重载方法的方法。</p><p>这已经比我计划的要长，并且花了一段时间！因此，如果有人感兴趣，我将在以后的文章中讨论Spring 1.1的任意重写机制（包括它如何解决重载方法）。我对像Dion和Matt Raible之类的不屈不挠的博客每天都赞不绝口，他们每天大约写3次博客。</p></div>
+<div class="blog--post"><p>几个月前，在我写博客之前的几天里， <a href="http://www.beust.com/weblog/archives/000132.html">塞德里克（Cedric）</a>和<a href="http://today.java.net/cs/user/print/au/152?x-t=full.view">鲍勃（Bob）进行了</a>有关“ Getter Injection”的讨论。</p><p>基本概念是，IoC容器可以在部署时覆盖托管对象上的抽象或具体方法。容器正在注入一种方法，例如吸气剂方法，而不是像Setter注入中那样引用或基元。碰巧的是，我已经在为Spring 1.1开发容器方法重写机制，此机制已在Spring 1.1 RC1中发布。这是一个有趣的概念，并且绝对是完整IoC容器的一部分。但是，我认为这个概念更笼统，需要一个更笼统的名称。而且，仅应在相当狭窄的场景中使用它。</p><p>你为什么想做这个？Cedric的动机是，setter方法“无用”，并且“在Java对象中拥有永远不会调用的方法是Design Smell”。他认为，对象中最重要的方法实际上是<em>getter</em> ，它们通常返回保存在setter中的对象引用。因此，他建议让容器实现getter方法，并取消setter方法。实际上，这意味着容器将实际覆盖定义为应用程序代码一部分的getter方法，否则将无法使用它们。因此，容器最终将使用与CMP 2.x类似的机制来实现它（尽管希望任何相似之处都将在那里结束）。</p><p>我并不是真的购买“无用方法”参数，因为设置器<em>将由</em> IoC容器使用依赖注入来调用，并且<em>将</em>在单元测试中被调用，而<em>根本</em>没有任何容器。如果在容器外部使用对象，则将由应用程序代码调用它们。此外，如果您不选择配置要调用的一个或多个设置程序，则使用getter / setter组合是建立默认值的好方法：如果需要，可以使用设置程序。虽然我可以看到Cedric的动机，但这里有一个折衷：如果我们摆脱了所谓的无用的二传手，我们将剩下不完整的类。如果吸气剂是抽象的，我们将回到需要测试抽象对象的CMP 2.x测试场景。如果吸气剂是具体的，我们将定期编写在运行时将被覆盖的方法。在我看来，这确实是无用的代码。（通常，我不喜欢覆盖具体方法，请尽可能避免使用。我想我首先阅读了《 <em>UML参考手册》</em>中的建议，这很有意义。）“设置注入”中还包含一个魔术元素。如果我可以有一个简单的POJO，而没有精美的容器子类，则我更喜欢它。正如塞德里克本人在去年5月在TSSS的一次小组讨论中所说的那样，“只有在科学失败时才使用魔术”。</p><p>我认为该概念应重命名为“ <strong>方法注入”</strong> ，并且对于其他一些不太常见的场景，它的价值更大。</p><p>在使用依赖注入的对象的典型配置中，我不会将其用作设置器或构造器注入的替代方法。设置方法和构造方法是纯Java结构，可以在容器中很好地工作，但不依赖于容器。非常好。IoC容器提供的魔术方法更加依赖于容器，尽管当然仍然可以在容器外部对对象进行子类化，尽管它们仍然只是Java。</p><p>从本质上讲，在某些极端情况下，我将方法注入视为子类的替代方法，在这种情况下，应将超类与容器依赖项隔离开来，并且容器比常规子类更容易实现必要的行为。所讨论的方法不必是getter方法（就像在Setter Injection getter中一样），尽管通常它将是一个返回某些东西的方法。</p><p>我看到容器实现方法的三种主要情况：</p><p>他们可以将容器依赖项移出应用程序代码。<br>他们可以依赖直到部署才知道的基础架构。<br>他们可以为运行时环境自定义旧代码的行为。但是，普通的旧子类化在这里也很有意义。<br>容器子类也比常规子类更具动态性。我们可以采用一个基类并以不同的方式部署它，而无需管理多个以上类的源代码。但是，由于它的魔商比常规子类，Strategy接口或各种替代产品的魔商高，所以我认为方法注入不应太急切地使用。</p><p>方法注入对我的主要吸引力在于摆脱了使用Spring 1.0有时不得不产生的容器依赖性，并且这种方法将适用于支持“非单一对象”或“原型”对象概念的任何容器。（也就是说，根据配置，您可以根据需要选择一个容器来获取IoC管理对象的共享实例或新实例。）我喜欢使用Spring，但我讨厌必须导入Spring API进行配置。</p><p>导致我实施此操作的特定用例是，通过Spring配置的一个“单例”对象需要创建非单例对象的实例（例如，单线程，一次性使用的处理对象）却希望该对象使用Dependency Injection进行配置，而不仅仅是使用new。例如，假设ThreadSafeService需要创建一个SingleShotHelper实例，该实例本身是通过依赖注入配置的。在Spring 1.0.x中，ThreadSafeService必须实现BeanFactoryAware生命周期接口，保存BeanFactory引用并调用</p><p><code>(SingleShotHelper) beanFactory.getBean(“singleShotHelper”)</code></p><p>每次需要创建一个助手时。效果很好，测试起来也不太困难（BeanFactory是一个简单的接口，因此很容易模拟），但是它是Spring的依赖项，因此使它更接近一个完美的非侵入性框架是理想的。类型转换也略显优雅，尽管没什么大不了的。</p><p>我通常会在10堂课中遇到一种情况。我有时会重构它来提取方法，如下所示：</p><p><code>protected SingleShotHelper createSingleShotHelper() { return (SingleShotHelper) context.getBean(“singleShotHelper”); }</code><br>我现在可以通过子类来实现它，并将Spring依赖项排除在超类之外，但这似乎有点过分。</p><p>这种方法是由容器而不是应用程序开发人员实现的理想选择。它返回容器知道的对象；实际上，在配置中，整个过程可以比代码更简洁地表示（当您允许保存BeanFactory引用所需的少量代码时）。</p><p>借助Spring 1.1中引入的新方法注入功能，可以使用摘要<br>（或具体）方法，例如：</p><p><code>protected abstract SingleShotHelper createSingleShotHelper();</code> </p><p>并告诉容器在部署时重写该方法，以从同一工厂或父工厂返回特定的bean，如下所示：</p><p><code><lookup-method name=“createSingleShotHelper” bean=“singleShotHelper” ></code></p><p>该方法可以被保护或公开。可以覆盖任何数量的方法。 <lookup-method>元素可以在bean定义元素中使用，就像property或Constructor-arg元素一样。</lookup-method></p><p>我看到方法注入最引人注目的情况是返回查找由容器管理的命名对象的结果。（当然这不是特定于Spring的：任何容器都可以实现这一点。）查找通常是非单个Bean（以Spring的说法）。</p><p>这样，Spring或任何其他IoC容器上的应用程序代码中就不会存在依赖关系。无需导入Spring API，即可关闭角落案例。就像我说的那样，此功能是由我正在从事的客户项目中的需求直接驱动的，并且在实践中证明是有用的。</p><p>查找方法可以与Setter注入或构造器注入结合使用。他们不接受参数，因此方法重载不是问题。</p><p>该实现使用CGLIB对该类进行子类化。（仅当CGLIB在类路径上时才可用，以避免使Spring核心容器依赖于CGLIB。）</p><p>Spring进了一步，使您可以为重写的方法定义任意行为，而不仅仅是bean查找。例如，您可能想要执行此操作以使用基于运行时基础结构的一般行为，例如使用Spring TransactionInterceptor类进行事务回滚。（当然，通常应使用回滚规则来避免这种情况。）或可能存在令人信服的通用替代行为案例，例如“如果存在活动事务，则返回事务数据源DS1，否则返回非事务数据源DS2”。同样，如果我们可以从应用程序代码中隐藏这种逻辑，那将是一次胜利。在这里，我们超出了纯粹的“获取器”的范围：例如，我们可以重写方法来发布事件。</p><p>通常可以使用替代方法来替代任意容器，例如，以常规方式（科学而非魔术）继承类并重写方法，或使用AOP。如示例中所示，在进行bean查找的情况下，容器进行重写有明显的好处，因为它消除了对Spring API的依赖。用XML进行描述也要简单得多。对于更一般的情况，有必要一种解决重载方法的方法。</p><p>这已经比我计划的要长，并且花了一段时间！因此，如果有人感兴趣，我将在以后的文章中讨论Spring 1.1的任意重写机制（包括它如何解决重载方法）。我对像Dion和Matt Raible之类的不屈不挠的博客每天都赞不绝口，他们每天大约写3次博客。</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 11;
 
       (function(disqus_shortname, document) {
@@ -182,7 +189,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -220,12 +228,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

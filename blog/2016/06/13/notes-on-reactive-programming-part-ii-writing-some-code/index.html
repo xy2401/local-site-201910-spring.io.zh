@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>关于反应式编程的注释第二部分：编写一些代码</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Notes on Reactive Programming Part II: Writing Some Code">
 <meta name="twitter:description" content="<div class=" paragrap="="> 
- </head><body dir="ltr"><p>In this article we continue the series on <a href="https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape">Reactive Programming</a>, and we concentrate on explaining some concepts through actual code samples. The end result should be that you understand a bit better what makes Reactive different, and what makes it functional. The examples here are quite abstract, but they give you a way to think about the APIs and the programming style, and start to get a feel for how it is different. We will see the elements of Reactive, and learn how to control the flow of data, and process in background threads if necessary.</p> 
+ <p>In this article we continue the series on <a href="https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape">Reactive Programming</a>, and we concentrate on explaining some concepts through actual code samples. The end result should be that you understand a bit better what makes Reactive different, and what makes it functional. The examples here are quite abstract, but they give you a way to think about the APIs and the programming style, and start to get a feel for how it is different. We will see the elements of Reactive, and learn how to control the flow of data, and process in background threads if necessary.</p> 
 
 ">
 <meta name="twitter:creator" content="@david_syer">
@@ -41,10 +45,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -171,7 +177,7 @@
 </div>
 </header>
 <div class="blog--post"><div class="paragraph">
-<p>在本文中，我们将继续“ <a href="https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape">响应式编程</a> ”系列，我们将重点通过实际的代码示例来解释一些概念。最终结果应该是您更好地了解了什么使Reactive有所不同以及使它起作用。这里的示例非常抽象，但是它们为您提供了一种思考API和编程风格的方法，并开始对它们之间的不同有所了解。我们将看到Reactive的元素，并学习如何控制数据流以及在必要时在后台线程中进行处理。</p>
+<p>在本文中，我们将继续“ <a href="https://spring.io/blog/2016/06/07/notes-on-reactive-programming-part-i-the-reactive-landscape">响应式编程</a> ”系列，我们将集中于通过实际的代码示例来解释一些概念。最终结果应该是您更好地了解了使Reactive与众不同以及使Reactive发挥功能的原因。这里的示例非常抽象，但是它们为您提供了一种思考API和编程风格的方法，并开始对它们之间的不同有所了解。我们将看到Reactive的元素，并学习如何控制数据流以及在必要时在后台线程中进行处理。</p>
 </div>
 <div class="sect1">
 <h2 id="setting-up-a-project"><a class="anchor" href="#setting-up-a-project"></a>设置项目</h2>
@@ -184,11 +190,11 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-core</artifactId>
-			<version>3.0.0.RC2</version>
-		</dependency></code></pre>
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">		&lt;dependency&gt;
+			&lt;groupId&gt;io.projectreactor&lt;/groupId&gt;
+			&lt;artifactId&gt;reactor-core&lt;/artifactId&gt;
+			&lt;version&gt;3.0.0.RC2&lt;/version&gt;
+		&lt;/dependency&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -208,44 +214,44 @@
 <h2 id="what-makes-it-functional"><a class="anchor" href="#what-makes-it-functional"></a>是什么使其功能正常？</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Reactive的基本构件是一系列事件，以及两个主角，这些事件的发布者和订阅者。也可以将序列称为“流”，因为那样就可以了。如果需要，我们将单词“ stream”和一个小“ s”一起使用，但是Java 8有一个<code>java.util.Stream</code>与众不同，因此请不要混淆。无论如何，我们将尝试将叙述集中在发布者和订阅者上（这就是Reactive Streams所做的）。</p>
+<p>Reactive的基本构件是一系列事件，以及两个主角，这些事件的发布者和订阅者。也可以将序列称为“流”，因为那样就可以了。如果需要，我们将单词“ stream”和一个小“ s”一起使用，但是Java 8有一个<code>java.util.Stream</code>这是不同的，所以不要混淆。无论如何，我们将尝试将叙述集中在发布者和订阅者上（这就是Reactive Streams所做的）。</p>
 </div>
 <div class="paragraph">
-<p>Reactor是我们将在示例中使用的库，因此我们将在此处使用表示法，并将发布者称为<code>Flux</code> （它实现了Reactive Streams的接口<code>Publisher</code> ）。RxJava库非常相似，并且具有许多并行功能，因此在那种情况下，我们将谈论的是<code>Observable</code> ，但是代码将非常相似。（Reactor 2.0称它为<code>Stream</code> ，如果我们也需要谈论Java 8 <code>Streams</code>会造成混淆，因此我们仅在Reactor 3.0中使用新代码。）</p>
+<p>Reactor是我们将在示例中使用的库，因此我们将坚持此处的表示法，并将发布者称为<code>Flux</code> （它实现了接口<code>Publisher</code>来自反应式流）。RxJava库非常相似，并且具有很多并行功能，因此在这种情况下，我们将讨论<code>Observable</code>相反，但是代码将非常相似。（反应堆2.0称它为<code>Stream</code>如果我们需要谈论Java 8，这将令人困惑<code>Streams</code>同样，因此我们将仅在Reactor 3.0中使用新代码。）</p>
 </div>
 <div class="sect2">
 <h3 id="generators"><a class="anchor" href="#generators"></a>发电机</h3>
 <div class="paragraph">
-<p><code>Flux</code>是特定POJO类型的事件序列的发布者，因此它是通用的，即<code>Flux<T></code>是<code>T</code>的发行商。 <code>Flux</code>具有一些静态便利方法，可以从多种来源创建其自身的实例。例如，要从数组创建<code>Flux</code> ：</p>
+<p>一种<code>Flux</code>是特定POJO类型的事件序列的发布者，因此它是通用的，即<code>Flux<T></code>是的发行商<code>T</code> 。 <code>Flux</code>有一些静态便利方法可以从多种来源创建其自身的实例。例如，创建一个<code>Flux</code>从数组中：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux<String> flux = Flux.just("red", "white", "blue");</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux&lt;String&gt; flux = Flux.just("red", "white", "blue");</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>我们刚刚生成了一个<code>Flux</code> ，现在我们可以用它做东西了。实际上，您只能做两件事：对其进行操作（对其进行转换，或将其与其他序列结合使用），对其进行订阅（它是发布者）。</p>
+<p>我们刚刚生成了一个<code>Flux</code> ，现在我们可以使用它进行处理了。实际上，您只能做两件事：对其进行操作（对其进行转换，或将其与其他序列结合使用），对其进行订阅（它是发布者）。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="single-valued-sequences"><a class="anchor" href="#single-valued-sequences"></a>单值序列</h3>
 <div class="paragraph">
-<p>通常，您会遇到一个只有一个或零个元素的序列，例如，一个通过其ID查找实体的存储库方法。Reactor具有<code>Mono</code>类型，表示单个值或空<code>Flux</code> 。<code>Mono</code>具有与<code>Flux</code>非常相似的API，但更具针对性，因为并非所有运算符都对单值序列有意义。RxJava也有叫上一个螺栓（1.x版本中） <code>Single</code> ，也<code>Completable</code>一个空序列。Reactor中的空序列为<code>Mono<Void></code> 。</p>
+<p>通常，您会遇到一个只有一个或零个元素的序列，例如，一个通过其ID查找实体的存储库方法。反应堆有一个<code>Mono</code>表示单值或空的类型<code>Flux</code> 。 <code>Mono</code>具有非常相似的API <code>Flux</code>但要更加集中，因为并非所有运算符都对单值序列有意义。RxJava在1.x版本中也有一个名为<code>Single</code> ，并且<code>Completable</code>空序列。Reactor中的空序列为<code>Mono<Void></code> 。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="operators"><a class="anchor" href="#operators"></a>经营者</h3>
 <div class="paragraph">
-<p><code>Flux</code>上有<em>很多</em>方法，几乎所有方法都是运算符。我们不会在这里查看所有内容，因为有更好的地方可以找到它们（例如Javadocs）。我们只需要了解操作员是什么，以及它可以为您做什么。</p>
+<p>有<em>很多</em>方法<code>Flux</code>他们几乎都是操作员。我们不会在这里查看所有内容，因为有更好的地方可以找到它们（例如Javadocs）。我们只需要了解操作员是什么，以及它可以为您做什么。</p>
 </div>
 <div class="paragraph">
-<p>例如，要请求将<code>Flux</code>内部的内部事件记录为标准输出，可以调用<code>.log()</code>方法。或者您可以使用<code>map()</code>对其进行转换：</p>
+<p>例如，要求内部的事件<code>Flux</code>要登录到标准输出，您可以致电<code>.log()</code>方法。或者您可以使用<code>map()</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux<String> flux = Flux.just("red", "white", "blue");
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux&lt;String&gt; flux = Flux.just("red", "white", "blue");
 
-Flux<String> upper = flux
+Flux&lt;String&gt; upper = flux
   .log()
   .map(String::toUpperCase);</code></pre>
 </div>
@@ -254,22 +260,22 @@ Flux<String> upper = flux
 <p>在此代码中，我们通过将输入字符串转换为大写字母来对其进行转换。到目前为止，如此琐碎。</p>
 </div>
 <div class="paragraph">
-<p>这个小样本的有趣之处在于-即使您还不习惯，也让您大跌眼镜-尚未处理任何数据。甚至什么都没有记录，因为从字面上看，什么也没发生（尝试一下，您会看到的）。在<code>Flux</code>上致电运营商等于制定了执行计划以备后用。它是完全声明性的，这就是为什么人们称其为“功能性”。仅当数据开始流动时，才执行在运算符中实现的逻辑，直到有人订阅<code>Flux</code> （或等效于<code>Publisher</code> ）后，该逻辑才会发生。</p>
+<p>这个小样本的有趣之处在于-即使您还不习惯，也让您大跌眼镜-尚未处理任何数据。甚至什么都没有记录，因为从字面上看，什么也没发生（尝试一下，您会看到的）。呼叫运营商<code>Flux</code>等于为以后制定执行计划。它是完全声明性的，这就是为什么人们称其为“功能性”。仅当数据开始流动时，才执行在运算符中实现的逻辑，直到有人订阅<code>Flux</code> （或等效于<code>Publisher</code> ）。</p>
 </div>
 <div class="paragraph">
-<p>所有Reactive库以及Java 8 <code>Streams</code>中都存在处理数据序列的相同的声明性功能方法。考虑使用外观与<code>Flux</code>相同的<code>Stream</code>类似代码：</p>
+<p>所有Reactive库以及Java 8中都存在处理数据序列的相同的声明性功能方法。 <code>Streams</code> 。考虑一下，看起来相似的代码，使用<code>Stream</code>内容与<code>Flux</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Stream<String> stream = Streams.of("red", "white", "blue");
-Stream<String> upper = stream.map(value -> {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Stream&lt;String&gt; stream = Streams.of("red", "white", "blue");
+Stream&lt;String&gt; upper = stream.map(value -&gt; {
     System.out.println(value);
     return value.toUpperCase();
 });</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>我们对<code>Flux</code>所做的观察适用于此：不处理任何数据，这只是一个执行计划。但是， <code>Flux</code>和<code>Stream</code>之间有一些重要的区别，这使<code>Stream</code>对于Reactive用例而言是不合适的API。<code>Flux</code>有更多的运算符，其中大部分只是方便，但是真正的区别在于您想使用数据时，因此这是我们接下来要研究的内容。</p>
+<p>我们所做的观察<code>Flux</code>在这里适用：不处理任何数据，这只是执行计划。但是，两者之间有一些重要的区别<code>Flux</code>和<code>Stream</code> ，这使得<code>Stream</code>不适合用于反应式用例的API。 <code>Flux</code>拥有更多的运算符，其中很多只是为了方便，但是真正的区别在于您想使用数据时，这就是我们接下来需要研究的内容。</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -277,7 +283,7 @@ Stream<String> upper = stream.map(value -> {
 <td class="icon">
 <div class="title">小费</div>
 </td>
-<td class="content">Sebastien Deleuze上有一个关于“响应式<a href="https://spring.io/blog/2016/04/19/understanding-reactive-types">类型”</a>的有用博客，他在其中通过查看它们定义的类型以及如何使用它们来描述各种流式和响应式API之间的区别。<code>Flux</code>和<code>Stream</code>之间的差异在此处更详细地突出显示。
+<td class="content">Sebastien Deleuze上有一个关于“ <a href="https://spring.io/blog/2016/04/19/understanding-reactive-types">反应式类型”</a>的有用博客，他在其中通过查看它们定义的类型以及如何使用它们来描述各种流式和反应式API之间的区别。之间的区别<code>Flux</code>和<code>Stream</code>在此处更详细地突出显示。
 </td>
 </tr>
 </tbody></table>
@@ -286,10 +292,10 @@ Stream<String> upper = stream.map(value -> {
 <div class="sect2">
 <h3 id="subscribers"><a class="anchor" href="#subscribers"></a>订户</h3>
 <div class="paragraph">
-<p>为了使数据流，您必须使用<code>subscribe()</code>方法之一来订阅<code>Flux</code> 。只有那些方法才能使数据流。它们遍历您在序列上声明的运算符链（如果有），并要求发布者开始创建数据。在我们一直在使用的样本示例中，这意味着字符串的基础集合被迭代。在更复杂的用例中，它可能会触发从文件系统读取文件，或者触发从数据库中提取文件或对HTTP服务的调用。</p>
+<p>为了使数据流，您必须订阅<code>Flux</code>使用其中之一<code>subscribe()</code>方法。只有那些方法才能使数据流。它们遍历您在序列上声明的运算符链（如果有），并要求发布者开始创建数据。在我们一直在使用的样本示例中，这意味着字符串的基础集合被迭代。在更复杂的用例中，它可能会触发从文件系统读取文件，或者触发从数据库中提取文件或对HTTP服务的调用。</p>
 </div>
 <div class="paragraph">
-<p>这是实际上对<code>subscribe()</code>的调用：</p>
+<p>这是一个电话<code>subscribe()</code>实际上：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -304,7 +310,7 @@ Stream<String> upper = stream.map(value -> {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>09:17:59.665 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ea988f8b899e8598c48985988fc49a9f88868399828f98c4ac869f92a39e8f988b88868fcea39e8f988b88868fb99f88998998839a9e838584aad98c8c89df8b8c">[email protected]</a>1)
+<pre class="prettyprint highlight"><code>09:17:59.665 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ea988f8b899e8598c48985988fc49a9f88868399828f98c4ac869f92a39e8f988b88868fcea39e8f988b88868fb99f88998998839a9e838584aad98c8c89df8b8c">[email&#160;protected]</a>1)
 09:17:59.666 [main] INFO reactor.core.publisher.FluxLog -  request(unbounded)
 09:17:59.666 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
 09:17:59.667 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
@@ -313,10 +319,10 @@ Stream<String> upper = stream.map(value -> {
 </div>
 </div>
 <div class="paragraph">
-<p>因此，我们可以看出，不带参数的<code>subscribe()</code>的作用是请求发布者发送<em>所有</em>数据—仅记录了一个<code>request()</code>且它是“无界的”。我们还可以看到发布的每个项目的回调（ <code>onNext()</code> ），序列的结尾（ <code>onComplete()</code> ）和原始订阅的<code>onSubscribe()</code> ）。如果需要，您可以使用<code>Flux</code>的<code>doOn*()</code>方法自己监听那些事件，它们本身是运算符，而不是订阅者，因此它们不会导致任何数据自行流动。</p>
+<p>因此，我们可以看到， <code>subscribe()</code>不带任何争论，就是要求发布者发送<em>所有</em>数据-只有一个<code>request()</code>记录下来，它是“无界的”。我们还可以看到发布的每个项目的回调（ <code>onNext()</code> ），在序列的结尾（ <code>onComplete()</code> ），以及原始订阅（ <code>onSubscribe()</code> ）。如果需要，您可以使用<code>doOn*()</code>方法中<code>Flux</code> ，它们本身就是运算符，而不是订阅者，因此它们不会导致任何数据自行流动。</p>
 </div>
 <div class="paragraph">
-<p><code>subscribe()</code>方法已重载，其他变体为您提供不同的选项来控制发生的情况。一种重要且方便的形式是带回调函数作为参数的<code>subscribe()</code> 。第一个参数是<code>Consumer</code> ，它为您提供每个项目的回调，如果有错误，您还可以选择为错误添加一个<code>Consumer</code> ，并在序列完成时执行普通的<code>Runnable</code> 。例如，仅使用逐项回调：</p>
+<p>的<code>subscribe()</code>方法已重载，其他变体为您提供不同的选项来控制发生的情况。一种重要且方便的形式是<code>subscribe()</code>以回调作为参数。第一个参数是<code>Consumer</code> ，它为您提供了每个项目的回调，并且您还可以选择添加一个<code>Consumer</code>如果有一个错误和一个香草错误<code>Runnable</code>在序列完成时执行。例如，仅使用逐项回调：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -331,7 +337,7 @@ Stream<String> upper = stream.map(value -> {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>09:56:12.680 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="67150206041308154904081502491712050b0e140f021549210b121f261515061e43261515061e3412051404150e17130e080927525e015e5e0206">[email protected]</a>)
+<pre class="prettyprint highlight"><code>09:56:12.680 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="67150206041308154904081502491712050b0e140f021549210b121f261515061e43261515061e3412051404150e17130e080927525e015e5e0206">[email&#160;protected]</a>)
 09:56:12.682 [main] INFO reactor.core.publisher.FluxLog -  request(unbounded)
 09:56:12.682 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
 RED
@@ -343,11 +349,11 @@ BLUE
 </div>
 </div>
 <div class="paragraph">
-<p>我们可以通过多种方式控制数据流，并使其“有界”。控制原料API是<code>Subscription</code>您从获得<code>Subscriber</code> 。上面的<code>subscribe()</code>的短调用的等效长格式为：</p>
+<p>我们可以通过多种方式控制数据流，并使其“有界”。用于控制的原始API是<code>Subscription</code>你从一个<code>Subscriber</code> 。短调用的等效长形式<code>subscribe()</code>以上是：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">.subscribe(new Subscriber<String>() {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">.subscribe(new Subscriber&lt;String&gt;() {
 
     @Override
     public void onSubscribe(Subscription s) {
@@ -368,11 +374,11 @@ BLUE
 </div>
 </div>
 <div class="paragraph">
-<p>为了控制流程，例如一次最多消费2件商品，您可以更智能地使用“ <code>Subscription</code> ：</p>
+<p>要控制流量，例如一次最多消耗2件物品，您可以使用<code>Subscription</code>更聪明地：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">.subscribe(new Subscriber<String>() {
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">.subscribe(new Subscriber&lt;String&gt;() {
 
     private long count = 0;
     private Subscription subscription;
@@ -386,7 +392,7 @@ BLUE
     @Override
     public void onNext(String t) {
         count++;
-        if (count>=2) {
+        if (count&gt;=2) {
             count = 0;
             subscription.request(2);
         }
@@ -395,11 +401,11 @@ BLUE
 </div>
 </div>
 <div class="paragraph">
-<p>此<code>Subscriber</code> “批处理”项目2。这是一个常见的用例，因此您可能会考虑将实现提取到便捷类中，这也将使代码更具可读性。输出看起来像这样：</p>
+<p>这个<code>Subscriber</code>一次“批处理”项目2。这是一个常见的用例，因此您可能会考虑将实现提取到便利类中，这也将使代码更具可读性。输出看起来像这样：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>09:47:13.562 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="186a7d797b6c776a367b776a7d36686d7a74716b707d6a365e746d60596a6a79613c596a6a79614b6d7a6b7b6a71686c717776582e29202b2a212a21">[email protected]</a>)
+<pre class="prettyprint highlight"><code>09:47:13.562 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="186a7d797b6c776a367b776a7d36686d7a74716b707d6a365e746d60596a6a79613c596a6a79614b6d7a6b7b6a71686c717776582e29202b2a212a21">[email&#160;protected]</a>)
 09:47:13.564 [main] INFO reactor.core.publisher.FluxLog -  request(2)
 09:47:13.564 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
 09:47:13.565 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
@@ -409,7 +415,7 @@ BLUE
 </div>
 </div>
 <div class="paragraph">
-<p>实际上，批处理订户是一个非常普遍的用例，以至于<code>Flux</code>已经提供了便捷的方法。上面的批处理示例可以这样实现：</p>
+<p>实际上，批处理订户是一种常见的用例，以至于已经有一些便捷的方法可用于<code>Flux</code> 。上面的批处理示例可以这样实现：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -420,11 +426,11 @@ BLUE
 </div>
 </div>
 <div class="paragraph">
-<p>（请注意对<code>subscribe()</code>的调用有请求限制）。这是输出：</p>
+<p>（请注意<code>subscribe()</code>要求限制）。这是输出：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>10:25:43.739 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bac8dfdbd9ced5c894d9d5c8df94cacfd8d6d3c9d2dfc894fcd6cfc2fbc8c8dbc39efbc8c8dbc3e9cfd8c9d9c8d3caced3d5d4fa8e8c8c8ddbdf8f8c">[email protected]</a>)
+<pre class="prettyprint highlight"><code>10:25:43.739 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bac8dfdbd9ced5c894d9d5c8df94cacfd8d6d3c9d2dfc894fcd6cfc2fbc8c8dbc39efbc8c8dbc3e9cfd8c9d9c8d3caced3d5d4fa8e8c8c8ddbdf8f8c">[email&#160;protected]</a>)
 10:25:43.740 [main] INFO reactor.core.publisher.FluxLog -  request(2)
 10:25:43.740 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
 10:25:43.741 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
@@ -439,7 +445,7 @@ BLUE
 <td class="icon">
 <div class="title">小费</div>
 </td>
-<td class="content">像Spring Reactive Web这样可以为您处理序列的库可以处理订阅。能够将这些顾虑降低到堆栈中是一件好事，因为它可以使您避免使用非业务逻辑使代码混乱，从而使代码更具可读性，并且更易于测试和维护。因此，通常来说，如果您<strong>可以避免订阅</strong>序列，或者至少将该代码推入处理层并从业务逻辑中移出，则是一件好事。
+<td class="content">一个可以为您处理序列的库，例如Spring Reactive Web，可以处理订阅。能够将这些顾虑降低到堆栈中是一件好事，因为它可以使您避免使用非业务逻辑使代码混乱，从而使代码更具可读性，并且更易于测试和维护。因此，通常来说，如果您<strong>可以避免订阅</strong>序列，或者至少将该代码推入处理层并从业务逻辑中移出，则是一件好事。
 </td>
 </tr>
 </tbody></table>
@@ -448,10 +454,10 @@ BLUE
 <div class="sect2">
 <h3 id="threads-schedulers-and-background-processing"><a class="anchor" href="#threads-schedulers-and-background-processing"></a>线程，调度程序和后台处理</h3>
 <div class="paragraph">
-<p>上面所有日志的一个有趣的功能是它们都在“主”线程上，这是调用方<code>subscribe()</code>的线程。这突出了一个重要的观点：Reactor在线程方面非常节俭，因为它为您提供了获得最佳性能的最大机会。如果您在过去5年中一直在处理线程，线程池和异步执行，试图从您的服务中挤出更多的汁液，那可能是一个令人惊讶的声明。但这是事实：在没有必要强制切换线程的情况下，即使JVM已优化为非常高效地处理线程，在单个线程上执行计算也总是更快。Reactor已将控制所有异步处理的键交给您，并且假定您知道自己在做什么。</p>
+<p>上面所有日志的一个有趣的功能是它们都在“主”线程上，这是调用方的线程<code>subscribe()</code> 。这突出了一个重要的观点：Reactor在线程方面非常节俭，因为它为您提供了获得最佳性能的最大机会。如果您在过去的5年中一直在处理线程，线程池和异步执行，试图从您的服务中挤出更多的汁液，那可能是一个令人惊讶的声明。但这是真的：在无需强制转换线程的情况下，即使对JVM进行了优化以使其非常高效地处理线程，也始终可以更快地在单个线程上进行计算。Reactor已将控制所有异步处理的键交给您，并且假定您知道自己在做什么。</p>
 </div>
 <div class="paragraph">
-<p><code>Flux</code>提供了一些控制线程边界的配置器方法。例如，您可以使用<code>Flux.subscribeOn()</code>将预订配置为在后台线程中处理：</p>
+<p><code>Flux</code>提供了一些控制线程边界的配置器方法。例如，您可以使用以下命令将订阅配置为在后台线程中处理<code>Flux.subscribeOn()</code> ：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -467,7 +473,7 @@ BLUE
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>13:43:41.279 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3547505456415a471b565a47501b454057595c465d50471b7359404d744747544c11744747544c6640574656475c45415c5a5b75000d030306535606">[email protected]</a>)
+<pre class="prettyprint highlight"><code>13:43:41.279 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3547505456415a471b565a47501b454057595c465d50471b7359404d744747544c11744747544c6640574656475c45415c5a5b75000d030306535606">[email&#160;protected]</a>)
 13:43:41.280 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  request(2)
 13:43:41.281 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onNext(red)
 13:43:41.281 [parallel-1-1] INFO reactor.core.publisher.FluxLog -  onNext(white)
@@ -488,30 +494,30 @@ BLUE
 </tbody></table>
 </div>
 <div class="paragraph">
-<p>请注意，订阅以及所有处理都在单个后台线程“ parallel-1-1”上进行-这是因为我们要求主<code>Flux</code>的订阅者在后台。如果项目处理是占用大量CPU资源的话，这很好（但实际上，在后台线程中毫无意义，因为您需要为上下文切换付费，但不会更快地得到结果）。您可能还希望能够执行I / O密集并且可能阻塞的项目处理。在这种情况下，您希望尽快完成它而不会阻塞调用者。线程池仍然是您的朋友，这就是您从<code>Schedulers.parallel()</code>获得的东西。要将单个项目的处理切换到单独的线程（直到池的限制），我们需要将它们分解为单独的发布者，并且对于每个发布者，都在后台线程中请求结果。一种实现方法是使用一个名为<code>flatMap()</code>的运算符，该运算符将项目映射到<code>Publisher</code> （可能是其他类型），然后再映射到新类型的序列：</p>
+<p>请注意，订阅以及所有处理都在单个后台线程“ parallel-1-1”上进行–这是因为我们要求主订阅者<code>Flux</code>在后台。如果项目处理是占用大量CPU资源的话，这很好（但实际上，在后台线程中毫无意义，因为您需要为上下文切换付费，但不会更快地得到结果）。您可能还希望能够执行I / O密集并且可能阻塞的项目处理。在这种情况下，您希望尽快完成它而不会阻塞调用者。线程池仍然是您的朋友，这就是您从中得到的<code>Schedulers.parallel()</code> 。要将单个项目的处理切换到单独的线程（直到池的限制），我们需要将它们分解为单独的发布者，并且对于每个发布者，都在后台线程中请求结果。一种方法是使用称为<code>flatMap()</code> ，将项目映射到<code>Publisher</code> （可能是其他类型），然后返回到新类型的序列：</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">Flux.just("red", "white", "blue")
   .log()
-  .flatMap(value ->
+  .flatMap(value -&gt;
      Mono.just(value.toUpperCase())
        .subscribeOn(Schedulers.parallel()),
      2)
-.subscribe(value -> {
+.subscribe(value -&gt; {
   log.info("Consumed: " + value);
 })</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>请注意，这里使用<code>flatMap()</code>将项目下推到“子”发布者中，在这里我们可以控制每个项目的订阅，而不是整个序列的订阅。Reactor内置了默认行为以尽可能长时间地挂接到单个线程上，因此，如果我们希望它处理后台线程中的特定项目或项目组，则需要明确。实际上，这是强制执行并行处理的少数公认技巧之一（有关更多详细信息，请参见“ <a href="https://github.com/reactor/reactive-streams-commons/issues/21">反应式宝石”</a>问题）。</p>
+<p>注意这里的使用<code>flatMap()</code>将项目下推到“子”发布者中，在这里我们可以控制每个项目的订阅，而不是整个序列的订阅。Reactor内置了默认行为以尽可能长时间地挂接到单个线程上，因此，如果我们希望它处理后台线程中的特定项目或项目组，则需要明确说明。实际上，这是强制执行并行处理的少数公认技巧之一（有关更多详细信息，请参见“ <a href="https://github.com/reactor/reactive-streams-commons/issues/21">反应式宝石”</a>问题）。</p>
 </div>
 <div class="paragraph">
 <p>输出看起来像这样：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>15:24:36.596 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c2e393d3f28332e723f332e39722c293e30352f34392e721a3029241528392e3d3e3039781528392e3d3e30390f293e2f3f2e352c283533321c6a3a6d3a3e3d6d">[email protected]</a>7)
+<pre class="prettyprint highlight"><code>15:24:36.596 [main] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c2e393d3f28332e723f332e39722c293e30352f34392e721a3029241528392e3d3e3039781528392e3d3e30390f293e2f3f2e352c283533321c6a3a6d3a3e3d6d">[email&#160;protected]</a>7)
 15:24:36.610 [main] INFO reactor.core.publisher.FluxLog -  request(2)
 15:24:36.610 [main] INFO reactor.core.publisher.FluxLog -  onNext(red)
 15:24:36.613 [main] INFO reactor.core.publisher.FluxLog -  onNext(white)
@@ -524,7 +530,7 @@ BLUE
 </div>
 </div>
 <div class="paragraph">
-<p>请注意，现在有多个线程正在使用这些项，并且<code>flatMap()</code>的并发提示确保只要有可用项，就可以在任何给定时间处理2个项。我们经常看到<code>request(1)</code>因为系统试图将2个项目保留在管道中，并且通常它们不会同时完成处理。实际上，Reactor会变得非常聪明，它会从上游<code>Publisher</code>预取项目，以消除订阅者的等待时间（我们在这里看不到，因为数量很少-我们仅处理3个项目） 。</p>
+<p>请注意，现在有多个线程正在使用这些项，并且在<code>flatMap()</code>确保有两个项目在任何给定时间被处理，只要它们可用。我们看<code>request(1)</code>这是因为系统试图将2个项目保留在管道中，并且通常它们不会同时完成处理。实际上，Reactor试图变得非常聪明，并且它从上游预取项目<code>Publisher</code>尝试消除订户的等待时间（由于数量少，我们在这里看不到-我们只处理3个项目）。</p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -538,7 +544,7 @@ BLUE
 </tbody></table>
 </div>
 <div class="paragraph">
-<p><code>Flux</code>还具有相同的<code>publishOn()</code>方法，但用于侦听器（即<code>onNext()</code>或使用者回调），而不是用于订阅者本身：</p>
+<p><code>Flux</code>也有一个<code>publishOn()</code>相同的方法，但对于听众（即<code>onNext()</code>或使用者回呼），而不是订阅者本身：</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -547,7 +553,7 @@ BLUE
   .map(String::toUpperCase)
   .subscribeOn(Schedulers.newParallel("sub"))
   .publishOn(Schedulers.newParallel("pub"), 2)
-.subscribe(value -> {
+.subscribe(value -&gt; {
     log.info("Consumed: " + value);
 });</code></pre>
 </div>
@@ -557,7 +563,7 @@ BLUE
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>15:12:09.750 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d1f080c0e19021f430e021f08431d180f01041e05081f432b0118152419081f0c0f0108492419081f0c0f01083e180f1e0e1f041d190402032d5c5a5f0809585a">[email protected]</a>)
+<pre class="prettyprint highlight"><code>15:12:09.750 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onSubscribe(<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d1f080c0e19021f430e021f08431d180f01041e05081f432b0118152419081f0c0f0108492419081f0c0f01083e180f1e0e1f041d190402032d5c5a5f0809585a">[email&#160;protected]</a>)
 15:12:09.758 [sub-1-1] INFO reactor.core.publisher.FluxLog -  request(2)
 15:12:09.759 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onNext(red)
 15:12:09.759 [sub-1-1] INFO reactor.core.publisher.FluxLog -  onNext(white)
@@ -570,7 +576,7 @@ BLUE
 </div>
 </div>
 <div class="paragraph">
-<p>请注意，使用者回调（记录为“ Consumed：…``”）在发布者线程<code>pub-1-1</code> 。如果您取出<code>subscribeOn()</code>调用，您可能会看到所有的处理数据的第二块的<code>pub-1-1</code>线程为好。再一次，这是Reactor在线程方面很节俭—如果没有明确的切换线程请求，则无论下一次调用如何，它都将保持不变。</p>
+<p>请注意，使用者回调（记录为“ Consumed：…``”）在发布者线程上<code>pub-1-1</code> 。如果您取出<code>subscribeOn()</code>调用中，您可能会看到在<code>pub-1-1</code>线程。再一次，这是Reactor在线程方面很节俭—如果没有明确的切换线程请求，则无论下一次调用如何，它都将保持不变。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -578,7 +584,7 @@ BLUE
 <td class="icon">
 <div class="title">注意</div>
 </td>
-<td class="content">我们将该示例中的代码从<code>publishOn()</code> <code>subscribe(null, 2)</code>更改为向<code>publishOn()</code>添加<code>prefetch=2</code> 。在这种情况下， <code>subscribe()</code>的获取大小提示将被忽略。
+<td class="content">我们将以下示例中的代码更改为<code>subscribe(null, 2)</code>添加一个<code>prefetch=2</code>到<code>publishOn()</code> 。在这种情况下，提取大小提示<code>subscribe()</code>本来会被忽略的。
 </td>
 </tr>
 </tbody></table>
@@ -587,7 +593,7 @@ BLUE
 <div class="sect2">
 <h3 id="extractors-the-subscribers-from-the-dark-side"><a class="anchor" href="#extractors-the-subscribers-from-the-dark-side"></a>提取器：黑暗面的订户</h3>
 <div class="paragraph">
-<p>订阅序列的另一种方法是调用<code>Mono.block()</code>或<code>Mono.toFuture()</code>或<code>Flux.toStream()</code> （这些是“提取器”方法，它们使您从Reactive类型中脱颖而出）灵活性较差，阻止了抽象）。<code>Flux</code>还具有将<code>Flux</code>转换为<code>Mono</code>转换器<code>collectList()</code>和<code>collectMap()</code> 。他们实际上并没有订阅该序列，但是他们确实放弃了您可能在单个项目级别上对订阅拥有的任何控制权。</p>
+<p>订阅序列的另一种方法是调用<code>Mono.block()</code>要么<code>Mono.toFuture()</code>要么<code>Flux.toStream()</code> （这些是“提取器”方法-它们使您摆脱了Reactive类型，变得不够灵活，阻塞抽象）。 <code>Flux</code>也有转换器<code>collectList()</code>和<code>collectMap()</code>从...转换<code>Flux</code>至<code>Mono</code> 。他们实际上并没有订阅该序列，但是他们确实放弃了您可能在单个项目级别上对订阅拥有的任何控制权。</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -601,7 +607,7 @@ BLUE
 </tbody></table>
 </div>
 <div class="paragraph">
-<p>这些方法可作为逃生舱口，从反应式过渡到阻止式过渡。如果您需要适应传统的API，例如Spring MVC。当您调用<code>Mono.block()</code>您将放弃反应式流的所有好处。这是Reactive Streams和Java 8 <code>Streams</code>之间的主要区别-本机Java <code>Stream</code>仅具有“全有或全无”订阅模型，等效于<code>Mono.block()</code> 。当然， <code>subscribe()</code>也可以阻塞调用线程，因此它与转换器方法一样危险，但是您拥有更多控制权-您可以通过使用<code>subscribeOn()</code>阻止它阻塞，并且可以通过回退来滴下这些项压力，并定期决定是否继续。</p>
+<p>这些方法可作为逃生舱口，从反应式过渡到阻止式过渡。如果您需要适应传统的API，例如Spring MVC。你打电话的时候<code>Mono.block()</code>您会丢弃反应式流的所有好处。这是Reactive Streams与Java 8之间的主要区别<code>Streams</code> -本机Java <code>Stream</code>仅具有“全有或全无”订阅模式，相当于<code>Mono.block()</code> 。当然<code>subscribe()</code>也可以阻塞调用线程，因此它与转换器方法一样危险，但是您拥有更多控制权-您可以通过使用防止阻塞<code>subscribeOn()</code>您可以通过施加反压并定期决定是否继续滴入物品。</p>
 </div>
 </div>
 </div>
@@ -616,7 +622,8 @@ BLUE
 </div></div>
 </div>
 <section id="disqus_thread"></section>
-<script src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" data-cfasync="false"></script><script type="text/javascript">var disqus_shortname = 'spring-io';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2510;
 
       (function(disqus_shortname, document) {
@@ -630,7 +637,8 @@ BLUE
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -668,12 +676,14 @@ BLUE
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

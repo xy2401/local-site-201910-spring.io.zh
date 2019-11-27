@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>使用Spring Boot 1.4的自定义测试片</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -35,14 +39,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2016-08-30 09:31:12.489">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -169,7 +175,7 @@
 </div>
 </header>
 <div class="blog--post"><p>Spring Boot 1.4包括对测试支持的重大改进，这些功能之一就是<em>测试切片</em> 。我想借此机会在此博客文章中进一步解释它是什么以及如何轻松创建自己的切片。</p>
-<p>测试切片是关于分割为测试创建的<code>ApplicationContext</code> 。通常，如果您想使用<code>MockMvc</code>测试控制器，那么您当然不想打扰数据层。相反，您可能想<em>模拟</em>控制器使用的服务，并验证所有与Web相关的交互是否按预期工作。可以在下面的示例中进行总结：</p>
+<p>测试切片是关于细分<code>ApplicationContext</code>为您的测试创建的。通常，如果要使用以下命令测试控制器<code>MockMvc</code> ，当然您不想打扰数据层。相反，您可能想<em>模拟</em>控制器使用的服务，并验证所有与Web相关的交互是否按预期工作。可以在下面的示例中进行总结：</p>
 <pre><code class="prettyprint java">@RunWith(SpringRunner.class)
 @WebMvcTest(UserVehicleController.class)
 public class UserVehicleControllerTests {
@@ -182,16 +188,16 @@ public class UserVehicleControllerTests {
 
     @Test
     public void testExample() throws Exception {
-        given(this.userVehicleService.getVehicleDetails("sboot"))
-                .willReturn(new VehicleDetails("Honda", "Civic"));
-        this.mvc.perform(get("/sboot/vehicle").accept(MediaType.TEXT_PLAIN))
-                .andExpect(status().isOk()).andExpect(content().string("Honda Civic"));
+        given(this.userVehicleService.getVehicleDetails(&quot;sboot&quot;))
+                .willReturn(new VehicleDetails(&quot;Honda&quot;, &quot;Civic&quot;));
+        this.mvc.perform(get(&quot;/sboot/vehicle&quot;).accept(MediaType.TEXT_PLAIN))
+                .andExpect(status().isOk()).andExpect(content().string(&quot;Honda Civic&quot;));
     }
 
 }
 </code></pre>
-<p><code>@WebMvcTest</code>是Spring Boot 1.4中的Web测试片。如果存在，则指示Spring Boot需要一个Web环境，并且仅应实例化指定的控制器。因为它知道测试的性质，所以它可以为您做出其他明智的决定（例如，自动配置<code>MockMvc</code>以便只剩下注入它）。另外，您的控制器对<code>UserVehicleService</code>具有依赖性，因此启动上下文将导致失败，因为<code>ApplicationContext</code>不了解它（请记住，只有Web基础结构和<code>UserVehicleController</code>是已知的）。<code>@MockBean</code>在这里用于注册<code>UserVehicleService</code>模拟，以便可以将其透明地注入到控制器中。</p>
-<p>现在，让我们看一下实现以更好地了解Spring Boot如何为您管理此实现。我们的第一站是<code>@WebMvcTest</code> （为了简便<code>@Target</code> ，删除了<code>@Target</code>和朋友）：</p>
+<p><code>@WebMvcTest</code>是Spring Boot 1.4中的Web测试片。如果存在，则指示Spring Boot需要一个Web环境，并且仅应实例化指定的控制器。由于它了解测试的性质，因此可以为您做出其他明智的决定（例如，自动配置<code>MockMvc</code>这样剩下的就是注入它）。另外，您的控制器对<code>UserVehicleService</code>因此启动上下文会导致失败，因为<code>ApplicationContext</code>不知道这一点（请记住，只有Web基础架构和<code>UserVehicleController</code>是已知的）。 <code>@MockBean</code>用于这里注册<code>UserVehicleService</code>模拟，以便可以将其透明地注入到控制器中。</p>
+<p>现在，让我们看一下实现以更好地了解Spring Boot如何为您管理此实现。我们的第一站是<code>@WebMvcTest</code> （删除<code>@Target</code>和朋友以示敬意）：</p>
 <pre><code class="prettyprint java">@BootstrapWith(WebMvcTestContextBootstrapper.class)
 @OverrideAutoConfiguration(enabled = false)
 @TypeExcludeFilters(WebMvcTypeExcludeFilter.class)
@@ -207,36 +213,36 @@ public @interface WebMvcTest { ... }
 <li>类路径扫描调整</li>
 <li>测试引导</li>
 </ul><h2><a href="#auto-configuration-customizations" class="anchor" name="auto-configuration-customizations"></a>自动配置自定义</h2>
-<p>Spring Boot 1.4现在定义了<code>spring-boot-test-autoconfigure</code>模块，该模块提供了与测试相关的自动配置的集合。这些自动配置是可组合的，可以帮助您轻松构建自己的基础架构。</p>
-<p>回到<code>@WebMvcTest</code> ，我们要做的第一件事情就是禁用默认的自动配置： <code>OverrideAutoConfiguration</code>做到这一点。由于默认自动配置现已禁用，因此您必须选择加入要包括的相关自动配置。三个<code>AutoConfigure</code>annotation为我们做到了：确保网络环境可用，已配置<code>MockMvc</code> ，并且提供了无操作缓存管理器。让我们看一下<code>AutoconfigureMockMvc</code>的摘录：</p>
+<p>Spring Boot 1.4现在定义了一个<code>spring-boot-test-autoconfigure</code>提供与测试相关的自动配置的集合的模块。这些自动配置是可组合的，可以帮助您轻松构建自己的基础架构。</p>
+<p>回到<code>@WebMvcTest</code> ，我们要做的第一件事是禁用默认的自动配置： <code>OverrideAutoConfiguration</code>做到这一点。由于默认自动配置现已禁用，因此您必须选择加入要包括的相关自动配置。他们三个<code>AutoConfigure</code>批注为我们做到了：它们确保网络环境可用， <code>MockMvc</code>已配置，并且无操作缓存管理器可用。让我们来看看摘录<code>AutoconfigureMockMvc</code> ：</p>
 <pre><code class="prettyprint java">@ImportAutoConfiguration
-@PropertyMapping("spring.test.mockmvc")
+@PropertyMapping(&quot;spring.test.mockmvc&quot;)
 public @interface AutoConfigureMockMvc {
 
     boolean addFilters() default true;
 
-    @PropertyMapping("webclient.enabled")
+    @PropertyMapping(&quot;webclient.enabled&quot;)
     boolean webClientEnabled() default true;
 
     ...
 }
 </code></pre>
-<p><code>@ImportAutoConfiguration</code>是一个注释，列出了应包含的自动配置。或者，您可以使用密钥注释的完全限定名称在<code>META-INF/spring.factories</code>提供列表。这是为<code>AutoConfigureMockMvc</code>定义的：</p>
+<p><code>@ImportAutoConfiguration</code>是一个注释，列出了应包括的自动配置。另外，您可以在<code>META-INF/spring.factories</code>使用键的注释的完全限定名称。这是为<code>AutoConfigureMockMvc</code> ：</p>
 <pre><code class="prettyprint">org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc=\
 org.s.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration,\
 org.s.boot.test.autoconfigure.web.servlet.MockMvcSecurityAutoConfiguration,\
 org.s.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration,\
 org.s.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration
 </code></pre>
-<p>您会明白：每个注释都带来了一些自动配置，您可以根据需要任意组合。你会发现， <code>WebMvcTest</code>也有<code>ImportAutoConfiguration</code>但在没有进入<code>spring.factories</code>它。Spring Boot将扫描类路径中的所有<code>spring.factories</code> ，并在必要时<em>合并</em>内容。如果您的模块要向<code>@WebMvcTest</code> （或<code>@AutoConfigureMockMvc</code> ）添加其他行为，则只需创建<code>META-INF/spring.factories</code>并注册其他自动配置类。您也可以使用<code>@AutoconfigureBefore</code>和<code>@AutoconfigureAfter</code>来订购它们。</p>
-<p>测试自动配置可以像往常一样配置：类级别的<code>@PropertyMapping</code>annotation将annotation的属性映射到<code>Environment</code>以便自动配置代码可以提取值并相应地调整配置。我们可以看到上面的<code>webClientEnabled</code>属性在自动配置中透明使用：</p>
-<pre><code class="prettyprint java">@ConditionalOnProperty(prefix = "spring.test.mockmvc.webclient", 
-        name = "enabled", matchIfMissing = true)
+<p>您会明白：每个注释都带来了一些自动配置，您可以根据需要任意组合。您会注意到<code>WebMvcTest</code>也有一个<code>ImportAutoConfiguration</code>但没有条目<code>spring.factories</code>为了它。Spring Boot将扫描所有<code>spring.factories</code>在类路径中，并在必要时<em>合并</em>内容。如果您的模块要添加其他行为， <code>@WebMvcTest</code> （要么<code>@AutoConfigureMockMvc</code> ），只需创建一个<code>META-INF/spring.factories</code>并注册其他自动配置类。您也可以使用<code>@AutoconfigureBefore</code>和<code>@AutoconfigureAfter</code>订购它们。</p>
+<p>测试自动配置可以像往常一样配置： <code>@PropertyMapping</code>类级别的注释将注释的属性映射到<code>Environment</code>以便自动配置代码可以提取值并相应地调整配置。我们可以看到<code>webClientEnabled</code>上面的属性在自动配置中透明使用：</p>
+<pre><code class="prettyprint java">@ConditionalOnProperty(prefix = &quot;spring.test.mockmvc.webclient&quot;, 
+        name = &quot;enabled&quot;, matchIfMissing = true)
 public class MockMvcWebClientAutoConfiguration { ... }
 </code></pre><h2><a href="#classpath-scanning-tuning" class="anchor" name="classpath-scanning-tuning"></a>类路径扫描调整</h2>
-<p><code>TypeExcludeFilters</code>是一种调整类路径扫描的方法。对于<code>@WebMvcTest</code>我们将仅<a href="https://github.com/spring-projects/spring-boot/blob/bbc91cc03f5df31c1985811d07abe4f9a906355e/spring-boot-test-autoconfigure/src/main/java/org/springframework/boot/test/autoconfigure/web/servlet/WebMvcTypeExcludeFilter.java">包含某些与Web相关的组件，</a>而忽略其余所有<a href="https://github.com/spring-projects/spring-boot/blob/bbc91cc03f5df31c1985811d07abe4f9a906355e/spring-boot-test-autoconfigure/src/main/java/org/springframework/boot/test/autoconfigure/web/servlet/WebMvcTypeExcludeFilter.java">组件</a> 。这是非常强大的功能，因为您可以按常规方式使用类路径扫描，并且仅包含切片所需的内容。</p><h2><a href="#test-bootstrap" class="anchor" name="test-bootstrap"></a>测试引导</h2>
-<p>最后，新的测试引导程序确保在项目中标识<code>@SpringBootApplication</code>annotation的类（除非指定了一个）。这是一个不错的默认值，因为您不再需要指定它<em>，默认情况下</em> classpath扫描是正确<em>的</em> 。</p><h2><a href="#creating-your-own-slice" class="anchor" name="creating-your-own-slice"></a>创建自己的切片</h2>
-<p>基于这些知识，创建自己的切片实际上非常简单。这种片的示例可以是新的<code>DataJdbcTest</code> ，它类似于<code>DataJpaTest</code>的片，仅配置<code>JdbcTemplate</code>而不使用JPA。如果您想正确地使用代码，请查看<a href="https://github.com/snicoll-scratches/demo-data-jdbc-test">github存储库</a>以获取更多详细信息。</p>
+<p><code>TypeExcludeFilters</code>是一种调整类路径扫描的方法。如果是<code>@WebMvcTest</code>我们将仅<a href="https://github.com/spring-projects/spring-boot/blob/bbc91cc03f5df31c1985811d07abe4f9a906355e/spring-boot-test-autoconfigure/src/main/java/org/springframework/boot/test/autoconfigure/web/servlet/WebMvcTypeExcludeFilter.java">包含某些与网络相关的组件，</a>而忽略其余所有<a href="https://github.com/spring-projects/spring-boot/blob/bbc91cc03f5df31c1985811d07abe4f9a906355e/spring-boot-test-autoconfigure/src/main/java/org/springframework/boot/test/autoconfigure/web/servlet/WebMvcTypeExcludeFilter.java">组件</a> 。这是非常强大的功能，因为您可以按常规方式使用类路径扫描，并且仅包含切片所需的内容。</p><h2><a href="#test-bootstrap" class="anchor" name="test-bootstrap"></a>测试引导</h2>
+<p>最后，新的测试引导程序可确保确定<code>@SpringBootApplication</code>项目中带注释的类（除非指定了一个）。这是一个不错的默认值，因为您不再需要指定它<em>，默认情况下</em> classpath扫描是正确<em>的</em> 。</p><h2><a href="#creating-your-own-slice" class="anchor" name="creating-your-own-slice"></a>创建自己的切片</h2>
+<p>基于这些知识，创建自己的切片实际上非常简单。这种切片的一个例子可能是新的<code>DataJdbcTest</code> ，类似于<code>DataJpaTest</code>只配置<code>JdbcTemplate</code>并且不使用JPA。如果您想正确地使用代码，请查看<a href="https://github.com/snicoll-scratches/demo-data-jdbc-test">github存储库</a>以获取更多详细信息。</p>
 <p>我们的第一步是创建<code>@AutoconfigureDataJdbc</code></p>
 <pre><code class="prettyprint java">package com.example.test.autoconfigure.jdbc;
 
@@ -259,7 +265,7 @@ org.s.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration,\
 org.s.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration,\
 org.s.boot.autoconfigure.transaction.TransactionAutoConfiguration
 </code></pre>
-<p>一旦建立了可重用的基础结构，就可以创建测试切片，并只需指定需要数据库和jdbc即可：</p>
+<p>一旦建立了可重用的基础架构，就可以创建测试切片，并只需指定需要数据库和jdbc即可：</p>
 <pre><code class="prettyprint java">@BootstrapWith(SpringBootTestContextBootstrapper.class)
 @OverrideAutoConfiguration(enabled = false)
 @TypeExcludeFilters(DataJdbcTypeExcludeFilter.class)
@@ -270,8 +276,8 @@ org.s.boot.autoconfigure.transaction.TransactionAutoConfiguration
 @ImportAutoConfiguration
 public @interface DataJdbcTest { }
 </code></pre>
-<p><a href="https://github.com/snicoll-scratches/demo-data-jdbc-test/blob/d0c0eaaecfc048a7543a86f3e9c91804eabad6e0/src/main/java/com/example/test/autoconfigure/jdbc/DataJdbcTypeExcludeFilter.java#L13"><code>DataJdbcTypeExcludeFilter</code></a>确保排除所有其他服务，因为这种测试默认情况下不需要任何bean。可以改进以允许将服务定义为注释的参数，就像<code>WebMvcTest</code>添加指定的控制器一样。</p>
-<p>完成此操作后，只需添加注释，即可使用测试数据库为您自动配置<code>JdbcTemplate</code> ：</p>
+<p><a href="https://github.com/snicoll-scratches/demo-data-jdbc-test/blob/d0c0eaaecfc048a7543a86f3e9c91804eabad6e0/src/main/java/com/example/test/autoconfigure/jdbc/DataJdbcTypeExcludeFilter.java#L13"><code>DataJdbcTypeExcludeFilter</code></a>确保排除所有其他服务，因为这种测试默认情况下不需要您的任何bean。可以改进以允许将服务定义为注释的参数，就像<code>WebMvcTest</code>添加指定的控制器。</p>
+<p>完成此操作后，您只需添加注释和<code>JdbcTemplate</code>已使用测试数据库自动为您配置：</p>
 <pre><code class="prettyprint java">@RunWith(SpringRunner.class)
 @DataJdbcTest
 public class DataJdbcSampleTests {
@@ -282,10 +288,11 @@ public class DataJdbcSampleTests {
     ...
 }
 </code></pre><h2><a href="#summary" class="anchor" name="summary"></a>摘要</h2>
-<p>Spring Boot 1.4为测试带来了自动配置，并允许您轻松地编写自己的测试注释。在本文中，我们了解了<code>WebMvcTest</code>工作方式以及如何创建自己的“ jdbc”切片。我们实际上正在<a href="https://github.com/spring-projects/spring-boot/issues/6563">考虑在下一个版本中添加该annotation，</a>因此请<a href="gitter.im/spring-projects/spring-boot">随时提供反馈</a> ！</p></div>
+<p>Spring Boot 1.4为测试带来了自动配置，并允许您轻松地编写自己的测试注释。在本文中，我们看到了<code>WebMvcTest</code>工作原理，以及如何创建自己的“ jdbc”切片。我们实际上正在<a href="https://github.com/spring-projects/spring-boot/issues/6563">考虑在下一个版本中添加该批注，</a>因此请<a href="gitter.im/spring-projects/spring-boot">随时提供反馈</a> ！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 2590;
 
       (function(disqus_shortname, document) {
@@ -299,7 +306,8 @@ public class DataJdbcSampleTests {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -337,12 +345,14 @@ public class DataJdbcSampleTests {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

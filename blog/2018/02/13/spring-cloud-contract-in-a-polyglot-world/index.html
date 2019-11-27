@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>多语言世界中的Spring Cloud Contract</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -22,7 +26,7 @@
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Spring Cloud Contract in a polyglot world">
 <meta name="twitter:description" content="<div class=" paragrap="="> 
- </head><body dir="ltr"><p>This article contains a short reminder of what Contract Testing is, how Spring Cloud Contract implements it, and how Spring Cloud Contract can be used in a polyglot world.</p> 
+ <p>This article contains a short reminder of what Contract Testing is, how Spring Cloud Contract implements it, and how Spring Cloud Contract can be used in a polyglot world.</p> 
 
 <h1 id="what-is-contract-testing" class="sect0"><a class="anchor" href="#what-is-contract-testing"></a>What is Contract Testing</h1>
 <div class="paragraph"> 
@@ -55,10 +59,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -189,16 +195,16 @@
 </div>
 <h1 id="what-is-contract-testing" class="sect0"><a class="anchor" href="#what-is-contract-testing"></a>什么是合同测试</h1>
 <div class="paragraph">
-<p>为了增加我们系统正常运行的确定性，我们编写了不同类型的测试。根据<a href="https://martinfowler.com/bliki/TestPyramid.html">测试金字塔</a> ， <a href="https://martinfowler.com/bliki/TestPyramid.html">测试</a>的主要类型是单元，集成和UI。测试越复杂，所需的时间和精力就越多，并且变得越脆。</p>
+<p>为了增加我们系统正常运行的确定性，我们编写了不同类型的测试。根据<a href="https://martinfowler.com/bliki/TestPyramid.html">测试金字塔</a> ， <a href="https://martinfowler.com/bliki/TestPyramid.html">测试</a>的主要类型是单元，集成和UI。测试越复杂，他们需要的时间和精力就越多，并且变得越脆。</p>
 </div>
 <div class="paragraph">
-<p>在分布式系统中，最常见的问题之一是测试应用程序之间的集成。假设您的服务将REST请求发送到另一个应用程序。使用Spring Boot时，您可以编写一个<code>@SpringBootTest</code>在其中测试该行为。您设置了Spring上下文，准备了要发送的请求...该将其发送到哪里？您尚未启动其他应用程序，因此收到“ <code>Connection Refused</code>异常。您可以尝试模拟真实的HTTP调用并返回假响应。但是，如果这样做，则不会测试任何实际的HTTP集成，序列化和反序列化机制，等等。您还可以启动一个伪造的HTTP服务器（例如<a href="http://wiremock.org">WireMock</a> ）并模拟其行为。这里的问题是，作为API的客户端，您需要定义服务器的行为方式。换句话说，如果您告诉伪造的服务器在将请求发送到端点<code>/myEndpoint</code> <code>testText</code>时返回文本<code>testText</code> ，即使真实的服务器没有这样的端点，它也<code>/myEndpoint</code> 。简而言之，问题在于存根可能不可靠。</p>
+<p>在分布式系统中，最常见的问题之一是测试应用程序之间的集成。假设您的服务将REST请求发送到另一个应用程序。使用Spring Boot时，您可以编写一个<code>@SpringBootTest</code>在其中测试该行为。您设置了Spring上下文，准备了要发送的请求...该将其发送到哪里？您尚未启动其他应用程序，因此您得到了一个<code>Connection Refused</code>例外。您可以尝试模拟真实的HTTP调用并返回假响应。但是，如果这样做，则不会测试任何实际的HTTP集成，序列化和反序列化机制，等等。您还可以启动一个伪造的HTTP服务器（例如<a href="http://wiremock.org">WireMock</a> ）并模拟其行为。这里的问题是，作为API的客户端，您需要定义服务器的行为方式。换句话说，如果您告诉假服务器返回文本<code>testText</code>当请求发送到端点时<code>/myEndpoint</code> ，即使真实的服务器没有这样的端点，它也可以做到这一点。简而言之，问题在于存根可能不可靠。</p>
 </div>
 <div class="paragraph">
 <p>另一个问题是与第三方系统的集成。可能有一个共享实例由于高负载而每5分钟崩溃一次。在这种情况下，我们希望对该系统进行存根处理，以免影响我们的集成测试，但是我们需要这些存根来确保可靠性。</p>
 </div>
 <div class="paragraph">
-<p>为端到端测试设置环境，生成所有应用程序以及通过在整个系统上运行来执行测试总是很诱人的。通常，这是一个很好的解决方案，可以增加您的业务功能仍然运行良好的信心。但是，端到端测试的问题在于它们经常会由于没有明显的原因而失败并且非常缓慢。没有比这更令人沮丧的是，在运行十个小时之后，由于API调用中的错字，端到端测试失败了。</p>
+<p>为端到端测试设置环境，生成所有应用程序以及通过在整个系统上运行来执行测试总是很诱人的。通常，这是一个很好的解决方案，可以增加您的业务功能仍然运行良好的信心。但是，端到端测试的问题在于它们常常由于没有明显的原因而失败并且非常缓慢。没有比这更令人沮丧的是，在运行十个小时之后，由于API调用中的错字，端到端测试失败了。</p>
 </div>
 <div class="paragraph">
 <p>解决此问题的一种潜在方法是合同测试。在详细介绍这些内容之前，我们先定义一些术语：</p>
@@ -209,7 +215,7 @@
 <p><strong>producer</strong> ：服务器端所有者（例如，HTTP API的所有者）或通过队列发送的消息的生产者，例如RabbitMQ。</p>
 </li>
 <li>
-<p><strong>消费者</strong> ：使用HTTP API或侦听通过（例如）RabbitMQ接收的消息的应用程序。</p>
+<p><strong>消费者</strong> ：使用HTTP API或侦听通过（例如）RabbitMQ接收到的消息的应用程序。</p>
 </li>
 <li>
 <p><strong>合同</strong> ：生产者和消费者之间就通信外观应达成的协议。<strong>它不是架构</strong> 。它更多是一种使用场景。例如，对于这种特定情况，我期望指定的输入，然后使用指定的输出进行回复。</p>
@@ -279,9 +285,623 @@ response: # (7)
 </div>
 </div>
 <div class="paragraph">
-<p>本文重点介绍合同测试的两种主要类型：生产者合同测试和消费者驱动的合同测试。它们之间的主要区别是生产者和消费者的合作风格。</p>
+<p>本文重点介绍合同测试的两种主要类型：生产者合同测试和消费者驱动的合同测试。它们之间的主要区别是生产者和消费者的合作方式。</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>在<strong>生产者合同</strong>测试方法中，生产者定义合同并编写合同测试，描述API，并在不与客户合作的情况下发布存根。通常，当API是公开的并且API的所有者甚至不知道确切使用它的人时，就会发生这种情况。一个示例是<a href="https://start.spring.io">Spring Initializr</a> ，它使用<a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/multi/multi__spring_cloud_contract_wiremock.html#_generating_stubs_using_rest_docs">Spring Rest Docs</a>测试发布其存根。版本<code>0.5.0.BUILD-SNAPSHOT</code></p><code>0.5.0.BUILD-SNAPSHOT</code></li><code>0.5.0.BUILD-SNAPSHOT</code></ul><code>0.5.0.BUILD-SNAPSHOT</code></div><code>0.5.0.BUILD-SNAPSHOT</code></div><code>0.5.0.BUILD-SNAPSHOT</code></div><code>0.5.0.BUILD-SNAPSHOT</code></article><code>0.5.0.BUILD-SNAPSHOT</code></div><code>0.5.0.BUILD-SNAPSHOT</code></div><code>0.5.0.BUILD-SNAPSHOT</code></div><code>0.5.0.BUILD-SNAPSHOT</code></div><code>0.5.0.BUILD-SNAPSHOT</code></body></html>
+<p>在<strong>生产者合同</strong>测试方法中，生产者定义合同并编写合同测试，描述API，并在不与客户合作的情况下发布存根。通常，当API是公开的并且API的所有者甚至不知道确切使用谁时，就会发生这种情况。一个示例是<a href="https://start.spring.io">Spring Initializr</a> ，它使用<a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/multi/multi__spring_cloud_contract_wiremock.html#_generating_stubs_using_rest_docs">Spring Rest Docs</a>测试发布其存根。版本存根<code>0.5.0.BUILD-SNAPSHOT</code>在<a href="https://repo.spring.io/libs-snapshot/io/spring/initializr/initializr-web/0.5.0.BUILD-SNAPSHOT/">这里</a>可用<a href="https://repo.spring.io/libs-snapshot/io/spring/initializr/initializr-web/0.5.0.BUILD-SNAPSHOT/"><code>stubs</code>分类器</a> 。</p>
+</li>
+<li>
+<p>在以<strong>消费者为导向的合同</strong>测试方法中，合同是由消费者在与生产者的强有力合作下提出的。当合同兼容性被破坏时，生产者确切地知道哪个消费者定义了哪个合同，哪个合同被破坏了。使用内部API时，这种方法更为常见。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>在这两种情况下，都可以在生产者的存储库中定义合同（通过DSL或通过编写合同测试来定义）或存储所有合同的外部仓库。</p>
+</div>
+<h1 id="introduction-to-maven-nomenclature" class="sect0"><a class="anchor" href="#introduction-to-maven-nomenclature"></a> Maven命名法简介</h1>
+<div class="paragraph">
+<p>由于现在将Spring Cloud Contract用于非JVM项目要容易得多，因此最好解释一下包装默认值背后的基本术语，并介绍<a href="https://maven.apache.org/">Maven</a>命名法。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tbody><tr>
+<td class="icon">
+<div class="title">小费</div>
+</td>
+<td class="content">Apache Maven是一个软件项目管理和理解工具。基于项目对象模型（POM）的概念，Maven可以从中央信息管理项目的构建，报告和文档。（请参阅<a href="https://maven.apache.org/" class="bare">https://maven.apache.org/</a> ）</td>
+</tr>
+</tbody></table>
+</div>
+<div class="paragraph">
+<p>（以下定义的一部分摘自《 <a href="https://maven.apache.org/glossary.html">Maven词汇表》</a> 。）</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>Project</code> ：Maven考虑项目。您构建的所有内容都是项目。这些项目遵循定义明确的“项目对象模型”。项目可以依赖于其他项目，在这种情况下，后者称为“依赖项”。一个项目可能与几个子项目一致。但是，这些子项目仍被视为项目。</p>
+</li>
+<li>
+<p><code>Artifact</code> ：工件是项目产生或使用的东西。Maven为项目产生的工件示例包括JAR，源代码和二进制发行版。每个工件由组ID和工件ID唯一标识，工件ID在组内是唯一的。</p>
+</li>
+<li>
+<p><code>JAR</code> ：JAR表示Java ARchive。这是一种基于ZIP文件格式的格式。Spring Cloud Contract将合同和生成的存根打包在JAR文件中。</p>
+</li>
+<li>
+<p><code>GroupId</code> ：组ID是项目的通用唯一标识符。虽然这通常是项目名称（例如， <code>commons-collections</code> ），使用完全限定的包名称将其与其他具有类似名称的项目（例如， <code>org.apache.maven</code> ）。通常，当发布到工件管理器时， <code>GroupId</code>将斜杠分开并形成URL的一部分。例如，对于组ID为<code>com.example</code> ，它的工件ID <code>application</code>将会<code>/com/example/application/</code> 。</p>
+</li>
+<li>
+<p><code>Classifier</code> ：Maven依赖项表示法如下所示： <code>groupId:artifactId:version:classifier</code> 。分类器是传递给依赖项的附加后缀（例如<code>stubs</code>要么<code>sources</code> ）。相同的依存关系（例如， <code>com.example:application</code> ）会产生多个分类器彼此不同的工件。</p>
+</li>
+<li>
+<p><code>Artifact manager</code> ：生成二进制文件，源文件或程序包时，希望其他人可以下载，参考或重用它们。在JVM世界中，这些工件将是JAR。对于Ruby来说，这些都是宝石。对于Docker，它们将是Docker映像。您可以将这些工件存储在管理器中。此类管理器的示例包括<a href="https://jfrog.com/artifactory/">Artifactory</a>和<a href="http://www.sonatype.org/nexus/">Nexus</a> 。</p>
+</li>
+</ul>
+</div>
+<h1 id="what-is-spring-cloud-contract" class="sect0"><a class="anchor" href="#what-is-spring-cloud-contract"></a>什么是Spring Cloud Contract</h1>
+<div class="paragraph">
+<p><a href="https://cloud.spring.io/spring-cloud-contract/">Spring Cloud Contract</a>是一个保护项目的总体项目，可帮助用户实施各种合同测试。它带有两个主要模块： <code>Spring Cloud Contract Verifier</code> ，主要由生产方使用，以及<code>Spring Cloud Contract Stub Runner</code> ，供消费者使用。</p>
+</div>
+<div class="paragraph">
+<p>该项目使您可以使用以下方法定义合同：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://www.groovy-lang.org/">Groovy DSL</a></p>
+</li>
+<li>
+<p><a href="http://yaml.org/">YAML</a></p>
+</li>
+<li>
+<p><a href="https://docs.pact.io/">JSON协定</a></p>
+</li>
+<li>
+<p><a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/multi/multi__spring_cloud_contract_wiremock.html#_generating_stubs_using_rest_docs">春季休假文档</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>假设我们已决定使用YAML编写合同。在生产者方面，从合同中：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>使用Maven或<a href="https://gradle.org/">Gradle</a>插件生成测试以断言已达成合同。</p>
+</li>
+<li>
+<p>生成存根以供其他项目重用。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>对于使用Spring Cloud Contract和YAML合同的JVM应用程序，生产者合同方法的简化流程如下。</p>
+</div>
+<div class="paragraph">
+<p>制片人：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>应用Maven或Gradle Spring Cloud Contract插件。</p>
+</li>
+<li>
+<p>在下定义YAML合同<code>src/test/resources/contracts/</code> 。</p>
+</li>
+<li>
+<p>根据合同生成测试和存根。</p>
+</li>
+<li>
+<p>创建一个基类，以扩展生成的测试并设置测试上下文。</p>
+</li>
+<li>
+<p>一旦测试通过，请使用<code>stubs</code>存储合同和存根的分类器。</p>
+</li>
+<li>
+<p>上载带有<code>stubs</code>分类器到二进制存储。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>消费者：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>使用存根赛跑者来获取生产者的存根。Stub Runner在由存根提供的内存HTTP服务器（默认情况下为<a href="https://wiremock.org">WireMock服务器</a> ）中启动。</p>
+</li>
+<li>
+<p>针对存根运行测试。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>因此，使用Spring Cloud Contract和Contract Testing可为您提供：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>存根可靠性：仅在测试通过后才生成。</p>
+</li>
+<li>
+<p>存根可重用性：可以由多个使用者下载并重用它们。</p>
+</li>
+</ul>
+</div>
+<h1 id="what-is-the-current-problem-with-spring-cloud-contract" class="sect0"><a class="anchor" href="#what-is-the-current-problem-with-spring-cloud-contract"></a> Spring Cloud Contract当前的“问题”是什么</h1>
+<div class="paragraph">
+<p>分布式系统是由用不同语言和框架编写的应用程序建立的。Spring Cloud Contract的“问题”之一是DSL必须以Groovy编写。即使合同不需要该语言的任何特殊知识，对于非JVM用户来说，这仍然是一个问题。</p>
+</div>
+<div class="paragraph">
+<p>在生产者方面，Spring Cloud Contract可使用Java或Groovy生成测试。当然，在非JVM环境中使用这些测试成为一个问题。您不仅需要安装Java，而且还需要使用Maven或Gradle插件生成测试，而这需要使用这些构建工具。</p>
+</div>
+<h1 id="spring-cloud-contract-and-polyglot-support" class="sect0"><a class="anchor" href="#spring-cloud-contract-and-polyglot-support"></a> Spring Cloud Contract和Polyglot支持</h1>
+<div class="paragraph">
+<p>从开始<code>Edgware.SR2</code>发布火车和<code>1.2.3.RELEASE</code>在Spring Cloud Contract的基础上，我们决定添加一些功能，以在非JVM世界中广泛采用Spring Cloud Contract。</p>
+</div>
+<div class="paragraph">
+<p>我们增加了与YAML签订合同的支持。 YAML是另一种标记语言，尚未绑定到任何特定语言，并且已经被广泛使用。那应该解决使用与任何特定语言相关的DSL定义合同的“问题”。</p>
+</div>
+<div class="paragraph">
+<p>为了隐藏实现细节（例如生成Java测试，插件设置或Java安装），我们需要引入一个抽象层。我们决定通过使用<a href="https://www.docker.com/">Docker</a>映像来隐藏它们。我们将所有项目设置，所需的程序包和文件夹结构封装在docker映像中，以这种方式，用户不需要任何知识（所需的环境变量除外）。</p>
+</div>
+<div class="paragraph">
+<p>我们为<a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/single/spring-cloud.html#docker-project">生产者</a>和<a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/single/spring-cloud.html#stubrunner-docker">消费者</a>介绍了Docker映像。所有与JVM相关的逻辑都包装在Docker容器中，这意味着您不必安装Java即可生成测试并使用Stub Runner运行存根。</p>
+</div>
+<div class="paragraph">
+<p>以下各节介绍了使用Spring Cloud Contract测试NodeJS应用程序的示例。该代码是从<a href="https://github.com/bradtraversy/bookstore" class="bare">https://github.com/bradtraversy/bookstore</a>分叉的，可在<a href="https://github.com/spring-cloud-samples/spring-cloud-contract-nodejs" class="bare">https://github.com/spring-cloud-samples/spring-cloud-contract-nodejs</a>下获得。我们的目标是以最少的精力开始为现有应用程序尽快生成测试和存根。</p>
+</div>
+<h1 id="spring-cloud-contract-on-the-producer-side" class="sect0"><a class="anchor" href="#spring-cloud-contract-on-the-producer-side"></a>生产者方的Spring Cloud合同</h1>
+<div class="paragraph">
+<p>让我们克隆简单的NodeJS MVC应用程序，如下所示：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ git clone https://github.com/spring-cloud-samples/spring-cloud-contract-nodejs
+$ cd spring-cloud-contract-nodejs</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>它连接到Mongo DB数据库以存储有关书籍的数据。</p>
+</div>
+<div class="paragraph">
+<p>YAML合约可在<code>/contracts</code>文件夹，如下：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ ls contracts
+1_shouldAddABook.yml          2_shouldReturnListOfBooks.yml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>数字后缀告诉Spring Cloud Contract，从这些合同生成的测试需要顺序执行。存根是有状态的，这意味着仅在执行由<code>1_shouldAddABook</code>是个<code>2_shouldReturnListOfBooks.yml</code>可从存根HTTP服务器获得。</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tbody><tr>
+<td class="icon">
+<div class="title">重要</div>
+</td>
+<td class="content">在一个真实的示例中，我们将以合同测试模式运行NodeJS应用程序，在该模式下，对数据库的调用将被存根，并且不需要有状态的存根。在此示例中，我们想展示如何立即受益于Spring Cloud Contract。
+</td>
+</tr>
+</tbody></table>
+</div>
+<div class="paragraph">
+<p>让我们看一下其中一个存根：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-yml" data-lang="yml">description: |
+  Should add a book
+request:
+  method: POST
+  url: /api/books
+  headers:
+    Content-Type: application/json
+  body: '{
+    "title" : "Title",
+    "genre" : "Genre",
+    "description" : "Description",
+    "author" : "Author",
+    "publisher" : "Publisher",
+    "pages" : 100,
+    "image_url" : "https://d213dhlpdb53mu.cloudfront.net/assets/pivotal-square-logo-41418bd391196c3022f3cd9f3959b3f6d7764c47873d858583384e759c7db435.svg",
+    "buy_url" : "https://pivotal.io"
+  }'
+response:
+  status: 200</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>合同规定，如果<code>POST</code>请求发送到<code>/api/books</code>标头为<code>Content-Type: application/json</code>和前述的身体，那么反应应该是<code>200</code> 。现在，在运行合同测试之前，让我们分析一下Spring Cloud Contract docker映像需求。</p>
+</div>
+<div class="sect1">
+<h2 id="spring-cloud-contract-docker-image"><a class="anchor" href="#spring-cloud-contract-docker-image"></a> Spring Cloud Contract Docker映像</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>该映像<a href="https://hub.docker.com/r/springcloud/spring-cloud-contract/">在SpringCloud org下的DockerHub</a>上可用。</p>
+</div>
+<div class="paragraph">
+<p>安装合同并传递环境变量后，该图像将：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>生成合同测试。</p>
+</li>
+<li>
+<p>针对提供的URL执行测试。</p>
+</li>
+<li>
+<p>生成<a href="http://wiremock.org">WireMock</a>存根。</p>
+</li>
+<li>
+<p>将存根发布到工件管理器。（此步骤是可选的，但默认情况下处于启用状态。）</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tbody><tr>
+<td class="icon">
+<div class="title">重要</div>
+</td>
+<td class="content">生成的测试假定您的应用程序正在运行，并准备监听指定端口上的请求。这意味着您必须在运行合同测试之前运行它。
+</td>
+</tr>
+</tbody></table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring-cloud-contract-docker-image-setup"><a class="anchor" href="#spring-cloud-contract-docker-image-setup"></a> Spring Cloud Contract Docker映像设置</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Docker映像在<code>/contracts</code>夹。运行测试的输出位于<code>/spring-cloud-contract/build</code>文件夹（对于调试目的很有用）。运行构建时，需要挂载那些卷。</p>
+</div>
+<div class="paragraph">
+<p>Docker映像还需要一些环境变量，这些变量指向您正在运行的应用程序，Artifact Manager实例以及其他，如以下列表所述：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>PROJECT_GROUP</code> ：您项目的组ID。默认为<code>com.example</code> 。</p>
+</li>
+<li>
+<p><code>PROJECT_VERSION</code> ：您项目的版本。默认为<code>0.0.1-SNAPSHOT</code> 。</p>
+</li>
+<li>
+<p><code>PROJECT_NAME</code> 。工件ID。默认为<code>example</code> 。</p>
+</li>
+<li>
+<p><code>REPO_WITH_BINARIES_URL</code> -您的工件管理器的网址。默认为<code><a href="http://localhost:8081/artifactory/libs-release-local" class="bare">http://localhost:8081/artifactory/libs-release-local</a></code> ，这是本地运行时<a href="https://jfrog.com/artifactory/">Artifactory</a>的默认URL。</p>
+</li>
+<li>
+<p><code>REPO_WITH_BINARIES_USERNAME</code> ：（在保护Artifact Manager时）用户名（可选）。</p>
+</li>
+<li>
+<p><code>REPO_WITH_BINARIES_PASSWORD</code> ：安全工件管理器时的密码（可选）。</p>
+</li>
+<li>
+<p><code>PUBLISH_ARTIFACTS</code> ：如果设置为<code>true</code> ，将工件发布到二进制存储。默认为<code>true</code> 。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>测试运行时使用以下环境变量：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>APPLICATION_BASE_URL</code> ：应针对其执行测试的网址。请记住，必须可以从Docker容器访问它（ <code>localhost</code>不起作用）。</p>
+</li>
+<li>
+<p><code>APPLICATION_USERNAME</code> ：（可选）用于对应用程序进行基本身份验证的用户名。</p>
+</li>
+<li>
+<p><code>APPLICATION_PASSWORD</code> ：（可选）用于对应用程序进行基本身份验证的密码。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<h1 id="running-spring-cloud-contract-tests-on-the-producer-side" class="sect0"><a class="anchor" href="#running-spring-cloud-contract-tests-on-the-producer-side"></a>在生产者端运行Spring Cloud Contract测试</h1>
+<div class="admonitionblock important">
+<table>
+<tbody><tr>
+<td class="icon">
+<div class="title">重要</div>
+</td>
+<td class="content">要运行此示例，您需要安装<a href="https://www.docker.com">Docker</a> ， <a href="https://docs.docker.com/compose/">Docker Compose</a>和<a href="https://docs.npmjs.com/cli/install">npm</a> 。
+</td>
+</tr>
+</tbody></table>
+</div>
+<div class="paragraph">
+<p>由于我们要运行测试，因此可以使用：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash">$ npm install
+$ npm test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>但是，出于学习目的，让我们将其分为以下几部分（我们将分析bash脚本的每一行）：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash"># Install the required npm packages
+$ npm install
+
+# Stop docker infra (mongodb, artifactory)
+$ ./stop_infra.sh
+# Start docker infra (mongodb, artifactory)
+$ ./setup_infra.sh
+
+# Kill &amp; Run app
+$ pkill -f "node app"
+$ nohup node app &amp;
+
+# Prepare environment variables
+$ export SC_CONTRACT_DOCKER_VERSION="1.2.3.RELEASE"
+$ export APP_IP="192.168.0.100" # This has to be the IP that is available outside of Docker container
+$ export APP_PORT="3000"
+$ export ARTIFACTORY_PORT="8081"
+$ export APPLICATION_BASE_URL="http://${APP_IP}:${APP_PORT}"
+$ export ARTIFACTORY_URL="http://${APP_IP}:${ARTIFACTORY_PORT}/artifactory/libs-release-local"
+$ export CURRENT_DIR="$( pwd )"
+$ export PROJECT_NAME="bookstore"
+$ export PROJECT_GROUP="com.example"
+$ export PROJECT_VERSION="0.0.1.RELEASE"
+
+# Execute contract tests
+$ docker run  --rm -e "APPLICATION_BASE_URL=${APPLICATION_BASE_URL}" \
+-e "PUBLISH_ARTIFACTS=true" -e "PROJECT_NAME=${PROJECT_NAME}" \
+-e "PROJECT_GROUP=${PROJECT_GROUP}" -e "REPO_WITH_BINARIES_URL=${ARTIFACTORY_URL}" \
+-e "PROJECT_VERSION=${PROJECT_VERSION}" -v "${CURRENT_DIR}/contracts/:/contracts:ro" \
+-v "${CURRENT_DIR}/node_modules/spring-cloud-contract/output:/spring-cloud-contract-output/" \
+springcloud/spring-cloud-contract:"${SC_CONTRACT_DOCKER_VERSION}"
+
+# Kill app
+$ pkill -f "node app"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>通过bash脚本将发生以下情况：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>基础架构（MongoDb，Artifactory）已建立。</p>
+</li>
+<li>
+<p>由于没有在NodeJS应用程序中模拟数据库的限制，因此合同也代表了有状态的情况</p>
+<div class="ulist">
+<ul>
+<li>
+<p>第一个请求是<code>POST</code>导致将数据插入数据库。</p>
+</li>
+<li>
+<p>第二个请求是<code>GET</code>返回具有一个先前插入的元素的数据列表。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>NodeJS应用程序已启动（在端口上<code>3000</code> ），可在以下位置找到<code>192.168.0.100</code> 。</p>
+</li>
+<li>
+<p>合同测试由Docker生成，并针对正在运行的应用程序执行测试。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>合同取自<code>/contracts</code>夹。</p>
+</li>
+<li>
+<p>测试执行的输出位于<code>node_modules/spring-cloud-contract/output</code> 。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>存根被上传到Artifactory。您可以在<a href="http://localhost:8081/artifactory/libs-release-local/com/example/bookstore/0.0.1.RELEASE/" class="bare">http：// localhost：8081 / artifactory / libs-release-local / com / example / bookstore / 0.0.1.RELEASE /中检出它们</a> 。存根位于<a href="http://localhost:8081/artifactory/libs-release-local/com/example/bookstore/0.0.1.RELEASE/bookstore-0.0.1.RELEASE-stubs.jar" class="bare">http：// localhost：8081 / artifactory / libs-release-local / com / example / bookstore / 0.0.1.RELEASE / bookstore-0.0.1.RELEASE-stubs.jar</a> 。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>总而言之，我们定义了YAML合同，运行NodeJS应用程序，并运行Docker映像以生成合同测试和存根并将其上载到Artifactory。</p>
+</div>
+<h1 id="using-spring-cloud-contract-stubs-on-the-consumer-side" class="sect0"><a class="anchor" href="#using-spring-cloud-contract-stubs-on-the-consumer-side"></a>在消费者端使用Spring Cloud Contract存根</h1>
+<div class="paragraph">
+<p>在此示例中，我们发布了<a href="https://hub.docker.com/r/springcloud/spring-cloud-contract-stub-runner/">spring-cloud / spring-cloud-contract-stub-runner</a> Docker映像，该映像启动了独立版本的Stub Runner。</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tbody><tr>
+<td class="icon">
+<div class="title">小费</div>
+</td>
+<td class="content">如果您对运行<code>java -jar</code>命令而不是运行Docker，您可以从Maven下载一个独立的JAR（例如，版本1.2.3）。发布），如下所示： <code>wget -O stub-runner.jar 'https://search.maven.org/remote_content?g=org.springframework.cloud&a=spring-cloud-contract-stub-runner-boot&v=1.2.3.RELEASE'</code>
+</td>
+</tr>
+</tbody></table>
+</div>
+<div class="paragraph">
+<p>您可以将任何<a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/single/spring-cloud.html#common-properties-junit-spring">属性</a>作为环境变量进行传递。惯例是所有字母都应大写，单词定界符和点（ <code>.</code> ）应该用下划线（ <code>_</code> ）。例如， <code>stubrunner.repositoryRoot</code>属性应表示为<code>STUBRUNNER_REPOSITORY_ROOT</code>环境变量。</p>
+</div>
+<div class="paragraph">
+<p>假设我们要在port上运行bookstore应用程序的存根<code>9876</code> 。为此，让我们使用存根来运行Stub Runner Boot应用程序，如下所示：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash"># Provide the Spring Cloud Contract Docker version
+$ export SC_CONTRACT_DOCKER_VERSION="1.2.3.RELEASE"
+# The IP at which the app is running and the Docker container can reach it
+$ export APP_IP="192.168.0.100"
+# Spring Cloud Contract Stub Runner properties
+$ export STUBRUNNER_PORT="8083"
+# Stub coordinates 'groupId:artifactId:version:classifier:port'
+$ export STUBRUNNER_IDS="com.example:bookstore:0.0.1.RELEASE:stubs:9876"
+$ export STUBRUNNER_REPOSITORY_ROOT="http://${APP_IP}:8081/artifactory/libs-release-local"
+# Run the docker with Stub Runner Boot
+$ docker run  --rm -e "STUBRUNNER_IDS=${STUBRUNNER_IDS}" \
+-e "STUBRUNNER_REPOSITORY_ROOT=${STUBRUNNER_REPOSITORY_ROOT}" \
+-p "${STUBRUNNER_PORT}:${STUBRUNNER_PORT}" -p "9876:9876" \
+springcloud/spring-cloud-contract-stub-runner:"${SC_CONTRACT_DOCKER_VERSION}"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>该脚本：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>启动一个独立的Spring Cloud Contract Stub Runner应用程序。</p>
+</li>
+<li>
+<p>使存根运行器下载具有以下坐标的存根： <code>com.example:bookstore:0.0.1.RELEASE:stubs</code> 。</p>
+</li>
+<li>
+<p>从Artifactory下载存根，地址为<code><a href="http://192.168.0.100:8081/artifactory/libs-release-local" class="bare">http://192.168.0.100:8081/artifactory/libs-release-local</a></code> 。</p>
+</li>
+<li>
+<p>在端口上启动（经过延迟后）Stub Runner <code>8083</code> 。</p>
+</li>
+<li>
+<p>在端口上运行存根<code>9876</code> 。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>在服务器端，我们构建了一个有状态的存根。让我们使用curl声明存根已正确设置，如下所示：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-bash" data-lang="bash"># let's execute the first request (no response is returned)
+$ curl -H "Content-Type:application/json" -X POST \
+--data '{ "title" : "Title", "genre" : "Genre", "description" : "Description", "author" : "Author", "publisher" : "Publisher", "pages" : 100, "image_url" : "https://d213dhlpdb53mu.cloudfront.net/assets/pivotal-square-logo-41418bd391196c3022f3cd9f3959b3f6d7764c47873d858583384e759c7db435.svg", "buy_url" : "https://pivotal.io" }' http://localhost:9876/api/books
+# Now it's time for the second request
+$ curl -X GET http://localhost:9876/api/books
+# You should receive the contents of the JSON</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>综上所述，一旦存根被上传，您就可以运行带有两个环境变量的Docker映像，并在集成测试中重复使用它们，而与所使用的编程语言无关。</p>
+</div>
+<h1 id="summary" class="sect0"><a class="anchor" href="#summary"></a>摘要</h1>
+<div class="paragraph">
+<p>在此博客文章中，我们解释了什么是合同测试以及为什么它们很重要。我们介绍了如何使用Spring Cloud Contract来生成和执行合同测试。最后，我们看了一个示例，说明如何为非JVM应用程序的生产者和使用者使用Spring Cloud Contract Docker映像。</p>
+</div>
+<h1 id="additional-resources" class="sect0"><a class="anchor" href="#additional-resources"></a>其他资源</h1>
+<div class="ulist">
+<ul>
+<li>
+<p>阅读<a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/single/spring-cloud.html#docker-project">Spring Cloud Contract</a>的文档。</p>
+</li>
+<li>
+<p>阅读<a href="https://cloud.spring.io/spring-cloud-static/Edgware.SR2/single/spring-cloud.html#stubrunner-docker">Spring Cloud Contract Stub Runner</a>的文档。</p>
+</li>
+<li>
+<p>查看<a href="https://github.com/spring-cloud-samples/spring-cloud-contract-nodejs">Bookstore示例</a> 。</p>
+</li>
+<li>
+<p>在<a href="https://gitter.im/spring-cloud/spring-cloud-contract">Spring Cloud Contract Gitter频道</a>上提问。</p>
+</li>
+</ul>
+</div></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 3169;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>绿豆：企业消息传递和Spring入门</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -36,15 +40,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2011-01-26 01:18:00.0">
-</head>
-<body dir="ltr">
+
+
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -170,9 +176,519 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p></p><p>在本文中，我们将介绍消息传递的核心概念，以及Spring框架及其姊妹项目提供的对各种消息传递的丰富支持。</p><p>什么是消息传递？为了最好地解释这一点，我将解释由Gregor Hohpe和Bobby Woolf（Addison Wesley，2004）开创性的<em>Enterprise Integration Patterns</em>书提供的示例。当您拨打电话时，您尝试将信息中继给另一方。仅当您拨打电话时第二方可用时，此方法才有效。由于并非总是可以接听电话，因此我们使用语音邮箱将消息排队。呼叫者将消息留在语音信箱中，然后被呼叫者可以自由地在以后的某个时间异步地检索该消息（或实际上很多消息）。</p><p>在该示例中，语音信箱位于两方的中间。它存储消息，然后在被叫方（接收方）检索到消息时将其传递。在企业消息传递的世界中，事情的工作原理几乎相同：一方将消息发送到消息传递代理（也称为面向消息的中间件– MOM），而另一方（在该方可以的情况下）–传递或明确查询来自消息代理的任何消息。</p><p>这就是类比不再有用的地方。与语音信箱相比，消息代理有很多选择。消息代理的理想位置是提供诸如路由之类的额外服务，并保证有关消息的传递。可以针对不同用例优化消息代理，例如，您可以为持久性而牺牲速度。消息代理可以将消息持久保存到外部存储以确保持久性，尽管通常这是可以以速度为名进行切换的配置。</p><p></p>
-<p>在语音信箱示例中，消息是由一方发送的，然后传递给另一方–通信是<em>点对点的</em> 。消息代理支持此消息，以及另一种称为<em>publish-subscribe</em>的通信，在该通信中，消息将传递到多个客户端。</p>
+<div class="blog--post"><p></p><p>在本文中，我们将介绍消息传递的核心概念，以及Spring框架及其姊妹项目提供的对各种消息传递的丰富支持。</p><p>什么是消息传递？为了最好地解释这一点，我将解释一下由Gregor Hohpe和Bobby Woolf（Addison Wesley，2004）开创性的《 <em>企业集成模式》</em>一书提供的示例。当您拨打电话时，您尝试将信息中继给另一方。仅当您拨打电话时第二方可用时，此方法才有效。由于并非总是可以接听电话，因此我们使用语音邮箱将消息排队。呼叫者将消息留在语音信箱中，然后被呼叫者可以自由地在以后的某个时间异步地检索该消息（或者实际上很多消息）。</p><p>在该示例中，语音信箱位于两方的中间。它存储消息，然后在被叫方（接收方）检索到消息时将其传递。在企业消息传递的世界中，事情的工作原理几乎相同：一方将消息发送到消息传递代理（也称为面向消息的中间件– MOM），而另一方（在该方可以的情况下）发送或明确查询来自消息代理的任何消息。</p><p>这就是类比不再有用的地方。与语音信箱相比，消息代理有很多选择。消息代理的理想位置是提供诸如路由之类的额外服务，并保证有关消息的传递。可以针对不同用例优化消息代理，例如，您可以为持久性而牺牲速度。消息代理可以将消息持久保存到外部存储以确保持久性，尽管通常这是可以以速度为名进行切换的配置。</p><p></p>
+<p>在语音信箱示例中，消息是由一方发送的，然后传递给另一方的-通信是<em>点对点的</em> 。消息代理支持此消息，以及另一种称为<em>publish-subscribe</em>的通信，在该通信中，消息将传递到多个客户端。</p>
 <p>消息代理的一种常见用法是解决两个不同系统之间的集成问题。发送到消息代理的数据通常具有消息的发送者和接收者共同的格式。使用消息代理，两个系统唯一需要达成协议的是数据合同。消息通常具有消息正文和消息标头，消息正文存储消息本身的内容，消息标头是键/值对，键/值对提供有关消息正文的元数据，可用于帮助消息的使用者。处理消息。邮件头可以是您喜欢的任何内容，但它们通常与邮件本身或邮件的处理器有关。</p>
 <h2>Java消息服务</h2>
-<p>Java消息服务（JMS）API指定用于与消息代理进行交互的客户端接口。每个消息代理都提供自己的API实现，非常类似于JDBC驱动程序对JDBC API所做的工作。这意味着JMS客户端通常应使用与服务器相同版本的客户端。有许多很好的JMS代理实现可供选择。原因之一是消息传递一直是应用程序开发的重要组成部分，并且今天一直如此。从1.1版开始，JMS就成为J2EE（现在为Java EE）规范的一部分。在过去十年的大部分时间里，JMS规范的版本均为1.1。</p>
-<p>在JMS中，客户端使用<code>javax.jms.ConnectionFactory</code>中创建一个<code>javax.jms.Connection</code> 。然后可以使用<code>Connection</code>创建一个<code>javax.jms.Session</code> 。<code>Session</code>表示客户端与代理的交互，并允许发送和接收消息以及其他不太明显的操作。</p><p></p><p>接口上最有用的方法涉及创建消息生产者，以及与<code>javax.jms.Destination</code></p><code>javax.jms.Destination</code></div><code>javax.jms.Destination</code></div><code>javax.jms.Destination</code></article><code>javax.jms.Destination</code></div><code>javax.jms.Destination</code></div><code>javax.jms.Destination</code></div><code>javax.jms.Destination</code></div><code>javax.jms.Destination</code></body></html>
+<p>Java消息服务（JMS）API指定用于与消息代理进行交互的客户端接口。每个消息代理都提供自己的API实现，非常类似于JDBC驱动程序对JDBC API所做的工作。这意味着JMS客户端通常应使用与服务器相同版本的客户端。有许多很好的JMS代理实现可供选择。原因之一是消息传递一直是应用程序开发的重要组成部分，并且今天一直如此。从1.1版开始，JMS就成为J2EE（现在的Java EE）规范的一部分。在过去十年的大部分时间里，JMS规范的版本均为1.1。</p>
+<p>在JMS中，客户使用<code>javax.jms.ConnectionFactory</code>创建一个<code>javax.jms.Connection</code> 。的<code>Connection</code>然后可以用来创建一个<code>javax.jms.Session</code> 。的<code>Session</code>代表客户端与代理的交互，并允许发送和接收消息以及其他不太明显的操作。</p><p></p><p>该接口上最有用的方法涉及创建消息生产者和消息使用者，这些消息使用者向/从一个<code>javax.jms.Destination</code> 。一种<code>Destination</code>将JMS概念的“地址”映射到消息代理上。它还映射了代理在何处存储消息的概念。在JMS中，消息被发送到同一位置，在同一位置存储和从同一位置使用，所有消息均由表示。 <code>javax.jms.Destination</code>实例。</p>[caption id =” attachment_7506” align =” alignnone” width =“ 573” caption =”以上，蓝色元素代表生产者和消费者。橙色元素表示代理中消息被缓冲的目的地。在JMS中，这些不是主题就是队列。”] <a href="http://blog.springsource.com/wp-content/uploads/2011/01/jms.jpg"><img src="http://blog.springsource.com/wp-content/uploads/2011/01/jms.jpg" alt="" title="简讯" width="573" height="322" class="size-full wp-image-7506"></a> [/字幕]<p> <code>Destination</code>是一个接口，并具有两个更具体的子接口， <code>javax.jms.Queue</code>和<code>javax.jms.Topic.</code>一种<code>Queue</code>代表标准队列，它是如上所述的点对点构造。一种<code>Topic</code>提供发布-订阅消息传递，并且可以将一条消息传递给多个收件人。<br></p><p></p>
+<p>向...发送消息<code>Destination</code> ，您必须创建一个<code>javax.jms.MessageProducer</code> 。的<code>MessageProducer</code>然后可以用来发送<code>javax.jms.Message</code> s。</p>
+<p>JMS支持两种不同的机制来接收消息。第一种方法是使用<code>javax.jmx.MessageConsumer#receive()</code>方法，该方法从<code>Destination</code> <em>同步地</em>默认情况下，该方法将阻塞直到收到消息。而不是使用<code>MessageConsumer</code> ，客户可以安装<code>javax.jms.MessageListener</code>通过打电话<code>javax.jms.Session#setMessageListener(MessageListener)</code> 。 <code>MessageListener</code>是一个接口，只有一种方法， <code>public void onMessage(javax.jms.Message)</code> ，只要<code>javax.jms.Message</code>可用于<code>Destination</code> 。一种<code>MessageListener</code>提供<em>异步</em>消息处理：消息到达时，将对其进行处理。</p>
+<p>JMS API还有很多要学习的知识，但是这些类和概念将在我们讨论Spring对JMS消息传递的支持时为您提供最大的帮助。第一层的支持是<code>org.springframework.jms.core.JmsTemplate</code> ，它提供了简化方法，可将我们刚刚讨论的内容简化为一类。的<code>JmsTemplate</code> ，需要<code>javax.jms.ConnectionFactory</code>实例来完成其工作。 <code>JmsTemplate</code>可以为您做很多工作。例如，要发送一条消息， <code>JmsTemplate</code>建立一个<code>javax.jms.Session</code> ，设置一个<code>javax.jms.MessageConsumer</code>要么<code>javax.jms.MessageProducer</code> ，设置所有交易机制，并为您提供最新的参考<code>javax.jms.Session</code>因此您可以创建自己选择的消息并发送。借助所有错误处理和构造逻辑，可以轻松节省数十行代码。发送消息后，它将销毁或关闭大多数对象。这是应用程序服务器（例如Java EE服务器）中的标准做法，因为<code>ConnectionFactory</code>实例由服务器创建，由服务器管理并进行池化。使用后，它们缓存实例。在那些环境中关闭资源只是将它们返回到池中。所以<code>JmsTemplate</code>在标准情况下做正确的事情，假设<code>ConnectionFactory</code>缓存或池实例。</p>
+<p>在应用服务器等托管环境中，您通常需要获取<code>javax.jms.ConnectionFactory</code>来自JNDI。您可以使用Spring为您查找该参考并配置一个<code>JmsTemplate</code> 。在我们的示例中，我们希望更宽松地进行操作，因此我们将使用独立的ActiveMQ消息代理。ActiveMQ是一种流行<a href="http://activemq.apache.org/">的开源消息代理</a> 。要使用它，请下载它，然后在bin文件夹中运行适合您的操作系统的启动脚本。在您的应用程序中，您将需要客户端库来连接相应版本的ActiveMQ。在撰写本文时，ActiveMQ的最新版本是5.4.2。如果使用的是Maven，请将以下依赖项添加到Maven pom文件中：</p>
+<pre><code class="prettyprint xml"><br /><br />            &lt;dependency&gt;
+                &lt;groupId&gt;org.apache.activemq&lt;/groupId&gt;
+                &lt;artifactId&gt;activemq-core&lt;/artifactId&gt;
+                &lt;version&gt;${activemq.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.apache.activemq&lt;/groupId&gt;
+                &lt;artifactId&gt;activemq-optional&lt;/artifactId&gt;
+                &lt;version&gt;${activemq.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+
+</code></pre>
+<p>确保为以下两个创建Maven属性<code>${activemq.version}</code>或手动将字符串替换为适当的版本。有一个<code>activemq-all</code>也有依赖关系，但它降低了很多可能不必要的jar。对于我们的应用程序，上面的两个依赖关系就足够了。</p>
+<h3>在JMS中使用Spring</h3>
+<p>让我们检查基本JMS应用程序的配置。首先，让我们检查一下基本的Spring XML配置：</p>
+<pre><code class="prettyprint xml"><br /><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+       xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+       xsi:schemaLocation=&quot;
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       &quot;&gt;
+
+    &lt;context:property-placeholder location=&quot;jms.properties&quot;/&gt;
+    &lt;context:component-scan base-package=&quot;org.springsource.greenbeans.examples.jms.core&quot;/&gt;
+    &lt;context:component-scan base-package=&quot;org.springsource.greenbeans.examples.jms.jmstemplate&quot;/&gt;
+    &lt;tx:annotation-driven transaction-manager=&quot;jmsTransactionManager&quot;/&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<p>您可以看到XML主要设置属性占位符解析并启用类路径扫描。最有趣的部分是<tx:annotation-driven transaction-manager=""></tx:annotation-driven>告诉Spring在所有具有<code>@Transactional</code>注释。元素在Spring上下文中引用了另一个bean， <code>jmsTransactionManager</code> ，在以下Java配置类中定义。</p>
+<pre><code class="prettyprint java"><br /><br />package org.springsource.greenbeans.examples.jms.core;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*
+import org.springframework.jms.connection.*
+import org.springframework.jms.core.JmsTemplate;
+
+import javax.jms.ConnectionFactory;
+
+@Configuration
+public class JmsConfiguration {
+
+  @Value(&quot;${broker.url}&quot;)
+  private String brokerUrl;
+
+  @Bean
+  public ConnectionFactory connectionFactory() {
+    ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
+    activeMQConnectionFactory.setBrokerURL(this.brokerUrl);
+    return new CachingConnectionFactory(activeMQConnectionFactory);
+  }
+
+  @Bean
+  public JmsTransactionManager jmsTransactionManager() {
+    return new JmsTransactionManager(this.connectionFactory());
+  }
+
+  @Bean
+  public JmsTemplate jmsTemplate() {
+    return new JmsTemplate(this.connectionFactory());
+  }
+}
+</code></pre>
+<p>该配置非常温顺。首先，我们定义一个<code>ActiveMQConnectionFactory</code>实例，然后将其提供给Spring框架的实例<code>CachingConnectionFactory</code> 。一些经纪人提供自己的缓存<code>ConnectionFactory</code>实施。但是，如果没有，那么您始终可以使用Spring Caching ConnectionFactory实现来实现速度提升。</p>
+<p>接下来，我们有一个<code>JmsTransactionManager</code> ，它提供JMS本地事务。在JMS中，事务回滚只有两个结果：在发送操作失败时，消息未发送，在接收操作失败时，消息与消息代理重新排队。最后一种情况可能很复杂。</p>
+<p>如果您收到一条消息，然后在处理过程中遇到错误，并且假设您保持事务打开，则该事务将回滚并将消息返回给代理。一旦在代理中发生什么，将取决于代理和您的配置。通常，仅会立即重新传递一条消息。但是，这并不总是所需的行为。因此，大多数（如果不是全部）代理都支持一些死信队列的概念，这些死信队列会将无法传递的消息发送到该队列。您可以根据需要处理此队列中的消息-可能在此错误情况发生时某些监视工具可以将某人唤醒。但是，大多数经纪人提供了更多控制权。可以为错误消息的路由设置规则。例如，代理可能会尝试立即重新传递一条消息，然后，如果再次失败，则可能要等待一段时间再尝试，如果失败，则要等待更长的时间。这通常称为退避期。也许在某个阈值之后，消息可能会被传递到死信队列，或者被彻底丢弃。在任何情况下，请检查您的经纪人的文件。</p>
+<p>最后，我们创建一个<code>JmsTemplate</code>通过给它一个参考<code>ConnectionFactory</code> 。</p>
+<p>让我们看一下<code>JmsTemplate</code>在行动。为了使示例简单，我们将首先讨论如何以恰当的名称发送消息<code>Producer</code>类。消息传递的一种常见用法是将通知作为同步机制发送到（或许多）不同的系统，以便感兴趣的系统具有某些数据的最新版本。让我们假设在这个例子中，我们有一个简单的<code>Customer</code>具有标准字段的POJO： <code>firstName</code> ， <code>lastName</code> ， <code>email</code>和<code>id</code> 。</p>
+<pre><code class="prettyprint java"><br />package org.springsource.greenbeans.examples.jms.core;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.*
+import org.springframework.beans.factory.annotation.*
+import org.springframework.jms.core.*;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springsource.greenbeans.examples.Customer;
+import javax.jms.*;
+
+
+@Component
+public class Producer {
+
+  @Value(&quot;${jms.customer.destination}&quot;)
+  private String customerDestination;
+
+  @Autowired
+  private JmsTemplate jmsTemplate;
+
+  private Log log = LogFactory.getLog(getClass());
+
+  @Transactional
+  public void sendCustomerUpdate(final Customer customer) throws Exception {
+    this.jmsTemplate.send(this.customerDestination, new MessageCreator() {
+      @Override
+      public Message createMessage(Session session) throws JMSException {
+           log.info(&quot;Sending customer data &quot; + ToStringBuilder.reflectionToString(customer));
+           MapMessage mapMessage = session.createMapMessage();
+           mapMessage.setLong(&quot;id&quot;, customer.getId());
+           mapMessage.setString(&quot;firstName&quot;, customer.getFirstName());
+           mapMessage.setString(&quot;lastName&quot;, customer.getLastName());
+           mapMessage.setString(&quot;email&quot;, customer.getEmail());
+      }
+    });
+  }
+}
+</code></pre>
+<p>在课堂上，我们看到一个<code>sendCustomerUpdate</code>以客户参考为参数的方法。使用<code>JmsTemplate</code>的send方法–具有两个参数：第一个参数是目的地名称（“客户”）的String，第二个是对Spring框架类的引用<code>MessageCreator</code> –我们使用<code>javax.jms.Session</code>参考传递到我们的实施中<code>createMessage(javax.jms.Session)</code>方法。您可以在JMS中创建多种消息： <code>javax.jms.TextMessage</code> ， <code>javax.jms.ObjectMessage</code> ， <code>javax.jms.MapMessage</code> ，等等。 <code>ObjectMessage</code>完全符合您的期望–它使您可以将序列化的对象作为有效负载传输JMS消息。通常，这是要避免的。序列化的数据类型将消息的生产者和使用者都耦合到相同的API合约，而这些合约可能并不总是成立的。即使可以保证在消息交换的两边都可以使用该类型且类型相同的类，但与其他更灵活的选项相比，这样做通常是无效的。相反，您更喜欢分解-也许您可以使用来将对象编组为XML或JSON String <code>javax.jms.TextMessage</code> 。或者，使用以下命令发送对象的组成部分，原始部分，而不是对象本身<code>javax.jms.MapMessage</code> ，这只是一条具有已知键/值对的消息，就像<code>java.util.Map</code> 。这就是我们在这里采取的方法。所有的JVM都有<code>ints</code> ， <code>longs,</code><code>Strings</code>等等，并且可以反序列化以这种方式传输的数据。</p><p></p><p>现在让我们来看一下在JMS中接收消息。第一种方法是一次一次同步请求它们。</p><p></p>
+<pre><code class="prettyprint java"><br /><br />package org.springsource.greenbeans.examples.jms.jmstemplate;
+
+import org.apache.commons.logging.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springsource.greenbeans.examples.Customer;
+import javax.jms.*
+
+@Component
+public class RawJmsTemplatePollingMessageConsumer {
+
+  @Autowired
+  protected JmsTemplate jmsTemplate;
+
+  @Value(&quot;${jms.customer.destination}&quot;)
+  private String destination;
+
+  private Log log = LogFactory.getLog(getClass());
+
+  @Transactional
+  public void receiveAndProcessCustomerUpdates() throws Exception {
+    Message message = this.jmsTemplate.receive(this.destination);
+    if (message instanceof MapMessage) {
+
+      MapMessage mapMessage = (MapMessage) message ;
+      String firstName = mapMessage.getString(&quot;firstName&quot;);
+      String lastName = mapMessage.getString(&quot;lastName&quot;);
+      String email = mapMessage.getString(&quot;email&quot;);
+      Long id = mapMessage.getLong(&quot;id&quot;);
+
+      Customer customer = new Customer(id, firstName, lastName, email );
+
+      log.info(&quot;receiving customer message: &quot; + customer);
+
+    }
+  }
+}
+</code></pre>
+<p>本示例使用<code>JmsTemplate</code>实例接收一条新消息（当一条消息可用时），然后将其转换为Customer对象，其步骤与发送消息时的操作相反，该消息被写到日志中。如果您必须重复多次，这种打包和解压缩JMS消息将变得很乏味。将这种逻辑提取到单独的类中通常具有价值。Spring JMS层次结构支持使用<code>MessageConverter</code>层次结构，使您可以覆盖对象的序列化方式。默认值– <code>SimpleMessageConverter</code> –在没有其他规定的情况下起作用，并且在大多数情况下它都可以很好地完成工作，因此在此我们不覆盖它。但是，如果我们决定要以XML形式传输对象，则可以利用<code>MarshallingMessageConverter</code> ，它利用了Spring框架的OXM（对象到XML封送处理）支持。最后，请注意<code>receiveAndProcessCustomerUpdates</code>方法装饰有<code>@Transactional</code>注解。收到消息后，如果出现任何问题，并且应该<code>Exception</code>被抛出后，Spring将回滚收据并将消息返回给代理。</p>
+<h3>聆听使其更简单</h3>
+<p>这个例子很简单，但是有一些限制。首先，我们的代码与JMS和Spring API紧密耦合。其次，这仅处理一条消息，并且仅在调用该方法时处理。实现者有责任看到该方法被调用。通常，实现者希望消息到达后立即异步处理。自然的下一步可能是随后从无穷循环内连续调用receive方法，以确保尽快处理队列中的所有消息。此后，为了在特别长时间运行的任务上实现更高的吞吐量并确保始终排空队列，可以添加线程，以便始终运行多个循环。这些是合乎逻辑的下一步，但是要接收消息并进行处理，它们还需要大量工作。实际上，这里唯一的业务逻辑是采用代码来处理消息的有效负载并对其执行操作的代码。</p>
+<p>Spring框架提供了针对此问题的开箱即用的解决方案，并且使用起来很简单！在Spring框架中，有两种适合于不同情况的实现，可以提供此功能。他们都植根于<code>AbstractJmsListeningContainer</code>类。如果需要，可以直接使用此层次结构，但是碰巧发生了，有一种使用Spring的JMS名称空间配置此结构的更简单的方法。</p>
+<p>让我们回顾一下以前的Spring XML配置，添加<code>http://www.springframework.org/schema/jms</code>命名空间，然后进行适当的配置。</p>
+<pre><code class="prettyprint xml"><br /><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:jms=&quot;http://www.springframework.org/schema/jms&quot;
+       ...
+       xsi:schemaLocation=&quot;…  http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd&quot;&gt;
+       ….
+
+    &lt;jms:listener-container  connection-factory=&quot;connectionFactory&quot; acknowledge=&quot;auto&quot; transaction-manager=&quot;jmsTransactionManager&quot;&gt;
+        &lt;jms:listener destination=&quot;${jms.customer.destination}&quot; ref=&quot;messageListenerContainerConsumer&quot; method=&quot;receiveMessage&quot; /&gt;
+    &lt;/jms:listener-container&gt;
+
+&lt;/beans&gt;
+</code></pre>
+<p>我们仅摘录了已添加到配置文件中的部分。的<code><jms:listener-container></code>元素需要引用连接工厂和正在使用的事务管理器。请注意，Spring消息侦听器提供了自己的缓存，因此您应该使用常规<code>ConnectionFactory</code>这里： <code>CachingConnectionFactory</code>在这里是多余的，不应使用。在开始时，您可以配置多个<code><jms:listener></code>您喜欢的元素，每个元素都指定一个<code>javax.jms.Destination</code>实例以及对将被赋予新消息的Spring bean的引用。（可选）您可以配置应在已配置的bean引用中调用哪种方法。如果Spring bean实现了其中一种<code>javax.jms.MessageListener</code>或Spring自己的<code>SessionAwareMessageListener</code>接口，那么每个接口上的唯一方法都将通过调用<code>javax.jms.Message</code> ，无需指定方法。如果配置了方法，则该方法应将与对象类型相同的对象作为其参数。 <code>javax.jms.Message</code>的有效载荷。对于我们的示例，这将是<code>java.util.Map</code>实例，因为我们期待一个<code>javax.jms.MapMessage</code>实例。</p>
+<p>修改后的代码是：</p>
+<pre><code class="prettyprint java"><br />package org.springsource.greenbeans.examples.jms.messagelistenercontainer;
+
+import org.apache.commons.logging.*;
+import org.springframework.stereotype.Component;
+import org.springsource.greenbeans.examples.Customer;
+
+import java.util.Map;
+
+@Component
+public class MessageListenerContainerConsumer {
+
+  private Log log = LogFactory.getLog(getClass());
+
+  public void receiveMessage(Map&lt;String, Object&gt; message) throws Exception {
+    String firstName = (String) message.get(&quot;firstName&quot;);
+    String lastName = (String) message.get(&quot;lastName&quot;);
+    String email = (String) message.get(&quot;email&quot;);
+    Long id = (Long) message.get(&quot;id&quot;);
+    Customer customer = new Customer(id, firstName, lastName, email);
+    log.info(&quot;receiving customer message: &quot; + customer);
+  }
+}
+</code></pre>
+<p>还不错吧？您的代码不了解JMS，甚至完全不了解Spring（它是为了保存<code>@Component</code>注解。自然地，您可以简单地使用XML或Java配置来配置此bean，也可以避免这种依赖性。）此外，您的代码更容易遵循。所有相同的规则都适用-例如，在接收过程中引发的异常将触发回滚。您可以通过指定要使用XML的侦听器数量来提高并发性<code><jms:listener-container ></code>元件。您还可以控制进行中的事务管理类型。</p>
+<h2>AMQP</h2>
+<p>尽管JMS是一个非常强大的选项，但它并非没有局限性。客户端与代理版本耦合在一起，安排已部署的系统和代理的重要日升级很快变得很繁琐。根据定义，JMS以Java为中心。客户端使用Java语言驱动程序连接到给定的代理。消息传递完全是关于集成的，我们不能总是假设我们正在与其他Java客户端集成，尤其是在拥有许多不同平台的世界中。尽管某些JMS消息代理（甚至是开源的）可以扩展到令人难以置信的吞吐量，但是那里只有更快的消息传递选项，如果您的情况需要，那么至少值得研究替代方案。JMS是一个很好的API，但是没有人会称其为最佳API。因此，尽管许多消息代理都支持JMS，但它们也支持其专有的API或更强大或更具表现力的替代API。一个示例是，一旦发送消息，JMS中便缺乏路由功能。</p>
+<p>迎接这些挑战的一种流行选择是AMQP标准。AMQP（高级消息排队协议）是最初源自摩根大通银行关键任务应用程序所面临挑战的标准。从他们的工作开始就出现了一个规范，最终围绕该规范成立了一个工作组，该组如今包括众多公司，例如高盛，Progress Software，Microsoft，Novell，Red Hat，WS02，高盛，美国银行，巴克莱，思科，信贷Suisse，Deutsche Borse Systems，当然还有VMware的SpringSource部门。尤其是SpringSource，开发了最流行的基于AMQP的消息代理实现RabbitMQ。</p>
+<p>RabbitMQ是一个<a href="http://www.rabbitmq.org">开源消息代理</a> 。它很容易安装，特别是如果您正在运行其软件包管理器已提供RabbitMQ的众多系统之一。RabbitMQ用Erlang语言编写。通常，实现细节应该无关紧要，但是由于RabbitMQ的速度，该细节非常重要。您会看到，Erlang是一种轻量级语言，最初是在关键任务电话系统中部署的。Erlang具有非常轻巧，直观的线程模型，该模型使Erlang程序能够实现比JVM当前更强大的并发性。此外，Erlang的线程模型与网络模型完美融合。这意味着横向扩展到多个线程或多台计算机的操作基本上是相同的。所有这一切都说明RabbitMQ速度很快。速度非常快，而且可以容错，这是爱立信等公司享受九点九（99.9999999％）可用性的原因之一。</p>
+<p>AMQP是有线协议（如HTTP），而不是API。这使得它与语言无关（实际上，有数十个针对不同语言和平台的已知客户端），这意味着RabbitMQ享受各种您通常不希望关心消息代理的工具的支持，例如WireShark，网络流量监控工具。从概念上讲，任何AMQP客户端都应该能够与任何其他AMQP实现进行对话。</p>
+<h3>窥探AMQP经纪人</h3>
+<p>AMQP规范指定了客户端和服务器端的所有构造以及例行管理选项。在AMQP中，客户端创建与服务器的连接。客户可以向交易所发送消息。交换路由消息到代理内部的队列，或一起停止它们。交换是无状态网守，而队列实际上是排队并存储消息。</p>
+<p>客户端可能会使用队列中的消息。交换和队列之间没有关系：您可以创建任意数量的队列，并将其中一个或多个绑定到交换。交换和队列之间的关系称为绑定。如果消息中的路由密钥与绑定匹配，则交换会将消息的最多一个副本发送到队列。这很重要，因为我之前说过，可以为单个队列指定许多交换和绑定。多个匹配项不会产生多个消息。交流决定什么是比赛。有几个知名的交易所，它们指定了不同的匹配算法。</p>
+<ul>
+<li><b>扇出交换</b> ：扇出交换将接收到的所有消息路由到绑定到该交换的每个队列（这最类似于<code>javax.jms.Topic</code> ，用于发布-订阅式消息传递）</li>
+<li><b>直接交换</b> ：当路由密钥（消息中的公共标头）和绑定密钥相同时匹配（这最类似于<code>javax.jms.Queue</code> ，用于点对点消息传递）</li>
+<li><b>主题交换</b> ：主题交换在JMS中没有特定于API的等效项。它最像某些消息代理中的分层主题。主题交换将路由键标头与交换绑定匹配，该交换绑定使用特殊语法允许使用通配符。绑定键可能指定以下内容，例如：“。years。＃”。该通配符将匹配任何一个单词，后跟一个点（“。”），然后是“ years”，再一个点（“。”），然后是零个或多个单词。因此，“ taxes.years.2011”将匹配，“ taxes.years”将匹配，但是“ years.2322”将不匹配。</li>
+<li><b>标头交换</b> ：匹配标头键或标头键/值对的存在。</li><p></p></ul><br>[标题id =“ attachment_7484” align =“ alignnone” width =“ 698” caption =“上面，蓝色圆圈是生产者和消费者，绿色元素是交易所，橙色元素是存储消息的AMQP队列。它们被简单地命名为消息存储，并且在JMS的意义上与队列没有任何关系。”] <a href="http://blog.springsource.com/wp-content/uploads/2011/01/amqp.jpg"><img src="http://blog.springsource.com/wp-content/uploads/2011/01/amqp.jpg" alt="" title="amqp" width="698" height="312" class="size-full wp-image-7484"></a> [/字幕]<br><p>该规范还允许添加特殊的交换。例如，RabbitMQ添加了插件交换，它基本上是第三方（或者实际上是RabbitMQ本身）提供额外功能的扩展点。这催生了越来越多的可安装插件列表，这些插件可完成从发送XMPP消息，处理复制以及显示Web UI进行管理的所有功能。</p><p></p>
+<h3>将Spring与AMQP一起使用</h3>
+<p>我们将研究<a href="http://www.springsource.org/spring-amqp">Spring AMQP（</a> Spring产品组合项目）的使用<a href="http://www.springsource.org/spring-amqp">，</a>该项目使您可以与RabbitMQ一起完成规范要求的所有工作，还可以进行更高级的RabbitMQ特定操作。</p>
+<p>让我们开始使用RabbitMQ和Spring AMQP客户端构建与JMS示例基本相同设计的示例。您首先需要的是适当的依赖项。如果您使用的是Maven，请将以下依赖项添加到您的<code>pom.xml</code>文件：</p>
+<pre><code class="prettyprint xml"><br />            &lt;dependency&gt;
+                &lt;groupId&gt;com.rabbitmq&lt;/groupId&gt;
+                &lt;artifactId&gt;amqp-client&lt;/artifactId&gt;
+                &lt;version&gt;${com.rabbitmq.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.amqp&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-rabbit&lt;/artifactId&gt;
+                &lt;version&gt;${spring.amqp.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.amqp&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-amqp&lt;/artifactId&gt;
+                &lt;version&gt;${spring.amqp.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+</code></pre>
+<p>确保为<code>${spring.amqp.version}</code>和<code>${com.rabbitmq.version}</code>属性占位符，或直接用适当的版本替换它们。在写这篇文章的时候， <code>${spring.amqp.version}</code>是<code>1.0.0.M2,</code>和<code>${com.rabbitmq.version}</code>是<code>2.1.0</code> 。和前面的示例一样，我们安装了一个简单的Spring XML配置文件来引导其他所有内容。唯一不同的是通过使用引用的事务管理器实现的名称<code><tx:annotation-driven></code>元素，扫描的软件包以及已加载的属性文件的名称！因此，我们不要在设置上浪费太多时间，而直接转到基于AMQP的示例的配置。</p>
+<pre><code class="prettyprint java"><br />package org.springsource.greenbeans.examples.amqp.core;
+
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.*;
+import org.springframework.amqp.rabbit.core.*
+import org.springframework.amqp.rabbit.transaction.RabbitTransactionManager;
+import org.springframework.amqp.support.converter.*
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+
+@Configuration
+@SuppressWarnings(&quot;unused&quot;)
+public class AmqpConfiguration {
+
+  @Value(&quot;${broker.url}&quot;)
+  private String brokerUrl;
+
+  @Value(&quot;${broker.username}&quot;)
+  private String username;
+
+  @Value(&quot;${broker.password}&quot;)
+  private String password;
+
+  @Value(&quot;${amqp.customer.queue}&quot;)
+  private String customerQueueName;
+
+  @Bean
+  public RabbitTemplate rabbitTemplate() {
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(singleConnectionFactory());
+    rabbitTemplate.setMessageConverter(jsonMessageConverter());
+    return rabbitTemplate;
+  }
+
+  @Bean
+  public RabbitTransactionManager rabbitTransactionManager() {
+    return new RabbitTransactionManager(this.singleConnectionFactory());
+  }
+
+  @Bean
+  public MessageConverter jsonMessageConverter() {
+    return new JsonMessageConverter();
+  }
+
+  @Bean
+  public ConnectionFactory singleConnectionFactory() {
+    SingleConnectionFactory connectionFactory = new SingleConnectionFactory(this.brokerUrl);
+    connectionFactory.setUsername(this.username);
+    connectionFactory.setPassword(this.password);
+    return connectionFactory;
+  }
+
+  @Bean
+  public AmqpAdmin amqpAdmin() {
+    return new RabbitAdmin(this.rabbitTemplate());
+  }
+
+  @Bean
+  public Queue customerQueue() {
+    Queue q = new Queue(this.customerQueueName);
+    amqpAdmin().declareQueue(q);
+    return q;
+  }
+
+  @Bean
+  public DirectExchange customerExchange() {
+    DirectExchange directExchange = new DirectExchange(customerQueueName);
+    this.amqpAdmin().declareExchange(directExchange);
+    return directExchange ;
+  }
+
+  @Bean
+  public Binding marketDataBinding() {
+    return BindingBuilder.from(customerQueue()).to(customerExchange()).with(this.customerQueueName);
+  }
+}
+</code></pre>
+<p>如您所见，这里发生的事情比我们的要多<code>JmsTemplate</code> ，但不要担心，主要部分在形式和功能上与JMS对应部分相同。其余只是细节。首先，我们配置通常的可疑对象- <code>TransactionManager</code> （ <code>RabbitTransactionManager</code> ）， <code>ConnectionFactory</code>实例和<code>RabbitTemplate</code> 。其中大多数应该是很自我解释的。</p>
+<p>让我们深入研究不排队的领域。第一个细微差别是我们将引用配置为<code>JsonMessageConverter</code>上<code>RabbitTemplate</code> 。切记：AMQP是独立于语言和平台的。从Java发送到AMQP代理的消息很可能由.NET或Python或PHP上的客户端使用。当消息打包并通过电线发送时，有效负载将以字节流的形式发送。邮件的接收者需要能够将这些字节还原为可以在接收者平台上读取的内容。如果消息使用Java对象，则这些字节将被序列化为Java对象，并且只有另一端具有相同类的Java客户端才能反序列化它。因此，就像在Spring JMS支持中一样，Spring AMQP提供了一个<code>MessageConverter</code>层次结构。Spring AMQP层次结构具有一个<code>MarshallingMessageConverter</code> ， 以及ASA <code>SimpleMessageConverter</code> ，并且-此外-它具有<code>JsonMessageConverter</code> （目前是Spring AMQP项目所独有的），它可以将对象与JSON相互转换（JSON（所有主要语言和平台都可以解析的JavaScript对象表示法格式，并且比XML更为冗长/疏漏））。在JMS中，智能序列化是效率和设计的问题，但是在AMQP中，这是一个更为紧迫的问题，因此请注意配置<code>MessageConverter</code> 。</p>
+<p>在JMS示例中，您将在配置中找到四个没有类似对象的对象。首先是<code>AmqpAdmin</code> 。AMQP在协议级别定义了用于创建应用程序需要工作的所有命令的命令，包括交换，队列和绑定。在Spring AMQP API中， <code>AmqpAdmin</code>是这些命令的关键界面。</p>
+<p>在里面<code>customerQueue</code>方法，我们配置一个AMQP队列， <code>DirectExchange</code>在里面<code>customerExchange</code>方法。最后，我们使用Spring AMQP流体<code>BindingBuilder</code>用于将队列连接到我们交易所的API。在我们的特定示例中，我们正在发送一条消息，其路由键为<code>"customers"</code>到名为“客户”的队列中。在我们的特定示例中，我们不需要声明除队列之外的任何东西，因为它可以启动无名交换并仅基于路由键路由消息。但是，即使它有点多余，查看它的完成方式还是很有用的。我们使用<code>AmqpAdmin</code>实例以“声明”这些构造。这些对象是幂等的。您可以“声明”它们一百万次，如果它们已经存在，那么除了其中一个声明之外，什么都不会发生，因此在应用程序启动时重复调用是无害的。另外，如果使这些构造具有<em>持久性</em> ，则无需每次都声明它们。</p>
+<p>让我们看看如何发送消息。</p>
+<pre><code class="prettyprint java"><br /><br />package org.springsource.greenbeans.examples.amqp.core;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.*
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springsource.greenbeans.examples.Customer;
+
+@Component
+public class Producer {
+
+  @Value(&quot;${amqp.customer.exchange}&quot;)
+  private String exchange;
+  
+  @Value(&quot;${amqp.customer.queue}&quot;)
+  private String routingKey;
+
+  @Autowired
+  private RabbitTemplate rabbitTemplate;
+
+  private Log log = LogFactory.getLog(getClass());
+
+  @Transactional
+  public void sendCustomerUpdate(Customer customer) {
+    log.info(&quot;sending customer update &quot; + ToStringBuilder.reflectionToString(customer));
+    this.rabbitTemplate.convertAndSend(this.exchange , this.routingKey, customer);
+  }
+}
+</code></pre>
+<p>在本课程中，我们使用<code>RabbitTemplate</code>发送消息并将其转换为JSON。我们指定<code>routingKey</code>我们要使用以及应该使用哪个交换（两个“客户”，以与我们在配置中设置的绑定类型保持一致。）我们已经配置了要使用的类<code>@Transactional</code>因此，任何发送消息失败的行为都将与使用JMS失败时的行为相同。</p>
+<p>现在，让我们看一下使用AMQP接收消息的选项。</p>
+<pre><code class="prettyprint java"><br /><br />package org.springsource.greenbeans.examples.amqp.amqptemplate;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.*;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springsource.greenbeans.examples.Customer;
+
+@Component
+public class RawAmqpTemplatePollingMessageConsumer {
+
+  @Autowired
+  protected RabbitTemplate amqpTemplate;
+
+  @Value(&quot;${amqp.customer.queue}&quot;)
+  private String queue;
+
+  private Log log = LogFactory.getLog(getClass());
+
+  @Transactional
+  public void receiveAndProcessCustomerUpdates() throws Exception {
+    Customer msg = (Customer)this.amqpTemplate.receiveAndConvert(this.queue);
+    log.info(&quot;receiving customer message: &quot; + ToStringBuilder.reflectionToString(  msg));
+  }
+}
+</code></pre>
+<p>毫不奇怪，这看起来几乎是相同的（为<code>RabbitTemplate</code> ）作为第一个同步JMS示例。在第一个示例中，我们省去了一些必须使用的转换逻辑，但是除此之外，它基本上是相同的。如果在收到消息时发生事务回滚，则消息将返回到队列的末尾，并最终在该队列中重新传递。</p>
+<p>与Spring JMS支持一样，Spring AMQP也支持异步消息接收。但是，由于Spring AMQP项目仍是一个新生项目，因此没有等效的名称空间支持。因此，我们需要配置对象。将以下内容添加到您的配置中。</p>
+<pre><code class="prettyprint java"><br /><br />  @Autowired
+  private MessageListenerContainerConsumer messageListenerContainerConsumer;
+
+  @Bean
+  public SimpleMessageListenerContainer listenerContainer() {
+    SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+    container.setTransactionManager(this.rabbitTransactionManager());
+    container.setConnectionFactory(singleConnectionFactory());
+    container.setQueueName(this.customerQueueName);
+
+    MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(
+           this.messageListenerContainerConsumer, this.jsonMessageConverter());
+    container.setMessageListener(messageListenerAdapter);
+    return container;
+  }
+</code></pre>
+<p>此配置注入将进行处理的组件（请参见下文， <code>messageListenerContainerConsumer</code>实例通过组件扫描获取并自动注册到Spring，这就是我们在此处自动写入实例的原因），然后配置一个<code>SimpleMessageListenerContainer</code>实例，该实例将处理接收消息，管理事务并转换传入的消息，然后再将其提供给POJO。</p>
+<p>POJO本身如下所示：</p>
+<pre><code class="prettyprint java"><br /><br />package org.springsource.greenbeans.examples.amqp.messagelistenercontainer;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.*;
+import org.springframework.stereotype.Component;
+import org.springsource.greenbeans.examples.Customer;
+
+@Component
+public class MessageListenerContainerConsumer {
+  
+  private Log log = LogFactory.getLog(getClass() );
+  
+  public void handleMessage(Customer cu){
+    log.info(&quot;Received customer &quot; + ToStringBuilder.reflectionToString(cu)) ;
+  }
+}
+</code></pre>
+<p>这个类比其他的类从消息转换器中受益更多。在这里，我们可以声明一个采用类型为Customer的参数的方法， <code>MessageListenerContainer</code>知道如何进行转换，然后将其传递给<code>handleMessage</code>方法。但是，所有相同的规则都适用。异常将触发回滚等。</p>
+<h2>摘要</h2>
+<p>在本文中，我们探讨了开发人员可用的两个选项，这些开发人员希望将企业消息传递与当前的Spring框架结合在一起。我们引入了Java消息服务（JMS）API和高级消息队列协议（AMQP）来处理企业消息。我们使用核心Spring框架和Spring AMQP项目提供了同步和异步示例。我们谈到了消息传递如何帮助扩展应用程序以及如何成为集成应用程序的便捷方法。我希望这将使您能够更轻松地理解使用企业消息传递时的可能选择，以及Spring如何使您更容易为应用程序做出正确选择。和往常一样，可以在我们的<a href="http://git.springsource.org/spring-samples/spring-samples">Spring Samples</a>存储库中找到此博客文章的代码。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 389;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

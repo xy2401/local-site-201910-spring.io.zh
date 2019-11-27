@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>GORM陷阱（第2部分）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="GORM Gotchas (Part 2)">
-<meta name="twitter:description" content="<p>In <a href=" blog="" 2010="" 06="" 23="" gorm-gotchas-part-="="></head><body dir="ltr">part 1 of this series, I introduced you to some of the subtleties associated with persisting domain instances with GORM. This time, I’m going to tackle relationships with particular focus on <tt>hasMany</tt> and <tt>belongsTo</tt>.
+<meta name="twitter:description" content="<p>In <a href=" blog="" 2010="" 06="" 23="" gorm-gotchas-part-="=">part 1 of this series, I introduced you to some of the subtleties associated with persisting domain instances with GORM. This time, I’m going to tackle relationships with particular focus on <tt>hasMany</tt> and <tt>belongsTo</tt>.
 <p>GORM provides only a few basic elements for defining relationships between domain classes, but they are sufficient to describe most needs. When I give training courses on Grails, it always surprises me how few slides cover relationships. As you can imagine, this apparent simplicity does hide some subtle behaviour that can trip up the unwary. Let’s start with the most basic of relationships: the many-to-one.</p>
 ">
 
@@ -36,10 +40,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -165,7 +171,7 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在<a href="/blog/2010/06/23/gorm-gotchas-part-1">本系列的第1部分中</a> ，我向您介绍了与持久化具有GORM的域实例相关的一些细节。这次，我将着重解决<tt>hasMany</tt>和<tt>belongsTo的关系</tt> 。</p><p>GORM仅提供用于定义域类之间关系的一些基本元素，但是它们足以描述大多数需求。当我提供有关Grails的培训课程时，总是让我感到惊讶的是，几乎没有几张幻灯片涵盖人际关系。您可以想象，这种明显的简单性确实隐藏了一些细微的行为，这些行为可能会使粗心大意的人绊倒。让我们从最基本的关系开始：多对一。</p>
+<div class="blog--post"><p>在<a href="/blog/2010/06/23/gorm-gotchas-part-1">本系列的第1部分中</a> ，我向您介绍了与使用GORM持久化域实例相关的一些细节。这次，我将着重解决<tt>hasMany</tt>和<tt>belongsTo的关系</tt> 。</p><p>GORM仅提供用于定义域类之间关系的一些基本元素，但是它们足以描述大多数需求。当我提供有关Grails的培训课程时，总是让我感到惊讶的是，几乎没有几张幻灯片能涵盖人际关系。您可以想象，这种明显的简单性确实隐藏了一些细微的行为，这些行为可能会使粗心大意的人绊倒。让我们从最基本的关系开始：多对一。</p>
 <h2>多对一</h2><p>假设我有以下两个域类：</p>
 <pre><code class="prettyprint groovy">class Location {
     String city
@@ -176,16 +182,16 @@ class Author {
     Location location
 }
 </code></pre><p>当您看到<tt>Author</tt>域类时，您只知道<tt>Book</tt>一辈子就不会落后。的确，也将有一个<tt>Book</tt>类，但现在让我们集中讨论上面的两个域类以及多对一的<tt>位置</tt>关系。</p><p>看起来很简单，对吧？是的。只需将<tt>location</tt>属性设置为<tt>Location</tt>实例，就可以将作者链接到位置。但是看看在Grails控制台中运行以下代码时会发生什么：</p>
-<pre><code class="prettyprint groovy">def a = new Author(name: "Niall Ferguson", location: new Location(city: "Boston"))
+<pre><code class="prettyprint groovy">def a = new Author(name: &quot;Niall Ferguson&quot;, location: new Location(city: &quot;Boston&quot;))
 a.save()
 </code></pre><p>引发异常。如果查看最终的“由...引起”异常，则会看到消息“ not-null属性引用了null或瞬时值：Author.location”。这是怎么回事？</p><p>这里有关“瞬时值”的位是关键。瞬时实例是未附加到Hibernate会话的实例。从代码中可以看到，我们将<tt>Author.location</tt>属性设置为一个新的<tt>Location</tt>实例，而不是从数据库中检索到的实例。因此，该实例是瞬态的。显而易见的解决方法是通过保存<tt>位置</tt>实例来使其持久化：</p>
-<pre><code class="prettyprint groovy">def l = new Location(city: "Boston")
+<pre><code class="prettyprint groovy">def l = new Location(city: &quot;Boston&quot;)
 l.save()
 
-def a = new Author(name: "Niall Ferguson", location: l)
+def a = new Author(name: &quot;Niall Ferguson&quot;, location: l)
 a.save()
-</code></pre><p>因此，如果我们的多对一属性必须将持久性实例作为值，那么为什么这么多GORM实例看起来像我们在原始代码中创建了新<tt>Location</tt>实例的例子？这是因为域类通常在这种情况下使用<tt>belongsTo</tt>属性。</p>
-<h3>级联与<tt>belongsTo</tt></h3><p>每当您在Hibernate中处理关系时，都需要对级联的含义有很好的了解。GORM也是如此。级联确定将什么类型的操作应用于域实例时，也将应用于该实例的关系。例如，给定上面的模型，保存我们的作者时是否保存了作者的位置？删除作者时会删除该位置吗？如果我们删除位置怎么办？关联作者也被删除了吗？</p><p>保存和删除是与级联相关的最常见操作，它们是您真正需要了解的唯一操作。因此，如果您返回上一部分，您将了解到<tt>位置</tt>实例未与作者保存在一起，因为该<tt>作者->位置</tt>关系的级联操作没有进行。如果现在将“ <tt>位置”</tt>更改为此：</p>
+</code></pre><p>因此，如果我们的多对一属性必须将持久实例作为值，那么为什么这么多GORM实例看起来像我们在原始代码中创建了新<tt>Location</tt>实例的例子？这是因为域类通常在这种情况下使用<tt>belongsTo</tt>属性。</p>
+<h3>级联与<tt>belongsTo</tt></h3><p>每当您在Hibernate中处理关系时，都需要对级联的含义有很好的了解。GORM也是如此。级联确定将什么类型的操作应用于域实例时，也将应用于该实例的关系。例如，给定上面的模型，保存我们的作者时是否保存了作者的位置？删除作者时会删除该位置吗？如果我们删除位置怎么办？关联作者也被删除了吗？</p><p>保存和删除是与级联有关的最常见操作，它们是您真正需要了解的唯一操作。因此，如果您返回上一部分，您将了解到<tt>位置</tt>实例未与作者保存在一起，因为该<tt>作者->位置</tt>关系的级联操作没有进行。如果现在将“ <tt>位置”</tt>更改为此：</p>
 <pre><code class="prettyprint groovy">class Location {
     String city
 
@@ -207,9 +213,9 @@ a.save()
         location(unique: true)
     }
 }
-</code></pre><p>当然，在这种特殊情况下，将“ <tt>作者-位置”</tt>关系变成一对一是没有意义的，但是希望您能看到如何定义一对一。</p><p>一旦了解了<tt>belongsTo的</tt>工作原理，多对一关系就非常简单。另一方面，如果您不习惯休眠，涉及集合的关系会引发一些不愉快的惊喜。</p>
+</code></pre><p>当然，在这种特殊情况下，将“ <tt>作者-位置”</tt>关系变成一对一是没有意义的，但是希望您能看到如何定义一对一。</p><p>一旦了解了<tt>belongsTo的</tt>工作原理，多对一关系就非常简单。另一方面，如果您不习惯休眠，涉及集合的关系可能会带来一些不愉快的惊喜。</p>
 <h2>集合（一对多/多对多）</h2><p>集合是在面向对象的语言中建立一对多关系建模的自然方法，而GORM可以考虑到幕后发生的事情，使使用它们变得非常容易。尽管如此，这绝对是一个领域，面向对象语言和关系数据库之间的阻抗不匹配使它变得丑陋。首先，您必须记住，内存中的数据可能与数据库中的数据不同。</p>
-<h3>域实例集合与数据库记录</h3><p>当您在域实例上有一个集合时，您正在处理内存中的对象。这意味着您可以像处理任何其他对象集合一样处理它。您可以对其进行迭代，也可以对其进行修改。然后，在某个时候，您将要保留对数据库的任何更改，这可以通过保存具有集合的对象来完成。我将稍后再讲，但是首先，我想演示一些与对象集合和实际数据之间的这种脱节有关的微妙之处。为此，我将介绍<tt>Book</tt>类：</p>
+<h3>域实例集合与数据库记录</h3><p>当您在域实例上有一个集合时，您正在处理内存中的对象。这意味着您可以像处理任何其他对象集合一样处理它。您可以对其进行迭代，也可以对其进行修改。然后，在某个时候，您将要保留对数据库的所有更改，这可以通过保存具有集合的对象来完成。我将稍后再讲，但是首先，我想演示一些与对象集合和实际数据之间的这种脱节有关的微妙之处。为此，我将介绍<tt>Book</tt>类：</p>
 <pre><code class="prettyprint groovy">class Book {
     String title
 
@@ -224,21 +230,21 @@ class Author {
 
     static hasMany = [ books: Book ]
 }
-</code></pre><p>这将创建一个单向（ <tt>Book</tt>没有向<tt>Author</tt>的后向引用）一对多关系，其中<tt>Author</tt>的书数为零或更多。现在，让我说我在Grails控制台（用于试验GORM的出色工具）中执行以下代码：</p>
-<pre><code class="prettyprint groovy">def a = new Author(name: "Niall Ferguson", location: new Location(city: "Boston"))
+</code></pre><p>这将创建一个单向（ <tt>Book</tt>没有向<tt>Author</tt>的反向引用）一对多关系，其中author拥有零本书或更多本书。现在，让我们说我在Grails控制台（用于试验GORM的出色工具）中执行以下代码：</p>
+<pre><code class="prettyprint groovy">def a = new Author(name: &quot;Niall Ferguson&quot;, location: new Location(city: &quot;Boston&quot;))
 a.save(flush: true)
 
-a.addToBooks(title: "Colossus")
-a.addToBooks(title: "Empire")
+a.addToBooks(title: &quot;Colossus&quot;)
+a.addToBooks(title: &quot;Empire&quot;)
 
 println a.books*.title
 println Book.list()*.title
-</code></pre><p>输出将如下所示：<br></p><pre><br>[Empire, Colossus]
-[]<br></pre><br>因此，您可以打印书籍的集合，但是它们尚未在数据库中。您甚至可以在第二个<tt>a.addToBooks（）</tt>之后插入<tt>a.save（）</tt> ，而不会产生明显的影响。还记得上一篇文章中所说的调用<tt>save（）</tt>不能保证立即保留数据吗？这是一个具体的例子。如果要在查询中查看新书，则必须添加一个显式刷新：<p></p>
+</code></pre><p>输出将如下所示：<br></p><pre><br />[Empire, Colossus]
+[]<br /></pre><br>因此，您可以打印书籍的集合，但是它们尚未在数据库中。您甚至可以在第二个<tt>a.addToBooks（）</tt>之后插入<tt>a.save（）</tt> ，而不会产生明显的影响。还记得上一篇文章中所说的调用<tt>save（）</tt>不能保证立即保留数据吗？这是一个具体的例子。如果要在查询中查看新书，则必须添加一个显式刷新：<p></p>
 <pre><code class="prettyprint groovy">...
-a.addToBooks(title: "Colossus")
-a.addToBooks(title: "Empire")
-a.save(flush: true)   // <---- This line added
+a.addToBooks(title: &quot;Colossus&quot;)
+a.addToBooks(title: &quot;Empire&quot;)
+a.save(flush: true)   // &lt;---- This line added
 
 println a.books*.title
 println Book.list()*.title
@@ -251,16 +257,16 @@ a.delete(flush: true)
 
 println Author.list()*.name
 println Book.list()*.title
-</code></pre><p>输出看起来像这样：<br></p><pre><br>[]<br>[Empire, Colossus]<br></pre><br>换句话说，作者已被删除，但书籍尚未被删除。这就是<tt>belongsTo的来历</tt> ：它确保删除和保存都级联。仅仅通过增加线路<tt>静态属于关联=作者</tt>对<tt>书</tt> ，上面的代码将打印<tt>作者</tt> <em>和</em> <tt>书</tt>空列表。简单吧？在这种情况下，是的，但是真正的乐趣才刚刚开始。<p></p><p>旁：在上面的示例中，我们如何强制刷新会话？如果我们不这样做， <tt>那么Author.list（）</tt>可能会显示刚刚被删除的作者，这仅仅是因为到那时为止更改可能尚未<tt>保留</tt> 。</p>
+</code></pre><p>输出看起来像这样：<br></p><pre><br />[]<br />[Empire, Colossus]<br /></pre><br>换句话说，作者已被删除，但书籍尚未被删除。这就是<tt>belongsTo的来历</tt> ：它确保删除和保存都级联。仅仅通过增加线路<tt>静态属于关联=作者</tt>对<tt>书</tt> ，上面的代码将打印<tt>作者</tt> <em>和</em> <tt>书</tt>空列表。简单吧？在这种情况下，是的，但是真正的乐趣才刚刚开始。<p></p><p>旁：在上面的示例中，我们如何强制刷新会话？如果我们不这样做， <tt>那么Author.list（）</tt>可能会显示刚刚被删除的作者，这仅仅是因为到那时为止更改可能尚未<tt>保留</tt> 。</p>
 <h3>删除孩子</h3><p>删除诸如<tt>Author</tt>实例之类的内容并让GORM自动删除子级非常简单。但是，如果您只想删除一本或多本作者的书，而不是作者本人，该怎么办？您可以尝试以下方法：</p>
 <pre><code class="prettyprint groovy">def a = Author.get(1)
 a.books*.delete()
-</code></pre><p>认为这将删除所有书籍。但实际上，此代码将生成异常：<br></p><pre><br>org.springframework.dao.InvalidDataAccessApiUsageException: deleted object would be re-saved by cascade (remove deleted object from associations): [Book#1]; …<br> at org.springframework.orm.hibernate3.SessionFactoryUtils.convertHibernateAccessException(SessionFactoryUtils.java:657)<br> at org.springframework.orm.hibernate3.HibernateAccessor.convertHibernateAccessException(HibernateAccessor.java:412)<br> at org.springframework.orm.hibernate3.HibernateTemplate.doExecute(HibernateTemplate.java:411)<br> at org.springframework.orm.hibernate3.HibernateTemplate.executeWithNativeSession(HibernateTemplate.java:374)<br> at org.springframework.orm.hibernate3.HibernateTemplate.flush(HibernateTemplate.java:881)<br> at ConsoleScript7.run(ConsoleScript7:3)<br>Caused by: org.hibernate.ObjectDeletedException: deleted object would be re-saved by cascade (remove deleted object from associations): [Book#1]<br></pre><br>哇，有用的stacktrace消息！是的，问题在于这些书仍在作者的收藏夹中，因此当刷新会话时，将重新创建它们。请记住，不仅保存会级联，而且修改后的域实例也会自动保留（由于Hibernate的脏检查）。<p></p><p>正如异常消息所说明的，解决方案是从收藏集中删除书籍：</p>
+</code></pre><p>认为这将删除所有书籍。但实际上，此代码将生成异常：<br></p><pre><br />org.springframework.dao.InvalidDataAccessApiUsageException: deleted object would be re-saved by cascade (remove deleted object from associations): [Book#1]; &hellip;<br /> at org.springframework.orm.hibernate3.SessionFactoryUtils.convertHibernateAccessException(SessionFactoryUtils.java:657)<br /> at org.springframework.orm.hibernate3.HibernateAccessor.convertHibernateAccessException(HibernateAccessor.java:412)<br /> at org.springframework.orm.hibernate3.HibernateTemplate.doExecute(HibernateTemplate.java:411)<br /> at org.springframework.orm.hibernate3.HibernateTemplate.executeWithNativeSession(HibernateTemplate.java:374)<br /> at org.springframework.orm.hibernate3.HibernateTemplate.flush(HibernateTemplate.java:881)<br /> at ConsoleScript7.run(ConsoleScript7:3)<br />Caused by: org.hibernate.ObjectDeletedException: deleted object would be re-saved by cascade (remove deleted object from associations): [Book#1]<br /></pre><br>哇，有用的stacktrace消息！是的，问题在于这些书仍在作者的收藏夹中，因此当刷新会话时，将重新创建它们。请记住，不仅保存会级联，而且修改后的域实例也会自动保留（因为Hibernate进行了脏检查）。<p></p><p>正如异常消息所说明的，解决方案是从收藏集中删除书籍：</p>
 <pre><code class="prettyprint groovy">def a = Author.get(1)
 a.books.clear()
 </code></pre><p>除此之外，这不是解决方案，因为书籍仍在数据库中。它们不再与作者关联。确定，因此我们也需要显式删除它们：</p>
 <pre><code class="prettyprint groovy">def a = Author.get(1)
-a.books.each { book ->
+a.books.each { book -&gt;
     a.removeFromBooks(book)
     book.delete()
 }
@@ -269,39 +275,40 @@ a.books.each { book ->
 def l = []
 l += a.books
 
-l.each { book ->
+l.each { book -&gt;
     a.removeFromBooks(book)
     book.delete()
 }
-</code></pre><p>那行得通，但是男孩确实需要一些努力。</p><p>如果您具有双向关系，则还必须小心，例如，如果您的<tt>belongsTo</tt>使用以下语法： <tt>static nobodyTo = [author：Author]</tt> 。如果我们从藏书中删除这些书而不删除它们，就像这样：</p>
+</code></pre><p>那行得通，但是男孩确实需要一些努力。</p><p>如果您具有双向关系，则还必须小心，例如，如果您的<tt>belongsTo</tt>使用以下语法： <tt>static nobodyTo = [author：Author]</tt> 。如果我们从馆藏中删除书籍而不删除它们，例如：</p>
 <pre><code class="prettyprint groovy">def a = Author.get(1)
 def l = []
 l += a.books
 
-l.each { book ->
+l.each { book -&gt;
     a.removeFromBooks(book)
 }
 </code></pre><p>我们将收到“ not-null属性引用null或瞬时值：Book.author”错误。正如我将在后面解释的那样，这是因为这些书的<tt>author</tt>属性设置为<tt>null</tt> 。由于该属性不可为空，因此会触发验证错误。这足以使任何人疯狂！</p><p>不要害怕，因为有解决方案。如果我们将此映射添加到<tt>Author</tt> ：</p>
 <pre><code class="prettyprint groovy">static mapping = {
-    books cascade: "all-delete-orphan"
+    books cascade: &quot;all-delete-orphan&quot;
 }
-</code></pre><p>那么从作者处删除的任何图书都会被GORM自动删除。现在，最后一个代码示例（我们从集合中删除所有书籍的示例）将开始工作。实际上，如果关系是单向的，则可以大幅减少代码：</p>
+</code></pre><p>那么从作者处删除的任何图书都会被GORM自动删除。现在，我们可以使用最后一个代码示例，在该示例中，我们从集合中删除了所有书籍。实际上，如果关系是单向的，则可以大幅减少代码：</p>
 <pre><code class="prettyprint groovy">def a = Author.get(1)
 a.books.clear()
-</code></pre><p>这将删除所有书籍，并一举删除它们！</p><p>这个故事的寓意很简单：如果对一个集合使用<tt>belongsTo</tt> ，请在父级的<tt>映射</tt>块中将级联类型显式设置为“ all-delete-orphan”。实际上，有很强的理由将其<tt>设为</tt> GORM中<tt>belongsTo</tt>和一对多关系的默认行为。</p><p>这就提出了一个有趣的问题： <tt>clear（）</tt>方法为什么不适用于双向关系？我不确定100％，但是我相信这是因为书中保留了对作者的反向引用。要了解为什么这会影响<tt>clear（）</tt>的行为，您必须首先意识到GORM将单向和双向一对多关系映射到数据库表的方式有所不同。对于单向关系，GORM默认情况下会创建一个联接表，因此当您清除账簿时，记录只是从该联接表中删除。双向关系是使用子表（即本例中的book表）上的直接外键映射的。图表应该使这一点更加清晰：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/one-to-many-mappings.png" alt="一对多映射" title="一对多映射" width="553" height="338" class="aligncenter size-full wp-image-5084"></p><p>当您清除书籍集合时，该外键仍然存在，因为GORM不会清除<tt>author</tt>属性的值。因此，就好像该集合从未被清空过。</p><p>对于收藏来说，差不多了。我只想通过快速查看<tt>addTo *（）</tt>和<tt>removeFrom *（）</tt>方法来结束本节。</p>
+</code></pre><p>这将删除所有书籍，并一举删除它们！</p><p>这个故事的寓意很简单：如果对一个集合使用<tt>belongsTo</tt> ，请在父级的<tt>映射</tt>块中将级联类型显式设置为“ all-delete-orphan”。实际上，有很强的理由使它成为GORM中<tt>belongsTo</tt>和一对多关系的默认行为。</p><p>这就提出了一个有趣的问题： <tt>clear（）</tt>方法为什么不适用于双向关系？我不确定100％，但是我相信这是因为这些书保留了对作者的反向引用。要了解为什么这会影响<tt>clear（）</tt>的行为，您必须首先意识到GORM将单向和双向一对多关系映射到数据库表的方式有所不同。对于单向关系，GORM默认情况下会创建一个联接表，因此当您清除账簿时，记录只是从该联接表中删除。双向关系是使用子表（即本例中的book表）上的直接外键映射的。图表应该使这一点更加清晰：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2010/06/one-to-many-mappings.png" alt="一对多映射" title="一对多映射" width="553" height="338" class="aligncenter size-full wp-image-5084"></p><p>当您清除书籍集合时，该外键仍然存在，因为GORM不会清除<tt>author</tt>属性的值。因此，就好像该集合从未被清空过。</p><p>对于收藏来说，差不多了。我只想通过快速查看<tt>addTo *（）</tt>和<tt>removeFrom *（）</tt>方法来结束本节。</p>
 <h3><tt>addTo *（）</tt>与<tt><<</tt></h3><p>在我的示例中，我使用了GORM提供的<tt>addTo *（）</tt>和<tt>removeFrom *（）</tt>动态方法。这是为什么？毕竟，如果这些是标准的Java集合，我们不能只使用如下代码：</p>
 <pre><code class="prettyprint groovy">def a = Author.get(1)
-a.books << new Book(title: "Colossus")
+a.books &lt;&lt; new Book(title: &quot;Colossus&quot;)
 </code></pre><p>当然可以，但是GORM方法有一些微妙的好处。考虑以下代码：</p>
-<pre><code class="prettyprint groovy">def a = new Author(name: "Niall Ferguson", location: new Location(city: "Boston"))
-a.books << new Book(title: "Colossus")
+<pre><code class="prettyprint groovy">def a = new Author(name: &quot;Niall Ferguson&quot;, location: new Location(city: &quot;Boston&quot;))
+a.books &lt;&lt; new Book(title: &quot;Colossus&quot;)
 a.save()
-</code></pre><p>看来这没什么不对吗？但是，如果您运行代码，则会得到<tt>NullPointerException，</tt>因为<tt>books</tt>集合尚未初始化。这与从数据库中获取作者<tt>（</tt>例如，使用<tt>get（））</tt>时看到的行为完全不同。在这种情况下，我们可以愉快地追加项目的<tt>藏书</tt> 。我们只遇到这个问题，因为我们是通过<tt>new</tt>创建作者的。如果改用<tt>addTo *（）</tt>方法，则不必担心此问题，因为它是null安全的。</p><p>现在考虑一个示例，在该示例中，我们先使用<tt>get（）</tt>获取作者，然后再将新书添加到其收藏中。如果这种关系是双向的，我们将遇到“属性为非空或瞬态”的异常，因为尚未设置书籍的<tt>author</tt>属性。如果使用标准收集方法，则必须手动初始化引用。使用<tt>addTo *（）</tt>方法，就可以完成此操作。</p><p><tt>addTo *（）</tt>方法的最后一个功能是隐式创建正确的域类。注意在我们的示例中，我们如何将书的初始属性值传递给方法，而不是显式实例化<tt>Book</tt> ？这是因为该方法可以从<tt>hasMany</tt>属性推断出集合包含的类型。整洁吧？</p><p><tt>removeFrom *（）</tt>方法的用处不大，但它确实清除了反向引用。当然，这与我之前讨论的“所有删除/孤立”级联选项一起使用时效果最佳。</p><p>最后要考虑的关系类型是多对多。</p>
-<h3>多对多</h3><p>如果需要，您可以让GORM为您管理多对多关系。不过，您需要注意一些事项：</p><h1><a href="#deletes-do-not-cascade-period" class="anchor" name="deletes-do-not-cascade-period"></a>删除不级联，周期。</h1><h1><a href="#one-side-of-the-relationship-em-must-em-have-a-tt-belongsto-tt-but-it-usually-doesn-rsquo-t-matter-which-side-has-it" class="anchor" name="one-side-of-the-relationship-em-must-em-have-a-tt-belongsto-tt-but-it-usually-doesn-rsquo-t-matter-which-side-has-it"></a>关系的一侧<em>必须</em>具有一个<tt>belongsTo</tt> ，但是通常哪一侧都没有关系。</h1><h1><a href="#the-tt-belongsto-tt-only-affects-the-direction-of-cascading-saves-it-em-does-not-cause-cascading-deletes-em" class="anchor" name="the-tt-belongsto-tt-only-affects-the-direction-of-cascading-saves-it-em-does-not-cause-cascading-deletes-em"></a> <tt>EmiratesTo</tt>仅影响级联保存的方向- <em>不会导致级联删除</em></h1><h1><a href="#a-join-table-is-always-used-but-you-cannot-store-any-extra-information-on-it" class="anchor" name="a-join-table-is-always-used-but-you-cannot-store-any-extra-information-on-it"></a>始终使用联接表，但是您不能在其上存储任何其他信息。</h1><p>很抱歉，请注意级联删除的要点，但重要的是要了解这种行为与多对一和一对多关系完全不同。了解最后一点也很重要：许多多对多关系具有关联的信息。例如，一个用户可能具有许多角色，而一个角色可能具有许多用户。但是用户在不同的项目中可能具有不同的角色，因此项目与关系本身相关联。在这种情况下，最好自己管理多对多关系。</p>
-<h2>摘要</h2><p>好吧，这可能是我到目前为止写的最长的文章，但是您已经结束了。恭喜你！如果您一次坐下来都无法消化所有内容，请不要担心，您可以随时参考。</p><p>我认为GORM在提供一个很好的抽象来以面向对象的方式处理数据库关系方面做得很好，但是正如您所看到的，您真的不能忘记您最终将要处理数据库。但是，有了本文提供的信息，您就可以轻松应对GORM集合的基础知识。希望这将意味着您可以在应用程序中享受一对多关系并从中受益。</p><p>您可能不相信，但是我还没有涵盖您需要了解的关于收藏的所有信息。关于延迟加载，仍然有一些有趣的问题需要解决，但是在下一篇文章中，我将与您讨论这些问题。</p><p>直到下一次！</p></div>
+</code></pre><p>看来这没什么不对吗？但是，如果您运行代码，则会得到<tt>NullPointerException，</tt>因为<tt>books</tt>集合尚未初始化。这与从数据库中获取作者<tt>（</tt>例如，使用<tt>get（））</tt>时看到的行为完全不同。在这种情况下，我们可以愉快地将项目添加到<tt>books</tt>集合中。我们只遇到这个问题，因为我们是通过<tt>new</tt>创建作者的。如果改用<tt>addTo *（）</tt>方法，则不必担心此问题，因为它是null安全的。</p><p>现在考虑一个示例，在该示例中，我们先使用<tt>get（）</tt>获取作者，然后再将新书添加到其收藏中。如果这种关系是双向的，我们将遇到“属性非空或瞬态”异常，因为尚未设置该书的<tt>author</tt>属性。如果使用标准收集方法，则必须手动初始化引用。使用<tt>addTo *（）</tt>方法，就可以完成此操作。</p><p><tt>addTo *（）</tt>方法的最后一个功能是隐式创建正确的域类。注意在我们的示例中，我们如何将书的初始属性值传递给方法，而不是显式实例化<tt>Book</tt> ？这是因为该方法可以从<tt>hasMany</tt>属性推断出集合包含的类型。整洁吧？</p><p><tt>removeFrom *（）</tt>方法的用处不大，但它确实清除了反向引用。当然，这与我之前讨论的“所有删除/孤立”级联选项一起使用时效果最佳。</p><p>最后要考虑的关系类型是多对多。</p>
+<h3>多对多</h3><p>如果需要，您可以让GORM为您管理多对多关系。不过，您需要注意一些事项：</p><h1><a href="#deletes-do-not-cascade-period" class="anchor" name="deletes-do-not-cascade-period"></a>删除不级联，周期。</h1><h1><a href="#one-side-of-the-relationship-em-must-em-have-a-tt-belongsto-tt-but-it-usually-doesn-rsquo-t-matter-which-side-has-it" class="anchor" name="one-side-of-the-relationship-em-must-em-have-a-tt-belongsto-tt-but-it-usually-doesn-rsquo-t-matter-which-side-has-it"></a>关系的一侧<em>必须</em>具有一个<tt>belongsTo</tt> ，但是通常哪一侧都没有关系。</h1><h1><a href="#the-tt-belongsto-tt-only-affects-the-direction-of-cascading-saves-it-em-does-not-cause-cascading-deletes-em" class="anchor" name="the-tt-belongsto-tt-only-affects-the-direction-of-cascading-saves-it-em-does-not-cause-cascading-deletes-em"></a> <tt>EmiratesTo</tt>仅影响级联保存的方向- <em>不会导致级联删除</em></h1><h1><a href="#a-join-table-is-always-used-but-you-cannot-store-any-extra-information-on-it" class="anchor" name="a-join-table-is-always-used-but-you-cannot-store-any-extra-information-on-it"></a>始终使用联接表，但是您不能在其上存储任何其他信息。</h1><p>很抱歉，请注意级联删除的意义，但重要的是要了解这种行为不同于多对一和一对多关系。了解最后一点也很重要：许多多对多关系具有关联的信息。例如，一个用户可能具有许多角色，而一个角色可能具有许多用户。但是用户在不同的项目中可能具有不同的角色，因此项目与关系本身相关联。在这种情况下，最好自己管理多对多关系。</p>
+<h2>摘要</h2><p>好吧，这可能是我到目前为止写的最长的文章，但是您已经结束了。恭喜你！如果您一次坐下来都无法消化所有内容，请不要担心，您可以随时参考。</p><p>我认为GORM在提供一个很好的抽象来以面向对象的方式处理数据库关系方面做得很好，但是正如您所看到的，您真的不能忘记您最终将要处理数据库。但是，有了本文提供的信息，您就可以轻松应对GORM集合的基础知识。希望这将意味着您可以在应用程序中享受一对多关系并从中受益。</p><p>您可能不相信它，但是我还没有涵盖您需要了解的关于收藏的所有内容。关于延迟加载，仍然需要解决一些有趣的问题，但是在下一篇文章中，我将与您讨论这些问题。</p><p>直到下一次！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 334;
 
       (function(disqus_shortname, document) {
@@ -315,7 +322,8 @@ a.save()
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -353,12 +361,14 @@ a.save()
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

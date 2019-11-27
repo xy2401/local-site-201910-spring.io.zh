@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>使用RabbitMQ路由拓扑以提高性能和可扩展性</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -25,7 +29,7 @@
 <h2>Basic Concepts</h2>
 <br>
 <br>
-<p style=" text-align:="" center="="></head><body dir="ltr"><a href="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png"><img class="size-full wp-image-8329  aligncenter" title="消息路由拓扑中的分层节点" src="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png" alt="消息路由拓扑中的分层节点" width="170" height="236"></a>
+<p style=" text-align:="" center="="><a href="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png"><img class="size-full wp-image-8329  aligncenter" title="消息路由拓扑中的分层节点" src="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png" alt="消息路由拓扑中的分层节点" width="170" height="236"></a>
 <br>
 <a href="http://en.wikipedia.org/wiki/AMQP">AMQP</a>
 <a href="http://en.wikipedia.org/wiki/Streaming_Text_Oriented_Messaging_Protocol">STOMP</a>
@@ -76,10 +80,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -205,4 +211,149 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>为高度可扩展的系统设计良好的路由拓扑就像映射图形。需要考虑很多事情，例如问题，环境的约束，消息传递实现的约束以及性能策略。我们经常遇到的问题是，在满足我们的需求时缺乏灵活性和表达能力。这是RabbitMQ脱颖而出的地方。<br></p><h2>基本概念</h2><br>通常，熟悉消息传递的任何人都知道将消息从A路由到B的概念。路由可以是简单的，也可以是非常复杂的，并且当为可伸缩的复杂系统设计路由拓扑时，它必须优雅。保持清洁和分离，组件可以在变化的负载下很好地节流。这可以表示为简单图或复杂图。路由拓扑可以以其最简单的形式表示为节点，例如分层节点：<br><p style="text-align:center"><a href="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png"><img class="size-full wp-image-8329  aligncenter" title="消息路由拓扑中的分层节点" src="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png" alt="消息路由拓扑中的分层节点" width="170" height="236"></a></p><br>对于RabbitMQ或<a href="https://en.wikipedia.org/wiki/AMQP">AMQP的</a>新手（请注意Rabbit与许多协议一起使用，包括<a href="https://en.wikipedia.org/wiki/Streaming_Text_Oriented_Messaging_Protocol">STOMP</a> ，HTTP，HTTPS，XMPP和SMTP），以下是一些基本组件说明：<br><ul><br> <li><strong>交换</strong> ，其接收从生产者应用程序的消息，并可选地路由这些到消息队列的服务器内的服务器内的实体</li><br> <li><strong>交换类型</strong>特定交换模型的算法和实现。与“交换实例”相反，后者是在服务器内接收和路由消息的实体</li><br> <li><strong>消息队列</strong>持有消息并将其转发给使用者应用程序的命名实体</li><br> <li><strong>绑定</strong>在消息队列和交换之间创建关系的实体</li><br> <li><strong>路由密钥</strong>交换可用于确定如何路由特定消息的虚拟地址</li><br></ul><br>对于点对点路由，路由密钥通常是消息队列的名称。对于主题pub-sub路由，路由密钥通常本质上是分层的：<p></p><p><code>api.agents.agent-{id}.operations.{operationName}</code></p><p>在更复杂的情况下，可以将路由密钥与消息头字段和/或其内容上的路由组合在一起。交换检查邮件的属性，标题字段，正文内容以及其他来源的数据，然后决定如何路由邮件。从上述路由关键思想派生的绑定模式可能看起来像<code>api.agents.*.operations.*</code> ，其中我们使用绑定模式<code>api.agents.*.operations.*</code></p><p><code>api.agents.*.operations.*</code></p><p><code>api.agents.*.operations.*</code></p><code>api.agents.*.operations.*</code></div><code>api.agents.*.operations.*</code></div><code>api.agents.*.operations.*</code></article><code>api.agents.*.operations.*</code></div><code>api.agents.*.operations.*</code></div><code>api.agents.*.operations.*</code></div><code>api.agents.*.operations.*</code></div><code>api.agents.*.operations.*</code></body></html>
+<div class="blog--post"><p>为高度可扩展的系统设计良好的路由拓扑就像映射图形。需要考虑很多事情，例如问题，环境的约束，消息传递实现的约束以及性能策略。我们经常遇到的问题是，在满足我们的需求时缺乏灵活性和表达能力。这是RabbitMQ脱颖而出的地方。<br></p><h2>基本概念</h2><br>通常，熟悉消息传递的任何人都知道将消息从A路由到B的概念。路由可以是简单的，也可以是非常复杂的，并且当为可伸缩的复杂系统设计路由拓扑时，它必须优雅。保持清洁和分离，组件可以在变化的负载下很好地节流。这可以表示为简单图或复杂图。路由拓扑可以以其最简单的形式表示为节点，例如分层节点：<br><p style="text-align:center"><a href="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png"><img class="size-full wp-image-8329  aligncenter" title="消息路由拓扑中的分层节点" src="http://blog.springsource.com/wp-content/uploads/2011/03/tree-nodes.png" alt="消息路由拓扑中的分层节点" width="170" height="236"></a></p><br>对于RabbitMQ或<a href="https://en.wikipedia.org/wiki/AMQP">AMQP的</a>新手（请注意Rabbit与许多协议一起使用，包括<a href="https://en.wikipedia.org/wiki/Streaming_Text_Oriented_Messaging_Protocol">STOMP</a> ，HTTP，HTTPS，XMPP和SMTP），以下是一些基本组件说明：<br><ul><br> <li><strong>Exchange</strong>服务器内的实体，该实体从生产者应用程序接收消息并将消息路由到服务器内的消息队列（可选）</li><br> <li><strong>交换类型</strong>特定交换模型的算法和实现。与“交换实例”相反，后者是在服务器内接收和路由消息的实体</li><br> <li><strong>消息队列</strong>持有消息并将其转发给使用者应用程序的命名实体</li><br> <li><strong>绑定</strong>在消息队列和交换之间创建关系的实体</li><br> <li><strong>路由密钥</strong>交换可用于确定如何路由特定消息的虚拟地址</li><br></ul><br>对于点对点路由，路由密钥通常是消息队列的名称。对于主题pub-sub路由，路由密钥通常本质上是分层的：<p></p><p><code>api.agents.agent-{id}.operations.{operationName}</code></p><p>在更复杂的情况下，可以将路由密钥与消息头字段和/或其内容上的路由组合在一起。交换检查邮件的属性，标头字段，正文内容以及其他来源的数据，然后决定如何路由邮件。从上述路由关键思想派生的绑定模式可能看起来像<code>api.agents.*.operations.*</code>我们绑定交换的地方<code>E1</code>排队<code>Q1</code>具有绑定模式<code>api.agents.*.operations.*</code>这样任何发送给<code>E1</code>前往<code>Q1</code>如果它们的路由键与绑定模式匹配。</p><p>Rabbit代理的结构与JMS代理不同。每个RabbitMQ服务器由至少一个节点（代理）组成，或更典型地，由群集中的节点组成。每个节点都有一个默认的虚拟主机“ /”，并且可以创建其他虚拟主机，例如“ / develoment”。Rabbit虚拟主机类似于Tomcat虚拟主机，并将代理数据分区为子集。在这些虚拟主机内是交换和队列。当用户使用其凭据进行连接时，它将连接到Rabbit节点上的虚拟主机。</p><p>在这里，我们连接到Rabbit节点，使用<a href="https://www.rabbitmq.com/java-client.html">RabbitMQ Java客户端api</a>声明要发布到的交换，要从中使用的队列，绑定模式，然后发布一些消息：</p>
+<pre><code class="prettyprint java">package org.demo.simple.rabbit;
+
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.QueueingConsumer;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public final class RocketSender {
+
+ public void sendRockets() throws IOException {
+     List&lt;String&gt; rocketsWithRoutings = new RocketRouter().build();
+
+     Connection connection = new ConnectionFactory().newConnection();
+     Channel channel = connection.createChannel();
+
+     String rocketExchange = &quot;rockets.launched&quot;;
+     channel.exchangeDeclare(rocketExchange, &quot;topic&quot;);
+     String rocketQueue = channel.queueDeclare().getQueue();
+     channel.queueBind(rocketQueue, rocketExchange, &quot;galaxies.*.planets.*&quot;);
+
+     for (String rocketTo : rocketsWithRoutings) {
+         channel.basicPublish(rocketExchange, &quot;galaxies.*.planets.&quot; + rocketTo, null, rocketTo.getBytes());
+     }
+
+     channel.close();
+     connection.close();
+ }
+}
+</code></pre><p>简单地消耗掉“落地”火箭可能看起来像：</p>
+<pre><code class="prettyprint java"><br /> QueueingConsumer queueingConsumer = new QueueingConsumer(channel);
+ channel.basicConsume(rocketQueue, false, queueingConsumer);
+
+ int landed = 0;
+ while (landed &lt; launched) {
+     QueueingConsumer.Delivery delivery = queueingConsumer.nextDelivery();
+     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+     String rocketLanded = new String(delivery.getBody());
+
+     if (rocketLanded.equalsIgnoreCase(&quot;Alderaan&quot;)) {
+         System.out.println(&quot;That&#39;s no moon, that&#39;s a space station.&quot;);
+     }
+     landed++;
+ }
+</code></pre>
+<h2>问题</h2><p>在考虑哪些路由策略在可扩展环境（其中性能本身也可以得到改善）中表现最佳时，有很多选择。通常，关于消息传递的一大优点是可用的配置多种多样，并找出可以解决当前和不断增长的需求的正确配置。</p><p>为了简单起见，我们考虑两种策略：<br></p><ol><br> <li>具有分层路由键的高度分区路由，较少的主题交换</li><br> <li>大量直接交换和队列，路由分区少得多</li><br></ol><br>每种情况都遵循此用例：必须扩展的每个应用程序既是生产者又是消费者：<br><p style="text-align:center"><a href="http://blog.springsource.com/wp-content/uploads/2011/03/producer-consumer.png"><img class="aligncenter size-full wp-image-8318" title="生产者消费者" src="http://blog.springsource.com/wp-content/uploads/2011/03/producer-consumer.png" alt="" width="311" height="95" align="center"></a></p><p></p>
+<h3>从哪儿开始</h3><p>在研究一个路由解决方案之前，盘点您的环境及其组件是一个好主意，该解决方案将随着时间的推移而干净有效地扩展。例如，什么有助于扩展？通常，解耦，分布，异步，并行，抽象级别和间接级别仅举几例。然后考虑哪些因素是当前或潜在的瓶颈。这是一个基本原则，即高流量/大流量路径需要更有效的吞吐量，否则将招致发行瓶颈的风险。一种方法是根据流量或热点图对这些进行排名。接下来，您可以对流量进行分类-是否存在总体模式，主题或类似消息类型，以及它们之间的关系是什么？现在开始考虑合并，如何以及在何处提高效率，并应用经过测试的模式来解决这些热点，解耦结垢并提高性能。<br></p><h2>一般布线注意事项</h2><br>所有交换类型的行为都不同。以下是一些一般规则：<br><ul><br> <li>如果您在应用程序的图中具有有限的路由键域，则许多扇出交换可能是正确的选择（每个路由键1：1交换映射）</li><br> <li>如果路由键的数量可能无限，请考虑进行主题交换</li><br> <li>对于主题路由，性能随着绑定数量的增加而降低</li><br> <li>扇出交换非常快，因为如果绑定到大量更改的队列，它们将没有路由要处理</li><br> <li>如果您不需要通配符，则直接交换是主题交换的一种更快的形式</li><br> <li>与具有更多绑定，更少交换和队列的拓扑相比，对100,000多个队列中的问题进行故障排除可能是乏味的</li><br> <li>大量的交换和队列占用了更多的内存，这可能很重要，但这确实取决于</li><br></ul><br>从2011年3月23日发布的RabbitMQ 2.4.0开始，提供了新的主题路由算法优化，其峰值速度比以前的主题算法快60倍。因此，一个建议是减少交换和队列，并增加路由，因为现在的时间增加很小。<br><h2>性能</h2><br><h3>什么是便宜的？</h3><br>在内存成本，交换和绑定方面。在RabbitMQ构建基础的<a title="Erlang" href="http://www.erlang.org">Erlang中</a> ，每个节点（代理）和每个队列都是一个进程。默认情况下，Erlang VM进程限制设置为1M，可以提高。但是，出于可伸缩性原因，交换不是一个过程，它只是RabbitMQ内置的Mnesia数据库中的一行。在集群中，声明交换会导致它出现在集群的所有节点上，而声明队列只会在其中一个节点上创建它。这解释了为什么交换在节点重新启动或在集群中创建节点后仍然存活，而队列却没有。<p></p><p>警惕流失。在策略2中，如果您创建许多新的队列及其绑定，则无论何时附加消费者，都可能会遇到问题。例如，给定的交流<code>E1…En</code>每当消费者时，向其发布许多消息<code>Cm</code>连接，它将创建从自己的队列到所有<code>E1…En</code>可能会导致问题，具体取决于连接速率。</p><p>为了减轻绑定流失，请考虑从版本2.3.1开始新增的交换到交换绑定。每个消费者都可以拥有自己的二级交易所<code>Ym</code>不能将其自动删除。然后绑定所有<code>E1…En</code>至<code>Ym</code> 。这样，这些绑定始终存在。在这种情况下，每当消费者<code>Cm</code>连接它只需要声明其队列并将该队列绑定到<code>Ym</code> 。如果Ym是一个扇出交换机，它将非常快，并将每个连接的绑定流失率降低到1，而不是每个连接可能降低n。<br></p><p style="text-align:center"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/exchange-exchange.png"><img class="aligncenter size-full wp-image-8355" title="交换到交换绑定" src="http://blog.springsource.com/wp-content/uploads/2011/04/exchange-exchange.png" alt="交换到交换绑定" width="533" height="159" align="center"></a></p><p></p>
+<h2>用例</h2>
+<h3>交换到交换可扩展用例</h3><p>考虑具有自治代理的服务器应用程序。每个代理都在虚拟机上，该虚拟机是弹性伸缩系统的一部分。当每个代理启动时，它会向服务器发送一条消息，表明它已联机，随后还有许多其他消息，例如身份验证和数据传输。如果我们有1,000个代理，每个代理声明50个直接交换，队列和绑定，则每个代理必须知道服务器的队列，才能完成queue.declare操作上的绑定契约。那不是可扩展的解决方案。</p><p>现在考虑创建共享的主题交换：一次用于代理到服务器的交换，另一次用于服务器到代理的交换，第三次处理未经身份验证的代理，该代理仅路由到不需要安全性的那些队列。现在，我们使用绑定模式，消息路由密钥进行分区，并为每台服务器提供一组共享密钥，以供与其连接的所有代理共享。然后，以最简单的形式，当每个代理上线时，它声明一个专用交换和队列，并将其交换绑定到共享主题交换。</p><p>现在，我们之间的关系通过交换到交换的映射来表示，这种映射降低了客户流失率，并使代理不必“知道”服务器队列。使用此模式，系统是干净的，分离的和可伸缩的。<br></p><p style="text-align:center"><a href="http://blog.springsource.com/wp-content/uploads/2011/04/routing-topology.png"><img class="aligncenter size-full wp-image-8374" title="基本路由拓扑" src="http://blog.springsource.com/wp-content/uploads/2011/04/routing-topology.png" alt="" width="926" height="655"></a></p><p></p>
+<h3>弹性扩展用例</h3><p>让我们将前面的场景更进一步。我们已经在场景2上使用了主题pub-sub路由：许多直接路由。现在让我们说，系统需求增加了，以扩展具有50,000个或更多代理的数据中心中服务器应用程序的集群。我们如何节流变化的负载？</p><p>经过身份验证的客户端交换将消息从代理路由到服务器。它处理将消息发布到单个消费者队列的所有操作，包括那些产生消息频率最高的操作。在当前拓扑下，这是一个潜在的瓶颈，对于10,000个客户端而言，每分钟大约有60,000条消息，或者每天有8,640万条消息。这很容易解决，RabbitMQ每天可以处理超过10亿条消息，具体取决于您的配置，例如您是否保留消息。</p><p>我们的服务器应用程序正在运行RabbitMQ集群。请记住，在集群中，声明交换会导致它出现在所有节点上，而声明队列只会在其中一个节点上创建它，因此我们必须配置解决方案。<br></p><h3>生产者与消费者之间的负载平衡</h3><br>为了在更多的客户端应用程序（Agent）联机时有效地处理这些潜在的非常高的负载，我们可以通过几种方式修改此拓扑。首先，对上述配置进行优化，以在Rabbit集群中平衡消息负载。我们可以为Rabbit集群中的每个节点创建一个队列。如果我们有四个节点，则为每个高流量队列创建该操作的hfq。{0,1,2,3}。现在，每个代理都可以按零到三之间的数字（或更复杂的循环实现）随机选择要发布的节点。使用RabbitMQ可以进行RPC调用，或者您可以使用<a title="兔子管理插件" href="https://www.rabbitmq.com/management.html">Rabbit管理插件</a>来获取节点数，您可以在循环算法中使用该节点数。<br><h3>具有循环调度的工作人员队列</h3><br>工作人员队列或任务队列通常用于在多个工作人员之间高效分配耗时的任务并轻松并行化工作。此外，此拓扑适用于消除执行资源密集型任务的需要，并且无需阻塞就可以完成。运行多个工作队列可将这些任务分配到它们之间。<br><p style="text-align:center"><a href="http://blog.springsource.com/wp-content/uploads/2011/03/multiple-consumers.png"><img class="aligncenter size-full wp-image-8325" title="工人队列" src="http://blog.springsource.com/wp-content/uploads/2011/03/multiple-consumers.png" alt="" width="297" height="124"></a></p><br>在默认情况下，对于Worker Queues，Rabbit使用循环分发方法，将每个消息按顺序发送给下一个使用者。每个使用者收到的消息数量大致相同。如果您声明一个队列并启动3个竞争的使用者，将它们绑定到交换机，并发送20,000条消息，则零消息将路由到第一个使用者，消息一个将路由到第二个使用者，消息2将发送到第三个消费者，依此类推。如果我们开始积累任务积压，我们可以简单地增加更多的工作人员，从而使系统易于扩展。<br><h2>性能</h2><br><h3>记忆</h3><br>以上两种选择均未必会在RabbitMQ中引起高负载。可以创建的交换和队列数量没有硬性限制，并且在一个代理上运行100,000个队列就可以了。通过正确的调整和足够的RAM，您可以很好地运行一百万个队列。<p></p><p>RabbitMQ动态地将消息推送到磁盘以释放RAM，因此队列的内存占用量与其内容无关。队列闲置10秒钟或更长时间后，它将“休眠”，从而导致该队列上的GC。结果，队列所需的内存量会大大减少。例如，可能有1000个空的空闲队列占用10MB的RAM。当它们全部处于活动状态时（即使为空），它们当然也可能会消耗更多的内存，具体取决于内存碎片。由于Erlang VM不会立即将内存交还给OS，因此很难迫使它们休眠以测试行为。</p><p>但是，您可以观察到一个休眠且休眠状态非常大的大型进程，因为回收的数量足以迫使VM将内存交还给OS。如果您运行的测试稳定地增加了Rabbit的内存占用量，则您会观察到休眠对空闲进程的影响，因为它降低了内存使用率。</p><p>Erlang是利用多核的多线程VM。它向开发人员提供了称为“进程”的绿色线程，因为与线程不同，它们在概念上不共享地址空间。这是有关<a href="http://www.infoq.com/news/2011/04/erlang-copied-jvm-and-scala" target="_new">Erlang VM和Processes的</a>一个有趣的表白。<br></p><h3>交易次数</h3><br>10,000条消息的交易最多可能需要四分钟才能发布。名为<a href="https://www.rabbitmq.com/blog/2011/02/10/introducing-publisher-confirms/">Publisher Confirms的</a> RabbitMQ新功能比相同但可事务处理的代码快100倍以上。如果不明确要求您执行事务，但确实需要验证，则可以考虑使用此选项。<br><h2>外卖</h2><br>以下是一些最终要点，可帮助您从实现中获得最大的性能收益：<br><ul><br> <li>新的主题路由算法优化最高可快60倍</li><br> <li>使用<em>与单个单词匹配的通配符' <em>'进行主题绑定的方式<em>要比与零或多个单词匹配的'＃'快得多。通配符'＃'在路由表中的处理时间比'</em> '</em></em></li><em><em><br> <li>交换交换绑定可改善解耦，增加拓扑灵活性，减少绑定流失并帮助提高性能</li><br> <li>交换和绑定非常轻巧</li><br> <li>RabbitMQ Publisher确认比AMQP交易快100倍以上</li><br> <li>队列闲置时间大于等于10秒后，它将“休眠”，从而导致队列上出现GC，从而导致该队列所需的内存显着减少</li><br> <li>工作人员队列有助于并行化和分配工作负载</li><br> <li>在Rabbit集群中分配工作队列有助于扩展</li><br> <li>负载均衡您的拓扑</li><br></em></em></ul><em><em><br>这绝不是关于该主题的论文，确实确实有更多的模式，拓扑和性能细节需要考虑。一如既往，一项策略取决于许多因素，但我希望这种策略能够囊括全部内容，以帮助或至少朝正确的方向思考。<br><h2>得到它</h2><br><a href="https://github.com/rabbitmq">GitHub上的RabbitMQ源</a><br><a href="https://www.rabbitmq.com/download.html">RabbitMQ二进制下载和插件</a><br><a href="http://www.erlang.org/download.html">Erlang下载</a><br>适用于Java和.NET的RabbitMQ的<a href="http://www.springsource.org/spring-amqp">Spring AMQP</a> API<br><a href="http://www.hyperic.com/downloads">Hyperic监视RabbitMQ</a><br>马文<br><blockquote><code><br><dependency><br><groupId>com.rabbitmq</groupId><br><artifactId>amqp-client</artifactId><br><version>${rabbitmq.version}</version><br><exclusions><br><exclusion><br><groupId>commons-cli</groupId><br><artifactId>commons-cli</artifactId><br></exclusion><br></exclusions><br></dependency><br><dependency><br><groupId>commons-io</groupId><br><artifactId>commons-io</artifactId><br></dependency><br></code></blockquote><p></p></em></em></div><em><em>
+</em></em></div><em><em>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 404;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</em></em></article><em><em>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</em></em></div><em><em>
+</em></em></div><em><em>
+</em></em></div><em><em>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</em></em></div><em><em>
+</em></em></body></html>

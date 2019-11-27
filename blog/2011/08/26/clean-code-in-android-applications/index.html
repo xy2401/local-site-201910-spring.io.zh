@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
 <title>Android应用程序中的干净代码</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Clean Code in Android Applications">
-<meta name="twitter:description" href="http://www.informationweek.com/news/231000573" content="<p>Let's say you wake up one morning, and think, " hey,="" i'm="" going="" to="" build="" an="" android="" app="" today="="></head><body dir="ltr">activated every day, outpacing even the iPhone. That means there is a large, potential audience for your app. Additionally, Android is built with Java. This may not seem like a big deal, but I have worked in <a href="http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html">Objective-C</a> on the <a href="http://developer.apple.com/technologies/ios/">iOS platform</a> for a few years, and while I am now quite comfortable with it, the <a href="http://developer.apple.com/devcenter/ios/index.action">iOS SDK</a> offered a steeper learning curve than I experienced with Android. Android just felt more accessible when I first started working with the <a href="http://developer.android.com/sdk/index.html">Android SDK</a>. That said, there are some clear differences from any other Java application you have built in the past, and I'll go over some of those in the first section.
+<meta name="twitter:description" href="http://www.informationweek.com/news/231000573" content="<p>Let's say you wake up one morning, and think, " hey,="" i'm="" going="" to="" build="" an="" android="" app="" today="=">activated every day, outpacing even the iPhone. That means there is a large, potential audience for your app. Additionally, Android is built with Java. This may not seem like a big deal, but I have worked in <a href="http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html">Objective-C</a> on the <a href="http://developer.apple.com/technologies/ios/">iOS platform</a> for a few years, and while I am now quite comfortable with it, the <a href="http://developer.apple.com/devcenter/ios/index.action">iOS SDK</a> offered a steeper learning curve than I experienced with Android. Android just felt more accessible when I first started working with the <a href="http://developer.android.com/sdk/index.html">Android SDK</a>. That said, there are some clear differences from any other Java application you have built in the past, and I'll go over some of those in the first section.
 ">
 <meta name="twitter:creator" content="@royclarkson">
 <meta name="twitter:image:src" content="https://gravatar.com/avatar/55c978494c708e62f4b76bde1e0dcc19?s=200">
@@ -37,10 +41,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -171,16 +177,16 @@
 <p>在这篇博客文章中，我将概述Android及其应用程序的生命周期，并讨论该框架施加的一些限制。我还将回顾一些技术和第三方项目，这些技术和第三方项目可帮助您清理Android代码，并专注于您希望通过应用程序实现的目标。</p>
 <h3>Android总览</h3>
 <p>让我们先简要概述一下Android的工作方式。Android应用程序（应用程序）是使用Java构建的，并已编译为类文件。然后将类文件编译为Dalvik可执行（DEX）格式，因此它们可以在Android使用的Dalvik虚拟机上运行。转换为DEX格式后，将类文件压缩到Android包（APK）中以分发到设备。由于使用了DEX格式，Dalvik VM不是真正的Java虚拟机，因为它不能对Java字节码进行操作。此外，Dalvik VM基于其核心类库的Apache Harmony项目的子集。这意味着您可以使用Java SE习惯的许多类和方法，但是当然不是全部。我发现<a href="https://developer.android.com/index.html">Android开发人员网站</a>上的<a href="https://developer.android.com/reference/packages.html">API参考</a>是检查这些差异的宝贵资源。</p>
-<p>默认情况下，Android操作系统为每个Android应用程序分配了唯一的Linux用户ID。由系统启动时，应用程序将在其自己的虚拟机（VM）中以其自己的Linux进程运行。在需要时，系统管理此过程的启动和关闭。您可能会猜到，这意味着每个应用程序都与其他正在运行的应用程序隔离运行。安装后，应用程序可以请求访问硬件功能或与其他应用程序进行交互的权限。用户选择授予这些权限给该应用程序或不安装它。应用程序所需或请求的权限在每个应用程序的Android清单文件中定义。这是一个XML文件，其中列出了应用程序的所有组件以及这些组件的所有设置。四种类型的应用程序组件都是<a href="https://developer.android.com/reference/android/app/Activity.html">活动</a> ， <a href="https://developer.android.com/reference/android/app/Service.html">服务</a> ， <a href="https://developer.android.com/reference/android/content/ContentProvider.html">内容提供商</a>和<a href="https://developer.android.com/reference/android/content/BroadcastReceiver.html">广播接收机</a> 。就此职位而言，我将重点关注活动。</p>
-<p>活动基本上代表一个Android应用程序的单个屏幕。例如，Twitter应用程序可能具有登录屏幕，带有推文列表的屏幕以及用于创作新推文的屏幕。这些屏幕中的每个屏幕代表应用程序内的不同活动。作为开发人员，您永远不会自己实例化活动对象。通过发送称为<a href="https://developer.android.com/reference/android/content/Intent.html">Intent</a>的异步消息来激活活动，如以下示例所示。</p>
-<pre><code class="prettyprint java"><br>startActivity(new Intent(context, HomeActivity.class));
+<p>默认情况下，Android操作系统为每个Android应用程序分配了唯一的Linux用户ID。由系统启动时，应用程序将在其自己的虚拟机（VM）中以其自己的Linux进程运行。在需要时，系统管理此过程的启动和关闭。您可能会猜到，这意味着每个应用程序都与其他正在运行的应用程序隔离运行。安装后，应用程序可以请求访问硬件功能或与其他应用程序进行交互的权限。用户选择授予这些权限给该应用程序或不安装它。应用程序所需或请求的权限在每个应用程序的Android清单文件中定义。这是一个XML文件，其中列出了应用程序的所有组件以及这些组件的所有设置。应用程序组件的四种类型是<a href="https://developer.android.com/reference/android/app/Activity.html">活动</a> ， <a href="https://developer.android.com/reference/android/app/Service.html">服务</a> ， <a href="https://developer.android.com/reference/android/content/ContentProvider.html">内容提供者</a>和<a href="https://developer.android.com/reference/android/content/BroadcastReceiver.html">广播接收者</a> 。就此职位而言，我将重点关注活动。</p>
+<p>活动基本上代表了Android应用程序的单个屏幕。例如，Twitter应用程序可能具有登录屏幕，带有推文列表的屏幕以及用于创作新推文的屏幕。这些屏幕中的每个屏幕代表应用程序内的不同活动。作为开发人员，您永远不会自己实例化活动对象。通过发送称为<a href="https://developer.android.com/reference/android/content/Intent.html">Intent</a>的异步消息来激活活动，如以下示例所示。</p>
+<pre><code class="prettyprint java"><br />startActivity(new Intent(context, HomeActivity.class));
 </code></pre>
 <p>调用<a href="https://developer.android.com/reference/android/content/Context.html#startActivity%28android.content.Intent%29">startActivity（Intent intent）时</a> ，系统要么创建一个新实例，要么重用一个现有实例，以便向用户显示活动。重要的一点是，系统控制应用程序和每个活动的启动和停止以及创建和销毁。如果要与此过程进行交互，则应用程序和活动类提供针对不同<a href="https://developer.android.com/reference/android/app/Activity.html#ActivityLifecycle">生命周期事件的</a>方法，您可以在子类中重写这些方法。</p>
 <h3>依赖注入</h3>
-<p><a href="http://www.springsource.org/spring-android">Spring Android</a>项目最近达到了其<a href="http://www.springsource.org/spring-android/news/1.0.0.m4-released">第四个里程碑</a>版本。在该版本中，我们继续改进了对Android的<a href="http://static.springsource.org/spring-android/docs/1.0.x/reference/html/rest-template.html">RestTemplate</a>和<a href="http://www.springsource.org/spring-social">Spring Social</a>支持，从而简化了发出RESTful HTTP请求和访问由<a href="https://oauth.net/">OAuth</a>保护的REST API的过程。尽管我们认为这些是对Android开发的宝贵补充，但一些开发人员已经询问了有关Spring Android中依赖注入支持的可能性的问题，因为您可能已经知道， <a href="http://www.springsource.org/about">Spring Framework</a>已经提供了一个流行的Inversion of Control（IOC）容器，用于在企业Java应用程序中启用依赖项注入。在Android春季计划的早期，依赖注入支持被确定为可能包含在项目中的候选对象。在那时，尚不清楚该支持将包括什么以及如何实施。因此，我开始研究和调查在Android中执行依赖注入的可能方法和局限性。</p><p></p><p>那么，什么是依赖注入？如果您问两个不同的开发人员，您可能会得到两个不同的答案。您可能会听到有关IOC，XML文件，注释或其他一些实现细节的信息。实际上，依赖注入只是通过将对象需要处理的工作交给对象而不是使对象伸入其环境中来减少耦合的技术。这听起来很容易，您可能会想自己已经可以使用类构造函数和setter方法来做到这一点，这是完全正确的。然而，从上面的概述部分召回，Android系统驱动的应用程序生命周期，所以我们可以做到这一点的<strong>方式</strong>是有限的。</p>
+<p><a href="http://www.springsource.org/spring-android">Spring Android</a>项目最近达到了其<a href="http://www.springsource.org/spring-android/news/1.0.0.m4-released">第四个里程碑</a>版本。在该版本中，我们继续改进了对Android的<a href="http://static.springsource.org/spring-android/docs/1.0.x/reference/html/rest-template.html">RestTemplate</a>和<a href="http://www.springsource.org/spring-social">Spring Social</a>支持，从而简化了发出RESTful HTTP请求和访问由<a href="https://oauth.net/">OAuth</a>保护的REST API的过程。尽管我们认为这些是对Android开发的宝贵补充，但一些开发人员已经询问了有关Spring Android中依赖注入支持的可能性的问题，因为您可能已经知道， <a href="http://www.springsource.org/about">Spring Framework</a>已经提供了一个流行的Inversion of Control（IOC）容器，用于在企业Java应用程序中启用依赖项注入。在Android春季计划的早期，依赖注入支持被确定为可能包含在项目中的候选对象。在那时，尚不清楚该支持将包括什么以及如何实施。因此，我开始研究和调查在Android中执行依赖注入的可能方法和局限性的过程。</p><p></p><p>那么，什么是依赖注入？如果您问两个不同的开发人员，您可能会得到两个不同的答案。您可能会听到有关IOC，XML文件，注释或其他一些实现细节的信息。实际上，依赖项注入只是通过将对象需要处理的工作交给对象而不是使对象伸入其环境中来减少耦合的技术。这听起来很容易，您可能会想自己已经可以使用类构造函数和setter方法来实现这一点，这是完全正确的。然而，从上面的概述部分召回，Android系统驱动的应用程序生命周期，所以我们可以做到这一点的<strong>方式</strong>是有限的。</p>
 <h4>Android方式</h4>
-<p>在不使用任何第三方库的情况下，将依赖项传递给Activity相当容易。如前所述，系统创建应用程序实例。因此，通过扩展应用程序，您可以有效地创建单例依赖项实例，然后可由应用程序中的任何活动对其进行访问。</p>
-<pre><code class="prettyprint java"><br>public class MainApplication extends Application  {
+<p>在不使用任何第三方库的情况下，将依赖项传递给Activity相当容易。如前所述，系统创建应用程序实例。因此，通过扩展应用程序，您可以有效地创建单例依赖项实例，然后可以通过应用程序中的任何活动对其进行访问。</p>
+<pre><code class="prettyprint java"><br />public class MainApplication extends Application  {
 
     private MyService service;
 
@@ -196,7 +202,7 @@
 }
 </code></pre>
 <p>活动类具有一个名为<a href="https://developer.android.com/reference/android/app/Activity.html#getApplication%28%29">getApplication（）</a>的方法，该方法返回对拥有活动的应用程序对象的引用。我们只需将其转换为MainApplication，就可以访问MyService的getter方法。当然，现在该活动必须“了解”该应用程序，这似乎是一个缺点。但是请记住，该活动已经知道其应用程序。该方法是内置的。</p>
-<pre><code class="prettyprint java"><br>public class MainActivity extends Activity  {
+<pre><code class="prettyprint java"><br />public class MainActivity extends Activity  {
 
     private MyService service;
 
@@ -209,11 +215,11 @@
 }
 </code></pre>
 <h4>机器人指南</h4>
-<p><a href="https://code.google.com/p/roboguice/">RoboGuice</a>项目利用Google的<a href="https://code.google.com/p/google-guice/">Guice</a>库向Android添加依赖项注入支持。Guice本身有两种版本，带有和不带有AOP（面向方面编程）的支持。在内部，标准Guice依靠字节码生成来执行方法拦截。但是，Android不支持运行时字节码生成，因此RoboGuice依赖于没有AOP的Guice版本。让我们看一下如何使用RoboGuice实现前面的示例。要添加自定义绑定，必须实现从<a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/application/RoboApplication.html">RoboApplication</a>扩展的Application对象。然后，您重写<a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/application/RoboApplication.html#addApplicationModules%28java.util.List%29">addApplicationModules（…）</a>方法，并添加一个绑定对象的模块实例。</p>
-<pre><code class="prettyprint java"><br>public class MainApplication extends RoboApplication {
+<p><a href="https://code.google.com/p/roboguice/">RoboGuice</a>项目利用Google的<a href="https://code.google.com/p/google-guice/">Guice</a>库向Android添加依赖项注入支持。Guice本身有两种版本，带有和不带有AOP（面向方面的编程）支持。在内部，标准Guice依靠字节码生成来执行方法拦截。但是，Android不支持运行时字节码生成，因此RoboGuice依赖于没有AOP的Guice版本。让我们看一下如何使用RoboGuice实现前面的示例。要添加自定义绑定，必须实现从<a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/application/RoboApplication.html">RoboApplication</a>扩展的Application对象。然后，您重写<a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/application/RoboApplication.html#addApplicationModules%28java.util.List%29">addApplicationModules（…）</a>方法，并添加一个绑定对象的模块实例。</p>
+<pre><code class="prettyprint java"><br />public class MainApplication extends RoboApplication {
 
     @Override
-    protected void addApplicationModules(List<Module> modules) {
+    protected void addApplicationModules(List&lt;Module&gt; modules) {
         // add your module with custom bindings
         modules.add(new MainModule());
     }
@@ -225,7 +231,7 @@
 }
 </code></pre>
 <p><a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/config/AbstractAndroidModule.html">AbstractAndroidModule</a>是标准Guice AbstractModule的扩展。重写<a href="https://google-guice.googlecode.com/svn/tags/2.0/javadoc/com/google/inject/AbstractModule.html#configure%28%29">configure（）</a>方法以指定绑定：</p>
-<pre><code class="prettyprint java"><br>public class MainModule extends AbstractAndroidModule {
+<pre><code class="prettyprint java"><br />public class MainModule extends AbstractAndroidModule {
 
     @Override
     protected void configure() {
@@ -234,7 +240,7 @@
 }
 </code></pre>
 <p>每个活动都必须继承自<a href="https://roboguice.googlecode.com/hg/roboguice/docs/apidocs/roboguice/activity/RoboActivity.html">RoboActivity，</a>以便可以进行注入：</p>
-<pre><code class="prettyprint java"><br>public class MainActivity extends RoboActivity {
+<pre><code class="prettyprint java"><br />public class MainActivity extends RoboActivity {
 
 	@Inject 
 	MyService service;
@@ -246,7 +252,7 @@
 }
 </code></pre>
 <p>这个示例并不太令人印象深刻，因为它需要更多代码才能完成类似的任务。RoboGuice接线在包含多个域模块的大型应用程序中变得更加有用，这些模块封装了可观的业务逻辑。同样，它提供的用于注入视图，资源和系统服务的支持通常很有用。您可以在下面的示例中看到这一点。第一个示例说明了标准的android方法，而第二个示例则使用了RoboGuice。如您所见，RoboGuice允许您消除许多样板查找代码。</p>
-<pre><code class="prettyprint java"><br>public class MyActivity extends Activity {
+<pre><code class="prettyprint java"><br />public class MyActivity extends Activity {
 	
     private TextView label;
     
@@ -264,7 +270,7 @@
     }
 }
 </code></pre>
-<pre><code class="prettyprint java"><br>public class MyActivity extends RoboActivity {
+<pre><code class="prettyprint java"><br />public class MyActivity extends RoboActivity {
 	
     @InjectView(R.id.mylabel)
     TextView label;
@@ -282,14 +288,14 @@
     }
 }
 </code></pre>
-<p>在这里，关于编程模型的其他一些事情对我来说是个惊喜。以前我们从标准android类扩展，现在我们从RoboGuice特定变体扩展。这使我们回到有关Android体系结构的上一节。子类化框架特定类型是必需的，因为第三方框架可以挂接到Android应用程序生命周期中的方式受到限制。另外，注入是在运行时执行的，这带来了性能和占用空间的成本。最后，值得注意的是，最新发布的版本是基于Guice 2.0构建的。我的理解是Guice 3.0的更新正在进行中。</p>
-<p>我目前还不确定RoboGuice的优势是否足以确保您的应用程序与第三方框架紧密结合。通常，我已经发现实施我自己的手动依赖项注入技术已经足够好了，如上一节所述，并在<a href="https://github.com/SpringSource/greenhouse-android">Greenhouse</a>参考应用程序中进行了演示。此外，Guice本身并不小，为您的应用程序增加了约400 KB的大小。RoboGuice项目页面甚至在配置<a href="https://developer.android.com/guide/developing/tools/proguard.html">ProGuard</a>减小应用程序大小时<a href="https://code.google.com/p/roboguice/wiki/ProGuard">对此</a>进行<a href="https://code.google.com/p/roboguice/wiki/ProGuard">了讨论</a> 。虽然配置ProGuard不一定很简单，但是无论您是否使用RoboGuice，在任何应用程序上使用ProGuard也是一个好习惯。</p>
+<p>在这里，关于编程模型的其他一些事情对我来说是个惊喜。以前我们从标准android类扩展，现在我们从RoboGuice特定变体扩展。这使我们回到有关Android体系结构的上一节。子类化框架特定类型是必需的，因为第三方框架挂接到Android应用程序生命周期的方式受到限制。另外，注入是在运行时执行的，这带来了性能和占用空间的成本。最后，值得注意的是，最新发布的版本是基于Guice 2.0构建的。我的理解是Guice 3.0的更新正在进行中。</p>
+<p>目前，我还不确定RoboGuice的优势是否足以确保您的应用程序与第三方框架紧密结合。通常，我已经发现实施我自己的手动依赖项注入技术已经足够好了，如上一节所述，并在<a href="https://github.com/SpringSource/greenhouse-android">Greenhouse</a>参考应用程序中进行了演示。另外，Guice本身并不小，为应用程序增加了约400 KB的大小。RoboGuice项目页面甚至在配置<a href="https://developer.android.com/guide/developing/tools/proguard.html">ProGuard</a>减小应用程序大小时<a href="https://code.google.com/p/roboguice/wiki/ProGuard">对此</a>进行<a href="https://code.google.com/p/roboguice/wiki/ProGuard">了讨论</a> 。虽然配置ProGuard不一定很简单，但无论是否使用RoboGuice，在任何应用程序上使用ProGuard也是一个好习惯。</p>
 <h3>超越依赖注入</h3>
 <p>我们已经介绍了依赖项注入和RoboGuice，并讨论了该项目方法的优缺点。这篇文章的标题是关于Android中的干净代码以及如何减少冗余的信息，因此，让我们现在超越依赖注入，并讨论其他一些技术。
 </p><h4>Android注释</h4>
-<a href="https://code.google.com/p/androidannotations/">Android Annotations</a>是由Pierre-Yves Ricau发起并维护的项目。通过使用annotation，该项目的目标专门是帮助减少Android项目中的样板代码量。它并不是要成为通用的依赖注入框架，并且实际上可以与RoboGuice并肩工作。有一些重叠之处，因为Android注释为注入视图和资源提供了一些类似的注释，但是它还提供了许多其他有用的功能。主要的区别是，Android的注解<a href="https://code.google.com/p/androidannotations/wiki/HowItWorks">生成样本代码</a>在编译时，所以没有运行时处罚使用它。它通过生成每个活动的子类并用标准样板代码替换注释来实现。此方法的一个小缺点是，必须在清单文件中的每个活动的名称后加上下划线。例如，如果我创建一个MyActivity类，则Android Annotations将生成一个相应的MyActivity_类。此外，startActivity（...）中的任何引用也必须更新以使用新类。<p></p>
-<p>在这里，您可以看到与RoboGuice的相似之处。这是先前RoboGuice示例的Android注释版本。请注意，在类上使用@EActivityannotation可让您设置活动的布局。另一个不错的感觉是，如果您在注释中省略了资源ID，则Android Annotations将查找与变量名称匹配的资源ID。</p>
-<pre><code class="prettyprint java"><br>@EActivity(R.layout.myactivity) // Sets content view to R.layout.myactivity
+<a href="https://code.google.com/p/androidannotations/">Android Annotations</a>是由Pierre-Yves Ricau发起并维护的项目。通过使用批注，该项目的目标专门是帮助减少Android项目中的样板代码量。它并不是要成为通用的依赖注入框架，并且实际上可以与RoboGuice并肩工作。有一些重叠之处，因为Android注释为注入视图和资源提供了一些类似的注释，但是它还提供了许多其他有用的功能。主要区别在于Android Annotations在编译时会<a href="https://code.google.com/p/androidannotations/wiki/HowItWorks">生成样板代码</a> ，因此使用它不会产生运行时间损失。它通过生成每个活动的子类并用标准样板代码替换注释来实现。此方法的一个小缺点是，必须在清单文件中的每个活动的名称后加上下划线。例如，如果我创建一个MyActivity类，则Android Annotations将生成一个相应的MyActivity_类。此外，startActivity（...）中的任何引用也必须更新以使用新类。<p></p>
+<p>在这里，您可以看到与RoboGuice的相似之处。这是先前RoboGuice示例的Android注释版本。请注意，在类上使用@EActivity批注可让您设置活动的布局。另一个不错的感觉是，如果您从注释中省略了资源ID，则Android Annotations将查找与变量名称匹配的资源ID。</p>
+<pre><code class="prettyprint java"><br />@EActivity(R.layout.myactivity) // Sets content view to R.layout.myactivity
 public class MyActivity extends Activity {
 
     @InjectView  // Injects R.id.mylabel
@@ -312,7 +318,7 @@ public class MyActivity extends Activity {
 <li>穿线</li>
 </ul>
 <p>以下是一些可能的例子。我想强调一下click事件处理和线程支持，因为它们确实说明了库的功能。</p>
-<pre><code class="prettyprint java"><br>public class AnotherActivity extends Activity {
+<pre><code class="prettyprint java"><br />public class AnotherActivity extends Activity {
 
     @Click // When R.id.runProcess button is clicked 
     void runProcess() {
@@ -331,11 +337,11 @@ public class MyActivity extends Activity {
     }
 }
 </code></pre>
-<p>某些开发人员可能会因为使用代码生成而被关闭，但是考虑到Android体系结构的局限性，Android注释提供了一种优雅的方法来最大程度地减少样板代码的使用，从而帮助您专注于业务逻辑，而不会增加运行时的占用空间。</p>
+<p>某些开发人员可能会因为使用代码生成而被关闭，但是考虑到Android体系结构的局限性，Android Annotations提供了一种优雅的方法来最大程度地减少样板代码的使用，从而帮助您专注于业务逻辑，而不会增加运行时的占用空间。</p>
 <h4>Android绑定</h4>
-<p>我想谈的最后一个项目是<a href="https://code.google.com/p/android-binding/">Android Binding</a> 。Android绑定是<a href="https://en.wikipedia.org/wiki/Model_View_ViewModel">MVVM</a> （Model-View-ViewModel）框架，旨在将活动与直接在用户界面上工作分开。为此，几乎所有代码都移出了Android活动类，并放置在ViewModel对象中，这旨在帮助实现可测试性。ViewModel对象可处理视图（布局）的所有事件和数据，但它并不紧密耦合于此。视图中发生的事件将作为命令发送到ViewModel。这些命令然后执行一些业务逻辑，并可能与模型交互，并更新ViewModel的属性，以便View可以绑定到它们。如果您曾经使用过.Net，那么数据绑定的概念将对您非常熟悉，因此Android Binding致力于将该概念应用于Android。Android Binding已启动，并由<a href="https://andytsui.wordpress.com/">Andy Tsui</a>维护。它仍然很年轻，缺乏文档，但是有一些不错的潜力。</p>
+<p>我想谈的最后一个项目是<a href="https://code.google.com/p/android-binding/">Android Binding</a> 。Android绑定是<a href="https://en.wikipedia.org/wiki/Model_View_ViewModel">MVVM</a> （Model-View-ViewModel）框架，旨在将活动与直接在用户界面上工作分开。为此，几乎所有代码都移出了Android活动类，并放置在ViewModel对象中，这旨在帮助实现可测试性。ViewModel对象可处理视图（布局）的所有事件和数据，但它并不紧密耦合于此。视图中发生的事件将作为命令发送到ViewModel。这些命令然后执行一些业务逻辑，并可能与模型交互，并更新ViewModel的属性，以便View可以绑定到它们。如果您曾经使用过.Net，那么数据绑定的概念对您将非常熟悉，因此Android Binding努力将这一概念应用于Android。Android Binding已启动，并由<a href="https://andytsui.wordpress.com/">Andy Tsui</a>维护。它仍然很年轻，缺乏文档，但是有一些不错的潜力。</p>
 <p>下面的示例显示了从BindingActivity扩展的EmailActivity。从BindingActivity扩展时，可以使用setAndBindRootView（…）方法为视图设置模型：</p>
-<pre><code class="prettyprint java"><br>public class EmailActivity extends BindingActivity {
+<pre><code class="prettyprint java"><br />public class EmailActivity extends BindingActivity {
 
     private EmailViewModel model;
 
@@ -348,40 +354,40 @@ public class MyActivity extends Activity {
 }
 </code></pre>
 <p>下一个示例片段显示了视图声明。对我来说，这是非常有趣的部分。查看此布局文件，您可以看到“ binding”属性的添加以及自定义的“ binding” xmlns声明。此示例显示了绑定两个文本字段和一个按钮，但是该项目支持绑定到许多其他<a href="https://code.google.com/p/android-binding/wiki/BindableAttributes">控件。</a> 。</p>
-<pre><code class="prettyprint xml"><br><?xml version="1.0" encoding="utf-8"?>
-<LinearLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:binding="http://www.gueei.com/android-binding"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+<pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;LinearLayout 
+    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:binding=&quot;http://www.gueei.com/android-binding&quot;
+    android:orientation=&quot;vertical&quot;
+    android:layout_width=&quot;fill_parent&quot;
+    android:layout_height=&quot;fill_parent&quot;&gt;
     		
-    <EditText
-        android:id="@+id/subject"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        binding:text="subject"
-    />
+    &lt;EditText
+        android:id=&quot;@+id/subject&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        binding:text=&quot;subject&quot;
+    /&gt;
 		
-    <EditText
-        android:id="@+id/message"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        binding:text="message"
-    />
+    &lt;EditText
+        android:id=&quot;@+id/message&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        binding:text=&quot;message&quot;
+    /&gt;
 	
-    <Button
-        android:id="@+id/submit"
-        android:text="Submit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        binding:onClick="submit"
-    />
+    &lt;Button
+        android:id=&quot;@+id/submit&quot;
+        android:text=&quot;Submit&quot;
+        android:layout_width=&quot;fill_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        binding:onClick=&quot;submit&quot;
+    /&gt;
 	
-</LinearLayout>
+&lt;/LinearLayout&gt;
 </code></pre>
 <p>最后，EmailViewModel包含视图的数据和控制逻辑。下面的摘录显示了文本字段值的“可观察对象”，以及单击“提交”按钮时执行的命令：</p>
-<pre><code class="prettyprint java"><br>public class EmailViewModel {
+<pre><code class="prettyprint java"><br />public class EmailViewModel {
 
     @Required
     public StringObservable subject = new StringObservable();
@@ -401,16 +407,17 @@ public class MyActivity extends Activity {
     };
 }
 </code></pre>
-<p>除了我在这里包含的内容之外，这个库还有更多内容。它还包括支持<a href="https://code.google.com/p/android-binding/wiki/ModelValidation">模型验证</a>通过使用一组注释的。有一些内置的规则，您可以使用RegEx模式匹配以及实现自己的自定义规则。最新版本还增加了对<a href="https://code.google.com/p/android-binding/wiki/OptionsMenu">绑定到“选项”菜单的</a>支持。</p>
+<p>除了我在这里包含的内容之外，这个库还有更多内容。它还包括通过使用一组注释对<a href="https://code.google.com/p/android-binding/wiki/ModelValidation">模型验证的</a>支持。有一些内置的规则，您可以使用RegEx模式匹配以及实现自己的自定义规则。最新版本还增加了对<a href="https://code.google.com/p/android-binding/wiki/OptionsMenu">绑定到“选项”菜单的</a>支持。</p>
 <p>与RoboGuice一样，Android绑定也是基于运行时的，并且要求您从特定的Activity基类进行扩展。对具体继承的这种依赖可能会使在同一应用程序中同时使用RoboGuice和Binding变得困难。我认为绑定的真正亮点是在具有数据输入和验证要求的大型业务应用程序中。声明性<a href="https://code.google.com/p/android-binding/wiki/BindingSyntax">xml绑定语法</a>非常不错。我不熟悉其他执行此操作的项目，它显示了有关Android开发的新观点。</p>
 <h3>总结思想</h3>
 <p>所有这些技术和项目都在努力在Android框架内实现已知的设计模式。这是一个值得实现的目标，因为如果正确应用这些模式，可以帮助我们更好地构造应用程序。一般来说，当我采用一种新的平台或语言时，我会尝试使用SDK首先提供的功能。从那里，我可以决定是使用第三方库还是应用特定的设计模式。我关心的一个问题是，有时在一种情况或技术下效果很好的设计模式或构想不能很好地转化为另一种情况。尽管Android架构存在局限性，本文中突出显示的技术和项目仍可以成功帮助您编写更简洁的代码。</p>
-<p>在本文中讨论的所有方法中，我对Android Annotations最为感兴趣。我喜欢它，因为它旨在使您的代码保持干净和可读性，而不会牺牲性能或使用其他资源。由于它会在编译时生成标准的Android代码，因此，您无需调试第三方库即可调试应用程序。<a href="http://www.springsource.org/roo">Spring Roo</a>采用了非常类似的方法，除了它的代码生成模型基于AspectJ而不是<a href="https://download.oracle.com/javase/6/docs/technotes/guides/apt/index.html">Java Annotation处理</a> 。看看Android Annotations项目是否可以集成到Spring Roo插件中，将是一件令人兴奋的事情。这将使社区能够创建新的Roo命令来支持Android项目和类型等。另外，由于Roo使用AspectJ编译时编织，因此可以消除对使用下划线命名生成的单独类的需求。</p>
+<p>在本文中讨论的所有方法中，我对Android Annotations最为感兴趣。我喜欢它，因为它旨在使您的代码保持干净和可读性，而不会牺牲性能或使用其他资源。由于它会在编译时生成标准的Android代码，因此，您无需调试第三方库即可调试应用程序。<a href="http://www.springsource.org/roo">Spring Roo</a>采用了非常相似的方法，除了它的代码生成模型基于AspectJ而不是<a href="https://download.oracle.com/javase/6/docs/technotes/guides/apt/index.html">Java Annotation处理</a> 。看看Android Annotations项目是否可以集成到Spring Roo插件中，将是一件令人兴奋的事情。这将使社区能够创建新的Roo命令来支持Android项目和类型等。另外，由于Roo使用AspectJ编译时编织，因此可以消除对使用下划线命名生成的单独类的需求。</p>
 <p>总之，我已经说明了一些技术和第三方库的使用，以帮助消除样板代码并简化Android应用程序的开发过程。是的，准备环境需要一些设置。但是，收益可能会超过初始投资。我建议将一些时间花在这些项目和技术上。他们每个人都对Android开发提供了独特而有价值的观点。</p>
 <p>谢谢阅读！我非常希望听到您的反馈。您如何看待本文中讨论的库-您在使用它们吗？您是否还需要其他库？您会在基于Android Annotations项目构建的Android Roo插件中找到价值吗？</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 433;
 
       (function(disqus_shortname, document) {
@@ -424,7 +431,8 @@ public class MyActivity extends Activity {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -462,12 +470,14 @@ public class MyActivity extends Activity {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

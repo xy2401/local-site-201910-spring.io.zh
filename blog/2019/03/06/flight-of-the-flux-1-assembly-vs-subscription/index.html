@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>助焊剂1的飞行-组装vs订阅</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Flight of the Flux 1 - Assembly vs Subscription">
-<meta name="twitter:description" content="<p>This blog post is the first in a series of posts that aim at providing a deeper look into <a href=" https:="" ="" github.com="" reactor="" reactor-cor="="></head><body dir="ltr">Reactor’s more advanced concepts and inner workings.
+<meta name="twitter:description" content="<p>This blog post is the first in a series of posts that aim at providing a deeper look into <a href=" https:="" ="" github.com="" reactor="" reactor-cor="="></head><body >Reactor’s more advanced concepts and inner workings.
 <p>It is derived from my <code>Flight of the Flux</code> talk, which content I found to be more adapted to a blog post format.</p>
 <p>I’ll update the table below with links when the other posts are published, but here is the planned content:</p>
 <ol> 
@@ -57,10 +61,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -186,108 +192,108 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>这篇博客文章是一系列文章的第一篇，旨在深入了解<a href="https://github.com/reactor/reactor-core">Reactor</a>的更高级概念和内部工作原理。</p>
-<p>它源自我的《 <code>Flight of the Flux</code>演讲，我发现该内容更适合于博客文章格式。</p>
+<div class="blog--post"><p>该博客文章是一系列文章的第一篇，旨在深入了解<a href="https://github.com/reactor/reactor-core">Reactor</a>的更高级概念和内部工作原理。</p>
+<p>它是从我的<code>Flight of the Flux</code>对话，我发现哪些内容更适合博客文章格式。</p>
 <p>发布其他帖子时，我将使用链接更新下表，但这是计划的内容：</p>
 <ol>
 <li>程序集与订阅（本文）</li>
 <li><a href="https://spring.io/blog/2019/04/16/flight-of-the-flux-2-debugging-caveats">调试警告</a></li>
 <li>并发不可知论</li>
-<li>调度和<code>publishOn</code> VS <code>subscribeOn</code></li>
+<li>调度程序和<code>publishOn</code>与<code>subscribeOn</code></li>
 <li>内部工作：偷工作</li>
 <li>内部工作原理：操作员融合</li>
 </ol>
-<p>如果你错过了介绍<em>无流</em>和电抗器的基本概念，伸头网站的<a href="https://projectreactor.io/learn">学习部分</a>和<a href="https://projectreactor.io/docs/core/release/reference">参考指南</a> 。</p>
+<p>如果您缺少对<em>反应式流</em>的介绍和Reactor的基本概念，请访问该站点的<a href="https://projectreactor.io/learn">学习部分</a>和<a href="https://projectreactor.io/docs/core/release/reference">参考指南</a> 。</p>
 <p>事不宜迟，让我们进入：</p><h2><a href="#assembly-time" class="anchor" name="assembly-time"></a>装配时间</h2>
-<p>当您第一次了解JVM上的<em>响应</em> <em>式流</em>和<em>响应式编程</em>时，您首先了解的是<code>Publisher</code>和<code>Subscriber</code>之间的高级关系：一个产生数据，另一个消耗数据。简单吧？此外，似乎<code>Publisher</code> <strong>将</strong>数据<strong>推</strong>送到<code>Subscriber</code> 。</p>
+<p>当您第一次了解JVM上的<em>响应</em> <em>式流</em>和<em>响应式编程</em>时，您首先了解的是<code>Publisher</code>和<code>Subscriber</code> ：一个产生数据，另一个消耗数据。简单吧？此外，似乎<code>Publisher</code> <strong>将</strong>数据<strong>推</strong>送到<code>Subscriber</code> 。</p>
 <p>但是，当使用诸如Reactor（或RxJava2）之类的Reactive Streams库时，您很快就会遇到以下问题：</p>
 <blockquote>
 <p>订阅之前什么都不会发生</p>
 </blockquote>
 <p>有时，您可能会读到两个库都实现了“推挽混合模型”。等一下<strong>拉</strong> ？</p>
 <p>我们将回到它，但是要理解该句子，您首先需要意识到，默认情况下，Reactor的反应类型是<em>lazy</em> 。</p>
-<p>调用一个方法<code>Flux</code>或<code>Mono</code> （ <em>运营商</em> ）不会立即触发的行为。而是返回一个新的<code>Flux</code> （或<code>Mono</code> ）实例，在该实例上您可以继续组成其他运算符。因此，您创建了一个运算符<em>链</em> （或一个运算符非循环图），它表示您的<strong>异步处理管道</strong> 。</p>
+<p>调用方法<code>Flux</code>要么<code>Mono</code> （ <em>操作员</em> ）不会立即触发该行为。取而代之的是<code>Flux</code> （要么<code>Mono</code> ）返回，您可以在其上继续编写其他运算符。因此，您创建了一个运算符<em>链</em> （或一个运算符非循环图），它表示您的<strong>异步处理管道</strong> 。</p>
 <p>此<strong>声明</strong>阶段称为<strong>组装时间</strong> 。</p>
-<p>让我们以一个示例为例，其中客户端应用程序向服务器发出HTTP请求，并期望使用HttpResponse：</p>
-<pre><code class="prettyprint java">Mono<HttpResponse> httpSource = makeHttpRequest();
-Mono<Json> jsonSource = httpSource.map(req -> parseJson(req));
-Mono<String> quote = jsonSource.map(json -> json.getString("quote"));
+<p>让我们举一个示例，其中客户端应用程序向服务器发出HTTP请求，并期望使用HttpResponse：</p>
+<pre><code class="prettyprint java">Mono&lt;HttpResponse&gt; httpSource = makeHttpRequest();
+Mono&lt;Json&gt; jsonSource = httpSource.map(req -&gt; parseJson(req));
+Mono&lt;String&gt; quote = jsonSource.map(json -&gt; json.getString(&quot;quote&quot;));
 //at this point, no HTTP request has been made
 </code></pre>
 <p>可以使用fluent API简化此操作：</p>
-<pre><code class="prettyprint java">Mono<String> quote = makeHttpRequest()
-    .map(req -> parseJson(req))
-    .map(json -> json.getString("quote"));
+<pre><code class="prettyprint java">Mono&lt;String&gt; quote = makeHttpRequest()
+    .map(req -&gt; parseJson(req))
+    .map(json -&gt; json.getString(&quot;quote&quot;));
 </code></pre>
-<p>声明完管道后，有两种情况：或者将代表处理管道的<code>Flux</code> / <code>Mono</code>传递到另一段代码，或者触发管道。</p>
-<p>前者意味着您返回<code>Mono</code>的代码可能会应用其他运算符，从而导致派生新的管道。由于操作员创建了新实例（就像洋葱一样），因此您自己的<code>Mono</code>不会发生变异，因此可以对其进行多次修饰，结果会大不相同：</p>
-<pre><code class="prettyprint java">//you could derive a `Mono<String>` of odd-length strings vs even-length ones
-Mono<String> evenLength = quote.filter(str -> str.length() % 2 == 0);
-Mono<String> oddLength = quote.filter(str -> str.length() % 2 == 1);
+<p>声明完管道后，有两种情况：要么通过<code>Flux</code> / <code>Mono</code>将处理管道表示为另一段代码，或者触发管道。</p>
+<p>前者表示您返回的代码<code>Mono</code>可能会应用其他运算符，从而导致派生新管道。由于操作员创建了新实例（就像洋葱一样），因此您自己<code>Mono</code>不会被突变，因此可以对其进行多次修饰，结果会大不相同：</p>
+<pre><code class="prettyprint java">//you could derive a `Mono&lt;String&gt;` of odd-length strings vs even-length ones
+Mono&lt;String&gt; evenLength = quote.filter(str -&gt; str.length() % 2 == 0);
+Mono&lt;String&gt; oddLength = quote.filter(str -&gt; str.length() % 2 == 1);
 
-//or even a `Flux<String>` of words in a quote
-Flux<String> words = quote.flatMapMany(quote -> Flux.fromArray(quote.split(" ")));
+//or even a `Flux&lt;String&gt;` of words in a quote
+Flux&lt;String&gt; words = quote.flatMapMany(quote -&gt; Flux.fromArray(quote.split(&quot; &quot;)));
 
-//by this point, none of the 3 "pipelines" have triggered an HTTP request
+//by this point, none of the 3 &quot;pipelines&quot; have triggered an HTTP request
 </code></pre>
-<p>将其与本质上并不懒惰的<code>CompletableFuture</code>进行比较：一旦您引用了<code>CompletableFuture</code> ，就意味着处理已经在进行中……</p>
+<p>与一个比较<code>CompletableFuture</code> ，这本质上并不懒惰：一旦您引用了<code>CompletableFuture</code> ，表示处理已经在进行中...</p>
 <p>考虑到这一点，让我们研究一下如何触发反应式管道。</p><h2><a href="#subscription-time" class="anchor" name="subscription-time"></a>订阅时间</h2>
-<p>到目前为止，我们已经<em>组装了一个异步管道</em> 。也就是说，我们已经通过使用<em>operator</em>实例化了<code>Flux</code>和<code>Mono</code>变量，这导致其他<code>Flux</code> / <code>Mono</code>的行为像洋葱一样分层。</p>
+<p>到目前为止，我们已经<em>组装了一个异步管道</em> 。也就是说，我们已实例化<code>Flux</code>和<code>Mono</code>通过使用<em>运算符的</em>变量，这导致其他<code>Flux</code> / <code>Mono</code>行为像洋葱一样分层。</p>
 <p>但是数据还没有开始流经每个声明的管道。</p>
 <p>这是因为数据流的触发不是管道的声明，而是对其的<strong>订阅</strong> 。记得：</p>
 <blockquote>
 <p>订阅之前什么都不会发生</p>
 </blockquote>
-<p>订阅是指“好的，该管道代表数据的转换，我对数据的最终形式很感兴趣”。最常见的方法是调用<code>Flux.subscribe(valueConsumer, errorConsumer)</code> 。</p>
-<p>该感兴趣的信令通过运营商的链向后传播，直到<em>源</em>操作中， <code>Publisher</code> ，实际上产生了初期数据：</p>
-<pre><code class="prettyprint java">makeHttpRequest() //<5>
-    .map(req -> parseJson(req)) //<4>
-    .map(json -> json.getString("quote")) //<3>
-    .flatMapMany(quote -> Flux.fromArray(quote.split(" "))) //<2>
-    .subscribe(System.out::println, Throwable::printStackTrace); //<1>
+<p>订阅是指“好的，该管道代表数据的转换，我对数据的最终形式很感兴趣”。最常见的方法是致电<code>Flux.subscribe(valueConsumer, errorConsumer)</code> 。</p>
+<p>感兴趣的信令通过运营商链向后传播，直到<em>源</em>运营商， <code>Publisher</code>实际上会产生初始数据：</p>
+<pre><code class="prettyprint java">makeHttpRequest() //&lt;5&gt;
+    .map(req -&gt; parseJson(req)) //&lt;4&gt;
+    .map(json -&gt; json.getString(&quot;quote&quot;)) //&lt;3&gt;
+    .flatMapMany(quote -&gt; Flux.fromArray(quote.split(&quot; &quot;))) //&lt;2&gt;
+    .subscribe(System.out::println, Throwable::printStackTrace); //&lt;1&gt;
 </code></pre>
 <ol>
-<li>我们订阅单词<code>Flux</code> ，表明我们要将每个单词打印到控制台（并打印任何错误的堆栈跟踪）</li>
-<li>兴趣已<code>flatMapMany</code>给<code>flatMapMany</code>步骤…</li>
-<li>…将其向上标志到json <code>map</code>步骤的链<code>map</code> …</li>
-<li>…然后是请求<code>map</code>步骤…</li>
-<li>......终于到达<code>makeHttpRequest()</code>我们会考虑我们的消息来源）</li>
+<li>我们赞成的话<code>Flux</code> ，表明我们要将每个单词打印到控制台（并打印任何错误的堆栈跟踪）</li>
+<li>兴趣已传达给<code>flatMapMany</code>步…</li>
+<li>…将其向上标志到json <code>map</code>步…</li>
+<li>…然后提出要求<code>map</code>步…</li>
+<li>…最终到达<code>makeHttpRequest()</code> （我们将考虑其来源）</li>
 </ol>
 <p>此时，源被触发。它以适当的方式生成数据：在这里它将向产生JSON的端点发出HTTP请求，然后发出HTTP响应。</p>
-<p>从那里，我们在<em>执行时间</em> 。数据已开始流过管道（按照从上到下的顺序，或者从<em>上游</em>到<em>下游</em> ）：</p>
+<p>从那时起，我们处于<em>执行时间</em> 。数据已开始流过管道（从上到下的顺序，或者从<em>上游</em>到<em>下游</em> ）：</p>
 <ol>
-<li>所述<code>HttpResponse</code>发射到<code>parseJson</code> <code>map</code></li>
-<li>它提取JSON正文并将其发送到<code>getString</code> <code>map</code></li>
+<li>的<code>HttpResponse</code>被发射到<code>parseJson</code> <code>map</code></li>
+<li>提取JSON正文并将其发送给<code>getString</code> <code>map</code></li>
 <li>提取<em>报价</em>并将其传递给<code>flatMapMany</code></li>
-<li><code>flatMapMany</code>将引号拆分为多个单词，并分别发出每个单词</li>
-<li>通知每个<code>subscribe</code>的值处理程序每个单词，并将其打印到控制台，每行一个</li>
+<li>的<code>flatMapMany</code>将报价分成单词并分别发出每个单词</li>
+<li>中的值处理程序<code>subscribe</code>通知每个单词，将它们打印到控制台，每行一个</li>
 </ol>
-<p>希望可以帮助您了解汇编时间与订阅/执行时间之间的区别！</p><h2><a href="#cold-vs-hot" class="anchor" name="cold-vs-hot"></a>冷与热</h2>
+<p>希望可以帮助您了解汇编时间与订阅/执行时间之间的区别！</p><h2><a href="#cold-vs-hot" class="anchor" name="cold-vs-hot"></a>冷vs热</h2>
 <p>在解释了差异并介绍了这一口头禅之后，可能是引入异常的好时机：laughing：</p>
 <blockquote>
 <p>在您订阅<strong>之前什么都不会</strong>发生… <strong>直到有事情发生</strong></p>
 </blockquote><h3><a href="#cold" class="anchor" name="cold"></a>冷</h3>
-<p>到目前为止，我们一直在处理称为<strong>Cold <code>Publisher</code></strong>的<code>Flux</code>和<code>Mono</code>来源。正如我们已经解释的那样，这些<code>Publishers</code>是惰性的，仅在有<code>Subscription</code>时才生成数据。此外，它们为每个单独的<code>Subscription</code>重新生成数据。</p>
-<p>在我们的HTTP响应<code>Mono</code>示例中，将为每个订阅执行HTTP请求：</p>
-<pre><code class="prettyprint java">Mono<String> evenLength = quote.filter(str -> str.length() % 2 == 0);
-Mono<String> oddLength = quote.filter(str -> str.length() % 2 == 1);
-Flux<String> words = quote.flatMapMany(quote -> Flux.fromArray(quote.split(" ")));
+<p>到目前为止，我们一直在处理<code>Flux</code>和<code>Mono</code>消息称<strong>感冒<code>Publisher</code></strong> 。正如我们所解释的，这些<code>Publishers</code>是懒惰的，仅当有<code>Subscription</code> 。此外，他们为每个人重新生成数据<code>Subscription</code> 。</p>
+<p>在我们的HTTP响应示例中<code>Mono</code> ，则将为每个订阅执行HTTP请求：</p>
+<pre><code class="prettyprint java">Mono&lt;String&gt; evenLength = quote.filter(str -&gt; str.length() % 2 == 0);
+Mono&lt;String&gt; oddLength = quote.filter(str -&gt; str.length() % 2 == 1);
+Flux&lt;String&gt; words = quote.flatMapMany(quote -&gt; Flux.fromArray(quote.split(&quot; &quot;)));
 
 evenLength.subscribe(); //this triggers an HTTP request
 oddLength.subscribe(); //this triggers another HTTP request
 words.subscribe(); //this triggers a third HTTP request
 </code></pre>
-<p>附带说明，某些运营商的行为暗示了多个订阅。例如，在发生错误（ <code>onError</code>信号）的情况下， <code>retry</code>重新预订其源，而<code>repeat</code>对<code>onComplete</code>信号执行相同的操作。</p>
-<p>因此，对于像HTTP请求这样的冷源，诸如<code>retry</code>类的东西将重新执行该请求，从而允许从例如服务器瞬时错误中恢复过来。</p><h3><a href="#hot" class="anchor" name="hot"></a>热</h3>
-<p>另一方面， <strong>热门<code>Publisher</code></strong>并不那么明确：它不一定需要<code>Subscriber</code>才能开始抽取数据。它也不一定每个新<code>Subscriber</code>都重新生成专用数据。</p>
+<p>附带说明，某些运营商的行为暗示了多个订阅。例如<code>retry</code>发生错误时重新订阅其来源（ <code>onError</code>信号），而<code>repeat</code>做了同样的<code>onComplete</code>信号。</p>
+<p>因此，对于像HTTP请求这样的冷源，类似<code>retry</code>将重新执行该请求，从而允许从例如服务器瞬时错误中恢复。</p><h3><a href="#hot" class="anchor" name="hot"></a>热</h3>
+<p><strong>热门<code>Publisher</code></strong>另一方面，它并不那么明确：它不一定需要<code>Subscriber</code>开始抽取数据。不必每次每个新生成专用数据<code>Subscriber</code>要么。</p>
 <p>为了说明这一点，让我们介绍一个新的冷发布者示例，然后我们将展示如何将该<em>冷</em>发布者转变为<em>热门</em>发布者：</p>
-<pre><code class="prettyprint java">Flux<Long> clockTicks = Flux.interval(Duration.ofSeconds(1));
+<pre><code class="prettyprint java">Flux&lt;Long&gt; clockTicks = Flux.interval(Duration.ofSeconds(1));
 
-clockTicks.subscribe(tick -> System.out.println("clock1 " + tick + "s");
+clockTicks.subscribe(tick -&gt; System.out.println(&quot;clock1 &quot; + tick + &quot;s&quot;);
 
 Thread.sleep(2000);
 
-clockTicks.subscribe(tick -> System.out.println("\tclock2 " + tick + "s");
+clockTicks.subscribe(tick -&gt; System.out.println(&quot;\tclock2 &quot; + tick + &quot;s&quot;);
 </code></pre>
 <p>打印：</p>
 <pre><code class="prettyprint">clock1 1s
@@ -301,15 +307,15 @@ clock1 5s
 clock1 6s
     clock2 4s
 </code></pre>
-<p>我们可以通过调用<code>share()</code>将<code>clockTicks</code>源变成热门的源：</p>
-<pre><code class="prettyprint java">Flux<Long> coldTicks = Flux.interval(Duration.ofSeconds(1));
-Flux<Long> clockTicks = coldTicks.share();
+<p>我们可以把<code>clockTicks</code>通过调用将其变成热门<code>share()</code> ：</p>
+<pre><code class="prettyprint java">Flux&lt;Long&gt; coldTicks = Flux.interval(Duration.ofSeconds(1));
+Flux&lt;Long&gt; clockTicks = coldTicks.share();
 
-clockTicks.subscribe(tick -> System.out.println("clock1 " + tick + "s");
+clockTicks.subscribe(tick -&gt; System.out.println(&quot;clock1 &quot; + tick + &quot;s&quot;);
 
 Thread.sleep(2000);
 
-clockTicks.subscribe(tick -> System.out.println("\tclock2 " + tick + "s");
+clockTicks.subscribe(tick -&gt; System.out.println(&quot;\tclock2 &quot; + tick + &quot;s&quot;);
 </code></pre>
 <p>而是产生以下结果：</p>
 <pre><code class="prettyprint">clock1 1s
@@ -324,16 +330,17 @@ clock1 6s
     clock2 6s
 
 </code></pre>
-<p>您会看到两个订阅现在共享相同的时钟滴答。 <code>share()</code>通过将源多播元素分配给新的<code>Subscribers</code>来将冷到热转换，但<strong>仅将这些新订阅之后发出的</strong>元素传递给新的<code>Subscribers</code> 。由于<code>clock2</code>在2秒后订阅，因此错过了早发射<code>1s</code>和<code>2s</code> 。</p>
-<p>因此，即使热门发布者通常通常至少需要初始<code>Subscription</code>才能触发数据流，他们也可以较为轻松。</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h2>
-<p>在本文中，我们了解了实例化<code>Flux</code> /链接运算符（即<strong>Assembly time</strong> ），触发它（即<strong>Subscription time</strong> ）和执行它（即<strong>Execution time</strong> ）之间的区别。</p>
-<p>因此，我们了解到<code>Flux</code>和<code>Mono</code>大多是懒惰的（又称<strong>Cold <code>Publisher</code></strong> ）： <strong>只有订阅</strong>它们后， <strong>什么都不会发生</strong> 。</p>
-<p>最后，我们了解了<code>Flux</code>和<code>Mono</code>的另一种风味，称为<strong>热门<code>Publisher</code></strong> ，其行为有所不同，并且不那么懒惰。</p>
+<p>您会看到两个订阅现在共享相同的时钟滴答。 <code>share()</code>通过将源多播元素转换为新的将冷到热<code>Subscribers</code> ，但是<strong>只有这些新订阅之后发出的元素</strong> 。以来<code>clock2</code> 2秒后订阅，错过了早期发射<code>1s</code>和<code>2s</code> 。</p>
+<p>因此，热门发布者可以减少懒惰，即使他们通常至少需要初步的<code>Subscription</code>触发数据流。</p><h2><a href="#conclusion" class="anchor" name="conclusion"></a>结论</h2>
+<p>在本文中，我们了解了实例化a和<code>Flux</code> /链接运算符（又名<strong>Assembly time</strong> ），触发它（又称<strong>Subscription time</strong> ）并执行它（又称<strong>Execution time</strong> ）。</p>
+<p>因此，我们了解到<code>Flux</code>和<code>Mono</code>大多是懒惰的（又名<strong>冷<code>Publisher</code></strong> ）： <strong>在您订阅</strong>它们<strong>之前，没有任何反应</strong> 。</p>
+<p>最后，我们了解了<code>Flux</code>和<code>Mono</code> ，被称为<strong>热门<code>Publisher</code></strong> ，其行为略有不同，并且比较懒惰。</p>
 <p>在下一期中，我们将了解为什么这三个阶段在您作为开发人员调试基于反应堆的代码的方式上有重大不同。</p>
 <p>同时，快乐的反应式编码！</p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 3570;
 
       (function(disqus_shortname, document) {
@@ -347,7 +354,8 @@ clock1 6s
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -385,12 +393,14 @@ clock1 6s
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

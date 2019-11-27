@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>跨站点请求伪造和OAuth2</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -21,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Cross Site Request Forgery and OAuth2">
-<meta name="twitter:description" content="<p>In this short article we look at Cross Site Request Forgery in the context of <a href=" http:="" ="" en.wikipedia.org="" wiki="" oauth#oauth_2.="="></head><body dir="ltr">OAuth2, looking at possible attacks and how they can be countered when OAuth2 is being used to protect web resources.
+<meta name="twitter:description" content="<p>In this short article we look at Cross Site Request Forgery in the context of <a href=" http:="" ="" en.wikipedia.org="" wiki="" oauth#oauth_2.="="></head><body >OAuth2, looking at possible attacks and how they can be countered when OAuth2 is being used to protect web resources.
 <p>OAuth2 is a protocol enabling a Client application, often a web application, to act on behalf of a User, but with the User’s permission. The actions a Client is allowed to perform are carried out on a Resource Server (another web application or web service), and the User approves the actions by telling an Authorization Server that he trusts the Client to do what it is asking. Common examples of Authorization Servers on the internet are <a href="http://developers.facebook.com/">Facebook</a> and <a href="http://code.google.com/apis/accounts/docs/OAuth2.html">Google</a>, both of which also provide Resource Servers (the Graph API in the case of Facebook and the Google APIs in the case of Google).</p>
 ">
 <meta name="twitter:creator" content="@david_syer">
@@ -39,10 +43,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,10 +174,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在这篇简短的文章中，我们在<a href="https://en.wikipedia.org/wiki/OAuth#OAuth_2.0">OAuth2</a>的上下文中研究了跨站点请求伪造，研究了可能的攻击以及当使用OAuth2保护Web资源时如何应对它们。</p><p>OAuth2是一种协议，使客户端应用程序（通常是Web应用程序）可以代表用户操作，但需要用户的许可。允许客户端执行的操作是在资源服务器（另一个Web应用程序或Web服务）上执行的，并且用户通过告诉授权服务器他相信客户端可以执行其要求的操作来批准这些操作。互联网上的授权服务器的常见示例是<a href="https://developers.facebook.com/">Facebook</a>和<a href="https://code.google.com/apis/accounts/docs/OAuth2.html">Google</a> ，它们都还提供资源服务器（在Facebook中是Graph API，在Google中是Google API）。</p><p>一个<a href="https://en.wikipedia.org/wiki/Cross-site_request_forgery">跨站请求伪造</a> （CSRF或“海冲浪”）攻击涉及一个坏家伙，在目标系统上更改某些状态的链接诱使用户点击。如果用户已经通过目标系统进行身份验证，他甚至可能不会注意到攻击，因为浏览器将自动发送身份验证标头或cookie。</p><p>无论如何，使用OAuth2保护资源和委托权限的系统都容易受到所有“常规” CSRF攻击-用户进行身份验证并且状态可能会更改。在这里，我们将重点放在针对OAuth2协议的攻击上，在这种情况下，坏人将试图获取访问令牌，这将使他能够做用户可以做的任何事情（在令牌）。</p><p>我们下面讨论的CSRF防御措施有赖于OAuth2 Client应用程序的精心实现，因此，只要授权服务器实现<a href="https://tools.ietf.org/html/draft-ietf-oauth-v2">OAuth2规范</a> ，任何客户端都可以使用它。一些防御措施位于OAuth2授权服务器本身中，因此只能由服务器组件的开发人员实施。某些是规范强制要求或强烈建议的，而某些仅来自仔细使用协议。</p><p>下面提供了一些示例CSRF尝试作为内联链接。单击它们并不危险-只是一个演示，没有可以破坏的数据或可以公开的身份。您可以使用在登录屏幕（marissa / koala）上建议的凭据登录授权服务器。攻击只会成功，因为演示系统的实施不正确。您应该希望真正的OAuth2实现者会更加小心。相对于授权服务器，这可能并不是徒劳的希望，但是您不确定客户端，不是这种应用程序有什么特别之处，但是客户端数量更多，出处也更多。</p><h2><a href="#attacks-on-the-authorization-server" class="anchor" name="attacks-on-the-authorization-server"></a>对授权服务器的攻击</h2><p>坏人试图通过诱骗用户在用户已经通过身份验证时单击指向授权服务器的链接来获取访问令牌。这些示例基于以下事实：授权服务器可能会将重定向发送到您要求的任何URI。规范允许这样做，除非已为相关客户端预先注册了特定的重定向。使用注册的重定向，攻击将无法正常进行，但是对于某些系统而言，这种限制可能过于严格，例如，Facebook不会打扰它，而Google会打扰。实际上，Facebook限制重定向URL由预先注册的应用程序“拥有”（即以相同的主机，路径等开头），这很合理，但不属于规范的一部分。</p><p>要尝试攻击，您需要一个授权服务器，然后您可以单击链接并查看重定向中揭示了哪些机密。重定向中有一个简单的脚本，可以捕获浏览器窗口的位置并对其进行镜像，以演示坏人如何剥离所需信息并将其发送到其他地方。因此，如果您看到一些秘密信息（例如浏览器中的访问令牌），则攻击成功。那只是一个演示。一个真正的坏人会拿取访问令牌，并用它代您（或在演示中代表mariss'a）做恶事。服务器应在以下位置运行<a href="http://oademo.cloudfoundry.com"></a> <a href="http://oademo.cloudfoundry.com">http</a> : <code>sparklr2</code>如果不是，则实现是<a href="https://github.com/SpringSource/spring-security-oauth">Spring Security OAuth</a>的<code>sparklr2</code>应用程序，如果您更改示例中的链接，则可以在本地运行它。</p><h3><a href="#implicit-grant-attacks" class="anchor" name="implicit-grant-attacks"></a>隐式授予攻击</h3><p>隐式授予攻击可以说是最讨厌的，因为坏人无需做任何工作即可获得令牌。但是，他确实需要知道客户端机密以及有效的客户端ID。</p><p>因此，此攻击成功。隐式授予：没有秘密的客户<a href="http://oademo.cloudfoundry.com/oauth/authorize?response_type=token&client_id=my-trusted-client&redirect_uri=http://dsyer.github.com/spring-security-oauth/attack.html&scope=read">请点击此处</a></p>
+<div class="blog--post"><p>在这篇简短的文章中，我们在<a href="https://en.wikipedia.org/wiki/OAuth#OAuth_2.0">OAuth2</a>的上下文中研究了跨站点请求伪造，研究了可能的攻击以及当使用OAuth2保护Web资源时如何应对它们。</p><p>OAuth2是一种协议，使客户端应用程序（通常是Web应用程序）可以代表用户使用，但必须获得用户的许可。允许客户端执行的操作是在资源服务器（另一个Web应用程序或Web服务）上执行的，并且用户通过告诉授权服务器他相信客户端可以执行其要求的操作来批准这些操作。互联网上的授权服务器的常见示例是<a href="https://developers.facebook.com/">Facebook</a>和<a href="https://code.google.com/apis/accounts/docs/OAuth2.html">Google</a> ，它们都还提供资源服务器（在Facebook中是Graph API，在Google中是Google API）。</p><p><a href="https://en.wikipedia.org/wiki/Cross-site_request_forgery">跨站点请求伪造</a> （CSRF或“海上冲浪”）攻击涉及到一个骗子，诱骗用户单击更改目标系统上某些状态的链接。如果用户已经通过目标系统进行身份验证，他甚至可能不会注意到攻击，因为浏览器将自动发送身份验证标头或cookie。</p><p>无论如何，使用OAuth2保护资源和委托权限的系统都容易受到所有“常规” CSRF攻击-用户进行身份验证并且状态可能会更改。在这里，我们将重点放在针对OAuth2协议的攻击上，在这种情况下，坏人将试图获取访问令牌，这将使他能够做用户可以做的任何事情（在令牌）。</p><p>我们下面讨论的CSRF防御措施有赖于OAuth2 Client应用程序的精心实现，因此，只要授权服务器实现<a href="https://tools.ietf.org/html/draft-ietf-oauth-v2">OAuth2规范</a> ，任何客户端都可以使用它。一些防御措施位于OAuth2授权服务器本身中，因此只能由服务器组件的开发人员实施。某些是规范强制要求或强烈建议的，而某些仅来自仔细使用协议。</p><p>下面提供了一些示例CSRF尝试作为内联链接。单击它们并不危险-只是一个演示，没有可以破坏的数据或可以公开的身份。您可以使用在登录屏幕（marissa / koala）上建议的凭据登录授权服务器。攻击只会成功，因为演示系统的实施不正确。您应该希望真正的OAuth2实现者会更加小心。相对于授权服务器，这可能并不是徒劳的希望，但是您不确定客户端，不是这种应用程序有什么特别之处，但是客户端数量更多，出处也更多。</p><h2><a href="#attacks-on-the-authorization-server" class="anchor" name="attacks-on-the-authorization-server"></a>对授权服务器的攻击</h2><p>坏人试图通过诱骗用户在用户已经通过身份验证时单击指向授权服务器的链接来获取访问令牌。这些示例基于以下事实：授权服务器可能会将重定向发送到您要求的任何URI。规范允许这样做，除非已为相关客户端预先注册了特定的重定向。使用注册的重定向，攻击将无法正常进行，但是对于某些系统而言，这种限制可能过于严格，例如，Facebook不会打扰它，而Google会打扰。实际上，Facebook限制重定向URL由预先注册的应用程序“拥有”（即以相同的主机，路径等开头），这很合理，但不属于规范的一部分。</p><p>要尝试攻击，您需要一个授权服务器，然后您可以单击链接并查看重定向中揭示了哪些机密。重定向中有一个简单的脚本，可以捕获浏览器窗口的位置并对其进行镜像，以演示坏人如何剥离所需信息并将其发送到其他地方。因此，如果您看到一些秘密信息（例如浏览器中的访问令牌），则攻击成功。那只是一个演示。一个真正的坏人会拿取访问令牌，并用它代您（或在演示中代表mariss'a）做恶事。服务器应在以下位置运行<a href="http://oademo.cloudfoundry.com"></a> <a href="http://oademo.cloudfoundry.com">http://oademo.cloudfoundry.com-</a>如果不是，则实现为<code>sparklr2</code> <a href="https://github.com/SpringSource/spring-security-oauth">Spring Security OAuth中的</a>应用程序，如果您更改示例中的链接，则可以在本地运行它。</p><h3><a href="#implicit-grant-attacks" class="anchor" name="implicit-grant-attacks"></a>隐式授予攻击</h3><p>隐式授予攻击可以说是最讨厌的，因为坏人无需做任何工作即可获得令牌。但是，他确实需要知道客户端机密以及有效的客户端ID。</p><p>因此，此攻击成功。隐式授予：没有秘密的客户<a href="http://oademo.cloudfoundry.com/oauth/authorize?response_type=token&client_id=my-trusted-client&redirect_uri=http://dsyer.github.com/spring-security-oauth/attack.html&scope=read">请点击此处</a></p>
 <p>但是这种攻击失败了。隐式授予：带有秘密的客户： <a href="http://oademo.cloudfoundry.com/oauth/authorize?response_type=token&client_id=my-trusted-client-with-secret&redirect_uri=http://dsyer.github.com/spring-security-oauth/attack.html&scope=read">点击此处</a></p><h3><a href="#authorization-code-attacks" class="anchor" name="authorization-code-attacks"></a>授权码攻击</h3><p>这里是基本的授权码授予流程，以提醒我们有关细节，然后再查看对其的攻击：</p><p>序列图，身份验证代码流：</p>
 <div class="wsd" wsd_style="qsd">
-<pre>User->Client: GET /peek
+<pre>
+    User->Client: GET /peek
 participant AuthServer
 
 activate User
@@ -211,10 +218,15 @@ deactivate ResourceServer
 
 Client->User: 200: result
 deactivate Client
-deactivate User</pre>
-</div><p>授权码攻击使坏人能够窃取授权码，然后可以将其交换为令牌。坏人可以获得独立于客户机密的授权码，但是要使用该密码，他将需要该机密。因此，这两个链接都向我们发送了一个有效的代码，但是其中一个受客户端机密保护，如果没有该机密，则不能用来冒充用户：</p><p>授权码授予：没有秘密的客户<a href="http://oademo.cloudfoundry.com/oauth/authorize?response_type=code&client_id=my-trusted-client&redirect_uri=http://dsyer.github.com/spring-security-oauth/attack.html&scope=read">请点击此处</a></p><p>授权码授予：机密客户： <a href="http://oademo.cloudfoundry.com/oauth/authorize?response_type=code&client_id=my-trusted-client-with-secret&redirect_uri=http://dsyer.github.com/spring-security-oauth/attack.html&scope=read">单击此处</a></p><p>序列图，auth-code-csrf：</p>
+deactivate User
+
+    
+
+</pre>
+</div><p>授权码攻击使坏人能够窃取授权码，然后可以将其交换为令牌。坏人可以获得独立于客户机密的授权码，但要使用该密码，他将需要该机密。因此，这两个链接都向我们发送了一个有效的代码，但是其中一个受客户端机密保护，如果没有该机密，则不能用来冒充用户：</p><p>授权码授予：没有秘密的客户<a href="http://oademo.cloudfoundry.com/oauth/authorize?response_type=code&client_id=my-trusted-client&redirect_uri=http://dsyer.github.com/spring-security-oauth/attack.html&scope=read">请点击此处</a></p><p>授权码授予：带有秘密的客户端： <a href="http://oademo.cloudfoundry.com/oauth/authorize?response_type=code&client_id=my-trusted-client-with-secret&redirect_uri=http://dsyer.github.com/spring-security-oauth/attack.html&scope=read">单击此处</a></p><p>序列图，auth-code-csrf：</p>
 <div class="wsd" wsd_style="qsd">
-<pre>participant User
+<pre>
+    participant User
 participant BadClient
 
 User->AuthServer: GET /authorize?client_id=good&redirect_uri=/bad/peek&state=poioiu
@@ -248,10 +260,14 @@ AuthServer->BadClient: 200: {access_token:CNMBVCXKVY}
 
 deactivate AuthServer
 deactivate BadClient
-deactivate User</pre>
-</div><h2><a href="#attacks-on-the-client" class="anchor" name="attacks-on-the-client"></a>对客户端的攻击</h2><p>客户端应用程序也很容易受到CSRF攻击，不是窃取访问令牌，而是更改客户端或（更可能是）客户端用来管理其状态的资源服务器上的状态。在这种情况下，提供程序系统无法阻止攻击，但是它们可以帮助客户端实施自己的保护。对此的主要机制是状态参数，该状态参数由客户端生成和管理，并由授权服务器完整传递。</p><p>这是带有状态参数的完整授权码授予流程的序列图。客户端通过返回用户会话以获取访问令牌时检查其状态是否存在，来实现CSRF保护。此设计中的状态参数是经过身份验证的用户与客户端应用程序的会话中的会话属性的键。</p>
+deactivate User
+
+    
+</pre>
+</div><h2><a href="#attacks-on-the-client" class="anchor" name="attacks-on-the-client"></a>对客户端的攻击</h2><p>客户端应用程序也很容易受到CSRF攻击，不是窃取访问令牌，而是更改客户端或（更可能是）客户端用来管理其状态的资源服务器上的状态。在这种情况下，提供程序系统无法阻止攻击，但是它们可以帮助客户端实施自己的保护。这样做的主要机制是状态参数，该状态参数由客户端生成和管理，并由授权服务器完整传递。</p><p>这是带有状态参数的完整授权码授予流程的序列图。客户端通过返回用户会话以获取访问令牌时检查其状态是否存在，来实现CSRF保护。此设计中的状态参数是经过身份验证的用户与客户端应用程序的会话中的会话属性的键。</p>
 <div class="wsd" wsd_style="qsd">
-<pre>User->Client: GET /peek
+<pre>
+    User->Client: GET /peek
 participant AuthServer
 
 activate User
@@ -294,12 +310,13 @@ deactivate ResourceServer
 
 Client->User: 200: result
 deactivate Client
-deactivate User</pre>
+deactivate User
+</pre>
 </div><p>如果状态键是可猜测的，则此示例中的CSRF攻击仍然可以成功，但是只要在令牌被授予后客户端清除了会话，攻击就必须在具有相同的键。</p><p>那将是不幸的（而且不太可能），但是OAuth2规范仍然建议客户端使用不可猜测的状态（例如，具有随机成分）。规范不假定客户端本身是有状态的，这使该建议更易于理解：如果state参数不仅是会话中的键，而且包含以某种不透明方式编码的整个状态本身，则对于使它变得不可思议。</p><h2><a href="#defense-measures" class="anchor" name="defense-measures"></a>防御措施</h2><p>这是可用于防御上述攻击的可能防御措施的摘要。所有这些都可以在使用<a href="http://git.springsource.org/spring-security/spring-security">Spring Security</a>和<a href="https://github.com/SpringSource/spring-security-oauth">Spring Security OAuth</a>构建的系统中实现，但很少自动执行-与开发人员框架通常一样，开发人员必须选择使用提供的功能。</p><h3><a href="#for-the-client" class="anchor" name="for-the-client"></a>对于客户</h3>
 <ul>
 <li>使用客户机密</li>
 <li>如果授权服务器允许，请使用注册的重定向，可以是固定的或可变的重定向（请参见下文）</li>
- <li>将随机状态参数值发送到授权端点，并使用相同的密钥在用户会话中存储某些内容</li>
+ <li>将随机状态参数值发送到授权端点，并使用相同的密钥将某些内容存储在用户会话中</li>
 <li>仅将请求发送到带有状态参数的授权端点</li>
 <li>在授权码请求到达时检查用户会话的状态</li>
 <li>如果客户端是无状态的（无会话），则使用状态密钥本身对用户进行编码，然后进行比较</li>
@@ -312,10 +329,13 @@ deactivate User</pre>
 <li>固定重定向：仅重定向到客户端注册的固定URL，或者</li>
 <li>可变重定向：允许用户重定向，但要求客户端注册网站地址并强制将所有重定向托管在该地址</li>
 </ul><h2><a href="#conclusions" class="anchor" name="conclusions"></a>结论</h2><p>我们已经研究了OAuth2系统上的某些CSRF攻击以及可以采取的防御措施。总的结论是，有很多机会可以战胜此类攻击，其中某些机会来自规范，而有些则没有。与任何安全漏洞一样，系统是否能很好地防御CSRF取决于实现的细节以及密码和机密的质量。即使是符合规格的系统也可能受到攻击，但是谨慎的实现可以采取一些措施，以使这些攻击不太可能成功。</p>
-<script src="https://www.websequencediagrams.com/service.js"></script></div>
+<script src="https://www.websequencediagrams.com/service.js"> 
+
+</script></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 451;
 
       (function(disqus_shortname, document) {
@@ -329,7 +349,8 @@ deactivate User</pre>
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -367,12 +388,14 @@ deactivate User</pre>
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

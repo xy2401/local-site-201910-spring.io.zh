@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head>
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>动态数据源路由</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -35,14 +39,16 @@
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2007-01-23 21:57:00.0">
 </head>
-<body dir="ltr">
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -168,4 +174,258 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Spring 2.0.1引入了<code>AbstractRoutingDataSource</code> 。我认为它值得关注，因为（基于客户的常见问题）我有一种直觉，认为有很多“本土”解决方案可以解决这个问题。加上实施起来很简单却容易忽略的事实，现在我有几个理由可以摆脱团队博客的困扰。</p><p>一般的想法是，路由<code>DataSource</code>充当中介，而“真实的”数据源可以在运行时根据查找关键字动态确定。一种潜在的用例是确保标准JTA不支持的特定于事务的隔离级别。为此，Spring提供了一个实现： <code>IsolationLevelDataSourceRouter</code> 。请查阅其JavaDoc以获取包括配置示例的详细描述。</p><p>另一个有趣的用例是根据当前用户上下文的某些属性确定数据源。接下来是一个相当人为的例子来说明这个想法。</p><p>首先，我创建了一个<code>Catalog</code> ，该<code>Catalog</code>扩展了Spring 2.0的<code>SimpleJdbcDaoSupport</code> 。该基类仅需要<code>javax.sql.DataSource</code></p><p><code>javax.sql.DataSource</code></p><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></article><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></div><code>javax.sql.DataSource</code></body></html>
+<div class="blog--post"><p>Spring 2.0.1引入了<code>AbstractRoutingDataSource</code> 。我认为它值得关注，因为（基于客户的常见问题）我有一种直觉，认为有很多“本土”解决方案可以解决这个问题。加上实施起来很简单却容易忽略的事实，现在我有几个理由可以摆脱团队博客的困扰。</p><p>一般的想法是<code>DataSource</code>充当中介-可以在运行时根据查找关键字动态确定“真实”数据源。一种潜在的用例是确保标准JTA不支持的特定于事务的隔离级别。为此，Spring提供了一个实现： <code>IsolationLevelDataSourceRouter</code> 。请查阅其JavaDoc以获取包括配置示例的详细描述。</p><p>另一个有趣的用例是根据当前用户上下文的某些属性确定数据源。接下来是一个相当人为的例子来说明这个想法。</p><p>首先，我创建了一个<code>Catalog</code>扩展了Spring 2.0的<code>SimpleJdbcDaoSupport</code> 。该基类只需要一个实现的实例<code>javax.sql.DataSource</code> ，然后创建一个<code>SimpleJdbcTemplate</code>为了你。由于它延伸<code>JdbcDaoSupport</code> ， <code>JdbcTemplate</code>也可以。但是，“简单”版本提供了许多不错的Java 5便利。您可以在Ben Hale的<a href="https://spring.io/blog/2006/11/28/simplejdbctemplate-spring-2-0-and-java-5">此博客中</a>了解有关<a href="https://spring.io/blog/2006/11/28/simplejdbctemplate-spring-2-0-and-java-5">此</a>内容的更多详细信息。</p><p>无论如何，这是我的代码<code>Catalog</code> ：</p>
+<pre><code class="prettyprint java">package blog.datasource;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+
+public class Catalog extends SimpleJdbcDaoSupport {
+	
+   public List&lt;Item&gt; getItems() {
+      String query = &quot;select name, price from item&quot;;
+      return getSimpleJdbcTemplate().query(query, new ParameterizedRowMapper&lt;Item&gt;() {
+            public Item mapRow(ResultSet rs, int row) throws SQLException {
+               String name = rs.getString(1);
+               double price = rs.getDouble(2);
+               return new Item(name, price);
+            }
+      });
+   }
+}
+</code></pre><p>如您所见， <code>Catalog</code>只需返回一个列表<code>item</code>对象。的<code>Item</code>仅包含名称和价格属性：</p>
+<pre><code class="prettyprint java">package blog.datasource;
+
+public class Item {
+
+   private String name;
+   private double price;
+	
+   public Item(String name, double price) {
+      this.name = name;
+      this.price = price;
+   }
+
+   public String getName() {
+      return name;
+   }
+
+   public double getPrice() {
+      return price;
+   }
+
+   public String toString() {
+      return name + &quot; (&quot; + price + &quot;)&quot;;
+   }
+
+}
+</code></pre><p>现在，为了演示多个数据源，我为不同的Customer类型创建了一个枚举（我想代表了会员的“级别”），并且创建了三个不同的数据库-以便每种类型的Customer都可以得到不同的商品列表（我做了提到这将是一个人为的例子，不是吗？）。重要的是，每个数据库在架构方面都是等效的。这样，目录的查询将针对其中的任何查询-只是返回不同的结果。在这种情况下，它只是带有两列的“项目”表：名称和价格。而且...这是枚举：</p>
+<pre><code class="prettyprint java">public enum CustomerType {
+   BRONZE, 
+   SILVER, 
+   GOLD
+}
+</code></pre><p>现在该创建一些bean定义了。由于我有3个数据源，除了端口号外其他所有数据源都是相同的，因此我创建了一个父bean，以便可以继承共享属性。然后，我添加了3个bean定义来表示per-CustomerType数据源：</p>
+<pre><code class="prettyprint xml">&lt;bean id=&quot;parentDataSource&quot;
+         class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;
+         abstract=&quot;true&quot;&gt;
+   &lt;property name=&quot;driverClassName&quot; value=&quot;org.hsqldb.jdbcDriver&quot;/&gt;
+   &lt;property name=&quot;username&quot; value=&quot;sa&quot;/&gt;
+&lt;/bean&gt;
+		
+&lt;bean id=&quot;goldDataSource&quot; parent=&quot;parentDataSource&quot;&gt;
+   &lt;property name=&quot;url&quot; value=&quot;jdbc:hsqldb:hsql://localhost:${db.port.gold}/blog&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;silverDataSource&quot; parent=&quot;parentDataSource&quot;&gt;
+   &lt;property name=&quot;url&quot; value=&quot;jdbc:hsqldb:hsql://localhost:${db.port.silver}/blog&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;bronzeDataSource&quot; parent=&quot;parentDataSource&quot;&gt;
+   &lt;property name=&quot;url&quot; value=&quot;jdbc:hsqldb:hsql://localhost:${db.port.bronze}/blog&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;bean class=&quot;org.springframework.beans.factory.config.PropertyPlaceholderConfigurer&quot;&gt;
+   &lt;property name=&quot;location&quot; value=&quot;classpath:/blog/datasource/db.properties&quot;/&gt;
+&lt;/bean&gt;	
+</code></pre><p>请注意，我添加了一个<code>PropertyPlaceholderConfigurer</code>这样我就可以将“ db.properties”文件中的端口号外部化，如下所示：</p>
+<pre>db.port.gold=9001
+db.port.silver=9002
+db.port.bronze=9003
+</pre><p>现在事情开始变得有趣起来。我需要向我提供“路由”数据源<code>Catalog</code>这样它就可以根据当前客户的类型在运行时动态地从3个不同的数据库获取连接。正如我所说， <code>AbstractRoutingDataSource</code>实施起来可能非常简单。这是我的实现：</p>
+<pre><code class="prettyprint java">package blog.datasource;
+
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+
+public class CustomerRoutingDataSource extends AbstractRoutingDataSource {
+
+   @Override
+   protected Object determineCurrentLookupKey() {
+      return CustomerContextHolder.getCustomerType();
+   }
+}
+</code></pre><p>…和<code>CustomerContextHolder</code>只是提供对线程绑定的访问<code>CustomerType</code> 。实际上，“上下文”可能会包含有关客户的更多信息。还要注意，如果您使用的是Spring Security，则可以从userDetails中检索一些信息。对于此示例，它只是客户的“类型”：</p>
+<pre><code class="prettyprint java">public class CustomerContextHolder {
+
+   private static final ThreadLocal&lt;CustomerType&gt; contextHolder = 
+            new ThreadLocal&lt;CustomerType&gt;();
+	
+   public static void setCustomerType(CustomerType customerType) {
+      Assert.notNull(customerType, &quot;customerType cannot be null&quot;);
+      contextHolder.set(customerType);
+   }
+
+   public static CustomerType getCustomerType() {
+      return (CustomerType) contextHolder.get();
+   }
+
+   public static void clearCustomerType() {
+      contextHolder.remove();
+   }
+}
+</code></pre><p>最后，我只需要配置目录并路由DataSource Bean。如您所见，Map中提供了“真实的” DataSource引用。如果提供字符串，则可以将它们解析为JNDI名称（或者可以提供任何自定义解析策略-请参阅JavaDoc）。另外，我只是将'bronzeDataSource'设置为默认值：</p>
+<pre><code class="prettyprint xml">&lt;bean id=&quot;catalog&quot; class=&quot;blog.datasource.Catalog&quot;&gt;
+   &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;dataSource&quot; class=&quot;blog.datasource.CustomerRoutingDataSource&quot;&gt;
+   &lt;property name=&quot;targetDataSources&quot;&gt;
+      &lt;map key-type=&quot;blog.datasource.CustomerType&quot;&gt;
+         &lt;entry key=&quot;GOLD&quot; value-ref=&quot;goldDataSource&quot;/&gt;
+         &lt;entry key=&quot;SILVER&quot; value-ref=&quot;silverDataSource&quot;/&gt;
+      &lt;/map&gt;
+   &lt;/property&gt;
+   &lt;property name=&quot;defaultTargetDataSource&quot; ref=&quot;bronzeDataSource&quot;/&gt;
+&lt;/bean&gt;
+</code></pre><p>当然，我希望看到它能正常工作，所以我创建了一个简单的测试（扩展了Spring的集成测试支持类之一）。我在“黄金”数据库中添加了3个项目，在“银”数据库中添加了2个项目，在“青铜”数据库中仅添加了1个项目。这是测试：</p>
+<pre><code class="prettyprint java">public class CatalogTests extends AbstractDependencyInjectionSpringContextTests {
+
+   private Catalog catalog;
+
+   public void setCatalog(Catalog catalog) {
+      this.catalog = catalog;
+   }
+
+   public void testDataSourceRouting() {
+      CustomerContextHolder.setCustomerType(CustomerType.GOLD);
+      List&lt;Item&gt; goldItems = catalog.getItems();
+      assertEquals(3, goldItems.size());
+      System.out.println(&quot;gold items: &quot; + goldItems);
+
+      CustomerContextHolder.setCustomerType(CustomerType.SILVER);
+      List&lt;Item&gt; silverItems = catalog.getItems();
+      assertEquals(2, silverItems.size());
+      System.out.println(&quot;silver items: &quot; + silverItems);
+	
+      CustomerContextHolder.clearCustomerType();
+      List&lt;Item&gt; bronzeItems = catalog.getItems();
+      assertEquals(1, bronzeItems.size());
+      System.out.println(&quot;bronze items: &quot; + bronzeItems);		
+   }
+
+   protected String[] getConfigLocations() {
+      return new String[] {&quot;/blog/datasource/beans.xml&quot;};
+   }	
+}
+</code></pre><p>…而不是简单地截取绿色条的屏幕截图，您会注意到我提供了一些控制台输出-结果！：</p>
+<pre>gold items: [gold item #1 (250.0), gold item #2 (325.45), gold item #3 (55.6)]
+silver items: [silver item #1 (25.0), silver item #2 (15.3)]
+bronze items: [bronze item #1 (23.75)]
+</pre><p>如您所见，配置很简单。更好的是，数据访问代码与查找不同的数据源无关。有关更多信息，请查阅JavaDoc。 <code>AbstractRoutingDataSource</code> 。</p></div>
+</div>
+<section id="disqus_thread"></section>
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
+      var disqus_identifier = 50;
+
+      (function(disqus_shortname, document) {
+        injectScript('//' + disqus_shortname + '.disqus.com/embed.js');
+        injectScript('//' + disqus_shortname + '.disqus.com/count.js');
+
+        function injectScript(url) {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = url;
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+        }
+
+      }(disqus_shortname, document));
+    </script>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
+<div class="mobile-only">
+<p><a href="/blog">
+<i class="icon-chevron-left"></i>背部</a></p>
+</div>
+</article>
+<aside class="span4 mobile-right-pane" id="sidebar">
+<div>
+<ul class="right-pane-widget--container secondary-nav with-icon">
+<li class="blog-category">
+<div class="icon blog-icon all-posts"></div>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category active">
+<div class="icon blog-icon engineering"></div>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon releases"></div>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+</li>
+<li class="blog-category">
+<div class="icon blog-icon news-and-events"></div>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+</li>
+</ul>
+<ul class="social-btn--container">
+<a class="social-btn twitter" href="https://twitter.com/springcentral"></a>
+
+<a class="social-btn linkedin" href="https://www.linkedin.com/groups/46964"></a>
+<a class="social-btn youtube" href="/videos"></a>
+</ul>
+<div id="blog-sidebar-newsletter">
+<p>将The Spring Team的更新发送到您的收件箱</p>
+<script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
+<form id="mktoForm_4723"></form>
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+          form.onSuccess(function(values, followUpUrl) {
+            form.getFormElem().html("<p>Thank you!</p>");
+            return false;
+          });
+        });
+      </script>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</div>
+<footer class="footer">
+<div class="container-fluid">
+<div class="row-fluid">
+<div class="span12">
+<div class="navbar">
+<div class="container">
+<ul class="nav">
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
+</ul>
+</div>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
+<div id="teconsent" style="display:inline-block"></div>
+</div>
+</div>
+</div>
+</footer>
+<div id="scrim"></div>
+</div>
+</body></html>

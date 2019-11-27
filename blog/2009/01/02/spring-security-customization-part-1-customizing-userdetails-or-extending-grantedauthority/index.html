@@ -1,13 +1,17 @@
-<html dir="ltr" data-code-prettify="" data-mobile-support="" data-search=""><head></head><body dir="ltr">﻿
+<html  data-code-prettify="" data-mobile-support="" data-search=""><head>
 <title>Spring Security自定义（第1部分-自定义UserDetails或扩展GrantedAuthority）</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -37,15 +41,17 @@
 ">
 <meta content="article" property="og:type">
 <meta property="og:article:published_time" content="2009-01-02 17:52:00.0">
-
-
+</head>
+<body >
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -171,10 +177,11 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>我希望这是第一部分，它将成为一个由多个部分组成的系列小文章，显示有关Spring Security定制的实际示例。这些定制的要求不是虚构的，并且全部来自现场。</p><p>假设您具有以下要求。您有一个角色列表，其中每个角色都包含适用于该角色的业务功能列表（请参见下文）：</p><p>ROLE_ADMIN<br>BF_QUOTE_CREATE<br>BF_POLICY_CREATE<br>BF_POLICY_DELETE</p><p>ROLE_AGENT<br>BF_QUOTE_CREATE<br>BF_POLICY_CREATE</p><p>ROLE_USER<br>BF_QUOTE_CREATE</p><p>诀窍是能够根据任何一个做出授权决定。</p><p><strong>例如：</strong><br><em>具有角色ROLE_ADMIN的用户应被授予访问该角色保护的任何资源的权限。</em><br><code><br><sec:authorize ifAllGranted=“ROLE_ADMIN”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code></p><p><code><br><sec:authorize ifAllGranted=“ROLE_ADMIN”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code></p><code><br><sec:authorize ifAllGranted=“ROLE_ADMIN”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code><br>要么<br><code><br>@Secured(”ROLE_ADMIN")<br>public void foo()<br>    …<br>}<br></code><p></p><p>应该为同一个用户授予受相应业务功能保护的任何资源的访问权限。<br><code><br><sec:authorize ifAllGranted=“BF_POLICY_DELETE”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code></p><p><code><br><sec:authorize ifAllGranted=“BF_POLICY_DELETE”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code></p><code><br><sec:authorize ifAllGranted=“BF_POLICY_DELETE”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code><br>要么<br><code><br>@Secured(”BF_POLICY_DELETE")<br>public void foo()<br>    …<br>}<br></code><p></p><p>实际上，有几种方法可以处理此要求。其中之一是创建<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/userdetails/hierarchicalroles/RoleHierarchy.html">RoleHierarchy</a>并使用<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/vote/RoleHierarchyVoter.html">RoleHierarchyVoter</a>遍历角色的层次结构。这种方法的缺点是，在Spring Security 2.0.4的当前实现中，taglib（安全性：authorize…）不会通过<em>AccessDecisionManager</em>做出决定，因此，在制定有关保护HTML元素的决定时，没有<em>投票者</em>扮演任何角色。但是，鉴于Spring Security惊人的灵活性和自定义功能，实现此要求仍然非常简单。<br>Spring Security的最大好处之一是围绕如何创建<em>Principal</em> （UserDetails对象）的自定义。创建<em>UserDetails</em>对象时，将使用<em>GrantedAuthorities</em>列表填充该对象。稍后检查此列表以与保护资源的<em>GrantedAuthority</em>相匹配。<br>我们可以做的自定义之一是在创建<em>UserDetails</em>对象期间自定义<em>GrantedAuthorities</em>列表。</p><p>在提供的示例中，有两个属性文件（为简化起见，我使用属性文件，但是您可以轻松地对其进行修改以使用DB或LDAP）。<br>一个文件<em>users.properties</em>将用户映射到<em>角色</em><br><code><br>oleg=powder,ROLE_ADMIN<br></code><br>而另一个角色到<em>bf.properties</em>将角色映射到<em>业务功能</em>列表<br><code><br>ROLE_ADMIN=BF_QUOTE_CREATE,BF_POLICY_CREATE,BF_POLICY_DELETE<br></code><br>我们的目标是创建一个<em>UserDetails</em>对象，其中包含代表<em>角色</em>和<em>业务功能</em>的<em>GrantedAuthorities</em>列表<em>。</em><br>例如：对于用户<strong>oleg</strong> ， <em>GrantedAuthorities</em>列表应为：<br><code><br>ROLE_ADMIN,BF_QUOTE_CREATE,BF_POLICY_CREATE,BF_POLICY_DELETE<br></code><br>因此，我们需要定义一个<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/userdetails/UserDetailsService.html">UserDetailsService</a>的自定义实现，其中通过使用两个属性文件（现实中可以是DB或LDAP），我们将创建<em>GrantedAuthorities的</em>自定义列表，然后将它们注入最终的<em>UserDetails</em>对象。这非常简单，我们可以重用<em>GrantedAuthority</em>接口的现有实现，例如<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/GrantedAuthorityImpl.html">GrantedAuthorityImpl</a> 。但是，我们还想确保可以为表示业务功能的每个GrantedAuthority跟踪（出于调试或任何其他目的） <strong>父</strong> <em>GrantedAuthority</em> 。<br>为了实现这两个目标，我们将通过定义<strong>BusinessFunctionGrantedAuthority</strong>类来扩展<em>GrantedAuthorityImpl</em> ，该类仅包含定义该<em>业务功能</em>的所有父<em>GrantedAuthority</em>对象的列表。<br><code><br>public class BusinessFunctionGrantedAuthority extends GrantedAuthorityImpl {<br>    private List<GrantedAuthority> parentAuthorities;<br>        …<br>}<br></code></p><p>然后，我们将创建UserDetailsService的自定义实现，并实现<em>loadUserByName（..）</em>方法，在该方法中执行以下操作：<br><br><br><em>1。根据users.properties文件的内容创建UserAttribute对象。UserAttribute将包含表示角色的GrantedAuthorities列表。<br><br>2。遍历Role-GratedAuthorities列表，并为每个角色-GrantedAuthority创建一个BusinessFunctionGrantedAuthority并将其添加到已创建的GrantedAuthorities的总体列表中<br><br>2.1将父级GrantedAuthority添加到每个BusinessFunctionGrantedAuthority<br><br>3。创建最终的UserDetails对象，其中包含GrantedAuthorities的完整列表。<br></em></p><p>然后在Spring Security配置中定义<em>AuthenticationProvider</em> ：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-6.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-6.png" alt="" title="图片6" width="500" height="126" class="alignnone size-full wp-image-905"></a></p><p>注意：我们正在向AuthenticationProvider注入由ComplexAuthorityUserDetailsService类实现的自定义UserDetailsService。（有关更多详细信息，请参见示例代码）<br><br>保护您的资源，部署和访问应用程序： <em><a href="http://localhost:8080/spring-security-sample-grantedAuthority/index.jsp">http：// localhost：8080 / spring-security-sample-grantedAuthority / index.jsp</a></em><br><br>登录后，您应该看到显示的<em>GrantedAuthorities</em>列表以及<em>Principal的</em>其他属性：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-5.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-5.png" alt="" title="图片5" width="500" height="253" class="alignnone size-full wp-image-901"></a></p><p>您可以清楚地看到，代表<em>业务功能的</em> <em>GrantedAuthority</em>还显示了定义该<em>业务功能</em>的父<em>GratedAuthorities</em>列表。<br>检查<em>index.jsp</em>并观察<em>security：authorize</em>标签如何同时使用<em>角色</em>和<em>业务功能</em>来保护HTML元素<br>就这些。您可以清楚地看到，只需进行少量次要自定义，便可以轻松扩展和自定义主体的结构，并基于自定义GrantedAuthorities应用声明式保护，而不会用自定义安全代码污染您的业务代码。</p><p>示例代码可以在这里下载： <a href="http://blog.springsource.com/wp-content/uploads/2009/01/spring-security-sample-grantedauthority.zip">spring-security-sample-grantedauthority</a></p></div>
+<div class="blog--post"><p>我希望这是第一部分，它将成为一个由多个部分组成的系列小文章，显示有关Spring Security定制的实际示例。这些定制的要求不是虚构的，并且全部来自现场。</p><p>假设您具有以下要求。您有一个角色列表，其中每个角色都包含适用于该角色的业务功能列表（请参见下文）：</p><p>ROLE_ADMIN<br>BF_QUOTE_CREATE<br>BF_POLICY_CREATE<br>BF_POLICY_DELETE</p><p>ROLE_AGENT<br>BF_QUOTE_CREATE<br>BF_POLICY_CREATE</p><p>ROLE_USER<br>BF_QUOTE_CREATE</p><p>诀窍是能够根据任何一个做出授权决定。</p><p><strong>例如：</strong><br><em>具有角色ROLE_ADMIN的用户应被授予访问该角色保护的任何资源的权限。</em><br><code><br><sec:authorize ifAllGranted=“ROLE_ADMIN”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code><br>要么<br><code><br>@Secured(”ROLE_ADMIN")<br>public void foo()<br>    …<br>}<br></code></p><p>应该给同一用户访问受相应业务功能保护的任何资源的权限。<br><code><br><sec:authorize ifAllGranted=“BF_POLICY_DELETE”><br>    <p><a href=“<a href="https://www.google.com" >google< a>">http://www.google.com">Google</a></a>;<br></sec:authorize><br></code><br>要么<br><code><br>@Secured(”BF_POLICY_DELETE")<br>public void foo()<br>    …<br>}<br></code></p><p>实际上，有几种方法可以处理此要求。其中之一是创建<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/userdetails/hierarchicalroles/RoleHierarchy.html">RoleHierarchy</a>并使用<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/vote/RoleHierarchyVoter.html">RoleHierarchyVoter</a>遍历角色的层次结构。这种方法的缺点是，在Spring Security 2.0.4的当前实现中，taglib（安全性：authorize…）不会通过<em>AccessDecisionManager</em>做出决定，因此，在制定有关保护HTML元素的决定时，没有<em>投票者</em>扮演任何角色。但是，鉴于Spring Security惊人的灵活性和自定义功能，实现此要求仍然非常简单。<br>Spring Security的最大好处之一是围绕如何创建<em>Principal</em> （UserDetails对象）的自定义。创建<em>UserDetails</em>对象时，将使用<em>GrantedAuthorities</em>列表填充该对象。稍后检查此列表以与保护资源的<em>GrantedAuthority</em>相匹配。<br>我们可以做的自定义之一是在创建<em>UserDetails</em>对象时自定义<em>GrantedAuthorities</em>列表。</p><p>在提供的示例中，有两个属性文件（为简化起见，我使用属性文件，但是您可以轻松地对其进行修改以使用DB或LDAP）。<br>一个文件<em>users.properties</em>将用户映射到<em>角色</em><br><code><br>oleg=powder,ROLE_ADMIN<br></code><br>而另一个角色到<em>bf.properties</em>将角色映射到<em>业务功能</em>列表<br><code><br>ROLE_ADMIN=BF_QUOTE_CREATE,BF_POLICY_CREATE,BF_POLICY_DELETE<br></code><br>我们的目标是创建一个<em>UserDetails</em>对象，其中包含代表<em>角色</em>和<em>业务功能</em>的<em>GrantedAuthorities</em>列表<em>。</em><br>例如：对于用户<strong>oleg</strong> ， <em>GrantedAuthorities</em>列表应为：<br><code><br>ROLE_ADMIN,BF_QUOTE_CREATE,BF_POLICY_CREATE,BF_POLICY_DELETE<br></code><br>因此，我们需要定义一个<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/userdetails/UserDetailsService.html">UserDetailsService</a>的自定义实现，其中通过使用两个属性文件（现实中可以是DB或LDAP），我们将创建<em>GrantedAuthorities的</em>自定义列表，然后将它们注入最终的<em>UserDetails</em>对象。这非常简单，我们可以重用<em>GrantedAuthority</em>接口的现有实现，例如<a href="http://static.springsource.org/spring-security/site/apidocs/org/springframework/security/GrantedAuthorityImpl.html">GrantedAuthorityImpl</a> 。但是，我们还想确保可以为表示业务功能的每个GrantedAuthority跟踪（出于调试或任何其他目的） <strong>父</strong> <em>GrantedAuthority</em> 。<br>为了实现这两个目标，我们将通过定义<strong>BusinessFunctionGrantedAuthority</strong>类来扩展<em>GrantedAuthorityImpl</em> ，该类仅包含定义此类<em>业务功能</em>的所有父<em>GrantedAuthority</em>对象的列表。<br><code><br>public class BusinessFunctionGrantedAuthority extends GrantedAuthorityImpl {<br>    private List<GrantedAuthority> parentAuthorities;<br>        …<br>}<br></code></p><p>然后，我们将创建UserDetailsService的自定义实现，并实现<em>loadUserByName（..）</em>方法，在该方法中执行以下操作：<br><br><br><em>1。根据users.properties文件的内容创建UserAttribute对象。UserAttribute将包含表示角色的GrantedAuthorities列表。<br><br>2。遍历Role-GratedAuthorities列表，并为每个角色-GrantedAuthority创建一个BusinessFunctionGrantedAuthority并将其添加到已创建的GrantedAuthorities的总体列表中<br><br>2.1将父级GrantedAuthority添加到每个BusinessFunctionGrantedAuthority<br><br>3。创建最终的UserDetails对象，其中包含GrantedAuthorities的完整列表。<br></em></p><p>然后在Spring Security配置中定义<em>AuthenticationProvider</em> ：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-6.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-6.png" alt="" title="图片6" width="500" height="126" class="alignnone size-full wp-image-905"></a></p><p>注意：我们正在向AuthenticationProvider注入由ComplexAuthorityUserDetailsService类实现的自定义UserDetailsService。（有关更多详细信息，请参见示例代码）<br><br>保护您的资源，部署和访问应用程序： <em><a href="http://localhost:8080/spring-security-sample-grantedAuthority/index.jsp">http：// localhost：8080 / spring-security-sample-grantedAuthority / index.jsp</a></em><br><br>登录后，您应该看到显示的<em>GrantedAuthorities</em>列表以及<em>Principal的</em>其他属性：</p><p><a href="http://blog.springsource.com/wp-content/uploads/2009/01/picture-5.png"><img src="http://blog.springsource.com/wp-content/uploads/2009/01/picture-5.png" alt="" title="图片5" width="500" height="253" class="alignnone size-full wp-image-901"></a></p><p>您可以清楚地看到，代表<em>业务功能的</em> <em>GrantedAuthority</em>还显示了定义该<em>业务功能</em>的父<em>GratedAuthorities</em>列表。<br>检查<em>index.jsp</em>并观察<em>security：authorize</em>标签如何同时使用<em>角色</em>和<em>业务功能</em>来保护HTML元素<br>就这些。您可以清楚地看到，只需进行少量次要自定义，便可以轻松扩展和自定义主体的结构，并基于自定义GrantedAuthorities应用声明式保护，而不会用自定义安全代码污染您的业务代码。</p><p>样本代码可以在这里下载： <a href="http://blog.springsource.com/wp-content/uploads/2009/01/spring-security-sample-grantedauthority.zip">spring-security-sample-grantedauthority</a></p></div>
 </div>
 <section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+<script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 197;
 
       (function(disqus_shortname, document) {
@@ -188,7 +195,8 @@
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -226,12 +234,14 @@
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>
