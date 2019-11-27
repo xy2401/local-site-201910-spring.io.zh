@@ -5,9 +5,13 @@
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -43,10 +47,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -342,66 +348,8 @@ public class JsonpAdvice extends AbstractJsonpResponseBodyAdvice {
         super(&quot;callback&quot;);
     }
 }
-</code></pre><p>有了这样<code>@ControllerAdvice</code> Bean已注册，则可以使用来从另一个域请求JSON网络服务<code><script /></code>标签：</p>
-<pre><code class="prettyprint html">&lt;script type=&quot;application/javascript&quot;
-            src=&quot;http://mydomain.com/1.json?jsonp=parseResponse&quot;&gt;
-&lt;/script&gt;
-</code></pre><p>在此示例中，收到的有效载荷将是：</p>
-<pre><code class="prettyprint javascript">parseResponse({
-  &quot;id&quot; : 1,
-  &quot;created&quot; : &quot;2014-11-14&quot;,
-  ...
-});
-</code></pre><p>JSONP也受支持，并在使用时自动启用<code>MappingJackson2JsonView</code>带有查询参数名为jsonp或callback的请求。JSONP查询参数名称可以通过<code>jsonpParameterNames</code>属性。</p><h2><a href="#xml-support" class="anchor" name="xml-support"></a> XML支持</h2><p>从2.0版本开始，Jackson对JSON以外的其他一些数据格式提供了一流的支持。 Spring Framework和Spring Boot为基于Jackson的XML序列化/反序列化提供内置支持。</p><p>一旦包含<a href="https://github.com/FasterXML/jackson-dataformat-xml"><code>jackson-dataformat-xml</code></a>依赖于您的项目，它会自动代替JAXB2使用。</p><p>与JAXB2相比，使用Jackson XML扩展具有几个优点：</p>
-<ul>
-<li>杰克逊和JAXB注释都可以识别</li>
-<li>支持JSON View，可让您轻松构建REST Web服务，并为XML和JSON数据格式使用相同的过滤输出</li>
-<li>无需注释您的班级<code>@XmlRootElement</code> ，每个可序列化为JSON的类将可序列化为XML</li>
-</ul><p>通常，您还需要确保使用的XML库是Woodstox，因为：</p>
-<ul>
-<li>它比JDK提供的Stax实现要快</li>
-<li>它避免了一些已知问题，例如添加不必要的名称空间前缀</li>
-<li>没有它，某些功能（例如漂亮的打印）将无法使用</li>
-</ul><p>为了使用它，只需添加最新的<a href="https://search.maven.org/#search|gav|1|g%3A"org.codehaus.woodstox" AND a%3A"woodstox-core-asl""><code>woodstox-core-asl</code></a>项目可用的依赖项。</p><h2><a href="#customizing-the-jackson-objectmapper" class="anchor" name="customizing-the-jackson-objectmapper"></a>定制Jackson ObjectMapper</h2><p>在Spring Framework 4.1.1之前，Jackson <code>HttpMessageConverter</code> s正在使用<code>ObjectMapper</code>默认配置。为了提供更好且易于自定义的默认配置， <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html"><code>Jackson2ObjectMapperBuilder</code></a>已经介绍了。它与众所周知的JavaConfig等效<a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperFactoryBean.html"><code>Jackson2ObjectMapperFactoryBean</code></a>在XML配置中使用。</p><p><a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html"><code>Jackson2ObjectMapperBuilder</code></a>提供了一个不错的API，可以自定义各种Jackson设置，同时保留Spring Framework提供的默认设置。它还允许创建<code>ObjectMapper</code>和<code>XmlMapper</code>基于相同配置的实例。</p><p>都<code>Jackson2ObjectMapperBuilder</code>和<code>Jackson2ObjectMapperFactoryBean</code>定义更好的Jackson默认配置。例如， <a href="https://fasterxml.github.io/jackson-databind/javadoc/2.0.0/com/fasterxml/jackson/databind/DeserializationFeature.html#FAIL_ON_UNKNOWN_PROPERTIES"><code>DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES</code></a>属性设置为false，以便允许反序列化具有未映射属性的JSON对象。</p><p>这些类还使您可以轻松注册Jackson <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#mixIn-java.lang.Class-java.lang.Class-">混合器</a> ， <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#modules-java.util.List-">模块</a> ， <a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#serializers-com.fasterxml.jackson.databind.JsonSerializer...-">序列化器</a>甚至属性命名策略，例如<code>PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES</code>如果你想拥有你的<code>userName</code> java属性翻译成<code>user_name</code>在JSON中。</p><h3><a href="#with-spring-boot" class="anchor" name="with-spring-boot"></a>带有弹簧靴</h3><p>如Spring Boot参考文档中所述，有多种方法可以<a href="https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto-customize-the-jackson-objectmapper">自定义Jackson <code>ObjectMapper</code></a> 。</p><p>例如，您可以通过添加以下属性轻松地启用/禁用Jackson功能<code>spring.jackson.serialization.indent_output=true</code>至<a href="https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-external-config-application-property-files"><code>application.properties</code></a> 。</p><p>作为替代方案，Spring Boot还允许自定义Spring MVC使用的Jackson配置（JSON和XML） <code>HttpMessageConverter</code>通过声明一个<code>Jackson2ObjectMapperBuilder</code><code>@Bean</code> ：</p>
-<pre><code class="prettyprint java">@Bean
-public Jackson2ObjectMapperBuilder jacksonBuilder() {
-	Jackson2ObjectMapperBuilder b = new Jackson2ObjectMapperBuilder();
-	b.indentOutput(true).dateFormat(new SimpleDateFormat(&quot;yyyy-MM-dd&quot;));
-	return b;
-}
-</code></pre><p>如果要使用常规配置密钥未公开的高级Jackson配置，这将很有用。</p><p>如果您只需要注册一个额外的Jackson模块，请注意Spring Boot会自动检测所有<code>Module</code><code>@Bean</code> 。例如，注册<a href="https://github.com/FasterXML/jackson-module-parameter-names">jackson-module-parameter-names</a> ：</p>
-<pre><code class="prettyprint java">@Bean
-public Module parameterNamesModule() {
-  return new ParameterNamesModule(JsonCreator.Mode.PROPERTIES);
-}
-</code></pre><h3><a href="#without-spring-boot" class="anchor" name="without-spring-boot"></a>没有Spring Boot</h3><p>在普通的Spring Framework应用程序中，您还可以使用<code>Jackson2ObjectMapperBuilder</code>自定义XML和JSON <code>HttpMessageConverter</code>如下所示：</p>
-<pre><code class="prettyprint java">@Configuration
-@EnableWebMvc
-public class WebConfiguration extends WebMvcConfigurerAdapter {
-
-	@Override
-	public void configureMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters) {
-		Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-		builder.indentOutput(true).dateFormat(new SimpleDateFormat(&quot;yyyy-MM-dd&quot;));
-		converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
-		converters.add(new MappingJackson2XmlHttpMessageConverter(builder.createXmlMapper(true).build()));
-	}
-}
-</code></pre><h3><a href="#jackson-modules" class="anchor" name="jackson-modules"></a>杰克逊模块</h3><p>如果在类路径中检测到某些知名的Jackson模块，则会自动注册它们：</p>
-<ul>
-<li><a href="https://github.com/FasterXML/jackson-datatype-jdk7">jackson-datatype-jdk7</a> ：Java 7类型，例如<code>java.nio.file.Path</code> （从4.2.1版本开始）</li>
-<li><a href="https://github.com/FasterXML/jackson-datatype-joda">jackson-datatype-joda</a> ：乔达时间类型</li>
-<li><a href="https://github.com/FasterXML/jackson-datatype-jsr310">jackson-datatype-jsr310</a> ：Java 8日期和时间API数据类型</li>
-<li><a href="https://github.com/FasterXML/jackson-datatype-jdk8">jackson-datatype-jdk8</a> ：其他Java 8类型，例如<code>Optional</code> （从4.2.0版开始）</li>
-</ul><p>其他一些模块默认情况下未注册（主要是因为它们需要其他配置），因此您必须显式注册它们，例如使用<a href="https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/http/converter/json/Jackson2ObjectMapperBuilder.html#modulesToInstall-com.fasterxml.jackson.databind.Module...-"><code>Jackson2ObjectMapperBuilder#modulesToInstall()</code></a>或通过宣布杰克逊<code>Module</code><code>@Bean</code>如果您使用的是Spring Boot：</p>
-<ul>
-<li><a href="https://github.com/FasterXML/jackson-module-parameter-names">jackson-module-parameter-names</a> ：添加了对访问参数名称的支持（在Java 8中添加的功能）</li>
-<li><a href="https://github.com/zalando/jackson-datatype-money">杰克逊数据类型货币</a> ： <code>javax.money</code>类型（非官方模块）</li>
-<li><a href="https://github.com/FasterXML/jackson-datatype-hibernate">jackson-datatype-hibernate</a> ：休眠特定的类型和属性（包括延迟加载方面）</li>
-</ul><h2><a href="#advanced-features" class="anchor" name="advanced-features"></a>高级功能</h2><p>从Spring Framework 4.1.3开始，由于添加了Spring上下文感知<a href="http://wiki.fasterxml.com/HandlerInstantiator"><code>HandlerInstantiator</code></a> （有关更多详细信息，请参见<a href="https://jira.spring.io/browse/SPR-10768">SPR-10768</a> ），您可以自动连接Jackson处理器（序列化器，反序列化器，类型和类型ID解析器）。</p><p>例如，这可以允许您构建自定义反序列化器，该自解串器会将JSON有效负载中仅包含引用的字段替换为完整的<code>Entity</code>从数据库中检索。</p></div>
-</div>
-<section id="disqus_thread"></section>
-<script src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js" data-cfasync="false"></script><script type="text/javascript">var disqus_shortname = 'spring-io';
+</code></pre><p>有了这样<code>@ControllerAdvice</code> Bean已注册，则可以使用来从另一个域请求JSON网络服务<code><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1840;
 
       (function(disqus_shortname, document) {
@@ -415,7 +363,8 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -453,12 +402,14 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>

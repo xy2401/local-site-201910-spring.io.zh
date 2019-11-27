@@ -1,5 +1,5 @@
 <html  data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>Building richer hypermedia with Spring HATEOAS</title>
+<title>使用Spring HATEOAS构建更丰富的超媒体</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
@@ -25,109 +25,87 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@springcentral">
 <meta name="twitter:title" content="Building richer hypermedia with Spring HATEOAS">
-<meta name="twitter:description" content="<div class=" paragrap="="> 
- </head><body ><p>Greetings Spring community,</p> 
+<meta name="twitter:description" content="&lt;div class=" paragrap="="> 
+ </head><body ><p>春季问候社区，</p> 
 
 <div class="paragraph"> 
- <p>As <a href="https://twitter.com/gregturn/status/935853433931943936">previously announced</a>, we have released a new <strong>Affordances API</strong> in 1.0.0.BUILD-SNAPSHOT. In this blog post, we’ll take a peek at exactly what this feature lets you do.</p> 
+ <p>如<a href="https://twitter.com/gregturn/status/935853433931943936">先前所宣布</a> ，我们已经在1.0.0中发布了新的<strong>Affordances API</strong> 。建立快照。在此博客文章中，我们将窥视此功能可为您提供的确切功能。</p> 
 </div>
 <div class="sect1"> 
- <h2 id="history-of-affordances"><a class="anchor" href="#history-of-affordances"></a>History of Affordances</h2> 
+ <h2 id="history-of-affordances"><a class="anchor" href="#history-of-affordances"></a>负担的历史</h2> 
  <div class="sectionbody"> 
   <div class="paragraph"> 
-   <p>For starters, what is an <strong>affordance</strong>? Doing a little archeology, Mike Admundsen, a REST advocate, has <a href="http://amundsen.com/blog/archives/1109">an article detailing the word’s origins</a>, going back at least to 1986:</p> 
+   <p>首先，什么是<strong>负担能力</strong> ？REST倡导者Mike Admundsen做了一点考古，至少在1986年有<a href="http://amundsen.com/blog/archives/1109">一篇文章详细介绍了这个词的起源</a> ：</p> 
   </div> 
   <div class="verseblock"> 
-   <pre class="content">The affordances of the environment are what it offers …​ what it provides or furnishes, either for good or ill. The verb 'to afford' is found in the dictionary, but the noun 'affordance' is not. I have made it up (page 126).</pre> 
-   <div class="attribution">
-     — The Ecological Approach to Visual Perception (Gibson) 
-   </div> 
+   <pre class="content">环境的承受能力就是它所提供的.........无论是好还是坏，它所提供或提供的东西。动词“ toford”在词典中找到，但名词“ affordance”却没有。我已经整理好了（第126页）。</pre> 
+   <div class="attribution">—视觉感知的生态方法（吉布森）</div> 
   </div> 
   <div class="paragraph"> 
-   <p>It then appeared in a psychology paper in 1988:</p> 
+   <p>然后在1988年的心理学论文中出现：</p> 
   </div> 
   <div class="verseblock"> 
-   <pre class="content">…​the term affordance refers to the perceived and actual properties of the thing, primarily those fundamental properties that determine just how the thing could possibly be used. (pg 9)</pre> 
-   <div class="attribution">
-     — The Design|Psychology of Everyday Things (Norman) 
-   </div> 
+   <pre class="content">......``负担''一词指的是事物的感知和实际属性，主要是那些决定如何使用事物的基本属性。 （第9页）</pre> 
+   <div class="attribution">—日常事物的设计|心理学（Norman）</div> 
   </div> 
   <div class="paragraph"> 
-   <p>Finally, it can be found in none other than one of Roy Fielding’s presentations on hypermedia in 2008:</p> 
+   <p>最后，在Roy Fielding在2008年关于超媒体的演讲之一中，可以找到它：</p> 
   </div> 
   <div class="verseblock"> 
-   <pre class="content">When I say Hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user obtains choices and selects actions (slide #50).</pre> 
-   <div class="attribution">
-     — Slide presention on REST (Fielding) 
-   </div> 
+   <pre class="content">当我说“超文本”时，我的意思是信息和控件的同时呈现，从而使信息成为用户通过其获得选择和选择动作的能力（幻灯片＃50）。</pre> 
+   <div class="attribution">—在REST上幻灯片演示（字段）</div> 
   </div> 
   <div class="paragraph"> 
-   <p>In all these situations, "affordance" refers to the available actions provided by the surrounding environment. In the context of REST, these are actions detailed by the hypermedia.</p> 
+   <p>在所有这些情况下，“负担”是指周围环境提供的可用操作。在REST的上下文中，这些是超媒体详细描述的操作。</p> 
   </div> 
   <div class="paragraph"> 
-   <p>In the past, when people moved away from SOAP and its action-based tactics, they have struggled to document their APIs, many unaware that Roy Fielding built hypermedia into REST for this very purpose. By including data along with the controls to not just find related data, but to also use the data is key.</p> 
+   <p>过去，当人们放弃SOAP及其基于动作的策略时，他们一直在努力记录自己的API，许多人并不知道Roy Fielding为此目的将超媒体内置到REST中。通过包含数据和控件，不仅可以找到相关数据，而且还可以使用数据是关键。</p> 
   </div> 
   <div class="paragraph"> 
-   <p>With a HAL document, clients are provided very simple affordances. The links are shown but nothing else about them. What you can do with the links and what it takes to interact with them is not detailed.</p> 
+   <p>通过HAL文档，可以为客户提供非常简单的费用。链接已显示，但没有其他内容。没有详细说明您可以使用链接做什么以及与链接进行交互所需要的操作。</p> 
   </div> 
  </div> 
-</div>
-">
-<meta name="twitter:creator" content="@gregturn">
-<meta name="twitter:image:src" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200">
-
-<meta property="og:title" content="Building richer hypermedia with Spring HATEOAS">
-<meta property="og:image" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200">
-<meta property="og:description" content="<div class=" paragrap="="> 
- <p>Greetings Spring community,</p> 
+</div>“&gt; <meta name="twitter:creator" content="@gregturn"><meta name="twitter:image:src" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200"><meta property="og:title" content="Building richer hypermedia with Spring HATEOAS"><meta property="og:image" content="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=200"><meta property="og:description" content="&lt;div class=" paragrap="="> 
+ <p>春季问候社区，</p> 
 
 <div class="paragraph"> 
- <p>As <a href="https://twitter.com/gregturn/status/935853433931943936">previously announced</a>, we have released a new <strong>Affordances API</strong> in 1.0.0.BUILD-SNAPSHOT. In this blog post, we’ll take a peek at exactly what this feature lets you do.</p> 
+ <p>如<a href="https://twitter.com/gregturn/status/935853433931943936">先前所宣布</a> ，我们已经在1.0.0中发布了新的<strong>Affordances API</strong> 。建立快照。在此博客文章中，我们将窥视此功能可为您提供的确切功能。</p> 
 </div>
 <div class="sect1"> 
- <h2 id="history-of-affordances"><a class="anchor" href="#history-of-affordances"></a>History of Affordances</h2> 
+ <h2 id="history-of-affordances"><a class="anchor" href="#history-of-affordances"></a>负担的历史</h2> 
  <div class="sectionbody"> 
   <div class="paragraph"> 
-   <p>For starters, what is an <strong>affordance</strong>? Doing a little archeology, Mike Admundsen, a REST advocate, has <a href="http://amundsen.com/blog/archives/1109">an article detailing the word’s origins</a>, going back at least to 1986:</p> 
+   <p>首先，什么是<strong>负担能力</strong> ？REST倡导者Mike Admundsen做了一点考古，至少在1986年有<a href="http://amundsen.com/blog/archives/1109">一篇文章详细介绍了这个词的起源</a> ：</p> 
   </div> 
   <div class="verseblock"> 
-   <pre class="content">The affordances of the environment are what it offers …​ what it provides or furnishes, either for good or ill. The verb 'to afford' is found in the dictionary, but the noun 'affordance' is not. I have made it up (page 126).</pre> 
-   <div class="attribution">
-     — The Ecological Approach to Visual Perception (Gibson) 
-   </div> 
+   <pre class="content">环境的承受能力就是它所提供的.........无论是好还是坏，它所提供或提供的东西。动词“ toford”在词典中找到，但名词“ affordance”却没有。我已经整理好了（第126页）。</pre> 
+   <div class="attribution">—视觉感知的生态方法（吉布森）</div> 
   </div> 
   <div class="paragraph"> 
-   <p>It then appeared in a psychology paper in 1988:</p> 
+   <p>然后在1988年的心理学论文中出现：</p> 
   </div> 
   <div class="verseblock"> 
-   <pre class="content">…​the term affordance refers to the perceived and actual properties of the thing, primarily those fundamental properties that determine just how the thing could possibly be used. (pg 9)</pre> 
-   <div class="attribution">
-     — The Design|Psychology of Everyday Things (Norman) 
-   </div> 
+   <pre class="content">......``负担''一词指的是事物的感知和实际属性，主要是那些决定如何使用事物的基本属性。 （第9页）</pre> 
+   <div class="attribution">—日常事物的设计|心理学（Norman）</div> 
   </div> 
   <div class="paragraph"> 
-   <p>Finally, it can be found in none other than one of Roy Fielding’s presentations on hypermedia in 2008:</p> 
+   <p>最后，在Roy Fielding在2008年关于超媒体的演讲之一中，可以找到它：</p> 
   </div> 
   <div class="verseblock"> 
-   <pre class="content">When I say Hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user obtains choices and selects actions (slide #50).</pre> 
-   <div class="attribution">
-     — Slide presention on REST (Fielding) 
-   </div> 
+   <pre class="content">当我说“超文本”时，我的意思是信息和控件的同时呈现，从而使信息成为用户通过其获得选择和选择动作的能力（幻灯片＃50）。</pre> 
+   <div class="attribution">—在REST上幻灯片演示（字段）</div> 
   </div> 
   <div class="paragraph"> 
-   <p>In all these situations, "affordance" refers to the available actions provided by the surrounding environment. In the context of REST, these are actions detailed by the hypermedia.</p> 
+   <p>在所有这些情况下，“负担”是指周围环境提供的可用操作。在REST的上下文中，这些是超媒体详细描述的操作。</p> 
   </div> 
   <div class="paragraph"> 
-   <p>In the past, when people moved away from SOAP and its action-based tactics, they have struggled to document their APIs, many unaware that Roy Fielding built hypermedia into REST for this very purpose. By including data along with the controls to not just find related data, but to also use the data is key.</p> 
+   <p>过去，当人们放弃SOAP及其基于动作的策略时，他们一直在努力记录自己的API，许多人并不知道Roy Fielding为此目的将超媒体内置到REST中。通过包含数据和控件，不仅可以找到相关数据，而且还可以使用数据是关键。</p> 
   </div> 
   <div class="paragraph"> 
-   <p>With a HAL document, clients are provided very simple affordances. The links are shown but nothing else about them. What you can do with the links and what it takes to interact with them is not detailed.</p> 
+   <p>通过HAL文档，可以为客户提供非常简单的费用。链接已显示，但没有其他内容。没有详细说明您可以使用链接做什么以及与链接进行交互所需要的操作。</p> 
   </div> 
  </div> 
-</div>
-">
-<meta content="article" property="og:type">
-<meta property="og:article:published_time" content="2018-01-12 17:40:00.0">
+</div>“&gt; <meta content="article" property="og:type"><meta property="og:article:published_time" content="2018-01-12 17:40:00.0">
 
 
 
@@ -148,16 +126,16 @@
 </div>
 <ul class="nav pull-right">
 <li class="navbar-link">
-<a href="/projects">Projects</a>
+<a href="/projects">专案</a>
 </li>
 <li class="navbar-link">
-<a href="/guides">Guides</a>
+<a href="/guides">导游</a>
 </li>
 <li class="navbar-link active">
-<a href="/blog">Blog</a>
+<a href="/blog">博客</a>
 </li>
 <li class="navbar-link">
-<a href="/services">Training & Certification</a>
+<a href="/services">培训与认证</a>
 </li>
 <li class="navbar-link nav-search js-nav-search">
 <a>
@@ -174,7 +152,7 @@
 <div class="container-fluid">
 <div class="search-form--container">
 <form class="form-inline form-search" action="/search" method="get">
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value="">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索文档，指南和帖子..." type="text" value="">
 <button class="search-form--submit" type="submit"></button>
 </form>
 </div>
@@ -187,38 +165,28 @@
 <div class="mobile-search--container">
 <form class="form-inline form-search" action="/search" method="get">
 <button class="search-form--submit" type="submit"></button>
-<input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value="">
+<input class="search-query search-form--form js-search-input" name="q" placeholder="搜索..." type="text" value="">
 </form>
 </div>
 <div class="navigation-item-list">
 <div class="navbar-link">
-<a href="/">
-Home
-<i class="icon-chevron-right pull-right"></i>
+<a href="/">家<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/projects">
-Projects
-<i class="icon-chevron-right pull-right"></i>
+<a href="/projects">专案<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/guides">
-Guides
-<i class="icon-chevron-right pull-right"></i>
+<a href="/guides">导游<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link active">
-<a href="/blog">
-Blog
-<i class="icon-chevron-right pull-right"></i>
+<a href="/blog">博客<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 <div class="navbar-link">
-<a href="/services">
-Training & Certification
-<i class="icon-chevron-right pull-right"></i>
+<a href="/services">培训与认证<i class="icon-chevron-right pull-right"></i>
 </a>
 </div>
 </div>
@@ -244,30 +212,29 @@ Training & Certification
 <article class="span8 mobile-left-pane" id="content">
 <header class="desktop-only">
 <div class="blog-category active content--title">
-<div>Engineering</div>
+<div>工程</div>
 </div>
 <div class="blog-category content--title">
-<div>Releases</div>
+<div>发布</div>
 </div>
 <div class="blog-category content--title">
-<div>News and Events</div>
+<div>新闻与活动</div>
 </div>
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Building richer hypermedia with Spring HATEOAS</h1>
+<h1 class="blog--title">使用Spring HATEOAS构建更丰富的超媒体</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
-<a class="category">Engineering</a>
+<a class="category">工程</a>
 </div>
 <div class="meta-data--item">
-<img class="meta-data--icon" src="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=20&d=mm">
-<a class="author" rel="author" href="/team/gturnquist">Greg Turnquist</a>
+<img class="meta-data--icon" src="https://gravatar.com/avatar/43e9a9d63f7f4f9891c9fcd592b89cfa?s=20&amp;d=mm"> <a class="author" rel="author" href="/team/gturnquist">格雷格·特恩奎斯特</a>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon calendar"></div>
-<time class="date" pubdate="" datetime="2018-01-12 17:40:00.0">January 12, 2018</time>
+<time class="date" pubdate="" datetime="2018-01-12 17:40:00.0">一月12，2018</time>
 </div>
 <div class="meta-data--item">
 <div class="meta-data--icon icon blog-icon comments"></div>
@@ -276,284 +243,167 @@ Training & Certification
 </div>
 </header>
 <div class="blog--post"><div class="paragraph">
-<p>Greetings Spring community,</p>
+<p>春季问候社区，</p>
 </div>
 <div class="paragraph">
-<p>As <a href="https://twitter.com/gregturn/status/935853433931943936">previously announced</a>, we have released a new <strong>Affordances API</strong> in 1.0.0.BUILD-SNAPSHOT. In this blog post, we’ll take a peek at exactly what this feature lets you do.</p>
+<p>如<a href="https://twitter.com/gregturn/status/935853433931943936">先前所宣布</a> ，我们已经在1.0.0中发布了新的<strong>Affordances API</strong> 。建立快照。在此博客文章中，我们将窥视此功能可为您提供的确切功能。</p>
 </div>
 <div class="sect1">
-<h2 id="history-of-affordances"><a class="anchor" href="#history-of-affordances"></a>History of Affordances</h2>
+<h2 id="history-of-affordances"><a class="anchor" href="#history-of-affordances"></a>负担的历史</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>For starters, what is an <strong>affordance</strong>? Doing a little archeology, Mike Admundsen, a REST advocate, has <a href="http://amundsen.com/blog/archives/1109">an article detailing the word’s origins</a>, going back at least to 1986:</p>
+<p>首先，什么是<strong>负担能力</strong> ？REST倡导者Mike Admundsen做了一点考古，至少在1986年有<a href="http://amundsen.com/blog/archives/1109">一篇文章详细介绍了这个词的起源</a> ：</p>
 </div>
 <div class="verseblock">
-<pre class="content">The affordances of the environment are what it offers …​ what it provides or furnishes, either for good or ill. The verb 'to afford' is found in the dictionary, but the noun 'affordance' is not. I have made it up (page 126).</pre>
-<div class="attribution">
-— The Ecological Approach to Visual Perception (Gibson)
-</div>
+<pre class="content">环境的承受能力就是它所提供的.........无论是好还是坏，它所提供或提供的东西。动词“ toford”在词典中找到，但名词“ affordance”却没有。我已经整理好了（第126页）。</pre>
+<div class="attribution">—视觉感知的生态方法（吉布森）</div>
 </div>
 <div class="paragraph">
-<p>It then appeared in a psychology paper in 1988:</p>
+<p>然后在1988年的心理学论文中出现：</p>
 </div>
 <div class="verseblock">
-<pre class="content">…​the term affordance refers to the perceived and actual properties of the thing, primarily those fundamental properties that determine just how the thing could possibly be used. (pg 9)</pre>
-<div class="attribution">
-— The Design|Psychology of Everyday Things (Norman)
-</div>
+<pre class="content">......``负担''一词指的是事物的感知和实际属性，主要是那些决定如何使用事物的基本属性。 （第9页）</pre>
+<div class="attribution">—日常事物的设计|心理学（Norman）</div>
 </div>
 <div class="paragraph">
-<p>Finally, it can be found in none other than one of Roy Fielding’s presentations on hypermedia in 2008:</p>
+<p>最后，在Roy Fielding在2008年关于超媒体的演讲之一中，可以找到它：</p>
 </div>
 <div class="verseblock">
-<pre class="content">When I say Hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user obtains choices and selects actions (slide #50).</pre>
-<div class="attribution">
-— Slide presention on REST (Fielding)
-</div>
+<pre class="content">当我说“超文本”时，我的意思是信息和控件的同时呈现，从而使信息成为用户通过其获得选择和选择动作的能力（幻灯片＃50）。</pre>
+<div class="attribution">—在REST上幻灯片演示（字段）</div>
 </div>
 <div class="paragraph">
-<p>In all these situations, "affordance" refers to the available actions provided by the surrounding environment. In the context of REST, these are actions detailed by the hypermedia.</p>
+<p>在所有这些情况下，“负担”是指周围环境提供的可用操作。在REST的上下文中，这些是超媒体详细描述的操作。</p>
 </div>
 <div class="paragraph">
-<p>In the past, when people moved away from SOAP and its action-based tactics, they have struggled to document their APIs, many unaware that Roy Fielding built hypermedia into REST for this very purpose. By including data along with the controls to not just find related data, but to also use the data is key.</p>
+<p>过去，当人们放弃SOAP及其基于动作的策略时，他们一直在努力记录自己的API，许多人并不知道Roy Fielding为此目的将超媒体内置到REST中。通过包含数据和控件，不仅可以找到相关数据，而且还可以使用数据是关键。</p>
 </div>
 <div class="paragraph">
-<p>With a HAL document, clients are provided very simple affordances. The links are shown but nothing else about them. What you can do with the links and what it takes to interact with them is not detailed.</p>
+<p>通过HAL文档，可以为客户提供非常简单的费用。链接已显示，但没有其他内容。没有详细说明您可以使用链接做什么以及与链接进行交互所需要的操作。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="affordances-and-spring-hateoas"><a class="anchor" href="#affordances-and-spring-hateoas"></a>Affordances and Spring HATEOAS</h2>
+<h2 id="affordances-and-spring-hateoas"><a class="anchor" href="#affordances-and-spring-hateoas"></a>负担和春季HATEOAS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can start exploring this new API by defining the following domain object:</p>
+<p>您可以通过定义以下域对象来开始探索这个新的API：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Data
-@Entity
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor
-class Employee {
-
-	@Id @GeneratedValue
-	private Long id;
-	private String firstName;
-	private String lastName;
-	private String role;
-
-	/**
-	 * Useful constructor when id is not yet known.
-	 */
-	Employee(String firstName, String lastName, String role) {
-
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.role = role;
-	}
-}</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Data @Entity @NoArgsConstructor（访问= AccessLevel。PRIVATE）@AllArgsConstructor类Employee {@Id @GeneratedValue私有Long ID；私有字符串firstName;私有字符串lastName;私有字符串角色； / ** *当id未知时有用的构造函数。* / Employee（String firstName，String lastName，String role）{this.firstName = firstName; this.lastName = lastName;这个角色=角色; }}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This domain object gives us a pretty simple POJO to interact with. To persist such objects, you need to define a corresponding Spring Data JPA repository:</p>
+<p>这个领域对象为我们提供了一个非常简单的POJO与之交互。为了持久化此类对象，您需要定义一个相应的Spring Data JPA存储库：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">interface EmployeeRepository extends CrudRepository<Employee, Long> {
-}</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">EmployeeRepository接口扩展了CrudRepository <employee, long="">{}</employee,></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This repository will supply the simplest CRUD operations.</p>
+<p>该存储库将提供最简单的CRUD操作。</p>
 </div>
 <div class="paragraph">
-<p>With these components, the table is set. You can now start defining REST operations and their corresponding affordances. First of all, create a Spring MVC REST controller as shown below:</p>
+<p>使用这些组件，可以设置表格。现在，您可以开始定义REST操作及其相应的功能。首先，创建一个Spring MVC REST控制器，如下所示：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RestController
-class EmployeeController {
-
-	private final EmployeeRepository repository;
-
-	EmployeeController(EmployeeRepository repository) {
-		this.repository = repository;
-	}
-
-	...
-}</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RestController类EmployeeController {私有的最终EmployeeRepository存储库； EmployeeController（EmployeeRepository仓库）{this.repository =仓库； } ...}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This control contains some key traits:</p>
+<p>此控件包含一些关键特征：</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>@RestController</code> indicates that all the mappings will write their results directly into the response body, not render view templates.</p>
+<p><code>@RestController</code>表示所有映射将直接将其结果写入响应主体，而不是呈现视图模板。</p>
 </li>
 <li>
-<p>The <code>EmployeeRepository</code> is injected via constructor injection, ensuring a consistent state.</p>
+<p><code>EmployeeRepository</code>通过构造函数注入被注入，以确保状态一致。</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Spring HATEOAS already has the means to build links out of Spring MVC endpoints. What this API provides is the ability to connect one endpoint with another. For example, you can link the <strong>GET</strong> endpoint for a single item resource (<code>/employees/{id}</code>) to the <strong>PUT</strong> mapping used for updating that employee (<code>/employees/{id}</code>). The following code shows just such a relationship:</p>
+<p>Spring HATEOAS已经具有在Spring MVC端点之外构建链接的方法。该API提供的功能是可以将一个端点连接到另一个端点。例如，您可以将单个项目资源（ <code>/employees/{id}</code> ）的<strong>GET</strong>端点链接到用于更新该员工（ <code>/employees/{id}</code> ）的<strong>PUT</strong>映射。以下代码显示了这种关系：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RestController
-class EmployeeController {
-
-	...
-
-	@GetMapping("/employees/{id}")
-	ResponseEntity<Resource<Employee>> findOne(@PathVariable long id) {
-
-		return repository.findById(id)
-			.map(employee -> new Resource<>(employee, getSingleItemLinks(employee.getId())))
-			.map(ResponseEntity::ok)
-			.orElse(ResponseEntity.notFound().build());
-	}
-
-	@PutMapping("/employees/{id}")
-	ResponseEntity<?> updateEmployee(@RequestBody Employee employee, @PathVariable long id) {
-
-		employee.setId(id);
-		Employee updatedEmployee = repository.save(employee);
-
-		Resource<Employee> employeeResource = new Resource<>(updatedEmployee, getSingleItemLinks(updatedEmployee.getId()));
-
-		try {
-			return ResponseEntity
-				.created(new URI(employeeResource.getRequiredLink(Link.REL_SELF).getHref()))
-				.body(employeeResource);
-		} catch (URISyntaxException e) {
-			return ResponseEntity.badRequest().body("Unable to update " + employee);
-		}
-	}
-
-	...
-
-	private List<Link> getSingleItemLinks(long id) {
-
-		return Arrays.asList(linkTo(methodOn(EmployeeController.class).findOne(id)).withSelfRel()
-				.andAffordance(afford(methodOn(EmployeeController.class).updateEmployee(null, id)))
-				.andAffordance(afford(methodOn(EmployeeController.class).deleteEmployee(id))),
-			linkTo(methodOn(EmployeeController.class).findAll()).withRel("employees"));
-	}
-}</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RestController类EmployeeController {...@GetMapping（“ / employees / {id}”）ResponseEntity <resource<employee>&gt; findOne（@PathVariable long id）{返回repository.findById（id）.map（employee-&gt; new Resource &lt;&gt;（employee，getSingleItemLinks（employee.getId（）） ））.map（ResponseEntity :: ok）.orElse（ResponseEntity.notFound（）。build（））; } @PutMapping（“ / employees / {id}”）ResponseEntity <?>updateEmployee（@RequestBody雇员雇员，@ PathVariable长ID）{employee.setId（id）;员工更新员工= repository.save（employee）;资源<employee>employeeResource =新资源&lt;&gt;（updatedEmployee，getSingleItemLinks（updatedEmployee.getId（）））;尝试{return ResponseEntity .created（new URI（employeeResource.getRequiredLink（Link。REL_SELF）.getHref（）））.body（employeeResource）; } catch（URISyntaxException e）{返回ResponseEntity.badRequest（）。body（“无法更新” +员工）； }} ...私人名单<link> getSingleItemLinks（long id）{return Arrays.asList（linkTo（methodOn（EmployeeController.class）.findOne（id））。withSelfRel（）.andAffordance（afford（methodOn（EmployeeController.class）.updateEmployee（null，id）））。 andAffordance（afford（methodOn（EmployeeController.class）.deleteEmployee（id））），linkTo（methodOn（EmployeeController.class）.findAll（））。withRel（“ employees”））; }}</employee></?></resource<employee></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>In the middle of this code are several usages of <code>.andAffordance(afford(methodOn(…​)))</code>. This is where a given link (the <strong>self</strong> link for <code>findOne</code>) is connected to a related link on the same URI (<code>updateEmployee</code>).</p>
+<p>在这段代码的中间是<code>.andAffordance(afford(methodOn(…​)))</code>几种用法。这是给定链接（ <code>findOne</code>的<strong>自身</strong>链接）连接到同一URI（ <code>updateEmployee</code> ）上的相关链接的<code>updateEmployee</code> 。</p>
 </div>
 <div class="paragraph">
-<p>With this version, Spring HATEOAS can now glean information about the Spring MVC endpoint in a mediatype-neutral format, allowing you to serve it up to users. Which begs the question—​how do you display this relationship of links to users?</p>
+<p>通过此版本，Spring HATEOAS现在可以以与媒体类型无关的格式收集有关Spring MVC端点的信息，从而使您可以将其提供给用户。哪个提出了问题-您如何显示链接到用户的这种关系？</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="introducing-hal-forms"><a class="anchor" href="#introducing-hal-forms"></a>Introducing HAL-FORMS</h2>
+<h2 id="introducing-hal-forms"><a class="anchor" href="#introducing-hal-forms"></a>介绍HAL-FORM</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>HAL itself doesn’t include any format to display these affordances. If you have multiple links at the same URI in a given resource, HAL will simply show one link. Thankfully, the popularity of HAL in the world of REST has caused derivative specs to start being developed.</p>
+<p>HAL本身不包含任何显示这些能力的格式。如果在给定资源中的同一URI上有多个链接，则HAL将仅显示一个链接。值得庆幸的是，HAL在REST世界中的普及已导致衍生规范的开始开发。</p>
 </div>
 <div class="paragraph">
-<p><a href="https://rwcbook.github.io/hal-forms/">HAL-FORMS</a> is a HAL extension that looks like any other HAL document with one additional field: <strong>_templates</strong>. This field allows displaying methods as well as properties.</p>
+<p><a href="https://rwcbook.github.io/hal-forms/">HAL-FORMS</a>是一种HAL扩展，看起来与任何其他HAL文档一样，都带有一个附加字段： <strong>_templates</strong> 。该字段允许显示方法和属性。</p>
 </div>
 <div class="paragraph">
-<p>Assuming the single item <code>Resource<Employee></code> code up above connected a Spring MVC <code>@GetMapping</code> endpoint to a <code>@PutMapping</code> endpoint (and you had some employee data loaded into the database), Spring HATEOAS will generate HAL-FORMS hypermedia like this:</p>
+<p>假设单项<code>Resource <employee></employee></code>在上面的代码中，将Spring MVC <code>@GetMapping</code>端点连接到<code>@PutMapping</code>端点（并且您已将一些员工数据加载到数据库中），Spring HATEOAS将生成HAL-FORMS超媒体，如下所示：</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-javascript" data-lang="javascript">{
-  "id" : 1,
-  "firstName" : "Frodo",
-  "lastName" : "Baggins",
-  "role" : "ring bearer",
-  "_links" : {
-    "self" : {
-      "href" : "http://localhost:8080/employees/1"
-    },
-    "employees" : {
-      "href" : "http://localhost:8080/employees"
-    }
-  },
-  "_templates" : {
-    "default" : {
-      "title" : null,
-      "method" : "put",
-      "contentType" : "",
-      "properties" : [ {
-        "name" : "firstName",
-        "required" : true
-      }, {
-        "name" : "id",
-        "required" : true
-      }, {
-        "name" : "lastName",
-        "required" : true
-      }, {
-        "name" : "role",
-        "required" : true
-      } ]
-    },
-    "deleteEmployee" : {
-      "title" : null,
-      "method" : "delete",
-      "contentType" : "",
-      "properties" : [ ]
-    }
-  }
-}</code></pre>
+<pre class="prettyprint highlight"><code class="language-javascript" data-lang="javascript">{“ id”：1，“ firstName”：“ Frodo”，“ lastName”：“ Baggins”，“ role”：“ ring bearer”，“ _ links”：{“ self”：{“ href”：“ http：// / localhost：8080 / employees / 1“}，” employees“：{” href“：” http：// localhost：8080 / employees“}}，” _templates“：{” default“：{” title“：null， “ method”：“ put”，“ contentType”：“”，“ properties”：[{“ name”：“ firstName”，“ required”：true}，{“ name”：“ id”，“ required”：true }，{“ name”：“ lastName”，“ required”：true}，{“ name”：“ role”，“ required”：true}]}，“ deleteEmployee”：{“ title”：null，“方法” ：“删除”，“ contentType”：“”，“属性”：[]}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>When you do a <code>GET /employees/1</code>, this HAL-FORMS document shows both data <em>and</em> links. But more importantly, it gives you a template for editing the resource (the <code>default</code> template). Since HAL-FORMS presumes you are working against the <strong>self</strong> link, you could do a <code>PUT /employees/1</code> to make an update. And the properties it would be looking for include <code>firstName</code>, <code>id</code>, <code>lastName</code>, and <code>role</code>.</p>
+<p>当您执行<code>GET /employees/1</code> ，此HAL-FORMS文档同时显示数据<em>和</em>链接。但更重要的是，它为您提供了一个用于编辑资源的模板（ <code>default</code>模板）。由于HAL-FORMS假定您正在使用<strong>自</strong>链接，因此可以执行<code>PUT /employees/1</code>进行更新。它要查找的属性包括<code>firstName</code> ， <code>id</code> ， <code>lastName</code>和<code>role</code> 。</p>
 </div>
 <div class="paragraph">
-<p>These hypermedia controls also indicate that you can issue a <code>DELETE /employees/1</code> request (the <code>deleteEmployee</code> template). No properties involved.</p>
+<p>这些超媒体控件还指示您可以发出<code>DELETE /employees/1</code>请求（ <code>deleteEmployee</code>模板）。不涉及任何属性。</p>
 </div>
 <div class="paragraph">
-<p>At first glance, this may not appear very impressive since you could already read that in the data shown at the top. But this format grants you the ability to write a little frontend JavaScript, and transform that template into:</p>
+<p>乍一看，这可能看起来并不令人印象深刻，因为您已经可以在顶部显示的数据中阅读到它。但是，这种格式使您能够编写一些前端JavaScript，并将该模板转换为：</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-html" data-lang="html"><form method="put" action="http://localhost:8080/employees/1">
-	<input type="text" id="firstName" name="firstName"/>
-	<input type="text" id="id" name="id" />
-	<input type="text" id="lastName" name="lastName" />
-	<input type="text" id="role" name="role" />
-	<input type="submit" value="Submit" />
+	<input type="text" id="firstName" name="firstName">
+	<input type="text" id="id" name="id">
+	<input type="text" id="lastName" name="lastName">
+	<input type="text" id="role" name="role">
+	<input type="submit" value="提交">
 </form></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>By mixing the <strong>self</strong> link with the listed properties, you can create a real HTML form, purely driven by the hypermedia. This completes the synergy of REST by letting the server push domain-specific details straight to the user of the site. There is no need to code this bit of domain knowledge into the client, hence reducing coupling. Instead, just convert the hypermedia’s template <em>into</em> a form. Then, as domain updates occur on the server side, the client can adapt with little friction.</p>
+<p>通过将<strong>自身</strong>链接与列出的属性混合，您可以创建一个真正由超媒体驱动的真正的HTML表单。通过让服务器将特定于域的详细信息直接推送给站点用户，从而完成了REST的协同作用。无需将这部分领域知识编码到客户端中，从而减少了耦合。相反，只需将超媒体的模板<em>转换</em>为表单即可。然后，当域更新发生在服务器端时，客户端可以轻松适应。</p>
 </div>
 <div class="paragraph">
-<p>In short, HAL-FORMS is designed to show other actions available against the same URI.</p>
+<p>简而言之，HAL-FORMS旨在显示针对同一URI可用的其他操作。</p>
 </div>
 <div class="paragraph">
-<p>Reading all this, did you find yourself asking the question, "why not just push an HTML form out instead of some JSON?" That is a fair question.</p>
+<p>阅读所有这些内容后，您是否发现自己在问一个问题，“为什么不直接推送HTML表单而不是JSON？“这是一个公平的问题。</p>
 </div>
 <div class="paragraph">
-<p>The Affordances API is completely neutral allowing the Spring team to work on other mediatypes apart from HAL-FORMS. Some that are already under development include <a href="https://rawgit.com/uber-hypermedia/specification/master/uber-hypermedia.html#rfc4627">Uber</a>, <a href="https://github.com/kevinswiber/siren">SIREN</a>, <a href="http://amundsen.com/media-types/collection/">Collection+JSON</a>, and a form of XHTML.</p>
+<p>Affordances API是完全中立的，允许Spring团队处理HAL-FORMS之外的其他媒体类型。已经在开发中的一些工具包括<a href="https://rawgit.com/uber-hypermedia/specification/master/uber-hypermedia.html#rfc4627">Uber</a> ， <a href="https://github.com/kevinswiber/siren">SIREN</a> ， <a href="http://amundsen.com/media-types/collection/">Collection + JSON</a>和一种XHTML形式。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="more-examples"><a class="anchor" href="#more-examples"></a>More examples</h2>
+<h2 id="more-examples"><a class="anchor" href="#more-examples"></a>更多例子</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The code and details found in this article can be found at <a href="https://github.com/spring-projects/spring-hateoas-examples" class="bare">https://github.com/spring-projects/spring-hateoas-examples</a>, particularly under <strong>Affordances</strong>.</p>
+<p>可以在<a href="https://github.com/spring-projects/spring-hateoas-examples" class="bare">https://github.com/spring-projects/spring-hateoas-examples</a>上找到本文中找到的代码和详细信息，特别是在<strong>Affordances</strong>下。</p>
 </div>
 <div class="paragraph">
-<p>We look forward to feedback from the community on the API.</p>
+<p>我们期待社区提供有关该API的反馈。</p>
 </div>
 <div class="paragraph">
-<p>Cheers!</p>
+<p>干杯!</p>
 </div>
 </div>
 </div></div>
@@ -576,13 +426,11 @@ class EmployeeController {
 
       }(disqus_shortname, document));
     </script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a class="dsq-brlink" href="https://disqus.com">comments powered by <span class="logo-disqus">Disqus</span></a>
+<noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
+<a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
 <p><a href="/blog">
-<i class="icon-chevron-left"></i>
-Back
-</a></p>
+<i class="icon-chevron-left"></i>背部</a></p>
 </div>
 </article>
 <aside class="span4 mobile-right-pane" id="sidebar">
@@ -590,23 +438,19 @@ Back
 <ul class="right-pane-widget--container secondary-nav with-icon">
 <li class="blog-category">
 <div class="icon blog-icon all-posts"></div>
-<a href="/blog">All Posts</a>
-<a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
+<a href="/blog">所有帖子</a> <a class="pull-right" href="/blog.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category active">
 <div class="icon blog-icon engineering"></div>
-<a href="/blog/category/engineering">Engineering</a>
-<a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/engineering">工程</a> <a class="pull-right" href="/blog/category/engineering.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon releases"></div>
-<a href="/blog/category/releases">Releases</a>
-<a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/releases">发布</a> <a class="pull-right" href="/blog/category/releases.atom"><i class="icon-rss"></i></a>
 </li>
 <li class="blog-category">
 <div class="icon blog-icon news-and-events"></div>
-<a href="/blog/category/news">News and Events</a>
-<a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
+<a href="/blog/category/news">新闻与活动</a> <a class="pull-right" href="/blog/category/news.atom"><i class="icon-rss"></i></a>
 </li>
 </ul>
 <ul class="social-btn--container">
@@ -616,7 +460,7 @@ Back
 <a class="social-btn youtube" href="/videos"></a>
 </ul>
 <div id="blog-sidebar-newsletter">
-<p>Get updates from The Spring Team delivered to your inbox</p>
+<p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
 <script>
@@ -640,17 +484,14 @@ Back
 <div class="navbar">
 <div class="container">
 <ul class="nav">
-<li><a href="/team">Team</a></li>
-<li><a href="/tools">Tools</a></li>
-<li><a href="https://store.pivotal.io/">Store</a></li>
-<li><a href="/blog">Newsletter</a></li>
+<li><a href="/team">球队</a></li>
+<li><a href="/tools">工具类</a></li>
+<li><a href="https://store.pivotal.io/">商店</a></li>
+<li><a href="/blog">通讯</a></li>
 </ul>
 </div>
-</div>
-© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved.
-<a href="https://pivotal.io/terms-of-use">Terms of Use</a> •
-<a href="https://pivotal.io/privacy-policy">Privacy</a> •
-<a href="/trademarks">Trademark Guidelines</a>
+</div>© <span>2019</span> <a href="https://www.pivotal.io/">Pivotal Software</a> ，Inc.保留所有权利。
+<a href="https://pivotal.io/terms-of-use">使用条款</a> • <a href="https://pivotal.io/privacy-policy">隐私</a> • <a href="/trademarks">商标准则</a>
 <div id="teconsent" style="display:inline-block"></div>
 </div>
 </div>

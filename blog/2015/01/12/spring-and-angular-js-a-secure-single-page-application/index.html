@@ -5,9 +5,13 @@
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
 <link rel="stylesheet" type="text/css" href="/css/main-bc256dba5f9d253d6425441ccfb82576.css">
 <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script>
-<script>System.config({baseURL: "/b92013b"});</script>
+<script>
+    System.config({baseURL: "/b92013b"});
+  </script>
 <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script>
-<script>System.import('app/main.js')</script>
+<script>
+      System.import('app/main.js')
+  </script>
 <meta name="google-site-verification" content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M">
 
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -43,10 +47,12 @@
 
 <noscript><iframe height="0" src="https://www.googletagmanager.com/ns.html?id=GTM-KZM7GF6" width="0" style="display:none"></iframe></noscript>
 
-<script type="text/javascript">// Work around Google font rendering issues in webkit browsers on Windows 7
+<script type="text/javascript">
+    // Work around Google font rendering issues in webkit browsers on Windows 7
     if (navigator.userAgent.indexOf("NT 6.1") != -1) {
       document.body.style.WebkitTextStroke = "0.5px";
-    }</script>
+    }
+  </script>
 <div class="viewport">
 <header class="navbar header--navbar desktop-only">
 <div class="navbar-inner">
@@ -331,104 +337,8 @@ postProcessors=less4j,jsMin
 &lt;/groups&gt;
 </code></pre></li>
 <li><p><code>main.less</code>为空，但可用于自定义外观，更改Twitter Bootstrap中的默认设置。例如，将颜色从默认的蓝色更改为浅粉红色，您可以添加一行： <code>@brand-primary: #de8579;</code> 。</p></li>
-</ul><p>将这些文件复制到您的项目中并运行“ mvn package”，您应该会在JAR文件中看到“ bootstrap-angular。*”资源。如果现在运行该应用程序，应该会看到CSS生效，但是仍然缺少业务逻辑和导航。</p><h2><a href="#create-the-angular-application" class="anchor" name="create-the-angular-application"></a>创建Angular应用程序</h2><p>让我们创建一个“ hello”应用程序（在“ src / main / resources / static / js / hello.js”中） <code><script/></code>在“ index.html”的底部找到了正确的位置）。</p><p>一个最小的Angular JS应用程序如下所示：</p>
-<pre><code class="prettyprint javascript">angular.module(&#39;hello&#39;, [])
-  .controller(&#39;home&#39;, function($scope) {
-    $scope.greeting = {id: &#39;xxx&#39;, content: &#39;Hello World!&#39;}
-})
-</code></pre><p>该应用程序的名称为“ hello”，它具有一个空（且冗余）的“ config”和一个名为“ home”的空“控制器”。当我们加载“ index.html”时，将调用“ home”控制器，因为我们已经装饰了内容<code><div></code>与<code>ng-controller="home"</code> 。</p><p>注意，我们注入了魔法<code>$scope</code>到控制器函数中（Angular <a href="https://docs.angularjs.org/tutorial">通过命名约定进行依赖注入</a> ，并识别函数参数的名称）。的<code>$scope</code>然后在函数内部使用来设置此控制器负责的UI元素的内容和行为。</p><p>如果您在“ src / main / resources / static / js”下添加了该文件，则您的应用现在应该安全且可以运行，并且会显示“ Hello World！”。的<code>greeting</code>由Angular在HTML中使用车把占位符呈现， <code>{{greeting.id}}</code>和<code>{{greeting.content}}</code> 。</p><p><span id="dynamic-content"></span></p><h2><a href="#adding-dynamic-content" class="anchor" name="adding-dynamic-content"></a>添加动态内容</h2><p>到目前为止，我们已经有了一个带有硬编码的问候语的应用程序。这对于了解事物如何组合很有用，但实际上我们希望内容来自后端服务器，因此让我们创建一个HTTP端点，可以用来获取问候。在您的<a href="https://github.com/dsyer/spring-security-angular/blob/master/basic/src/main/java/demo/UiApplication.java">应用程序类</a> （在“ src / main / java / demo”中）中，添加<code>@RestController</code>注释并定义一个新的<code>@RequestMapping</code> ：</p>
-<pre><code class="prettyprint java">@SpringBootApplication
-@RestController
-public class UiApplication {
-
-  @RequestMapping(&quot;/resource&quot;)
-  public Map&lt;String,Object&gt; home() {
-    Map&lt;String,Object&gt; model = new HashMap&lt;String,Object&gt;();
-    model.put(&quot;id&quot;, UUID.randomUUID().toString());
-    model.put(&quot;content&quot;, &quot;Hello World&quot;);
-    return model;
-  }
-
-  public static void main(String[] args) {
-    SpringApplication.run(UiApplication.class, args);
-  }
-
-}
-</code></pre>
-<blockquote><p>注意：根据创建新项目的方式，可能不会调用它<code>UiApplication</code> ，并且可能有<code>@EnableAutoConfiguration @ComponentScan @Configuration</code>代替<code>@SpringBootApplication</code> 。</p>
-</blockquote><p>运行该应用程序并尝试卷曲“ / resource”端点，默认情况下您会发现它是安全的：</p>
-<pre><code class="prettyprint">$ curl localhost:8080/resource
-{&quot;timestamp&quot;:1420442772928,&quot;status&quot;:401,&quot;error&quot;:&quot;Unauthorized&quot;,&quot;message&quot;:&quot;Full authentication is required to access this resource&quot;,&quot;path&quot;:&quot;/resource&quot;}
-</code></pre><h3><a href="#loading-a-dynamic-resource-from-angular" class="anchor" name="loading-a-dynamic-resource-from-angular"></a>从Angular加载动态资源</h3><p>因此，让我们在浏览器中获取该消息。修改“ home”控制器以使用XHR加载受保护的资源：</p>
-<pre><code class="prettyprint javascript">angular.module(&#39;hello&#39;, [])
-  .controller(&#39;home&#39;, function($scope, $http) {
-  $http.get(&#39;/resource/&#39;).success(function(data) {
-    $scope.greeting = data;
-  })
-});
-</code></pre><p>我们注入了<a href="https://docs.angularjs.org/api/ng/service/$http"><code>$http</code>服务</a> ，它是Angular提供的一项核心功能，并用于获取我们的资源。成功时，Angular将JSON从响应主体传递回回调函数。</p><p>再次运行该应用程序（或只是在浏览器中重新加载主页），您将看到带有唯一ID的动态消息。因此，即使资源受到保护并且您不能直接卷曲它，浏览器仍能够访问内容。我们有不到一百行代码的安全单页应用程序！</p>
-<blockquote><p>注意：更改静态资源后，可能需要强制浏览器重新加载静态资源。在Chrome（以及带有插件的Firefox）中，您可以使用“开发人员工具”（F12），这可能就足够了。或者，您可能必须使用CTRL + F5。</p>
-</blockquote><p><span id="how-does-it-work"></span></p><h2><a href="#how-does-it-work" class="anchor" name="how-does-it-work"></a>它是如何工作的？</h2><p>如果您使用某些开发人员工具，则可以在浏览器中看到浏览器与后端之间的交互（通常F12会打开它，默认情况下在Chrome中运行，并且需要Firefox中的插件）。总结如下：</p>
-<table>
-<thead>
-<tr>
-<th>动词</th>
-<th>路径</th>
-<th>状态</th>
-<th>响应</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>得到</td>
-<td>/</td>
-<td>401</td>
-<td>浏览器提示进行身份验证</td>
-</tr>
-<tr>
-<td>得到</td>
-<td>/</td>
-<td>200</td>
-<td>index.html</td>
-</tr>
-<tr>
-<td>得到</td>
-<td>/css/angular-bootstrap.css</td>
-<td>200</td>
-<td>Twitter引导CSS</td>
-</tr>
-<tr>
-<td>得到</td>
-<td>/js/angular-bootstrap.js</td>
-<td>200</td>
-<td>Bootstrap和Angular JS</td>
-</tr>
-<tr>
-<td>得到</td>
-<td>/js/hello.js</td>
-<td>200</td>
-<td>应用逻辑</td>
-</tr>
-<tr>
-<td>得到</td>
-<td>/资源</td>
-<td>200</td>
-<td>JSON问候</td>
-</tr>
-</tbody>
-</table><p>您可能不会看到401，因为浏览器将主页加载视为单个交互，并且可能会看到2个“ /资源”请求，因为存在<a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a>协商。</p><p>仔细查看请求，您将看到所有请求都有一个“ Authorization”标头，如下所示：</p>
-<pre><code class="prettyprint">Authorization: Basic dXNlcjpwYXNzd29yZA==
-</code></pre><p>浏览器会随每个请求发送用户名和密码（因此请记住在生产环境中仅使用HTTPS）。没有关于“ Angular”的内容，因此它可以与您的JavaScript框架或非框架选择一起使用。</p><h3><a href="#what-rsquo-s-wrong-with-that" class="anchor" name="what-rsquo-s-wrong-with-that"></a>怎么了</h3><p>从表面上看，我们似乎做得很好，简洁，易于实施，所有数据都由一个秘密密码保护，并且如果我们更改前端或后端技术，它仍然可以工作。但是有一些问题。</p>
-<ul>
-<li><p>基本身份验证仅限于用户名和密码身份验证。</p></li>
-<li><p>身份验证用户界面无处不在，但难看（浏览器对话框）。</p></li>
-<li><p>没有<a href="https://en.wikipedia.org/wiki/Cross-site_request_forgery">跨站请求伪造</a> （CSRF）的保护。</p></li>
-</ul><p>CSRF并不是我们的应用程序真正存在的问题，因为它只需要获取后端资源（即服务器中的任何状态都不会更改）。一旦您的应用程序中包含POST，PUT或DELETE，就无法通过任何合理的现代措施来保护它了。</p><p>在<a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii">本系列</a>的<a href="https://spring.io/blog/2015/01/12/the-login-page-angular-js-and-spring-security-part-ii">下一篇文章中，</a>我们将扩展应用程序以使用基于表单的身份验证，它比HTTP Basic灵活得多。一旦有了表单，我们将需要CSRF保护，并且Spring Security和Angular都具有一些很好的即用型功能来帮助完成此任务。剧透：我们将需要使用<code>HttpSession</code> 。</p>
-<blockquote><p>谢谢：我要感谢所有帮助我开发本系列文章的人，尤其是<a href="https://spring.io/team/rwinch">Rob Winch</a>和<a href="https://twitter.com/thspaeth">Thorsten Spaeth</a>对文章和源代码的认真评论，并教了我一些我不知道的技巧我以为我最熟悉。</p>
-</blockquote></div>
-</div>
-<section id="disqus_thread"></section>
-<script type="text/javascript">var disqus_shortname = 'spring-io';
+</ul><p>将这些文件复制到您的项目中并运行“ mvn package”，您应该会在JAR文件中看到“ bootstrap-angular。*”资源。如果现在运行该应用程序，应该会看到CSS生效，但是仍然缺少业务逻辑和导航。</p><h2><a href="#create-the-angular-application" class="anchor" name="create-the-angular-application"></a>创建Angular应用程序</h2><p>让我们创建一个“ hello”应用程序（在“ src / main / resources / static / js / hello.js”中） <code><script type="text/javascript">
+      var disqus_shortname = 'spring-io';
       var disqus_identifier = 1903;
 
       (function(disqus_shortname, document) {
@@ -442,7 +352,8 @@ public class UiApplication {
           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
         }
 
-      }(disqus_shortname, document));</script>
+      }(disqus_shortname, document));
+    </script>
 <noscript>请启用JavaScript以查看<a href="http://disqus.com/?ref_noscript">由Disqus提供</a>的<a href="http://disqus.com/?ref_noscript">评论。</a></noscript>
 <a class="dsq-brlink" href="https://disqus.com">由<span class="logo-disqus">Disqus</span>提供动力的评论</a>
 <div class="mobile-only">
@@ -480,12 +391,14 @@ public class UiApplication {
 <p>将The Spring Team的更新发送到您的收件箱</p>
 <script src="https://app-sj05.marketo.com/js/forms2/js/forms2.min.js"></script>
 <form id="mktoForm_4723"></form>
-<script>MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
+<script>
+        MktoForms2.loadForm("https://app-sj05.marketo.com", "625-IUJ-009", 4723, function(form){
           form.onSuccess(function(values, followUpUrl) {
             form.getFormElem().html("<p>Thank you!</p>");
             return false;
           });
-        });</script>
+        });
+      </script>
 </div>
 </div>
 </aside>
