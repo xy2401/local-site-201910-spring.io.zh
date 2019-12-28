@@ -1,5 +1,5 @@
 <html  data-code-prettify="" data-mobile-support="" data-search=""><head></head><body >﻿
-<title>Spring框架和BIRT</title>
+<title>Spring Framework 和BIRT</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
@@ -151,7 +151,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">Spring框架和BIRT</h1>
+<h1 class="blog--title">Spring Framework 和BIRT</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -174,8 +174,8 @@
 <div style="float:right;border:1px solid black;margin:10px;padding:10px">
 <h2 style="font-size:smaller">目录</h2><p> <a href="#intro">介绍</a><br> <a href="#thesamplecode">样例代码</a><br> <a href="#frommvc">从Spring MVC调用BIRT引擎</a><br> <a href="#birtviewer">从BIRT Viewer访问Spring Bean</a><br> <a href="#remotebeansfrombirt">使用远程处理从BIRT报表访问Bean</a><br> <a href="#conclusion">结论</a><br> <a href="#attachments">附件</a></p>
 <h2 style="font-size:smaller">资料下载</h2><p><a href="http://www.springsource.org/files/birt/SpringandBirtCoreJar.zip">SpringandBirtCoreJar.zip</a><br><a href="http://www.springsource.org/files/birt/SpringBirtArticleSamples.zip">SpringBirtArticleSamples.zip</a><br></p></div><p></p>
-<h2 name="intro">介绍</h2><p>Eclipse的商业智能和报告工具（BIRT）项目是基于流行的Eclipse IDE的开源项目。 BIRT项目于2005年夏季首次发布重要版本，自成立以来已获得超过一千万的下载量。该项目由Actuate Corporation启动，该公司使用BIRT作为其许多商业产品的基础。<a href="https://www.eclipse.org/birt" target="_blank">BIRT项目的站点</a>包括简介，教程，下载和使用BIRT的示例。</p><p>开发人员使用BIRT在Java / Java EE环境中构建和部署报告。在BIRT 3.7中，提供了一个新的基于POJO的运行时环境，该环境使BIRT引擎的部署更加简单。本文讨论了一些使用Spring Framework中组件的BIRT集成方案。</p><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_6002ca03.png" align="bottom" width="576" height="315" border="0"><br>图1 – BIRT拼贴</p><p>BIRT项目包括以下关键组件：<br></p><ul><br><li>BIRT Designer-用于设计报告的开发人员工具。</li><br><li>Web Viewer-用于部署报告的示例Java Web应用程序。该查看器包含一个JSP标签库，可以方便地与现有Web应用程序集成。</li><br><li>BIRT引擎-用于构建，运行和呈现BIRT报告的设计和报告引擎。</li><br><li>BIRT Charts-支持构建和运行高度复杂的交互式图表的软件包。</li><br></ul><p></p><p>Spring框架是流行的体系结构和实现方法的集合，可简化企业Java开发。该框架的核心部分是依赖注入和面向切面的编程。利用这些功能是为了减少应用程序特定于基础结构的部分与其主要目标业务功能之间的耦合。Spring框架由VMware内的SpringSource业务部门以开源方式开发（原始SpingSource公司于2009年被VMware收购）。它在Java开发人员社区中得到了广泛的使用，并在所有平台上执行，包括VMware支持的Tomcat（称为tcServer）。</p><p>尽管Spring框架提供了许多有用的功能，但是与BIRT集成有关的大多数问题都围绕着报告中的Spring MVC和Spring bean访问。本文介绍了三种方案：<br></p><ul><br><li>在Spring MVC中集成BIRT引擎</li><br><li>从BIRT Viewer访问Spring bean</li><br><li>使用Spring Remoting从BIRT报表访问Spring Bean</li><br></ul><p></p><p>本文假定读者具有BIRT和Spring框架的编程知识。要了解有关Spring框架的更多信息，请查看<a href="http://blog.springsource.org/category/green-beans/">“ Green Beans”博客系列</a> 。</p><p>每个方案都有与本文关联的关联示例，该示例是使用以下组件构建和测试的：<br></p><ul><br><li><a href="http://www.springsource.org/download">Spring Framework 3.1.0</a> </li><br><li><a href="http://download.eclipse.org/birt/downloads/">BIRT 3.7.1</a></li><br><li><a href="https://ant.apache.org/bindownload.cgi">Apache Ant 1.7.1</a></li><br><li><a href="https://tomcat.apache.org/download-60.cgi">Apache Tomcat 6.0.20</a></li><br></ul><p></p><p>这些示例仅用于说明目的，几乎不包含任何错误检查。</p>
-<h2><a name="thesamplecode">样例代码</a></h2><p>在整个本文中，不同的集成方案是指将数据提供给BIRT报告的通用Spring bean。Spring框架包含许多复杂的数据访问组件，但是这个简单的示例对于更复杂的场景是有用的学习工具。在示例代码中，有两个包： <em>org.eclipse.birt.spring.example</em>和<em>org.eclipse.birt.spring.core</em> 。示例程序包包含简单的代码，可以用您自己的数据访问对象替换它们。核心软件包包括用于运行和呈现BIRT报告的Spring View，将URL中输入的报告参数转换为适当的BIRT报告参数类型的参数转换器类，以及将报告引擎提供给其他bean的BIRT引擎工厂。示例类如下所示，并在本文中使用。下一节将介绍核心类。</p><p>我们从一个简单的POJO开始，它将在我们的BIRT报告中使用。它名为Car，包含用于描述汽车的简单属性。</p>
+<h2 name="intro">介绍</h2><p>Eclipse的商业智能和报告工具（BIRT）项目是基于流行的Eclipse IDE的开源项目。 BIRT项目于2005年夏季首次发布重要版本，自成立以来已获得超过一千万的下载量。该项目由Actuate Corporation启动，该公司使用BIRT作为其许多商业产品的基础。<a href="https://www.eclipse.org/birt" target="_blank">BIRT项目的站点</a>包括简介，教程，下载和使用BIRT的示例。</p><p>开发人员使用BIRT在Java / Java EE环境中构建和部署报告。在BIRT 3.7中，提供了一个新的基于POJO的运行时环境，该环境使BIRT引擎的部署更加简单。本文讨论了一些使用Spring Framework中组件的BIRT集成方案。</p><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_6002ca03.png" align="bottom" width="576" height="315" border="0"><br>图1 – BIRT拼贴</p><p>BIRT项目包括以下关键组件：<br></p><ul><br><li>BIRT Designer-用于设计报告的开发人员工具。</li><br><li>Web Viewer-用于部署报告的示例Java Web应用程序。该查看器包含一个JSP标签库，可以方便地与现有Web应用程序集成。</li><br><li>BIRT引擎-用于构建，运行和呈现BIRT报告的设计和报告引擎。</li><br><li>BIRT Charts-支持构建和运行高度复杂的交互式图表的软件包。</li><br></ul><p></p><p>Spring Framework 是流行的体系结构和实现方法的集合，可简化企业Java开发。该框架的核心部分是依赖注入和面向切面的编程。利用这些功能是为了减少应用程序特定于基础结构的部分与其主要目标业务功能之间的耦合。Spring Framework 由VMware内的SpringSource业务部门以开源方式开发（原始SpingSource公司于2009年被VMware收购）。它在Java开发人员社区中得到了广泛的使用，并在所有平台上执行，包括VMware支持的Tomcat（称为tcServer）。</p><p>尽管Spring Framework 提供了许多有用的功能，但是与BIRT集成有关的大多数问题都围绕着报告中的Spring MVC和Spring bean访问。本文介绍了三种方案：<br></p><ul><br><li>在Spring MVC中集成BIRT引擎</li><br><li>从BIRT Viewer访问Spring bean</li><br><li>使用Spring Remoting从BIRT报表访问Spring Bean</li><br></ul><p></p><p>本文假定读者具有BIRT和Spring Framework 的编程知识。要了解有关Spring Framework 的更多信息，请查看<a href="http://blog.springsource.org/category/green-beans/">“ Green Beans”博客系列</a> 。</p><p>每个方案都有与本文关联的关联示例，该示例是使用以下组件构建和测试的：<br></p><ul><br><li><a href="http://www.springsource.org/download">Spring Framework 3.1.0</a> </li><br><li><a href="http://download.eclipse.org/birt/downloads/">BIRT 3.7.1</a></li><br><li><a href="https://ant.apache.org/bindownload.cgi">Apache Ant 1.7.1</a></li><br><li><a href="https://tomcat.apache.org/download-60.cgi">Apache Tomcat 6.0.20</a></li><br></ul><p></p><p>这些示例仅用于说明目的，几乎不包含任何错误检查。</p>
+<h2><a name="thesamplecode">样例代码</a></h2><p>在整个本文中，不同的集成方案是指将数据提供给BIRT报告的通用Spring bean。Spring Framework 包含许多复杂的数据访问组件，但是这个简单的示例对于更复杂的场景是有用的学习工具。在示例代码中，有两个包： <em>org.eclipse.birt.spring.example</em>和<em>org.eclipse.birt.spring.core</em> 。示例程序包包含简单的代码，可以用您自己的数据访问对象替换它们。核心软件包包括用于运行和呈现BIRT报告的Spring View，将URL中输入的报告参数转换为适当的BIRT报告参数类型的参数转换器类，以及将报告引擎提供给其他bean的BIRT引擎工厂。示例类如下所示，并在本文中使用。下一节将介绍核心类。</p><p>我们从一个简单的POJO开始，它将在我们的BIRT报告中使用。它名为Car，包含用于描述汽车的简单属性。</p>
 <pre> 
 package org.eclipse.birt.spring.example;
 
@@ -609,7 +609,7 @@ if( !reportContext.getHttpServletRequest().getAttribute("attributeBean").isDesig
 //Access Bean 
 } 
 </pre><p><img src="http://www.springsource.org/files/BIRT3.7SpringIntegrationVersion7_html_4f65ce7d.png" align="bottom" width="576" height="420" border="0"><br>图3 –在BIRT Viewer中显示Spring bean输出</p>
-<h2><a name="remotebeansfrombirt">使用远程处理从BIRT报表访问Bean</a></h2><p>本文的前两部分着重于将BIRT引擎和Viewer与Spring框架集成在一起。虽然这些方法很好用，但是假设您需要访问位于单独上下文或另一台机器上的Spring bean。Spring Remoting可用于实现此功能。</p><p>尽管任何一种Spring Remoting技术或其他机制（例如SOAP或REST）都可以使用，但本节介绍了如何使用基于Spring Introker的基于HTTP Invoker的服务导出器。为了实现此示例，我们首先构建一个示例Web应用程序，其中包含一个Car Service bean，该bean将Car POJO提供给远程客户端。</p><p>为了进行远程处理，我们首先定义Car POJO，如以下代码所示：</p>
+<h2><a name="remotebeansfrombirt">使用远程处理从BIRT报表访问Bean</a></h2><p>本文的前两部分着重于将BIRT引擎和Viewer与Spring Framework 集成在一起。虽然这些方法很好用，但是假设您需要访问位于单独上下文或另一台机器上的Spring bean。Spring Remoting可用于实现此功能。</p><p>尽管任何一种Spring Remoting技术或其他机制（例如SOAP或REST）都可以使用，但本节介绍了如何使用基于Spring Introker的基于HTTP Invoker的服务导出器。为了实现此示例，我们首先构建一个示例Web应用程序，其中包含一个Car Service bean，该bean将Car POJO提供给远程客户端。</p><p>为了进行远程处理，我们首先定义Car POJO，如以下代码所示：</p>
 <pre> 
 package org.eclipse.birt.spring.remoting.example;
 
@@ -753,7 +753,7 @@ public class BirtDataServiceConfiguration {
   &lt;/welcome-file-list&gt;
 
 &lt;/web-app&gt;
-</pre><p>Web应用程序需要Spring框架中WEB-INF / lib目录中的以下JAR文件：</p>
+</pre><p>Web应用程序需要Spring Framework 中WEB-INF / lib目录中的以下JAR文件：</p>
 <ul>
 <li>cglib-nodep-2.2.2.jar</li>
 <li>org.springframework.aop-3.1.0。RELEASE.jar</li>

@@ -170,7 +170,7 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>该博客文章的目的是提供一个简单的逐步指南，以在<i>独立</i>于Spring框架的环境中开始使用JPA。尽管JPA规范最初是<i>EJB 3.0</i>的持久性机制，但幸运的是，任何这样的机制实际上都应该能够持久化简单的POJO。因此，在您的类路径中有几个JAR和一些Spring配置的Bean之后，您就可以开始在您喜欢的IDE中尝试JPA代码了。我将使用Glassfish JPA-这是参考实现，它基于Oracle的TopLink ORM框架。</p>
+<div class="blog--post"><p>该博客文章的目的是提供一个简单的逐步指南，以在<i>独立</i>于Spring Framework 的环境中开始使用JPA。尽管JPA规范最初是<i>EJB 3.0</i>的持久性机制，但幸运的是，任何这样的机制实际上都应该能够持久化简单的POJO。因此，在您的类路径中有几个JAR和一些Spring配置的Bean之后，您就可以开始在您喜欢的IDE中尝试JPA代码了。我将使用Glassfish JPA-这是参考实现，它基于Oracle的TopLink ORM框架。</p>
 <h2>初始设置</h2><p>确保您使用的是Java 5（JPA和EJB 3.0的先决条件）。</p><p>从以下位置下载玻璃鱼JPA罐： <a href="https://glassfish.dev.java.net/downloads/persistence/JavaPersistence.html"></a> <a href="https://glassfish.dev.java.net/downloads/persistence/JavaPersistence.html">https://glassfish.dev.java.net/downloads/persistence/JavaPersistence.html</a><br>（注意：我使用的是“ V2_build_02” jar，但任何更高版本也应适用。）</p><p>要从“安装程序”罐中解开罐，请运行：<br><tt>java -jar glassfish-persistence-installer-v2-b02.jar</tt><br>（这是接受许可协议所必需的）</p><p>将<tt>toplink-essentials.jar</tt>添加到您的类路径中</p><p>添加包含您的数据库驱动程序的JAR（在示例中，我使用的是hsqldb.jar版本1.8.0.1，但仅需进行少量更改即可适应另一个数据库）。</p><p>使用2.0 M5版本添加以下Spring JAR（在此处提供： <a href="https://sourceforge.net/project/showfiles.php?group_id=73357"></a> <a href="https://sourceforge.net/project/showfiles.php?group_id=73357">http://sourceforge.net/project/showfiles.php?group_id=73357</a> ）。<br></p><ul><br> <li>spring.jar<br> </li><li>spring-jpa.jar<br> </li><li>spring-mock.jar<br></li></ul><p></p><p>最后，将这些罐子也添加到您的类路径中：<br></p><ul><br> <li>commons-logging.jar<br> </li><li>log4j.jar<br> </li><li>junit.jar<br></li></ul><p></p>
 <h2>代码-域模型</h2><p>此示例将基于仅3个类的有目的的简单域模型。注意注释的使用。使用JPA，可以选择使用批注或XML文件来指定对象关系映射元数据-甚至是两种方法的组合。在这里，我选择仅使用批注-对于这些批注，将在域模型代码清单之后立即提供简短说明。</p><p>一， <tt>餐厅</tt>类：</p>
 <pre><code class="prettyprint java"><br />package blog.jpa.domain;
@@ -395,7 +395,7 @@ public class JpaRestaurantDao extends JpaDaoSupport implements RestaurantDao {
 
 }
 </code></pre>
-<h2>服务层</h2><p>由于此处的目的是集中于数据访问层的JPA实现，因此省略了服务层。显然，在现实情况中，服务层将在系统体系结构中发挥关键作用。这将是事务的分界点-通常，它们将在Spring配置中以声明方式分界。在下一步中，当您查看配置时，您会注意到我提供了一个“ transactionManager” bean。基础测试类使用它自动将每个测试方法包装在事务中，并且它是与将事务层包装服务层方法的“ transactionManager”相同。最重要的一点是，数据访问层中没有与事务相关的代码。使用Spring <tt>JpaTemplate</tt>可以确保在所有DAO之间共享相同的<tt>EntityManager</tt> 。因此，事务传播会自动发生-由服务层决定。换句话说，它的行为实际上与Spring框架中配置的其他持久性机制完全相同。没有针对JPA的特定内容-因此，将其排除在此针对JPA的条目之外的理由。</p>
+<h2>服务层</h2><p>由于此处的目的是集中于数据访问层的JPA实现，因此省略了服务层。显然，在现实情况中，服务层将在系统体系结构中发挥关键作用。这将是事务的分界点-通常，它们将在Spring配置中以声明方式分界。在下一步中，当您查看配置时，您会注意到我提供了一个“ transactionManager” bean。基础测试类使用它自动将每个测试方法包装在事务中，并且它是与将事务层包装服务层方法的“ transactionManager”相同。最重要的一点是，数据访问层中没有与事务相关的代码。使用Spring <tt>JpaTemplate</tt>可以确保在所有DAO之间共享相同的<tt>EntityManager</tt> 。因此，事务传播会自动发生-由服务层决定。换句话说，它的行为实际上与Spring Framework 中配置的其他持久性机制完全相同。没有针对JPA的特定内容-因此，将其排除在此针对JPA的条目之外的理由。</p>
 <h2>组态</h2><p>由于我选择了基于注释的映射，因此在介绍域类时，您实际上已经看到了大多数特定于JPA的配置。如上所述，也有可能通过XML（在“ orm.xml”文件中）配置那些映射。唯一需要的其他配置是在“ META-INF / persistence.xml”中。在这种情况下，这非常简单，因为与数据库相关的属性将通过Spring配置中提供的依赖项注入“数据源”提供给<tt>EntityManagerFactory</tt> （下一个原因）。“ persistence.xml”中的唯一其他信息是使用本地还是全局（JTA）事务。以下是“ persistence.xml”文件的内容：</p>
 <pre><code class="prettyprint xml"><br />&lt;persistence xmlns=&quot;http://java.sun.com/xml/ns/persistence&quot; version=&quot;1.0&quot;&gt;
 

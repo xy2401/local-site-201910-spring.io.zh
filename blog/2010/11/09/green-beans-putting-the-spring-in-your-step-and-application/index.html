@@ -170,7 +170,7 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>Spring框架于2003年成为事实上的标准，从那时起，它一直在帮助人们使用更干净的代码构建更大，更好的应用程序。在本文中，我们将讨论可用于使用Spring组件模型配置应用程序的选项。我们将以最简单的形式生成一个简单的应用程序，并对其进行重新处理，以利用Spring框架中许多简化的功能所带来的优势，并将继续使其成为当今应用程序的实际标准。</p><p>现代的企业Java应用程序具有许多协作对象，这些对象可以协同工作以进一步实现目标，通常具有内在的商业价值。即使在简单的情况下，该对象图也很深。以服务的简单情况为例（也许是一项支持处理客户数据的服务？）想要与数据库对话。这样的服务需要一个数据源，并可能需要某种便利库，以方便通过JDBC，JPA，JDO，NoSQL选项等进行数据库访问。在这样的图中，试图根据需要简单地创建对象是很诱人的，在其使用地点。在这样的系统中，对象构造或获取的知识遍布使用它们的bean中。如果-与数据库一样<code>javax.sql.DataSource</code> -在多个地方都需要该对象，那么将所有对象都放置在一个地方然后共享新创建的实例就更干净了。这具有将易于出错和易失性的配置信息保存在易于更改的位置的优势（例如，在开发和生产环境中更改数据库凭据时）。</p><p>这是人们使用Spring的主要原因之一-因为Spring使人们能够集中描述这些协作对象。从Spring的最早版本开始，就有一个XML文件用于描述对象图。在早期（大约在2003年），此文件使用DTD，但今天使用XML模式。这是我们以Spring的XML格式描述的示例服务。随着我们的进行，我们将删除越来越多的XML配置。每<code>bean</code>元素描述了将要创建的对象，并为其指定了<code>id</code> 。每<code>property</code>元素描述了对象的setter方法以及应提供的值。Spring应用程序容器会为您调用这些设置器。</p>
+<div class="blog--post"><p>Spring Framework 于2003年成为事实上的标准，从那时起，它一直在帮助人们使用更干净的代码构建更大，更好的应用程序。在本文中，我们将讨论可用于使用Spring组件模型配置应用程序的选项。我们将以最简单的形式生成一个简单的应用程序，并对其进行重新处理，以利用Spring Framework 中许多简化的功能所带来的优势，并将继续使其成为当今应用程序的实际标准。</p><p>现代的企业Java应用程序具有许多协作对象，这些对象可以协同工作以进一步实现目标，通常具有内在的商业价值。即使在简单的情况下，该对象图也很深。以服务的简单情况为例（也许是一项支持处理客户数据的服务？）想要与数据库对话。这样的服务需要一个数据源，并可能需要某种便利库，以方便通过JDBC，JPA，JDO，NoSQL选项等进行数据库访问。在这样的图中，试图根据需要简单地创建对象是很诱人的，在其使用地点。在这样的系统中，对象构造或获取的知识遍布使用它们的bean中。如果-与数据库一样<code>javax.sql.DataSource</code> -在多个地方都需要该对象，那么将所有对象都放置在一个地方然后共享新创建的实例就更干净了。这具有将易于出错和易失性的配置信息保存在易于更改的位置的优势（例如，在开发和生产环境中更改数据库凭据时）。</p><p>这是人们使用Spring的主要原因之一-因为Spring使人们能够集中描述这些协作对象。从Spring的最早版本开始，就有一个XML文件用于描述对象图。在早期（大约在2003年），此文件使用DTD，但今天使用XML模式。这是我们以Spring的XML格式描述的示例服务。随着我们的进行，我们将删除越来越多的XML配置。每<code>bean</code>元素描述了将要创建的对象，并为其指定了<code>id</code> 。每<code>property</code>元素描述了对象的setter方法以及应提供的值。Spring应用程序容器会为您调用这些设置器。</p>
 <pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
        xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
@@ -196,8 +196,8 @@
     &lt;/bean&gt;
 
 &lt;/beans&gt;
-</code></pre><p>简单吧？令人高兴的是，我们可以针对没有特定实现知识的接口编写代码。在上面的示例中，我们实例化了一个<code>DriverManagerDataSource</code>并将其传递给<code>JdbcTemplate</code>通过使用<code>ref</code>属性。 <code>ref</code>告诉Spring框架您想将引用传递给在同一容器中配置的另一个bean。同样，在我们的示例中，我们传递了对<code>CustomerClient</code>实例，但在消耗性Java代码中，我们针对<code>CustomerService</code>接口，而不是特定类型<code>DatabaseCustomerService</code> 。</p><p>这种简单的设置为我们提供了很多间接性和灵活性。现在，对象的创建和构造已移至Spring配置，我们可以在Spring配置中隐藏真正复杂的设置，而使我们的代码更明智。隐藏复杂构造逻辑的一种常见方法是通过工厂模式。如果要构造许多需要一起使用的对象，或者要在创建对象时考虑很多不同的因素，则工厂模式特别有用。本质上，您正在做的事情是提供一种比任何一个类的构造函数自然都更强大的描述对象创建的方法。Spring明确支持此模式。如果配置的Bean实现了<code>org.springframework.beans.factory.FactoryBean
-<t></t></code>界面<code>getObject()</code>接口上的方法将被调用，结果将是Spring上下文中可用的对象。Spring框架本身广泛使用了这种做法，以提供方便的方法来以可重用的方式构造复杂的对象图。</p><p>在我们的示例中，我们使用一个称为H2的嵌入式数据库，它是一个功能强大的内存Java数据库。通常，嵌入式数据库用于开发环境中。一种常见的做法是在开发中使用嵌入式数据库来快速测试和重置数据集。通常，这还需要从SQL脚本加载数据以引导嵌入式数据库。Spring框架提供了显式支持，用于配置嵌入式数据源，然后根据脚本评估脚本。 <code>javax.sql.DataSource</code> 。</p>
+</code></pre><p>简单吧？令人高兴的是，我们可以针对没有特定实现知识的接口编写代码。在上面的示例中，我们实例化了一个<code>DriverManagerDataSource</code>并将其传递给<code>JdbcTemplate</code>通过使用<code>ref</code>属性。 <code>ref</code>告诉Spring Framework 您想将引用传递给在同一容器中配置的另一个bean。同样，在我们的示例中，我们传递了对<code>CustomerClient</code>实例，但在消耗性Java代码中，我们针对<code>CustomerService</code>接口，而不是特定类型<code>DatabaseCustomerService</code> 。</p><p>这种简单的设置为我们提供了很多间接性和灵活性。现在，对象的创建和构造已移至Spring配置，我们可以在Spring配置中隐藏真正复杂的设置，而使我们的代码更明智。隐藏复杂构造逻辑的一种常见方法是通过工厂模式。如果要构造许多需要一起使用的对象，或者要在创建对象时考虑很多不同的因素，则工厂模式特别有用。本质上，您正在做的事情是提供一种比任何一个类的构造函数自然都更强大的描述对象创建的方法。Spring明确支持此模式。如果配置的Bean实现了<code>org.springframework.beans.factory.FactoryBean
+<t></t></code>界面<code>getObject()</code>接口上的方法将被调用，结果将是Spring上下文中可用的对象。Spring Framework 本身广泛使用了这种做法，以提供方便的方法来以可重用的方式构造复杂的对象图。</p><p>在我们的示例中，我们使用一个称为H2的嵌入式数据库，它是一个功能强大的内存Java数据库。通常，嵌入式数据库用于开发环境中。一种常见的做法是在开发中使用嵌入式数据库来快速测试和重置数据集。通常，这还需要从SQL脚本加载数据以引导嵌入式数据库。Spring Framework 提供了显式支持，用于配置嵌入式数据源，然后根据脚本评估脚本。 <code>javax.sql.DataSource</code> 。</p>
 <div style="border:1px solid black;padding:10px"><strong>Spring 3.1中的特定于环境的Bean-在Spring</strong>框架的下一个迭代中，我们将介绍对<em>特定</em>于<em>环境的</em> Bean的支持。特定于环境的Bean提供了一种更直接的方式，可以根据某些环境切换是否正确来将Bean“打开”。这在一些定义明确的场景中很有用，在这种场景中，bean的配置在不同的环境中会发生巨大变化。这里的示例-在测试中使用嵌入式数据库，但另一个<code>javax.sql.DataSource</code>在生产中就是这样一种情况。当然，还有其他一些方法可以使用Spring 3.0或更早的版本来实现相同的灵活性，包括<code>FactoryBean</code>和<code>PropertyPlaceHolderConfigurer</code> s。</div><p>回顾前面的示例，我们可以声明我们的<code>javax.sql.DataSource</code>叫<code>ds</code>像这样，改为：</p>
 <pre><code class="prettyprint xml">    &lt;bean id=&quot;ds&quot; class=&quot;org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactoryBean&quot;&gt;
         &lt;property name=&quot;databaseType&quot; value=&quot;H2&quot;/&gt;
@@ -207,7 +207,7 @@
             &lt;/bean&gt;
         &lt;/property&gt;
     &lt;/bean&gt; 
-</code></pre><p>这个<code>FactoryBean</code>负责读取任何SQL脚本（我只指定了一个名为<code>setup.sql</code>在这里，尽管您可以指定任意数量（用逗号分隔），然后将它们加载到数据库中，然后返回<code>javax.sql.DataSource</code>以简单，方便的方式实例化。</p><p>我们已经看到了强大的拳头<code>FactoryBean</code>可以打包。精心设计<code>FactoryBean</code>将显示最有可能在设置对象中有用的选项，并且在运行时还将提供有关各种选项的无效配置的反馈。但是，通过XML模式提供的验证，XML可以在设计时提供更多指导。这就是Spring框架长期支持使用基于XML模式的名称空间的原因，该名称空间描述了实现更多反馈和简化的功能。让我们回顾一下嵌入式数据库示例。Spring框架提供了一个用于配置嵌入式数据源的名称空间。要在Spring中使用名称空间，您只需限定名称空间并添加对<code>schemaLocation</code>元件。经过修改以支持JDBC XML名称空间的先前的Spring配置文件如下所示：</p>
+</code></pre><p>这个<code>FactoryBean</code>负责读取任何SQL脚本（我只指定了一个名为<code>setup.sql</code>在这里，尽管您可以指定任意数量（用逗号分隔），然后将它们加载到数据库中，然后返回<code>javax.sql.DataSource</code>以简单，方便的方式实例化。</p><p>我们已经看到了强大的拳头<code>FactoryBean</code>可以打包。精心设计<code>FactoryBean</code>将显示最有可能在设置对象中有用的选项，并且在运行时还将提供有关各种选项的无效配置的反馈。但是，通过XML模式提供的验证，XML可以在设计时提供更多指导。这就是Spring Framework 长期支持使用基于XML模式的名称空间的原因，该名称空间描述了实现更多反馈和简化的功能。让我们回顾一下嵌入式数据库示例。Spring Framework 提供了一个用于配置嵌入式数据源的名称空间。要在Spring中使用名称空间，您只需限定名称空间并添加对<code>schemaLocation</code>元件。经过修改以支持JDBC XML名称空间的先前的Spring配置文件如下所示：</p>
 <pre><code class="prettyprint xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
        xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
@@ -227,7 +227,7 @@
     &lt;context:component-scan base-package=&quot;org.springframework.samples&quot;/&gt;
     &lt;!-- ...  same as before ... --&gt;
 &lt;/beans&gt;
-</code></pre><p>我们在中注释的所有bean <code>org.springframework.samples</code>与Spring框架一起打包<code>@Component</code>注释将被拾取并与上下文一起注册为bean，就像我们使用来配置它们一样<code>bean</code> XML中的元素。我们已经注释了<code>DatabaseCustomerService</code>和<code>CustomerClient</code>与类<code>@Component</code> ，这使我们可以删除等效项<code>bean</code> XML配置中那些bean的元素。组件扫描非常方便，因为尽管分散了配置，但Spring承担了很多繁重的工作。</p><p>我们知道这个bean依赖于<code>JdbcTemplate</code> 。的<code>JdbcTemplate</code>已在上下文中配置。由于仅配置了一个，因此我们可以使用<code>@Autowired,</code>它告诉Spring按类型解析依赖关系并将其注入。如果在上下文中配置了多个实例，则在这种情况下将引发错误。</p>
+</code></pre><p>我们在中注释的所有bean <code>org.springframework.samples</code>与Spring Framework 一起打包<code>@Component</code>注释将被拾取并与上下文一起注册为bean，就像我们使用来配置它们一样<code>bean</code> XML中的元素。我们已经注释了<code>DatabaseCustomerService</code>和<code>CustomerClient</code>与类<code>@Component</code> ，这使我们可以删除等效项<code>bean</code> XML配置中那些bean的元素。组件扫描非常方便，因为尽管分散了配置，但Spring承担了很多繁重的工作。</p><p>我们知道这个bean依赖于<code>JdbcTemplate</code> 。的<code>JdbcTemplate</code>已在上下文中配置。由于仅配置了一个，因此我们可以使用<code>@Autowired,</code>它告诉Spring按类型解析依赖关系并将其注入。如果在上下文中配置了多个实例，则在这种情况下将引发错误。</p>
 <div style="border:1px solid black;padding:10px"><strong>依赖关系解析的注释-</strong>有很多方法可以告诉Spring要在之上和之后注入哪个bean <code>@Autowired</code> 。您可以使用JSR 330支持的注释，例如<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/htmlsingle/spring-framework-reference.html#beans-autowired-annotation" target="_blank"><code>@javax.inject.Inject</code></a>或JSR 250 <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/htmlsingle/spring-framework-reference.html#beans-resource-annotation" target="_blank"><code>@javax.annotation.Resource</code></a>或Spring的<a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/htmlsingle/spring-framework-reference.html#new-feature-java-config" target="_blank"><code>@Value</code></a>注解。</div>
 <pre><code class="prettyprint java">package org.springframework.samples;
 
@@ -324,7 +324,7 @@ public class CustomerConfiguration {
 		return new JdbcTemplate(this.dataSource);
 	}
 }
-</code></pre><p>该类使用<code>@Autowired</code>获得对嵌入式数据源的引用。这与先前示例中使用的方式类似，不同之处在于，这里我们在专用字段变量（而不是setter方法）上使用批注。Spring框架将在类的构造函数，字段变量或setter方法上使用注释。最后，我们有一个注释为<code>@Bean.</code>此方法提供了<code>JdbcTemplate</code>实例，这意味着我们可以从文件中删除XML配置。我们不在这里，但是您可以定义多个<code>@Bean</code>定义类中的方法，它们可以通过相互调用来相互引用。如果一种方法带有注释<code>@Bean</code>调用另一个，返回值将是一个新创建的对象，或者-如果已经创建了bean-已经在上下文中注册的bean。在上面的课程中，我们还有一个<code>@Configuration</code>类上的注释。这个注释告诉Spring将此类视为专门用于配置的特殊类型的组件。本质上，此bean受益于与在Spring上下文中注册的任何bean相同的所有服务， <em>并且</em>已对其应用了额外的服务以启用Java配置。要使用Java配置，请确保在类路径上具有CGLIB库。</p><p>最终的修订XML文件如下所示：</p>
+</code></pre><p>该类使用<code>@Autowired</code>获得对嵌入式数据源的引用。这与先前示例中使用的方式类似，不同之处在于，这里我们在专用字段变量（而不是setter方法）上使用批注。Spring Framework 将在类的构造函数，字段变量或setter方法上使用注释。最后，我们有一个注释为<code>@Bean.</code>此方法提供了<code>JdbcTemplate</code>实例，这意味着我们可以从文件中删除XML配置。我们不在这里，但是您可以定义多个<code>@Bean</code>定义类中的方法，它们可以通过相互调用来相互引用。如果一种方法带有注释<code>@Bean</code>调用另一个，返回值将是一个新创建的对象，或者-如果已经创建了bean-已经在上下文中注册的bean。在上面的课程中，我们还有一个<code>@Configuration</code>类上的注释。这个注释告诉Spring将此类视为专门用于配置的特殊类型的组件。本质上，此bean受益于与在Spring上下文中注册的任何bean相同的所有服务， <em>并且</em>已对其应用了额外的服务以启用Java配置。要使用Java配置，请确保在类路径上具有CGLIB库。</p><p>最终的修订XML文件如下所示：</p>
 <pre><code class="prettyprint xml"><br />&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
        xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
@@ -339,7 +339,7 @@ public class CustomerConfiguration {
     &lt;/jdbc:embedded-database&gt;   
 
 &lt;/beans&gt;
-</code></pre><p>在本文中，我们通过Spring的依赖注入功能追踪了您可以遵循的步骤，以使代码库更简洁，更友好。尽管我们谈论的奇妙技术提供了比其他任何方式都更高的灵活性和更多功能，但重要的是要记住，这种令人难以置信的支持已经存在了至少4年。多数情况持续了许多年。人们将这些片段用作其应用程序的基础已经很久了。依赖注入和控制反转仅仅是开始。Spring框架在此处建立的组件模型的基础上，为大量不断增长的用例提供了许多简化库。</p><p>在Spring之上构建应用程序时，可以将自己与应用程序所部署到的Web服务器，应用程序服务器和云环境的锁定隔离开来，同时最大程度地提高对基础平台的投资回报。</p></div>
+</code></pre><p>在本文中，我们通过Spring的依赖注入功能追踪了您可以遵循的步骤，以使代码库更简洁，更友好。尽管我们谈论的奇妙技术提供了比其他任何方式都更高的灵活性和更多功能，但重要的是要记住，这种令人难以置信的支持已经存在了至少4年。多数情况持续了许多年。人们将这些片段用作其应用程序的基础已经很久了。依赖注入和控制反转仅仅是开始。Spring Framework 在此处建立的组件模型的基础上，为大量不断增长的用例提供了许多简化库。</p><p>在Spring之上构建应用程序时，可以将自己与应用程序所部署到的Web服务器，应用程序服务器和云环境的锁定隔离开来，同时最大程度地提高对基础平台的投资回报。</p></div>
 </div>
 <section id="disqus_thread"></section>
 <script type="text/javascript">
