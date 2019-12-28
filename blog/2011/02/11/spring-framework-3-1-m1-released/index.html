@@ -277,7 +277,7 @@
 	ctx.load(&quot;classpath:/com/bank/config/xml/*-config.xml&quot;);
 	ctx.refresh();
 </code></pre><p>但这还不够。在进行这些更改后运行单元测试时，我们会看到<code>NoSuchBeanDefinitionException</code>抛出该错误，因为该容器找不到名为“ dataSource”的Spring bean。原因是，尽管我们已经明确定义了两个bean定义配置文件-“ dev”和“ production”，但我们尚未<i>激活</i>它们中的任何一个。</p>
-<h3>进入环境</h3><p>Spring的3.1中的新概念<em><code>Environment</code></em> 。这种抽象已集成到整个容器中，在接下来的几天中，我们将在博客文章中多次看到它。对于我们这里的目的，重要的是要了解<code>Environment</code>包含有关哪些配置文件（如果有）当前处于活动状态的信息。当春天<code>ApplicationContext</code>上面正在加载我们的三个bean定义文件，它非常注意<code><beans profile=“…”></code>每个属性。如果存在并且设置为当前未激活的概要文件的名称，那么将跳过整个文件-不会解析或注册任何bean定义。</p><p>可以通过多种方式来激活配置文件，但是最直接的方法是针对<code>ApplicationContext</code> API：</p>
+<h3>进入环境</h3><p>Spring的3.1中的新概念<em><code>Environment</code></em> 。这种抽象已集成到整个容器中，在接下来的几天中，我们将在博客文章中多次看到它。对于我们这里的目的，重要的是要了解<code>Environment</code>包含有关哪些配置文件（如果有）当前处于活动状态的信息。当 Spring <code>ApplicationContext</code>上面正在加载我们的三个bean定义文件，它非常注意<code><beans profile=“…”></code>每个属性。如果存在并且设置为当前未激活的概要文件的名称，那么将跳过整个文件-不会解析或注册任何bean定义。</p><p>可以通过多种方式来激活配置文件，但是最直接的方法是针对<code>ApplicationContext</code> API：</p>
 <pre><code class="prettyprint java"><br />	GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
 	ctx.getEnvironment().setActiveProfiles(&quot;dev&quot;);
 	ctx.load(&quot;classpath:/com/bank/config/xml/*-config.xml&quot;);
