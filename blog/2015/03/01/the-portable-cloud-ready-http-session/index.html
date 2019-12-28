@@ -219,7 +219,7 @@ class HelloRestController {
 		return uid.toString();
 	}
 }
-</code></pre><p>在运行它之前，请确保将干净的Redis数据库专用于此应用程序。例如，您可以使用以下命令重置当前数据库： <code>FLUSHDB</code> 。Spring Boot Redis启动器会自动连接到运行于<code>localhost</code> 。如果您想将其指向特定位置，请使用<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/redis/RedisProperties.java">各种<code>spring.redis.*</code>属性</a> 。</p><p>该示例尽可能最小：仅确认数据已写入Redis后备存储中。打开你的<code>redis-cli</code>与Web应用程序交互后的实用程序<code>localhost:8080/</code>在您的浏览器中。第一个请求将触发一个唯一的会话，该会话将用于缓存<code>uid</code>值。同一浏览器会话的后续请求将看到相同的值。输入<code>keys *</code>在里面<code>redis-cli</code>看看有什么坚持。</p><h2><a href="#deploying-to-cloudfoundry" class="anchor" name="deploying-to-cloudfoundry"></a>部署到CloudFoundry</h2><p>迁移到此云可能会有些棘手。如果您将此部署到Cloud Foundry，则Cloud Foundry buildpack将自动替换自动配置的Spring Boot <code>RedisConnectionFactory</code>与一个<code>RedisConnectionFactory</code>指向绑定到应用程序的Redis实例。<em>如果</em>您使用正确的buildpack在Cloud Foundry上运行，并且没有多个组件，则此方法有效<code>RedisConnectionFactory</code>在您的应用程序中。</p><p>我将使用Cloud Foundry <code>manifest.yml</code>描述该应用程序在部署到Cloud Foundry时的外观。在这种情况下，至少需要一个名为<code>redis-session</code>支持Redis数据库。我已将此文件放在我Maven旁边的项目根目录中<code>pom.xml</code> 。注意这个<code>manifest.yml</code>贡献一个环境变量， <code>SPRING_PROFILES_ACTIVE</code> ，这将激活<code>cloud</code>弹簧轮廓。我们稍后将使用它。</p>
+</code></pre><p>在运行它之前，请确保将干净的Redis数据库专用于此应用程序。例如，您可以使用以下命令重置当前数据库： <code>FLUSHDB</code> 。Spring Boot Redis启动器会自动连接到运行于<code>localhost</code> 。如果您想将其指向特定位置，请使用<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/redis/RedisProperties.java">各种<code>spring.redis.*</code>属性</a> 。</p><p>该示例尽可能最小：仅确认数据已写入Redis后备存储中。打开你的<code>redis-cli</code>与Web应用程序交互后的实用程序<code>localhost:8080/</code>在您的浏览器中。第一个请求将触发一个唯一的会话，该会话将用于缓存<code>uid</code>值。同一浏览器会话的后续请求将看到相同的值。输入<code>keys *</code>在里面<code>redis-cli</code>看看有什么坚持。</p><h2><a href="#deploying-to-cloudfoundry" class="anchor" name="deploying-to-cloudfoundry"></a>部署到CloudFoundry</h2><p>迁移到此云可能会有些棘手。如果您将此部署到Cloud Foundry，则Cloud Foundry buildpack将自动替换自动配置的Spring Boot <code>RedisConnectionFactory</code>与一个<code>RedisConnectionFactory</code>指向绑定到应用程序的Redis实例。<em>如果</em>您使用正确的buildpack在Cloud Foundry上运行，并且没有多个组件，则此方法有效<code>RedisConnectionFactory</code>在您的应用程序中。</p><p>我将使用Cloud Foundry <code>manifest.yml</code>描述该应用程序在部署到Cloud Foundry时的外观。在这种情况下，至少需要一个名为<code>redis-session</code>支持Redis数据库。我已将此文件放在我Maven旁边的项目根目录中<code>pom.xml</code> 。注意这个<code>manifest.yml</code>贡献一个环境变量， <code>SPRING_PROFILES_ACTIVE</code> ，这将激活<code>cloud</code>Spring 轮廓。我们稍后将使用它。</p>
 <pre><code class="prettyprint yml"><br />---
 applications:
 - name: connectors
@@ -249,7 +249,7 @@ cf push
 
 </code></pre><p>这种方法是最简单的，这就是您仅添加Spring Cloud入门依赖项所得到的。如果要显式配置服务，请通过在Spring Boot中添加以下属性来禁用Spring Boot启动程序<code>src/main/resources/application.properties</code> ：</p>
 <pre><code class="prettyprint properties">spring.cloud.enabled=false
-</code></pre><p>然后，显式使用Spring Cloud PaaS连接器。Bean定义<em>仅</em>在<code>cloud</code>弹簧轮廓已激活。否则，Spring Boot自动配置将启动（这是在本地运行时所需的配置）。</p>
+</code></pre><p>然后，显式使用Spring Cloud PaaS连接器。Bean定义<em>仅</em>在<code>cloud</code>Spring 轮廓已激活。否则，Spring Boot自动配置将启动（这是在本地运行时所需的配置）。</p>
 <pre><code class="prettyprint java">package demo;
 
 import org.springframework.boot.CommandLineRunner;

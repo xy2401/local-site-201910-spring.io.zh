@@ -170,7 +170,7 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>有时有人建议Spring和Spring Boot是“重量级”的，也许只是因为它们允许应用程序超出其重量，从而为很多用户代码提供了很多功能。在本文中，我们重点介绍内存使用情况，并询问是否可以量化使用Spring的效果？具体来说，我们想比其他JVM应用程序更多地了解使用Spring的实际开销。我们首先使用Spring Boot创建一个基本应用程序，然后看看几种不同的方法来衡量它的运行情况。然后，我们看一些比较点：简单的Java应用程序，使用Spring但不使用Spring Boot的应用程序，使用Spring Boot但不进行自动配置的应用程序以及一些Ratpack示例应用程序。</p><h2><a href="#vanilla-spring-boot-app" class="anchor" name="vanilla-spring-boot-app"></a>香草弹簧启动应用程序</h2>
+<div class="blog--post"><p>有时有人建议Spring和Spring Boot是“重量级”的，也许只是因为它们允许应用程序超出其重量，从而为很多用户代码提供了很多功能。在本文中，我们重点介绍内存使用情况，并询问是否可以量化使用Spring的效果？具体来说，我们想比其他JVM应用程序更多地了解使用Spring的实际开销。我们首先使用Spring Boot创建一个基本应用程序，然后看看几种不同的方法来衡量它的运行情况。然后，我们看一些比较点：简单的Java应用程序，使用Spring但不使用Spring Boot的应用程序，使用Spring Boot但不进行自动配置的应用程序以及一些Ratpack示例应用程序。</p><h2><a href="#vanilla-spring-boot-app" class="anchor" name="vanilla-spring-boot-app"></a>香草Spring 启动应用程序</h2>
 <p>作为基准，我们构建了一个静态应用，其中包含一些webjar和<code>spring.resources.enabled=true</code> 。这对于通过一个或两个REST端点提供美观的静态内容非常合适。我们用来测试的应用程序的源代码<a href="https://github.com/dsyer/spring-boot-memory-blog/blob/master/demo">在github中</a> 。您可以使用<code>mvnw</code>包装器脚本（如果有可用的JDK 1.8，并且在路径上）（ <code>mvnw package</code> ）。可以这样启动：</p>
 <pre><code class="prettyprint">$ java -Xmx32m -Xss256k -jar target/demo-0.0.1-SNAPSHOT.jar
 </code></pre>
@@ -338,7 +338,7 @@ public class DemoApplication {
 </code></pre>
 <p>作为Spring Boot胖子，它可以在大约16MB的堆中运行，在28MB的非堆中运行。作为常规的gradle应用程序，它在堆上要轻一些（不需要缓存的jar），但使用相同的非堆内存。有30个线程。有趣的是，没有大于300KB的对象，而我们的带有Tomcat的Spring Boot应用程序通常在该级别之上有10个或更多对象。</p><h2><a href="#variations-on-the-vanilla-app" class="anchor" name="variations-on-the-vanilla-app"></a> Vanilla App的变体</h2>
 <p>从爆炸的jar刮胡子运行到堆外最多可减少6MB（区别在于启动器中缓存的jar数据）。同时也使启动速度更快：少于5秒，而内存受胖子限制的情况则只有7秒。</p>
-<p>应用程序的精简版版本没有静态资源或Webjar，但爆炸存档的运行速度为23MB，非堆运行的内存为41MB（启动时间少于3秒）。非堆使用情况细分为元空间：35MB，压缩类空间：4MB，代码缓存：4MB。弹簧<code>ReflectionUtils</code>在Spring 4.2.3中跳到YourKit中的内存图表顶部附近（仅次于Tomcat第二） <code>NioEndpoint</code> ）。的<code>ReflectionUtils</code>应该在内存压力下收缩，但实际上并没有收缩，因此在上下文启动后，Spring 4.2.4会<a href="https://jira.spring.io/browse/SPR-13783">清除缓存</a> ，从而节省了一些内存（减少到约20MB的堆）。 <code>DefaultListableBeanFactory</code>下降到第三位，大小几乎是资源链（webjars定位器）的一半，但是在不删除更多功能的情况下不会进一步缩小。</p>
+<p>应用程序的精简版版本没有静态资源或Webjar，但爆炸存档的运行速度为23MB，非堆运行的内存为41MB（启动时间少于3秒）。非堆使用情况细分为元空间：35MB，压缩类空间：4MB，代码缓存：4MB。Spring <code>ReflectionUtils</code>在Spring 4.2.3中跳到YourKit中的内存图表顶部附近（仅次于Tomcat第二） <code>NioEndpoint</code> ）。的<code>ReflectionUtils</code>应该在内存压力下收缩，但实际上并没有收缩，因此在上下文启动后，Spring 4.2.4会<a href="https://jira.spring.io/browse/SPR-13783">清除缓存</a> ，从而节省了一些内存（减少到约20MB的堆）。 <code>DefaultListableBeanFactory</code>下降到第三位，大小几乎是资源链（webjars定位器）的一半，但是在不删除更多功能的情况下不会进一步缩小。</p>
 <p>事实证明， <code>NioEndpoint</code>拥有一个1MB的“动态降落伞”，直到检测到<code>OutOfMemoryError</code> 。您可以将其自定义为零，然后放弃降落伞以节省额外的MB堆，例如：</p>
 <pre><code class="prettyprint java">@SpringBootApplication
 public class SlimApplication implements EmbeddedServletContainerCustomizer {
