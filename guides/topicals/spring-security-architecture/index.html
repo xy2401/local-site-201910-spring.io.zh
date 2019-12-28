@@ -300,7 +300,7 @@ int vote(Authentication authentication, S object,
 </div>
 </div>
 <div class="paragraph">
-<p>客户端向应用程序发送请求，然后容器根据请求URI的路径确定对它应用哪些过滤器和哪个servlet。一个servlet最多只能处理一个请求，但是过滤器形成一个链，因此它们是有序的，实际上，如果过滤器要处理请求本身，则可以否决链的其余部分。过滤器还可以修改下游过滤器和Servlet中使用的请求和/或响应。过滤器链的顺序非常重要，Spring Boot通过两种机制对其进行管理：一种是<code>@Beans</code>类型的<code>Filter</code>可以有一个<code>@Order</code>或实施<code>Ordered</code> ，另一个是它们可以成为<code>FilterRegistrationBean</code>该API本身具有一个订单。一些现成的过滤器定义了它们自己的常数，以帮助表示它们希望相对于彼此的顺序（例如， <code>SessionRepositoryFilter</code>从春季会议有一个<code>DEFAULT_ORDER</code>的<code>Integer.MIN_VALUE + 50</code> ，这告诉我们它喜欢在链中处于早期，但不排除其他过滤器排在它之前。</p>
+<p>客户端向应用程序发送请求，然后容器根据请求URI的路径确定对它应用哪些过滤器和哪个servlet。一个servlet最多只能处理一个请求，但是过滤器形成一个链，因此它们是有序的，实际上，如果过滤器要处理请求本身，则可以否决链的其余部分。过滤器还可以修改下游过滤器和Servlet中使用的请求和/或响应。过滤器链的顺序非常重要，Spring Boot通过两种机制对其进行管理：一种是<code>@Beans</code>类型的<code>Filter</code>可以有一个<code>@Order</code>或实施<code>Ordered</code> ，另一个是它们可以成为<code>FilterRegistrationBean</code>该API本身具有一个订单。一些现成的过滤器定义了它们自己的常数，以帮助表示它们希望相对于彼此的顺序（例如， <code>SessionRepositoryFilter</code>从 Spring 会议有一个<code>DEFAULT_ORDER</code>的<code>Integer.MIN_VALUE + 50</code> ，这告诉我们它喜欢在链中处于早期，但不排除其他过滤器排在它之前。</p>
 </div>
 <div class="paragraph">
 <p>Spring Security作为单个安装<code>Filter</code>在链中，其秘密类型为<code>FilterChainProxy</code> ，其原因很快就会显现出来。在Spring Boot应用中，安全过滤器是<code>@Bean</code>在里面<code>ApplicationContext</code> ，并且默认情况下已安装，因此它适用于每个请求。它安装在由以下位置定义的位置<code>SecurityProperties.DEFAULT_FILTER_ORDER</code> ，而后者又由<code>FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER</code> （Spring Boot应用程序希望过滤器包装请求并修改其行为的最大顺序）。但是，还有更多的功能：从容器的角度来看，Spring Security是单个过滤器，但是在内部有其他过滤器，每个过滤器都扮演着特殊的角色。这是一张图片：</p>
