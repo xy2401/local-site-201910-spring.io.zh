@@ -170,7 +170,7 @@
 </a></div>
 </div>
 </header>
-<div class="blog--post"><p>在上一篇有关<a href="https://spring.io/blog/2016/06/24/managing-secrets-with-vault">使用Vault管理机密的</a>文章中，我向您介绍了Vault以及如何使用通用机密后端存储任意机密。保险柜不仅可以管理秘密数据，例如API密钥，密码和其他类似字符串的敏感数据。今天，我们来看看Vault与数据库，服务和证书的集成。</p><h2><a href="#database-credentials-tend-to-be-static" class="anchor" name="database-credentials-tend-to-be-static"></a>数据库凭证通常是静态的</h2>
+<div class="blog--post"><p>在上一篇有关<a href="https://spring.io/blog/2016/06/24/managing-secrets-with-vault">使用Vault管理机密的</a>文章中，我向您介绍了Vault以及如何使用通用机密后端存储任意机密。 Vault 不仅可以管理秘密数据，例如API密钥，密码和其他类似字符串的敏感数据。今天，我们来看看Vault与数据库，服务和证书的集成。</p><h2><a href="#database-credentials-tend-to-be-static" class="anchor" name="database-credentials-tend-to-be-static"></a>数据库凭证通常是静态的</h2>
 <p>对于数据库，获取数据库申请证书的常规工作流程是要求某些操作员或自助服务工具为您提供证书，以便您的应用程序可以登录数据库。此时，凭据被认为是静态的。在迁移数据库或存在安全漏洞的情况下，通常会更改凭据。</p>
 <p>使用<a href="https://github.com/spring-cloud-incubator/spring-cloud-vault-config">Spring Cloud Vault，</a>您可以将用户名和密码存储在Vault中，而不是您的应用程序配置中。<a href="https://cloud.spring.io/spring-cloud-config/">Spring Config Server</a>也是一个不错的选择。它允许您<a href="https://cloud.spring.io/spring-cloud-static/spring-cloud.html#_encryption_and_decryption">将加密的机密存储</a>在配置存储库中。您的凭据受到保护。</p>
 <p>有一个警告：长期存在的凭证是泄漏的良好目标。凭据泄漏可能会导致意外访问。一些数据库对源主机实施了限制。在某些情况下，数据库用户可以限制为一组主机。该限制阻止了其他主机的访问。尽管如此，每个有权访问允许的计算机的用户和进程都可以使用泄漏的凭据。但是，您如何发现泄漏？如果您的数据泄露给公众或互联网，则可能会发现泄露，但情况并非总是如此。对于其他情况，意外的人可能会读取或更改您的数据，并且可以肯定的是，泄漏会在相当长的一段时间内未被发现。</p>
@@ -178,7 +178,7 @@
 <p>Vault附带了与不同系统的各种集成。其中一些与<a href="https://www.vaultproject.io/docs/secrets/postgresql/index.html">PostgreSQL</a>和<a href="https://www.vaultproject.io/docs/secrets/mysql/index.html">MySQL</a>集成为秘密后端。秘密后端可以提供秘密。在这种情况下，秘密后端并不意味着秘密数据存储在PosgreSQL / MySQL中。这意味着Vault可以根据需要创建（和撤消）数据库用户。</p>
 <p>要生成数据库凭证，您需要首先设置一个角色。角色控制用于数据库凭据生成的权限上下文。角色定义与凭证关联的权限。如果您运行不同的应用程序，并且每个应用程序需要不同的数据库权限，则该概念很好地适用。<br>角色还定义了获取凭证的最大租用时间。租约是在保管箱中说出凭据有效的持续时间。凭证过期后，保管箱将从数据库系统中撤消凭证。某些数据库（例如PostgreSQL）已内置了对密码到期的支持。 <code>CREATE ROLE … VALID UNTIL …</code>条款。</p><h2><a href="#first-steps-with-vault-and-mysql" class="anchor" name="first-steps-with-vault-and-mysql"></a> Vault和MySQL的第一步</h2>
 <p>现在如何开始使用Vault和MySQL？</p>
-<p>您需要已初始化且未密封的Vault服务器和正在运行的MySQL服务器。请参阅上<a href="https://spring.io/blog/2016/06/24/managing-secrets-with-vault#wait-there-rsquo-s-hope">一篇文章</a>如何设置保险柜。</p>
+<p>您需要已初始化且未密封的Vault服务器和正在运行的MySQL服务器。请参阅上<a href="https://spring.io/blog/2016/06/24/managing-secrets-with-vault#wait-there-rsquo-s-hope">一篇文章</a>如何设置 Vault 。</p>
 <p>然后，您可以根据连接详细信息和角色声明来设置MySQL后端：</p>
 <p>首先，安装<code>mysql</code>与秘密后端</p>
 <pre><code class="prettyprint bash">$ vault mount mysql
@@ -190,12 +190,12 @@ Successfully mounted &#39;mysql&#39; at &#39;mysql&#39;!
 	connection_url=&quot;root:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="22504d4d5662564152">[email&#160;protected]</a>(127.0.0.1:3306)/&quot;
 Success! Data written to: mysql/config/connection
 </code></pre>
-<p>该角色包含用于用户创建和授权的脚本。如果需要，可以包含多个命令。保险柜将在每一代凭证上执行以下命令：</p>
+<p>该角色包含用于用户创建和授权的脚本。如果需要，可以包含多个命令。 Vault 将在每一代凭证上执行以下命令：</p>
 <pre><code class="prettyprint bash">$ vault write mysql/roles/readonly \
 	sql=&quot;CREATE USER &#39;{{name}}&#39;@&#39;%&#39; IDENTIFIED BY &#39;{{password}}&#39;;GRANT SELECT ON *.* TO &#39;{{name}}&#39;@&#39;%&#39;;&quot;
 Success! Data written to: mysql/roles/readonly
 </code></pre>
-<p>保险柜现已准备好为<code>readonly</code>角色。您可以通过以下方式获取凭据</p>
+<p> Vault 现已准备好为<code>readonly</code>角色。您可以通过以下方式获取凭据</p>
 <pre><code class="prettyprint bash">$ vault read mysql/creds/readonly
 Key            	Value
 ---            	-----
@@ -315,7 +315,7 @@ public class MySqlApplication {
 <p>然后启动您的应用程序。该代码产生如下输出：</p>
 <p><code>Connection works with User: token-...</code></p>
 <p>Spring Cloud Vault在启动时获取数据库凭据，并使用默认属性名称存储这些凭据，以便Spring Boot可以选择它们。</p><h2><a href="#other-services" class="anchor" name="other-services"></a>其他服务</h2>
-<p>保险柜支持其他几种集成。我们已经建立了对Spring Boot中也支持的集成的支持。</p>
+<p> Vault 支持其他几种集成。我们已经建立了对Spring Boot中也支持的集成的支持。</p>
 <p>您可以使用以下服务和数据库：</p>
 <ul>
 <li>PostgreSQL和MySQL-生成用于JDBC和Spring Data JPA的凭证</li>

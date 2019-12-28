@@ -1,5 +1,5 @@
 <html  data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>使用保险柜管理机密</title>
+<title>使用 Vault 管理机密</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
@@ -145,7 +145,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">使用保险柜管理机密</h1>
+<h1 class="blog--title">使用 Vault 管理机密</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -169,8 +169,8 @@
 <p>可以使用<a href="https://cloud.spring.io/spring-cloud-config/spring-cloud-config.html#_encryption_and_decryption">Spring Cloud Config Server</a>或<a href="https://tomee.apache.org/datasource-password-encryption.html">TomEE</a>对敏感数据进行加密。<br>加密数据比未加密数据好了一步。加密在另一侧强加了对用户侧解密的需求，这需要分发解密密钥。现在，您将钥匙放在哪里？密钥受密码保护吗？您将密码放在哪里？您在多少系统上分发密钥和密码？</p>
 <p>如您所见，加密引入了鸡蛋问题。存储解密密钥使应用程序可以解密数据。它还允许攻击向量。未经授权的人可以通过访问机器来访问解密密钥。该人可以解密可通过此密钥解密的数据。该密钥是静态的，因此泄漏的密钥需要更改密钥。数据需要重新加密，凭据需要更改。在线测量不可能发现这种泄漏，因为一旦获得数据就可以离线解密。</p>
 <p>一种方法是在应用程序启动之前将密钥放在难以猜测的位置，并在将密钥读取到内存后擦除密钥。按键可用的时间缩短了。缩短了攻击时间范围，但关键仍然在那里。擦除密钥仅对一个应用程序启动有效。众所周知，云中的容器和微服务一旦崩溃就会重新启动。由于密钥已丢失，因此不再可能重新启动应用程序。</p><h2><a href="#wait-there-rsquo-s-hope" class="anchor" name="wait-there-rsquo-s-hope"></a>等等，有希望！</h2>
-<p>正确地进行加密非常困难，而如果自己进行加密，则管理秘密就更加困难。保险柜正好解决了这些问题。它有助于解决鸡蛋问题，并且带有加密功能。保险柜是一项用于管理机密的服务。它提供了一个API，可根据策略访问机密。API的任何用户都需要进行身份验证，并且只能看到其被授权的机密。保管箱使用带有<a href="https://en.wikipedia.org/wiki/Galois/Counter_Mode">GCM的</a> 256位<a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES</a>加密数据。它可以将数据存储在各种后端（文件，Amazon DynamoDB，Consul等）中。另一个关键方面是，保管箱从不将密钥存储在持久位置中。启动/重新启动保管库始终需要一个或多个操作员才能解封保管库。但是，让我们先从基础开始。</p>
-<p>保险柜并不是所有安全问题的答案。值得检查<a href="https://www.vaultproject.io/docs/internals/security.html">Vault安全模型</a>文档以了解威胁模型。</p>
+<p>正确地进行加密非常困难，而如果自己进行加密，则管理秘密就更加困难。 Vault 正好解决了这些问题。它有助于解决鸡蛋问题，并且带有加密功能。 Vault 是一项用于管理机密的服务。它提供了一个API，可根据策略访问机密。API的任何用户都需要进行身份验证，并且只能看到其被授权的机密。保管箱使用带有<a href="https://en.wikipedia.org/wiki/Galois/Counter_Mode">GCM的</a> 256位<a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES</a>加密数据。它可以将数据存储在各种后端（文件，Amazon DynamoDB，Consul等）中。另一个关键方面是，保管箱从不将密钥存储在持久位置中。启动/重新启动保管库始终需要一个或多个操作员才能解封保管库。但是，让我们先从基础开始。</p>
+<p> Vault 并不是所有安全问题的答案。值得检查<a href="https://www.vaultproject.io/docs/internals/security.html">Vault安全模型</a>文档以了解威胁模型。</p>
 <p>要引导Vault，您需要从<a href="https://www.vaultproject.io/downloads.html">https://www.vaultproject.io/downloads.html</a>下载二进制文件。 Vault用Go编写，二进制文件可用于各种平台。<br>解压缩下载的文件，即可开始使用Vault。</p>
 <p>接下来启动Vault服务器。您需要一个配置文件来指定一些选项。</p>
 <p><strong>vault.conf</strong></p>
@@ -189,7 +189,7 @@ disable_mlock = true
 <pre><code class="prettyprint">$ vault server -config vault.conf
 </code></pre>
 <p>保管箱将作为前台进程启动。</p>
-<p>恭喜，您已启动保险柜。</p>
+<p>恭喜，您已启动 Vault 。</p>
 <p>现在是打开第二个控制台以使用Vault执行管理任务的好时机。Vault现在以纯文本模式运行，因为已禁用TLS / SSL。您需要设置<code>VAULT_ADDR</code>环境变量，以通知Vault客户端使用纯文本：</p>
 <pre><code class="prettyprint">$ export VAULT_ADDR=http://127.0.0.1:8200
 </code></pre>
@@ -199,7 +199,7 @@ disable_mlock = true
 <li>主密钥和密钥拆分</li>
 <li>根令牌</li>
 </ol>
-<p>保险柜允许使用<a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir Secret Sharing</a>算法共享密钥。数据通常用一个密钥加密。有权访问密钥的人作为一个人就可以完全控制所有数据。有时您不想要那样。通常，您希望在多个人之间分配主密钥，因此，没有一个人可以控制所有加密数据。保管箱允许指定总数的密钥共享和初始化期间解封Vault所需的密钥共享数。保险柜初始化后，便无法更改该设置。从控制台初始化保管库将显示完整密钥。您可能希望通过DevOps工具采用API进行初始化，例如，向应该接收密钥共享的操作员发送安全消息。</p>
+<p> Vault 允许使用<a href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir Secret Sharing</a>算法共享密钥。数据通常用一个密钥加密。有权访问密钥的人作为一个人就可以完全控制所有数据。有时您不想要那样。通常，您希望在多个人之间分配主密钥，因此，没有一个人可以控制所有加密数据。保管箱允许指定总数的密钥共享和初始化期间解封Vault所需的密钥共享数。 Vault 初始化后，便无法更改该设置。从控制台初始化保管库将显示完整密钥。您可能希望通过DevOps工具采用API进行初始化，例如，向应该接收密钥共享的操作员发送安全消息。</p>
 <p>使用以下方法初始化保管箱：</p>
 <pre><code class="prettyprint bash">$ vault init -key-shares=5 -key-threshold=2
 </code></pre>
@@ -232,15 +232,15 @@ Key Shares: 5
 Key Threshold: 2
 Unseal Progress: 0
 </code></pre>
-<p>保险柜开封后，您可以开始在保险柜内部存储机密数据。</p>
-<p>保险柜需要经过身份验证的访问权限才能从此处继续。保险柜将令牌用作其传输级别的常规身份验证。</p>
+<p> Vault 开封后，您可以开始在 Vault 内部存储机密数据。</p>
+<p> Vault 需要经过身份验证的访问权限才能从此处继续。 Vault 将令牌用作其传输级别的常规身份验证。</p>
 <p>还记得初始化的输出吗？密钥共享之后的最后一项是根令牌。目前最简单的方法是使用根令牌。在控制台上使用令牌的最简单方法是将其存储在环境变量中：</p>
 <pre><code class="prettyprint">$ export VAULT_TOKEN=9a63de21-8af7-311a-9a5a-151b6a0d4795
 $ vault write secret/my-application <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dfafbeacaca8b0adbbe2979fadbb8bef98aaecacac">[email&#160;protected]</a>
 </code></pre>
 <p>通用秘密后端允许将任意值存储为键值存储。单个上下文可以存储一个或多个键值元组。上下文可以按层次进行组织，使用的数据格式为JSON。</p>
 <p>Vault提供除一般的秘密后台其它后端，使证书产生的MySQL，SQL服务器和PostgreSQL，领事和<a href="https://www.vaultproject.io/docs/secrets/index.html">更多</a> 。</p><h2><a href="#authentication" class="anchor" name="authentication"></a>认证方式</h2>
-<p>保险柜主要与令牌一起使用。每个令牌都分配给可能限制操作和路径的策略。策略使用基于路径的匹配来应用规则。令牌可以获取元数据（键值）并显示分配的名称，这使管理对操作更加友好。</p>
+<p> Vault 主要与令牌一起使用。每个令牌都分配给可能限制操作和路径的策略。策略使用基于路径的匹配来应用规则。令牌可以获取元数据（键值）并显示分配的名称，这使管理对操作更加友好。</p>
 <p>您可以手动创建令牌并将其分配给应用程序和用户。除此之外，还有两种<a href="https://www.vaultproject.io/docs/auth/index.html">身份验证机制</a> （LDAP，用户名/密码，GitHub令牌……），允许用户登录并获取令牌。令牌和身份验证机制可以撤销，这使得锁定特定用户变得容易。</p><h2><a href="#spring-cloud-vault" class="anchor" name="spring-cloud-vault"></a> Spring Cloud Vault</h2>
 <p>我们在Pivotal考察了Vault，并认为它是一种很有前途的工具。这就是我们构建<a href="https://github.com/spring-cloud-incubator/spring-cloud-vault-config">Spring Cloud Vault</a>的原因。Spring Cloud Vault是类似于<a href="https://github.com/spring-cloud/spring-cloud-config">Spring Cloud Config</a>的配置扩展。Spring Cloud Config的目标是由存储在各种存储库（例如GitHub，SVN甚至是Vault）中的数据支持的外部配置管理。</p>
 <p>借助Spring Cloud Vault，您可以访问Vault中的秘密。在启动应用程序时会获取机密。Spring Cloud Vault使用应用程序中的数据（应用程序名称，活动上下文）来确定存储机密的上下文路径。</p>
@@ -300,11 +300,11 @@ token_accessor 	2fd7dcba-39d0-04d3-8d6b-096c3529cf14
 token_duration 	0
 token_renewable	true
 token_policies 	[root]
-</code></pre><h3><a href="#write-data-into-vault" class="anchor" name="write-data-into-vault"></a>将数据写入保险柜</h3>
-<p>将一些数据写入保险柜：</p>
+</code></pre><h3><a href="#write-data-into-vault" class="anchor" name="write-data-into-vault"></a>将数据写入 Vault </h3>
+<p>将一些数据写入 Vault ：</p>
 <pre><code class="prettyprint">$ vault write secret/my-application <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c7b7a6b4b4b0a8b5a3fa8f87b5a393f780b2f4b4b4">[email&#160;protected]</a>
 </code></pre><h3><a href="#update-your-spring-boot-application" class="anchor" name="update-your-spring-boot-application"></a>更新您的Spring Boot应用程序</h3>
-<p>现在转到您的应用程序启动器类，并增强它以注入秘密。使用与将其写入保险柜时相同的属性名称：</p>
+<p>现在转到您的应用程序启动器类，并增强它以注入秘密。使用与将其写入 Vault 时相同的属性名称：</p>
 <pre><code class="prettyprint java">package example;
 
 import javax.annotation.PostConstruct;
