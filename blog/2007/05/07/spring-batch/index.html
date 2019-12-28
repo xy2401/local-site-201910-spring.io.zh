@@ -1,5 +1,5 @@
 <html  data-code-prettify="" data-mobile-support="" data-search=""><head>
-<title>春季批</title>
+<title>Spring Batch</title>
 <meta id="Viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no">
 <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png">
 <link href="asset?aid=0" rel="stylesheet" type="text/css">
@@ -151,7 +151,7 @@
 </header>
 <div class="blog--container">
 <header>
-<h1 class="blog--title">春季批</h1>
+<h1 class="blog--title">Spring Batch</h1>
 <div class="meta-data--container">
 <div class="meta-data--item desktop-only">
 <div class="meta-data--icon icon blog-icon engineering"></div>
@@ -171,7 +171,7 @@
 </div>
 </header>
 <div class="blog--post"><h2>介绍</h2><p>我一直在与几个客户一起努力开发一种名为<a href="http://www.springframework.org/spring-batch">Spring Batch</a>的新产品。目的是提供工具和应用程序以支持企业环境中的批量处理。Spring Batch是<a href="http://www.springframework.org/sub-projects">Spring Portfolio的</a>一部分，在Spring 2.1发行版中首次发布。</p><p>实际上，构建一些原型代码的最初动力实际上来自许多Interface21客户端。这提供了一些有用的附加细节以及对实现的一些限制，以便可以将其应用于客户提出的现实问题。我希望本文能激发更多兴趣，并提供有关一般方法的反馈。</p><p>罗德·约翰逊（Rod Johnson）将与我们的埃森哲合作伙伴一起在Spring Batch上进行JavaOne演示。如果您有幸来到这里，您将看到一些细节和产品背后的想法。在这里，我将显示Spring Batch基础结构层的一些细节，这些细节不会在演示文稿中涉及。</p><p>一旦弄清如何将所有工件（网站，JIRA，持续集成等）整合在一起，源代码将以Subversion的形式发布。我还计划用更多博客详细介绍产品设计的方式。有一份邮件列表，供有兴趣在我们朝1.0发行版过渡的发行过程中关注的人们使用。要注册列表，请转到<a href="http://lists.interface21.com/listmanager/listinfo/spring-batch-announce">列表信息页面</a> 。</p>
-<h3>春季批处理基础架构</h3><p>初始版本提供了一些底层工具来支持产品的其他部分。我们称这些为Spring Batch基础架构。</p><p>基础结构的目标之一是提供声明性或半声明性方法来优化批量处理。这包括将批处理操作一起批处理的功能，以及在出现异常时重试工作的功能。这两个要求都有事务性的味道，类似的概念可能是相关的（传播，同步）。他们俩都适合于Spring中常见的模板编程模型，请参见<tt>TransactionTemplate</tt> ， <tt>JdbcTemplate</tt> ， <tt>JmsTemplate</tt> 。</p><p>在框架中的核心接口是<tt>BatchOperations</tt>和<tt>BatchCallback</tt>和<tt>BatchOperations</tt>的主要实现<tt>BatchTemplate。</tt>用法示例：</p>
+<h3>Spring Batch处理基础架构</h3><p>初始版本提供了一些底层工具来支持产品的其他部分。我们称这些为Spring Batch基础架构。</p><p>基础结构的目标之一是提供声明性或半声明性方法来优化批量处理。这包括将批处理操作一起批处理的功能，以及在出现异常时重试工作的功能。这两个要求都有事务性的味道，类似的概念可能是相关的（传播，同步）。他们俩都适合于Spring中常见的模板编程模型，请参见<tt>TransactionTemplate</tt> ， <tt>JdbcTemplate</tt> ， <tt>JmsTemplate</tt> 。</p><p>在框架中的核心接口是<tt>BatchOperations</tt>和<tt>BatchCallback</tt>和<tt>BatchOperations</tt>的主要实现<tt>BatchTemplate。</tt>用法示例：</p>
 <pre><code class="prettyprint java"><br />BatchTemplate template = new BatchTemplate();
 
 template.setCompletionPolicy(new FixedChunkSizeCompletionPolicy(20));
@@ -199,7 +199,7 @@ Object result = template.execute(new RetryCallback() {
 });
 </code></pre>
 <h3>优化交易管道处理</h3><p>产品发布后，可以立即使用基础架构来简化批次优化和自动重试。该框架面向无需了解框架任何细节的应用程序开发人员-有一些应用程序开发人员接口可用于方便地构建数据处理管道，但除此之外，我们的目标是支持接近POJO编程实际的模型。这类似于Spring Core在事务管理和DAO实施领域中采用的方法。</p>
-<h3>春季批处理容器层</h3><p>Spring Batch的设计愿景是可以将基础结构用于我们称为Spring Batch容器层的一类面向过程的批处理应用程序。要发布的第一个容器是一个批量处理应用程序，在其实现中使用基础结构。这个所谓的“简单批处理执行容器”将为批处理生命周期的可追溯性和管理提供强大的功能。一个关键目标是，对于非开发人员（例如支持一些业务的应用程序支持团队），批处理的管理（查找作业及其输入和结果，开始，计划，重新启动）应尽可能地容易。人们告诉我这是牺牲品，但我喜欢将其视为“ ETL”工具（提取转换和加载）。至少ETL是容器的字面意思，即使它与某些人对传统ETL的观念不符。 Spring编程模型非常适合此类问题-编写您的POJO，该POJO知道如何定位和处理单个数据项，并让框架进行处理。</p><p>观看此空间，以获取有关容器层，领域概念，普遍存在的语言和设计细节的更多博客。</p>
+<h3>Spring Batch处理容器层</h3><p>Spring Batch的设计愿景是可以将基础结构用于我们称为Spring Batch容器层的一类面向过程的批处理应用程序。要发布的第一个容器是一个批量处理应用程序，在其实现中使用基础结构。这个所谓的“简单批处理执行容器”将为批处理生命周期的可追溯性和管理提供强大的功能。一个关键目标是，对于非开发人员（例如支持一些业务的应用程序支持团队），批处理的管理（查找作业及其输入和结果，开始，计划，重新启动）应尽可能地容易。人们告诉我这是牺牲品，但我喜欢将其视为“ ETL”工具（提取转换和加载）。至少ETL是容器的字面意思，即使它与某些人对传统ETL的观念不符。 Spring编程模型非常适合此类问题-编写您的POJO，该POJO知道如何定位和处理单个数据项，并让框架进行处理。</p><p>观看此空间，以获取有关容器层，领域概念，普遍存在的语言和设计细节的更多博客。</p>
 <h3>未来发展方向</h3><p>除了简单的容器之外，我们还希望提供一个扩展，该扩展可以接受输入源，将其划分为子范围，并同时进行处理。常见的应用是将并发处理放在远程代理（例如EJB或Web服务）后面。所有并发子流程都可以分别标识自己，显示统计信息并在发生错误后从最后一个已知的良好记录重新启动。他们还能够将其可报告的详细信息汇总到父流程，从而为操作员提供并行作业的单个视图。与简单容器中一样，可以使用实现为逻辑工作单元的相同业务逻辑。区别仅在于配置-Spring编程模型再次处于最佳状态。</p><p>Matt Welsh的工作表明，与更严格的处理体系结构相比， <a href="http://www.eecs.harvard.edu/~mdw/proj/seda/">SEDA</a>具有巨大的优势，而消息传递容器使我们拥有了许多现成的弹性。因此，我们希望提供更具SEDA风格的容器，或容器支持，以及支持更传统的方法。此处可能与Mule和/或其他ESB工具配合使用，从而提供了非常可扩展的体系结构的优点，在该体系结构中可以尽可能晚地选择传输和分发策略。原则上，相同的应用程序代码可用于处理少量数据的独立工具和大型企业规模的批量处理引擎。</p></div>
 </div>
 <section id="disqus_thread"></section>
