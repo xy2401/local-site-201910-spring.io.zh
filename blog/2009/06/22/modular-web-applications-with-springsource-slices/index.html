@@ -34,7 +34,7 @@ git submodule init
 git submodule update
 </code></pre>
 <p>要构建切片的打包版本，只需从<span style="font-family:monospace">build-slices</span>目录运行<span style="font-family:monospace">ant clean jar软件包</span> ：</p>
-<p>普通的cd片/构建片蚂蚁清洁罐包装</p>
+<p>普通的cd片/构建片 ant 清洁罐包装</p>
 <p>这将在<span style="font-family:monospace">目标/工件</span>中生成一个zip文件，其中包含Slices子系统，然后可以将其安装在dm Server 2.0之上</p>
 <p>安装Slices只需要将新子系统添加到dm Server中，然后更新dmServer的配置文件以启动新子系统即可。切片应与任何最新的<a href="http://www.springsource.com/download/community?project=SpringSource dm Server&nightly=yes">dm Server 2.0快照版本一起使用</a> 。在这里，我使用的是2.0.0。我已经下载并解压缩到桌面上的CI-R326-B274：</p>
 <p>平原解压缩target / artifacts / springsource-slices-BUILD-20090622083953.zip -d〜/ Desktop / springsource-dm-server-2.0.0。CI-R326-B274```</p>
@@ -42,9 +42,9 @@ git submodule update
 <p>``普通#######################配置文件配置#################### ### profile.name =切片profile.subsystems = com.springsource.server.web，com.springsource.osgi.slices profile.optionalSubsystems =```</p><p>保存更新的文件，您就可以尝试使用Slices示例应用程序。</p>
 <h3>试用示例应用程序</h3><p>Slices存储库包含Spring 3的PetClinic示例版本，当我们向Slices添加新功能时，我们会不断对其进行增强和改进。</p><p>在使用示例之前，必须将其依赖项添加到dm Server安装中。依赖关系列在样本的dependencies.txt文件中。将列出的每个依赖项下载到安装的<span style="font-family:monospace">repository / bundles / usr</span>目录。接下来，使用<span style="font-family:monospace">-clean</span>启动选项启动dm Server：</p>
 <p>普通./bin/startup.sh -clean`</p><p>现在是时候构建和部署示例了。移至<span style="font-family:monospace">slices / samples / slices-petclinic / com.springsource.slices.petclinic.host</span>目录并运行<span style="font-family:monospace">ant clean jar</span> ：</p>
-<p>普通CD样本/slices-petclinic/com.springsource.slices.petclinic.host蚂蚁清洁罐</p><p>然后可以通过将产生的war复制到dm Server的拾取目录来部署主机：</p>
+<p>普通CD样本/slices-petclinic/com.springsource.slices.petclinic.host ant 清洁罐</p><p>然后可以通过将产生的war复制到dm Server的拾取目录来部署主机：</p>
 <p>``plain cp target / artifacts / com.springsource.slices.petclinic.host.war〜/ Desktop / springsource-dm-server-2.0.0。CI-R326-B274 /皮卡/```</p><p>现在应该可以从以下位置访问主机了<a href="http://localhost:8080/petclinic"></a> <a href="http://localhost:8080/petclinic">http：// localhost：8080 / petclinic</a> ：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/06/petclinic-no-slices.png" alt="petclinic-no-slices" title="petclinic-no-slices" width="743" height="619" class="alignnone size-full wp-image-2333"></p><p>接下来，进入<span style="font-family:monospace">slices / samples / slices-petclinic / com.springsource.slices.petclinic.appointments</span>目录并运行<span style="font-family:monospace">ant clean jar</span>来构建约会切片：</p>
-<p>普通cd样本/slices-petclinic/com.springsource.slices.petclinic.appointments蚂蚁清洁罐</p><p>现在可以通过将产生的war复制到dm Server的Pickup目录来部署该片：</p>
+<p>普通cd样本/slices-petclinic/com.springsource.slices.petclinic.appointments ant 清洁罐</p><p>现在可以通过将产生的war复制到dm Server的Pickup目录来部署该片：</p>
 <p>普通cp target / artifacts / com.springsource.slices.petclinic.appointments.war〜/ Desktop / springsource-dm-server-2.0.0。CI-R326-B274 /皮卡/```</p><p>刷新<a href="http://localhost:8080/petclinic"></a> <a href="http://localhost:8080/petclinic">http：// localhost：8080 / petclinic</a> ，现在它将通过新的“约会”链接反映约会切片的存在：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/06/petclinic-appointments-slice.png" alt="宠物诊所切片" title="宠物诊所切片" width="743" height="619" class="alignnone size-full wp-image-2334"></p><p>现在，您可以根据需要从拾取目录中删除约会大战，以使切片再次消失。</p>
 <h3>切片应用程序的剖析</h3><p>使用切片，您可以从多个OSGi捆绑包构建Web应用程序，每个捆绑包都为应用程序URL空间的不同子部分提供内容。切片应用程序以父级/子级结构排列，每个应用程序最多具有一个父级（称为<strong>主机</strong> ）和零个或多个子级（称为<strong>slices）</strong> 。我们正在研究一个简单的Slices示例，如下所示：</p><p><img src="http://blog.springsource.com/wp-content/uploads/2009/06/slice-anatomy.png" alt="切片解剖" title="切片解剖" width="636" height="300" class="alignnone size-full wp-image-2290"></p>
 <h4>主机内部</h4><p>petclinic.host软件包包含所有共享的内容，例如图像和CSS，以及用于提供主页的控制器和JSP。主机捆绑包只是一个符合RFC66的Web捆绑包，其<span style="font-family:monospace">web.xml中</span>配置了<span style="font-family:monospace">SliceHostFilter</span> 。下面的代码片段显示了<span style="font-family:monospace">petclinic.host</span>捆绑包中的<span style="font-family:monospace">web.xml</span> ：</p>
