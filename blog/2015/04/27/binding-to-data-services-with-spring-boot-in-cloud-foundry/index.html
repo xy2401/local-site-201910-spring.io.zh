@@ -228,7 +228,7 @@ public class CloudApplication {
 <pre><code class="prettyprint">VCAP_APPLICATION={&quot;name&quot;:&quot;application&quot;,&quot;instance_id&quot;:&quot;FOO&quot;}
 VCAP_SERVICES={&quot;mysql&quot;:[{&quot;name&quot;:&quot;mysql&quot;,&quot;tags&quot;:[&quot;mysql&quot;],&quot;credentials&quot;:{&quot;uri&quot;:&quot;mysql://root:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4634292932062a2925272a2e293532">[email&#160;protected]</a>/test&quot;}}]}
 </code></pre>
-<p>（“标签”提示我们要创建一个MySQL <code>DataSource</code> ，“ uri”提供位置，“名称”成为Bean ID）。的<code>DataSource</code>现在正在使用MySQL提供的凭据<code>VCAP_*</code>环境变量。Spring Boot对连接器有一些自动配置，因此，如果您查看应用程序中的Bean，将会看到一个<code>CloudFactory</code>豆，还有<code>DataSource</code> bean（ID为“ mysql”）。<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cloud/CloudAutoConfiguration.java">自动配置</a>相当于添加<code>@ServiceScan</code>您的应用程序配置。仅当您的应用程序在“云”配置文件中运行且只有不存在该配置文件时，它才处于活动状态<code>@Bean</code>类型的<code>Cloud</code> ，以及配置标志<code>spring.cloud.enabled</code>不是“假”。</p></li>
+<p>（“标签”提示我们要创建一个MySQL <code>DataSource</code> ，“ uri”提供位置，“名称”成为Bean ID）。的<code>DataSource</code>现在正在使用MySQL提供的凭据<code>VCAP_*</code>环境变量。Spring Boot对连接器有一些自动配置，因此，如果您查看应用程序中的Bean，将会看到一个<code>CloudFactory</code> bean ，还有<code>DataSource</code> bean（ID为“ mysql”）。<a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/cloud/CloudAutoConfiguration.java">自动配置</a>相当于添加<code>@ServiceScan</code>您的应用程序配置。仅当您的应用程序在“云”配置文件中运行且只有不存在该配置文件时，它才处于活动状态<code>@Bean</code>类型的<code>Cloud</code> ，以及配置标志<code>spring.cloud.enabled</code>不是“假”。</p></li>
 <li>
 <p>从Java buildpack添加“自动重新配置” JAR（Maven坐标<code>org.cloudfoundry:auto-reconfiguration:1.7.0.RELEASE</code> ）。您可以将其添加为本地依赖项，以模拟在Cloud Foundry中运行应用程序，但是对实际应用程序执行此操作是不正常的（这只是为了试验自动配置）。现在，自动重新配置JAR拥有创建<code>DataSource</code> ，但还没有（因为），因为它检测到您已经具有类型的Bean <code>CloudFactory</code> ，这是Spring Boot添加的。</p></li>
 <li>
@@ -419,7 +419,7 @@ public DataSourceProperties dataSourceProperties() {
 <li>
 <p>除非已处于活动状态，否则Cloud Foundry Java buildpack会检测到Spring Boot应用程序并激活“ cloud”配置文件。如果您想在本地尝试，添加buildpack自动重新配置JAR会做同样的事情。</p></li>
 <li>
-<p>通过自动重新配置JAR，buildpack也将启动并创建一个<code>DataSource</code> （同上的RabbitMQ，Redis的，蒙戈等），如果它<em>没有</em>找到一个<code>CloudFactory</code>豆或<code>Cloud</code>豆（以及其他）。因此，在Spring Boot应用程序中包含Spring Cloud Connector会关闭“自动重新配置”行为（bean创建）的这一部分。</p></li>
+<p>通过自动重新配置JAR，buildpack也将启动并创建一个<code>DataSource</code> （同上的RabbitMQ，Redis的，蒙戈等），如果它<em>没有</em>找到一个<code>CloudFactory</code> bean 或<code>Cloud</code> bean （以及其他）。因此，在Spring Boot应用程序中包含Spring Cloud Connector会关闭“自动重新配置”行为（bean创建）的这一部分。</p></li>
 <li>
 <p>关闭Spring Boot <code>CloudAutoConfiguration</code>这很容易，但是如果您这样做的话，就必须记住要关闭buildpack自动重配置。唯一的方法是定义一个bean定义（可以是type <code>Cloud</code>要么<code>CloudFactory</code>例如）。</p></li>
 <li>

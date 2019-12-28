@@ -289,7 +289,7 @@ creating public bean
 </code></pre><p>之后应该失败，例如：</p>
 <pre><code class="prettyprint java"><br />org.springframework.beans.factory.NoSuchBeanDefinitionException: No bean named &#39;hiddenBean&#39; is defined
 ...
-</code></pre><p>控制台的第一行显示，在我们持有的上下文中未定义secretBean和hiddenBean。但是，以下几行显示，对于每个publicBean，隐藏的bean创建一次（因为它是单例），而secretBean创建两次，因为它是原型。</p><p>那么隐藏的豆在哪里呢？在子容器内。</p><p>父容器（在我们的例子中为<em>上下文</em> ）完全不知道它，因此也不知道其中声明的任何bean。但是，在子上下文中声明的bean可以访问在父上下文中声明的任何bean，反之亦然。另一方面，公共Bean（例如publicBean）由父容器内的Java配置“推送”，但是由于它们以与隐藏Bean相同的配置声明，因此它们可以在实例化期间引用“秘密” Bean。</p>
+</code></pre><p>控制台的第一行显示，在我们持有的上下文中未定义secretBean和hiddenBean。但是，以下几行显示，对于每个publicBean，隐藏的bean创建一次（因为它是单例），而secretBean创建两次，因为它是原型。</p><p>那么隐藏的 bean 在哪里呢？在子容器内。</p><p>父容器（在我们的例子中为<em>上下文</em> ）完全不知道它，因此也不知道其中声明的任何bean。但是，在子上下文中声明的bean可以访问在父上下文中声明的任何bean，反之亦然。另一方面，公共Bean（例如publicBean）由父容器内的Java配置“推送”，但是由于它们以与隐藏Bean相同的配置声明，因此它们可以在实例化期间引用“秘密” Bean。</p>
 <h2>看妈，没有XML！</h2><p>对于那些想完全放弃XML的人，Spring Java Configuration提供了<a href="http://static.springframework.org/spring-javaconfig/docs/1.0-m2a/api/org/springframework/config/java/context/AnnotationApplicationContext.html">AnnotationApplicationContext</a> ，它使用类而不是XML文件，如您从上面的测试用例中可以看到的。尽管我的示例有效，但它不是理想的，因为没有任何缓存，将为每个测试创建和销毁应用程序上下文。<br>一种替代方法是重用现有的<a href="http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/test/AbstractDependencyInjectionSpringContextTests.html">AbstractDependencyInjectionSpringContextTests</a>并适当地覆盖上下文创建：</p>
 <pre><code class="prettyprint java"><br />public class NoXMLTest extends AbstractDependencyInjectionSpringContextTests {
 

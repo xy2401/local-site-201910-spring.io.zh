@@ -272,7 +272,7 @@ public class JndiDataConfig {
 	}
 
 }
-</code></pre><p>至此，我们宣布了两个不同的<code>DataSource</code>自己的beans<code>@Profile</code> -带注释<code>@Configuration</code>类。与XML一样，这些类和<code>@Bean</code>根据当前处于活动状态的Spring配置文件，将跳过或处理其中的方法。但是，在看到实际效果之前，我们首先需要完成重构。我们将两种可能分开<code>DataSource</code>豆，但我们如何从内部引用它们<code>TransferServiceConfig</code> –特别是<code>accountRepository()</code>方法？我们有两种选择，而且两种选择都始于了解<code>@Configuration</code>课程是<code>@Autowired</code>注射。这是因为最后<code>@Configuration</code>对象在容器中被当作“只是另一个Spring bean”来管理。让我们来看看：</p><p><code>src/main/com/bank/config/code/TransferServiceConfig.java</code></p>
+</code></pre><p>至此，我们宣布了两个不同的<code>DataSource</code>自己的beans<code>@Profile</code> -带注释<code>@Configuration</code>类。与XML一样，这些类和<code>@Bean</code>根据当前处于活动状态的Spring配置文件，将跳过或处理其中的方法。但是，在看到实际效果之前，我们首先需要完成重构。我们将两种可能分开<code>DataSource</code> bean ，但我们如何从内部引用它们<code>TransferServiceConfig</code> –特别是<code>accountRepository()</code>方法？我们有两种选择，而且两种选择都始于了解<code>@Configuration</code>课程是<code>@Autowired</code>注射。这是因为最后<code>@Configuration</code>对象在容器中被当作“只是另一个Spring bean”来管理。让我们来看看：</p><p><code>src/main/com/bank/config/code/TransferServiceConfig.java</code></p>
 <pre><code class="prettyprint java"><br />@Configuration
 public class TransferServiceConfig {
 
@@ -294,7 +294,7 @@ public class TransferServiceConfig {
 	}
 
 }
-</code></pre><p>随着使用<code>@Autowired</code>在上面的注释中，我们已经要求Spring容器注入类型为的bean <code>DataSource</code>对我们来说，无论它在哪里声明–在XML中， <code>@Configuration</code>类，否则。然后在<code>accountRepository()</code>方法，注入<code>dataSource</code>字段仅被引用。这是一种实现<code>@Configuration</code>类，并且在概念上没有不同<code>ref</code>两者之间的样式引用<code><bean></code>在不同XML文件中声明的元素。</p><p>重构的最后一步是不仅将单元测试更新为引导<code>TransferServiceConfig</code> ，还有JNDI和独立<code>@Configuration</code>我们的变体<code>DataSource</code>豆：</p><p><code>src/test/com/bank/config/code/IntegrationTests.java</code></p>
+</code></pre><p>随着使用<code>@Autowired</code>在上面的注释中，我们已经要求Spring容器注入类型为的bean <code>DataSource</code>对我们来说，无论它在哪里声明–在XML中， <code>@Configuration</code>类，否则。然后在<code>accountRepository()</code>方法，注入<code>dataSource</code>字段仅被引用。这是一种实现<code>@Configuration</code>类，并且在概念上没有不同<code>ref</code>两者之间的样式引用<code><bean></code>在不同XML文件中声明的元素。</p><p>重构的最后一步是不仅将单元测试更新为引导<code>TransferServiceConfig</code> ，还有JNDI和独立<code>@Configuration</code>我们的变体<code>DataSource</code> bean ：</p><p><code>src/test/com/bank/config/code/IntegrationTests.java</code></p>
 <pre><code class="prettyprint java"><br />public class IntegrationTests {
 	@Test
 	public void transferTenDollars() throws InsufficientFundsException {
@@ -312,7 +312,7 @@ public class TransferServiceConfig {
 		ctx.scan(&quot;com.bank.config.code&quot;); // find and register all @Configuration classes within
 		ctx.refresh();
 </code></pre><p>但是，您选择注册您的<code>@Configuration</code>上课，到此我们的任务就完成了！我们已经从Spring移植了我们的配置<code><beans/></code> XML到<code>@Configuration</code>类，并使用以下命令直接从这些类引导容器<code>AnnotationConfigApplicationContext</code> 。</p>
-<h3>进一步改善<code>@Configuration</code>类结构</h3><p>一切在我们的应用程序中都可以正常运行，并且JUnit栏为绿色，但是仍有改进的空间。回想一下<code>DataSource</code>豆原为<code>@Autowired</code>进入<code>TransferServiceConfig</code> ？这种运作良好，但它并不十分清楚<em>，其中</em> bean是从哪里来的。如上所述，它可以来自XML或任何其他<code>@Configuration</code>类。我将在下面介绍的技术引入了<em>面向对象的配置，</em>并应进一步实现我们的目标，即拥有一种基于Java的自然配置–可以充分利用IDE的功能。</p><p>如果我们考虑一下<code>StandaloneDataConfig</code>和<code>JndiDataConfig</code> ，它们实际上是两个相同的类，因为它们都声明了具有以下签名的方法：</p>
+<h3>进一步改善<code>@Configuration</code>类结构</h3><p>一切在我们的应用程序中都可以正常运行，并且JUnit栏为绿色，但是仍有改进的空间。回想一下<code>DataSource</code> bean 原为<code>@Autowired</code>进入<code>TransferServiceConfig</code> ？这种运作良好，但它并不十分清楚<em>，其中</em> bean是从哪里来的。如上所述，它可以来自XML或任何其他<code>@Configuration</code>类。我将在下面介绍的技术引入了<em>面向对象的配置，</em>并应进一步实现我们的目标，即拥有一种基于Java的自然配置–可以充分利用IDE的功能。</p><p>如果我们考虑一下<code>StandaloneDataConfig</code>和<code>JndiDataConfig</code> ，它们实际上是两个相同的类，因为它们都声明了具有以下签名的方法：</p>
 <pre><code class="prettyprint java"><br />		public DataSource dataSource();
 </code></pre><p>似乎缺少的只是一个统一两者的接口。让我们介绍一个-我们很快就会在下面看到原因：</p><p><code>src/main/com/bank/config/code/DataConfig.java</code></p>
 <pre><code class="prettyprint java"><br />interface DataConfig {
@@ -324,7 +324,7 @@ public class StandaloneDataConfig implements DataConfig { ... }
 
 @Configuration
 public class JndiDataConfig implements DataConfig { ... }
-</code></pre><p>这能给我们带来什么？就像我们<code>@Autowired</code>的<code>DataSource</code>豆直接入<code>TransferServiceConfig</code> ， <em>我们也要注入<code>@Configuration</code>实例本身</em> 。让我们看一下实际情况：</p><p><code>src/main/com/bank/config/code/TransferServiceConfig.java</code></p>
+</code></pre><p>这能给我们带来什么？就像我们<code>@Autowired</code>的<code>DataSource</code> bean 直接入<code>TransferServiceConfig</code> ， <em>我们也要注入<code>@Configuration</code>实例本身</em> 。让我们看一下实际情况：</p><p><code>src/main/com/bank/config/code/TransferServiceConfig.java</code></p>
 <pre><code class="prettyprint java"><br />@Configuration
 public class TransferServiceConfig {
 

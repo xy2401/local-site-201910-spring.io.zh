@@ -169,7 +169,7 @@
 <div class="blog--post"><p>在针对Groovy＆Grails的SpringSource培训课程中，我们强调Grails站在巨人的肩膀上。那些巨人之一就是春天。没有它，Grails根本不会像现在这样快地被开发出来。它也可能没有灵活性，无法轻松地与企业Java系统集成。仅查看可用插件的数量：许多插件基于具有Spring支持的Java库。</p><p>在这篇文章中，我想先从Grails如何使用Spring开始，然后介绍可以利用这种原始能力和灵活性的各种方式。</p>
 <h2>春天的孩子</h2><p>您可能没有意识到这一点，但是当您创建Grails应用程序时，您也在创建一个Spring MVC应用程序。在后台，Grails创建了Spring MVC的<tt>DispatcherServlet</tt>的变体，并配置了一堆bean来完成繁重的工作。当然，这意味着存在一个Spring上下文来支持您的应用程序-您可以访问的上下文将在以后看到。</p><p>如果在典型的Grails应用程序的Spring上下文中查看，则可以找到以下bean的一些示例：<br></p><ul><br><li><em>grailsApplication-</em>代表当前应用程序及其资源的Bean</li><br><li><em>pluginManager-</em>插件管理器，您可以查询有关已加载插件的信息</li><br><li><em>jspViewResolver-</em>用于GSP的自定义MVC视图解析器，可回退到JSP</li><br><li><em>messageSource-</em>本地化消息的来源</li><br><li><em>localeResolver-</em>如何确定用户的语言环境</li><br><li><em>注解</em> <tt>HandlerMapping-</tt>允许使用<tt>@Controller</tt>注解</li><br></ul><br>那只是Grails创建的许多bean中的几个。实际上，您可能会惊讶地发现所有应用程序控制器，标记库，域类和服务也是bean。<p></p><p>Grails在其他哪些领域还依赖Spring？好吧，这里有一个数据绑定的开始：Spring将所有字符串数据物理绑定到对象属性。它也不只是Web层：GORM使用Spring的Hibernate模板保存和查询域类。也许最重要的是，Grails使用Spring的事务管理。正如我已经提到的，许多插件都利用Java库提供的Spring集成。</p><p>因此，Grails应用程序实际上是Spring应用程序。这就提出了一个问题，即在需要时如何利用底层的Spring组件。</p>
 <h2>和春天说话</h2><p>您可以轻松编写Grails应用程序，甚至是相当复杂的应用程序，而不必担心Spring。太好了，因为这意味着新开发人员不必立即学习该技术。但是，仅仅因为你<em>没有</em>使用Spring直接交互，并不意味着它很难。</p><p>您可以采取几种方法，我将依次介绍每种方法。</p>
-<h3>服务和自动接线</h3><p>Spring的关键是bean的创建和连接。通常，您必须提供一些配置才能执行此操作，但是Grails服务为您提供了一种轻量级的，基于约定的替代方法。如前所述，您在Grails应用程序中创建的多个工件会自动变为Spring Bean，但这是使您获得最大控制权的服务。</p><p>原理很简单：在<tt>grails-app / services</tt>下创建一个带有<tt>Service</tt>后缀的类，您将在应用程序中自动获得一个新的（单个）Spring bean。那个豆的名字？简单：类名带有小写的首字母。例如， <tt>SecurityService</tt>类将产生一个名为“ securityService”的bean。<tt>AuditReportService</tt>将同样成为“ auditReportService” bean。</p><p>将其他Bean连接到您的服务（以及所有其他Grails核心构件）也很简单：声明一个与您想要的Bean具有相同名称的属性。例如，假设我想使用另一个服务（或控制器）中的“ auditReportService” bean。我可以这样连接：</p>
+<h3>服务和自动接线</h3><p>Spring的关键是bean的创建和连接。通常，您必须提供一些配置才能执行此操作，但是Grails服务为您提供了一种轻量级的，基于约定的替代方法。如前所述，您在Grails应用程序中创建的多个工件会自动变为Spring Bean，但这是使您获得最大控制权的服务。</p><p>原理很简单：在<tt>grails-app / services</tt>下创建一个带有<tt>Service</tt>后缀的类，您将在应用程序中自动获得一个新的（单个）Spring bean。那个 bean 的名字？简单：类名带有小写的首字母。例如， <tt>SecurityService</tt>类将产生一个名为“ securityService”的bean。<tt>AuditReportService</tt>将同样成为“ auditReportService” bean。</p><p>将其他Bean连接到您的服务（以及所有其他Grails核心构件）也很简单：声明一个与您想要的Bean具有相同名称的属性。例如，假设我想使用另一个服务（或控制器）中的“ auditReportService” bean。我可以这样连接：</p>
 <pre><code class="prettyprint groovy">class MyService {
     def auditReportService
     ...
@@ -180,7 +180,7 @@
     ...
 }
 </code></pre><p>如您所见，当您使用服务时，几乎可以毫不费力地获得Spring的许多主要好处。太好了，但是如果您想将现有的类转换为bean，该怎么办？也许您已经用Java编写了它们，或者将它们打包在JAR文件中。对于纯Spring，您可以手动配置它们。幸运的是，您可以在Grails中执行相同的操作。</p>
-<h3>手动定义豆</h3><p>在过去的美好时光中，在注释之前，您将为Spring应用程序创建一个或多个XML格式的bean描述符文件。Grails允许您对<tt>grails-app / conf / spring / resources.xml</tt>文件执行相同的操作。没什么特别的，因此标准的Spring文档适用！</p><p>我不得不说我不再是编写XML的忠实拥护者，因此我更喜欢另一种bean定义格式：Grails的Spring Bean DSL。这里的定义中<tt>的grails-app / conf目录/春/ resources.groovy</tt>报告生成bean的一个很简单的例子：</p>
+<h3>手动定义 bean </h3><p>在过去的美好时光中，在注释之前，您将为Spring应用程序创建一个或多个XML格式的bean描述符文件。Grails允许您对<tt>grails-app / conf / spring / resources.xml</tt>文件执行相同的操作。没什么特别的，因此标准的Spring文档适用！</p><p>我不得不说我不再是编写XML的忠实拥护者，因此我更喜欢另一种bean定义格式：Grails的Spring Bean DSL。这里的定义中<tt>的grails-app / conf目录/春/ resources.groovy</tt>报告生成bean的一个很简单的例子：</p>
 <pre><code class="prettyprint groovy">beans = {
     reportGenerator(org.example.XmlReportGenerator)
 }
